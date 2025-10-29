@@ -8,17 +8,17 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
+  objectField,
+  requestDataField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import {
-  objectField,
-  requestDataField,
-  responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 
 import { UserRole } from "../../../../../user/user-roles/enum";
 
@@ -36,10 +36,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "setup", "update"],
   examples: {
-    requests: {});
+    requests: {},
     urlPathParams: undefined,
-    responses: {});
-  });
+    responses: {},
+  },
 
   fields: objectField(
     {
@@ -47,9 +47,9 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.system.unifiedUi.cli.setup.update.post.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.description",
-      layout: { type: LayoutType.GRID, columns: 12 });
-    });
-    { request: "data", response: true });
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
       verbose: requestDataField(
@@ -59,8 +59,8 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.unifiedUi.cli.setup.update.post.title",
           description:
             "app.api.v1.core.system.unifiedUi.cli.setup.update.post.description",
-          layout: { columns: 6 });
-        });
+          layout: { columns: 6 },
+        },
         z.boolean().default(false),
       ),
 
@@ -70,7 +70,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.cli.setup.update.post.success.title",
-        });
+        },
         z.boolean(),
       ),
 
@@ -79,7 +79,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.cli.setup.update.post.title",
-        });
+        },
         z.boolean(),
       ),
 
@@ -88,7 +88,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.cli.setup.update.post.description",
-        });
+        },
         z.string().optional(),
       ),
 
@@ -97,7 +97,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.cli.setup.update.post.title",
-        });
+        },
         z.string().optional(),
       ),
 
@@ -106,7 +106,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.cli.setup.update.post.success.description",
-        });
+        },
         z.string(),
       ),
 
@@ -115,10 +115,10 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.cli.setup.update.post.title",
-        });
+        },
         z.string().optional(),
       ),
-    });
+    },
   ),
 
   // === ERROR HANDLING ===
@@ -128,56 +128,56 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.validation.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.validation.description",
-    });
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.unauthorized.description",
-    });
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.server.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.server.description",
-    });
+    },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.network.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.network.description",
-    });
+    },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.forbidden.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.forbidden.description",
-    });
+    },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.notFound.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.notFound.description",
-    });
+    },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.unknown.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.unknown.description",
-    });
+    },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.conflict.description",
-    });
+    },
     [EndpointErrorTypes.CONFLICT]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.conflict.description",
-    });
-  });
+    },
+  },
 
   // === SUCCESS HANDLING ===
   successTypes: {
@@ -185,7 +185,7 @@ const { POST } = createEndpoint({
       "app.api.v1.core.system.unifiedUi.cli.setup.update.post.success.title",
     description:
       "app.api.v1.core.system.unifiedUi.cli.setup.update.post.success.description",
-  });
+  },
 });
 
 const endpoints = { POST };

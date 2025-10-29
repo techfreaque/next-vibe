@@ -74,7 +74,7 @@ export interface BaseExecutionContext<TData = { [key: string]: ParameterValue }>
  * Shared across all platforms (AI, MCP, CLI)
  */
 export interface BaseExecutionResult<
-  TErrorParams = { [key: string]: string | number });
+  TErrorParams = { [key: string]: string | number },
   TMetadata = {
     executionTime: number;
     endpointPath: string;
@@ -164,7 +164,7 @@ export abstract class BaseExecutor {
         toolName: context.toolName,
         error: errorMessage,
         executionTime: Date.now() - startTime,
-      });
+      })
 
       return this.createErrorResult(errorMessage, startTime);
     }

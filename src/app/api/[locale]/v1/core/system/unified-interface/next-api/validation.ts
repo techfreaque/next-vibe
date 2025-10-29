@@ -80,7 +80,7 @@ export async function validateNextRequestData<
         errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
         messageParams: {
           error: urlValidation.message,
-        },
+        });
       };
     }
 
@@ -99,7 +99,7 @@ export async function validateNextRequestData<
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
-        },
+        });
       };
     }
 
@@ -110,7 +110,7 @@ export async function validateNextRequestData<
         requestData: requestValidation.data,
         urlPathParams: urlValidation.data,
         locale: validatedLocale,
-      },
+      });
     };
   } catch (error) {
     return {
@@ -123,7 +123,7 @@ export async function validateNextRequestData<
           error instanceof Error
             ? error.message
             : "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
-      },
+      });
     };
   }
 }

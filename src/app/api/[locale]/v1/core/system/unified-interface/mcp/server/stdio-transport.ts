@@ -60,13 +60,13 @@ export class StdioTransport implements IMCPTransport {
       this.logger.error("[MCP Transport] stdin error", {
         error: error.message,
       });
-    });
+    },
 
     process.stdout.on("error", (error: Error) => {
       this.logger.error("[MCP Transport] stdout error", {
         error: error.message,
       });
-    });
+    },
 
     this.running = true;
     this.logger.info("[MCP Transport] STDIO transport started");
@@ -139,7 +139,7 @@ export class StdioTransport implements IMCPTransport {
     try {
       this.logger.debug("[MCP Transport] Received message", {
         length: line.length,
-      });
+      },
 
       const message = JSON.parse(line) as JsonRpcRequest;
 
@@ -165,7 +165,7 @@ export class StdioTransport implements IMCPTransport {
             code: -32700,
             // eslint-disable-next-line i18next/no-literal-string
             message: "Parse error",
-          });
+          },
           id: partialMessage.id || null,
         });
       } catch {

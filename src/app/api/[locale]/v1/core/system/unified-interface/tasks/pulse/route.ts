@@ -20,6 +20,6 @@ export const { POST, tools } = endpointsHandler({
         locale,
         logger,
       );
-    });
-  });
+    },
+  },
 });

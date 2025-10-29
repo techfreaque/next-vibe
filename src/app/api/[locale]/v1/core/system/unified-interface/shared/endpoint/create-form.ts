@@ -332,7 +332,7 @@ function transformFieldForMethod<F>(field: F, method: Methods): F {
         // Method not supported for this field - return field with empty usage that will result in z.never()
         return {
           ...field,
-          usage: {});
+          usage: {},
         } as F;
       }
       return {
@@ -682,7 +682,7 @@ export function createFormEndpoint<
       requests: undefined,
       responses: undefined,
       urlPathParams: undefined,
-    });
+    },
     requestSchema: getRequestSchema,
     responseSchema: getResponseSchema,
     requestUrlPathParamsSchema: getUrlSchema,
@@ -749,10 +749,10 @@ export function createFormEndpoint<
     errorTypes: config.errorTypes,
     successTypes: config.successTypes,
     examples: config.examples.POST || {
-      requests: {});
-      responses: {});
+      requests: {},
+      responses: {},
       urlPathParams: undefined,
-    });
+    },
     requestSchema: postRequestSchema,
     responseSchema: postResponseSchema,
     requestUrlPathParamsSchema: postRequestUrlSchema,

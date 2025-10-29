@@ -191,7 +191,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
       case FieldDataType.ARRAY:
         return (value) => {
           if (Array.isArray(value)) {
-            return this.formatter.formatArray(value, { maxItems: 3 });
+            return this.formatter.formatArray(value, { maxItems: 3 })
           }
           return this.safeToString(value);
         };

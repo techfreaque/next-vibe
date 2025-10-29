@@ -47,7 +47,7 @@ export function containsFile(obj: FormDataValue): boolean {
  */
 export function objectToFormData(
   obj: Record<string, FormDataValue>,
-  formData: FormData = new FormData(}),
+  formData: FormData = new FormData(),
   parentKey = "",
 ): FormData {
   for (const [key, value] of Object.entries(obj)) {
@@ -102,7 +102,7 @@ export async function callApi<
     readonly method: Methods;
     readonly path: readonly string[];
     readonly requiresAuthentication: () => boolean;
-  });
+  }
 >(
   endpoint: TEndpoint,
   endpointUrl: string,
@@ -124,10 +124,10 @@ export async function callApi<
       if (!tokenResponse.success || !tokenResponse.data) {
         // Return error - server should provide proper translation key
         return fail({
-        message: 
+          message:
           "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.auth_required",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       // Note: We don't set Authorization header here because the JWT token
@@ -160,14 +160,14 @@ export async function callApi<
 
       // Fallback error when server doesn't return proper error format
       return fail({
-        message: 
+        message:
         "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.http_error",
         errorType: ErrorResponseTypes.HTTP_ERROR,
-        {
+        messageParams: {
           statusCode: response.status,
           url: endpointUrl,
-        });
-      );
+        },
+      });
     }
 
     // Validate successful response against schema
@@ -181,13 +181,13 @@ export async function callApi<
       if (!validationResponse.success) {
         // Fallback error when response validation fails
         return fail({
-        message: 
+          message:
           "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.validation_error",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          {
+          messageParams: {
             message: validationResponse.message,
-          });
-        );
+          },
+        });
       }
 
       return {
@@ -203,20 +203,20 @@ export async function callApi<
 
     // Fallback error when server returns success but no data
     return fail({
-        message: 
+      message:
       "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.internal_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      {
+      messageParams: {
         url: endpointUrl,
-      });
-    );
+      },
+    });
   } catch (error) {
     // Fallback error when request fails completely
     return fail({
-        message: 
+      message:
       "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.internal_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { error: parseError(error).message, endpoint: endpoint.path.join("/") });
-    );
+      messageParams: { error: parseError(error).message, endpoint: endpoint.path.join("/") },
+    });
   }
 }

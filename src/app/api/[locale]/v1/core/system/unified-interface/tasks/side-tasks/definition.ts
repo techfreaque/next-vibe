@@ -6,6 +6,12 @@
 
 import { z } from "zod";
 
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import {
+  objectField,
+  requestDataField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -13,12 +19,6 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
-import {
-  objectField,
-  requestDataField,
-  responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 // Side task action enum
@@ -57,9 +57,9 @@ const sideTasksPostEndpoint = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 });
-    });
-    { request: "data", response: true });
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
       action: requestDataField(
@@ -75,46 +75,46 @@ const sideTasksPostEndpoint = createEndpoint({
               value: "list",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionList",
-            });
+            },
             {
               value: "get",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionGet",
-            });
+            },
             {
               value: "create",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionCreate",
-            });
+            },
             {
               value: "update",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionUpdate",
-            });
+            },
             {
               value: "delete",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionDelete",
-            });
+            },
             {
               value: "stats",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionStats",
-            });
+            },
             {
               value: "executions",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionExecutions",
-            });
+            },
             {
               value: "health-check",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionHealthCheck",
-            });
+            },
           ],
-          layout: { columns: 3 });
+          layout: { columns: 3 },
           required: true,
-        });
+        },
         sideTaskActionSchema,
       ),
 
@@ -126,8 +126,8 @@ const sideTasksPostEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdLabel",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdDescription",
-          layout: { columns: 3 });
-        });
+          layout: { columns: 3 },
+        },
         z.string().optional(),
       ),
 
@@ -139,8 +139,8 @@ const sideTasksPostEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameLabel",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameDescription",
-          layout: { columns: 3 });
-        });
+          layout: { columns: 3 },
+        },
         z.string().optional(),
       ),
 
@@ -152,8 +152,8 @@ const sideTasksPostEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitLabel",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitDescription",
-          layout: { columns: 3 });
-        });
+          layout: { columns: 3 },
+        },
         z.number().optional().default(50),
       ),
 
@@ -165,8 +165,8 @@ const sideTasksPostEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataLabel",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataDescription",
-          layout: { columns: 12 });
-        });
+          layout: { columns: 12 },
+        },
         z.record(z.string(), z.unknown()).optional(),
       ),
 
@@ -176,7 +176,7 @@ const sideTasksPostEndpoint = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.tasks.side.response.data.title",
-        });
+        },
         z.unknown().optional(),
       ),
 
@@ -185,10 +185,10 @@ const sideTasksPostEndpoint = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.tasks.side.response.count.title",
-        });
+        },
         z.number().optional(),
       ),
-    });
+    },
   ),
 
   examples: {
@@ -196,30 +196,30 @@ const sideTasksPostEndpoint = createEndpoint({
       list: {
         action: "list" as const,
         limit: 10,
-      });
+      },
       get: {
         action: "get" as const,
         id: "task-12345",
-      });
+      },
       stats: {
         action: "stats" as const,
-      });
+      },
       success: {
         action: "list" as const,
         limit: 10,
-      });
-    });
+      },
+    },
     responses: {
       list: {
         data: [],
         count: 0,
-      });
+      },
       get: {
-        data: { id: "task-12345", name: "example-task" });
-      });
+        data: { id: "task-12345", name: "example-task" },
+      },
       stats: {
-        data: { total: 5 });
-      });
+        data: { total: 5 },
+      },
       success: {
         data: {
           tasks: [
@@ -227,13 +227,13 @@ const sideTasksPostEndpoint = createEndpoint({
               id: "task-12345",
               name: "example-task",
               status: "running",
-            });
+            },
           ],
-        });
+        },
         count: 1,
-      });
-    });
-  });
+      },
+    },
+  },
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -241,63 +241,63 @@ const sideTasksPostEndpoint = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.validation.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.validation.description",
-    });
+    },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.network.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.network.description",
-    });
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.description",
-    });
+    },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.description",
-    });
+    },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.description",
-    });
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.description",
-    });
+    },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.description",
-    });
+    },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.description",
-    });
+    },
     [EndpointErrorTypes.CONFLICT]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.description",
-    });
-  });
+    },
+  },
 
   successTypes: {
     title:
       "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.title",
     description:
       "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.description",
-  });
+  },
 });
 
 /**
@@ -324,9 +324,9 @@ const sideTasksGetEndpoint = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 });
-    });
-    { response: true });
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { response: true },
     {
       // === RESPONSE FIELDS ONLY ===
       totalTasks: responseField(
@@ -334,7 +334,7 @@ const sideTasksGetEndpoint = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.response.totalTasks.title",
-        });
+        },
         z.number(),
       ),
 
@@ -343,7 +343,7 @@ const sideTasksGetEndpoint = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.response.runningTasks.title",
-        });
+        },
         z.number(),
       ),
 
@@ -352,7 +352,7 @@ const sideTasksGetEndpoint = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.response.healthyTasks.title",
-        });
+        },
         z.number(),
       ),
 
@@ -361,10 +361,10 @@ const sideTasksGetEndpoint = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.response.unhealthyTasks.title",
-        });
+        },
         z.number(),
       ),
-    });
+    },
   ),
 
   examples: {
@@ -374,9 +374,9 @@ const sideTasksGetEndpoint = createEndpoint({
         runningTasks: 2,
         healthyTasks: 4,
         unhealthyTasks: 1,
-      });
-    });
-  });
+      },
+    },
+  },
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -384,63 +384,63 @@ const sideTasksGetEndpoint = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.validation.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.validation.description",
-    });
+    },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.network.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.network.description",
-    });
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.description",
-    });
+    },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.description",
-    });
+    },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.description",
-    });
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.description",
-    });
+    },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.description",
-    });
+    },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.description",
-    });
+    },
     [EndpointErrorTypes.CONFLICT]: {
       title:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.description",
-    });
-  });
+    },
+  },
 
   successTypes: {
     title:
       "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.title",
     description:
       "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.description",
-  });
+  },
 });
 
 const endpoints = {

@@ -43,7 +43,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.title" as const,
       description:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 });
+      layout: { type: LayoutType.GRID, columns: 12 },
     });
     { request: "data", response: true });
     {
@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.name.description" as const,
           placeholder: "core:system:db:ping",
-        });
+        },
         z.string().min(1),
       ),
       arguments: requestDataField(
@@ -66,7 +66,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.arguments.description" as const,
           placeholder: "{}",
-        });
+        },
         z.record(z.string(), z.unknown()).optional().default({}),
       ),
       content: responseArrayField(
@@ -84,13 +84,13 @@ const { POST } = createEndpoint({
               label:
                 "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.result.content.text" as const,
               type: FieldDataType.TEXT,
-            });
+            },
           ],
-        });
+        },
         objectField(
           {
             type: WidgetType.CONTAINER,
-            layout: { type: LayoutType.VERTICAL });
+            layout: { type: LayoutType.VERTICAL },
           });
           { response: true });
           {
@@ -103,7 +103,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.BADGE,
           text: "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.result.isError" as const,
-        });
+        },
         z.boolean(),
       ),
     });
@@ -173,24 +173,24 @@ const { POST } = createEndpoint({
       "app.api.v1.core.system.unifiedUi.mcp.execute.post.success.title",
     description:
       "app.api.v1.core.system.unifiedUi.mcp.execute.post.success.description",
-  });
+  },
 
   examples: {
     requests: {
       default: {
         name: "core:system:db:ping",
-        arguments: {});
+        arguments: {},
       });
-    });
+    },
     responses: {
       default: {
         content: [{ type: "text" as const, text: '{"success": true}' }],
         isError: false,
       });
-    });
+    },
     urlPathParams: undefined,
   });
-});
+},
 
 const executeDefinition = { POST };
 

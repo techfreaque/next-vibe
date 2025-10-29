@@ -6,9 +6,9 @@
 import { type FormEvent, useEffect, useMemo } from "react";
 import type { z } from "zod";
 
-import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
@@ -56,7 +56,7 @@ export function useEndpointCreate<
     urlPathParams?: TEndpoint["TUrlVariablesOutput"];
     autoPrefillData?: Partial<TEndpoint["TRequestOutput"]>;
     initialState?: Partial<TEndpoint["TRequestOutput"]>;
-  } = {});
+  } = {},
 ): ApiFormReturn<
   TEndpoint["TRequestOutput"],
   TEndpoint["TResponseOutput"],
@@ -67,8 +67,8 @@ export function useEndpointCreate<
     return null;
   }
   const {
-    formOptions = { persistForm: true });
-    mutationOptions = {});
+    formOptions = { persistForm: true },
+    mutationOptions = {},
     autoPrefillData,
     initialState,
   } = options;

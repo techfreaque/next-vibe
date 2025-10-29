@@ -70,7 +70,7 @@ export function zodSchemaToJsonSchema(schema: z.ZodSchema): JsonSchema {
     const jsonSchema = zodToJsonSchema(schema, {
       target: "jsonSchema7",
       $refStrategy: "none",
-    });
+    },
 
     if (typeof jsonSchema === "object" && jsonSchema !== null) {
       const schema = jsonSchema as {
@@ -89,14 +89,14 @@ export function zodSchemaToJsonSchema(schema: z.ZodSchema): JsonSchema {
     // Fallback to empty object schema
     return {
       type: "object",
-      properties: {});
+      properties: {},
       required: [],
     };
   } catch {
     // If conversion fails, return empty object schema
     return {
       type: "object",
-      properties: {});
+      properties: {},
       required: [],
     };
   }

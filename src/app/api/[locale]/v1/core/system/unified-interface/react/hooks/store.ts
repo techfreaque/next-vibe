@@ -39,8 +39,8 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 60_000,
       refetchOnWindowFocus: false,
-    });
-  });
+    },
+  },
 });
 
 // Type alias for any data that can be stored
@@ -59,7 +59,7 @@ type CustomStateValue = string | number | boolean | null | undefined;
 // Track in-flight requests to prevent duplicates
 const inFlightRequests = new Map<
   string,
-  messageParams: { promise: Promise<AnyData>; timestamp: number }
+  { promise: Promise<AnyData>; timestamp: number }
 >();
 
 // Throttle map to prevent excessive API calls
@@ -172,7 +172,7 @@ export function createCustomStateSetter<T extends CustomStateValue>(
       customState: {
         ...state.customState,
         [stateKey.key]: value,
-      });
+      },
     }));
   };
 }
@@ -215,7 +215,7 @@ export interface ApiStore {
       readonly method: Methods;
       readonly path: readonly string[];
       readonly requiresAuthentication: () => boolean;
-    });
+    }
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
@@ -232,7 +232,7 @@ export interface ApiStore {
       "queryKey"
     > & {
       queryKey?: QueryKey;
-    });
+    }
   ) => Promise<ResponseType<TEndpoint["TResponseOutput"]>>;
 
   executeMutation: <
@@ -248,7 +248,7 @@ export interface ApiStore {
       readonly method: Methods;
       readonly path: readonly string[];
       readonly requiresAuthentication: () => boolean;
-    });
+    }
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
@@ -351,12 +351,12 @@ export interface MutationStoreType<TResponse> {
 }
 
 export const useApiStore = create<ApiStore>((set, get) => ({
-  queries: {});
-  mutations: {});
-  forms: {});
-  customState: {});
+  queries: {},
+  mutations: {},
+  forms: {},
+  customState: {},
 
-  getQueryId: (queryKey: QueryKey): string => generateStorageKey(queryKey}),
+  getQueryId: (queryKey: QueryKey): string => generateStorageKey(queryKey),
 
   getMutationId: (endpoint: {
     readonly method: Methods;
@@ -383,7 +383,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       readonly method: Methods;
       readonly path: readonly string[];
       readonly requiresAuthentication: () => boolean;
-    });
+    }
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
@@ -400,7 +400,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       "queryKey"
     > & {
       queryKey?: QueryKey;
-    } = {});
+    } = {}
   ): Promise<ResponseType<TEndpoint["TResponseOutput"]>> => {
     // Check if the endpoint expects undefined for request data
     // This is determined by checking if the schema is undefinedSchema
@@ -521,7 +521,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               ...options,
               forceRefresh: true,
               backgroundRefresh: false,
-            });
+            },
           );
         }, refreshDelay);
 
@@ -623,8 +623,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   statusMessage:
                     "app.api.v1.core.system.unifiedInterface.react.store.status.cached_data" as const,
                   lastFetchTime: existingQuery.lastFetchTime ?? null,
-                });
-              });
+                },
+              },
             };
           });
 
@@ -660,7 +660,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               // Prevent infinite chain of background refreshes
               backgroundRefresh: false,
             }).catch((err) =>
-              logger.error("Background refresh failed", parseError(err)}),
+              logger.error("Background refresh failed", parseError(err)),
             );
           }, refreshDelay);
 
@@ -706,18 +706,18 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
         if (!requestValidation.success) {
           logger.error("executeQuery: request validation failed", {
-            endpointPath: endpoint.path.join("/"}),
+            endpointPath: endpoint.path.join("/"),
             error: requestValidation.error.message,
           });
           removeStorageItem(queryId);
 
           // Create a proper error response
           const errorResponse = fail({
-        message: 
+            message:
             "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: { endpoint: endpoint.path.join("/") });
-          );
+            messageParams: { endpoint: endpoint.path.join("/") },
+          });
 
           // Update state with error
           set((state) => ({
@@ -726,7 +726,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               [queryId]: {
                 ...((state.queries[queryId] as
                   | QueryStoreType<AnyData>
-                  | undefined) ?? {}}),
+                  | undefined) ?? {}),
                 response: errorResponse,
                 data: (
                   state.queries[queryId] as QueryStoreType<AnyData> | undefined
@@ -740,9 +740,9 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 isCachedData: state.queries[queryId]?.isCachedData ?? false,
                 statusMessage:
                   "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
-                lastFetchTime: Date.now(}),
-              });
-            });
+                lastFetchTime: Date.now(),
+              },
+            },
           }));
 
           // Call onError callback if provided
@@ -789,7 +789,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               queries: {
                 ...state.queries,
                 [queryId]: {
-                  ...(existingQuery ?? {}}),
+                  ...(existingQuery ?? {}),
                   response: response as ResponseType<AnyData>,
                   data: existingQuery?.data,
                   error: response,
@@ -801,9 +801,9 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                     "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed" as const,
                   isLoadingFresh: false,
                   isCachedData: existingQuery?.isCachedData ?? false,
-                  lastFetchTime: Date.now(}),
-                });
-              });
+                  lastFetchTime: Date.now(),
+                },
+              },
             };
           });
 
@@ -842,14 +842,14 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 isCachedData: false,
                 statusMessage:
                   "app.api.v1.core.system.unifiedInterface.react.store.status.success" as const,
-                lastFetchTime: Date.now(}),
-              });
-            });
+                lastFetchTime: Date.now(),
+              },
+            },
           };
 
           logger.debug("executeQuery: SUCCESS - Store updated", {
             queryId,
-            endpointPath: endpoint.path.join("/"}),
+            endpointPath: endpoint.path.join("/"),
             hasData: !!response.data,
             responseData:
               response.data !== undefined
@@ -879,7 +879,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 [queryId]: {
                   ...((state.queries[queryId] as
                     | QueryStoreType<AnyData>
-                    | undefined) ?? {}}),
+                    | undefined) ?? {}),
                   response: onSuccessResult as ResponseType<AnyData>,
                   data: (
                     state.queries[queryId] as
@@ -895,9 +895,9 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isCachedData: state.queries[queryId]?.isCachedData ?? false,
                   statusMessage:
                     "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
-                  lastFetchTime: Date.now(}),
-                });
-              });
+                  lastFetchTime: Date.now(),
+                },
+              },
             }));
 
             // Call onError callback if provided
@@ -920,14 +920,14 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       } catch (err) {
         // Create a properly typed error response with translation key
         const errorResponse = fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: parseError(err).message,
-            endpoint: endpoint.path.join("/"}),
-          });
-        );
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
+            error: parseError(err).message,
+            endpoint: endpoint.path.join("/"),
+          },
+        });
 
         // Update state with error
         set((state) => ({
@@ -936,7 +936,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             [queryId]: {
               ...((state.queries[queryId] as
                 | QueryStoreType<AnyData>
-                | undefined) ?? {}}),
+                | undefined) ?? {}),
               response: errorResponse as ResponseType<AnyData>,
               data: (
                 state.queries[queryId] as QueryStoreType<AnyData> | undefined
@@ -950,9 +950,9 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               isCachedData: state.queries[queryId]?.isCachedData ?? false,
               statusMessage:
                 "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed" as const,
-              lastFetchTime: Date.now(}),
-            });
-          });
+              lastFetchTime: Date.now(),
+            },
+          },
         }));
 
         // Call onError callback if provided
@@ -972,7 +972,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     // Register the in-flight request with timestamp
     inFlightRequests.set(requestKey, {
       promise: fetchPromise as Promise<AnyData>,
-      timestamp: Date.now(}),
+      timestamp: Date.now(),
     });
 
     // Set up cleanup when the promise resolves or rejects
@@ -987,21 +987,21 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       return createSuccessResponse(result);
     } catch (error) {
       logger.error("executeQuery: Error in await fetchPromise", {
-        endpointPath: endpoint.path.join("/"}),
-        error: parseError(error}),
+        endpointPath: endpoint.path.join("/"),
+        error: parseError(error),
       });
       // Return error response instead of throwing
       const errorResponse = isErrorResponseType(error)
         ? error
         : fail({
-        message: 
+            message:
             "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { error: parseError(error).message });
-          );
+            messageParams: { error: parseError(error).message },
+          });
       return errorResponse;
     }
-  });
+  },
 
   executeMutation: async <
     TRequestOutput,
@@ -1016,7 +1016,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       readonly method: Methods;
       readonly path: readonly string[];
       readonly requiresAuthentication: () => boolean;
-    });
+    }
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
@@ -1028,7 +1028,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       TRequestOutput,
       TResponseOutput,
       TUrlVariablesOutput
-    > = {});
+    > = {},
   ): Promise<ResponseType<TResponseOutput>> => {
     // Check if the endpoint expects undefined for request data
     // This is determined by checking if the schema is undefinedSchema
@@ -1044,7 +1044,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     ) {
       logger.debug(
         "Converting object to undefined for endpoint with undefinedSchema",
-        endpoint.path.join("/"}),
+        endpoint.path.join("/"),
       );
       requestData = undefined as TEndpoint["TRequestOutput"];
     }
@@ -1063,8 +1063,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           statusMessage:
             "app.api.v1.core.system.unifiedInterface.react.store.status.mutation_pending" as const,
           data: undefined,
-        });
-      });
+        },
+      },
     }));
 
     try {
@@ -1074,11 +1074,11 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       if (!requestValidation.success) {
         // Create a proper error response
         const errorResponse = fail({
-        message: 
+          message:
           "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { endpoint: endpoint.path.join("/") });
-        );
+          messageParams: { endpoint: endpoint.path.join("/") },
+        });
 
         // Update error state
         set((state) => ({
@@ -1093,8 +1093,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               statusMessage:
                 "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
               data: undefined,
-            });
-          });
+            },
+          },
         }));
 
         // Call onError handler if provided
@@ -1142,8 +1142,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               statusMessage:
                 "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed" as const,
               data: undefined,
-            });
-          });
+            },
+          },
         }));
 
         // Call onError handler if provided
@@ -1157,11 +1157,10 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
         // Return error response with proper translation key
         return fail({
-        message: 
-          "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed",
+          message: "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: response.message, endpoint: endpoint.path.join("/") });
-        );
+          messageParams: { error: response.message, endpoint: endpoint.path.join("/") },
+        });
       }
 
       // Update success state
@@ -1181,8 +1180,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             statusMessage:
               "app.api.v1.core.system.unifiedInterface.react.store.status.mutation_success" as const,
             data: responseData as AnyData,
-          });
-        });
+          },
+        },
       }));
 
       // Invalidate queries (trigger refetch)
@@ -1213,8 +1212,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 statusMessage:
                   "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
                 data: undefined,
-              });
-            });
+              },
+            },
           }));
 
           // Call onError handler if provided
@@ -1236,11 +1235,11 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const errorResponse = isErrorResponseType(error)
         ? error
         : fail({
-        message: 
+            message:
             "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { error: parseError(error).message });
-          );
+            messageParams: { error: parseError(error).message },
+          });
 
       // Update error state
       set((state) => ({
@@ -1255,8 +1254,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             statusMessage:
               "app.api.v1.core.system.unifiedInterface.react.store.errors.unexpected_failure" as const,
             data: undefined,
-          });
-        });
+          },
+        },
       }));
 
       // Call onError handler if provided
@@ -1270,13 +1269,12 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
       // Return error response with proper translation key
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedInterface.react.store.errors.unexpected_failure",
+        message: "app.api.v1.core.system.unifiedInterface.react.store.errors.unexpected_failure",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorResponse.message, endpoint: endpoint.path.join("/") });
-      );
+        messageParams: { error: errorResponse.message, endpoint: endpoint.path.join("/") },
+      });
     }
-  });
+  },
 
   invalidateQueries: async (queryKey: QueryKey): Promise<void> => {
     const queryId = get().getQueryId(queryKey);
@@ -1299,7 +1297,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
     // Also invalidate in React Query if it's being used
     await queryClient.invalidateQueries({ queryKey });
-  });
+  },
 
   refetchQuery: async <TResponse>(
     queryKey: QueryKey,
@@ -1323,54 +1321,54 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       // Create a proper error response with error details and translation key
       const errorMessage = err instanceof Error ? err.message : String(err);
       return fail({
-        message: 
+        message:
         "app.api.v1.core.system.unifiedInterface.react.store.errors.refetch_failed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage, queryKey: JSON.stringify(queryKey) });
-      );
+        messageParams: { error: errorMessage, queryKey: JSON.stringify(queryKey) },
+      });
     }
-  });
+  },
 
   setFormError: (formId: string, error: ErrorResponseType | null): void => {
     set((state) => ({
       forms: {
         ...state.forms,
         [formId]: {
-          ...(state.forms[formId] ?? messageParams: { isSubmitting: false }}),
+          ...(state.forms[formId] ?? { isSubmitting: false }),
           formError: error,
-        });
-      });
+        },
+      },
     }));
-  });
+  },
 
   clearFormError: (formId: string): void => {
     set((state) => ({
       forms: {
         ...state.forms,
         [formId]: {
-          ...(state.forms[formId] ?? messageParams: { formError: null, isSubmitting: false }}),
+          ...(state.forms[formId] ?? { formError: null, isSubmitting: false }),
           formError: null,
-        });
-      });
+        },
+      },
     }));
-  });
+  },
 
   setFormQueryParams: (formId: string, params: FormQueryParams): void => {
     set((state) => ({
       forms: {
         ...state.forms,
         [formId]: {
-          ...(state.forms[formId] ?? messageParams: { formError: null, isSubmitting: false }}),
+          ...(state.forms[formId] ?? { formError: null, isSubmitting: false }),
           queryParams: params,
-        });
-      });
+        },
+      },
     }));
-  });
+  },
 
   getFormQueryParams: <T>(formId: string): T | undefined => {
     const form = get().forms[formId];
     return form?.queryParams as T | undefined;
-  });
+  },
 
   /**
    * Update query data for an endpoint
@@ -1467,12 +1465,12 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         response: newData as ResponseType<AnyData>,
         data: newData.data as AnyData,
         // Update timestamp to ensure change detection
-        lastFetchTime: Date.now(}),
+        lastFetchTime: Date.now(),
       };
 
       return { queries };
     });
-  });
+  },
 }));
 
 // Export QueryClient for potential direct usage
@@ -1499,7 +1497,7 @@ export const apiClient = {
       readonly method: Methods;
       readonly path: readonly string[];
       readonly requiresAuthentication: () => boolean;
-    });
+    }
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
@@ -1512,7 +1510,7 @@ export const apiClient = {
       "queryKey"
     > & {
       queryKey?: QueryKey;
-    } = {});
+    } = {}
   ): Promise<ResponseType<TResponseOutput>> => {
     // Check if the endpoint expects undefined for request data
     const isUndefinedSchema =
@@ -1527,7 +1525,7 @@ export const apiClient = {
     ) {
       logger.debug(
         "Converting object to undefined for endpoint with undefinedSchema",
-        endpoint.path.join("/"}),
+        endpoint.path.join("/"),
       );
       requestData = undefined as TEndpoint["TRequestOutput"];
     }
@@ -1547,7 +1545,7 @@ export const apiClient = {
     if (!response.success) {
       // Log the error
       logger.error("API query failed", {
-        endpoint: endpoint.path.join("/"}),
+        endpoint: endpoint.path.join("/"),
         error: response.message,
       });
 
@@ -1557,7 +1555,7 @@ export const apiClient = {
 
     // Return the success response directly
     return response;
-  });
+  },
 
   /**
    * Mutate data through an API endpoint without using React hooks
@@ -1582,7 +1580,7 @@ export const apiClient = {
       TEndpoint["TRequestOutput"],
       TEndpoint["TResponseOutput"],
       TEndpoint["TUrlVariablesOutput"]
-    > = {});
+    > = {},
   ): Promise<ResponseType<TEndpoint["TResponseOutput"]>> => {
     // Check if the endpoint expects undefined for request data
     const isUndefinedSchema =
@@ -1593,7 +1591,7 @@ export const apiClient = {
     if (isUndefinedSchema && typeof data === "object" && data !== null) {
       logger.debug(
         "Converting object to undefined for endpoint with undefinedSchema",
-        endpoint.path.join("/"}),
+        endpoint.path.join("/"),
       );
       data = undefined as TEndpoint["TRequestOutput"];
     }
@@ -1605,7 +1603,7 @@ export const apiClient = {
     if (!response.success) {
       // Log the error
       logger.error("API mutation failed", {
-        endpoint: endpoint.path.join("/"}),
+        endpoint: endpoint.path.join("/"),
         error: response.message,
       });
 
@@ -1615,14 +1613,14 @@ export const apiClient = {
 
     // Return the success response directly
     return response;
-  });
+  },
 
   /**
    * Invalidate a query to force refetch on next access
    */
   invalidateQueries: async (queryKey: QueryKey): Promise<void> => {
     await useApiStore.getState().invalidateQueries(queryKey);
-  });
+  },
 
   /**
    * Get current query state without using React hooks
@@ -1634,7 +1632,7 @@ export const apiClient = {
     const state = useApiStore.getState();
     const query = state.queries[queryId];
     return query as QueryStoreType<TResponse> | undefined;
-  });
+  },
 
   /**
    * Get current mutation state without using React hooks
@@ -1657,7 +1655,7 @@ export const apiClient = {
     return mutation as
       | MutationStoreType<TEndpoint["TResponseOutput"]>
       | undefined;
-  });
+  },
 
   /**
    * Update query data for an endpoint
@@ -1712,5 +1710,5 @@ export const apiClient = {
     useApiStore
       .getState()
       .updateEndpointData(endpoint, updater, requestData, urlPathParams);
-  });
+  },
 };

@@ -51,7 +51,7 @@ const test1_3: Test1_3_Result = "✓ PASS";
 
 // Test 1.4: ObjectField with any usage extends UnifiedField
 type Test1_4_ObjectField = ObjectField<
-  { name: PrimitiveField<z.ZodString, { request: "data" }> });
+  { name: PrimitiveField<z.ZodString, { request: "data" }> },
   any
 >;
 type Test1_4_Result =
@@ -367,7 +367,7 @@ type Test9_1_Result =
       credentials: any;
       options: any;
       leadId: any;
-    });
+    },
     any
   >
     ? "✓ PASS"

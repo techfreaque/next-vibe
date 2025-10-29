@@ -25,7 +25,7 @@ export const { GET, tools } = endpointsHandler({
             lastPulseAt: null,
             successRate: null,
             totalExecutions: 0,
-          });
+          },
         };
       }
 
@@ -37,8 +37,8 @@ export const { GET, tools } = endpointsHandler({
           lastPulseAt: health.lastPulseAt?.toISOString() ?? null,
           successRate: health.successRate,
           totalExecutions: health.totalExecutions,
-        });
+        },
       };
-    });
-  });
+    },
+  },
 });

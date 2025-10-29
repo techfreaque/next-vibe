@@ -115,7 +115,7 @@ export class BraveSearchError extends Error {
  * Brave Search Service with caching and rate limiting
  */
 class BraveSearchService {
-  private cache: Map<string, messageParams: { data: SearchResponse; expiresAt: number }>;
+  private cache: Map<string, { data: SearchResponse; expiresAt: number }>;
   private rateLimitQueue: number[] = [];
   private readonly MAX_REQUESTS_PER_SECOND = 5;
   private readonly CACHE_TTL = 3600000; // 1 hour
@@ -153,7 +153,7 @@ class BraveSearchService {
     const response: SearchResponse = {
       query,
       results,
-      timestamp: Date.now(}),
+      timestamp: Date.now(),
       cached: false,
       source: "brave",
     };
@@ -173,7 +173,7 @@ class BraveSearchService {
   ): Promise<SearchResult[]> {
     const params = new URLSearchParams({
       q: query,
-      count: String(config.maxResults ?? 5}),
+      count: String(config.maxResults ?? 5),
       safesearch: config.safesearch ?? "moderate",
     });
 
@@ -232,12 +232,12 @@ class BraveSearchService {
     if (data.web?.results) {
       results.push(
         ...data.web.results.map((result) => ({
-          title: this.sanitizeText(result.title}),
+          title: this.sanitizeText(result.title),
           url: result.url,
-          description: this.sanitizeText(result.description}),
+          description: this.sanitizeText(result.description),
           age: result.age ?? result.page_age,
           thumbnail: result.thumbnail?.src,
-        })}),
+        })),
       );
     }
 
@@ -245,12 +245,12 @@ class BraveSearchService {
     if (includeNews && data.news?.results) {
       results.push(
         ...data.news.results.map((result) => ({
-          title: this.sanitizeText(result.title}),
+          title: this.sanitizeText(result.title),
           url: result.url,
-          description: this.sanitizeText(result.description}),
+          description: this.sanitizeText(result.description),
           age: result.age,
           source: result.source,
-        })}),
+        })),
       );
     }
 
@@ -350,10 +350,10 @@ class BraveSearchService {
   /**
    * Get cache statistics
    */
-  getCacheStats(): messageParams: { size: number; entries: string[] } {
+  getCacheStats(): { size: number; entries: string[] } {
     return {
       size: this.cache.size,
-      entries: Array.from(this.cache.keys()}),
+      entries: Array.from(this.cache.keys()),
     };
   }
 
@@ -415,24 +415,24 @@ Use this when:
     query: z.string().min(1).max(400).describe(
       // eslint-disable-next-line i18next/no-literal-string
       "Clear and specific search query. Use keywords rather than questions.",
-    }),
+    ),
     maxResults: z
       .number()
       .min(1)
       .max(10)
       .optional()
       // eslint-disable-next-line i18next/no-literal-string
-      .describe("Number of results to return (default: 5)"}),
+      .describe("Number of results to return (default: 5)"),
     includeNews: z
       .boolean()
       .optional()
       // eslint-disable-next-line i18next/no-literal-string
-      .describe("Include news results for current events (default: false)"}),
+      .describe("Include news results for current events (default: false)"),
     freshness: z.enum(FRESHNESS_OPTIONS).optional().describe(
       // eslint-disable-next-line i18next/no-literal-string
       "Filter by freshness: pd (day), pw (week), pm (month), py (year)",
-    }),
-  }}),
+    ),
+  }),
   execute: async ({
     query,
     maxResults,
@@ -481,9 +481,9 @@ Use this when:
           snippet: result.description,
           age: result.age,
           source: result.source,
-        })}),
+        })),
         cached: searchResults.cached,
-        timestamp: new Date(searchResults.timestamp).toISOString(}),
+        timestamp: new Date(searchResults.timestamp).toISOString(),
       };
       return successResult;
     } catch (error) {
@@ -542,11 +542,12 @@ class BraveSearchRepository implements IBraveSearchRepository {
 
     try {
       if (!query || typeof query !== "string" || query.trim() === "") {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.validation.title" as const,
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.validation.title" as const,
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { message: SEARCH_MESSAGES.QUERY_REQUIRED },
-        );
+        });
       }
 
       const searchService = getBraveSearchService();
@@ -569,9 +570,9 @@ class BraveSearchRepository implements IBraveSearchRepository {
           snippet: result.description,
           age: result.age,
           source: result.source,
-        })}),
+        })),
         cached: searchResults.cached,
-        timestamp: new Date(searchResults.timestamp).toISOString(}),
+        timestamp: new Date(searchResults.timestamp).toISOString(),
       });
     } catch (error) {
       const searchService = getBraveSearchService();
@@ -585,11 +586,12 @@ class BraveSearchRepository implements IBraveSearchRepository {
         query,
       });
 
-      return fail({message: 
-        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { message: braveError.message },
-      );
+      });
     }
   }
 }

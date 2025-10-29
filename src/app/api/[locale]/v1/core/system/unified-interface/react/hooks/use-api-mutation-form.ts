@@ -57,12 +57,12 @@ export function useApiForm<
 >(
   endpoint: TEndpoint,
   logger: EndpointLogger,
-  options: ApiFormOptions<TEndpoint["TRequestOutput"]> = {});
+  options: ApiFormOptions<TEndpoint["TRequestOutput"]> = {},
   mutationOptions: ApiMutationOptions<
     TEndpoint["TRequestOutput"],
     TEndpoint["TResponseOutput"],
     TEndpoint["TUrlVariablesOutput"]
-  > = {});
+  > = {}
 ): ApiFormReturn<
   TEndpoint["TRequestOutput"],
   TEndpoint["TResponseOutput"],
@@ -136,7 +136,7 @@ export function useApiForm<
   type FormData = TEndpoint["TRequestOutput"];
   const formConfig = {
     ...options,
-    resolver: zodResolver(endpoint.requestSchema}),
+    resolver: zodResolver(endpoint.requestSchema),
   };
 
   // Extract persistence options
@@ -210,12 +210,12 @@ export function useApiForm<
           } catch (error) {
             logger.error(
               "Error saving form data to storage:",
-              parseError(error}),
+              parseError(error),
             );
           }
         }, debounceMs);
       }
-    });
+    }
 
     return (): void => {
       subscription.unsubscribe();
@@ -265,7 +265,7 @@ export function useApiForm<
     if (event) {
       logger.debug("Preventing default form submission", {
         endpoint: endpoint.path.join("/"}),
-      });
+      },
       event.preventDefault();
     }
 
@@ -273,7 +273,7 @@ export function useApiForm<
       logger.debug("_submitForm called with validated data", {
         endpoint: endpoint.path.join("/"}),
         validatedData,
-      });
+      },
       try {
         // Clear any previous errors
         clearFormError();

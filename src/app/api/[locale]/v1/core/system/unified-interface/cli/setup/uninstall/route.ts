@@ -19,6 +19,6 @@ export const { POST, tools } = endpointsHandler({
         verbose: data.verbose,
       });
       return setupUninstallRepository.uninstallCli(data, user, locale);
-    });
-  });
+    }
+  }
 });

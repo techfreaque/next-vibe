@@ -29,9 +29,9 @@ const t = initTRPC
           ...shape.data,
           zodError:
             error.cause instanceof ZodError ? error.cause.format() : null,
-        });
+        }
       };
-    });
+    }
   });
 
 /**
@@ -64,8 +64,8 @@ const isAuthenticated = middleware(async ({ ctx, next }) => {
     ctx: {
       ...ctx,
       user: ctx.user, // Type narrowing - user is now guaranteed to be authenticated
-    });
-  });
+    }
+  })
 });
 
 /**
@@ -87,7 +87,7 @@ export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
     if (!ctx.user || ctx.user.isPublic) {
       logger.error("tRPC: Role check failed - user not authenticated", {
         requiredRoles: Array.from(roles),
-      });
+      })
       // eslint-disable-next-line no-restricted-syntax
       throw new TRPCError({
         code: "UNAUTHORIZED",
@@ -114,7 +114,7 @@ export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
       ctx: {
         ...ctx,
         user: ctx.user,
-      });
+      }
     });
   });
 }
@@ -150,19 +150,19 @@ export function convertToTRPCError(
 ): TRPCError {
   switch (errorType) {
     case ErrorResponseTypes.UNAUTHORIZED:
-      return new TRPCError({ code: "UNAUTHORIZED", message });
+      return new TRPCError({ code: "UNAUTHORIZED", message },
     case ErrorResponseTypes.FORBIDDEN:
-      return new TRPCError({ code: "FORBIDDEN", message });
+      return new TRPCError({ code: "FORBIDDEN", message },
     case ErrorResponseTypes.NOT_FOUND:
-      return new TRPCError({ code: "NOT_FOUND", message });
+      return new TRPCError({ code: "NOT_FOUND", message },
     case ErrorResponseTypes.VALIDATION_ERROR:
     case ErrorResponseTypes.INVALID_REQUEST_ERROR:
-      return new TRPCError({ code: "BAD_REQUEST", message });
+      return new TRPCError({ code: "BAD_REQUEST", message },
     case ErrorResponseTypes.CONFLICT:
-      return new TRPCError({ code: "CONFLICT", message });
+      return new TRPCError({ code: "CONFLICT", message },
     case ErrorResponseTypes.INTERNAL_ERROR:
     default:
-      return new TRPCError({ code: "INTERNAL_SERVER_ERROR", message });
+      return new TRPCError({ code: "INTERNAL_SERVER_ERROR", message },
   }
 }
 

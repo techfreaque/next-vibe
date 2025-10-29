@@ -105,7 +105,7 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
           executionTime: 0,
           endpointPath: "",
           method: "",
-        });
+        }
       };
     }
 
@@ -118,7 +118,7 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
           executionTime: 0,
           endpointPath: "",
           method: "",
-        });
+        }
       };
     }
 
@@ -158,7 +158,7 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
         hits: this.cacheStats.hits,
         misses: this.cacheStats.misses,
         lastRefresh: this.cacheStats.lastRefresh,
-      });
+      },
       lastRefresh: this.cacheStats.lastRefresh,
       initialized: this.initialized,
     };

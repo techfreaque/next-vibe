@@ -114,7 +114,7 @@ export async function executeHandler<
       locale,
       request,
       logger,
-    });
+    },
 
     return result;
   } catch (error) {
@@ -135,7 +135,7 @@ export async function executeHandler<
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: parsedError.message,
-      },
+      });
     });
   }
 }
@@ -198,7 +198,7 @@ export async function authenticateUser<
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
               error: parsedError.message,
-            },
+            });
           })
         : undefined,
     });
@@ -244,7 +244,7 @@ export async function authenticateTypedUser<
       method: endpoint.method,
       platform: context?.platform,
       error: parsedError,
-    });
+    },
 
     return fail({
       message:
@@ -257,7 +257,7 @@ export async function authenticateTypedUser<
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
               error: parsedError.message,
-            },
+            });
           })
         : undefined,
     });

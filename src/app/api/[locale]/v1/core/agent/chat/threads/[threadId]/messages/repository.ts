@@ -9,7 +9,6 @@ import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -23,7 +22,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { chatFolders, chatMessages, chatThreads } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
 import {
-  fail,
   canReadThread,
   canWriteThread,
 } from "../../../permissions/permissions";
@@ -39,14 +37,14 @@ import type {
  */
 export interface MessagesRepositoryInterface {
   listMessages(
-    data: messageParams: { threadId: string },
+    data: { threadId: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<MessageListResponseOutput>>;
 
   createMessage(
-    data: MessageCreateRequestOutput & messageParams: { threadId: string },
+    data: MessageCreateRequestOutput & { threadId: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -61,7 +59,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
    * List all messages in a thread
    */
   async listMessages(
-    data: messageParams: { threadId: string },
+    data: { threadId: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -81,10 +79,10 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         .limit(1);
 
       if (!thread) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.notFound.title" as const,
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.notFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       // Reject incognito threads - they should never be accessed on server
@@ -109,10 +107,10 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
 
       // Check read permission using permission system
       if (!canReadThread(user, thread, folder)) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.title" as const,
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.title" as const,
           errorType: ErrorResponseTypes.FORBIDDEN,
-        );
+        });
       }
 
       // Get all messages in thread
@@ -135,11 +133,12 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         toolCalls: msg.metadata?.toolCalls || null,
       }));
 
-      return createSuccessResponse(messageParams: { messages: mappedMessages });
+      return createSuccessResponse({ messages: mappedMessages });
     } catch (error) {
       logger.error("Error listing messages", parseError(error));
-      return fail({message: 
-        "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.server.title" as const,
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.server.title" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       );
@@ -150,7 +149,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
    * Create a new message in a thread
    */
   async createMessage(
-    data: MessageCreateRequestOutput & messageParams: { threadId: string },
+    data: MessageCreateRequestOutput & { threadId: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -158,16 +157,18 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
     try {
       // Public users cannot create messages
       if (user.isPublic) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
           errorType: ErrorResponseTypes.FORBIDDEN,
         );
       }
 
       // Type guard to ensure user has id
       if (!user.id) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.unauthorized.title" as const,
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.unauthorized.title" as const,
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -188,10 +189,10 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         .limit(1);
 
       if (!thread) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.notFound.title",
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       // Reject incognito threads - they should never be accessed on server
@@ -216,10 +217,10 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
 
       // Check write permission using permission system
       if (!canWriteThread(user, thread, folder)) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
           errorType: ErrorResponseTypes.FORBIDDEN,
-        );
+        });
       }
 
       // Calculate depth if parent exists
@@ -230,21 +231,21 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
           .from(chatMessages)
           .where(
             and(
-              eq(chatMessages.id, data.message.parentId}),
-              eq(chatMessages.threadId, data.threadId}),
-            }),
+              eq(chatMessages.id, data.message.parentId),
+              eq(chatMessages.threadId, data.threadId),
+            ),
           )
           .limit(1);
 
         if (!parentMessage) {
-          return fail({message: 
-            "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.validation.title",
+          return fail({
+            message: "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.validation.title",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            {
+            messageParams: {
               error:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.validation.parentNotFound",
             },
-          );
+          });
         }
 
         depth = parentMessage.depth + 1;
@@ -269,8 +270,9 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         });
 
       if (!message) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.server.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         );
       }
@@ -278,7 +280,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       // Update thread's updatedAt timestamp
       await db
         .update(chatThreads)
-        .set(messageParams: { updatedAt: new Date() })
+        .set({ updatedAt: new Date() })
         .where(eq(chatThreads.id, data.threadId));
 
       logger.debug("Message created", {
@@ -292,11 +294,12 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       });
     } catch (error) {
       logger.error("Error creating message", parseError(error));
-      return fail({message: 
-        "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.server.title",
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
-      );
+      });
     }
   }
 }

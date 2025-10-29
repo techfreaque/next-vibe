@@ -44,9 +44,9 @@ export const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.request.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.request.description",
-      layout: { type: LayoutType.GRID, columns: 6 });
-    });
-    { request: "data", response: true });
+      layout: { type: LayoutType.GRID, columns: 6 },
+    },
+    { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
       taskId: requestDataField(
@@ -59,7 +59,7 @@ export const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.taskId.description",
           placeholder:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.taskId.placeholder",
-        });
+        },
         z.string().optional(),
       ),
       taskName: requestDataField(
@@ -72,7 +72,7 @@ export const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.taskName.description",
           placeholder:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.taskName.placeholder",
-        });
+        },
         z.string().optional(),
       ),
       status: requestDataField(
@@ -85,8 +85,8 @@ export const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.status.description",
           placeholder:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.status.placeholder",
-          layout: { columns: 6 });
-        });
+          layout: { columns: 6 },
+        },
         z.string().optional(),
       ),
       priority: requestDataField(
@@ -99,8 +99,8 @@ export const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.priority.description",
           placeholder:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.priority.placeholder",
-          layout: { columns: 6 });
-        });
+          layout: { columns: 6 },
+        },
         z.string().optional(),
       ),
       startDate: requestDataField(
@@ -111,7 +111,7 @@ export const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.startDate.label",
           description:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.startDate.description",
-        });
+        },
         z.string().optional(),
       ),
       endDate: requestDataField(
@@ -122,7 +122,7 @@ export const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.endDate.label",
           description:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.endDate.description",
-        });
+        },
         z.string().optional(),
       ),
       limit: requestDataField(
@@ -135,7 +135,7 @@ export const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.limit.description",
           placeholder:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.limit.placeholder",
-        });
+        },
         z.string().optional(),
       ),
       offset: requestDataField(
@@ -148,7 +148,7 @@ export const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.offset.description",
           placeholder:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.fields.offset.placeholder",
-        });
+        },
         z.string().optional(),
       ),
 
@@ -158,7 +158,7 @@ export const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.response.executions.title",
-        });
+        },
         z.array(
           z.object({
             id: z.string(),
@@ -186,7 +186,7 @@ export const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.response.totalCount.title",
-        });
+        },
         z.number(),
       ),
       hasMore: responseField(
@@ -194,7 +194,7 @@ export const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.response.hasMore.title",
-        });
+        },
         z.boolean(),
       ),
       summary: responseField(
@@ -202,7 +202,7 @@ export const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.response.summary.title",
-        });
+        },
         z.object({
           totalExecutions: z.number(),
           successfulExecutions: z.number(),
@@ -211,81 +211,81 @@ export const { GET } = createEndpoint({
           successRate: z.number(),
         }),
       ),
-    });
+    },
   ),
   successTypes: {
     title:
       "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.success.title",
     description:
       "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.success.description",
-  });
+  },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.validation.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.validation.description",
-    });
+    },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.network.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.network.description",
-    });
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.unauthorized.description",
-    });
+    },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.forbidden.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.forbidden.description",
-    });
+    },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.notFound.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.notFound.description",
-    });
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.server.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.server.description",
-    });
+    },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.unknown.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.unknown.description",
-    });
+    },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.unsavedChanges.titleChanges",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.unsavedChanges.titleChanges",
-    });
+    },
     [EndpointErrorTypes.CONFLICT]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.conflict.description",
-    });
-  });
+    },
+  },
   examples: {
     requests: {
-      default: {});
+      default: {},
       filtered: {
         taskId: "123",
         startDate: "2021-01-01",
         endDate: "2021-01-31",
         limit: "10",
         offset: "0",
-      });
-    });
+      },
+    },
     responses: {
       default: {
         executions: [],
@@ -297,8 +297,8 @@ export const { GET } = createEndpoint({
           failedExecutions: 0,
           averageDuration: null,
           successRate: 0,
-        });
-      });
+        },
+      },
       filtered: {
         executions: [],
         totalCount: 0,
@@ -309,11 +309,11 @@ export const { GET } = createEndpoint({
           failedExecutions: 0,
           averageDuration: null,
           successRate: 0,
-        });
-      });
-    });
-  });
-});
+        },
+      },
+    },
+  },
+})
 
 // Export types
 export type CronHistoryRequestInput = typeof GET.types.RequestInput;

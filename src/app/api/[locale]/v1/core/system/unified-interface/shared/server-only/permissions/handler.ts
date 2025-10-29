@@ -126,7 +126,7 @@ export abstract class BasePermissionHandler {
     resource: {
       ownerId?: string;
       requiredRoles?: readonly (typeof UserRoleValue)[];
-    });
+    },
     logger: EndpointLogger,
   ): Promise<PermissionResult> {
     // Public users have limited access

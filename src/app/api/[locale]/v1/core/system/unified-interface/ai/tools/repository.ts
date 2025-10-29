@@ -78,8 +78,7 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
     const { t } = simpleT(locale);
 
     // Transform endpoints to serializable format and resolve translation keys
-    const serializableTools = filteredEndpoints.map(
-      (endpoint: DiscoveredEndpoint) => {
+    const serializableTools = filteredEndpoints.map((endpoint: DiscoveredEndpoint) => {
         const definition = endpoint.definition;
 
         // Resolve translation keys to actual text
@@ -131,7 +130,7 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
             : [],
           // Omit parameters as Zod schemas cannot be JSON serialized
         };
-      });
+      },
     );
 
     const result = {

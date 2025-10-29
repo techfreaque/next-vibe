@@ -125,10 +125,10 @@ export function createTRPCProcedureFromEndpoint<
           };
 
           return await trpcHandler(
-            { ...requestData, urlPathParams });
+            { ...requestData, urlPathParams },
             enhancedCtx,
           );
-        });
+        },
 
     case Methods.POST:
     case Methods.PUT:
@@ -152,10 +152,10 @@ export function createTRPCProcedureFromEndpoint<
           };
 
           return await trpcHandler(
-            { ...requestData, urlPathParams });
+            { ...requestData, urlPathParams },
             enhancedCtx,
           );
-        });
+        },
 
     default:
       // This should never happen in production as all supported methods are handled above

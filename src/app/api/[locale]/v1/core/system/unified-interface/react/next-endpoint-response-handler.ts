@@ -108,7 +108,7 @@ export function createNextHandler<
       // Authenticate user using unified core with Next.js context
       const authResult = await authenticateUser(
         endpoint,
-        { platform: "next", locale });
+        { platform: "next", locale },
         logger,
       );
       if (!authResult.success) {
@@ -138,7 +138,7 @@ export function createNextHandler<
           urlParameters: urlParameters as Record<string, string>,
           request,
           locale,
-        });
+        },
         logger,
       );
 
@@ -206,11 +206,11 @@ export function createNextHandler<
               requestData: validationResult.data.requestData,
               t,
               locale: validationResult.data.locale,
-            });
+            },
             logger,
           );
           return createSuccessResponse(undefined);
-        });
+        },
         logger,
       });
     } catch (error) {
@@ -221,7 +221,7 @@ export function createNextHandler<
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parseError(error).message,
-        });
+        },
         logger,
       });
     }

@@ -23,8 +23,8 @@ export function useCronStats(
         enabled: true,
         refetchOnWindowFocus: false,
         staleTime: 30 * 1000, // 30 seconds
-      });
-    });
+      },
+    },
     logger,
   );
 }

@@ -49,7 +49,7 @@ export type TrpcHandlerReturnType<
   TResponseOutput,
   TUrlVariablesOutput,
 > = (
-  input: TRequestOutput & { urlPathParams?: TUrlVariablesOutput });
+  input: TRequestOutput & { urlPathParams?: TUrlVariablesOutput },
   ctx: TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]>,
 ) => Promise<TResponseOutput>;
 

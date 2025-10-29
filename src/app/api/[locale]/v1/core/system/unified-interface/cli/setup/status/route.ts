@@ -17,6 +17,6 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, user, locale, logger }) => {
       logger.debug("Setup status check started");
       return setupStatusRepository.getStatus(data, user, locale);
-    });
-  });
+    },
+  },
 });

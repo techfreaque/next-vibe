@@ -26,13 +26,13 @@ import type {
  */
 export async function getFolder(
   user: JwtPayloadType,
-  data: messageParams: { id: string },
+  data: { id: string },
 ): Promise<ResponseType<FolderGetResponseOutput>> {
   if (user.isPublic) {
-    return fail({message: 
-      "app.api.v1.core.agent.chat.folders.id.get.errors.unauthorized.title",
+    return fail({
+      message: "app.api.v1.core.agent.chat.folders.id.get.errors.unauthorized.title",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
-    );
+    });
   }
 
   try {
@@ -43,10 +43,10 @@ export async function getFolder(
       .limit(1);
 
     if (!folder) {
-      return fail({message: 
-        "app.api.v1.core.agent.chat.folders.id.get.errors.notFound.title",
+      return fail({
+        message: "app.api.v1.core.agent.chat.folders.id.get.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
-      );
+      });
     }
 
     return createSuccessResponse({
@@ -61,16 +61,16 @@ export async function getFolder(
           expanded: folder.expanded,
           sortOrder: folder.sortOrder,
           metadata: (folder.metadata as Record<string, string | number | boolean | null>) || {},
-          createdAt: new Date(folder.createdAt}),
-          updatedAt: new Date(folder.updatedAt}),
+          createdAt: new Date(folder.createdAt),
+          updatedAt: new Date(folder.updatedAt),
         },
       },
     });
   } catch {
-    return fail({message: 
-      "app.api.v1.core.agent.chat.folders.id.get.errors.server.title",
+    return fail({
+      message: "app.api.v1.core.agent.chat.folders.id.get.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    });
   }
 }
 
@@ -79,13 +79,13 @@ export async function getFolder(
  */
 export async function updateFolder(
   user: JwtPayloadType,
-  data: FolderUpdateRequestOutput & messageParams: { id: string },
+  data: FolderUpdateRequestOutput & { id: string },
 ): Promise<ResponseType<FolderUpdateResponseOutput>> {
   if (user.isPublic) {
-    return fail({message: 
-      "app.api.v1.core.agent.chat.folders.id.patch.errors.unauthorized.title",
+    return fail({
+      message: "app.api.v1.core.agent.chat.folders.id.patch.errors.unauthorized.title",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
-    );
+    });
   }
 
   try {
@@ -99,10 +99,10 @@ export async function updateFolder(
       .limit(1);
 
     if (!existingFolder) {
-      return fail({message: 
-        "app.api.v1.core.agent.chat.folders.id.patch.errors.notFound.title",
+      return fail({
+        message: "app.api.v1.core.agent.chat.folders.id.patch.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
-      );
+      });
     }
 
     // Prevent circular parent references
@@ -121,16 +121,16 @@ export async function updateFolder(
       .update(chatFolders)
       .set({
         ...updates,
-        updatedAt: new Date(}),
+        updatedAt: new Date(),
       })
       .where(and(eq(chatFolders.id, id), eq(chatFolders.userId, user.id)))
       .returning();
 
     if (!updatedFolder) {
-      return fail({message: 
-        "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
+      return fail({
+        message: "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
 
     return createSuccessResponse({
@@ -145,16 +145,16 @@ export async function updateFolder(
           expanded: updatedFolder.expanded,
           sortOrder: updatedFolder.sortOrder,
           metadata: (updatedFolder.metadata as Record<string, string | number | boolean | null>) || {},
-          createdAt: new Date(updatedFolder.createdAt}),
-          updatedAt: new Date(updatedFolder.updatedAt}),
+          createdAt: new Date(updatedFolder.createdAt),
+          updatedAt: new Date(updatedFolder.updatedAt),
         },
       },
     });
   } catch {
-    return fail({message: 
-      "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
+    return fail({
+      message: "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    });
   }
 }
 
@@ -163,13 +163,13 @@ export async function updateFolder(
  */
 export async function deleteFolder(
   user: JwtPayloadType,
-  data: messageParams: { id: string },
+  data: { id: string },
 ): Promise<ResponseType<FolderDeleteResponseOutput>> {
   if (user.isPublic) {
-    return fail({message: 
-      "app.api.v1.core.agent.chat.folders.id.delete.errors.unauthorized.title",
+    return fail({
+      message: "app.api.v1.core.agent.chat.folders.id.delete.errors.unauthorized.title",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
-    );
+    });
   }
 
   try {
@@ -183,10 +183,10 @@ export async function deleteFolder(
       .limit(1);
 
     if (!existingFolder) {
-      return fail({message: 
-        "app.api.v1.core.agent.chat.folders.id.delete.errors.notFound.title",
+      return fail({
+        message: "app.api.v1.core.agent.chat.folders.id.delete.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
-      );
+      });
     }
 
     // Delete the folder (cascade will handle child folders and threads)
@@ -201,9 +201,9 @@ export async function deleteFolder(
       },
     });
   } catch {
-    return fail({message: 
-      "app.api.v1.core.agent.chat.folders.id.delete.errors.server.title",
+    return fail({
+      message: "app.api.v1.core.agent.chat.folders.id.delete.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    });
   }
 }

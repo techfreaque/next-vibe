@@ -42,10 +42,11 @@ export const branchRepository = {
     try {
       // Type guard to ensure user has id
       if (!user.id) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.unauthorized.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       const userId = user.id;
@@ -56,17 +57,18 @@ export const branchRepository = {
         .from(chatThreads)
         .where(
           and(
-            eq(chatThreads.id, urlPathParams.threadId}),
-            eq(chatThreads.userId, userId}),
-          }),
+            eq(chatThreads.id, urlPathParams.threadId),
+            eq(chatThreads.userId, userId),
+          ),
         )
         .limit(1);
 
       if (!thread) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.threadNotFound.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.threadNotFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       // Reject incognito threads
@@ -85,25 +87,25 @@ export const branchRepository = {
         .from(chatMessages)
         .where(
           and(
-            eq(chatMessages.id, urlPathParams.messageId}),
-            eq(chatMessages.threadId, urlPathParams.threadId}),
-          }),
+            eq(chatMessages.id, urlPathParams.messageId),
+            eq(chatMessages.threadId, urlPathParams.threadId),
+          ),
         )
         .limit(1);
 
       if (!sourceMessage) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.messageNotFound.title",
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.messageNotFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       // Cannot branch from root message (no parent)
       if (!sourceMessage.parentId) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.cannotBranchFromRoot.title",
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.cannotBranchFromRoot.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        );
+        });
       }
 
       // Create new message with same parent as source message
@@ -125,7 +127,7 @@ export const branchRepository = {
       // Update thread's updatedAt timestamp
       await db
         .update(chatThreads)
-        .set(messageParams: { updatedAt: new Date() })
+        .set({ updatedAt: new Date() })
         .where(eq(chatThreads.id, urlPathParams.threadId));
 
       logger.info("Branch created successfully", {
@@ -152,10 +154,10 @@ export const branchRepository = {
       });
     } catch (error) {
       logger.error("Failed to create branch", parseError(error));
-      return fail({message: 
-        "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.createFailed.title",
+      return fail({
+        message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.createFailed.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   },
 };

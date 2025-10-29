@@ -20,6 +20,6 @@ export const { POST, tools } = endpointsHandler({
         verbose: data.verbose,
       });
       return setupInstallRepository.installCli(data, user, locale);
-    });
-  });
+    },
+  },
 });

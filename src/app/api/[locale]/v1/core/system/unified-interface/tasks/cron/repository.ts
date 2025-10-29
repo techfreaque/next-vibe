@@ -8,9 +8,9 @@ import { count, desc, eq, sql } from "drizzle-orm";
 
 import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
@@ -112,11 +112,10 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        ErrorResponseTypes.DATABASE_ERROR.errorKey,
+        message: ErrorResponseTypes.DATABASE_ERROR.errorKey,
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { message: parsedError.message });
-      );
+        messageParams: { message: parsedError.message },
+      });
     }
   }
 
@@ -141,11 +140,10 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        ErrorResponseTypes.DATABASE_ERROR.errorKey,
+        message: ErrorResponseTypes.DATABASE_ERROR.errorKey,
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { message: parsedError.message });
-      );
+        messageParams: { message: parsedError.message },
+      });
     }
   }
 
@@ -170,11 +168,10 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        ErrorResponseTypes.DATABASE_ERROR.errorKey,
+        message: ErrorResponseTypes.DATABASE_ERROR.errorKey,
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { message: parsedError.message });
-      );
+        messageParams: { message: parsedError.message },
+      });
     }
   }
 
@@ -183,7 +180,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTask>> {
     try {
-      logger.debug("Creating new cron task", messageParams: { name: task.name });
+      logger.debug("Creating new cron task", { name: task.name });
       const [newTask] = await db.insert(cronTasks).values(task).returning();
       logger.info("Successfully created cron task", {
         id: newTask.id,
@@ -197,11 +194,10 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        ErrorResponseTypes.DATABASE_ERROR.errorKey,
+        message: ErrorResponseTypes.DATABASE_ERROR.errorKey,
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { message: parsedError.message });
-      );
+        messageParams: { message: parsedError.message },
+      });
     }
   }
 
@@ -220,10 +216,9 @@ export class CronTasksRepository implements ICronTasksRepository {
 
       if (!updatedTask) {
         return fail({
-        message: 
-          ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: ErrorResponseTypes.NOT_FOUND.errorKey,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       return createSuccessResponse(updatedTask);
@@ -234,11 +229,11 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryTaskUpdateFailed",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryTaskUpdateFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, taskId: id });
-      );
+        messageParams: { error: parsedError.message, taskId: id },
+      });
     }
   }
 
@@ -258,11 +253,11 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryTaskDeleteFailed",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryTaskDeleteFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, taskId: id });
-      );
+        messageParams: { error: parsedError.message, taskId: id },
+      });
     }
   }
 
@@ -286,11 +281,11 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryExecutionCreateFailed",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryExecutionCreateFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, taskId: execution.taskId });
-      );
+        messageParams: { error: parsedError.message, taskId: execution.taskId },
+      });
     }
   }
 
@@ -302,7 +297,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     try {
       logger.debug("Updating cron task execution", {
         id,
-        updates: Object.keys(updates}),
+        updates: Object.keys(updates),
       });
       const [updatedExecution] = await db
         .update(cronTaskExecutions)
@@ -312,10 +307,9 @@ export class CronTasksRepository implements ICronTasksRepository {
 
       if (!updatedExecution) {
         return fail({
-        message: 
-          ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: ErrorResponseTypes.NOT_FOUND.errorKey,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       return createSuccessResponse(updatedExecution);
@@ -326,11 +320,11 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryExecutionUpdateFailed",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryExecutionUpdateFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, executionId: id });
-      );
+        messageParams: { error: parsedError.message, executionId: id },
+      });
     }
   }
 
@@ -357,11 +351,11 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryExecutionsFetchFailed",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryExecutionsFetchFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, taskId, limit });
-      );
+        messageParams: { error: parsedError.message, taskId, limit },
+      });
     }
   }
 
@@ -385,11 +379,11 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryRecentExecutionsFetchFailed",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryRecentExecutionsFetchFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, limit });
-      );
+        messageParams: { error: parsedError.message, limit },
+      });
     }
   }
 
@@ -409,11 +403,11 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositorySchedulesFetchFailed",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositorySchedulesFetchFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -425,7 +419,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     try {
       logger.debug("Updating task schedule", {
         taskId,
-        updates: Object.keys(updates}),
+        updates: Object.keys(updates),
       });
       const [updatedSchedule] = await db
         .update(cronTaskSchedules)
@@ -435,10 +429,9 @@ export class CronTasksRepository implements ICronTasksRepository {
 
       if (!updatedSchedule) {
         return fail({
-        message: 
-          ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: ErrorResponseTypes.NOT_FOUND.errorKey,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       return createSuccessResponse(updatedSchedule);
@@ -449,11 +442,11 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryScheduleUpdateFailed",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryScheduleUpdateFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, taskId });
-      );
+        messageParams: { error: parsedError.message, taskId },
+      });
     }
   }
 
@@ -469,7 +462,7 @@ export class CronTasksRepository implements ICronTasksRepository {
       logger.debug("Fetching task statistics");
       const [stats] = await db
         .select({
-          totalTasks: count(cronTasks.id}),
+          totalTasks: count(cronTasks.id),
           enabledTasks: sql<number>`count(case when ${cronTasks.enabled} = true then 1 end)::int`,
           disabledTasks: sql<number>`count(case when ${cronTasks.enabled} = false then 1 end)::int`,
           averageExecutionTime: sql<number>`avg(${cronTasks.averageExecutionTime})::int`,
@@ -488,11 +481,11 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryStatisticsFetchFailed",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.common.cronRepositoryStatisticsFetchFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 }

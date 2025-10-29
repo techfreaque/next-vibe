@@ -90,13 +90,13 @@ const DEFAULT_CONFIG: Omit<PlatformConfig, "platform"> = {
     enabled: true,
     ttl: 5 * 60 * 1000, // 5 minutes
     maxSize: 1000,
-  });
+  },
   features: {
     parallelExecution: true,
     streaming: true,
     resultCaching: true,
     composition: false, // Disabled by default for safety
-  });
+  }
 };
 
 /**
@@ -108,16 +108,16 @@ export const CLI_CONFIG: PlatformConfig = {
   cache: {
     ...DEFAULT_CONFIG.cache,
     ttl: 10 * 60 * 1000, // 10 minutes for CLI
-  });
+  },
   features: {
     ...DEFAULT_CONFIG.features,
     streaming: false, // CLI doesn't need streaming
-  });
+  },
   platformSpecific: {
     colorOutput: true,
     verboseErrors: true,
     interactiveMode: true,
-  });
+  }
 };
 
 /**
@@ -134,21 +134,21 @@ export const AI_CONFIG: PlatformConfig = {
   cache: {
     ...DEFAULT_CONFIG.cache,
     ttl: 15 * 60 * 1000, // 15 minutes for AI
-  });
+  },
   rateLimit: {
     enabled: true,
     maxRequests: 100,
     windowMs: 60 * 1000, // 100 requests per minute
-  });
+  },
   features: {
     ...DEFAULT_CONFIG.features,
     composition: false, // Disabled for safety
-  });
+  },
   platformSpecific: {
     maxToolsPerRequest: 10,
     enableConfirmation: true,
     dangerousOperations: false,
-  });
+  }
 };
 
 /**
@@ -165,24 +165,24 @@ export const MCP_CONFIG: PlatformConfig = {
   cache: {
     ...DEFAULT_CONFIG.cache,
     ttl: 20 * 60 * 1000, // 20 minutes for MCP
-  });
+  },
   rateLimit: {
     enabled: true,
     maxRequests: 50,
     windowMs: 60 * 1000, // 50 requests per minute
-  });
+  },
   features: {
     ...DEFAULT_CONFIG.features,
     composition: false,
-  });
+  },
   platformSpecific: {
     protocolVersion: "2024-11-05",
     capabilities: {
       tools: true,
       prompts: false,
       resources: false,
-    });
-  });
+    }
+  }
 };
 
 /**
@@ -194,15 +194,15 @@ export const WEB_CONFIG: PlatformConfig = {
   cache: {
     ...DEFAULT_CONFIG.cache,
     ttl: 2 * 60 * 1000, // 2 minutes for web (shorter for freshness)
-  });
+  },
   features: {
     ...DEFAULT_CONFIG.features,
     streaming: true,
-  });
+  },
   platformSpecific: {
     enableWebSockets: true,
     enableSSE: true,
-  });
+  }
 };
 
 /**
@@ -215,15 +215,15 @@ export const MOBILE_CONFIG: PlatformConfig = {
     ...DEFAULT_CONFIG.cache,
     ttl: 10 * 60 * 1000, // 10 minutes for mobile
     maxSize: 500, // Smaller cache for mobile
-  });
+  },
   features: {
     ...DEFAULT_CONFIG.features,
     streaming: true,
-  });
+  },
   platformSpecific: {
     offlineMode: true,
     reducedPayloads: true,
-  });
+  }
 };
 
 /**
@@ -261,15 +261,15 @@ export function mergePlatformConfig(
     cache: {
       ...baseConfig.cache,
       ...(customConfig.cache || {}),
-    });
+    },
     features: {
       ...baseConfig.features,
       ...(customConfig.features || {}),
-    });
+    },
     platformSpecific: {
       ...baseConfig.platformSpecific,
       ...(customConfig.platformSpecific || {}),
-    });
+    }
   };
 }
 

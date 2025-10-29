@@ -52,7 +52,7 @@ export interface TextToSpeechRepository {
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
-      response: messageParams: { success: boolean; audioUrl: string; provider: string };
+      response: { success: boolean; audioUrl: string; provider: string };
     }>
   >;
 }
@@ -71,7 +71,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
-      response: messageParams: { success: boolean; audioUrl: string; provider: string };
+      response: { success: boolean; audioUrl: string; provider: string };
     }>
   > {
     logger.info("Starting text-to-speech conversion", {
@@ -84,10 +84,11 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
     // Check API key
     if (!env.EDEN_AI_API_KEY) {
       logger.error("Eden AI API key not configured");
-      return fail({message: 
-        "app.api.v1.core.agent.textToSpeech.post.errors.apiKeyMissing",
+      return fail({
+        message:
+          "app.api.v1.core.agent.textToSpeech.post.errors.apiKeyMissing",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      );
+      });
     }
 
     try {
@@ -112,7 +113,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
             text: data.text,
             language: data.language,
             option: data.voice,
-          }}),
+          }),
         },
       );
 
@@ -122,13 +123,14 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
           status: response.status,
           error: errorText,
         });
-        return fail({message: 
-          "app.api.v1.core.agent.textToSpeech.post.errors.conversionFailed",
+        return fail({
+          message:
+            "app.api.v1.core.agent.textToSpeech.post.errors.conversionFailed",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          {
+          messageParams: {
             error: errorText,
           },
-        );
+        });
       }
 
       const responseData = (await response.json()) as EdenAITTSResponse;
@@ -143,15 +145,16 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
       if (!audioResourceUrl) {
         logger.error("No audio URL in response", {
           provider: data.provider,
-          responseKeys: Object.keys(responseData}),
+          responseKeys: Object.keys(responseData),
         });
-        return fail({message: 
-          "app.api.v1.core.agent.textToSpeech.post.errors.noAudioUrl",
+        return fail({
+          message:
+            "app.api.v1.core.agent.textToSpeech.post.errors.noAudioUrl",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        );
+        });
       }
 
-      logger.debug("Fetching audio from URL", messageParams: { audioUrl: audioResourceUrl });
+      logger.debug("Fetching audio from URL", { audioUrl: audioResourceUrl });
 
       // Fetch the audio file
       const audioResponse = await fetch(audioResourceUrl);
@@ -160,10 +163,11 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
           status: audioResponse.status,
           audioUrl: audioResourceUrl,
         });
-        return fail({message: 
-          "app.api.v1.core.agent.textToSpeech.post.errors.audioFetchFailed",
+        return fail({
+          message:
+            "app.api.v1.core.agent.textToSpeech.post.errors.audioFetchFailed",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        );
+        });
       }
 
       const audioBuffer = await audioResponse.arrayBuffer();
@@ -212,13 +216,14 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
         provider: data.provider,
       });
 
-      return fail({message: 
-        "app.api.v1.core.agent.textToSpeech.post.errors.conversionFailed",
+      return fail({
+        message:
+          "app.api.v1.core.agent.textToSpeech.post.errors.conversionFailed",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        {
+        messageParams: {
           error: errorMessage,
         },
-      );
+      });
     }
   }
 }

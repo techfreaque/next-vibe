@@ -313,13 +313,13 @@ export class ModularCLIResponseRenderer {
       case FieldDataType.ARRAY:
         return this.formatter.formatArray(
           Array.isArray(value) ? value : [value],
-          { maxItems: 5 }
+          { maxItems: 5 },
         );
       case FieldDataType.OBJECT:
         return this.formatter.formatObject(
           typeof value === "object" && value !== null && !Array.isArray(value)
             ? value
-            : {}
+            : {},
         );
       default:
         return String(value);
@@ -415,7 +415,7 @@ class DefaultDataFormatter implements DataFormatter {
   formatNumber(
     value: number,
     locale: CountryLanguage,
-    options?: { precision?: number; unit?: string }
+    options?: { precision?: number; unit?: string },
   ): string {
     return this.baseFormatter.formatNumber(value, {
       precision: options?.precision,

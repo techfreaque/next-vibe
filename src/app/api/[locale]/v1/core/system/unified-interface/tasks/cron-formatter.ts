@@ -575,7 +575,7 @@ export function validateCronSchedule(
   timezone = "UTC",
 ): boolean {
   try {
-    cronParser.parse(schedule, { tz: timezone });
+    cronParser.parse(schedule, { tz: timezone },
     return true;
   } catch {
     return false;

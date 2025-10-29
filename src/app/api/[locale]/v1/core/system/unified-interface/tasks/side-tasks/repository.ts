@@ -8,9 +8,9 @@ import { count, desc, eq, sql } from "drizzle-orm";
 
 import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
@@ -140,11 +140,11 @@ export class SideTasksRepository implements ISideTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.common.sideTasksRepositoryFetchAllFailed",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.common.sideTasksRepositoryFetchAllFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -170,11 +170,11 @@ export class SideTasksRepository implements ISideTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.common.sideTasksRepositoryFetchByIdFailed",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.common.sideTasksRepositoryFetchByIdFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, taskId: id });
-      );
+        messageParams: { error: parsedError.message, taskId: id },
+      });
     }
   }
 
@@ -191,11 +191,11 @@ export class SideTasksRepository implements ISideTasksRepository {
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchByNameFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchByNameFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -204,7 +204,7 @@ export class SideTasksRepository implements ISideTasksRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<SideTaskRecord>> {
     try {
-      logger.debug("Creating new side task", messageParams: { name: task.name });
+      logger.debug("Creating new side task", { name: task.name });
       const [newTask] = await db.insert(sideTasks).values(task).returning();
       logger.info("Successfully created side task", {
         id: newTask.id,
@@ -218,11 +218,11 @@ export class SideTasksRepository implements ISideTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.common.sideTasksRepositoryCreateFailed",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.common.sideTasksRepositoryCreateFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, taskName: task.name });
-      );
+        messageParams: { error: parsedError.message, taskName: task.name },
+      });
     }
   }
 
@@ -239,21 +239,21 @@ export class SideTasksRepository implements ISideTasksRepository {
 
       if (!updatedTask) {
         return fail({
-        message: 
-          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.taskNotFound" as const,
+          message:
+            "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.taskNotFound" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       return createSuccessResponse<SideTaskRecord>(updatedTask);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.updateTaskFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.updateTaskFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -264,11 +264,11 @@ export class SideTasksRepository implements ISideTasksRepository {
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.deleteTaskFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.deleteTaskFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -284,11 +284,11 @@ export class SideTasksRepository implements ISideTasksRepository {
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.createExecutionFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.createExecutionFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -305,21 +305,21 @@ export class SideTasksRepository implements ISideTasksRepository {
 
       if (!updatedExecution) {
         return fail({
-        message: 
-          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.executionNotFound" as const,
+          message:
+            "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.executionNotFound" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       return createSuccessResponse<SideTaskExecutionRecord>(updatedExecution);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.updateExecutionFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.updateExecutionFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -340,11 +340,11 @@ export class SideTasksRepository implements ISideTasksRepository {
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchExecutionsFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchExecutionsFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -363,11 +363,11 @@ export class SideTasksRepository implements ISideTasksRepository {
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchRecentExecutionsFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchRecentExecutionsFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -383,11 +383,11 @@ export class SideTasksRepository implements ISideTasksRepository {
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.createHealthCheckFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.createHealthCheckFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -408,11 +408,11 @@ export class SideTasksRepository implements ISideTasksRepository {
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchLatestHealthCheckFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchLatestHealthCheckFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -433,11 +433,11 @@ export class SideTasksRepository implements ISideTasksRepository {
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchHealthCheckHistoryFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchHealthCheckHistoryFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -452,7 +452,7 @@ export class SideTasksRepository implements ISideTasksRepository {
     try {
       const [stats] = await db
         .select({
-          totalTasks: count(sideTasks.id}),
+          totalTasks: count(sideTasks.id),
           runningTasks: sql<number>`count(case when ${sideTasks.isRunning} = true then 1 end)::int`,
         })
         .from(sideTasks);
@@ -481,11 +481,11 @@ export class SideTasksRepository implements ISideTasksRepository {
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchStatisticsFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchStatisticsFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -502,11 +502,11 @@ export class SideTasksRepository implements ISideTasksRepository {
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchStatisticsFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchStatisticsFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -541,20 +541,20 @@ export class SideTasksRepository implements ISideTasksRepository {
         }
         default:
           return fail({
-        message: 
-            "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchStatisticsFailed" as const,
+            message:
+              "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchStatisticsFailed" as const,
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            { action });
-          );
+            messageParams: { action },
+          });
       }
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchStatisticsFailed" as const,
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchStatisticsFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 }

@@ -107,10 +107,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse<PulseHealth | null>(health[0] || null);
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -124,10 +123,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       if (!currentHealthResponse.success || !currentHealthResponse.data) {
         // If no health record exists, cannot update - require a full create
         return fail({
-        message: 
-          ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: ErrorResponseTypes.NOT_FOUND.errorKey,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       const [updatedHealth] = await db
@@ -139,10 +137,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse<PulseHealth>(updatedHealth);
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -159,10 +156,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
     } catch (error) {
       logger.error("Failed to create health record", parseError(error));
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -179,10 +175,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse(newExecution);
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -201,19 +196,17 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
       if (!updatedExecution) {
         return fail({
-        message: 
-          ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: ErrorResponseTypes.NOT_FOUND.errorKey,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       return createSuccessResponse(updatedExecution);
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -231,10 +224,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse(executions);
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -253,10 +245,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse(execution[0] || null);
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -273,10 +264,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse(newNotification);
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -294,10 +284,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse(notifications);
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -309,25 +298,23 @@ export class PulseHealthRepository implements IPulseHealthRepository {
     try {
       const [updatedNotification] = await db
         .update(pulseNotifications)
-        .set(messageParams: { sent: true, sentAt: new Date() })
+        .set({ sent: true, sentAt: new Date() })
         .where(eq(pulseNotifications.id, id))
         .returning();
 
       if (!updatedNotification) {
         return fail({
-        message: 
-          ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: ErrorResponseTypes.NOT_FOUND.errorKey,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       return createSuccessResponse(updatedNotification);
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -345,17 +332,16 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       const currentHealthResponse = await this.getCurrentHealth(_logger);
       if (!currentHealthResponse.success) {
         return fail({
-        message: 
-          ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        });
       }
       const currentHealth = currentHealthResponse.data;
 
       // Get execution statistics
       const [execStats] = await db
         .select({
-          totalExecutions: count(pulseExecutions.id}),
+          totalExecutions: count(pulseExecutions.id),
           averageExecutionTime: sql<number>`avg(${pulseExecutions.durationMs})::int`,
         })
         .from(pulseExecutions);
@@ -369,10 +355,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       });
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
   /**
@@ -413,7 +398,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       // This is a simplified implementation for now
       const summary = {
         pulseId,
-        executedAt: new Date().toISOString(}),
+        executedAt: new Date().toISOString(),
         totalTasksDiscovered: 0,
         tasksDue: [],
         tasksExecuted: [],
@@ -440,10 +425,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse(response);
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -464,18 +448,18 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         await this.createHealthRecord(
           {
             status: success ? "HEALTHY" : "WARNING",
-            lastPulseAt: new Date(}),
+            lastPulseAt: new Date(),
             consecutiveFailures: success ? 0 : 1,
             avgExecutionTimeMs: executionTimeMs,
             successRate: success ? 10000 : 0, // Basis points
             totalExecutions: 1,
             totalSuccesses: success ? 1 : 0,
             totalFailures: success ? 0 : 1,
-            metadata: {});
+            metadata: {},
             alertsSent: 0,
             lastAlertAt: null,
             isMaintenanceMode: false,
-          });
+          },
           {} as EndpointLogger,
         );
       } else {
@@ -490,17 +474,17 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
         await this.updateHealth(
           {
-            lastPulseAt: new Date(}),
+            lastPulseAt: new Date(),
             consecutiveFailures: success ? 0 : health.consecutiveFailures + 1,
             avgExecutionTimeMs: Math.round(
               (health.avgExecutionTimeMs || 0 + executionTimeMs) / 2,
-            }),
+            ),
             successRate: newSuccessRate,
             totalExecutions: newTotalExecutions,
             totalSuccesses: newTotalSuccesses,
             totalFailures: newTotalFailures,
             status: success ? "HEALTHY" : "WARNING",
-          });
+          },
           {} as EndpointLogger,
         );
       }
@@ -508,10 +492,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse(undefined);
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -541,10 +524,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
       if (!healthResponse.success || !healthResponse.data) {
         return fail({
-        message: 
-          ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: ErrorResponseTypes.NOT_FOUND.errorKey,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       const health = healthResponse.data;
@@ -564,17 +546,16 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         alertsSent: health.alertsSent,
         lastAlertAt: health.lastAlertAt?.toISOString() || null,
         isMaintenanceMode: health.isMaintenanceMode,
-        createdAt: health.createdAt.toISOString(}),
-        updatedAt: health.updatedAt.toISOString(}),
+        createdAt: health.createdAt.toISOString(),
+        updatedAt: health.updatedAt.toISOString(),
       };
 
       return createSuccessResponse(response);
     } catch {
       return fail({
-        message: 
-        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 }

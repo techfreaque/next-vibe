@@ -14,5 +14,5 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     handler: ({ data, user, locale, logger }) =>
       cronStatusRepository.getStatus(data, user, locale, logger),
-  });
+  },
 });

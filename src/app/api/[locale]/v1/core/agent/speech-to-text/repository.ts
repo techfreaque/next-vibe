@@ -7,10 +7,9 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -96,7 +95,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
 
       // Create form data for Eden AI
       const formData = new FormData();
-      const blob = new Blob([buffer], messageParams: { type: file.type });
+      const blob = new Blob([buffer], { type: file.type });
       formData.append("file", blob, file.name);
       formData.append("providers", data.provider);
       formData.append("language", data.language);
@@ -125,13 +124,14 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
           status: response.status,
           error: errorText,
         });
-        return fail({message: 
-          "app.api.v1.core.agent.speechToText.post.errors.transcriptionFailed",
+        return fail({
+          message:
+            "app.api.v1.core.agent.speechToText.post.errors.transcriptionFailed",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          {
+          messageParams: {
             error: errorText,
           },
-        );
+        });
       }
 
       const responseData = (await response.json()) as {
@@ -141,10 +141,10 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
 
       if (!publicId) {
         logger.error("No public ID received from Eden AI");
-        return fail({message: 
-          "app.api.v1.core.agent.speechToText.post.errors.noPublicId",
+        return fail({
+          message: "app.api.v1.core.agent.speechToText.post.errors.noPublicId",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        );
+        });
       }
 
       logger.debug("Received public ID from Eden AI", { publicId });
@@ -188,13 +188,14 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
         provider: data.provider,
       });
 
-      return fail({message: 
-        "app.api.v1.core.agent.speechToText.post.errors.transcriptionFailed",
+      return fail({
+        message:
+          "app.api.v1.core.agent.speechToText.post.errors.transcriptionFailed",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        {
+        messageParams: {
           error: errorMessage,
         },
-      );
+      });
     }
   }
 
@@ -205,7 +206,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
     publicId: string,
     provider: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<messageParams: { text: string; confidence: number | undefined }>> {
+  ): Promise<ResponseType<{ text: string; confidence: number | undefined }>> {
     let attempts = 0;
 
     while (attempts < MAX_POLLING_ATTEMPTS) {
@@ -229,10 +230,11 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
             status: response.status,
             publicId,
           });
-          return fail({message: 
-            "app.api.v1.core.agent.speechToText.post.errors.pollFailed",
+          return fail({
+            message:
+              "app.api.v1.core.agent.speechToText.post.errors.pollFailed",
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          );
+          });
         }
 
         const resultData = (await response.json()) as EdenAITranscriptionResult;
@@ -254,10 +256,10 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
           });
         } else if (resultData.status === "failed") {
           logger.error("Transcription failed", { publicId, provider });
-          return fail({message: 
-            "app.api.v1.core.agent.speechToText.post.errors.failed",
+          return fail({
+            message: "app.api.v1.core.agent.speechToText.post.errors.failed",
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          );
+          });
         }
 
         attempts++;
@@ -272,21 +274,22 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
           error: errorMessage,
           attempts,
         });
-        return fail({message: 
-          "app.api.v1.core.agent.speechToText.post.errors.transcriptionFailed",
+        return fail({
+          message:
+            "app.api.v1.core.agent.speechToText.post.errors.transcriptionFailed",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          {
+          messageParams: {
             error: errorMessage,
           },
-        );
+        });
       }
     }
 
     logger.error("Transcription timeout", { publicId, provider });
-    return fail({message: 
-      "app.api.v1.core.agent.speechToText.post.errors.timeout",
+    return fail({
+      message: "app.api.v1.core.agent.speechToText.post.errors.timeout",
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-    );
+    });
   }
 }
 

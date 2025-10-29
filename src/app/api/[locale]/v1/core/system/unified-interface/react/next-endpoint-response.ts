@@ -6,11 +6,10 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
-  fail,
   createSuccessResponse,
   errorResponseSchema,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -59,6 +58,7 @@ export async function createHTTPSuccessResponse<TResponse>({
       message: "app.api.v1.core.shared.errorTypes.invalid_response_error",
       errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
       messageParams: { message: validationResult.message },
+      cause: validationResult,
       logger,
     });
   }
@@ -121,7 +121,10 @@ export function createHTTPErrorResponse({
   // Validate error response format
   const validationResult = validateData(
     fail({
-        message: message, errorType, messageParams),
+      message: message,
+      errorType,
+      messageParams,
+    }),
     errorResponseSchema,
     logger,
   );
@@ -133,12 +136,11 @@ export function createHTTPErrorResponse({
     );
     return NextResponse.json(
       fail({
-        message: 
-        "app.api.v1.core.shared.errorTypes.invalid_response_error",
+        message: "app.api.v1.core.shared.errorTypes.invalid_response_error",
         errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
-        { message: validationResult.message });
-      ),
-      { status: 500 });
+        messageParams: { message: validationResult.message },
+      }),
+      { status: 500 },
     );
   }
 
@@ -169,24 +171,22 @@ export async function validatePostRequest<T>(
       logger.error(`Request validation error: ${validationResult.message}`);
       // Return the actual validation error directly, not a generic wrapper
       return fail({
-        message: 
-        validationResult.message,
+        message: validationResult.message,
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-        validationResult.messageParams,
-      );
+        cause: validationResult,
+      });
     }
 
     return createSuccessResponse(validationResult.data);
   } catch (error) {
     // For JSON parsing errors, use a specific error message
     return fail({
-        message: 
-      "app.api.v1.core.shared.errors.invalid_request_data",
+      message: "app.api.v1.core.shared.errors.invalid_request_data",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-      {
+      messageParams: {
         message: parseError(error).message,
       });
-    );
+    });
   }
 }
 
@@ -274,23 +274,21 @@ export function validateGetRequest<T extends ZodSchema>(
       );
       // Return the actual validation error directly, not a generic wrapper
       return fail({
-        message: 
-        validationResult.message,
+        message: validationResult.message,
         errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
-        validationResult.messageParams,
-      );
+        cause: validationResult,
+      });
     }
   } catch (error) {
     logger.error(
       `Error validating query parameters: ${parseError(error).message}`,
     );
     return fail({
-        message: 
-      "app.api.v1.core.shared.errors.invalid_url_parameters",
+      message: "app.api.v1.core.shared.errors.invalid_url_parameters",
       errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
-      {
+      messageParams: {
         message: parseError(error).message,
       });
-    );
+    });
   }
 }

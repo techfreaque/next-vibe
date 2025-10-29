@@ -56,7 +56,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
         // eslint-disable-next-line i18next/no-literal-string
         platformName: "MCP Registry",
         enabledCheck: isMCPServerEnabled,
-      });
+      },
       logger,
     );
   }
@@ -119,8 +119,8 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
       return this.fail({
         error: t("app.api.v1.core.system.unifiedUi.mcp.registry.toolNotFound"),
         code: MCPErrorCode.TOOL_NOT_FOUND,
-        details: { toolName: context.toolName });
-      );
+        details: { toolName: context.toolName },
+      });
     }
 
     // Check permissions (toolMeta IS the endpoint now)
@@ -131,8 +131,8 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
           "app.api.v1.core.system.unifiedUi.mcp.registry.endpointNotFound",
         ),
         code: MCPErrorCode.TOOL_NOT_FOUND,
-        details: { toolName: context.toolName });
-      );
+        details: { toolName: context.toolName },
+      });
     }
 
     if (!toolFilter.hasEndpointPermission(endpoint, context.user)) {
@@ -141,7 +141,10 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
           "app.api.v1.core.system.unifiedUi.mcp.registry.permissionDenied",
         ),
         code: MCPErrorCode.PERMISSION_DENIED,
-        details: { toolName: context.toolName, requiredRoles: toolMeta.allowedRoles },
+        details: {
+          toolName: context.toolName,
+          requiredRoles: toolMeta.allowedRoles,
+        },
       });
     }
 
@@ -164,7 +167,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
       const executionContext: RouteExecutionContext = {
         toolName: toolMeta.name,
         data: context.data,
-        urlPathParams: {});
+        urlPathParams: {},
         user: context.user,
         locale: context.locale,
         logger: this.logger,
@@ -172,7 +175,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
           dryRun: false,
           interactive: false,
           output: "json" as const,
-        });
+        },
       };
 
       const routeExecutor = new RouteDelegationHandler();
@@ -222,7 +225,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
             code,
             ...details,
           }),
-        });
+        },
       ],
       isError: true,
     };
@@ -232,7 +235,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
    * Convert route execution result to MCP format
    */
   private convertToMCPResult(
-    result: { success: boolean; data?: ParameterValue; error?: string });
+    result: { success: boolean; data?: ParameterValue; error?: string },
     toolName: string,
     locale: CountryLanguage,
   ): MCPToolCallResult {
@@ -242,7 +245,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
           {
             type: "text",
             text: JSON.stringify(result.data || result, null, 2),
-          });
+          },
         ],
         isError: false,
       };
@@ -252,9 +255,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
     return this.fail({
       error:
         result.error ||
-        t(
-          "app.api.v1.core.system.unifiedUi.mcp.registry.toolExecutionFailed",
-        ),
+        t("app.api.v1.core.system.unifiedUi.mcp.registry.toolExecutionFailed"),
       code: MCPErrorCode.TOOL_EXECUTION_FAILED,
       details: { toolName },
     });
@@ -302,7 +303,7 @@ export const getMCPRegistry = createKeyedSingletonGetter(
   (key: string, locale: CountryLanguage) => {
     const logger = createEndpointLogger(false, Date.now(), locale);
     return new MCPRegistry(logger);
-  });
+  },
 );
 
 /**

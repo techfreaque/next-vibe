@@ -136,6 +136,6 @@ export function createErrorResult(
       executionTime,
       endpointPath: "",
       method: "",
-    });
+    },
   };
 }

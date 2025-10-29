@@ -26,7 +26,7 @@ export function useAIToolsList(
   logger: EndpointLogger,
   params?: {
     enabled?: boolean;
-  });
+  },
 ): ReturnType<typeof useEndpoint<typeof definitions>> {
   const queryOptions = useMemo(
     () => ({
@@ -41,7 +41,7 @@ export function useAIToolsList(
     definitions,
     {
       queryOptions,
-    });
+    },
     logger,
   );
 }

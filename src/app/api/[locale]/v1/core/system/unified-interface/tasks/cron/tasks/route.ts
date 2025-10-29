@@ -15,8 +15,8 @@ export const { GET, POST, tools } = endpointsHandler({
   [Methods.GET]: {
     handler: async ({ data, user, locale, logger }) => {
       return await cronTasksListRepository.getTasks(data, user, locale, logger);
-    });
-  });
+    },
+  },
   [Methods.POST]: {
     handler: async ({ data, user, locale, logger }) => {
       return await cronTasksListRepository.createTask(
@@ -25,6 +25,6 @@ export const { GET, POST, tools } = endpointsHandler({
         locale,
         logger,
       );
-    });
-  });
+    },
+  },
 });

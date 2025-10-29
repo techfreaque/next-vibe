@@ -54,7 +54,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     this.logger.debug("[MCP Protocol] Received request", {
       method: request.method,
       id: request.id,
-    });
+    })
 
     try {
       // Validate JSON-RPC version
@@ -129,7 +129,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       this.logger.error("[MCP Protocol] Request handling failed", {
         method: request.method,
         error: parsedError.message,
-      });
+      },
 
       return this.fail({
         message: 
@@ -150,7 +150,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       clientName: params.clientInfo.name,
       clientVersion: params.clientInfo.version,
       protocolVersion: params.protocolVersion,
-    });
+    },
 
     const config = getMCPConfig();
 
@@ -168,7 +168,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
         resources: config.capabilities.resources
           ? { subscribe: false }
           : undefined,
-      });
+      },
       serverInfo: {
         name: config.name,
         version: config.version,
@@ -195,7 +195,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
 
     this.logger.info("[MCP Protocol] Tools listed", {
       count: tools.length,
-    });
+    },
 
     return {
       tools,
@@ -209,23 +209,23 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   async handleToolCall(params: MCPToolCallParams): Promise<MCPToolCallResult> {
     this.logger.info("[MCP Protocol] Calling tool", {
       toolName: params.name,
-    });
+    },
 
     const registry = getMCPRegistry(this.locale);
 
     // Execute tool
     const result = await registry.executeTool({
       toolName: params.name,
-      arguments: params.arguments || {});
+      arguments: params.arguments || {},
       user: this.user,
       locale: this.locale,
       requestId: Date.now(),
-    });
+    },
 
     this.logger.info("[MCP Protocol] Tool call complete", {
       toolName: params.name,
       isError: result.isError,
-    });
+    },
 
     return result;
   }

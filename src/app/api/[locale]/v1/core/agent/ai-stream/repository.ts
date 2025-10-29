@@ -814,10 +814,10 @@ class AiStreamRepository implements IAiStreamRepository {
     }
 
     if (!validationResult.success) {
-      return fail({message: 
-        "app.api.v1.core.agent.chat.aiStream.route.errors.creditValidationFailed",
+      return fail({
+        message: "app.api.v1.core.agent.chat.aiStream.route.errors.creditValidationFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
 
     // Step 2: Check if user has enough credits (unless free model)
@@ -830,14 +830,14 @@ class AiStreamRepository implements IAiStreamRepository {
         balance: validationResult.data.balance,
       });
 
-      return fail({message: 
-        "app.api.v1.core.agent.chat.aiStream.route.errors.insufficientCredits",
+      return fail({
+        message: "app.api.v1.core.agent.chat.aiStream.route.errors.insufficientCredits",
         errorType: ErrorResponseTypes.FORBIDDEN,
-        {
-          cost: modelCost.toString(}),
-          balance: validationResult.data.balance.toString(}),
+        messageParams: {
+          cost: modelCost.toString(),
+          balance: validationResult.data.balance.toString(),
         },
-      );
+      });
     }
 
     logger.debug("Credit validation passed", {
@@ -874,10 +874,10 @@ class AiStreamRepository implements IAiStreamRepository {
             logger,
           );
           if (!retryResult) {
-            return fail({message: 
-              "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
+            return fail({
+              message: "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
               errorType: ErrorResponseTypes.NOT_FOUND,
-            );
+            });
           }
           operationResult = retryResult;
         }
@@ -894,10 +894,10 @@ class AiStreamRepository implements IAiStreamRepository {
             logger,
           );
           if (!editResult) {
-            return fail({message: 
-              "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
+            return fail({
+              message: "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
               errorType: ErrorResponseTypes.NOT_FOUND,
-            );
+            });
           }
           operationResult = editResult;
         }
@@ -933,10 +933,10 @@ class AiStreamRepository implements IAiStreamRepository {
       logger.error("Failed to ensure thread", {
         error: parseError(error).message,
       });
-      return fail({message: 
-        "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
+      return fail({
+        message: "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
-      );
+      });
     }
 
     // Step 5: Calculate message depth
@@ -987,7 +987,7 @@ class AiStreamRepository implements IAiStreamRepository {
       messages.length > 0 &&
       messages[0].role !== "system"
     ) {
-      messages.unshift(messageParams: { role: "system", content: systemPrompt });
+      messages.unshift({ role: "system", content: systemPrompt });
     }
 
     // Step 8: Create AI message placeholder
@@ -1031,7 +1031,7 @@ class AiStreamRepository implements IAiStreamRepository {
             success: false,
             message:
               "app.api.v1.core.agent.chat.aiStream.route.errors.uncensoredApiKeyMissing",
-            errorType: errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           };
         }
 
@@ -1090,7 +1090,7 @@ class AiStreamRepository implements IAiStreamRepository {
               });
               const threadEvent = createStreamEvent.threadCreated({
                 threadId: threadResult.threadId,
-                title: generateThreadTitle(data.content}),
+                title: generateThreadTitle(data.content),
                 rootFolderId: data.rootFolderId,
                 subFolderId: data.subFolderId || null,
               });
@@ -1123,7 +1123,7 @@ class AiStreamRepository implements IAiStreamRepository {
               const userMessageEvent = createStreamEvent.messageCreated({
                 messageId: userMessageId,
                 threadId: threadResult.threadId,
-                role: toChatMessageRole(effectiveRole}),
+                role: toChatMessageRole(effectiveRole),
                 parentId: effectiveParentMessageId || null,
                 depth: messageDepth,
                 content: effectiveContent,
@@ -1131,7 +1131,7 @@ class AiStreamRepository implements IAiStreamRepository {
               const userMessageEventString = formatSSEEvent(userMessageEvent);
               logger.debug("[DEBUG] USER MESSAGE_CREATED event formatted", {
                 messageId: userMessageId,
-                eventString: userMessageEventString.substring(0, 200}),
+                eventString: userMessageEventString.substring(0, 200),
               });
               controller.enqueue(encoder.encode(userMessageEventString));
               logger.debug("[DEBUG] USER MESSAGE_CREATED event emitted", {
@@ -1184,10 +1184,10 @@ class AiStreamRepository implements IAiStreamRepository {
             // stopWhen: allows up to 5 steps (tool call + text generation cycles)
             // The model will continue until it generates text without tool calls or reaches the step limit
             const streamResult = streamText({
-              model: provider(openRouterModelId}),
+              model: provider(openRouterModelId),
               messages,
               temperature: data.temperature,
-              abortSignal: AbortSignal.timeout(maxDuration * 1000}),
+              abortSignal: AbortSignal.timeout(maxDuration * 1000),
               system: systemPrompt || undefined,
               ...(tools
                 ? {
@@ -1210,7 +1210,7 @@ class AiStreamRepository implements IAiStreamRepository {
                       });
                     },
                   }
-                : {}}),
+                : {}),
             });
 
             // Collect tool calls during streaming
@@ -1228,7 +1228,7 @@ class AiStreamRepository implements IAiStreamRepository {
             const registry = getToolRegistry();
             const allEndpoints = registry.getEndpoints(user, Platform.AI);
             const endpointMap = new Map(
-              allEndpoints.map((endpoint) => [endpoint.toolName, endpoint]}),
+              allEndpoints.map((endpoint) => [endpoint.toolName, endpoint]),
             );
 
             // Stream the response
@@ -1251,7 +1251,7 @@ class AiStreamRepository implements IAiStreamRepository {
                           .update(chatMessages)
                           .set({
                             content: fullContent,
-                            updatedAt: new Date(}),
+                            updatedAt: new Date(),
                           })
                           .where(eq(chatMessages.id, lastAssistantMessageId));
 
@@ -1272,7 +1272,7 @@ class AiStreamRepository implements IAiStreamRepository {
                         finishReason: null,
                       });
                       controller.enqueue(
-                        encoder.encode(formatSSEEvent(partDoneEvent)}),
+                        encoder.encode(formatSSEEvent(partDoneEvent)),
                       );
                     }
 
@@ -1317,7 +1317,7 @@ class AiStreamRepository implements IAiStreamRepository {
                       sequenceIndex, // Position in sequence
                     });
                     controller.enqueue(
-                      encoder.encode(formatSSEEvent(aiMessageEvent)}),
+                      encoder.encode(formatSSEEvent(aiMessageEvent)),
                     );
                     aiMessageCreated = true;
                     lastAssistantMessageId = aiMessageId; // Track this as the last assistant message
@@ -1340,7 +1340,7 @@ class AiStreamRepository implements IAiStreamRepository {
                     delta: textDelta,
                   });
                   controller.enqueue(
-                    encoder.encode(formatSSEEvent(deltaEvent)}),
+                    encoder.encode(formatSSEEvent(deltaEvent)),
                   );
                 }
               } else if (part.type === "reasoning-start") {
@@ -1400,14 +1400,14 @@ class AiStreamRepository implements IAiStreamRepository {
                             string,
                             string | number | boolean
                           >,
-                        })}),
+                        })),
                       };
                     } else {
                       widgetMetadata = undefined;
                     }
                   } catch (error) {
                     logger.error("Failed to extract widget metadata", {
-                      error: String(error}),
+                      error: String(error),
                     });
                     widgetMetadata = undefined;
                   }
@@ -1434,7 +1434,7 @@ class AiStreamRepository implements IAiStreamRepository {
 
                 logger.info("[AI Stream] Tool call received", {
                   toolName: part.toolName,
-                  argsStringified: JSON.stringify(validatedArgs}),
+                  argsStringified: JSON.stringify(validatedArgs),
                   toolCallsCount: collectedToolCalls.length,
                 });
 
@@ -1465,7 +1465,7 @@ class AiStreamRepository implements IAiStreamRepository {
                     sequenceIndex,
                   });
                   controller.enqueue(
-                    encoder.encode(formatSSEEvent(messageCreatedEvent)}),
+                    encoder.encode(formatSSEEvent(messageCreatedEvent)),
                   );
 
                   // Save to database if not incognito
@@ -1511,7 +1511,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   toolCalls: [toolCallData], // Include the tool call data
                 });
                 controller.enqueue(
-                  encoder.encode(formatSSEEvent(toolMessageEvent)}),
+                  encoder.encode(formatSSEEvent(toolMessageEvent)),
                 );
 
                 // Save tool message to database (if not incognito)
@@ -1556,7 +1556,7 @@ class AiStreamRepository implements IAiStreamRepository {
                     toolCalls: [toolCallData],
                   });
                 controller.enqueue(
-                  encoder.encode(formatSSEEvent(toolMessageCreatedEvent)}),
+                  encoder.encode(formatSSEEvent(toolMessageCreatedEvent)),
                 );
 
                 // Emit tool-call event to frontend with the tool message ID
@@ -1566,7 +1566,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   args: toolCallData.args,
                 });
                 controller.enqueue(
-                  encoder.encode(formatSSEEvent(toolCallEvent)}),
+                  encoder.encode(formatSSEEvent(toolCallEvent)),
                 );
 
                 // Update current parent to this tool message for next message
@@ -1591,7 +1591,7 @@ class AiStreamRepository implements IAiStreamRepository {
                     toolName: part.toolName,
                     hasOutput: "output" in part,
                     outputType: typeof output,
-                    outputStringified: JSON.stringify(output).substring(0, 500}),
+                    outputStringified: JSON.stringify(output).substring(0, 500),
                   });
 
                   // Check if the output is an error result
@@ -1626,7 +1626,7 @@ class AiStreamRepository implements IAiStreamRepository {
                     hasResult: !!validatedOutput,
                     hasError: !!toolError,
                     resultType: typeof validatedOutput,
-                    isValid: isValidToolResult(output}),
+                    isValid: isValidToolResult(output),
                   });
 
                   // Get the tool message ID for this tool
@@ -1640,7 +1640,7 @@ class AiStreamRepository implements IAiStreamRepository {
                         metadata: {
                           toolCalls: [collectedToolCalls[toolCallIndex]],
                         },
-                        updatedAt: new Date(}),
+                        updatedAt: new Date(),
                       })
                       .where(eq(chatMessages.id, toolMessageId));
 
@@ -1659,7 +1659,7 @@ class AiStreamRepository implements IAiStreamRepository {
                     result: validatedOutput,
                   });
                   controller.enqueue(
-                    encoder.encode(formatSSEEvent(toolResultEvent)}),
+                    encoder.encode(formatSSEEvent(toolResultEvent)),
                   );
                 }
               }
@@ -1690,7 +1690,7 @@ class AiStreamRepository implements IAiStreamRepository {
                 toolCallsCount: step.toolCalls.length,
                 toolResultsCount: step.toolResults.length,
                 finishReason: step.finishReason,
-              })}),
+              })),
             });
 
             // Don't inject <think> tags - the model does that on its own
@@ -1706,7 +1706,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   ? {
                       toolCalls: collectedToolCalls,
                     }
-                  : {}}),
+                  : {}),
               };
 
               await db
@@ -1715,7 +1715,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   content: finalContent,
                   tokens: usage.totalTokens,
                   metadata,
-                  updatedAt: new Date(}),
+                  updatedAt: new Date(),
                 })
                 .where(eq(chatMessages.id, aiMessageId));
 
@@ -1751,7 +1751,7 @@ class AiStreamRepository implements IAiStreamRepository {
           } catch (error) {
             const errorMessage =
               error instanceof Error ? error.message : String(error);
-            logger.error("Stream error", messageParams: { error: errorMessage });
+            logger.error("Stream error", { error: errorMessage });
 
             // Emit error event
             const errorEvent = createStreamEvent.error({
@@ -1771,7 +1771,7 @@ class AiStreamRepository implements IAiStreamRepository {
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
           },
-        }}),
+        }),
       );
     } catch (error) {
       const errorMessage =
@@ -1785,7 +1785,7 @@ class AiStreamRepository implements IAiStreamRepository {
         success: false,
         message:
           "app.api.v1.core.agent.chat.aiStream.route.errors.streamCreationFailed",
-        errorType: errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: {
           error: errorMessage,
         },

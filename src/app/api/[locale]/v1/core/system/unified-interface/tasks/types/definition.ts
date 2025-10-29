@@ -7,16 +7,16 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
+  objectField,
+  requestDataField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import {
-  objectField,
-  requestDataField,
-  responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
@@ -40,9 +40,9 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.container.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 });
-    });
-    { request: "data", response: true });
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
       operation: requestDataField(
@@ -58,21 +58,21 @@ const { GET } = createEndpoint({
               value: "list",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.types.get.operation.list",
-            });
+            },
             {
               value: "validate",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.types.get.operation.validate",
-            });
+            },
             {
               value: "export",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.types.get.operation.export",
-            });
+            },
           ],
-          layout: { columns: 4 });
+          layout: { columns: 4 },
           required: true,
-        });
+        },
         z.enum(["list", "validate", "export"]),
       ),
 
@@ -89,25 +89,25 @@ const { GET } = createEndpoint({
               value: "cron",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.types.get.category.cron",
-            });
+            },
             {
               value: "side",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.types.get.category.side",
-            });
+            },
             {
               value: "config",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.types.get.category.config",
-            });
+            },
             {
               value: "execution",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.types.get.category.execution",
-            });
+            },
           ],
-          layout: { columns: 4 });
-        });
+          layout: { columns: 4 },
+        },
         z.enum(["cron", "side", "config", "execution"]).optional(),
       ),
 
@@ -124,20 +124,20 @@ const { GET } = createEndpoint({
               value: "json",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.types.get.format.json",
-            });
+            },
             {
               value: "typescript",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.types.get.format.typescript",
-            });
+            },
             {
               value: "schema",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.types.get.format.schema",
-            });
+            },
           ],
-          layout: { columns: 4 });
-        });
+          layout: { columns: 4 },
+        },
         z.enum(["json", "typescript", "schema"]).default("json"),
       ),
 
@@ -147,7 +147,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.types.get.response.success.title",
-        });
+        },
         z.boolean(),
       ),
 
@@ -156,7 +156,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.types.get.response.types.title",
-        });
+        },
         z.record(z.string(), z.unknown()),
       ),
 
@@ -165,14 +165,14 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.types.get.response.metadata.title",
-        });
+        },
         z.object({
           totalTypes: z.number(),
           categories: z.array(z.string()),
           timestamp: z.string(),
         }),
       ),
-    });
+    },
   ),
 
   examples: {
@@ -180,47 +180,47 @@ const { GET } = createEndpoint({
       list: {
         operation: "list",
         format: "json",
-      });
+      },
       export: {
         operation: "export",
         typeCategory: "cron",
         format: "typescript",
-      });
+      },
       success: {
         operation: "list",
         format: "json",
-      });
-    });
+      },
+    },
     responses: {
       list: {
         success: true,
-        types: {});
+        types: {},
         metadata: {
           totalTypes: 0,
           categories: [],
           timestamp: "2023-07-21T12:00:00Z",
-        });
-      });
+        },
+      },
       export: {
         success: true,
-        types: {});
+        types: {},
         metadata: {
           totalTypes: 0,
           categories: [],
           timestamp: "2023-07-21T12:00:00Z",
-        });
-      });
+        },
+      },
       success: {
         success: true,
-        types: {});
+        types: {},
         metadata: {
           totalTypes: 0,
           categories: [],
           timestamp: "2023-07-21T12:00:00Z",
-        });
-      });
-    });
-  });
+        },
+      },
+    },
+  },
 
   errorTypes: {
     validation_failed: {
@@ -228,63 +228,63 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.validation.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.validation.description",
-    });
+    },
     unauthorized: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.unauthorized.description",
-    });
+    },
     server_error: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.internal.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.internal.description",
-    });
+    },
     forbidden: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.forbidden.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.forbidden.description",
-    });
+    },
     not_found: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.notFound.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.notFound.description",
-    });
+    },
     network_error: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.network.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.network.description",
-    });
+    },
     unknown_error: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.unknown.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.unknown.description",
-    });
+    },
     unsaved_changes: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.unsaved.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.unsaved.description",
-    });
+    },
     conflict: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.conflict.description",
-    });
-  });
+    },
+  },
 
   successTypes: {
     title:
       "app.api.v1.core.system.unifiedBackend.tasks.types.get.success.title",
     description:
       "app.api.v1.core.system.unifiedBackend.tasks.types.get.success.description",
-  });
+  },
 });
 
 // Export the endpoint

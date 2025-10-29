@@ -43,7 +43,7 @@ export class HelpService {
    */
   discoverCommands(
     logger: EndpointLogger,
-    options: HelpServiceOptions = {});
+    options: HelpServiceOptions = {},
   ): CommandMetadata[] {
     const locale = options.locale || "en-GLOBAL";
     const { t } = simpleT(locale);
@@ -134,7 +134,7 @@ export class HelpService {
             ),
             aliases: [shortAlias, fullAlias],
             routePath: routeFile,
-          });
+          },
         ];
       }
 

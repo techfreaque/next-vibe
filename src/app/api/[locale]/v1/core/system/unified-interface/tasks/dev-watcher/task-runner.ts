@@ -102,7 +102,7 @@ const devWatcherTaskRunner: TaskRunner = {
       // Fallback to polling if file watching fails
       await startPollingWatcher(signal, logger);
     }
-  });
+  },
 
   async onError({
     error,
@@ -113,12 +113,12 @@ const devWatcherTaskRunner: TaskRunner = {
   }): Promise<void> {
     logger.error("Dev watcher error", parseError(error));
     await Promise.resolve();
-  });
+  },
 
   async onShutdown({ logger }: { logger: EndpointLogger }): Promise<void> {
     logger.debug("Development file watcher shutting down...");
     await Promise.resolve();
-  });
+  }
 };
 
 /**
@@ -158,7 +158,7 @@ const startSmartFileWatcher = async (
           skipEndpoints: false,
           skipSeeds: true, // Seeds don't need frequent regeneration
           skipTaskIndex: false, // Keep task index updated
-        });
+        },
         mockUser,
         "en-GLOBAL",
         logger,
@@ -194,7 +194,7 @@ const startSmartFileWatcher = async (
               logger.debug(`📝 File changed: ${filename} (${eventType})`);
               debouncedRunGenerators();
             }
-          });
+          }
         );
 
         watchers.push(watcher);
@@ -227,9 +227,9 @@ const startSmartFileWatcher = async (
         try {
           watcher.close();
         } catch (error) {
-          logger.debug("Error closing watcher:", { error: String(error) });
+          logger.debug("Error closing watcher:", { error: String(error) },
         }
-      });
+      },
 
       logger.debug("✅ File watchers stopped");
       resolve();
@@ -270,7 +270,7 @@ const startPollingWatcher = async (
           skipEndpoints: false,
           skipSeeds: true,
           skipTaskIndex: false,
-        });
+        },
         mockUser,
         "en-GLOBAL",
         logger,
@@ -369,7 +369,7 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
     }
 
     logger.info("Database health monitor stopped");
-  });
+  },
 
   async onError({
     error,
@@ -380,7 +380,7 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
   }): Promise<void> {
     logger.error("Database health monitor error", parseError(error));
     await Promise.resolve();
-  });
+  },
 
   async onShutdown({ logger }: { logger: EndpointLogger }): Promise<void> {
     logger.info("Database health monitor shutting down...");

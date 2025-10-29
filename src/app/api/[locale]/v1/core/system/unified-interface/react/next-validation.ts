@@ -160,7 +160,7 @@ export async function validateNextRequestData<
 function validateGetRequestData<TRequestInput, TRequestOutput>(
   endpoint: {
     requestSchema: z.ZodSchema<TRequestOutput, TRequestInput>;
-  });
+  },
   request: NextRequest,
   logger: EndpointLogger,
 ): ResponseType<TRequestOutput> {
@@ -173,7 +173,7 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
   // Check if schema is z.never() by testing if it rejects empty object
   const isNeverSchema = (() => {
     try {
-      const testResult = endpoint.requestSchema.safeParse({});
+      const testResult = endpoint.requestSchema.safeParse({},
       return (
         !testResult.success &&
         testResult.error?.issues?.[0]?.code === "invalid_type" &&
@@ -331,7 +331,7 @@ function parseFormDataToObject(formData: FormData): Record<string, unknown> {
 async function validatePostRequestData<TRequestInput, TRequestOutput>(
   endpoint: {
     requestSchema: z.ZodSchema<TRequestOutput, TRequestInput>;
-  });
+  },
   request: NextRequest,
   logger: EndpointLogger,
 ): Promise<ResponseType<TRequestOutput>> {
@@ -344,7 +344,7 @@ async function validatePostRequestData<TRequestInput, TRequestOutput>(
   // Check if schema is z.never() by testing if it rejects empty object
   const isNeverSchema = (() => {
     try {
-      const testResult = endpoint.requestSchema.safeParse({});
+      const testResult = endpoint.requestSchema.safeParse({},
       return (
         !testResult.success &&
         testResult.error?.issues?.[0]?.code === "invalid_type" &&

@@ -61,8 +61,8 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
           error: t(
             "app.api.v1.core.system.unifiedUi.cli.setup.status.post.errors.unauthorized.description",
           ),
-        });
-      );
+        },
+      
     }
 
     try {
@@ -88,8 +88,8 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
           "app.api.v1.core.system.unifiedUi.cli.setup.status.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
-          error: parsedError.message });
-      );
+          error: parsedError.message },
+      
     }
   }
 
@@ -110,8 +110,8 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
         {
           verbose: false,
           ignoreErrors: true,
-        });
-      );
+        },
+      
 
       if (output?.trim()) {
         // Get version
@@ -159,8 +159,8 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
         stdio: options.verbose ? "inherit" : "pipe",
         shell: false,
 
-        env: { ...process.env, NODE_ENV: "development" });
-      });
+        env: { ...process.env, NODE_ENV: "development" },
+      },
 
       let output = String();
       let errorOutput = String();
@@ -168,7 +168,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
       if (!options.verbose) {
         childProcess.stdout?.on("data", (data: Buffer) => {
           output += data.toString();
-        });
+        },
 
         childProcess.stderr?.on("data", (data: Buffer) => {
           errorOutput += data.toString();
@@ -181,7 +181,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
         } else {
           reject(new Error(errorOutput || output || String(code)));
         }
-      });
+      },
 
       childProcess.on("error", (error: Error) => {
         if (!options.ignoreErrors) {

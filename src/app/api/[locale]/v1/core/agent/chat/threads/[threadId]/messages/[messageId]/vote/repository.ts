@@ -3,7 +3,6 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import {
   fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
   type ResponseType,
@@ -42,10 +41,10 @@ export const voteRepository = {
     try {
       // Type guard to ensure user has id
       if (!user.id) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.unauthorized.title",
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       const userId = user.id;
@@ -60,17 +59,17 @@ export const voteRepository = {
         .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
         .where(
           and(
-            eq(chatMessages.id, urlPathParams.messageId}),
-            eq(chatMessages.threadId, urlPathParams.threadId}),
-          }),
+            eq(chatMessages.id, urlPathParams.messageId),
+            eq(chatMessages.threadId, urlPathParams.threadId),
+          ),
         )
         .limit(1);
 
       if (!messageWithThread) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.notFound.title",
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       const { message, thread } = messageWithThread;
@@ -87,10 +86,11 @@ export const voteRepository = {
 
       // Check voting permissions - simplified
       if (!canVoteMessage(userId, null, message)) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
-        );
+        });
       }
 
       // Get current metadata
@@ -141,7 +141,7 @@ export const voteRepository = {
         newVoteDetails.push({
           userId,
           vote: "up",
-          timestamp: Date.now(}),
+          timestamp: Date.now(),
         });
         newVoterIds.push(userId);
       } else if (data.vote === "down") {
@@ -150,7 +150,7 @@ export const voteRepository = {
         newVoteDetails.push({
           userId,
           vote: "down",
-          timestamp: Date.now(}),
+          timestamp: Date.now(),
         });
         newVoterIds.push(userId);
       }
@@ -169,7 +169,7 @@ export const voteRepository = {
           upvotes,
           downvotes,
           metadata: newMetadata,
-          updatedAt: new Date(}),
+          updatedAt: new Date(),
         })
         .where(eq(chatMessages.id, urlPathParams.messageId));
 
@@ -188,10 +188,11 @@ export const voteRepository = {
       });
     } catch (error) {
       logger.error("Failed to record vote", parseError(error));
-      return fail({message: 
-        "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.server.title",
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   },
 };

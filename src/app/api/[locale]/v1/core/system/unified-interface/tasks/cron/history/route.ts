@@ -14,5 +14,5 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     handler: ({ data, locale, logger }) =>
       cronHistoryRepository.getTaskHistory(data, locale, logger),
-  });
+  },
 });

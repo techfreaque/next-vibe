@@ -14,9 +14,9 @@ import type {
   ResponseType,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -293,7 +293,7 @@ export interface TaskRunnerManager {
   // Task execution with overlap prevention
   executeCronTask: (
     task: CronTask,
-  ) => Promise<ResponseType<messageParams: { status: string; message: string }>>;
+  ) => Promise<ResponseType<{ status: string; message: string }>>;
   startSideTask: (
     task: SideTask,
     signal: AbortSignal,
@@ -316,7 +316,7 @@ export interface TaskRunnerManager {
   getStatus(): {
     running: boolean;
     activeTasks: string[];
-    errors: Array<messageParams: { taskName: string; error: string; timestamp: Date }>;
+    errors: Array<{ taskName: string; error: string; timestamp: Date }>;
   };
 
   // Environment-specific behavior
@@ -462,7 +462,7 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
           totalTypes,
           categories,
           timestamp,
-        });
+        },
       });
     } catch (error) {
       const parsedError = parseError(error);
@@ -482,8 +482,8 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
           typeCategory: data.typeCategory || "all",
           operation: data.operation,
           format: data.format,
-        });
-      );
+        },
+      });
     }
   }
 
@@ -506,11 +506,11 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.internal.title",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message });
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -538,7 +538,7 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
               TaskResult: "Task execution result",
               // eslint-disable-next-line i18next/no-literal-string
               TaskStatus: "Task status information",
-            });
+            },
             null,
             2,
           );
@@ -560,11 +560,11 @@ export interface TaskStatus { /* ... */ }`;
           // Handle unsupported format with proper error response
           logger.error("Unsupported export format", { format });
           return fail({
-        message: 
-            "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.validation.title",
+            message:
+              "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.validation.title",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            { format });
-          );
+            messageParams: { format },
+          });
       }
 
       logger.debug("Successfully exported task types", { format });
@@ -576,11 +576,11 @@ export interface TaskStatus { /* ... */ }`;
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.internal.title",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message, format });
-      );
+        messageParams: { error: parsedError.message, format },
+      });
     }
   }
 }

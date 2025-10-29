@@ -7,9 +7,9 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -69,13 +69,13 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
                   executions: 15,
                   successes: 14,
                   failures: 1,
-                });
+                },
                 {
                   timestamp: "2023-07-21T01:00:00Z",
                   executions: 8,
                   successes: 7,
                   failures: 1,
-                });
+                },
               ]
             : undefined,
         topFailures:
@@ -85,12 +85,12 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
                   taskName: "email-campaign",
                   failures: 5,
                   lastFailure: "2023-07-21T10:30:00Z",
-                });
+                },
                 {
                   taskName: "data-sync",
                   failures: 3,
                   lastFailure: "2023-07-21T09:15:00Z",
-                });
+                },
               ]
             : undefined,
       };
@@ -103,7 +103,7 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
           successfulTasks: mockStats.successfulTasks,
           failedTasks: mockStats.failedTasks,
           averageExecutionTime: mockStats.averageExecutionTime,
-        });
+        },
       };
 
       logger.debug("Cron statistics retrieved successfully", {
@@ -128,8 +128,8 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
           period: data.period || "day",
           type: data.type || "overview",
           taskId: data.taskId || "unknown",
-        });
-      );
+        },
+      });
     }
   }
 }

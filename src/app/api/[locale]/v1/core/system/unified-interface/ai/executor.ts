@@ -32,7 +32,7 @@ export class ToolExecutor extends BaseExecutor implements IToolExecutor {
    */
   async execute(
     context: AIToolExecutionContext,
-    options: ToolExecutorOptions = {});
+    options: ToolExecutorOptions = {},
   ): Promise<AIToolExecutionResult> {
     const { t } = simpleT(context.locale);
 
@@ -54,7 +54,7 @@ export class ToolExecutor extends BaseExecutor implements IToolExecutor {
           executionTime: Date.now() - startTime,
           endpointPath: endpoint?.definition.path.join(pathSeparator) || "",
           method: endpoint?.definition.method || "",
-        });
+        },
       };
     }
 
@@ -65,7 +65,7 @@ export class ToolExecutor extends BaseExecutor implements IToolExecutor {
         toolName: context.toolName,
         userId: context.user.id,
         data: context.data,
-      });
+      },
     );
 
     // Use base executor's shared logic
@@ -113,7 +113,7 @@ export class ToolExecutor extends BaseExecutor implements IToolExecutor {
    */
   async executeParallel(
     contexts: AIToolExecutionContext[],
-    options: ToolExecutorOptions = {});
+    options: ToolExecutorOptions = {},
   ): Promise<AIToolExecutionResult[]> {
     if (!AI_CONFIG.features.parallelExecution) {
       // Execute sequentially if parallel execution disabled
@@ -146,7 +146,7 @@ export class ToolExecutor extends BaseExecutor implements IToolExecutor {
    */
   static createContext(
     toolName: string,
-    data: { [key: string]: ToolParameterValue });
+    data: { [key: string]: ToolParameterValue },
     user: AIToolExecutionContext["user"],
     locale: AIToolExecutionContext["locale"],
     logger: EndpointLogger,
@@ -160,7 +160,7 @@ export class ToolExecutor extends BaseExecutor implements IToolExecutor {
       logger,
       metadata: metadata || {
         timestamp: Date.now(),
-      });
+      },
     };
   }
 }

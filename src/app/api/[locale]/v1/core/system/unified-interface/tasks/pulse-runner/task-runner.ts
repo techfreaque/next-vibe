@@ -84,7 +84,7 @@ const pulseTaskRunner: TaskRunner = {
     }
 
     logger.info("Pulse task runner stopped");
-  });
+  },
 
   async onError(props: {
     error: Error;
@@ -96,7 +96,7 @@ const pulseTaskRunner: TaskRunner = {
     logger.error("Pulse task runner error", parseError(error));
     // Could send alerts or notifications here
     await Promise.resolve();
-  });
+  },
 
   async onShutdown(props: {
     logger: EndpointLogger;
@@ -107,7 +107,7 @@ const pulseTaskRunner: TaskRunner = {
     logger.info("Pulse task runner shutting down gracefully...");
     // Perform any cleanup if needed
     await Promise.resolve();
-  });
+  },
 };
 
 /**

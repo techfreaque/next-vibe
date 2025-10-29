@@ -26,15 +26,15 @@ export function validateNotIncognito(
   errorKeyPrefix: string,
 ): ResponseType<never> | null {
   if (rootFolderId === "incognito") {
-    return fail({message: 
-      `${errorKeyPrefix}.errors.forbidden.title` as TranslationKey,
+    return fail({
+      message: `${errorKeyPrefix}.errors.forbidden.title` as TranslationKey,
       errorType: ErrorResponseTypes.FORBIDDEN,
-      {
+      messageParams: {
         message: simpleT(locale).t(
           `${errorKeyPrefix}.errors.forbidden.incognitoNotAllowed` as TranslationKey,
-        }),
+        ),
       },
-    );
+    });
   }
   return null;
 }
@@ -47,7 +47,10 @@ export function validateUserHasId(
   titleKey: TranslationKey,
 ): ResponseType<never> | null {
   if (!userId) {
-    return fail({message: titleKey, ErrorResponseTypes.UNAUTHORIZED);
+    return fail({
+      message: titleKey,
+      errorType: ErrorResponseTypes.UNAUTHORIZED,
+    });
   }
   return null;
 }
@@ -61,8 +64,12 @@ export function validateExists<T>(
   messageKey: TranslationKey,
 ): ResponseType<never> | null {
   if (!entity) {
-    return fail({message: titleKey, ErrorResponseTypes.NOT_FOUND, {
-      error: messageKey,
+    return fail({
+      message: titleKey,
+      errorType: ErrorResponseTypes.NOT_FOUND,
+      messageParams: {
+        error: messageKey,
+      },
     });
   }
   return null;
@@ -78,8 +85,12 @@ export function validateNoCircularReference(
   messageKey: TranslationKey,
 ): ResponseType<never> | null {
   if (parentId === id) {
-    return fail({message: titleKey, ErrorResponseTypes.VALIDATION_ERROR, {
-      error: messageKey,
+    return fail({
+      message: titleKey,
+      errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      messageParams: {
+        error: messageKey,
+      },
     });
   }
   return null;

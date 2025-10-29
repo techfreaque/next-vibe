@@ -15,8 +15,11 @@ import {
   handleNextVibeResponse,
 } from "../../unified-interface/react/trpc-trpc";
 import { createEndpointLogger } from "../shared/logger/endpoint";
+import {
+  authenticateUser,
+  executeHandler,
+} from "../shared/server-only/execution/core";
 import type { Methods } from "../shared/types/enums";
-import { authenticateUser, executeHandler } from "../shared/server-only/execution/core";
 import type { ApiHandlerOptions } from "../shared/types/handler";
 import type {
   TRPCContext,
@@ -57,7 +60,7 @@ export function createTRPCHandler<
   const { endpoint, handler } = options;
 
   return async (
-    input: TRequestOutput & { urlPathParams?: TUrlVariablesOutput });
+    input: TRequestOutput & { urlPathParams?: TUrlVariablesOutput },
     ctx: TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]>,
   ): Promise<TResponseOutput> => {
     try {
@@ -70,7 +73,7 @@ export function createTRPCHandler<
           platform: "trpc",
           request: ctx.request,
           locale: ctx.locale,
-        });
+        },
         createEndpointLogger(false, Date.now(), ctx.locale),
       );
       if (!authResult.success) {
@@ -93,9 +96,9 @@ export function createTRPCHandler<
         {
           method: endpoint.method,
           requestData: input,
-          urlParameters: input.urlPathParams ?? {});
+          urlParameters: input.urlPathParams ?? {},
           locale: ctx.locale,
-        });
+        },
         logger,
       );
 

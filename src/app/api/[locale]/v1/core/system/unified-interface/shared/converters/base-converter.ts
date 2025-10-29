@@ -81,14 +81,14 @@ export function zodSchemaToJsonSchema(schema: z.ZodSchema): JsonSchema {
     // Fallback to empty object schema
     return {
       type: "object",
-      properties: {});
+      properties: {},
       required: [],
     };
   } catch {
     // If conversion fails, return empty object schema
     return {
       type: "object",
-      properties: {});
+      properties: {},
       required: [],
     };
   }

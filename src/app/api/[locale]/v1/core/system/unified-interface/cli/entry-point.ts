@@ -343,9 +343,7 @@ export class CliEntryPoint {
         }
         return endpointDescription;
       }
-      return this.t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.executeCommand",
-      );
+      return this.t("app.api.v1.core.system.unifiedUi.cli.vibe.executeCommand");
     };
 
     const description = getDescription();

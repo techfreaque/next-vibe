@@ -50,9 +50,9 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.container.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 });
-    });
-    { request: "urlPathParams", response: true });
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { request: "urlPathParams", response: true },
     {
       // URL parameter
       id: requestUrlPathParamsField(
@@ -63,7 +63,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.fields.id.label",
           description:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.fields.id.description",
-        });
+        },
         z.string(),
       ),
 
@@ -73,7 +73,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.response.task.title",
-        });
+        },
         z.object({
           id: z.string(),
           name: z.string(),
@@ -92,7 +92,7 @@ const { GET } = createEndpoint({
           updatedAt: z.string(),
         }),
       ),
-    });
+    },
   ),
 
   errorTypes: {
@@ -101,68 +101,68 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.validation.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.validation.description",
-    });
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.unauthorized.description",
-    });
+    },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.notFound.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.notFound.description",
-    });
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.internal.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.internal.description",
-    });
+    },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.forbidden.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.forbidden.description",
-    });
+    },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.network.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.network.description",
-    });
+    },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.unknown.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.unknown.description",
-    });
+    },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.unsaved.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.unsaved.description",
-    });
+    },
     [EndpointErrorTypes.CONFLICT]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.conflict.description",
-    });
-  });
+    },
+  },
   successTypes: {
     title:
       "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.success.retrieved.title",
     description:
       "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.success.retrieved.description",
-  });
+  },
   examples: {
     urlPathParams: {
       default: {
         id: "task-123",
-      });
-    });
+      },
+    },
     requests: undefined,
     responses: {
       default: {
@@ -180,10 +180,10 @@ const { GET } = createEndpoint({
           version: 1,
           createdAt: "2024-01-01T00:00:00Z",
           updatedAt: "2024-01-01T00:00:00Z",
-        });
-      });
-    });
-  });
+        },
+      },
+    },
+  },
 });
 
 /**
@@ -208,9 +208,9 @@ const { PUT } = createEndpoint({
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.container.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 });
-    });
-    { request: "data&urlPathParams", response: true });
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { request: "data&urlPathParams", response: true },
     {
       // URL parameter
       id: requestUrlPathParamsField(
@@ -221,7 +221,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.id.label",
           description:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.id.description",
-        });
+        },
         z.string(),
       ),
 
@@ -236,8 +236,8 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.name.description",
           placeholder:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.name.placeholder",
-          layout: { columns: 12 });
-        });
+          layout: { columns: 12 },
+        },
         z.string().min(1),
       ),
 
@@ -251,8 +251,8 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.description.description",
           placeholder:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.description.placeholder",
-          layout: { columns: 12 });
-        });
+          layout: { columns: 12 },
+        },
         z.string().optional(),
       ),
 
@@ -266,8 +266,8 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.schedule.description",
           placeholder:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.schedule.placeholder",
-          layout: { columns: 6 });
-        });
+          layout: { columns: 6 },
+        },
         z.string().min(1),
       ),
 
@@ -279,8 +279,8 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.enabled.label",
           description:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.enabled.description",
-          layout: { columns: 6 });
-        });
+          layout: { columns: 6 },
+        },
         z.boolean(),
       ),
 
@@ -295,8 +295,8 @@ const { PUT } = createEndpoint({
           placeholder:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.priority.placeholder",
           options: CronTaskPriorityOptions,
-          layout: { columns: 6 });
-        });
+          layout: { columns: 6 },
+        },
         z.enum(CronTaskPriority),
       ),
 
@@ -310,8 +310,8 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.timeout.description",
           placeholder:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.timeout.placeholder",
-          layout: { columns: 6 });
-        });
+          layout: { columns: 6 },
+        },
         z.number().optional(),
       ),
 
@@ -325,8 +325,8 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.retries.description",
           placeholder:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.retries.placeholder",
-          layout: { columns: 6 });
-        });
+          layout: { columns: 6 },
+        },
         z.number().optional(),
       ),
 
@@ -336,7 +336,7 @@ const { PUT } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.response.task.title",
-        });
+        },
         z.object({
           id: z.string(),
           name: z.string(),
@@ -361,10 +361,10 @@ const { PUT } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.response.success.title",
-        });
+        },
         z.boolean(),
       ),
-    });
+    },
   ),
 
   errorTypes: {
@@ -373,68 +373,68 @@ const { PUT } = createEndpoint({
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.validation.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.validation.description",
-    });
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.unauthorized.description",
-    });
+    },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.notFound.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.notFound.description",
-    });
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.internal.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.internal.description",
-    });
+    },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.forbidden.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.forbidden.description",
-    });
+    },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.network.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.network.description",
-    });
+    },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.unknown.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.unknown.description",
-    });
+    },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.unsaved.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.unsaved.description",
-    });
+    },
     [EndpointErrorTypes.CONFLICT]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.conflict.description",
-    });
-  });
+    },
+  },
   successTypes: {
     title:
       "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.success.updated.title",
     description:
       "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.success.updated.description",
-  });
+  },
   examples: {
     urlPathParams: {
       default: {
         id: "task-123",
-      });
-    });
+      },
+    },
     requests: {
       default: {
         name: "Updated Task",
@@ -444,8 +444,8 @@ const { PUT } = createEndpoint({
         priority: "HIGH",
         timeout: 7200,
         retries: 5,
-      });
-    });
+      },
+    },
     responses: {
       default: {
         task: {
@@ -462,11 +462,11 @@ const { PUT } = createEndpoint({
           version: 2,
           createdAt: "2024-01-01T00:00:00Z",
           updatedAt: "2024-01-02T00:00:00Z",
-        });
+        },
         success: true,
-      });
-    });
-  });
+      },
+    },
+  },
 });
 
 /**
@@ -491,9 +491,9 @@ const { DELETE } = createEndpoint({
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.container.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 });
-    });
-    { request: "urlPathParams", response: true });
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { request: "urlPathParams", response: true },
     {
       // URL parameter
       id: requestUrlPathParamsField(
@@ -504,7 +504,7 @@ const { DELETE } = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.fields.id.label",
           description:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.fields.id.description",
-        });
+        },
         z.string(),
       ),
 
@@ -514,7 +514,7 @@ const { DELETE } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.response.success.title",
-        });
+        },
         z.boolean(),
       ),
 
@@ -523,10 +523,10 @@ const { DELETE } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.response.message.title",
-        });
+        },
         z.string(),
       ),
-    });
+    },
   ),
 
   errorTypes: {
@@ -535,76 +535,76 @@ const { DELETE } = createEndpoint({
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.validation.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.validation.description",
-    });
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.unauthorized.description",
-    });
+    },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.notFound.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.notFound.description",
-    });
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.internal.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.internal.description",
-    });
+    },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.forbidden.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.forbidden.description",
-    });
+    },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.network.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.network.description",
-    });
+    },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.unknown.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.unknown.description",
-    });
+    },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.unsaved.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.unsaved.description",
-    });
+    },
     [EndpointErrorTypes.CONFLICT]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.conflict.description",
-    });
-  });
+    },
+  },
   successTypes: {
     title:
       "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.success.deleted.title",
     description:
       "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.success.deleted.description",
-  });
+  },
   examples: {
     urlPathParams: {
       default: {
         id: "task-123",
-      });
-    });
+      },
+    },
     requests: undefined,
     responses: {
       default: {
         success: true,
         message: "Task deleted successfully",
-      });
-    });
-  });
+      },
+    },
+  },
 });
 
 // Export the endpoints following MIGRATION_GUIDE pattern

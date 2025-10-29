@@ -8,17 +8,17 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
+  objectField,
+  requestDataField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import {
-  objectField,
-  requestDataField,
-  responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 
 import { UserRole } from "../../../../../user/user-roles/enum";
 
@@ -40,16 +40,16 @@ const { POST } = createEndpoint({
       default: {
         force: false,
         verbose: false,
-      });
+      },
       force: {
         force: true,
         verbose: false,
-      });
+      },
       verbose: {
         force: false,
         verbose: true,
-      });
-    });
+      },
+    },
     responses: {
       default: {
         success: true,
@@ -60,7 +60,7 @@ const { POST } = createEndpoint({
           "app.api.v1.core.system.unifiedUi.cli.setup.install.installSuccessAt",
         output:
           "app.api.v1.core.system.unifiedUi.cli.setup.install.installSuccess",
-      });
+      },
       force: {
         success: true,
         installed: true,
@@ -70,7 +70,7 @@ const { POST } = createEndpoint({
           "app.api.v1.core.system.unifiedUi.cli.setup.install.installSuccessAt",
         output:
           "app.api.v1.core.system.unifiedUi.cli.setup.install.installSuccess",
-      });
+      },
       verbose: {
         success: true,
         installed: true,
@@ -80,9 +80,9 @@ const { POST } = createEndpoint({
           "app.api.v1.core.system.unifiedUi.cli.setup.install.installSuccessAt",
         output:
           "app.api.v1.core.system.unifiedUi.cli.setup.install.installSuccess",
-      });
-    });
-  });
+      },
+    },
+  },
 
   fields: objectField(
     {
@@ -90,9 +90,9 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.system.unifiedUi.cli.setup.install.post.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.description",
-      layout: { type: LayoutType.GRID, columns: 12 });
-    });
-    { request: "data", response: true });
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
       force: requestDataField(
@@ -103,8 +103,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedUi.cli.setup.install.post.title",
           description:
             "app.api.v1.core.system.unifiedUi.cli.setup.install.post.description",
-          layout: { columns: 6 });
-        });
+          layout: { columns: 6 },
+        },
         z.boolean().default(false),
       ),
 
@@ -116,8 +116,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedUi.cli.setup.install.post.title",
           description:
             "app.api.v1.core.system.unifiedUi.cli.setup.install.post.description",
-          layout: { columns: 6 });
-        });
+          layout: { columns: 6 },
+        },
         z.boolean().default(false),
       ),
 
@@ -127,7 +127,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.title",
-        });
+        },
         z.boolean(),
       ),
 
@@ -136,7 +136,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.cli.setup.install.post.title",
-        });
+        },
         z.boolean(),
       ),
 
@@ -145,7 +145,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.cli.setup.install.post.description",
-        });
+        },
         z.string().optional(),
       ),
 
@@ -154,7 +154,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.cli.setup.install.post.title",
-        });
+        },
         z.string().optional(),
       ),
 
@@ -163,7 +163,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.cli.setup.install.post.title",
-        });
+        },
         z.string(),
       ),
 
@@ -172,10 +172,10 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.cli.setup.install.post.title",
-        });
+        },
         z.string().optional(),
       ),
-    });
+    },
   ),
 
   // === ERROR HANDLING ===
@@ -185,56 +185,56 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.validation.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.validation.description",
-    });
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.description",
-    });
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.description",
-    });
+    },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.network.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.network.description",
-    });
+    },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.forbidden.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.forbidden.description",
-    });
+    },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.notFound.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.notFound.description",
-    });
+    },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unknown.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unknown.description",
-    });
+    },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.conflict.description",
-    });
+    },
     [EndpointErrorTypes.CONFLICT]: {
       title:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.conflict.description",
-    });
-  });
+    },
+  },
 
   // === SUCCESS HANDLING ===
   successTypes: {
@@ -242,8 +242,9 @@ const { POST } = createEndpoint({
       "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.title",
     description:
       "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.description",
-  });
+  },
 });
+
 // Export types for repository usage - following migration guide pattern
 export type InstallRequestInput = typeof POST.types.RequestInput;
 export type InstallRequestOutput = typeof POST.types.RequestOutput;

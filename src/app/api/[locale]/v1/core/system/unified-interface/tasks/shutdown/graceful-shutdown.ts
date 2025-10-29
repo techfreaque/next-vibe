@@ -111,7 +111,7 @@ export class GracefulShutdownManager {
               parsedError.message,
             );
           }
-        });
+        },
       );
 
       // Wait for all handlers to complete

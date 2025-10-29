@@ -5,7 +5,6 @@
 
 import {
   fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -31,7 +30,7 @@ export const { GET, POST, tools } = endpointsHandler({
 
       // For public/lead users, return only default personas
       const defaultPersonas = repository.getDefaultPersonas();
-      return createSuccessResponse(messageParams: { personas: defaultPersonas });
+      return createSuccessResponse({ personas: defaultPersonas });
     },
   },
   [Methods.POST]: {
@@ -40,10 +39,10 @@ export const { GET, POST, tools } = endpointsHandler({
       const userId = user.id;
 
       if (!userId) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.personas.post.errors.unauthorized.title",
+        return fail({
+          message: "app.api.v1.core.agent.chat.personas.post.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       // Create the custom persona
@@ -60,7 +59,7 @@ export const { GET, POST, tools } = endpointsHandler({
         metadata: {},
       });
 
-      return createSuccessResponse(messageParams: { id: persona.id });
+      return createSuccessResponse({ id: persona.id });
     },
   },
 });

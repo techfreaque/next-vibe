@@ -222,7 +222,7 @@ export async function nativeEndpoint<
       url: fetchUrl,
       method: endpoint.method,
       hasBody: !!fetchOptions.body,
-    });
+    },
 
     const fetchResponse = await fetch(fetchUrl, fetchOptions);
 

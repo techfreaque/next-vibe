@@ -32,7 +32,7 @@ export const mcpConfig: MCPServerConfig = {
     tools: true,
     prompts: false,
     resources: false,
-  });
+  },
   rootDir: MCP_CONFIG.rootDir,
   excludePaths: MCP_CONFIG.excludePaths,
 };

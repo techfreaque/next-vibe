@@ -14,5 +14,5 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     handler: ({ data, user, locale, logger }) =>
       pulseExecuteRepository.executePulse(data, user, locale, logger),
-  });
+  },
 });

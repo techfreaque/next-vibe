@@ -152,7 +152,7 @@ exec bun "${vibeTsPath}" "$@"
           error: t(
             "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.description",
           ),
-        });
+        },
       });
     }
 
@@ -189,7 +189,7 @@ exec bun "${vibeTsPath}" "$@"
               "Bun is not installed or not in PATH. Please install Bun first: curl -fsSL https://bun.sh/install | bash",
             // eslint-disable-next-line i18next/no-literal-string
             command: "bun --version",
-          });
+          },
         });
       }
 
@@ -222,7 +222,7 @@ exec bun "${vibeTsPath}" "$@"
             error: `vibe-runtime.ts not found at ${vibeTsPath}`,
 
             cwd: process.cwd(),
-          });
+          },
         });
       }
 
@@ -257,7 +257,7 @@ exec bun "${vibeTsPath}" "$@"
             directory: binDir,
 
             reason: parsedError.message,
-          });
+          },
         });
       }
 
@@ -314,7 +314,7 @@ exec bun "${vibeTsPath}" "$@"
           reason: parsedError.message,
           // eslint-disable-next-line i18next/no-literal-string
           stack: parsedError.stack || "No stack trace available",
-        });
+        },
       });
     }
   }
@@ -374,7 +374,7 @@ exec bun "${vibeTsPath}" "$@"
       cwd?: string;
       verbose?: boolean;
       ignoreErrors?: boolean;
-    } = {});
+    } = {},
   ): Promise<string> {
     return await new Promise((resolve, reject) => {
       // Use npx for npm commands to avoid shell issues
@@ -386,7 +386,7 @@ exec bun "${vibeTsPath}" "$@"
         stdio: options.verbose ? "inherit" : "pipe",
         shell: false, // Disable shell to avoid security warnings
 
-        env: { ...process.env, NODE_ENV: "development" });
+        env: { ...process.env, NODE_ENV: "development" },
       });
 
       let output = "";

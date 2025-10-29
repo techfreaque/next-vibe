@@ -9,7 +9,6 @@ import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -75,10 +74,11 @@ class MessageRepository implements MessageRepositoryInterface {
     try {
       // Type guard to ensure user has id
       if (!user.id) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.unauthorized.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       const userId = user.id;
@@ -89,17 +89,18 @@ class MessageRepository implements MessageRepositoryInterface {
         .from(chatThreads)
         .where(
           and(
-            eq(chatThreads.id, urlPathParams.threadId}),
-            eq(chatThreads.userId, userId}),
-          }),
+            eq(chatThreads.id, urlPathParams.threadId),
+            eq(chatThreads.userId, userId),
+          ),
         )
         .limit(1);
 
       if (!thread) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.threadNotFound.title" as const,
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.threadNotFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       // Reject incognito threads
@@ -118,17 +119,18 @@ class MessageRepository implements MessageRepositoryInterface {
         .from(chatMessages)
         .where(
           and(
-            eq(chatMessages.id, urlPathParams.messageId}),
-            eq(chatMessages.threadId, urlPathParams.threadId}),
-          }),
+            eq(chatMessages.id, urlPathParams.messageId),
+            eq(chatMessages.threadId, urlPathParams.threadId),
+          ),
         )
         .limit(1);
 
       if (!message) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.messageNotFound.title" as const,
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.messageNotFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       return createSuccessResponse({
@@ -149,10 +151,11 @@ class MessageRepository implements MessageRepositoryInterface {
       });
     } catch (error) {
       logger.error("Error getting message:", parseError(error));
-      return fail({message: 
-        "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.server.description" as const,
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.server.description" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -169,10 +172,10 @@ class MessageRepository implements MessageRepositoryInterface {
     try {
       // Type guard to ensure user has id
       if (!user.id) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.unauthorized.title",
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       const userId = user.id;
@@ -183,17 +186,17 @@ class MessageRepository implements MessageRepositoryInterface {
         .from(chatThreads)
         .where(
           and(
-            eq(chatThreads.id, urlPathParams.threadId}),
-            eq(chatThreads.userId, userId}),
-          }),
+            eq(chatThreads.id, urlPathParams.threadId),
+            eq(chatThreads.userId, userId),
+          ),
         )
         .limit(1);
 
       if (!thread) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.threadNotFound.title" as const,
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.threadNotFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       // Reject incognito threads
@@ -212,17 +215,17 @@ class MessageRepository implements MessageRepositoryInterface {
         .from(chatMessages)
         .where(
           and(
-            eq(chatMessages.id, urlPathParams.messageId}),
-            eq(chatMessages.threadId, urlPathParams.threadId}),
-          }),
+            eq(chatMessages.id, urlPathParams.messageId),
+            eq(chatMessages.threadId, urlPathParams.threadId),
+          ),
         )
         .limit(1);
 
       if (!existingMessage) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.messageNotFound.title" as const,
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.messageNotFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       // Update message
@@ -230,11 +233,11 @@ class MessageRepository implements MessageRepositoryInterface {
         ? {
             content: data.content,
             role: data.role,
-            updatedAt: new Date(}),
+            updatedAt: new Date(),
           }
         : {
             content: data.content,
-            updatedAt: new Date(}),
+            updatedAt: new Date(),
           };
 
       const [updatedMessage] = await db
@@ -253,10 +256,10 @@ class MessageRepository implements MessageRepositoryInterface {
       });
     } catch (error) {
       logger.error("Error updating message:", parseError(error));
-      return fail({message: 
-        "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.server.description" as const,
+      return fail({
+        message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.server.description" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -272,10 +275,10 @@ class MessageRepository implements MessageRepositoryInterface {
     try {
       // Type guard to ensure user has id
       if (!user.id) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.unauthorized.title",
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       const userId = user.id;
@@ -286,17 +289,17 @@ class MessageRepository implements MessageRepositoryInterface {
         .from(chatThreads)
         .where(
           and(
-            eq(chatThreads.id, urlPathParams.threadId}),
-            eq(chatThreads.userId, userId}),
-          }),
+            eq(chatThreads.id, urlPathParams.threadId),
+            eq(chatThreads.userId, userId),
+          ),
         )
         .limit(1);
 
       if (!thread) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.threadNotFound.title" as const,
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.threadNotFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       // Reject incognito threads
@@ -315,17 +318,17 @@ class MessageRepository implements MessageRepositoryInterface {
         .from(chatMessages)
         .where(
           and(
-            eq(chatMessages.id, urlPathParams.messageId}),
-            eq(chatMessages.threadId, urlPathParams.threadId}),
-          }),
+            eq(chatMessages.id, urlPathParams.messageId),
+            eq(chatMessages.threadId, urlPathParams.threadId),
+          ),
         )
         .limit(1);
 
       if (!existingMessage) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.messageNotFound.title" as const,
+        return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.messageNotFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       // Delete message
@@ -338,10 +341,10 @@ class MessageRepository implements MessageRepositoryInterface {
       });
     } catch (error) {
       logger.error("Error deleting message:", parseError(error));
-      return fail({message: 
-        "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.server.description" as const,
+      return fail({
+        message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.server.description" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 }

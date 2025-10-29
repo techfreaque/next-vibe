@@ -32,6 +32,6 @@ export const { GET, tools } = endpointsHandler({
         props.locale,
         props.logger,
       );
-    });
-  });
+    },
+  },
 });

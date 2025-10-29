@@ -60,13 +60,13 @@ export function useApiQueryForm<
 >({
   endpoint,
   urlPathParams,
-  formOptions = messageParams: { persistForm: true, autoSubmit: true, debounceMs: 500 });
-  queryOptions = messageParams: { enabled: true });
+  formOptions = { persistForm: true, autoSubmit: true, debounceMs: 500 },
+  queryOptions = { enabled: true },
   logger,
 }: {
   endpoint: TEndpoint;
   urlPathParams: TEndpoint["TUrlVariablesOutput"];
-  formOptions: ApiQueryFormOptions<TEndpoint["TRequestOutput"]> & {
+  formOptions?: ApiQueryFormOptions<TEndpoint["TRequestOutput"]> & {
     /**
      * Whether to enable form persistence
      * @default true
@@ -156,7 +156,7 @@ export function useApiQueryForm<
         for (const [key, value] of Object.entries(
           params as {
             [key: string]: string | number | boolean | null | undefined;
-          });
+          },
         )) {
           if (
             typeof value === "string" ||
@@ -182,9 +182,9 @@ export function useApiQueryForm<
         setFormQueryParams(formId, safeParams);
       } else {
         // For primitive types, create a simple object
-        setFormQueryParams(formId, messageParams: { value: String(params) });
+        setFormQueryParams(formId, { value: String(params) });
       }
-    });
+    },
     [formId, setFormQueryParams],
   );
 
@@ -221,7 +221,7 @@ export function useApiQueryForm<
     ...restFormOptions,
     resolver: zodResolver<FormData, FormData>(
       endpoint.requestSchema as z.ZodType<FormData, any, FormData>,
-    }),
+    ),
   };
 
   // Generate a storage key based on the endpoint if not provided
@@ -307,7 +307,7 @@ export function useApiQueryForm<
           }
         }, persistDebounceMs);
       }
-    });
+    };
 
     return (): void => {
       subscription.unsubscribe();
@@ -319,7 +319,7 @@ export function useApiQueryForm<
 
   // Error management functions
   const clearFormError = useCallback(
-    () => clearFormErrorStore(formId}),
+    () => clearFormErrorStore(formId),
     [clearFormErrorStore, formId],
   );
 
@@ -328,16 +328,16 @@ export function useApiQueryForm<
       if (error) {
         // Convert Error to ErrorResponseType
         const errorResponse = fail({
-        message: 
-          "app.api.v1.core.system.unifiedUi.react.hooks.queryForm.errors.validation_failed",
+          message:
+            "app.api.v1.core.system.unifiedUi.react.hooks.queryForm.errors.validation_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          { formId, message: error.message });
-        );
+          messageParams: { formId, message: error.message },
+        });
         setFormErrorStore(formId, errorResponse);
       } else {
         setFormErrorStore(formId, null);
       }
-    });
+    },
     [setFormErrorStore, formId],
   );
 
@@ -364,7 +364,7 @@ export function useApiQueryForm<
             urlPathParams: urlPathParams,
           });
         }
-      });
+      },
       // Ensure retry is a number if provided
       retry:
         typeof queryOptions.retry === "boolean"
@@ -374,7 +374,7 @@ export function useApiQueryForm<
           : typeof queryOptions.retry === "function"
             ? 3
             : queryOptions.retry,
-    });
+    },
   });
 
   // Force refetch when queryParams change (since useApiQuery doesn't auto-refetch)
@@ -525,12 +525,12 @@ export function useApiQueryForm<
         InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
       >
     > = {
-      ...(inputOptions || {}}),
+      ...(inputOptions || {}),
       urlParamVariables:
         inputOptions?.urlParamVariables ||
         ({} as ExtractOutput<
           InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
-        >}),
+        >),
     };
     // Define the internal submit function that will be called after validation
     const _submitForm = async (): Promise<void> => {
@@ -538,7 +538,7 @@ export function useApiQueryForm<
         // Check if we're already submitting to prevent duplicate requests
         if (isSubmittingRef.current) {
           logger.debug("Already submitting, skipping duplicate request", {
-            endpoint: endpoint.path.join("/"}),
+            endpoint: endpoint.path.join("/"),
           });
           return;
         }
@@ -550,7 +550,7 @@ export function useApiQueryForm<
         if (currentTime - lastSubmitTimeRef.current < minSubmitInterval) {
           // We're submitting too frequently, throttle by waiting
           logger.debug("Throttling form submission", {
-            endpoint: endpoint.path.join("/"}),
+            endpoint: endpoint.path.join("/"),
           });
           await new Promise<void>((resolve) => {
             setTimeout(() => resolve(), minSubmitInterval);
@@ -598,7 +598,7 @@ export function useApiQueryForm<
         // Call the onSuccess callback if provided and the result is successful
         if (result.success && options.onSuccess) {
           logger.debug("Calling onSuccess callback", {
-            endpoint: endpoint.path.join("/"}),
+            endpoint: endpoint.path.join("/"),
           });
           options.onSuccess({
             responseData: result.data,
@@ -607,7 +607,7 @@ export function useApiQueryForm<
           });
         } else if (!result.success && options.onError) {
           logger.debug("Calling onError callback", {
-            endpoint: endpoint.path.join("/"}),
+            endpoint: endpoint.path.join("/"),
           });
           // If the result is not successful, call the onError callback
           options.onError({
@@ -620,23 +620,23 @@ export function useApiQueryForm<
                   TEndpoint["fields"],
                   FieldUsage.RequestUrlParams
                 >
-              >}),
+              >),
           });
         }
       } catch (error) {
         // Handle any errors that occur during submission
         const errorMessage = parseError(error).message;
         logger.error("Error in submitForm", {
-          endpoint: endpoint.path.join("/"}),
+          endpoint: endpoint.path.join("/"),
           error: errorMessage,
         });
 
         const errorResponse = fail({
-        message: 
-          "app.api.v1.core.system.unifiedUi.react.hooks.queryForm.errors.network_failure",
+          message:
+            "app.api.v1.core.system.unifiedUi.react.hooks.queryForm.errors.network_failure",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          { formId, error: errorMessage });
-        );
+          messageParams: { formId, error: errorMessage },
+        });
 
         // Set the error in the form state
         setError(new Error(errorResponse.message));

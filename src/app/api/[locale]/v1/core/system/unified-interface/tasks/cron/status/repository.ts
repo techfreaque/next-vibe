@@ -7,9 +7,9 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -80,7 +80,7 @@ class CronStatusRepositoryImpl implements ICronStatusRepository {
               lastRun: "2023-07-21T11:30:00Z",
               nextRun: "2023-07-21T12:30:00Z",
               schedule: scheduleEvery30Min,
-            });
+            },
             {
               id: "task-2",
               name: "data-sync",
@@ -88,7 +88,7 @@ class CronStatusRepositoryImpl implements ICronStatusRepository {
               lastRun: "2023-07-21T10:00:00Z",
               nextRun: "2023-07-22T10:00:00Z",
               schedule: scheduleDaily10AM,
-            });
+            },
             {
               id: "task-3",
               name: "cleanup-logs",
@@ -96,7 +96,7 @@ class CronStatusRepositoryImpl implements ICronStatusRepository {
               lastRun: "2023-07-20T23:00:00Z",
               nextRun: "2023-07-21T23:00:00Z",
               schedule: scheduleDaily11PM,
-            });
+            },
           ]
         : [];
 
@@ -130,11 +130,14 @@ class CronStatusRepositoryImpl implements ICronStatusRepository {
         error: parsedError.message,
       });
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.server.title",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message, taskId: data.taskId || "unknown" });
-      );
+        messageParams: {
+          error: parsedError.message,
+          taskId: data.taskId || "unknown",
+        },
+      });
     }
   }
 }

@@ -47,19 +47,19 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedUi.ai.tools.get.response.title" as const,
       description:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.response.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 });
-    });
-    { response: true });
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { response: true },
     {
       tools: responseField(
         {
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedUi.ai.tools.get.fields.tools.title" as const,
-        });
+        },
         z.array(aiToolMetadataSchema),
       ),
-    });
+    },
   ),
 
   // === ERROR HANDLING ===
@@ -69,72 +69,72 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.validation.title",
       description:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.validation.description",
-    });
+    },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.network.title",
       description:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.network.description",
-    });
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.unauthorized.description",
-    });
+    },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.forbidden.title",
       description:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.forbidden.description",
-    });
+    },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.notFound.title",
       description:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.notFound.description",
-    });
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.server.title",
       description:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.server.description",
-    });
+    },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.unknown.title",
       description:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.unknown.description",
-    });
+    },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.unsavedChanges.title",
       description:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.unsavedChanges.description",
-    });
+    },
     [EndpointErrorTypes.CONFLICT]: {
       title:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.conflict.description",
-    });
-  });
+    },
+  },
 
   // === SUCCESS HANDLING ===
   successTypes: {
     title: "app.api.v1.core.system.unifiedUi.ai.tools.get.success.title",
     description:
       "app.api.v1.core.system.unifiedUi.ai.tools.get.success.description",
-  });
+  },
 
   // === EXAMPLES ===
   examples: {
     responses: {
       default: {
         tools: [],
-      });
-    });
-  });
+      },
+    },
+  },
 });
 
 const toolsDefinition = { GET };

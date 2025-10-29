@@ -49,7 +49,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
     try {
       // First uninstall existing CLI
       const uninstallResult = await setupUninstallRepository.uninstallCli(
-        { verbose: data.verbose });
+        { verbose: data.verbose },
         user,
         locale,
       );
@@ -69,7 +69,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
 
       // Then install CLI with force
       const installResult = await setupInstallRepository.installCli(
-        { force: true, verbose: data.verbose });
+        { force: true, verbose: data.verbose },
         user,
         locale,
       );

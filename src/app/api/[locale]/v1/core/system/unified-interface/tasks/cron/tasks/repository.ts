@@ -156,18 +156,18 @@ function formatTaskResponse(
     description: task.description || undefined,
     schedule: task.schedule || DEFAULT_CRON_SCHEDULE,
     enabled: task.enabled,
-    priority: prioritySchema.parse(task.priority}),
-    status: statusSchema.parse(determineTaskStatus(task)}),
-    category: categorySchema.parse(task.category}),
-    lastRun: task.lastRun?.toISOString(}),
+    priority: prioritySchema.parse(task.priority),
+    status: statusSchema.parse(determineTaskStatus(task)),
+    category: categorySchema.parse(task.category),
+    lastRun: task.lastRun?.toISOString(),
     nextRun:
       task.nextRun?.toISOString() ||
       (task.enabled
         ? calculateNextExecutionTime(task.schedule || undefined)?.toISOString()
-        : undefined}),
-    version: parseInt(task.version.split(".")[0] || "1", 10}),
-    createdAt: task.createdAt.toISOString(}),
-    updatedAt: task.updatedAt.toISOString(}),
+        : undefined),
+    version: parseInt(task.version.split(".")[0] || "1", 10),
+    createdAt: task.createdAt.toISOString(),
+    updatedAt: task.updatedAt.toISOString(),
   };
   return formatted;
 }
@@ -220,7 +220,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       if (data.status && data.status.length > 0) {
         // Since we don't have lastExecutionStatus in the current schema,
         // we'll filter by enabled status as a placeholder
-        logger.debug("Applied status filter", messageParams: { statuses: data.status });
+        logger.debug("Applied status filter", { statuses: data.status });
       }
 
       // Apply multi-select priority filter
@@ -255,7 +255,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         .limit(limit)
         .offset(offset);
 
-      logger.info("Retrieved tasks from database", messageParams: { count: tasks.length });
+      logger.info("Retrieved tasks from database", { count: tasks.length });
 
       // Format tasks with computed fields
       const formattedTasks = tasks.map((task) => formatTaskResponse(task));
@@ -274,7 +274,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         filtersApplied: conditions.length,
         limit,
         offset,
-      });
+      })
 
       return createSuccessResponse(response);
     } catch (error) {
@@ -284,7 +284,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       return fail({
         message: 
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.get.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,}
       );
     }
   }
@@ -313,7 +313,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         return fail({
         message: 
           "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.post.errors.conflict.title",
-          errorType: ErrorResponseTypes.CONFLICT,
+          errorType: ErrorResponseTypes.CONFLICT,}
         );
       }
 
@@ -333,7 +333,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         version: "1",
         defaultConfig: {
           retryDelay: data.retryDelay ?? 5000,
-        });
+        },
         nextRun: nextRun || undefined,
         runCount: 0,
         successCount: 0,
@@ -353,7 +353,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         return fail({
         message: 
           "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.post.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,}
         );
       }
 
@@ -381,15 +381,15 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
           description: createdTask.description || undefined,
           schedule: createdTask.schedule || DEFAULT_CRON_SCHEDULE,
           enabled: createdTask.enabled,
-          priority: z.enum(CronTaskPriority).parse(createdTask.priority}),
+          priority: z.enum(CronTaskPriority).parse(createdTask.priority),
           status: CronTaskStatus.PENDING, // New tasks are always pending
-          category: z.enum(TaskCategory).parse(createdTask.category}),
+          category: z.enum(TaskCategory).parse(createdTask.category),
           timeout: createdTask.timeout || 300000,
           retries: createdTask.retries || 3,
           retryDelay,
           version: parseInt(createdTask.version, 10) || 1,
-          createdAt: createdTask.createdAt.toISOString(}),
-          updatedAt: createdTask.updatedAt.toISOString(}),
+          createdAt: createdTask.createdAt.toISOString(),
+          updatedAt: createdTask.updatedAt.toISOString(),
         });
       };
 
@@ -406,14 +406,14 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         return fail({
         message: 
           "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.post.errors.conflict.title",
-          errorType: ErrorResponseTypes.CONFLICT,
+          errorType: ErrorResponseTypes.CONFLICT,}
         );
       }
 
       return fail({
         message: 
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.post.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,}
       );
     }
   }

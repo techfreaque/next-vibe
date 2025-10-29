@@ -8,10 +8,9 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -34,21 +33,21 @@ import type {
  */
 export interface ThreadByIdRepositoryInterface {
   getThreadById(
-    data: messageParams: { id: string },
+    data: { id: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadGetResponseOutput>>;
 
   updateThread(
-    data: ThreadPatchRequestOutput & messageParams: { id: string },
+    data: ThreadPatchRequestOutput & { id: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadPatchResponseOutput>>;
 
   deleteThread(
-    data: messageParams: { id: string },
+    data: { id: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -63,7 +62,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
    * Get thread by ID
    */
   async getThreadById(
-    data: messageParams: { id: string },
+    data: { id: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -76,29 +75,31 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
 
       // Type guard to ensure user has id
       if (!user.id) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.get.errors.unauthorized.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.get.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       const [thread] = await db
         .select()
         .from(chatThreads)
         .where(
-          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)}),
+          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)),
         )
         .limit(1);
 
       if (!thread) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.get.errors.notFound.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.get.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { threadId: data.id },
-        );
+        });
       }
 
-      logger.debug("Thread found successfully", messageParams: { threadId: thread.id });
+      logger.debug("Thread found successfully", { threadId: thread.id });
 
       // Map database fields to response fields
       // Exclude: rootFolderId (not in response), moderatorIds, searchVector
@@ -128,11 +129,12 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       return createSuccessResponse(response);
     } catch (error) {
       logger.error("Error getting thread by ID", parseError(error));
-      return fail({message: 
-        "app.api.v1.core.agent.chat.threads.threadId.get.errors.server.title",
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.threads.threadId.get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
-      );
+      });
     }
   }
 
@@ -140,7 +142,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
    * Update thread
    */
   async updateThread(
-    data: ThreadPatchRequestOutput & messageParams: { id: string },
+    data: ThreadPatchRequestOutput & { id: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -154,10 +156,11 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
 
       // Type guard to ensure user has id
       if (!user.id) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.patch.errors.unauthorized.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.patch.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       // First verify the thread exists and belongs to the user
@@ -165,16 +168,17 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         .select()
         .from(chatThreads)
         .where(
-          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)}),
+          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)),
         )
         .limit(1);
 
       if (!existingThread) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.patch.errors.notFound.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.patch.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { threadId: data.id },
-        );
+        });
       }
 
       // Folder validation: folderId is optional and validated by schema
@@ -184,7 +188,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         updatedAt: Date;
       };
       const updateData: UpdateData = {
-        updatedAt: new Date(}),
+        updatedAt: new Date(),
       };
 
       if (data.updates?.title !== undefined) {
@@ -221,7 +225,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         .update(chatThreads)
         .set(updateData)
         .where(
-          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)}),
+          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)),
         )
         .returning();
 
@@ -257,11 +261,12 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       return createSuccessResponse(response);
     } catch (error) {
       logger.error("Error updating thread", parseError(error));
-      return fail({message: 
-        "app.api.v1.core.agent.chat.threads.threadId.patch.errors.server.title",
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.threads.threadId.patch.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
-      );
+      });
     }
   }
 
@@ -269,7 +274,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
    * Delete thread
    */
   async deleteThread(
-    data: messageParams: { id: string },
+    data: { id: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -282,10 +287,11 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
 
       // Type guard to ensure user has id
       if (!user.id) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.delete.errors.unauthorized.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.delete.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       // First verify the thread exists and belongs to the user
@@ -293,26 +299,27 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         .select()
         .from(chatThreads)
         .where(
-          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)}),
+          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)),
         )
         .limit(1);
 
       if (!existingThread) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.threadId.delete.errors.notFound.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.delete.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { threadId: data.id },
-        );
+        });
       }
 
       // Delete the thread (cascade will handle messages)
       await db
         .delete(chatThreads)
         .where(
-          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)}),
+          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)),
         );
 
-      logger.debug("Thread deleted successfully", messageParams: { threadId: data.id });
+      logger.debug("Thread deleted successfully", { threadId: data.id });
 
       return createSuccessResponse({
         success: true,
@@ -320,11 +327,12 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       });
     } catch (error) {
       logger.error("Error deleting thread", parseError(error));
-      return fail({message: 
-        "app.api.v1.core.agent.chat.threads.threadId.delete.errors.server.title",
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.threads.threadId.delete.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
-      );
+      });
     }
   }
 }

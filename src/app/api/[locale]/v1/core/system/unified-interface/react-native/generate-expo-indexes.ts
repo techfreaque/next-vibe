@@ -118,7 +118,7 @@ export default ${wrapperType}(${componentName});
  */
 function ensureDir(dirPath: string): void {
   if (!existsSync(dirPath)) {
-    mkdirSync(dirPath, { recursive: true });
+    mkdirSync(dirPath, { recursive: true },
   }
 }
 
@@ -194,7 +194,7 @@ function generateIndexes(logger: EndpointLogger): GenerationResult {
         `❌ Error: ${relativePath}/index.tsx - ${errorMessage}`,
         "yellow",
       );
-      result.errors.push({ file: relativePath, error: errorMessage });
+      result.errors.push({ file: relativePath, error: errorMessage },
     }
   }
 
@@ -241,7 +241,7 @@ function generateIndexes(logger: EndpointLogger): GenerationResult {
         `❌ Error: ${relativePath}/_layout.tsx - ${errorMessage}`,
         "yellow",
       );
-      result.errors.push({ file: relativePath, error: errorMessage });
+      result.errors.push({ file: relativePath, error: errorMessage },
     }
   }
 

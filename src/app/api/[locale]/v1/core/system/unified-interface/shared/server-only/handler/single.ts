@@ -9,12 +9,12 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 
 import { createCliHandler } from "../../../cli/executor";
 import { createNextHandler } from "../../../next-api/handler";
+import { createTRPCHandler } from "../../../trpc/handler";
+import type { Methods } from "../../types/enums";
 import type {
   ApiHandlerOptions,
   EndpointHandlerReturn,
 } from "../../types/handler";
-import { createTRPCHandler } from "../../../trpc/handler";
-import type { Methods } from "../../types/enums";
 
 /**
  * Create an API route handler that supports both Next.js, tRPC, and CLI
@@ -72,7 +72,7 @@ export function endpointHandler<
     tools: {
       trpc: trpcProcedure,
       cli: cliHandler,
-    });
+    },
   } as TOptions["endpoint"] extends {
     types: {
       RequestOutput: infer TRequestOutput;

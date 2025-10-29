@@ -58,7 +58,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
         dryRun: data.dryRun,
         force: data.force,
         taskNames: data.taskNames,
-      });
+      },
 
       const executedAt = new Date().toISOString();
       const results: Array<{
@@ -107,7 +107,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
             success: taskResult.success,
             duration,
             message: taskResult.message,
-          });
+          },
 
           logger.debug(`Task ${taskName} completed`, {
             success: taskResult.success,
@@ -125,7 +125,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
             message: t(
               "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.executionFailed",
             }),
-          });
+          },
 
           logger.error(`Task ${taskName} failed`, {
             error: parsedError.message,
@@ -157,7 +157,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
         tasksExecuted: totalTasks,
         successfulTasks,
         dryRun: data.dryRun,
-      });
+      },
 
       return createSuccessResponse(response);
     } catch (error) {
@@ -165,7 +165,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
       logger.error("Failed to execute pulse cycle", {
         error: parsedError.message,
         dryRun: data.dryRun,
-      });
+      },
 
       return fail({
         message: 

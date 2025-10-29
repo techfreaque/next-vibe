@@ -57,7 +57,7 @@ export function useEndpointRead<
     autoPrefillData?: Partial<TEndpoint["TRequestOutput"]>;
     initialState?: Partial<TEndpoint["TRequestOutput"]>;
     autoPrefillConfig?: AutoPrefillConfig;
-  } = {});
+  } = {},
 ): ApiQueryFormReturn<
   TEndpoint["TRequestOutput"],
   TEndpoint["TResponseOutput"],
@@ -68,8 +68,8 @@ export function useEndpointRead<
     return null;
   }
   const {
-    formOptions = { persistForm: true, autoSubmit: true, debounceMs: 500 });
-    queryOptions = {});
+    formOptions = { persistForm: true, autoSubmit: true, debounceMs: 500 },
+    queryOptions = {},
     urlPathParams = {} as TEndpoint["TUrlVariablesOutput"],
     autoPrefillData,
     initialState,
@@ -77,7 +77,7 @@ export function useEndpointRead<
       autoPrefill: true,
       autoPrefillFromLocalStorage: false,
       showUnsavedChangesAlert: true,
-    });
+    },
   } = options;
 
   // Merge all form data sources with proper priority handling

@@ -18,19 +18,19 @@ export function useCronTask(
   params: {
     taskId: string;
     enabled?: boolean;
-  });
+  },
   logger: EndpointLogger,
 ): EndpointReturn<typeof endpoints> {
   return useEndpoint(
     endpoints,
     {
-      urlPathParams: { id: params.taskId });
+      urlPathParams: { id: params.taskId },
       queryOptions: {
         enabled: params.enabled ?? true,
         refetchOnWindowFocus: false,
         staleTime: 30 * 1000, // 30 seconds
-      });
-    });
+      },
+    },
     logger,
   );
 }

@@ -70,13 +70,13 @@ export class MCPExecuteRepositoryImpl implements MCPExecuteRepository {
       user,
       locale,
       requestId: Date.now(),
-    });
+    },
 
     logger.info("[MCP Execute Repository] Tool execution complete", {
       toolName: data.name,
       isError: result.isError,
       contentLength: result.content.length,
-    });
+    },
 
     return createSuccessResponse(result);
   }

@@ -7,10 +7,10 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
 
+import type { CreateApiEndpoint } from "../../endpoint/create";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Methods } from "../../types/enums";
 import type { DefinitionModule } from "../../types/handler";
-import type { CreateApiEndpoint } from "../../endpoint/create";
 import { loadRouteModule } from "./route-loader";
 
 /**
@@ -84,9 +84,7 @@ async function loadDefinitionFromFile<TEndpoint = unknown>(
   const definitionPath = routePath.replace("/route.ts", "/definition.ts");
 
   try {
-    const definitionImport = (await import(
-      definitionPath
-    )) as DefinitionModule;
+    const definitionImport = (await import(definitionPath)) as DefinitionModule;
     const definitions = definitionImport.default;
 
     if (definitions?.[method]) {
@@ -94,7 +92,7 @@ async function loadDefinitionFromFile<TEndpoint = unknown>(
       if (endpoint) {
         logger.debug(
           `[Definition Loader] Found definition in definition file`,
-          { method, definitionPath }
+          { method, definitionPath },
         );
         return endpoint as TEndpoint;
       }
@@ -139,7 +137,7 @@ export async function loadEndpointDefinition<TEndpoint = CreateApiEndpoint>(
       tryRegistry,
       fallbackToDynamic,
     },
-    logger
+    logger,
   );
 
   if (moduleResult.module) {

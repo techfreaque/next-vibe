@@ -38,10 +38,10 @@ export async function getFolders(
   const userIdentifier = user.isPublic ? user.leadId : user.id;
 
   if (!userIdentifier) {
-    return fail({message: 
-      "app.api.v1.core.agent.chat.folders.get.errors.unauthorized.title",
+    return fail({
+      message: "app.api.v1.core.agent.chat.folders.get.errors.unauthorized.title",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
-    );
+    });
   }
 
   const { rootFolderId } = data;
@@ -52,9 +52,9 @@ export async function getFolders(
       .from(chatFolders)
       .where(
         and(
-          eq(chatFolders.userId, userIdentifier}),
-          eq(chatFolders.rootFolderId, rootFolderId}),
-        }),
+          eq(chatFolders.userId, userIdentifier),
+          eq(chatFolders.rootFolderId, rootFolderId),
+        ),
       )
       .orderBy(desc(chatFolders.sortOrder), desc(chatFolders.createdAt));
 
@@ -74,15 +74,15 @@ export async function getFolders(
         expanded: folder.expanded,
         sortOrder: folder.sortOrder,
         metadata: (folder.metadata as JsonValue) || {},
-        createdAt: new Date(folder.createdAt}),
-        updatedAt: new Date(folder.updatedAt}),
-      })}),
+        createdAt: new Date(folder.createdAt),
+        updatedAt: new Date(folder.updatedAt),
+      })),
     });
   } catch {
-    return fail({message: 
-      "app.api.v1.core.agent.chat.folders.get.errors.server.title",
+    return fail({
+      message: "app.api.v1.core.agent.chat.folders.get.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    });
   }
 }
 
@@ -96,7 +96,7 @@ export async function createFolder(
   logger: EndpointLogger,
 ): Promise<ResponseType<FolderCreateResponseOutput>> {
   try {
-    const messageParams: { folder: folderData } = data;
+    const { folder: folderData } = data;
 
     // Check permissions using the permission system
     const hasPermission = await canCreateFolder(
@@ -108,45 +108,45 @@ export async function createFolder(
     if (!hasPermission) {
       // Determine the specific error message
       if (user.isPublic) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
+        return fail({
+          message: "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
-        );
+        });
       }
 
       if (folderData.rootFolderId === "incognito") {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
+        return fail({
+          message: "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
-          {
+          messageParams: {
             message: simpleT(locale).t(
               "app.api.v1.core.agent.chat.folders.post.errors.forbidden.incognitoNotAllowed",
-            }),
+            ),
           },
-        );
+        });
       }
 
       if (folderData.rootFolderId === "public") {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
+        return fail({
+          message: "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
-        );
+        });
       }
 
-      return fail({message: 
-        "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
+      return fail({
+        message: "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
         errorType: ErrorResponseTypes.FORBIDDEN,
-      );
+      });
     }
 
     // For authenticated users, use userId
     const userIdentifier = user.id;
 
     if (!userIdentifier) {
-      return fail({message: 
-        "app.api.v1.core.agent.chat.folders.post.errors.unauthorized.title",
+      return fail({
+        message: "app.api.v1.core.agent.chat.folders.post.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
-      );
+      });
     }
 
     // Get the next sort order
@@ -155,12 +155,12 @@ export async function createFolder(
       .from(chatFolders)
       .where(
         and(
-          eq(chatFolders.userId, userIdentifier}),
-          eq(chatFolders.rootFolderId, folderData.rootFolderId}),
+          eq(chatFolders.userId, userIdentifier),
+          eq(chatFolders.rootFolderId, folderData.rootFolderId),
           folderData.parentId
             ? eq(chatFolders.parentId, folderData.parentId)
-            : isNull(chatFolders.parentId}),
-        }),
+            : isNull(chatFolders.parentId),
+        ),
       );
 
     const nextSortOrder = existingFolders.length;
@@ -181,10 +181,10 @@ export async function createFolder(
       .returning();
 
     if (!newFolder) {
-      return fail({message: 
-        "app.api.v1.core.agent.chat.folders.post.errors.server.title",
+      return fail({
+        message: "app.api.v1.core.agent.chat.folders.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
 
     return createSuccessResponse({
@@ -204,16 +204,16 @@ export async function createFolder(
           expanded: newFolder.expanded,
           sortOrder: newFolder.sortOrder,
           metadata: (newFolder.metadata as JsonValue) || {},
-          createdAt: new Date(newFolder.createdAt}),
-          updatedAt: new Date(newFolder.updatedAt}),
+          createdAt: new Date(newFolder.createdAt),
+          updatedAt: new Date(newFolder.updatedAt),
         },
       },
     });
   } catch (error) {
     logger.error("Failed to create folder", parseError(error));
-    return fail({message: 
-      "app.api.v1.core.agent.chat.folders.post.errors.server.title",
+    return fail({
+      message: "app.api.v1.core.agent.chat.folders.post.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    });
   }
 }

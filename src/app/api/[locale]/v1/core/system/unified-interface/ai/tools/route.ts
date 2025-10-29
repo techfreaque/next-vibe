@@ -13,6 +13,6 @@ export const { GET, tools } = endpointsHandler({
     handler: ({ data, user, logger, locale }) => {
       const toolsData = aiToolsRepository.getTools(data, user, logger, locale);
       return createSuccessResponse(toolsData);
-    });
-  });
+    },
+  },
 });

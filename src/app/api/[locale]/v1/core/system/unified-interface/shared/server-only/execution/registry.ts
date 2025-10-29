@@ -91,7 +91,7 @@ export abstract class BaseRegistry {
     } catch (error) {
       this.logger.error(`[${this.config.platformName}] Initialization failed`, {
         error: getErrorMessage(error),
-      });
+      },
       this.initialized = false;
       this.endpoints = [];
     }
@@ -111,7 +111,7 @@ export abstract class BaseRegistry {
    * @param platform - Platform to filter by (optional)
    */
   getEndpointsByPermissions(
-    user: { id?: string; email?: string; role?: string; isPublic: boolean });
+    user: { id?: string; email?: string; role?: string; isPublic: boolean },
     platform?: string,
   ): DiscoveredEndpoint[] {
     this.ensureInitialized();

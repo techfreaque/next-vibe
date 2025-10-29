@@ -51,8 +51,8 @@ export class ToolFactory {
       user: AIToolExecutionContext["user"];
       locale: CountryLanguage;
       logger: EndpointLogger;
-    });
-    options: ToolFactoryOptions = {});
+    },
+    options: ToolFactoryOptions = {},
   ): CoreTool {
     // Generate description from endpoint definition
     const description =
@@ -87,7 +87,7 @@ export class ToolFactory {
           metadata: {
             timestamp: Date.now(),
             endpointId: endpoint.id,
-          });
+          },
         };
 
         const result = await executor.execute(executionContext);
@@ -101,7 +101,7 @@ export class ToolFactory {
         }
 
         return result.data;
-      });
+      },
     });
   }
 
@@ -174,8 +174,8 @@ export class ToolFactory {
       user: AIToolExecutionContext["user"];
       locale: CountryLanguage;
       logger: EndpointLogger;
-    });
-    options: ToolFactoryOptions = {});
+    },
+    options: ToolFactoryOptions = {},
   ): Map<string, CoreTool> {
     const tools = new Map<string, CoreTool>();
 
@@ -259,7 +259,7 @@ export function createToolFromEndpoint(
     user: AIToolExecutionContext["user"];
     locale: CountryLanguage;
     logger: EndpointLogger;
-  });
+  },
   options?: ToolFactoryOptions,
 ): CoreTool {
   const factory = getToolFactory();
@@ -276,7 +276,7 @@ export function createToolsFromEndpoints(
     user: AIToolExecutionContext["user"];
     locale: CountryLanguage;
     logger: EndpointLogger;
-  });
+  },
   options?: ToolFactoryOptions,
 ): Map<string, CoreTool> {
   const factory = getToolFactory();

@@ -109,7 +109,7 @@ export async function createTRPCContext<
   try {
     // Try to get authenticated user first
     const authResult = await authRepository.getCurrentUser(
-      { platform: "trpc", request: req, locale: opts.locale });
+      { platform: "trpc", request: req, locale: opts.locale },
       opts.logger,
     );
 
@@ -122,7 +122,7 @@ export async function createTRPCContext<
         // Check for customer role
         const authenticatedUser = await authRepository.getAuthMinimalUser(
           [UserRole.CUSTOMER],
-          { platform: "trpc", request: req, locale: opts.locale });
+          { platform: "trpc", request: req, locale: opts.locale },
           opts.logger,
         );
         if (authenticatedUser && !authenticatedUser.isPublic) {
@@ -131,7 +131,7 @@ export async function createTRPCContext<
           // Check for admin role
           const adminUser = await authRepository.getAuthMinimalUser(
             [UserRole.ADMIN],
-            { platform: "trpc", request: req, locale: opts.locale });
+            { platform: "trpc", request: req, locale: opts.locale },
             opts.logger,
           );
           if (adminUser && !adminUser.isPublic) {
@@ -143,7 +143,7 @@ export async function createTRPCContext<
       // Authentication failed - get public user with proper leadId
       user = await authRepository.getAuthMinimalUser(
         [UserRole.PUBLIC],
-        { platform: "trpc", request: req, locale: opts.locale });
+        { platform: "trpc", request: req, locale: opts.locale },
         opts.logger,
       );
       userRoles = [UserRole.PUBLIC];
@@ -152,10 +152,10 @@ export async function createTRPCContext<
     // Authentication failed - get public user with proper leadId
     opts.logger.error("tRPC context: Authentication failed", {
       error: parseError(error),
-    });
+    },
     user = await authRepository.getAuthMinimalUser(
       [UserRole.PUBLIC],
-      { platform: "trpc", request: req, locale: opts.locale });
+      { platform: "trpc", request: req, locale: opts.locale },
       opts.logger,
     );
     userRoles = [UserRole.PUBLIC];
@@ -191,7 +191,7 @@ export async function createAuthenticatedTRPCContext(opts: {
     ...opts,
     logger,
     locale: opts.locale,
-  });
+  },
 
   if (!context.user) {
     // eslint-disable-next-line no-restricted-syntax

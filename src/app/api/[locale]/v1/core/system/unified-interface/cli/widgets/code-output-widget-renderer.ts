@@ -391,7 +391,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
       }
       // eslint-disable-next-line i18next/no-literal-string
       return row.join(" | ");
-    });
+    })
 
     return [header, separator, ...rows].join("\n");
   }

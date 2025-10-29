@@ -235,7 +235,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
         limit: data.limit,
         offset: data.offset,
         error: parsedError.message,
-      });
+      },
 
       return fail({
         message:

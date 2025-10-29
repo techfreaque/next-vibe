@@ -63,7 +63,7 @@ export function validateCliRequestData<
   endpoint: {
     requestSchema: TRequestSchema;
     requestUrlPathParamsSchema: TUrlSchema;
-  });
+  },
   context: CliValidationContext<z.input<TRequestSchema>, z.input<TUrlSchema>>,
   logger: EndpointLogger,
 ): ResponseType<
@@ -93,7 +93,7 @@ export function validateCliRequestData<
         errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
         messageParams: {
           error: urlValidation.message,
-        });
+        }
       };
     }
 
@@ -111,7 +111,7 @@ export function validateCliRequestData<
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
-        });
+        }
       };
     }
 
@@ -121,7 +121,7 @@ export function validateCliRequestData<
         requestData: requestValidation.data,
         urlPathParams: urlValidation.data,
         locale: validatedLocale,
-      });
+      }
     };
   } catch (error) {
     logger.error("CLI validation error", {
@@ -141,7 +141,7 @@ export function validateCliRequestData<
  * Types flow naturally from the schema
  */
 export function validateGetRequestData<TSchema extends z.ZodTypeAny>(
-  endpoint: { requestSchema: TSchema });
+  endpoint: { requestSchema: TSchema },
   request: NextRequest,
   logger: EndpointLogger,
 ): ResponseType<z.output<TSchema>> {
@@ -177,7 +177,7 @@ export function validateGetRequestData<TSchema extends z.ZodTypeAny>(
  * Types flow naturally from the schema
  */
 export async function validatePostRequestData<TSchema extends z.ZodTypeAny>(
-  endpoint: { requestSchema: TSchema });
+  endpoint: { requestSchema: TSchema },
   request: NextRequest,
   logger: EndpointLogger,
 ): Promise<ResponseType<z.output<TSchema>>> {
@@ -212,7 +212,7 @@ export async function validateNextRequestData<
   endpoint: {
     requestSchema: TRequestSchema;
     requestUrlPathParamsSchema: TUrlSchema;
-  });
+  },
   context: NextValidationContext<z.input<TUrlSchema>>,
   logger: EndpointLogger,
 ): Promise<
@@ -244,7 +244,7 @@ export async function validateNextRequestData<
         errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
         messageParams: {
           error: urlValidation.message,
-        });
+        }
       };
     }
 
@@ -269,7 +269,7 @@ export async function validateNextRequestData<
         requestData: requestValidation.data,
         urlPathParams: urlValidation.data,
         locale: validatedLocale,
-      });
+      }
     };
   } catch (error) {
     logger.error("Next.js validation error", {
@@ -295,7 +295,7 @@ export function validateTrpcRequestData<
   endpoint: {
     requestSchema: TRequestSchema;
     requestUrlPathParamsSchema: TUrlSchema;
-  });
+  },
   context: TrpcValidationContext<
     z.output<TRequestSchema>,
     z.output<TUrlSchema>
@@ -316,7 +316,7 @@ export function validateTrpcRequestData<
         requestData: context.requestData,
         urlPathParams: context.urlParameters,
         locale: validatedLocale,
-      });
+      }
     };
   } catch (error) {
     logger.error("tRPC validation error", {

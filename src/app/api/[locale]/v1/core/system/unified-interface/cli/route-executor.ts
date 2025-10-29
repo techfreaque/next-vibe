@@ -3,8 +3,8 @@
  * Integrates with existing CLI handler system to execute routes
  */
 
-import { parseError } from "next-vibe/shared/utils";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 import type z from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -563,9 +563,7 @@ export class RouteDelegationHandler {
       const { t } = simpleT(locale);
       let errorMessage =
         result.error ||
-        t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.errors.unknownError",
-        );
+        t("app.api.v1.core.system.unifiedUi.cli.vibe.errors.unknownError");
 
       // Try to translate if it looks like a translation key (contains dots)
       if (errorMessage.includes(".")) {
@@ -682,10 +680,7 @@ export class RouteDelegationHandler {
     // Try to translate if it looks like a translation key
     if (causeMessage.includes(".")) {
       try {
-        causeMessage = t(
-          causeMessage as TranslationKey,
-          result.cause.messageParams,
-        );
+        causeMessage = t(causeMessage, result.cause.messageParams);
       } catch {
         // If translation fails, use the key as-is
       }

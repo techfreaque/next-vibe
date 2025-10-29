@@ -105,10 +105,11 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       });
 
       if (!userIdentifier) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.get.errors.unauthorized.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.get.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       // Build where clause - use leadId for anonymous users, userId for authenticated users
@@ -151,8 +152,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       if (search) {
         conditions.push(
           or(
-            ilike(chatThreads.title, `%${search}%`}),
-            ilike(chatThreads.preview, `%${search}%`}),
+            ilike(chatThreads.title, `%${search}%`),
+            ilike(chatThreads.preview, `%${search}%`),
           )!,
         );
       }
@@ -161,7 +162,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
 
       // Get total count
       const [{ total }] = await db
-        .select(messageParams: { total: count() })
+        .select({ total: count() })
         .from(chatThreads)
         .where(whereClause);
 
@@ -196,7 +197,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         limit,
         pageCount,
         resultsCount: threads.length,
-        threadIds: threads.map((t) => t.id}),
+        threadIds: threads.map((t) => t.id),
       });
 
       return createSuccessResponse({
@@ -210,11 +211,12 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       });
     } catch (error) {
       logger.error("Error listing threads", parseError(error));
-      return fail({message: 
-        "app.api.v1.core.agent.chat.threads.get.errors.server.title",
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.threads.get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
-      );
+      });
     }
   }
 
@@ -254,10 +256,11 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       const userIdentifier = user.isPublic ? user.leadId : user.id;
 
       if (!userIdentifier) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.threads.post.errors.unauthorized.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.post.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       const threadData = {
@@ -266,7 +269,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
           data.thread?.title ||
           simpleT(locale).t(
             "app.api.v1.core.agent.chat.threads.post.threadTitle.default",
-          }),
+          ),
         rootFolderId: data.thread?.rootFolderId,
         folderId: data.thread?.subFolderId ?? null,
         status: ThreadStatus.ACTIVE,
@@ -296,7 +299,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         updatedAt: dbThread.updatedAt,
       };
 
-      logger.debug("Thread created successfully", messageParams: { threadId: thread.id });
+      logger.debug("Thread created successfully", { threadId: thread.id });
 
       return createSuccessResponse({
         response: {
@@ -305,11 +308,12 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       });
     } catch (error) {
       logger.error("Error creating thread", parseError(error));
-      return fail({message: 
-        "app.api.v1.core.agent.chat.threads.post.errors.server.title",
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.threads.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
-      );
+      });
     }
   }
 }

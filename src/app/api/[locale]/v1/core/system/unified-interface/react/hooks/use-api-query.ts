@@ -163,7 +163,7 @@ export function useApiQuery<
                 }
               }
               return value;
-            });
+            }
           );
           requestDataKey = safeRequestData;
         } else {
@@ -215,7 +215,7 @@ export function useApiQuery<
                 }
               }
               return value;
-            });
+            }
           );
         } else {
           // For primitives, use string representation
@@ -307,7 +307,7 @@ export function useApiQuery<
       return (
         (query as QueryStoreType<TEndpoint["TResponseOutput"]>) ?? defaultState
       );
-    });
+    },
     [queryId, defaultState],
   );
 
@@ -333,7 +333,7 @@ export function useApiQuery<
     if (options.enabled === false) {
       logger.info("useApiQuery: Query disabled, skipping", {
         endpointPath: [...endpoint.path],
-      });
+      })
       return;
     }
 
@@ -343,7 +343,7 @@ export function useApiQuery<
         "useApiQuery: Document hidden (navigation in progress), skipping",
         {
           endpointPath: [...endpoint.path],
-        });
+        }
       );
       return;
     }
@@ -352,7 +352,7 @@ export function useApiQuery<
     if (isInitialMount.current && skipInitialFetch) {
       logger.debug("useApiQuery: Skipping initial fetch", {
         endpointPath: [...endpoint.path],
-      });
+      })
       isInitialMount.current = false;
       return;
     }
@@ -469,7 +469,7 @@ export function useApiQuery<
 
           // Update initial mount ref
           isInitialMount.current = false;
-        });
+        },
         minExecutionInterval - (now - lastExecutionTimeRef.current}),
       );
 

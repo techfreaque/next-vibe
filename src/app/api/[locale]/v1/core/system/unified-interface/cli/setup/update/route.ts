@@ -17,6 +17,6 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, user, locale, logger }) => {
       logger.info("Setup update operation started", { verbose: data.verbose });
       return setupUpdateRepository.updateCli(data, user, locale);
-    });
-  });
+    },
+  },
 });

@@ -7,18 +7,18 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
+  objectField,
+  requestDataField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import {
-  objectField,
-  requestDataField,
-  responseArrayField,
-  responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
@@ -41,62 +41,62 @@ const cronStatusGetEndpoint = createEndpoint({
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.validation.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.validation.description",
-    });
+    },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.network.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.network.description",
-    });
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unauthorized.description",
-    });
+    },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.forbidden.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.forbidden.description",
-    });
+    },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.notFound.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.notFound.description",
-    });
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.server.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.server.description",
-    });
+    },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unknown.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unknown.description",
-    });
+    },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unsavedChanges.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unsavedChanges.description",
-    });
+    },
     [EndpointErrorTypes.CONFLICT]: {
       title:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.conflict.description",
-    });
-  });
+    },
+  },
   successTypes: {
     title:
       "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.success.title",
     description:
       "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.description",
-  });
+  },
 
   fields: objectField(
     {
@@ -105,9 +105,9 @@ const cronStatusGetEndpoint = createEndpoint({
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.title",
       description:
         "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.description",
-      layout: { type: LayoutType.GRID, columns: 12 });
-    });
-    { request: "data", response: true });
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
       taskId: requestDataField(
@@ -118,8 +118,8 @@ const cronStatusGetEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.taskName",
           description:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.taskNamesDescription",
-          layout: { columns: 6 });
-        });
+          layout: { columns: 6 },
+        },
         z.string().optional(),
       ),
 
@@ -131,8 +131,8 @@ const cronStatusGetEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.detailed",
           description:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.detailedDescription",
-          layout: { columns: 6 });
-        });
+          layout: { columns: 6 },
+        },
         z.boolean().default(false),
       ),
 
@@ -142,7 +142,7 @@ const cronStatusGetEndpoint = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.success.content",
-        });
+        },
         z.boolean(),
       ),
 
@@ -151,7 +151,7 @@ const cronStatusGetEndpoint = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.pulse.health.healthy",
-        });
+        },
         z.enum(["healthy", "warning", "critical", "unknown"]),
       ),
 
@@ -160,7 +160,7 @@ const cronStatusGetEndpoint = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.active",
-        });
+        },
         z.number(),
       ),
 
@@ -169,7 +169,7 @@ const cronStatusGetEndpoint = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.total",
-        });
+        },
         z.number(),
       ),
 
@@ -178,7 +178,7 @@ const cronStatusGetEndpoint = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.uptime",
-        });
+        },
         z.string(),
       ),
 
@@ -191,45 +191,45 @@ const cronStatusGetEndpoint = createEndpoint({
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.id",
               type: FieldDataType.TEXT,
-            });
+            },
             {
               key: "name",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.taskName",
               type: FieldDataType.TEXT,
-            });
+            },
             {
               key: "status",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.status",
               type: FieldDataType.TEXT,
-            });
+            },
             {
               key: "lastRun",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.lastRun",
               type: FieldDataType.TEXT,
-            });
+            },
             {
               key: "nextRun",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.nextRun",
               type: FieldDataType.TEXT,
-            });
+            },
             {
               key: "schedule",
               label:
                 "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.schedule",
               type: FieldDataType.TEXT,
-            });
+            },
           ],
-        });
+        },
         responseField(
           {
             type: WidgetType.TEXT,
             content:
               "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.taskName",
-          });
+          },
           z.object({
             id: z.string(),
             name: z.string(),
@@ -240,7 +240,7 @@ const cronStatusGetEndpoint = createEndpoint({
           }),
         ),
       ),
-    });
+    },
   ),
 
   examples: {
@@ -248,18 +248,18 @@ const cronStatusGetEndpoint = createEndpoint({
     requests: {
       basic: {
         detailed: false,
-      });
+      },
       detailed: {
         detailed: true,
-      });
+      },
       specific: {
         taskId: "task-12345",
         detailed: true,
-      });
+      },
       success: {
         detailed: false,
-      });
-    });
+      },
+    },
     responses: {
       basic: {
         success: true,
@@ -275,9 +275,9 @@ const cronStatusGetEndpoint = createEndpoint({
             lastRun: "2023-07-21T11:30:00Z",
             nextRun: "2023-07-21T12:30:00Z",
             schedule: "0 */30 * * *",
-          });
+          },
         ],
-      });
+      },
       detailed: {
         success: true,
         systemStatus: "healthy" as const,
@@ -292,9 +292,9 @@ const cronStatusGetEndpoint = createEndpoint({
             lastRun: "2023-07-21T11:30:00Z",
             nextRun: "2023-07-21T12:30:00Z",
             schedule: "0 */30 * * *",
-          });
+          },
         ],
-      });
+      },
       specific: {
         success: true,
         systemStatus: "healthy" as const,
@@ -309,9 +309,9 @@ const cronStatusGetEndpoint = createEndpoint({
             lastRun: "2023-07-21T11:30:00Z",
             nextRun: "2023-07-21T12:30:00Z",
             schedule: "0 */30 * * *",
-          });
+          },
         ],
-      });
+      },
       success: {
         success: true,
         systemStatus: "healthy" as const,
@@ -326,11 +326,11 @@ const cronStatusGetEndpoint = createEndpoint({
             lastRun: "2023-07-21T11:30:00Z",
             nextRun: "2023-07-21T12:30:00Z",
             schedule: "0 */30 * * *",
-          });
+          },
         ],
-      });
-    });
-  });
+      },
+    },
+  },
 });
 
 export { cronStatusGetEndpoint as GET };

@@ -52,7 +52,7 @@ export function useEndpointFilter<
     >;
     urlPathParams?: TEndpoint["TUrlVariablesOutput"];
     initialFilters?: Partial<TEndpoint["TRequestOutput"]>;
-  } = {});
+  } = {},
 ): ApiQueryFormReturn<
   TEndpoint["TRequestOutput"],
   TEndpoint["TResponseOutput"],
@@ -63,8 +63,8 @@ export function useEndpointFilter<
     return null;
   }
   const {
-    formOptions = { persistForm: true, autoSubmit: true, debounceMs: 300 });
-    queryOptions = {});
+    formOptions = { persistForm: true, autoSubmit: true, debounceMs: 300 },
+    queryOptions = {},
     urlPathParams = {} as TEndpoint["TUrlVariablesOutput"],
     initialFilters,
   } = options;

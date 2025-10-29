@@ -122,13 +122,13 @@ const testPublicEndpoint = createEndpoint({
     string,
     { title: TranslationKey; description: TranslationKey }
   >,
-  successTypes: {} as { title: TranslationKey; description: TranslationKey });
+  successTypes: {} as { title: TranslationKey; description: TranslationKey },
   examples: {
     requests: undefined,
     urlPathParams: undefined,
     responses: undefined,
   });
-});
+},
 
 const testAdminEndpoint = createEndpoint({
   method: Methods.GET,
@@ -147,7 +147,7 @@ const testAdminEndpoint = createEndpoint({
     string,
     { title: TranslationKey; description: TranslationKey }
   >,
-  successTypes: {} as { title: TranslationKey; description: TranslationKey });
+  successTypes: {} as { title: TranslationKey; description: TranslationKey },
   examples: {
     requests: undefined,
     urlPathParams: undefined,
@@ -184,11 +184,11 @@ const testResponseEndpoint = createEndpoint({
     { response: true });
     {
       userId: responseField(
-        { type: WidgetType.TEXT, content: "test" });
+        { type: WidgetType.TEXT, content: "test" },
         z.string(),
       ),
       count: responseField(
-        { type: WidgetType.TEXT, content: "test" });
+        { type: WidgetType.TEXT, content: "test" },
         z.number(),
       ),
     });
@@ -197,12 +197,12 @@ const testResponseEndpoint = createEndpoint({
     string,
     { title: TranslationKey; description: TranslationKey }
   >,
-  successTypes: {} as { title: TranslationKey; description: TranslationKey });
+  successTypes: {} as { title: TranslationKey; description: TranslationKey },
   examples: {
     requests: undefined,
     urlPathParams: undefined,
     responses: {
-      default: { userId: "test-user-id", count: 42 });
+      default: { userId: "test-user-id", count: 42 },
     });
   });
 });

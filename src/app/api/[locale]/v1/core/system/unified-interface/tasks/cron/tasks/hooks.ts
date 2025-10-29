@@ -28,19 +28,19 @@ export function useCronTaskEndpoint(
   params: {
     taskId: string;
     enabled?: boolean;
-  });
+  },
   logger: EndpointLogger,
 ): EndpointReturn<typeof taskEndpoints> {
   return useEndpoint(
     taskEndpoints,
     {
-      urlPathParams: { id: params.taskId });
+      urlPathParams: { id: params.taskId },
       queryOptions: {
         enabled: params.enabled ?? true,
         refetchOnWindowFocus: false,
         staleTime: 30 * 1000, // 30 seconds
-      });
-    });
+      },
+    },
     logger,
   );
 }
@@ -66,12 +66,12 @@ export function useDeleteCronTask(
   return useEndpoint(
     taskEndpoints,
     {
-      urlPathParams: { id: taskId });
+      urlPathParams: { id: taskId },
       queryOptions: {
         enabled: false, // Don't auto-fetch for delete operations
         refetchOnWindowFocus: false,
-      });
-    });
+      },
+    },
     logger,
   );
 }
@@ -87,12 +87,12 @@ export function useToggleCronTask(
   return useEndpoint(
     taskEndpoints,
     {
-      urlPathParams: { id: taskId });
+      urlPathParams: { id: taskId },
       queryOptions: {
         enabled: false, // Don't auto-fetch for update operations
         refetchOnWindowFocus: false,
-      });
-    });
+      },
+    },
     logger,
   );
 }

@@ -13,8 +13,8 @@ export const AI_TOOL_CONSTANTS = {
     space: " ",
     endpointForPrefix: "Endpoint for ",
     hiddenPlaceholder: "[hidden]",
-  });
+  },
   discovery: {
     versionSegments: ["v1", "v2", "core"] as const,
-  });
+  },
 } as const;

@@ -124,7 +124,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
       const output = await this.runCommand(command, ["vibe"], {
         verbose: false,
         ignoreErrors: true,
-      });
+      },
 
       if (output?.trim()) {
         // Get version
@@ -168,8 +168,8 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
         cwd: options.cwd || process.cwd(),
         stdio: options.verbose ? "inherit" : "pipe",
         shell: false,
-        env: { NODE_ENV: "development" });
-      });
+        env: { NODE_ENV: "development" },
+      },
 
       let output = "";
       let errorOutput = "";
@@ -177,7 +177,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
       if (!options.verbose) {
         childProcess.stdout?.on("data", (data: Buffer) => {
           output += data.toString();
-        });
+        },
 
         childProcess.stderr?.on("data", (data: Buffer) => {
           errorOutput += data.toString();
@@ -190,7 +190,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
         } else {
           reject(new Error(errorOutput || output || String(code)));
         }
-      });
+      },
 
       childProcess.on("error", (error: Error) => {
         if (!options.ignoreErrors) {

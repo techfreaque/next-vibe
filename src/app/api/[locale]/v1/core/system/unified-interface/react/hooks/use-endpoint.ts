@@ -105,7 +105,7 @@ export function useEndpoint<
   >,
 >(
   endpoints: T,
-  options: UseEndpointOptions<T> = {});
+  options: UseEndpointOptions<T> = {},
   logger: EndpointLogger,
 ): EndpointReturn<T> {
   // Normalize options with smart defaults
@@ -139,7 +139,7 @@ export function useEndpoint<
     formOptions: {
       persistForm: false, // No local storage
       persistenceKey: undefined,
-    });
+    },
     queryOptions,
     urlPathParams: queryOptions?.urlPathParams,
     autoPrefillConfig,
@@ -167,14 +167,14 @@ export function useEndpoint<
       persistForm: false, // No local storage
       defaultValues,
       persistenceKey: undefined,
-    });
-    mutationOptions: {});
+    },
+    mutationOptions: {},
     urlPathParams: queryOptions?.urlPathParams,
     autoPrefillData,
   });
 
   const deleteOperation = useEndpointDelete(deleteEndpoint, logger, {
-    mutationOptions: {});
+    mutationOptions: {},
     urlPathParams: queryOptions?.urlPathParams,
   });
 
@@ -203,7 +203,7 @@ export function useEndpoint<
         ): Promise<void> => {
           e?.preventDefault();
           await createOperation.submitForm(e);
-        });
+        },
         reset: (): void => createOperation.form.reset(resetData || {}),
         isSuccess: createOperation.isSubmitSuccessful,
         isDirty: createOperation.form.formState.isDirty,
@@ -224,10 +224,10 @@ export function useEndpoint<
         variant: "success",
         title: {
           message: primaryEndpoint.successTypes.title,
-        });
+        },
         message: {
           message: primaryEndpoint.successTypes.description,
-        });
+        },
       };
     }
 
@@ -248,10 +248,10 @@ export function useEndpoint<
           variant: "destructive",
           title: {
             message: errorConfig.title,
-          });
+          },
           message: {
             message: errorConfig.description,
-          });
+          },
         };
       }
 
@@ -260,11 +260,11 @@ export function useEndpoint<
         variant: "destructive",
         title: {
           message: "app.common.error.title",
-        });
+        },
         message: {
           message: error.message,
           messageParams: error.messageParams,
-        });
+        },
       };
     }
 

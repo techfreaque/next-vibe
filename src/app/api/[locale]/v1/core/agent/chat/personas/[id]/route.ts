@@ -4,10 +4,10 @@
  */
 
 import {
-  fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
@@ -27,10 +27,11 @@ export const { GET, PATCH, tools } = endpointsHandler({
       const persona = await repository.getPersonaById(id, userId);
 
       if (!persona) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.personas.id.get.errors.notFound.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.personas.id.get.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
       return createSuccessResponse({ persona });
@@ -43,10 +44,11 @@ export const { GET, PATCH, tools } = endpointsHandler({
       const { id } = urlPathParams;
 
       if (!userId) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.personas.id.patch.errors.unauthorized.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.personas.id.patch.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       // Only custom personas (UUIDs) can be updated
@@ -56,18 +58,19 @@ export const { GET, PATCH, tools } = endpointsHandler({
         ...rest,
         ...(personaDescription !== undefined && {
           description: personaDescription,
-        }}),
+        }),
       };
       const updated = await repository.updateCustomPersona(id, userId, dbData);
 
       if (!updated) {
-        return fail({message: 
-          "app.api.v1.core.agent.chat.personas.id.patch.errors.notFound.title",
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.personas.id.patch.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-        );
+        });
       }
 
-      return createSuccessResponse(messageParams: { success: true });
+      return createSuccessResponse({ success: true });
     },
   },
 });

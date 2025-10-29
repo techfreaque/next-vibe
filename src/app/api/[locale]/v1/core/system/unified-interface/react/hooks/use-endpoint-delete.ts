@@ -43,7 +43,7 @@ export function useEndpointDelete<
       TEndpoint["TUrlVariablesOutput"]
     >;
     urlPathParams?: TEndpoint["TUrlVariablesOutput"];
-  } = {});
+  } = {},
 ): {
   /** The complete response including success/error state */
   response: ResponseType<TEndpoint["TResponseOutput"]> | undefined;
@@ -63,7 +63,7 @@ export function useEndpointDelete<
   }
 
   const {
-    mutationOptions = {});
+    mutationOptions = {},
     urlPathParams = {} as TEndpoint["TUrlVariablesOutput"],
   } = options;
 
@@ -77,7 +77,7 @@ export function useEndpointDelete<
         requestData: data || ({} as TEndpoint["TRequestOutput"]),
         urlPathParams: urlPathParams,
       });
-    });
+    },
     [mutation, urlPathParams],
   );
 
