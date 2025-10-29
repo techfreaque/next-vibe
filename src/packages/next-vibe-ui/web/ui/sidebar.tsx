@@ -9,6 +9,7 @@ import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
 
+import { useIsMobile } from "../hooks/use-mobile";
 import { Button } from "./button";
 import { Input } from "./input";
 import { Separator } from "./separator";
@@ -20,7 +21,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./tooltip";
-import { useIsMobile } from "../hooks/use-mobile";
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

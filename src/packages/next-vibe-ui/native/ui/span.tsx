@@ -16,4 +16,3 @@ export const Span = React.forwardRef<
 ));
 
 Span.displayName = "Span";
-

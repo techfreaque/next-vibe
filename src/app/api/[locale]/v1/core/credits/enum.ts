@@ -3,7 +3,7 @@
  * Defines credit-related enumerations
  */
 
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enum-helpers";
+import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/enum";
 
 /**
  * Credit type identifier for tracking which credit pool is being used

@@ -16,9 +16,9 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import type { JSX, ReactNode } from "react";
-import type { Control } from "react-hook-form";
+import type { Control, UseFormReturn } from "react-hook-form";
 
-import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint-types";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import {
   UserRoleFilter,
   UserStatusFilter,
@@ -35,8 +35,10 @@ interface UsersStatsFiltersContainerProps {
   form: EndpointReturn<typeof statsEndpoints>["read"]["form"];
 }
 
+type StatsFormData = EndpointReturn<typeof statsEndpoints>["read"] extends { form: UseFormReturn<infer T> } ? T : never;
+
 interface UsersStatsFiltersProps {
-  control: Control<any>;
+  control: Control<StatsFormData>;
 }
 
 export function UsersStatsFilters({

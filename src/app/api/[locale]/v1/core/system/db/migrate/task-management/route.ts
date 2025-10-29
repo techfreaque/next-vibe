@@ -4,8 +4,8 @@
  * Optional route - only created because migration task management HTTP access is useful
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
 import { migrationTaskManagementRepository as repository } from "./repository";

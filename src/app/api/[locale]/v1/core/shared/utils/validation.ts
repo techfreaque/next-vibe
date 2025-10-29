@@ -1,6 +1,6 @@
 import type { z, ZodError, ZodIssue } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import type { ResponseType } from "../types/response.schema";
 import {
@@ -42,7 +42,7 @@ export function validateData<TSchema extends z.ZodType>(
       };
       logger.error("Validation error details", parseError(error));
       return createErrorResponse(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
         ErrorResponseTypes.VALIDATION_ERROR,
         {
           error: formattedErrors.join(", "),
@@ -57,7 +57,7 @@ export function validateData<TSchema extends z.ZodType>(
     const parsedError = parseError(error);
     logger.error("Unexpected validation error", parsedError);
     return createErrorResponse(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
       ErrorResponseTypes.VALIDATION_ERROR,
       { error: parsedError.message },
     );

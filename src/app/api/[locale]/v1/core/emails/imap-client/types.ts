@@ -8,11 +8,11 @@ import { z } from "zod";
 import {
   LayoutType,
   WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import {
   objectField,
   responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 
 // IMAP Message Response Schema using objectField pattern
 export const imapMessageResponseSchema = objectField(

@@ -23,7 +23,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/ui/storage";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/types";
 import type { CountryLanguage } from "@/i18n/core/config";

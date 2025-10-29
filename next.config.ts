@@ -106,7 +106,7 @@ const nextConfig: NextConfig = {
       }
     : undefined,
 
-  // Support for WebSockets in server components (moved from experimental)
+  // Support for WebSockets in server components
   serverExternalPackages: ["socket.io", "socket.io-client"],
 
   // Ensure WebSocket routes are properly handled

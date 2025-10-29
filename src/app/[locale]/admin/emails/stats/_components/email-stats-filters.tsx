@@ -26,7 +26,7 @@ import {
 import type { EmailStatsGetRequestTypeOutput } from "@/app/api/[locale]/v1/core/emails/messages/stats/definition";
 import type emailStatsEndpoint from "@/app/api/[locale]/v1/core/emails/messages/stats/definition";
 import { SortOrder } from "@/app/api/[locale]/v1/core/leads/enum";
-import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint-types";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

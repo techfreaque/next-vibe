@@ -8,7 +8,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -145,6 +145,7 @@ export async function dev(
           demoUser.id,
           1000,
           "subscription",
+          logger,
           expiresAt,
         );
 
@@ -248,6 +249,7 @@ export async function dev(
             adminUser.id,
             1000,
             "subscription",
+            logger,
             expiresAt,
           );
 
@@ -365,6 +367,7 @@ export async function dev(
             lowCreditsUser.id,
             3,
             "subscription",
+            logger,
             expiresAt,
           );
 

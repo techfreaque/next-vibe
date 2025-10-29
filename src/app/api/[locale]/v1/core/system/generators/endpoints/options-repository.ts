@@ -75,7 +75,10 @@ export interface CliOptionsRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<CliOptionsResponseOutput>>;
 
-  validateOption(name: string, value: unknown): Promise<ResponseType<boolean>>;
+  validateOption(
+    name: string,
+    value: string | number | boolean | null | string[],
+  ): Promise<ResponseType<boolean>>;
   generateHelp(category?: string): Promise<ResponseType<string>>;
 }
 
@@ -92,7 +95,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
   /**
    * Process CLI options based on operation
    */
-  async processOptions(
+  processOptions(
     data: CliOptionsRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -102,11 +105,11 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
     // Validate user permissions
     if (!user?.id) {
       return createErrorResponse(
-        "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
         ErrorResponseTypes.UNAUTHORIZED,
         {
           error: t(
-            "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.description",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.description",
           ),
         },
       );
@@ -120,11 +123,12 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
       };
 
       switch (data.operation) {
-        case "list":
+        case "list": {
           const category =
             typeof data.category === "string" ? data.category : undefined;
           response.options = Object.keys(this.listOptions(category));
           break;
+        }
         case "validate":
           if (data.optionName && data.optionValue !== undefined) {
             const validation = this.validateOptionValue(
@@ -140,7 +144,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
               isValid: false,
               errors: [
                 t(
-                  "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.validation.title",
+                  "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.validation.title",
                 ),
               ],
             };
@@ -150,7 +154,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
           // Define new option (implementation would go here)
           response.options = [
             t(
-              "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.title",
+              "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.success.title",
             ),
           ];
           break;
@@ -158,7 +162,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
           // Parse option values (implementation would go here)
           response.options = [
             t(
-              "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.title",
+              "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.success.title",
             ),
           ];
           break;
@@ -187,18 +191,20 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
   /**
    * Validate a single option
    */
-  async validateOption(
+  validateOption(
     name: string,
-    value: unknown,
+    value: string | number | boolean | null | string[],
   ): Promise<ResponseType<boolean>> {
     try {
       const validation = this.validateOptionValue(name, value);
-      return createSuccessResponse(validation.valid);
+      return Promise.resolve(createSuccessResponse(validation.valid));
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.shared.errorTypes.validation_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
+      return Promise.resolve(
+        createErrorResponse(
+          "app.api.v1.core.shared.errorTypes.validation_error",
+          ErrorResponseTypes.INTERNAL_ERROR,
+          { error: parseError(error).message },
+        ),
       );
     }
   }
@@ -206,15 +212,17 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
   /**
    * Generate help text
    */
-  async generateHelp(category?: string): Promise<ResponseType<string>> {
+  generateHelp(category?: string): Promise<ResponseType<string>> {
     try {
       const help = this.generateOptionsHelp(category);
-      return createSuccessResponse(help);
+      return Promise.resolve(createSuccessResponse(help));
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.shared.errorTypes.internal_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
+      return Promise.resolve(
+        createErrorResponse(
+          "app.api.v1.core.shared.errorTypes.internal_error",
+          ErrorResponseTypes.INTERNAL_ERROR,
+          { error: parseError(error).message },
+        ),
       );
     }
   }
@@ -272,8 +280,11 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
   /**
    * List options by category
    */
-  private listOptions(category?: string): Record<string, unknown> {
-    const options: Record<string, unknown> = {};
+  private listOptions(
+    category?: string,
+  ): Record<string, string | number | boolean | null | object> {
+    const options: Record<string, string | number | boolean | null | object> =
+      {};
 
     for (const [name, definition] of this.optionDefinitions) {
       if (!category || definition.category === category) {
@@ -298,7 +309,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
    */
   private validateOptionValue(
     name: string,
-    value: unknown,
+    value: string | number | boolean | null | string[],
   ): {
     valid: boolean;
     errors: string[];

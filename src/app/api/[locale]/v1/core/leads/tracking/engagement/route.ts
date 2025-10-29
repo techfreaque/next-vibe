@@ -4,8 +4,8 @@
  */
 import "server-only";
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import { leadTrackingRepository } from "../repository";
 import definitions from "./definition";
@@ -28,8 +28,7 @@ export const { GET, POST, tools } = endpointsHandler({
     },
   },
   [Methods.GET]: {
-    handler: async ({ data, request, user, locale, logger }) => {
-      const clientInfo = leadTrackingRepository.extractClientInfo(request);
+    handler: async ({ data, user, locale, logger }) => {
       return await leadTrackingRepository.handleClickTracking(
         data,
         user,

@@ -12,14 +12,14 @@ import type {
 import { parseError } from "next-vibe/shared/utils";
 import { useEffect } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import {
   createCustomStateKey,
   type EnhancedMutationResult,
   useApiMutation,
   useApiQuery,
   useCustomState,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 

@@ -5,14 +5,14 @@ import { LogOut, User } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { useLogout } from "@/app/api/[locale]/v1/core/user/private/logout/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface UserMenuProps {
-  user: JwtPayloadType;
+  user: JwtPayloadType | undefined;
   locale: CountryLanguage;
   logger: EndpointLogger;
 }

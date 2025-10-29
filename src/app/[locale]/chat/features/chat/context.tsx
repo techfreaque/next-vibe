@@ -12,7 +12,7 @@ import {
   useChat,
   type UseChatReturn,
 } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 /**

@@ -19,7 +19,7 @@ import {
 import type { JSX } from "react";
 
 import { useImapFoldersList } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/list/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import { useTranslation } from "@/i18n/core/client";
 
 interface ImapFoldersListProps {

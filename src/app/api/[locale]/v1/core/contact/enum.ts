@@ -3,7 +3,7 @@
  * Enum definitions for contact form operations with automatic translation option generation
  */
 
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enum-helpers";
+import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/enum";
 
 /**
  * Contact Subject options

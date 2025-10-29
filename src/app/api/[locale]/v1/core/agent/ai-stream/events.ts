@@ -4,7 +4,7 @@
  */
 
 import type { DefaultFolderId } from "../chat/config";
-import type { ToolCallResult } from "../chat/db";
+import type { ToolCall, ToolCallResult } from "../chat/db";
 import type { ChatMessageRole } from "../chat/enum";
 import type { ModelId } from "../chat/model-access/models";
 
@@ -53,6 +53,9 @@ export interface MessageCreatedEventData {
   content: string;
   model?: ModelId;
   persona?: string;
+  sequenceId?: string | null; // Links messages in the same AI response sequence
+  sequenceIndex?: number; // Order within sequence
+  toolCalls?: ToolCall[]; // Tool calls for TOOL role messages
 }
 
 /**

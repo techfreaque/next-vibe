@@ -17,7 +17,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 
 import type { DefaultFolderId } from "./config";
@@ -272,6 +272,11 @@ export const chatMessages = pgTable(
       onDelete: "cascade",
     }),
     depth: integer("depth").default(0).notNull(),
+
+    // Message sequencing - links messages that are part of the same AI response
+    // All messages in a sequence share the same sequenceId (first message's ID)
+    sequenceId: uuid("sequence_id"),
+    sequenceIndex: integer("sequence_index").default(0).notNull(), // Order within sequence
 
     // Author information (for multi-user support)
     authorId: text("author_id"), // User ID or "local"

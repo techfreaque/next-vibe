@@ -149,7 +149,7 @@ export const i18nConfig = [
               `^[A-Z]+(?:_[A-Z]+)*$`,
 
               // exclude "use client" and "use server"
-              `^use (?:client|server)$`
+              `^use (?:client|server|custom)$`
             ]
           },
           validComponents: [

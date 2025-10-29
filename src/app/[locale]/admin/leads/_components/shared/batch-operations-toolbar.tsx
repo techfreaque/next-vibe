@@ -48,7 +48,6 @@ interface BatchOperationsToolbarProps {
     scope: typeof BatchOperationScopeValues,
   ) => void;
   onBatchDelete: (scope: typeof BatchOperationScopeValues) => void;
-  currentFilters: unknown;
   isLoading?: boolean;
   resetTrigger?: number; // Used to trigger state reset
 }
@@ -60,7 +59,6 @@ export function BatchOperationsToolbar({
   pageSize,
   onBatchUpdate,
   onBatchDelete,
-  currentFilters,
   isLoading = false,
   resetTrigger = 0,
 }: BatchOperationsToolbarProps): React.JSX.Element {

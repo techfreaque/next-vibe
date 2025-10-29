@@ -12,8 +12,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { ChevronDown } from "./icons/ChevronDown";
 import { cn } from "../lib/utils";
+import { ChevronDown } from "./icons/ChevronDown";
 
 const NavigationMenu = React.forwardRef<
   NavigationMenuPrimitive.RootRef,

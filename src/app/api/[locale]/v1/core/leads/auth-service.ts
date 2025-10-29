@@ -7,16 +7,11 @@
 import "server-only";
 
 import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
-import { LEAD_ID_COOKIE_NAME } from "next-vibe/shared/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  createErrorResponse,
-  createSuccessResponse,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
+import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
@@ -403,10 +398,7 @@ class LeadAuthServiceImpl {
    * For CLI/MCP: lead ID is stored in .vibe.session file
    * For mobile: lead ID is stored in AsyncStorage
    */
-  async setLeadIdCookie(
-    leadId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>> {
+  setLeadIdCookie(leadId: string, logger: EndpointLogger): ResponseType<void> {
     logger.warn(
       "setLeadIdCookie is deprecated - lead ID storage is now handled by platform-specific auth handlers",
       { leadId },

@@ -5,7 +5,7 @@ import type { JSX, ReactNode } from "react";
 
 import Footer from "@/app/[locale]/_components/footer";
 import { Navbar } from "@/app/[locale]/_components/nav/navbar";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";

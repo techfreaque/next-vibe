@@ -50,7 +50,7 @@ export function DataTable<TData, TValue>({
   ListFooterComponent,
   isRefreshing = false,
   onRefresh,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData, TValue>): JSX.Element {
   const insets = useSafeAreaInsets();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const table = useReactTable({
@@ -130,7 +130,7 @@ export function DataTable<TData, TValue>({
                     )}
                     onPress={
                       onRowPress
-                        ? () => {
+                        ? (): void => {
                             onRowPress(row);
                           }
                         : undefined
@@ -165,7 +165,7 @@ export function DataTable<TData, TValue>({
 
 const { width } = Dimensions.get("window");
 
-function getColumnWidth(size: number, length: number) {
+function getColumnWidth(size: number, length: number): number {
   const evenWidth = width / length;
   return evenWidth > size ? evenWidth : size;
 }

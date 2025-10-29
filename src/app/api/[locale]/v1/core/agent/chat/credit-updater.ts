@@ -6,8 +6,8 @@
 "use client";
 
 import creditsDefinition from "@/app/api/[locale]/v1/core/credits/definition";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/store";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
 
 import type { ModelId } from "./model-access/models";
 import { getModelById } from "./model-access/models";

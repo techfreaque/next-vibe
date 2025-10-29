@@ -475,7 +475,14 @@ export const translations = {
       query: "Query",
     },
     multiple: "{{count}} tool calls",
+    arguments: "Arguments",
     result: "Result",
+    error: "Error",
+  },
+  reasoning: {
+    title: "Thinking",
+    multiple: "{{count}} reasoning steps",
+    step: "Step {{number}}",
   },
   modelUtilities: {
     general: "General Chat",

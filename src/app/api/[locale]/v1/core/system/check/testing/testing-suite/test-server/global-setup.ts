@@ -7,7 +7,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { closeDatabase } from "@/app/api/[locale]/v1/core/system/db";
 import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import teardown from "./global-teardown";

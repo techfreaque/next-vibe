@@ -11,9 +11,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 // Import types from the endpoint definition
 import type endpoints from "./definition";
@@ -41,9 +42,7 @@ export class SchemaVerifyRepositoryImpl
 {
   async execute(
     data: RequestType,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _user: JwtPayloadType,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     locale: CountryLanguage,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _logger: EndpointLogger,
@@ -54,15 +53,30 @@ export class SchemaVerifyRepositoryImpl
 
     try {
       // Check database schema integrity
-      const validationResult = await this.performSchemaValidation();
+      const validationResult = await this.performSchemaValidation(locale);
       const schemaValid = validationResult.valid;
 
       if (!data.silent) {
-        outputs.push(`✅ Verified ${validationResult.tablesChecked} tables`);
-        outputs.push(`✅ Verified ${validationResult.columnsChecked} columns`);
-        outputs.push(`✅ Verified ${validationResult.indexesChecked} indexes`);
+        const { t } = simpleT(locale);
         outputs.push(
-          `✅ Verified ${validationResult.constraintsChecked} constraints`,
+          t("app.api.v1.core.system.db.schemaVerify.verified.tables", {
+            count: validationResult.tablesChecked,
+          }),
+        );
+        outputs.push(
+          t("app.api.v1.core.system.db.schemaVerify.verified.columns", {
+            count: validationResult.columnsChecked,
+          }),
+        );
+        outputs.push(
+          t("app.api.v1.core.system.db.schemaVerify.verified.indexes", {
+            count: validationResult.indexesChecked,
+          }),
+        );
+        outputs.push(
+          t("app.api.v1.core.system.db.schemaVerify.verified.constraints", {
+            count: validationResult.constraintsChecked,
+          }),
         );
       }
 
@@ -72,7 +86,12 @@ export class SchemaVerifyRepositoryImpl
         if (data.fixIssues) {
           const fixed = await this.fixSchemaIssues();
           fixedIssues.push(...fixed);
-          outputs.push(`🔧 Fixed ${fixed.length} schema issues`);
+          const { t } = simpleT(locale);
+          outputs.push(
+            t("app.api.v1.core.system.db.schemaVerify.fixed", {
+              count: fixed.length,
+            }),
+          );
         }
       }
 
@@ -80,10 +99,16 @@ export class SchemaVerifyRepositoryImpl
         schemaValid || (data.fixIssues && fixedIssues.length === issues.length);
 
       if (!data.silent && finalValid) {
-        outputs.push("\n✅ Schema validation passed - all checks successful");
-      } else if (!data.silent && !finalValid) {
+        const { t } = simpleT(locale);
         outputs.push(
-          `\n❌ Schema validation failed - ${issues.length} issues found`,
+          t("app.api.v1.core.system.db.schemaVerify.validationPassed"),
+        );
+      } else if (!data.silent && !finalValid) {
+        const { t } = simpleT(locale);
+        outputs.push(
+          t("app.api.v1.core.system.db.schemaVerify.validationFailed", {
+            count: issues.length,
+          }),
         );
       }
 
@@ -107,7 +132,7 @@ export class SchemaVerifyRepositoryImpl
     }
   }
 
-  private async performSchemaValidation(): Promise<{
+  private async performSchemaValidation(locale: CountryLanguage): Promise<{
     valid: boolean;
     tablesChecked: number;
     columnsChecked: number;
@@ -132,13 +157,16 @@ export class SchemaVerifyRepositoryImpl
         issues: [],
       };
     } catch {
+      const { t } = simpleT(locale);
       return {
         valid: false,
         tablesChecked: 0,
         columnsChecked: 0,
         indexesChecked: 0,
         constraintsChecked: 0,
-        issues: ["Failed to connect to database"],
+        issues: [
+          t("app.api.v1.core.system.db.schemaVerify.dbConnectionFailed"),
+        ],
       };
     }
   }

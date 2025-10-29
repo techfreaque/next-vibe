@@ -6,7 +6,8 @@
 import "server-only";
 
 import {
-  createErrorResponse,
+  fail,
+  fail,
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
@@ -25,13 +26,13 @@ export function validateNotIncognito(
   errorKeyPrefix: string,
 ): ResponseType<never> | null {
   if (rootFolderId === "incognito") {
-    return createErrorResponse(
+    return fail({message: 
       `${errorKeyPrefix}.errors.forbidden.title` as TranslationKey,
-      ErrorResponseTypes.FORBIDDEN,
+      errorType: ErrorResponseTypes.FORBIDDEN,
       {
         message: simpleT(locale).t(
           `${errorKeyPrefix}.errors.forbidden.incognitoNotAllowed` as TranslationKey,
-        ),
+        }),
       },
     );
   }
@@ -46,7 +47,7 @@ export function validateUserHasId(
   titleKey: TranslationKey,
 ): ResponseType<never> | null {
   if (!userId) {
-    return createErrorResponse(titleKey, ErrorResponseTypes.UNAUTHORIZED);
+    return fail({message: titleKey, ErrorResponseTypes.UNAUTHORIZED);
   }
   return null;
 }
@@ -60,7 +61,7 @@ export function validateExists<T>(
   messageKey: TranslationKey,
 ): ResponseType<never> | null {
   if (!entity) {
-    return createErrorResponse(titleKey, ErrorResponseTypes.NOT_FOUND, {
+    return fail({message: titleKey, ErrorResponseTypes.NOT_FOUND, {
       error: messageKey,
     });
   }
@@ -77,7 +78,7 @@ export function validateNoCircularReference(
   messageKey: TranslationKey,
 ): ResponseType<never> | null {
   if (parentId === id) {
-    return createErrorResponse(titleKey, ErrorResponseTypes.VALIDATION_ERROR, {
+    return fail({message: titleKey, ErrorResponseTypes.VALIDATION_ERROR, {
       error: messageKey,
     });
   }

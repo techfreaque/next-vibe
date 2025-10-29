@@ -4,13 +4,14 @@
  */
 
 import {
-  createErrorResponse,
+  fail,
+  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import * as repository from "../repository";
 import definitions from "./definition";
@@ -26,9 +27,9 @@ export const { GET, PATCH, tools } = endpointsHandler({
       const persona = await repository.getPersonaById(id, userId);
 
       if (!persona) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.personas.id.get.errors.notFound.title",
-          ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
         );
       }
 
@@ -42,9 +43,9 @@ export const { GET, PATCH, tools } = endpointsHandler({
       const { id } = urlPathParams;
 
       if (!userId) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.personas.id.patch.errors.unauthorized.title",
-          ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
         );
       }
 
@@ -55,18 +56,18 @@ export const { GET, PATCH, tools } = endpointsHandler({
         ...rest,
         ...(personaDescription !== undefined && {
           description: personaDescription,
-        }),
+        }}),
       };
       const updated = await repository.updateCustomPersona(id, userId, dbData);
 
       if (!updated) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.personas.id.patch.errors.notFound.title",
-          ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
         );
       }
 
-      return createSuccessResponse({ success: true });
+      return createSuccessResponse(messageParams: { success: true });
     },
   },
 });

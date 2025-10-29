@@ -227,12 +227,9 @@ export function TagsField({
                           onClick={() => addTag(inputValue)}
                         >
                           <Plus className="h-3 w-3 mr-2" />
-                          {t(
-                            "packages.nextVibeUi.web.common.addCustomValue",
-                            {
-                              value: inputValue.trim(),
-                            },
-                          )}
+                          {t("packages.nextVibeUi.web.common.addCustomValue", {
+                            value: inputValue.trim(),
+                          })}
                         </Button>
                       </div>
                     )}

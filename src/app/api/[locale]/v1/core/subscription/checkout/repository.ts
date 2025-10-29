@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import Stripe from "stripe";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import type { Countries, CountryLanguage } from "@/i18n/core/config";

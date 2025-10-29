@@ -15,8 +15,8 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../system/unified-backend/shared/endpoint-logger";
-import { helpService } from "../../system/unified-backend/shared/help/help-service";
+import type { EndpointLogger } from "../../system/unified-interface/shared/logger/endpoint";
+import { helpService } from "../../system/unified-interface/shared/server-only/help/service";
 import type { HelpRequestOutput, HelpResponseOutput } from "./definition";
 
 /**
@@ -61,7 +61,7 @@ class HelpRepository {
       }
 
       // Show general help with usage information
-      const response = this.formatGeneralHelp(commands);
+      const response = this.formatGeneralHelp();
       logger.info("General help generated successfully");
       return createSuccessResponse(response);
     } catch (error) {
@@ -144,13 +144,7 @@ class HelpRepository {
   /**
    * Format general help with usage information
    */
-  private formatGeneralHelp(
-    commands: Array<{
-      alias: string;
-      description?: string;
-      category: string;
-    }>,
-  ): HelpResponseOutput {
+  private formatGeneralHelp(): HelpResponseOutput {
     return {
       header: {
         title: "Vibe CLI - Next-generation API execution tool",

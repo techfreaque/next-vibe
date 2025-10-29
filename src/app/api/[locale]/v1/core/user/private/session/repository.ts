@@ -18,7 +18,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
-import { createDefaultCliUser } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/auth/cli-user-factory";
+import { createDefaultCliUser } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/auth/cli-user";
 
 import type { NewSession, Session } from "./db";
 import { sessions } from "./db";
@@ -85,7 +85,18 @@ export class SessionRepositoryImpl implements SessionRepository {
     try {
       // Note: Logger not available for internal session methods
 
-      // Handle CLI tokens - they don't need session validation
+      // First, try to find the session in the database
+      // This handles both regular sessions and JWT tokens stored during login
+      const results = await db
+        .select()
+        .from(sessions)
+        .where(eq(sessions.token, token));
+
+      if (results.length > 0) {
+        return createSuccessResponse(results[0]);
+      }
+
+      // If not found in database and it looks like a JWT token, handle as CLI token
       // CLI tokens are JWTs that are self-contained and don't require database sessions
       if (token?.startsWith("eyJ")) {
         // This looks like a JWT token (starts with eyJ which is base64 for {"alg")
@@ -101,20 +112,12 @@ export class SessionRepositoryImpl implements SessionRepository {
         return createSuccessResponse(mockSession);
       }
 
-      const results = await db
-        .select()
-        .from(sessions)
-        .where(eq(sessions.token, token));
-
-      if (results.length === 0) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.session.errors.session_not_found",
-          ErrorResponseTypes.NOT_FOUND,
-          { token },
-        );
-      }
-
-      return createSuccessResponse(results[0]);
+      // Token not found in database and not a JWT
+      return createErrorResponse(
+        "app.api.v1.core.user.private.session.errors.session_not_found",
+        ErrorResponseTypes.NOT_FOUND,
+        { token },
+      );
     } catch (error) {
       // Note: Logger not available for internal session methods
       return createErrorResponse(

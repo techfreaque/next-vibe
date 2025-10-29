@@ -21,14 +21,14 @@ import {
 } from "next-vibe-ui/ui/table";
 import React, { useState } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import type { CronTaskResponseType } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/tasks/definition";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { CronTaskResponseType } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/tasks/definition";
+import { formatCronSchedule } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron-formatter";
 import {
   useCronTaskEndpoint,
   useDeleteCronTask,
   useToggleCronTask,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/tasks/cron/tasks/hooks";
-import { formatCronSchedule } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron-formatter";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/tasks/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";

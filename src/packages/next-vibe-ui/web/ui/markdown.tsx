@@ -1,6 +1,7 @@
 "use client";
 
 import { Brain, Check, ChevronDown, Copy, ExternalLink } from "lucide-react";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -10,7 +11,6 @@ import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
 import { useTranslation } from "@/i18n/core/client";
-import { cn } from "next-vibe/shared/utils";
 
 // Constants for non-translatable values
 const DECORATIVE_QUOTE = String.fromCharCode(0x201c); // Left double quotation mark
@@ -128,9 +128,7 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
                 >
                   <Brain className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
                   <span className="flex-1 text-left font-semibold">
-                    {t(
-                      "packages.nextVibeUi.web.ui.markdown.reasoningProcess",
-                    )}
+                    {t("packages.nextVibeUi.web.ui.markdown.reasoningProcess")}
                     {isIncomplete && (
                       <span className="ml-2 text-xs font-normal text-purple-500 dark:text-purple-400">
                         {t("packages.nextVibeUi.web.ui.markdown.streaming")}

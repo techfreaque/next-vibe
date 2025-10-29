@@ -26,9 +26,9 @@ import {
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import { useAIToolsList } from "@/app/api/[locale]/v1/core/system/unified-ui/ai/tools/hooks";
-import type { AIToolMetadataSerialized } from "@/app/api/[locale]/v1/core/system/unified-ui/ai/types";
+import { useAIToolsList } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/tools/hooks";
+import type { AIToolMetadataSerialized } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

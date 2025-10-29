@@ -3,9 +3,14 @@
  * This is a placeholder for the web-only EndpointFormField component
  * TODO: Implement native version or create proper fallback
  */
+import type { JSX } from "react";
 import { Text, View } from "react-native";
 
-export function EndpointFormField(props: any) {
+interface EndpointFormFieldProps {
+  [key: string]: unknown;
+}
+
+export function EndpointFormField(_props: EndpointFormFieldProps): JSX.Element {
   console.warn("🔶 Using stub: EndpointFormField");
   return (
     <View style={{ padding: 8, backgroundColor: "#FEF3C7", marginVertical: 4 }}>

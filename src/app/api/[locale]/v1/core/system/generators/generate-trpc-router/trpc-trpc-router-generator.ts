@@ -7,12 +7,12 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { findRouteFiles } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/filesystem/directory-scanner";
+import { findRouteFiles } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/filesystem/scanner";
 
 import {
   type RouteFileStructure,
   validateRouteFileForTRPC,
-} from "../../unified-ui/react/trpc-trpc-procedure-factory";
+} from "../../unified-interface/react/trpc-trpc-procedure-factory";
 
 /**
  * Router generation configuration
@@ -307,7 +307,7 @@ function generateRouterCode(validRouteFiles: RouteFileInfo[]): string {
 /* eslint-disable simple-import-sort/imports */
 /* eslint-disable prettier/prettier */
 
-import { router } from '@/app/api/[locale]/v1/core/system/unified-ui/react/trpc-trpc';
+import { router } from '@/app/api/[locale]/v1/core/system/unified-interface/react/trpc-trpc';
 ${imports.join("\n")}
 
 ${constants.join("\n")}
@@ -419,11 +419,16 @@ function generateNestedRouterCode(
     if (Array.isArray(value)) {
       // Direct procedures at this level
       if (value.length === 1) {
-        // eslint-disable-next-line i18next/no-literal-string
-        entries.push(`${indent}${quotedKey}: router(${value[0].varName}),`);
+        // Single route file - spread the procedures object (e.g., { GET: procedure, POST: procedure })
+
+        entries.push(
+          `${indent}${quotedKey}: router({ ...${value[0].varName} }),`,
+        );
       } else {
         // Multiple route files at same level - merge them
-        const mergedProcedures = value.map((rf) => rf.varName).join(", ");
+        const mergedProcedures = value
+          .map((rf) => `...${rf.varName}`)
+          .join(", ");
         // eslint-disable-next-line i18next/no-literal-string
         entries.push(`${indent}${quotedKey}: router({ ${mergedProcedures} }),`);
       }

@@ -13,19 +13,19 @@ import {
   TimePeriod,
   TimePeriodOptions,
 } from "@/app/api/[locale]/v1/core/shared/stats-filtering";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import {
   objectField,
   requestDataField,
   responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { Countries, Languages } from "@/i18n/core/config";
 

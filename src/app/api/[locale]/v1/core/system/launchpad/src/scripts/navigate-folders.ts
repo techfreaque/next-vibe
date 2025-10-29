@@ -8,7 +8,6 @@ import { promisify } from "node:util";
 
 import chalk from "chalk";
 import inquirer from "inquirer";
-import { parseError } from "next-vibe/shared/utils";
 
 import type {
   LaunchpadConfig,

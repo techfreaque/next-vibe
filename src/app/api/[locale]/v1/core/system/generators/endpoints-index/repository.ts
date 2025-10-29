@@ -15,7 +15,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
@@ -121,7 +121,7 @@ class EndpointsIndexGeneratorRepositoryImpl
   }
 
   /**
-   * Generate endpoints content
+   * Generate endpoints content with singleton pattern
    */
   private generateContent(
     definitionFiles: string[],
@@ -177,14 +177,40 @@ class EndpointsIndexGeneratorRepositoryImpl
 /* eslint-disable simple-import-sort/imports */
 /* eslint-disable prettier/prettier */
 
-import type { ApiSection } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/core-types";
+import type { ApiSection } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import { setNestedPath } from "next-vibe/shared/utils/object-path";
 
 ${imports.join("\n")}
 
-export function setupEndpoints(): Record<string, ApiSection> {
+/**
+ * Singleton instance for endpoints registry
+ */
+let endpointsInstance: Record<string, ApiSection> | null = null;
+
+/**
+ * Initialize and return singleton endpoints instance
+ */
+function initializeEndpoints(): Record<string, ApiSection> {
+  if (endpointsInstance !== null) {
+    return endpointsInstance;
+  }
+
   const endpoints: Record<string, ApiSection> = {};
 ${setNestedPathCalls.join("\n")}
+
+  endpointsInstance = endpoints;
+  return endpoints;
+}
+
+/**
+ * Get the singleton endpoints instance
+ */
+export const endpoints = initializeEndpoints();
+
+/**
+ * @deprecated Use 'endpoints' singleton export instead
+ */
+export function setupEndpoints(): Record<string, ApiSection> {
   return endpoints;
 }
 `;

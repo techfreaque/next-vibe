@@ -7,7 +7,7 @@
 
 import type React from "react";
 
-import { useTaskHistory } from "@/app/api/[locale]/v1/core/system/unified-ui/tasks/cron/history/hooks";
+import { useTaskHistory } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/history/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { ExecutionHistory } from "./execution-history";

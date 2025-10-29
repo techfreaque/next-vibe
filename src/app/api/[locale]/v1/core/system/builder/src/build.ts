@@ -21,7 +21,7 @@ const program = new Command();
  * Type guard to validate if an imported module has the expected BuildConfig structure
  */
 function isBuildConfigModule(
-  module: unknown,
+  module: Record<string, string | number | boolean | null | object>,
 ): module is { default: BuildConfig } {
   if (typeof module !== "object" || module === null) {
     return false;
@@ -29,7 +29,7 @@ function isBuildConfigModule(
   if (!("default" in module)) {
     return false;
   }
-  const defaultExport = (module as { default: unknown }).default;
+  const defaultExport = module.default;
   if (typeof defaultExport !== "object" || defaultExport === null) {
     return false;
   }

@@ -15,10 +15,10 @@
  */
 
 import PageComponent from "@/app/[locale]/page";
-import { createPageWrapper } from "@/app/api/[locale]/v1/core/system/unified-ui/react-native/platform-helpers";
+import { createPageWrapper } from "@/app/api/[locale]/v1/core/system/unified-interface/react-native/platform-helpers";
 
-// /**
-//  * Wrapper component that converts Expo Router's synchronous params
-//  * to Next.js 15's async params format
-//  */
-// export default createPageWrapper(PageComponent);
+/**
+ * Wrapper component that converts Expo Router's synchronous params
+ * to Next.js 15's async params format
+ */
+export default createPageWrapper(PageComponent);

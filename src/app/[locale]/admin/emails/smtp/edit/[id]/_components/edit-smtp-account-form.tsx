@@ -17,7 +17,7 @@ import type React from "react";
 
 import { useSmtpAccountById } from "@/app/api/[locale]/v1/core/emails/smtp-client/edit/[id]/hooks";
 import { SmtpSecurityType } from "@/app/api/[locale]/v1/core/emails/smtp-client/enum";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";

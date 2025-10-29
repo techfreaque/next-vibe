@@ -6,8 +6,8 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
 
 import { userRepository } from "../repository";
 import definitions, { type UserSearchGetResponseOutput } from "./definition";

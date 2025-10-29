@@ -7,7 +7,7 @@ import type { JSX } from "react";
 import React, { forwardRef } from "react";
 
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLocaleString } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";

@@ -1,13 +1,10 @@
 /* eslint-disable no-console */
 
+import type { ExplicitAnyType } from "next-vibe/shared/types/utils";
+import { Environment, validateEnv } from "next-vibe/shared/utils/env-util";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import type { ExplicitAnyType } from "next-vibe/shared/types/utils";
-import {
-  Environment,
-  validateEnv,
-} from "next-vibe/shared/utils/env-util";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 const isServer = typeof window === "undefined";
 const isReactNative = false;

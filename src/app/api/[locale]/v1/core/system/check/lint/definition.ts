@@ -5,20 +5,20 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import {
   objectField,
   requestDataField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 
 import { UserRole } from "../../../user/user-roles/enum";
 
@@ -266,7 +266,7 @@ const { POST } = createEndpoint({
         fix: false,
       },
       fix: {
-        path: "src/app/api/[locale]/v1/core/system/unified-ui/cli",
+        path: "src/app/api/[locale]/v1/core/system/unified-interface/cli",
         verbose: true,
         fix: true,
       },

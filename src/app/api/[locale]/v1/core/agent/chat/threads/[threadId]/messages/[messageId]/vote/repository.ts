@@ -2,7 +2,8 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import {
-  createErrorResponse,
+  fail,
+  fail,
   createSuccessResponse,
   ErrorResponseTypes,
   type ResponseType,
@@ -10,7 +11,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -41,9 +42,9 @@ export const voteRepository = {
     try {
       // Type guard to ensure user has id
       if (!user.id) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.unauthorized.title",
-          ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
         );
       }
 
@@ -59,16 +60,16 @@ export const voteRepository = {
         .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
         .where(
           and(
-            eq(chatMessages.id, urlPathParams.messageId),
-            eq(chatMessages.threadId, urlPathParams.threadId),
-          ),
+            eq(chatMessages.id, urlPathParams.messageId}),
+            eq(chatMessages.threadId, urlPathParams.threadId}),
+          }),
         )
         .limit(1);
 
       if (!messageWithThread) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.notFound.title",
-          ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
         );
       }
 
@@ -86,9 +87,9 @@ export const voteRepository = {
 
       // Check voting permissions - simplified
       if (!canVoteMessage(userId, null, message)) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.title",
-          ErrorResponseTypes.FORBIDDEN,
+          errorType: ErrorResponseTypes.FORBIDDEN,
         );
       }
 
@@ -140,7 +141,7 @@ export const voteRepository = {
         newVoteDetails.push({
           userId,
           vote: "up",
-          timestamp: Date.now(),
+          timestamp: Date.now(}),
         });
         newVoterIds.push(userId);
       } else if (data.vote === "down") {
@@ -149,7 +150,7 @@ export const voteRepository = {
         newVoteDetails.push({
           userId,
           vote: "down",
-          timestamp: Date.now(),
+          timestamp: Date.now(}),
         });
         newVoterIds.push(userId);
       }
@@ -168,7 +169,7 @@ export const voteRepository = {
           upvotes,
           downvotes,
           metadata: newMetadata,
-          updatedAt: new Date(),
+          updatedAt: new Date(}),
         })
         .where(eq(chatMessages.id, urlPathParams.messageId));
 
@@ -187,9 +188,9 @@ export const voteRepository = {
       });
     } catch (error) {
       logger.error("Failed to record vote", parseError(error));
-      return createErrorResponse(
+      return fail({message: 
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
   },

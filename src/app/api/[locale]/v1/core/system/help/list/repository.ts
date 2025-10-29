@@ -14,8 +14,8 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../unified-backend/shared/endpoint-logger";
-import { helpService } from "../../unified-backend/shared/help/help-service";
+import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
+import { helpService } from "../../unified-interface/shared/server-only/help/service";
 import type {
   HelpListRequestOutput,
   HelpListResponseOutput,

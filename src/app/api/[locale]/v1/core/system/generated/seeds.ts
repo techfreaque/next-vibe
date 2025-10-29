@@ -19,7 +19,7 @@ import * as seedModule7 from "../../emails/smtp-client/seeds";
 import * as seedModule8 from "../../emails/messages/seeds";
 import * as seedModule9 from "../../emails/imap-client/seeds";
 import * as seedModule10 from "../../newsletter/seeds";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 
 export const seeds: Record<string, EnvironmentSeeds> = {};
 

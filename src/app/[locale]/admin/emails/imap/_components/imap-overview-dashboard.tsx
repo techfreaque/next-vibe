@@ -29,7 +29,7 @@ import { useEffect, useState } from "react";
 
 import { useImapAccountsList } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/hooks";
 import { useImapHealth } from "@/app/api/[locale]/v1/core/emails/imap-client/health/hooks";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
 /**

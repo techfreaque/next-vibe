@@ -280,6 +280,8 @@ export function createIncognitoMessage(
     tokens: null,
     upvotes: null,
     downvotes: null,
+    sequenceId: null,
+    sequenceIndex: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
   };

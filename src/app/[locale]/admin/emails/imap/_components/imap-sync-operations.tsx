@@ -34,20 +34,20 @@ import imapAccountsListDefinition, {
 } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/definition";
 import { ImapSyncStatus } from "@/app/api/[locale]/v1/core/emails/imap-client/enum";
 import imapSyncDefinition from "@/app/api/[locale]/v1/core/emails/imap-client/sync/definition";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
 /**
  * IMAP Sync Operations Component
  */
 export function ImapSyncOperations(): JSX.Element {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [isSyncing, setIsSyncing] = useState(false);
 
   const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), "en-GLOBAL"),
-    [],
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
   );
 
   // Use accounts endpoint to get sync status information

@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
 /* eslint-disable i18next/no-literal-string */
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import type { EnvFrontend, EnvFrontendInput } from "@/config/env-client";
-import { envClientSchema } from "@/config/env-client";
 import type { ExplicitAnyType } from "next-vibe/shared/types/utils";
 import { validateEnv } from "next-vibe/shared/utils/env-util";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { EnvFrontend, EnvFrontendInput } from "@/config/env-client";
+import { envClientSchema } from "@/config/env-client";
 
 // Platform detection for React Native
 const isServer = false; // React Native is always client-side

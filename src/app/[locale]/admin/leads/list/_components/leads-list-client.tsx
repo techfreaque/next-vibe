@@ -30,7 +30,7 @@ import {
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import type { LeadListGetResponseTypeOutput } from "@/app/api/[locale]/v1/core/leads/list/definition";
 import { useLeadsListEndpoint } from "@/app/api/[locale]/v1/core/leads/list/hooks";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import {
   CountryFilter,
   type CountryLanguage,
@@ -604,7 +604,6 @@ export function LeadsListClient({
             }
             onBatchUpdate={handleBatchUpdate}
             onBatchDelete={handleBatchDelete}
-            currentFilters={leadsEndpoint.read.form.getValues()}
             resetTrigger={resetTrigger}
             isLoading={
               batchOperations.batchUpdateEndpoint.create.isSubmitting ||

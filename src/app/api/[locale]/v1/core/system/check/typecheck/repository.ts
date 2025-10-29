@@ -9,13 +9,13 @@ import { promisify } from "node:util";
 import { exec } from "child_process";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "../../../shared/types/response.schema";
 import { parseError } from "../../../shared/utils/parse-error";
 import { parseJsonWithComments } from "../../../shared/utils/parse-json";
@@ -195,14 +195,15 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       } else if (config.pathType === PathType.SINGLE_FILE) {
         // Single file - create temporary tsconfig that includes only this file
         if (!config.tempConfigFile) {
-          return createErrorResponse(
-            "app.api.v1.core.system.check.typecheck.errors.noTsFiles.title",
-            ErrorResponseTypes.NOT_FOUND,
-            {
+          return fail({
+            message:
+              "app.api.v1.core.system.check.typecheck.errors.noTsFiles.title",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+            messageParams: {
               message:
                 "app.api.v1.core.system.check.typecheck.errors.noTsFiles.message",
             },
-          );
+          });
         }
 
         // Create temporary tsconfig for the single file
@@ -222,14 +223,15 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         }
 
         if (!config.tempConfigFile) {
-          return createErrorResponse(
-            "app.api.v1.core.system.check.typecheck.errors.noTsFiles.title",
-            ErrorResponseTypes.NOT_FOUND,
-            {
+          return fail({
+            message:
+              "app.api.v1.core.system.check.typecheck.errors.noTsFiles.title",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+            messageParams: {
               message:
                 "app.api.v1.core.system.check.typecheck.errors.noTsFiles.message",
             },
-          );
+          });
         }
 
         // Create temporary tsconfig for the folder files
@@ -243,14 +245,15 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
       // Validate command before execution
       if (!command || typeof command !== "string") {
-        return createErrorResponse(
-          "app.api.v1.core.system.check.typecheck.errors.invalidCommand.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          {
+        return fail({
+          message:
+            "app.api.v1.core.system.check.typecheck.errors.invalidCommand.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
             message:
               "app.api.v1.core.system.check.typecheck.errors.invalidCommand.message",
           },
-        );
+        });
       }
 
       let stdout: string | undefined;
@@ -287,13 +290,14 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
             "Unexpected error executing TypeScript command",
             parsedExecError,
           );
-          return createErrorResponse(
-            "app.api.v1.core.system.check.typecheck.errors.internal.title",
-            ErrorResponseTypes.INTERNAL_ERROR,
-            {
+          return fail({
+            message:
+              "app.api.v1.core.system.check.typecheck.errors.internal.title",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: {
               error: parsedExecError.message,
             },
-          );
+          });
         }
       }
 
@@ -532,15 +536,15 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         return createSuccessResponse(response);
       }
 
-      return createErrorResponse(
-        "app.api.v1.core.system.check.typecheck.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.system.check.typecheck.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           error: parsedError.message,
           output: output.trim(),
           duration: duration.toString(),
         },
-      );
+      });
     }
   }
 }

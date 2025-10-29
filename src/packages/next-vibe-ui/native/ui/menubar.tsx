@@ -2,11 +2,11 @@ import * as MenubarPrimitive from "@rn-primitives/menubar";
 import * as React from "react";
 import { Platform, Text, type TextProps, View } from "react-native";
 
+import { cn } from "../lib/utils";
 import { Check } from "./icons/Check";
 import { ChevronDown } from "./icons/ChevronDown";
 import { ChevronRight } from "./icons/ChevronRight";
 import { ChevronUp } from "./icons/ChevronUp";
-import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
 
 const MenubarMenu = MenubarPrimitive.Menu;

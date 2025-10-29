@@ -5,7 +5,7 @@
 
 import { Environment } from "next-vibe/shared/utils/env-util";
 
-import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
+import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
 import { env } from "@/config/env";
 
 import type { CampaignStarterConfigType } from "./definition";

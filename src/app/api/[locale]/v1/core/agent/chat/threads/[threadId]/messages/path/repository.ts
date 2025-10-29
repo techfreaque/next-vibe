@@ -3,14 +3,15 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
+  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -41,9 +42,9 @@ export const pathRepository = {
     try {
       // Type guard to ensure user has id
       if (!user.id) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.errors.unauthorized.title",
-          ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
         );
       }
 
@@ -55,16 +56,16 @@ export const pathRepository = {
         .from(chatThreads)
         .where(
           and(
-            eq(chatThreads.id, urlPathParams.threadId),
-            eq(chatThreads.userId, userId),
-          ),
+            eq(chatThreads.id, urlPathParams.threadId}),
+            eq(chatThreads.userId, userId}),
+          }),
         )
         .limit(1);
 
       if (!thread) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.errors.threadNotFound.title",
-          ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
         );
       }
 
@@ -88,9 +89,9 @@ export const pathRepository = {
       const rootMessage = allMessages.find((msg) => !msg.parentId);
 
       if (!rootMessage) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.errors.noRootMessage.title",
-          ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
         );
       }
 
@@ -128,7 +129,7 @@ export const pathRepository = {
         // Use branch index if provided, otherwise use first child (index 0)
         const branchIndex = branchIndices[currentId] ?? 0;
         const validIndex = Math.min(
-          Math.max(0, branchIndex),
+          Math.max(0, branchIndex}),
           children.length - 1,
         );
 
@@ -154,13 +155,13 @@ export const pathRepository = {
           tokens: msg.tokens,
           createdAt: msg.createdAt,
           updatedAt: msg.updatedAt,
-        })),
+        })}),
       });
     } catch (error) {
       logger.error("Failed to get conversation path", parseError(error));
-      return createErrorResponse(
+      return fail({message: 
         "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.errors.getFailed.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
   },

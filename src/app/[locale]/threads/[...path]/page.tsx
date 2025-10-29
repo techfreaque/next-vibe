@@ -14,7 +14,7 @@
 import type { JSX } from "react";
 
 import { ChatProvider } from "@/app/[locale]/chat/features/chat/context";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -40,32 +40,12 @@ export default async function ThreadsPathPage({
     {
       locale,
       detailLevel: UserDetailLevel.MINIMAL,
-      roles: [UserRole.CUSTOMER, UserRole.ADMIN],
+      roles: [UserRole.PUBLIC, UserRole.CUSTOMER],
     },
     logger,
   );
 
-  // ChatInterface requires a private user (authenticated)
-  if (
-    !userResponse.success ||
-    !userResponse.data ||
-    userResponse.data.isPublic
-  ) {
-    // Redirect to login or show error
-    // For now, create a minimal private user structure
-    const fallbackUser = {
-      id: "00000000-0000-0000-0000-000000000000",
-      leadId: "00000000-0000-0000-0000-000000000000",
-      isPublic: false as const,
-    };
-    return (
-      <ChatProvider locale={locale}>
-        <ChatInterface urlPath={path} user={fallbackUser} />
-      </ChatProvider>
-    );
-  }
-
-  const user = userResponse.data;
+  const user = userResponse.success ? userResponse.data : undefined;
 
   // Path structure: [rootId, ...subfolders, possibleThreadId]
   // The ChatInterface will determine from localStorage whether the last segment

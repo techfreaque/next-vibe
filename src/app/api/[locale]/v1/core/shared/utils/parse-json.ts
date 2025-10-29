@@ -36,9 +36,6 @@ export function parseJsonWithComments(
       return createErrorResponse(
         "app.api.v1.core.shared.utils.parseJsonWithComments.errors.invalid_json",
         ErrorResponseTypes.INVALID_FORMAT_ERROR,
-        {
-          error: "Parsed JSON is not an object",
-        },
       );
     }
     // Type guard: result is an object, cast to JsonWithComments
@@ -65,7 +62,7 @@ export function parseJsonWithComments(
  */
 export function tryParseJsonWithComments(
   jsonString: string,
-): Record<string, unknown> | null {
+): JsonWithComments | null {
   const result = parseJsonWithComments(jsonString);
   return result.success ? result.data : null;
 }

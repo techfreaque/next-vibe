@@ -6,7 +6,7 @@ import {
 import { z } from "zod";
 
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 
 import {

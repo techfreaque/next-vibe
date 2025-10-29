@@ -4,8 +4,8 @@ import { Command } from "commander";
 import inquirer from "inquirer";
 
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared.js";
 
@@ -66,7 +66,7 @@ program
     "Git tag to determine target (overrides auto-detection)",
   )
   .action(async (options: CIReleaseOptions) => {
-    const logger = createEndpointLogger(true, Date.now(), locale);
+    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
       await ciReleaseCommand(logger, rootDir, options.target, options.tag);
@@ -92,7 +92,7 @@ program
   .command("release-all")
   .description("Release all packages sequentially with state persistence")
   .action(async () => {
-    const logger = createEndpointLogger(true, Date.now(), locale);
+    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
       await releaseAllCommand(logger, rootDir);
@@ -109,7 +109,7 @@ program
     "Version bump type (patch|minor|major|init)",
   )
   .action(async (options: ForceReleaseOptions) => {
-    const logger = createEndpointLogger(true, Date.now(), locale);
+    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
 
@@ -171,7 +171,7 @@ program
   .description("Weekly dependency update with branch creation and PR")
   .option("--branch <branch>", "Target branch name", "next_version_candidates")
   .action(async (options: WeeklyUpdateOptions) => {
-    const logger = createEndpointLogger(true, Date.now(), locale);
+    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
       await weeklyUpdateCommand(logger, rootDir, options.branch);

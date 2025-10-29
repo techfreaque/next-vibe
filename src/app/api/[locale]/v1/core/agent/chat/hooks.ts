@@ -11,8 +11,8 @@ import { AUTH_STATUS_COOKIE_PREFIX } from "next-vibe/shared/constants";
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/store";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -483,6 +483,8 @@ export function useChat(
           tokens: streamMsg.totalTokens || null,
           upvotes: null,
           downvotes: null,
+          sequenceId: streamMsg.sequenceId ?? null,
+          sequenceIndex: streamMsg.sequenceIndex ?? 0,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -607,6 +609,8 @@ export function useChat(
                   : null,
                 upvotes: null,
                 downvotes: null,
+                sequenceId: message.sequenceId ?? null,
+                sequenceIndex: message.sequenceIndex ?? 0,
                 createdAt: new Date(message.createdAt),
                 updatedAt: new Date(message.updatedAt),
               });

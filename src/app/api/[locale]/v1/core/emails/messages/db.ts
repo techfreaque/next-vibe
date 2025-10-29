@@ -15,7 +15,6 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
 import { ImapLoggingLevel } from "../imap-client/config/enum";
 import { imapAccounts, imapFolders } from "../imap-client/db";

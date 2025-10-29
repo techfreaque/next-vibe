@@ -2,7 +2,7 @@
 import { join } from "node:path";
 
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import type { ReleaseConfig } from "../types/index.js";
 import { handleUncommittedChanges } from "../utils/git.js";

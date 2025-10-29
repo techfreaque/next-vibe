@@ -5,14 +5,14 @@
 
 import "server-only";
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import { imapFoldersRepository } from "../repository";
 import definitions from "./definition";
 
 /**
- * Export handlers using endpointHandler
+ * Export handlers using endpointsHandler
  */
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,

@@ -7,21 +7,21 @@
 
 import { type ChangeEvent, useCallback, useMemo } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import {
   createCustomStateKey,
   useCustomState,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/store";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
 import type {
   ApiFormReturn,
   ApiQueryReturn,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/types";
-import type { EnhancedMutationResult } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-api-mutation";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/types";
+import type { EnhancedMutationResult } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-api-mutation";
 import {
   useApiForm,
   useApiMutation,
   useApiQuery,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { useUser } from "@/app/api/[locale]/v1/core/user/private/me/hooks";
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";

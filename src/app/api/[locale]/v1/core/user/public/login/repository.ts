@@ -4,8 +4,9 @@
  */
 
 import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import type { NextRequest } from "next/server";
+import { LEAD_ID_COOKIE_NAME } from "next-vibe/shared/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -18,7 +19,7 @@ import { verifyPassword } from "next-vibe/shared/utils/password";
 import { leadAuthService } from "@/app/api/[locale]/v1/core/leads/auth-service";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -366,10 +367,20 @@ export class LoginRepositoryImpl implements LoginRepository {
         );
       }
 
-      // Get primary leadId for user
+      // Get leadId from cookie (the one the user had before logging in)
+      const cookieStore = await cookies();
+      const cookieLeadId = cookieStore.get(LEAD_ID_COOKIE_NAME)?.value;
+
+      // Link the cookie leadId to the user if it exists
+      // This ensures the userLeads table has the relationship for credit lookups
+      if (cookieLeadId) {
+        await leadAuthService.linkLeadToUser(cookieLeadId, userId, logger);
+      }
+
+      // Get primary leadId for user (now that we've linked the cookie leadId)
       const leadIdResult = await leadAuthService.getAuthenticatedUserLeadId(
         userId,
-        undefined, // No cookie leadId in this context
+        cookieLeadId,
         locale,
         logger,
       );
@@ -613,13 +624,22 @@ export class LoginRepositoryImpl implements LoginRepository {
           convertedLead: convertResult.data,
         });
       } else {
-        logger.error("Lead conversion failed during login", {
-          leadId,
-          email,
-          userId,
-          error: convertResult.message,
-          errorType: convertResult.errorType,
-        });
+        // Check if it's a duplicate error (409) - this is expected if the lead is already linked
+        if (convertResult.errorType.errorCode === 409) {
+          logger.debug("Lead already linked to user during login", {
+            leadId,
+            email,
+            userId,
+          });
+        } else {
+          logger.error("Lead conversion failed during login", {
+            leadId,
+            email,
+            userId,
+            error: convertResult.message,
+            errorType: convertResult.errorType,
+          });
+        }
       }
     } catch (error) {
       // Don't fail user login if lead conversion fails

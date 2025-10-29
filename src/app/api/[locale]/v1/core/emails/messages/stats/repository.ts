@@ -28,7 +28,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -158,12 +158,14 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         this.generateTopPerformingProviders(whereClause),
       ]);
 
-      const currentPeriodStats = results[0];
-      const historicalData = results[1];
-      const groupedStats = results[2];
-      const recentActivity = results[3];
-      const topPerformingTemplates = results[4];
-      const topPerformingProviders = results[5];
+      const [
+        currentPeriodStats,
+        historicalData,
+        groupedStats,
+        recentActivity,
+        topPerformingTemplates,
+        topPerformingProviders,
+      ] = results;
 
       const statsResponse: EmailStatsResponseType = {
         ...currentPeriodStats,

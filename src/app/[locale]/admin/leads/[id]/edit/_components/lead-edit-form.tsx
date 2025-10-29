@@ -16,13 +16,13 @@ import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import type React from "react";
 import type { JSX } from "react";
 
-import type { LeadDetailResponse } from "@/app/api/[locale]/v1/core/leads/types";
 import {
   EmailCampaignStage,
   LeadStatus,
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import { useLeadByIdEndpoint } from "@/app/api/[locale]/v1/core/leads/lead/[id]/hooks";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { LeadDetailResponse } from "@/app/api/[locale]/v1/core/leads/types";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { Countries } from "@/i18n/core/config";

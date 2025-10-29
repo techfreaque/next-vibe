@@ -23,15 +23,15 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/constants";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/constants";
 import {
   CronTaskPriority,
   TaskCategory,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
 import type {
   Task,
   TaskExecutionContext,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/repository";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/types/repository";
 
 import { newsletterSubscriptions } from "../db";
 import { NewsletterSubscriptionStatus } from "../enum";

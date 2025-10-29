@@ -30,7 +30,7 @@ import {
   LeadStatus,
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import { useLeadsImportEndpoint } from "@/app/api/[locale]/v1/core/leads/import/hooks";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { Languages } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

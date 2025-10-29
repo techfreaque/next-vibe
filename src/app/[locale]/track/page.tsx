@@ -7,7 +7,7 @@ import type React from "react";
 import { useEffect, useMemo } from "react";
 
 import { generateEngagementTrackingApiUrl } from "@/app/api/[locale]/v1/core/leads/tracking/utils";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -120,7 +120,7 @@ export default function TrackPage(): React.ReactElement {
     return (): void => {
       isMounted = false;
     };
-  }, [searchParams, router, locale]);
+  }, [searchParams, router, locale, logger]);
 
   // Show loading state while processing
   return (

@@ -1,4 +1,4 @@
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import { DEFAULT_CONFIG_PATH } from "../utils/release-config.js";
 import { ciRelease } from "./ci-release.js";

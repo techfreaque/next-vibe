@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { parseError } from "next-vibe/shared/utils";
 import pg from "pg";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 
 import * as agentChatSchema from "../../agent/chat/db";

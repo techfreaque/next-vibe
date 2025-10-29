@@ -7,13 +7,14 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
+  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -51,7 +52,7 @@ export interface TextToSpeechRepository {
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
-      response: { success: boolean; audioUrl: string; provider: string };
+      response: messageParams: { success: boolean; audioUrl: string; provider: string };
     }>
   >;
 }
@@ -70,7 +71,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
-      response: { success: boolean; audioUrl: string; provider: string };
+      response: messageParams: { success: boolean; audioUrl: string; provider: string };
     }>
   > {
     logger.info("Starting text-to-speech conversion", {
@@ -83,9 +84,9 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
     // Check API key
     if (!env.EDEN_AI_API_KEY) {
       logger.error("Eden AI API key not configured");
-      return createErrorResponse(
+      return fail({message: 
         "app.api.v1.core.agent.textToSpeech.post.errors.apiKeyMissing",
-        ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       );
     }
 
@@ -111,7 +112,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
             text: data.text,
             language: data.language,
             option: data.voice,
-          }),
+          }}),
         },
       );
 
@@ -121,9 +122,9 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
           status: response.status,
           error: errorText,
         });
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.textToSpeech.post.errors.conversionFailed",
-          ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           {
             error: errorText,
           },
@@ -142,15 +143,15 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
       if (!audioResourceUrl) {
         logger.error("No audio URL in response", {
           provider: data.provider,
-          responseKeys: Object.keys(responseData),
+          responseKeys: Object.keys(responseData}),
         });
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.textToSpeech.post.errors.noAudioUrl",
-          ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         );
       }
 
-      logger.debug("Fetching audio from URL", { audioUrl: audioResourceUrl });
+      logger.debug("Fetching audio from URL", messageParams: { audioUrl: audioResourceUrl });
 
       // Fetch the audio file
       const audioResponse = await fetch(audioResourceUrl);
@@ -159,9 +160,9 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
           status: audioResponse.status,
           audioUrl: audioResourceUrl,
         });
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.textToSpeech.post.errors.audioFetchFailed",
-          ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         );
       }
 
@@ -211,9 +212,9 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
         provider: data.provider,
       });
 
-      return createErrorResponse(
+      return fail({message: 
         "app.api.v1.core.agent.textToSpeech.post.errors.conversionFailed",
-        ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         {
           error: errorMessage,
         },

@@ -7,4 +7,3 @@ export const Span = React.forwardRef<
 >((props, ref) => <span ref={ref} {...props} />);
 
 Span.displayName = "Span";
-

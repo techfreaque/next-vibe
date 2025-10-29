@@ -25,7 +25,7 @@ import {
   YAxis,
 } from "recharts";
 
-import type { CronStatsResponseType } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/stats/definition";
+import type { CronStatsResponseType } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/stats/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 // Chart constants

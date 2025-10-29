@@ -13,16 +13,16 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/constants";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/constants";
 import {
   CronTaskPriority,
   TaskCategory,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
-import type { Task } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/repository";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
+import type { Task } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/types/repository";
 import { defaultLocale } from "@/i18n/core/config";
 
 import type { JWTPublicPayloadType } from "../auth/types";

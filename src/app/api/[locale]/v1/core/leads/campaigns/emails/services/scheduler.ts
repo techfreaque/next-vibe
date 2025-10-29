@@ -7,7 +7,7 @@ import { and, count, eq, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { emailCampaigns, leads } from "../../../db";

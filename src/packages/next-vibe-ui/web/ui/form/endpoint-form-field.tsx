@@ -23,8 +23,6 @@ import type { z } from "zod";
 import { useTranslation } from "@/i18n/core/client";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { getFieldConfig } from "./infer-field-config";
-
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
 import { Button } from "../button";
@@ -60,6 +58,7 @@ import {
   FormLabel,
   FormMessage,
 } from "./form";
+import { getFieldConfig } from "./infer-field-config";
 
 // Default theme for required fields
 const DEFAULT_THEME: RequiredFieldTheme = {
@@ -683,12 +682,14 @@ export function EndpointFormField<
   const { t } = useTranslation();
 
   // Auto-infer config from endpoint fields if not provided
-  const config = providedConfig || (endpointFields ? getFieldConfig(endpointFields, name) : null);
+  const config =
+    providedConfig ||
+    (endpointFields ? getFieldConfig(endpointFields, name) : null);
 
   if (!config) {
     throw new Error(
       `EndpointFormField: No config provided for field "${name}". ` +
-      `Either provide a config prop or pass endpointFields for auto-inference.`
+        `Either provide a config prop or pass endpointFields for auto-inference.`,
     );
   }
 

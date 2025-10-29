@@ -59,7 +59,7 @@ const FormField = <
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
   ...props
-}: ControllerProps<TFieldValues, TName>) => {
+}: ControllerProps<TFieldValues, TName>): JSX.Element => {
   return (
     <FormFieldContext.Provider value={{ name: props.name }}>
       <Controller {...props} />
@@ -67,7 +67,20 @@ const FormField = <
   );
 };
 
-const useFormField = () => {
+interface UseFormFieldReturn {
+  invalid: boolean;
+  isDirty: boolean;
+  isTouched: boolean;
+  isValidating: boolean;
+  error?: FieldError;
+  id: string;
+  name: string;
+  formItemId: string;
+  formDescriptionId: string;
+  formMessageId: string;
+}
+
+const useFormField = (): UseFormFieldReturn => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
   const { getFieldState, formState, handleSubmit } = useFormContext();
@@ -209,14 +222,14 @@ const FormInput = React.forwardRef<
     formMessageNativeID,
   } = useFormField();
 
-  React.useImperativeHandle(ref, () => {
+  React.useImperativeHandle(ref, (): React.ComponentRef<typeof Input> => {
     if (!inputRef.current) {
       return {} as React.ComponentRef<typeof Input>;
     }
     return inputRef.current;
   }, []);
 
-  function handleOnLabelPress() {
+  function handleOnLabelPress(): void {
     if (!inputRef.current) {
       return;
     }
@@ -267,14 +280,14 @@ const FormTextarea = React.forwardRef<
     formMessageNativeID,
   } = useFormField();
 
-  React.useImperativeHandle(ref, () => {
+  React.useImperativeHandle(ref, (): React.ComponentRef<typeof Textarea> => {
     if (!textareaRef.current) {
       return {} as React.ComponentRef<typeof Textarea>;
     }
     return textareaRef.current;
   }, []);
 
-  function handleOnLabelPress() {
+  function handleOnLabelPress(): void {
     if (!textareaRef.current) {
       return;
     }
@@ -324,7 +337,7 @@ const FormCheckbox = React.forwardRef<
     formMessageNativeID,
   } = useFormField();
 
-  function handleOnLabelPress() {
+  function handleOnLabelPress(): void {
     onChange?.(!value);
   }
 
@@ -389,7 +402,7 @@ const FormDatePicker = React.forwardRef<React.ElementRef<typeof Button>, any>(
               }
               aria-invalid={!!error}
             >
-              {({ pressed }) => (
+              {({ pressed }): JSX.Element => (
                 <>
                   <CalendarIcon
                     className={buttonTextVariants({
@@ -417,7 +430,7 @@ const FormDatePicker = React.forwardRef<React.ElementRef<typeof Button>, any>(
                     <Button
                       className="absolute right-0 active:opacity-70 native:pr-3"
                       variant="ghost"
-                      onPress={() => {
+                      onPress={(): void => {
                         onChange?.("");
                       }}
                     >
@@ -432,7 +445,7 @@ const FormDatePicker = React.forwardRef<React.ElementRef<typeof Button>, any>(
             <BottomSheetView hadHeader={false} className="pt-2">
               <Calendar
                 selected={value ? new Date(value) : undefined}
-                onSelect={(date) => {
+                onSelect={(date): void => {
                   onChange?.(date ? date.toISOString().split("T")[0] : "");
                 }}
               />
@@ -508,7 +521,7 @@ const FormCombobox = React.forwardRef<any, any>(
             <SelectValue placeholder="Select an option" />
           </SelectTrigger>
           <SelectContent>
-            {options.map((option: Option | undefined) => {
+            {options.map((option: Option | undefined): JSX.Element | null => {
               if (!option) {
                 return null;
               }
@@ -603,14 +616,14 @@ const FormSwitch = React.forwardRef<
     formMessageNativeID,
   } = useFormField();
 
-  React.useImperativeHandle(ref, () => {
+  React.useImperativeHandle(ref, (): React.ComponentRef<typeof Switch> => {
     if (!switchRef.current) {
       return {} as React.ComponentRef<typeof Switch>;
     }
     return switchRef.current;
   }, []);
 
-  function handleOnLabelPress() {
+  function handleOnLabelPress(): void {
     onChange?.(!value);
   }
 

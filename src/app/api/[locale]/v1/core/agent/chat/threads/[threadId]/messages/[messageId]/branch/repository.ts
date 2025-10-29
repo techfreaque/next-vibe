@@ -2,7 +2,8 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import {
-  createErrorResponse,
+  fail,
+  fail,
   createSuccessResponse,
   ErrorResponseTypes,
   type ResponseType,
@@ -10,7 +11,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -41,9 +42,9 @@ export const branchRepository = {
     try {
       // Type guard to ensure user has id
       if (!user.id) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.unauthorized.title",
-          ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
         );
       }
 
@@ -55,16 +56,16 @@ export const branchRepository = {
         .from(chatThreads)
         .where(
           and(
-            eq(chatThreads.id, urlPathParams.threadId),
-            eq(chatThreads.userId, userId),
-          ),
+            eq(chatThreads.id, urlPathParams.threadId}),
+            eq(chatThreads.userId, userId}),
+          }),
         )
         .limit(1);
 
       if (!thread) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.threadNotFound.title",
-          ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
         );
       }
 
@@ -84,24 +85,24 @@ export const branchRepository = {
         .from(chatMessages)
         .where(
           and(
-            eq(chatMessages.id, urlPathParams.messageId),
-            eq(chatMessages.threadId, urlPathParams.threadId),
-          ),
+            eq(chatMessages.id, urlPathParams.messageId}),
+            eq(chatMessages.threadId, urlPathParams.threadId}),
+          }),
         )
         .limit(1);
 
       if (!sourceMessage) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.messageNotFound.title",
-          ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
         );
       }
 
       // Cannot branch from root message (no parent)
       if (!sourceMessage.parentId) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.cannotBranchFromRoot.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
         );
       }
 
@@ -124,7 +125,7 @@ export const branchRepository = {
       // Update thread's updatedAt timestamp
       await db
         .update(chatThreads)
-        .set({ updatedAt: new Date() })
+        .set(messageParams: { updatedAt: new Date() })
         .where(eq(chatThreads.id, urlPathParams.threadId));
 
       logger.info("Branch created successfully", {
@@ -151,9 +152,9 @@ export const branchRepository = {
       });
     } catch (error) {
       logger.error("Failed to create branch", parseError(error));
-      return createErrorResponse(
+      return fail({message: 
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.createFailed.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
   },

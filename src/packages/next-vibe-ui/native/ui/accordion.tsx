@@ -1,7 +1,8 @@
 import * as AccordionPrimitive from "@rn-primitives/accordion";
+import { styled } from "nativewind";
 import * as React from "react";
 import { Platform, Pressable, View } from "react-native";
-import {
+import Animated, {
   Extrapolation,
   FadeIn,
   FadeOutUp,
@@ -12,11 +13,9 @@ import {
   useDerivedValue,
   withTiming,
 } from "react-native-reanimated";
-import { styled } from "nativewind";
-import Animated from "react-native-reanimated";
 
-import { ChevronDown } from "./icons/ChevronDown";
 import { cn } from "../lib/utils";
+import { ChevronDown } from "./icons/ChevronDown";
 import { TextClassContext } from "./text";
 
 // Local styled components to avoid type instantiation issues
@@ -80,7 +79,10 @@ const Trigger = Platform.OS === "web" ? View : Pressable;
 
 const AccordionTrigger = React.forwardRef<
   AccordionPrimitive.TriggerRef,
-  AccordionPrimitive.TriggerProps & { className?: string; children: React.ReactNode }
+  AccordionPrimitive.TriggerProps & {
+    className?: string;
+    children: React.ReactNode;
+  }
 >(({ className, children, ...props }, ref) => {
   const { isExpanded } = AccordionPrimitive.useItemContext();
 

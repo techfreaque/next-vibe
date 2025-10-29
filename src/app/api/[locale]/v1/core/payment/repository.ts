@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 import Stripe from "stripe";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 import { env } from "@/config/env";
@@ -175,8 +175,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         // Extract last part of translation key (e.g., "card" from "app.api.v1.core.payment.enums.paymentMethodType.card")
         const parts = type.split(".");
         const value = parts[parts.length - 1];
+        if (!value) return "";
         // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
-        return value.replace(/([A-Z])/g, "_$1").toLowerCase();
+        return value.replace(/([A-Z])/g, (match) => `_${match}`).toLowerCase();
       }) || [
         "card",
       ]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
@@ -868,6 +869,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         userId,
         1000,
         "subscription",
+        logger,
         expiresAt,
       );
 
@@ -925,6 +927,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           userId,
           totalCredits,
           "permanent",
+          logger,
           undefined, // No expiry for permanent credits
         );
 

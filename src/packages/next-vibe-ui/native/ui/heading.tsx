@@ -81,4 +81,3 @@ export const H6 = React.forwardRef<
 ));
 
 H6.displayName = "H6";
-

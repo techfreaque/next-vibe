@@ -30,7 +30,7 @@ interface SignUpFormProps {
   locale: CountryLanguage;
 }
 
-function renderTermsCheckboxLabel(
+export function renderTermsCheckboxLabel(
   t: TFunction,
   locale: CountryLanguage,
 ): React.ReactElement {

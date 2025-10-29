@@ -3,13 +3,14 @@
  * Defines enumerations for chat functionality (threads, folders, messages)
  */
 
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enum-helpers";
+import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/enum";
 
 // using a regular enum as this needs no translation
 export enum ChatMessageRole {
   USER = "user",
   ASSISTANT = "assistant",
   SYSTEM = "system",
+  TOOL = "tool",
   ERROR = "error",
 }
 
@@ -18,6 +19,7 @@ export const ChatMessageRoleDB = [
   ChatMessageRole.USER,
   ChatMessageRole.ASSISTANT,
   ChatMessageRole.SYSTEM,
+  ChatMessageRole.TOOL,
   ChatMessageRole.ERROR,
 ] as const;
 
@@ -37,6 +39,11 @@ export const ChatMessageRoleOptions = [
     value: ChatMessageRole.SYSTEM,
     // eslint-disable-next-line i18next/no-literal-string
     label: "System",
+  },
+  {
+    value: ChatMessageRole.TOOL,
+    // eslint-disable-next-line i18next/no-literal-string
+    label: "Tool",
   },
   {
     value: ChatMessageRole.ERROR,

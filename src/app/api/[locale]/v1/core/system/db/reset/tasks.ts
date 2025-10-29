@@ -3,7 +3,7 @@
  * Tasks for database reset functionality
  */
 
-import type { Task } from "../../unified-backend/tasks/types/repository";
+import type { Task } from "../../unified-interface/tasks/types/repository";
 
 /**
  * Database Reset Safety Check Cron Task

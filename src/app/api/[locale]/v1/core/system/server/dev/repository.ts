@@ -12,9 +12,9 @@ import { spawn } from "node:child_process";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { Task } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/repository";
-import { unifiedTaskRunnerRepository } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/unified-runner/repository";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { Task } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/types/repository";
+import { unifiedTaskRunnerRepository } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/unified-runner/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -30,6 +30,21 @@ type RequestType = typeof endpoints.POST.types.RequestOutput;
 const DOCKER_VOLUME_NAME = "dev-postgres-data";
 const DATABASE_TEST_QUERY = "SELECT 1";
 const DOCKER_VOLUME_RM_COMMAND = `docker volume rm ${DOCKER_VOLUME_NAME} 2>/dev/null || true`;
+const DATABASE_TIMEOUT_PREFIX = "Database connection timeout after";
+const DATABASE_TIMEOUT_SUFFIX = "attempts";
+
+/**
+ * Returns database connection timeout error message
+ * Internal dev utility - not user-facing
+ * @param maxAttempts - Maximum number of connection attempts
+ * @param delayMs - Delay between attempts in milliseconds
+ */
+const getDatabaseTimeoutMessage = (
+  maxAttempts: number,
+  delayMs: number,
+): string =>
+  // eslint-disable-next-line i18next/no-literal-string -- Internal dev error message not user-facing
+  `${DATABASE_TIMEOUT_PREFIX} ${maxAttempts} ${DATABASE_TIMEOUT_SUFFIX} (${(maxAttempts * delayMs) / 1000}s)`;
 
 /**
  * Dev Repository Interface
@@ -195,9 +210,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           logger.error(
             "❌ Database connection timeout - this will cause errors",
           );
-          throw new Error(
-            `Database connection timeout after ${maxAttempts} attempts (${(maxAttempts * delayMs) / 1000}s)`,
-          );
+          // eslint-disable-next-line no-restricted-syntax -- Dev tooling requires throwing errors
+          throw new Error(getDatabaseTimeoutMessage(maxAttempts, delayMs));
         }
 
         if (attempt % 10 === 0) {
@@ -370,7 +384,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     try {
       // Load the task registry
       const { taskRegistry } = await import(
-        "@/app/api/[locale]/v1/core/system/unified-backend/tasks/generated/tasks-index"
+        "@/app/api/[locale]/v1/core/system/generated/tasks-index"
       );
 
       // Filter tasks for development environment
@@ -396,6 +410,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         devTasks,
         signal,
         locale,
+        logger,
       );
 
       if (startResult.success) {
@@ -406,7 +421,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           taskNames: devTasks.map((t) => t.name),
         });
       } else {
-        logger.error("Failed to start unified task runner");
+        logger.error("Failed to start unified task runner", {
+          message: startResult.message,
+          errorCode: startResult.errorType.errorCode,
+        });
       }
     } catch (error) {
       const errorMsg = parseError(error).message;

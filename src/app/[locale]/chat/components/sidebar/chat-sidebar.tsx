@@ -37,7 +37,7 @@ import type {
   UseChatReturn,
 } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
 import { useCredits } from "@/app/api/[locale]/v1/core/credits/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -77,7 +77,7 @@ interface ChatSidebarProps {
   onUpdateThreadTitle: (threadId: string, title: string) => void;
   searchThreads: (query: string) => Array<{ id: string; title: string }>;
   autoFocusSearch?: boolean;
-  user: JwtPayloadType;
+  user: JwtPayloadType | undefined;
 }
 
 export function ChatSidebar({

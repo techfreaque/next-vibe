@@ -11,15 +11,16 @@ import type { JSX } from "react";
 import React from "react";
 
 import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatAnimations } from "../../lib/design-tokens";
 import type { ChatMessage } from "../../types";
-import { AssistantMessageBubble } from "./assistant-message-bubble";
 import { BranchNavigator } from "./branch-navigator";
 import { ErrorMessageBubble } from "./error-message-bubble";
+import { GroupedAssistantMessage } from "./grouped-assistant-message";
 import { MessageEditor } from "./message-editor";
+import { groupMessagesBySequence } from "./message-grouping";
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
 import { UserMessageBubble } from "./user-message-bubble";
 
@@ -83,6 +84,18 @@ export function LinearMessageView({
   logger,
   rootFolderId = "general",
 }: LinearMessageViewProps): JSX.Element {
+  // Group messages by sequence for proper display
+  const messageGroups = groupMessagesBySequence(messages);
+
+  // Create a map of message IDs to their groups for quick lookup
+  const messageToGroupMap = new Map<string, (typeof messageGroups)[0]>();
+  for (const group of messageGroups) {
+    messageToGroupMap.set(group.primary.id, group);
+    for (const continuation of group.continuations) {
+      messageToGroupMap.set(continuation.id, group);
+    }
+  }
+
   // Check for root-level branches (multiple root messages)
   const rootBranches = branchInfo["__root__"];
   const hasRootBranches = rootBranches && rootBranches.siblings.length > 1;
@@ -122,6 +135,15 @@ export function LinearMessageView({
         // Get the next message in the path (the child we're following)
         const nextMessage =
           index < messages.length - 1 ? messages[index + 1] : null;
+
+        // Check if this is a continuation message (part of a sequence but not the primary)
+        const group = messageToGroupMap.get(message.id);
+        const isContinuation = group && group.primary.id !== message.id;
+
+        // Skip rendering continuation messages - they'll be rendered with their primary
+        if (isContinuation) {
+          return null;
+        }
 
         return (
           <React.Fragment key={message.id}>
@@ -185,17 +207,18 @@ export function LinearMessageView({
                       rootFolderId={rootFolderId}
                     />
                   )}
-                  {message.role === "assistant" && (
-                    <AssistantMessageBubble
-                      message={message}
-                      ttsAutoplay={ttsAutoplay}
-                      locale={locale}
-                      onAnswerAsModel={onStartAnswer}
-                      onDelete={onDeleteMessage}
-                      showAuthor={true}
-                      logger={logger}
-                    />
-                  )}
+                  {(message.role === "assistant" || message.role === "tool") &&
+                    group && (
+                      <GroupedAssistantMessage
+                        group={group}
+                        ttsAutoplay={ttsAutoplay}
+                        locale={locale}
+                        onAnswerAsModel={onStartAnswer}
+                        onDelete={onDeleteMessage}
+                        showAuthor={true}
+                        logger={logger}
+                      />
+                    )}
                   {message.role === "error" && (
                     <ErrorMessageBubble message={message} />
                   )}

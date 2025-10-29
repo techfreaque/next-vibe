@@ -21,7 +21,7 @@ import { Logo } from "@/app/[locale]/_components/nav/logo";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { getPersonaName } from "@/app/api/[locale]/v1/core/agent/chat/personas/config";
 import { useTTSAudio } from "@/app/api/[locale]/v1/core/agent/text-to-speech/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -319,6 +319,7 @@ export function ThreadedMessage({
                         <ToolCallDisplay
                           toolCalls={message.toolCalls}
                           locale={locale}
+                          hasContent={message.content.trim().length > 0}
                         />
                       )}
 

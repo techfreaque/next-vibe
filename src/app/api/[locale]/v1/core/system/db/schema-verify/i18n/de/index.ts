@@ -83,4 +83,14 @@ export const translations: typeof enTranslations = {
       title: "Behobene Probleme",
     },
   },
+  verified: {
+    tables: "✅ {{count}} Tabellen verifiziert",
+    columns: "✅ {{count}} Spalten verifiziert",
+    indexes: "✅ {{count}} Indizes verifiziert",
+    constraints: "✅ {{count}} Einschränkungen verifiziert",
+  },
+  fixed: "🔧 {{count}} Schema-Probleme behoben",
+  validationPassed: "\n✅ Schema-Validierung bestanden - alle Prüfungen erfolgreich",
+  validationFailed: "\n❌ Schema-Validierung fehlgeschlagen - {{count}} Probleme gefunden",
+  dbConnectionFailed: "Verbindung zur Datenbank fehlgeschlagen",
 };

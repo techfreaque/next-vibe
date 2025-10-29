@@ -8,7 +8,7 @@
 import {
   FieldDataType,
   WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { Countries } from "@/i18n/core/config";
 
 import type { FieldConfig } from "./endpoint-form-field-types";

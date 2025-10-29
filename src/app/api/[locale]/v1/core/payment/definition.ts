@@ -5,17 +5,17 @@
 
 import { z } from "zod";
 
-import { createFormEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-form-endpoint";
+import { createFormEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create-form";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import {
   field,
   objectField,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import {

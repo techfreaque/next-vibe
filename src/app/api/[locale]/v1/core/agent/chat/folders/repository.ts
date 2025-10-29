@@ -3,7 +3,8 @@ import "server-only";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
+  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -12,10 +13,11 @@ import { parseError } from "next-vibe/shared/utils";
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { canCreateFolder } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { JsonValue } from "type-fest";
 
 import type {
   FolderCreateRequestOutput,
@@ -36,9 +38,9 @@ export async function getFolders(
   const userIdentifier = user.isPublic ? user.leadId : user.id;
 
   if (!userIdentifier) {
-    return createErrorResponse(
+    return fail({message: 
       "app.api.v1.core.agent.chat.folders.get.errors.unauthorized.title",
-      ErrorResponseTypes.UNAUTHORIZED,
+      errorType: ErrorResponseTypes.UNAUTHORIZED,
     );
   }
 
@@ -50,9 +52,9 @@ export async function getFolders(
       .from(chatFolders)
       .where(
         and(
-          eq(chatFolders.userId, userIdentifier),
-          eq(chatFolders.rootFolderId, rootFolderId),
-        ),
+          eq(chatFolders.userId, userIdentifier}),
+          eq(chatFolders.rootFolderId, rootFolderId}),
+        }),
       )
       .orderBy(desc(chatFolders.sortOrder), desc(chatFolders.createdAt));
 
@@ -71,15 +73,15 @@ export async function getFolders(
         parentId: folder.parentId,
         expanded: folder.expanded,
         sortOrder: folder.sortOrder,
-        metadata: (folder.metadata as Record<string, any>) || {},
-        createdAt: new Date(folder.createdAt),
-        updatedAt: new Date(folder.updatedAt),
-      })),
+        metadata: (folder.metadata as JsonValue) || {},
+        createdAt: new Date(folder.createdAt}),
+        updatedAt: new Date(folder.updatedAt}),
+      })}),
     });
   } catch {
-    return createErrorResponse(
+    return fail({message: 
       "app.api.v1.core.agent.chat.folders.get.errors.server.title",
-      ErrorResponseTypes.INTERNAL_ERROR,
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
 }
@@ -94,7 +96,7 @@ export async function createFolder(
   logger: EndpointLogger,
 ): Promise<ResponseType<FolderCreateResponseOutput>> {
   try {
-    const { folder: folderData } = data;
+    const messageParams: { folder: folderData } = data;
 
     // Check permissions using the permission system
     const hasPermission = await canCreateFolder(
@@ -106,34 +108,34 @@ export async function createFolder(
     if (!hasPermission) {
       // Determine the specific error message
       if (user.isPublic) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
-          ErrorResponseTypes.FORBIDDEN,
+          errorType: ErrorResponseTypes.FORBIDDEN,
         );
       }
 
       if (folderData.rootFolderId === "incognito") {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
-          ErrorResponseTypes.FORBIDDEN,
+          errorType: ErrorResponseTypes.FORBIDDEN,
           {
             message: simpleT(locale).t(
               "app.api.v1.core.agent.chat.folders.post.errors.forbidden.incognitoNotAllowed",
-            ),
+            }),
           },
         );
       }
 
       if (folderData.rootFolderId === "public") {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
-          ErrorResponseTypes.FORBIDDEN,
+          errorType: ErrorResponseTypes.FORBIDDEN,
         );
       }
 
-      return createErrorResponse(
+      return fail({message: 
         "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
-        ErrorResponseTypes.FORBIDDEN,
+        errorType: ErrorResponseTypes.FORBIDDEN,
       );
     }
 
@@ -141,9 +143,9 @@ export async function createFolder(
     const userIdentifier = user.id;
 
     if (!userIdentifier) {
-      return createErrorResponse(
+      return fail({message: 
         "app.api.v1.core.agent.chat.folders.post.errors.unauthorized.title",
-        ErrorResponseTypes.UNAUTHORIZED,
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
       );
     }
 
@@ -153,12 +155,12 @@ export async function createFolder(
       .from(chatFolders)
       .where(
         and(
-          eq(chatFolders.userId, userIdentifier),
-          eq(chatFolders.rootFolderId, folderData.rootFolderId),
+          eq(chatFolders.userId, userIdentifier}),
+          eq(chatFolders.rootFolderId, folderData.rootFolderId}),
           folderData.parentId
             ? eq(chatFolders.parentId, folderData.parentId)
-            : isNull(chatFolders.parentId),
-        ),
+            : isNull(chatFolders.parentId}),
+        }),
       );
 
     const nextSortOrder = existingFolders.length;
@@ -179,9 +181,9 @@ export async function createFolder(
       .returning();
 
     if (!newFolder) {
-      return createErrorResponse(
+      return fail({message: 
         "app.api.v1.core.agent.chat.folders.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
 
@@ -201,17 +203,17 @@ export async function createFolder(
           parentId: newFolder.parentId,
           expanded: newFolder.expanded,
           sortOrder: newFolder.sortOrder,
-          metadata: (newFolder.metadata as Record<string, any>) || {},
-          createdAt: new Date(newFolder.createdAt),
-          updatedAt: new Date(newFolder.updatedAt),
+          metadata: (newFolder.metadata as JsonValue) || {},
+          createdAt: new Date(newFolder.createdAt}),
+          updatedAt: new Date(newFolder.updatedAt}),
         },
       },
     });
   } catch (error) {
     logger.error("Failed to create folder", parseError(error));
-    return createErrorResponse(
+    return fail({message: 
       "app.api.v1.core.agent.chat.folders.post.errors.server.title",
-      ErrorResponseTypes.INTERNAL_ERROR,
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
 }

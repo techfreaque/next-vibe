@@ -8,14 +8,15 @@ import "server-only";
 import { and, count, desc, eq, gte, ilike, isNull, lte, or } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
+  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -74,11 +75,14 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       const dateFrom = data.dateFrom;
       const dateTo = data.dateTo;
 
+      // Extract userId safely - only exists for authenticated users
+      const userId = !user.isPublic && "id" in user ? user.id : undefined;
+
       logger.info("Listing threads - START", {
-        userId: user.id,
+        userId,
         leadId: user.leadId,
         isPublic: user.isPublic,
-        hasUserId: !!user.id,
+        hasUserId: !!userId,
         hasLeadId: !!user.leadId,
         page,
         limit,
@@ -93,7 +97,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
 
       // For anonymous users (public), use leadId instead of userId
       // For authenticated users, use userId
-      const userIdentifier = user.isPublic ? user.leadId : user.id;
+      const userIdentifier = user.isPublic ? user.leadId : userId;
 
       logger.info("Listing threads - User identifier", {
         userIdentifier,
@@ -101,9 +105,9 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       });
 
       if (!userIdentifier) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.get.errors.unauthorized.title",
-          ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
         );
       }
 
@@ -147,8 +151,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       if (search) {
         conditions.push(
           or(
-            ilike(chatThreads.title, `%${search}%`),
-            ilike(chatThreads.preview, `%${search}%`),
+            ilike(chatThreads.title, `%${search}%`}),
+            ilike(chatThreads.preview, `%${search}%`}),
           )!,
         );
       }
@@ -157,7 +161,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
 
       // Get total count
       const [{ total }] = await db
-        .select({ total: count() })
+        .select(messageParams: { total: count() })
         .from(chatThreads)
         .where(whereClause);
 
@@ -192,7 +196,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         limit,
         pageCount,
         resultsCount: threads.length,
-        threadIds: threads.map((t) => t.id),
+        threadIds: threads.map((t) => t.id}),
       });
 
       return createSuccessResponse({
@@ -206,10 +210,10 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       });
     } catch (error) {
       logger.error("Error listing threads", parseError(error));
-      return createErrorResponse(
+      return fail({message: 
         "app.api.v1.core.agent.chat.threads.get.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       );
     }
   }
@@ -250,9 +254,9 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       const userIdentifier = user.isPublic ? user.leadId : user.id;
 
       if (!userIdentifier) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.post.errors.unauthorized.title",
-          ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
         );
       }
 
@@ -262,7 +266,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
           data.thread?.title ||
           simpleT(locale).t(
             "app.api.v1.core.agent.chat.threads.post.threadTitle.default",
-          ),
+          }),
         rootFolderId: data.thread?.rootFolderId,
         folderId: data.thread?.subFolderId ?? null,
         status: ThreadStatus.ACTIVE,
@@ -292,7 +296,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         updatedAt: dbThread.updatedAt,
       };
 
-      logger.debug("Thread created successfully", { threadId: thread.id });
+      logger.debug("Thread created successfully", messageParams: { threadId: thread.id });
 
       return createSuccessResponse({
         response: {
@@ -301,10 +305,10 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       });
     } catch (error) {
       logger.error("Error creating thread", parseError(error));
-      return createErrorResponse(
+      return fail({message: 
         "app.api.v1.core.agent.chat.threads.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       );
     }
   }

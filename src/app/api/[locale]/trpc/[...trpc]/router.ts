@@ -7,7 +7,7 @@
 /* eslint-disable simple-import-sort/imports */
 /* eslint-disable prettier/prettier */
 
-import { router } from '@/app/api/[locale]/v1/core/system/unified-ui/react/trpc-trpc';
+import { router } from '@/app/api/[locale]/v1/core/system/unified-interface/react/trpc-trpc';
 import { tools as route0Tools } from '../../v1/core/agent/chat/personas/[id]/route';
 import { tools as route1Tools } from '../../v1/core/agent/chat/personas/route';
 import { tools as route2Tools } from '../../v1/core/agent/chat/threads/route';
@@ -23,7 +23,7 @@ import { tools as route11Tools } from '../../v1/core/system/server/health/route'
 import { tools as route12Tools } from '../../v1/core/system/translations/reorganize/route';
 import { tools as route13Tools } from '../../v1/core/system/translations/restore-backup/route';
 import { tools as route14Tools } from '../../v1/core/system/translations/stats/route';
-import { tools as route15Tools } from '../../v1/core/system/help/list/route';
+import { tools as route15Tools } from '../../v1/core/system/help/route';
 import { tools as route16Tools } from '../../v1/core/system/db/schema-verify/route';
 import { tools as route17Tools } from '../../v1/core/system/db/utils/docker-operations/route';
 import { tools as route18Tools } from '../../v1/core/system/db/migrate-repair/route';
@@ -35,18 +35,18 @@ import { tools as route23Tools } from '../../v1/core/system/db/migrate/route';
 import { tools as route24Tools } from '../../v1/core/system/db/ping/route';
 import { tools as route25Tools } from '../../v1/core/system/db/sql/route';
 import { tools as route26Tools } from '../../v1/core/system/db/studio/route';
-import { tools as route27Tools } from '../../v1/core/system/unified-backend/tasks/cron/tasks/route';
-import { tools as route28Tools } from '../../v1/core/system/unified-backend/tasks/cron/history/route';
-import { tools as route29Tools } from '../../v1/core/system/unified-backend/tasks/cron/status/route';
-import { tools as route30Tools } from '../../v1/core/system/unified-backend/tasks/cron/stats/route';
-import { tools as route31Tools } from '../../v1/core/system/unified-backend/tasks/side-tasks/route';
-import { tools as route32Tools } from '../../v1/core/system/unified-backend/tasks/types/route';
-import { tools as route33Tools } from '../../v1/core/system/unified-backend/tasks/pulse/route';
-import { tools as route34Tools } from '../../v1/core/system/unified-backend/tasks/unified-runner/route';
-import { tools as route35Tools } from '../../v1/core/system/unified-ui/cli/setup/uninstall/route';
-import { tools as route36Tools } from '../../v1/core/system/unified-ui/cli/setup/update/route';
-import { tools as route37Tools } from '../../v1/core/system/unified-ui/cli/setup/status/route';
-import { tools as route38Tools } from '../../v1/core/system/unified-ui/cli/setup/install/route';
+import { tools as route27Tools } from '../../v1/core/system/unified-interface/tasks/cron/tasks/route';
+import { tools as route28Tools } from '../../v1/core/system/unified-interface/tasks/cron/history/route';
+import { tools as route29Tools } from '../../v1/core/system/unified-interface/tasks/cron/status/route';
+import { tools as route30Tools } from '../../v1/core/system/unified-interface/tasks/cron/stats/route';
+import { tools as route31Tools } from '../../v1/core/system/unified-interface/tasks/side-tasks/route';
+import { tools as route32Tools } from '../../v1/core/system/unified-interface/tasks/types/route';
+import { tools as route33Tools } from '../../v1/core/system/unified-interface/tasks/pulse/route';
+import { tools as route34Tools } from '../../v1/core/system/unified-interface/tasks/unified-runner/route';
+import { tools as route35Tools } from '../../v1/core/system/unified-interface/cli/setup/uninstall/route';
+import { tools as route36Tools } from '../../v1/core/system/unified-interface/cli/setup/update/route';
+import { tools as route37Tools } from '../../v1/core/system/unified-interface/cli/setup/status/route';
+import { tools as route38Tools } from '../../v1/core/system/unified-interface/cli/setup/install/route';
 import { tools as route39Tools } from '../../v1/core/system/generators/generate-all/route';
 import { tools as route40Tools } from '../../v1/core/system/generators/endpoints/route';
 import { tools as route41Tools } from '../../v1/core/system/generators/endpoints-index/route';
@@ -203,164 +203,162 @@ export const appRouter = router({
     core: router({
       agent: router({
         chat: router({
-          personas: router({ route0, route1 }),
-          threads: router({ route2, route3 }),
-          folders: router({ route4, route5 }),
+          personas: router({ ...route0, ...route1 }),
+          threads: router({ ...route2, ...route3 }),
+          folders: router({ ...route4, ...route5 }),
         }),
-        "brave-search": router(route6),
-        "text-to-speech": router(route7),
-        "speech-to-text": router(route8),
+        "brave-search": router({ ...route6 }),
+        "text-to-speech": router({ ...route7 }),
+        "speech-to-text": router({ ...route8 }),
       }),
       system: router({
         server: router({
-          dev: router(route9),
-          start: router(route10),
-          health: router(route11),
+          dev: router({ ...route9 }),
+          start: router({ ...route10 }),
+          health: router({ ...route11 }),
         }),
         translations: router({
-          reorganize: router(route12),
-          "restore-backup": router(route13),
-          stats: router(route14),
+          reorganize: router({ ...route12 }),
+          "restore-backup": router({ ...route13 }),
+          stats: router({ ...route14 }),
         }),
-        help: router({
-          list: router(route15),
-        }),
+        help: router({ ...route15 }),
         db: router({
-          "schema-verify": router(route16),
+          "schema-verify": router({ ...route16 }),
           utils: router({
-            "docker-operations": router(route17),
+            "docker-operations": router({ ...route17 }),
           }),
-          "migrate-repair": router(route18),
-          "migrate-prod": router(route19),
-          seed: router(route20),
-          reset: router(route21),
-          "migrate-sync": router(route22),
-          migrate: router(route23),
-          ping: router(route24),
-          sql: router(route25),
-          studio: router(route26),
+          "migrate-repair": router({ ...route18 }),
+          "migrate-prod": router({ ...route19 }),
+          seed: router({ ...route20 }),
+          reset: router({ ...route21 }),
+          "migrate-sync": router({ ...route22 }),
+          migrate: router({ ...route23 }),
+          ping: router({ ...route24 }),
+          sql: router({ ...route25 }),
+          studio: router({ ...route26 }),
         }),
-        "unified-backend": router({
+        "unified-interface": router({
           tasks: router({
             cron: router({
-              tasks: router(route27),
-              history: router(route28),
-              status: router(route29),
-              stats: router(route30),
+              tasks: router({ ...route27 }),
+              history: router({ ...route28 }),
+              status: router({ ...route29 }),
+              stats: router({ ...route30 }),
             }),
-            "side-tasks": router(route31),
-            types: router(route32),
-            pulse: router(route33),
-            "unified-runner": router(route34),
+            "side-tasks": router({ ...route31 }),
+            types: router({ ...route32 }),
+            pulse: router({ ...route33 }),
+            "unified-runner": router({ ...route34 }),
           }),
         }),
-        "unified-ui": router({
+        "unified-interface": router({
           cli: router({
             setup: router({
-              uninstall: router(route35),
-              update: router(route36),
-              status: router(route37),
-              install: router(route38),
+              uninstall: router({ ...route35 }),
+              update: router({ ...route36 }),
+              status: router({ ...route37 }),
+              install: router({ ...route38 }),
             }),
           }),
         }),
         generators: router({
-          "generate-all": router(route39),
-          endpoints: router(route40),
-          "endpoints-index": router(route41),
-          "task-index": router(route42),
-          seeds: router(route43),
+          "generate-all": router({ ...route39 }),
+          endpoints: router({ ...route40 }),
+          "endpoints-index": router({ ...route41 }),
+          "task-index": router({ ...route42 }),
+          seeds: router({ ...route43 }),
           "generate-trpc-router": router({
-            validation: router(route44),
+            validation: router({ ...route44 }),
           }),
         }),
       }),
-      manifest: router(route45),
+      manifest: router({ ...route45 }),
       leads: router({
-        lead: router(route46),
+        lead: router({ ...route46 }),
         tracking: router({
-          engagement: router(route47),
+          engagement: router({ ...route47 }),
         }),
-        search: router(route48),
+        search: router({ ...route48 }),
         campaigns: router({
           "campaign-starter": router({
-            "campaign-starter-config": router(route49),
+            "campaign-starter-config": router({ ...route49 }),
           }),
           emails: router({
-            "test-mail": router(route50),
+            "test-mail": router({ ...route50 }),
           }),
         }),
-        list: router(route51),
-        import: router(route52),
-        export: router(route53),
-        stats: router(route54),
-        create: router(route55),
-        batch: router(route56),
+        list: router({ ...route51 }),
+        import: router({ ...route52 }),
+        export: router({ ...route53 }),
+        stats: router({ ...route54 }),
+        create: router({ ...route55 }),
+        batch: router({ ...route56 }),
       }),
       users: router({
-        user: router(route57),
-        list: router(route58),
-        stats: router(route59),
-        create: router(route60),
+        user: router({ ...route57 }),
+        list: router({ ...route58 }),
+        stats: router({ ...route59 }),
+        create: router({ ...route60 }),
       }),
       user: router({
         private: router({
-          logout: router(route61),
-          me: router(route62),
+          logout: router({ ...route61 }),
+          me: router({ ...route62 }),
         }),
         public: router({
           login: router({
-            options: router(route63),
+            options: router({ ...route63 }),
           }),
-          signup: router(route64),
+          signup: router({ ...route64 }),
           "reset-password": router({
-            validate: router(route65),
-            request: router(route66),
-            confirm: router(route67),
+            validate: router({ ...route65 }),
+            request: router({ ...route66 }),
+            confirm: router({ ...route67 }),
           }),
         }),
-        search: router(route68),
+        search: router({ ...route68 }),
         auth: router({
-          check: router(route69),
+          check: router({ ...route69 }),
         }),
       }),
-      stripe: router(route70),
-      subscription: router(route71),
+      stripe: router({ ...route70 }),
+      subscription: router({ ...route71 }),
       payment: router({
-        portal: router(route72),
-        invoice: router(route73),
-        refund: router(route74),
+        portal: router({ ...route72 }),
+        invoice: router({ ...route73 }),
+        refund: router({ ...route74 }),
       }),
       credits: router({
-        history: router(route75),
-        purchase: router(route76),
+        history: router({ ...route75 }),
+        purchase: router({ ...route76 }),
       }),
-      contact: router(route77),
+      contact: router({ ...route77 }),
       emails: router({
         "smtp-client": router({
-          list: router(route78),
-          edit: router(route79),
-          create: router(route80),
+          list: router({ ...route78 }),
+          edit: router({ ...route79 }),
+          create: router({ ...route80 }),
         }),
-        send: router(route81),
-        messages: router(route82),
+        send: router({ ...route81 }),
+        messages: router({ ...route82 }),
         "imap-client": router({
-          messages: router(route83),
+          messages: router({ ...route83 }),
           folders: router({
-            list: router(route84),
-            sync: router(route85),
+            list: router({ ...route84 }),
+            sync: router({ ...route85 }),
           }),
-          config: router(route86),
-          health: router(route87),
-          sync: router(route88),
-          accounts: router(route89),
+          config: router({ ...route86 }),
+          health: router({ ...route87 }),
+          sync: router({ ...route88 }),
+          accounts: router({ ...route89 }),
         }),
       }),
-      import: router(route90),
+      import: router({ ...route90 }),
       newsletter: router({
-        unsubscribe: router(route91),
-        subscribe: router(route92),
-        status: router(route93),
+        unsubscribe: router({ ...route91 }),
+        subscribe: router({ ...route92 }),
+        status: router({ ...route93 }),
       }),
     }),
   }),

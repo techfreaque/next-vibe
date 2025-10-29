@@ -37,10 +37,12 @@ export interface ChatThread {
 export interface ChatMessage {
   id: string;
   threadId: string;
-  role: "user" | "assistant" | "system" | "error";
+  role: "user" | "assistant" | "system" | "tool" | "error";
   content: string;
   parentId: string | null;
   depth: number;
+  sequenceId: string | null; // Links messages in the same AI response sequence
+  sequenceIndex: number; // Order within sequence
   authorId: string | null;
   authorName: string | null;
   isAI: boolean;

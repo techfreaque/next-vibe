@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import {
   FOLDER_TRANSFORMATIONS,

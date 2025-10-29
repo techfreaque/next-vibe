@@ -35,7 +35,7 @@ import {
   type PersonaCategory,
   type PersonaCategoryId,
 } from "@/app/api/[locale]/v1/core/agent/chat/personas/config";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

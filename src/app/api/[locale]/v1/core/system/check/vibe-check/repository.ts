@@ -14,7 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { lintRepository } from "../lint/repository";
@@ -63,12 +63,12 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
           const promises = [];
 
           // Run lint if not skipped
-          if (!data.skipLint && path) {
-            // Only run lint if we have a specific path - lint doesn't support no-path mode
+          if (!data.skipLint) {
+            // Lint repository defaults to "./" when path is undefined
             promises.push(
               lintRepository.execute(
                 {
-                  path,
+                  path: path || "./",
                   verbose: logger.isDebugEnabled,
                   fix: data.fix || false,
                   timeout: data.timeout,

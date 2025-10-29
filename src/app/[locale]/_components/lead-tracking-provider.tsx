@@ -4,7 +4,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { useEffect, useMemo } from "react";
 
 import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
 import { EngagementTypes } from "../../api/[locale]/v1/core/leads/enum";
@@ -53,8 +53,8 @@ export function LeadTrackingProvider(): null {
           return;
         }
 
-        const apiResult: ResponseType<LeadEngagementResponseOutput> =
-          await response.json();
+        const apiResult =
+          (await response.json()) as ResponseType<LeadEngagementResponseOutput>;
 
         if (apiResult.success) {
           logger.debug("info.leads.tracking.engagement.visit_recorded", {

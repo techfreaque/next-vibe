@@ -21,9 +21,9 @@ import {
   isDefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
@@ -91,7 +91,7 @@ interface ChatInterfaceProps {
   initialThreadId?: string;
   /** URL path segments from /threads/[...path] route */
   urlPath?: string[];
-  user: JwtPrivatePayloadType;
+  user: JwtPayloadType | undefined;
 }
 
 export function ChatInterface({

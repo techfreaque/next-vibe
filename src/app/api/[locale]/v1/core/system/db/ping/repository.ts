@@ -13,7 +13,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db, rawPool } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import type { PingRequestOutput, PingResponseOutput } from "./definition";
 

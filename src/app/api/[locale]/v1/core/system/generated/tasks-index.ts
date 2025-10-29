@@ -6,22 +6,22 @@
  * Task files: 5
  * Task runner files: 2
  * Side task config files: 0
- * Generated at: 2025-10-28T13:40:02.971Z
+ * Generated at: 2025-10-29T13:54:09.078Z
  */
 
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
-import type { Task, TaskRegistry, TaskRunnerManager } from "../unified-backend/tasks/types/repository";
-import { UnifiedTaskRunnerRepositoryImpl } from "../unified-backend/tasks/unified-runner/repository";
+import type { Task, TaskRegistry, TaskRunnerManager } from "../unified-interface/tasks/types/repository";
+import { UnifiedTaskRunnerRepositoryImpl } from "../unified-interface/tasks/unified-runner/repository";
 
 import { tasks as taskModule0 } from "../../leads/import/task";
 import { tasks as taskModule1 } from "../../user/session-cleanup/task";
 import { tasks as taskModule2 } from "../../credits/expire/task";
 import { tasks as taskModule3 } from "../../emails/imap-client/sync/task";
 import { tasks as taskModule4 } from "../../newsletter/unsubscribe/task";
-import { taskRunners as runnerModule5 } from "../unified-backend/tasks/dev-watcher/task-runner";
-import { taskRunners as runnerModule6 } from "../unified-backend/tasks/pulse-runner/task-runner";
+import { taskRunners as runnerModule5 } from "../unified-interface/tasks/dev-watcher/task-runner";
+import { taskRunners as runnerModule6 } from "../unified-interface/tasks/pulse-runner/task-runner";
 
 const allTasks: Task[] = [
   ...taskModule0,

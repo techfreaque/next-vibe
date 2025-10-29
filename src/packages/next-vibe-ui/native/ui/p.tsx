@@ -16,4 +16,3 @@ export const P = React.forwardRef<
 ));
 
 P.displayName = "P";
-

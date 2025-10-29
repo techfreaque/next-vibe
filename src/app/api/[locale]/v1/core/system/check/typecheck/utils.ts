@@ -13,7 +13,6 @@ import {
 import { extname, join, relative, resolve } from "node:path";
 
 import { parseJsonWithComments } from "@/app/api/[locale]/v1/core/shared/utils/parse-json";
-import { findTypeScriptFiles as findTypeScriptFilesUtil } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/filesystem/directory-scanner";
 
 /**
  * TypeScript file extensions

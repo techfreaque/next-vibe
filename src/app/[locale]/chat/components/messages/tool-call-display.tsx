@@ -24,13 +24,22 @@ interface ToolCallDisplayProps {
   hasContent?: boolean; // Whether the message has content after tool calls
 }
 
+/**
+ * Tool Call Display Component
+ * Simplified tool call display for threaded and flat views
+ *
+ * UX behavior:
+ * - Tool calls are OPEN by default when there's no content after (user needs to see what happened)
+ * - Tool calls are COLLAPSED by default when there's content after (reduce wall of text)
+ * - Users can always toggle open/closed manually
+ */
 export function ToolCallDisplay({
   toolCalls,
   locale,
   hasContent = false,
 }: ToolCallDisplayProps): JSX.Element | null {
   const { t } = simpleT(locale);
-  // Open by default if no content after, collapsed if there is content
+  // Open by default when NO content after, collapsed when there IS content after
   const [isOpen, setIsOpen] = useState(!hasContent);
 
   if (!toolCalls || toolCalls.length === 0) {

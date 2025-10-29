@@ -9,9 +9,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import type React from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import type { IndividualCronTaskType } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/task/[id]/definition";
-import { useCronTaskEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/tasks/cron/tasks/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { IndividualCronTaskType } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/task/[id]/definition";
+import { useCronTaskEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/tasks/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

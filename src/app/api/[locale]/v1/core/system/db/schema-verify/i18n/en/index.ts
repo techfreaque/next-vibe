@@ -79,4 +79,14 @@ export const translations = {
       title: "Fixed Issues",
     },
   },
+  verified: {
+    tables: "✅ Verified {{count}} tables",
+    columns: "✅ Verified {{count}} columns",
+    indexes: "✅ Verified {{count}} indexes",
+    constraints: "✅ Verified {{count}} constraints",
+  },
+  fixed: "🔧 Fixed {{count}} schema issues",
+  validationPassed: "\n✅ Schema validation passed - all checks successful",
+  validationFailed: "\n❌ Schema validation failed - {{count}} issues found",
+  dbConnectionFailed: "Failed to connect to database",
 };

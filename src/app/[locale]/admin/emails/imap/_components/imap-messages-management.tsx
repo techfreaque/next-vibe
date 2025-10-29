@@ -21,7 +21,7 @@ import {
   SortOrder,
 } from "@/app/api/[locale]/v1/core/emails/imap-client/enum";
 import { useImapMessagesListEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/list/hooks";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
 import { ImapMessagesTable } from "./imap-messages-table";

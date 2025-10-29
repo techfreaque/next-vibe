@@ -1,13 +1,13 @@
 import "server-only";
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
+import { Methods } from "@/app/api/[locale]/v1/core/system/shared/enums";
 
 import { loginRepository } from "../repository";
 import loginOptionsDefinitions from "./definition";
 
 /**
- * Export handlers using endpointHandler
+ * Export handlers using endpointsHandler
  */
 export const { GET, tools } = endpointsHandler({
   endpoint: loginOptionsDefinitions,

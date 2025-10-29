@@ -95,7 +95,7 @@ const config = [
         "@typescript-eslint/parser": [".ts", ".tsx"],
       },
       "import/resolver": {
-        typescript: { project: "./tsconfig.json", alwaysTryTypes: true },
+        typescript: { project: resolve(__dirname, "tsconfig.json"), alwaysTryTypes: true },
         node: { extensions: [".ts", ".tsx", ".js", ".jsx"] },
       },
       react: { version: "detect" },

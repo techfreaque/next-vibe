@@ -19,7 +19,7 @@ import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -67,11 +67,7 @@ export default function LocaleLayoutWrapper(): React.ReactElement {
             setError(
               err instanceof Error
                 ? err
-                : new Error(
-                    t(
-                      "app-native._layout.failedToLoadLayout",
-                    ),
-                  ),
+                : new Error(t("app-native._layout.failedToLoadLayout")),
             );
           }
         }
@@ -95,9 +91,7 @@ export default function LocaleLayoutWrapper(): React.ReactElement {
         }}
       >
         <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-          {t(
-            "app-native._layout.failedToLoadLayout",
-          )}
+          {t("app-native._layout.failedToLoadLayout")}
         </Text>
         <Text style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
           {error.message}

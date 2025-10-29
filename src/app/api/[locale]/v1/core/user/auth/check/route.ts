@@ -7,7 +7,7 @@
  * - Native: Validates Bearer token from Authorization header
  */
 
-import { endpointHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handler";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
 
 import endpoints from "./definition";
 
@@ -15,7 +15,7 @@ import endpoints from "./definition";
  * GET /api/[locale]/v1/core/user/auth/check
  * Check authentication status for current user
  */
-export const { GET, tools } = endpointHandler({
+export const { GET, tools } = endpointsHandler({
   endpoint: endpoints.GET,
   handler: (props) => {
     // The endpoint handler already validates authentication

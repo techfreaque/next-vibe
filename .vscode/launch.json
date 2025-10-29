@@ -13,7 +13,7 @@
             "type": "node",
             "request": "launch",
             "name": "Vibe Dev Server",
-            "program": "${workspaceFolder}/src/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/vibe.ts",
+            "program": "${workspaceFolder}/src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe/vibe.ts",
             "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
             "runtimeArgs": [
                 "--inspect-brk",
@@ -32,7 +32,7 @@
             "type": "node",
             "request": "launch",
             "name": "Vibe Native",
-            // "program": "${workspaceFolder}/src/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/vibe.ts",
+            // "program": "${workspaceFolder}/src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe/vibe.ts",
             "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
             "runtimeArgs": [
                 "--inspect-brk",
@@ -53,7 +53,7 @@
             "request": "launch",
             "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
             "runtimeArgs": [
-                "src/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/vibe.ts",
+                "src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe/vibe.ts",
                 "dev",
                 "--turbo"
             ],
@@ -90,7 +90,7 @@
             "request": "launch",
             "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
             "runtimeArgs": [
-                "src/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/vibe.ts",
+                "src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe/vibe.ts",
                 "${input:vibeCommand}"
             ],
             "cwd": "${workspaceFolder}",

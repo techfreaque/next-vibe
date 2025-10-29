@@ -3,7 +3,6 @@
  */
 
 // Export all utility functions
-export * from "../../system/unified-backend/shared/field-utils";
 export * from "./base64";
 export * from "./env-util";
 export * from "./object";

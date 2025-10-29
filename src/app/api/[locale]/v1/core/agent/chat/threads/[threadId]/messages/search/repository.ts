@@ -8,14 +8,15 @@ import "server-only";
 import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
+  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -72,25 +73,25 @@ export class MessageSearchRepositoryImpl
 
       // Type guard to ensure user has id
       if (!user.id) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.errors.unauthorized.title",
-          ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
         );
       }
 
       // Verify thread exists and belongs to user
       const [thread] = await db
-        .select({ id: chatThreads.id, rootFolderId: chatThreads.rootFolderId })
+        .select(messageParams: { id: chatThreads.id, rootFolderId: chatThreads.rootFolderId })
         .from(chatThreads)
         .where(
-          and(eq(chatThreads.id, threadId), eq(chatThreads.userId, user.id)),
+          and(eq(chatThreads.id, threadId), eq(chatThreads.userId, user.id)}),
         )
         .limit(1);
 
       if (!thread) {
-        return createErrorResponse(
+        return fail({message: 
           "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.errors.notFound.title",
-          ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
         );
       }
 
@@ -120,9 +121,9 @@ export class MessageSearchRepositoryImpl
         .from(chatMessages)
         .where(
           and(
-            eq(chatMessages.threadId, threadId),
+            eq(chatMessages.threadId, threadId}),
             sql`${chatMessages.searchVector} @@ plainto_tsquery('english', ${query})`,
-          ),
+          }),
         )
         .orderBy(
           sql`ts_rank(${chatMessages.searchVector}, plainto_tsquery('english', ${query})) DESC`,
@@ -131,16 +132,16 @@ export class MessageSearchRepositoryImpl
         .offset(offset);
 
       // Get total count
-      const [{ count: totalCount }] = await db
+      const [messageParams: { count: totalCount }] = await db
         .select({
           count: sql<number>`count(*)::int`,
         })
         .from(chatMessages)
         .where(
           and(
-            eq(chatMessages.threadId, threadId),
+            eq(chatMessages.threadId, threadId}),
             sql`${chatMessages.searchVector} @@ plainto_tsquery('english', ${query})`,
-          ),
+          }),
         );
 
       logger.debug("Messages search completed", {
@@ -158,14 +159,14 @@ export class MessageSearchRepositoryImpl
           rank: r.rank,
           headline: r.headline,
           createdAt: r.createdAt,
-        })),
+        })}),
         totalCount,
       });
     } catch (error) {
       logger.error("Failed to search messages", parseError(error));
-      return createErrorResponse(
+      return fail({message: 
         "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.errors.serverError.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
   }

@@ -3,7 +3,7 @@
  * Core enums for email service functionality
  */
 
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enum-helpers";
+import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/enum";
 
 /**
  * Email Service Priority Enum

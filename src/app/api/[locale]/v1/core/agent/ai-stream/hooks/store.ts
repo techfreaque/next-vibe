@@ -18,6 +18,7 @@ export interface StreamingMessage {
   threadId: string;
   role: ChatMessageRole;
   content: string;
+  reasoning?: string; // Reasoning/thinking content (o1-style models)
   parentId: string | null;
   depth: number;
   model?: ModelId | null;
@@ -27,6 +28,8 @@ export interface StreamingMessage {
   isStreaming: boolean;
   error?: string;
   toolCalls?: ToolCall[];
+  sequenceId?: string | null; // Links messages in the same AI response sequence
+  sequenceIndex?: number; // Order within sequence
 }
 
 /**

@@ -5,9 +5,10 @@ import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { loginRepository } from "@/app/api/[locale]/v1/core/user/public/login/repository";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
@@ -69,12 +70,17 @@ export default async function LoginPage({
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
   // Check if user is already logged in using repository-first pattern
+  // Allow both PUBLIC and CUSTOMER roles for login page
   const verifiedUserResponse = await userRepository.getUserByAuth(
-    { locale },
+    { locale, roles: [UserRole.PUBLIC, UserRole.CUSTOMER] },
     logger,
   );
-  // Redirect if already authenticated
-  if (verifiedUserResponse.success && verifiedUserResponse.data) {
+  // Redirect if already authenticated (not public)
+  if (
+    verifiedUserResponse.success &&
+    verifiedUserResponse.data &&
+    !verifiedUserResponse.data.isPublic
+  ) {
     // If there's a callback URL, use it
     const userId = verifiedUserResponse.data.id;
     if (userId) {
@@ -82,10 +88,6 @@ export default async function LoginPage({
         redirect(callbackUrl);
       }
       redirect(`/${locale}/chat`);
-    } else {
-      logger.error("No user ID in JWT payload", {
-        payload: verifiedUserResponse.data,
-      });
     }
   }
 

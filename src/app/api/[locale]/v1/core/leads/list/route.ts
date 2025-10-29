@@ -3,8 +3,8 @@
  * Handles GET requests for listing leads with filtering and pagination
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
 
 import endpoints from "./definition";
 import { leadsListRepository as repository } from "./repository";

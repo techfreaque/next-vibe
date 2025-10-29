@@ -4,17 +4,17 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import {
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
-import {
-  objectField,
-  responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { UserRole } from "../../user-roles/enum";

@@ -14,7 +14,7 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import React from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { UserRoleOptions } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { useUsersCreateEndpoint } from "@/app/api/[locale]/v1/core/users/create/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";

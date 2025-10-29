@@ -16,7 +16,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN bun install --frozen-lockfile --ignore-scripts
 
 # Build using vibe directly
-RUN bun src/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/vibe.ts build
+RUN bun src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe/vibe.ts build
 
 # Production stage
 FROM base AS runner

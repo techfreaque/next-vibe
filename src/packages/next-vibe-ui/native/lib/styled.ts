@@ -35,4 +35,3 @@ export const StyledAnimatedText = styled(Animated.Text, {
 export const StyledAnimatedScrollView = styled(Animated.ScrollView, {
   className: "style",
 });
-

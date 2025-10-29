@@ -12,7 +12,7 @@ import React, { useState } from "react";
 
 import { Logo } from "@/app/[locale]/_components/nav/logo";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -613,6 +613,7 @@ function FlatMessage({
                 <ToolCallDisplay
                   toolCalls={message.toolCalls}
                   locale={locale}
+                  hasContent={message.content.trim().length > 0}
                 />
               )}
 

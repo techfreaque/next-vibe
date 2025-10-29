@@ -12,10 +12,10 @@ import { useToast } from "next-vibe-ui/ui";
 import type { ChangeEvent } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import type { FormAlertState } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint-types";
-import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/types";
-import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-api-mutation-form";
+import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { FormAlertState } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
+import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/types";
+import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-api-mutation-form";
 import { useTranslation } from "@/i18n/core/client";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
@@ -68,7 +68,7 @@ export function useLogin(
 } {
   const { toast } = useToast();
   const router = useRouter();
-  const { refetch } = useUser(logger);
+  useUser(logger); // Keep user state in sync
   const { t, locale } = useTranslation();
 
   // Minimal state - only keep what can't be stored in the form
@@ -152,7 +152,7 @@ export function useLogin(
       persistForm: false,
     },
     {
-      onSuccess: async (data) => {
+      onSuccess: (data) => {
         try {
           logger.debug("app.api.v1.core.user.public.login.onSuccess.start", {
             data,
@@ -190,13 +190,16 @@ export function useLogin(
           const redirectTo: Route = (redirectParam ||
             `/${locale}/`) satisfies Route;
 
-          logger.debug("app.api.v1.core.user.public.login.refetch.start");
-          // Refetch user data after successful login
-          await refetch();
-          logger.debug("app.api.v1.core.user.public.login.refetch.success");
+          // Set auth status to enable user query on the next page
+          const authStatusResult = authClientRepository.setAuthStatus(logger);
+          if (!authStatusResult.success) {
+            logger.error("user.auth.status.set.failed", {
+              message: authStatusResult.message,
+              errorCode: authStatusResult.errorType.errorCode,
+            });
+          }
 
           // Navigate immediately - the new page will handle user data fetching
-          // Remove router.refresh() to prevent re-render loop
           logger.debug("app.api.v1.core.user.public.login.redirect", {
             redirectTo,
           });
@@ -239,7 +242,7 @@ export function useLogin(
   }
 
   // Generate alert state from error/success states
-  const alert = useMemo((): FormAlertState | null => {
+  const getAlert = (): FormAlertState | null => {
     // Check for account locked state
     if (isAccountLocked) {
       return {
@@ -282,13 +285,9 @@ export function useLogin(
     }
 
     return null;
-  }, [
-    isAccountLocked,
-    errorMessage,
-    responseMessage,
-    responseMessageParams,
-    responseSuccess,
-  ]);
+  };
+
+  const alert = getAlert();
 
   return {
     form: formResult.form,

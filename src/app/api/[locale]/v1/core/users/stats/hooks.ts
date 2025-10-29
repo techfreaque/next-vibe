@@ -7,12 +7,12 @@
 
 import { useCallback, useMemo } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type {
   EndpointReturn,
   FormAlertState,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint-types";
-import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
+import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { Countries, type CountryLanguage } from "@/i18n/core/config";
 
 import { UserRoleFilter, UserStatusFilter } from "../enum";

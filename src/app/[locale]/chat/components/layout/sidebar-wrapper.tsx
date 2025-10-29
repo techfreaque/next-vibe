@@ -10,7 +10,7 @@ import type {
   FolderUpdate,
   UseChatReturn,
 } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -39,7 +39,7 @@ interface SidebarWrapperProps {
   currentRootFolderId: string;
   currentSubFolderId: string | null;
   chat: UseChatReturn;
-  user: JwtPayloadType;
+  user: JwtPayloadType | undefined;
 }
 
 export function SidebarWrapper({

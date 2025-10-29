@@ -3,7 +3,7 @@ import * as path from "node:path";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import { I18N_PATH, INDEX_FILE } from "../constants";
 import type { TranslationObject } from "./key-usage-analyzer";
@@ -879,7 +879,7 @@ export class FileGenerator {
     // Remove leading underscore: _components -> components
     sanitized = sanitized.replace(/^_/, "");
 
-    // Convert kebab-case to camelCase: unified-ui -> unifiedUi
+    // Convert kebab-case to camelCase: unified-interface -> unifiedUi
     sanitized = sanitized.replace(/-([a-z])/g, (_, letter: string) =>
       letter.toUpperCase(),
     );

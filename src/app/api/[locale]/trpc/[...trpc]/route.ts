@@ -10,10 +10,10 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
 import { z } from "zod";
 
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { createTRPCContext } from "@/app/api/[locale]/v1/core/system/unified-interface/react/trpc-trpc-context";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import { createTRPCContext } from "@/app/api/[locale]/v1/core/system/unified-ui/react/trpc-trpc-context";
 import { appRouter } from "./router";
 
 /**

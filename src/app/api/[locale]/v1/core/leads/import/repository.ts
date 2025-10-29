@@ -18,7 +18,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { Countries, Languages } from "@/i18n/core/config";
 
 import { importRepository } from "../../import/repository";
@@ -83,7 +83,7 @@ export interface DomainImportRepository<T extends DomainRecord> {
       offset?: number;
     },
     logger: EndpointLogger,
-  ): Promise<ResponseType<unknown>>;
+  ): Promise<ResponseType<ImportJobsStatusGetResponseOutput>>;
 
   /**
    * Update import job with formatted response
@@ -542,7 +542,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
       offset?: number;
     },
     logger: EndpointLogger,
-  ) {
+  ): Promise<ResponseType<ImportJobsStatusGetResponseOutput>> {
     const response = await importRepository.listImportJobs(
       userId,
       {

@@ -345,9 +345,7 @@ export const getCsvImportJobStatusLabel = (
  * Get display label for Import Domain
  */
 export const getImportDomainLabel = (domain: ImportDomain): string => {
-  const option = ImportDomainOptions.find(
-    (opt) => opt.value === (domain as string),
-  );
+  const option = ImportDomainOptions.find((opt) => opt.value === domain);
   return option?.label || domain;
 };
 

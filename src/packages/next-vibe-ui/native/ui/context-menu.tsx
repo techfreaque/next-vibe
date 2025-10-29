@@ -9,26 +9,26 @@ import {
   View,
   type ViewStyle,
 } from "react-native";
-import { styled } from "nativewind";
 
+import { cn } from "../lib/utils";
 import { Check } from "./icons/Check";
 import { ChevronDown } from "./icons/ChevronDown";
 import { ChevronRight } from "./icons/ChevronRight";
 import { ChevronUp } from "./icons/ChevronUp";
-import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
 
 // Local styled components - use direct primitives to avoid type instantiation issues
 // The styled() function from nativewind has overly complex type inference for these components
-const StyledContextMenuSubTrigger = ContextMenuPrimitive.SubTrigger as any;
-const StyledContextMenuSubContent = ContextMenuPrimitive.SubContent as any;
-const StyledContextMenuContent = ContextMenuPrimitive.Content as any;
-const StyledContextMenuItem = ContextMenuPrimitive.Item as any;
-const StyledContextMenuCheckboxItem = ContextMenuPrimitive.CheckboxItem as any;
-const StyledContextMenuRadioItem = ContextMenuPrimitive.RadioItem as any;
-const StyledContextMenuLabel = ContextMenuPrimitive.Label as any;
-const StyledContextMenuSeparator = ContextMenuPrimitive.Separator as any;
-const StyledContextMenuItemIndicator = ContextMenuPrimitive.ItemIndicator as any;
+const StyledContextMenuSubTrigger = ContextMenuPrimitive.SubTrigger as typeof ContextMenuPrimitive.SubTrigger;
+const StyledContextMenuSubContent = ContextMenuPrimitive.SubContent as typeof ContextMenuPrimitive.SubContent;
+const StyledContextMenuContent = ContextMenuPrimitive.Content as typeof ContextMenuPrimitive.Content;
+const StyledContextMenuItem = ContextMenuPrimitive.Item as typeof ContextMenuPrimitive.Item;
+const StyledContextMenuCheckboxItem = ContextMenuPrimitive.CheckboxItem as typeof ContextMenuPrimitive.CheckboxItem;
+const StyledContextMenuRadioItem = ContextMenuPrimitive.RadioItem as typeof ContextMenuPrimitive.RadioItem;
+const StyledContextMenuLabel = ContextMenuPrimitive.Label as typeof ContextMenuPrimitive.Label;
+const StyledContextMenuSeparator = ContextMenuPrimitive.Separator as typeof ContextMenuPrimitive.Separator;
+const StyledContextMenuItemIndicator =
+  ContextMenuPrimitive.ItemIndicator as typeof ContextMenuPrimitive.ItemIndicator;
 
 const ContextMenu = ContextMenuPrimitive.Root;
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger;

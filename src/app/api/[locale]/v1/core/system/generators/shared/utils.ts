@@ -88,7 +88,7 @@ export function getRelativeImportPath(
 export function extractNestedPath(
   filePath: string,
   startMarker = "v1",
-  endMarker = "definition.ts",
+  endMarker?: string,
 ): string[] {
   const pathParts = filePath.split("/");
 
@@ -97,9 +97,23 @@ export function extractNestedPath(
     throw new Error(`Could not find ${startMarker} in path: ${filePath}`);
   }
 
-  const endIndex = pathParts.findIndex((p) => p === endMarker);
+  // If no end marker provided, auto-detect definition.ts or route.ts
+  let actualEndMarker = endMarker;
+  if (!actualEndMarker) {
+    if (pathParts.includes("definition.ts")) {
+      actualEndMarker = "definition.ts";
+    } else if (pathParts.includes("route.ts")) {
+      actualEndMarker = "route.ts";
+    } else {
+      throw new Error(
+        `Could not auto-detect end marker (definition.ts or route.ts) in path: ${filePath}`,
+      );
+    }
+  }
+
+  const endIndex = pathParts.findIndex((p) => p === actualEndMarker);
   if (endIndex === -1) {
-    throw new Error(`Could not find ${endMarker} in path: ${filePath}`);
+    throw new Error(`Could not find ${actualEndMarker} in path: ${filePath}`);
   }
 
   return pathParts.slice(startIndex + 1, endIndex);
@@ -168,4 +182,68 @@ export function generateFileHeader(
   lines.push(" */");
 
   return lines.join("\n");
+}
+
+/**
+ * Extract path from definition file for flat structure
+ * Returns both the path key and any aliases
+ */
+export function extractPathKey(
+  filePath: string,
+  startMarker = "v1",
+): { path: string; aliases: string[] } {
+  const nestedPath = extractNestedPath(filePath, startMarker);
+  const path = nestedPath.join("/");
+  const aliases: string[] = [];
+
+  // Generate aliases for common dynamic segment patterns
+  if (path.includes("[")) {
+    // Map of common parameter name variations
+    const commonAliases: Record<string, string[]> = {
+      "[id]": [":id", "{id}"],
+      "[threadId]": [":threadId", "{threadId}", "[thread_id]", ":thread_id"],
+      "[messageId]": [
+        ":messageId",
+        "{messageId}",
+        "[message_id]",
+        ":message_id",
+      ],
+      "[jobId]": [":jobId", "{jobId}", "[job_id]", ":job_id"],
+    };
+
+    // Generate aliases by replacing dynamic segments
+    for (const [bracket, replacements] of Object.entries(commonAliases)) {
+      if (path.includes(bracket)) {
+        for (const replacement of replacements) {
+          const alias = path.replaceAll(bracket, replacement);
+          aliases.push(alias);
+        }
+      }
+    }
+
+    // Also add underscore version of camelCase paths
+    const underscorePath = path.replace(
+      /\[([a-z]+)([A-Z][a-z]+)\]/g,
+      (_match, p1, p2) => {
+        return `[${p1.toLowerCase()}_${p2.toLowerCase()}]`;
+      },
+    );
+    if (underscorePath !== path && !aliases.includes(underscorePath)) {
+      aliases.push(underscorePath);
+    }
+  }
+
+  return { path, aliases };
+}
+
+/**
+ * Generate absolute import path for definition or route file
+ */
+export function generateAbsoluteImportPath(
+  filePath: string,
+  fileType: "definition" | "route",
+): string {
+  const nestedPath = extractNestedPath(filePath);
+  const pathStr = nestedPath.join("/");
+  return `@/app/api/[locale]/v1/${pathStr}/${fileType}`;
 }

@@ -2,9 +2,10 @@
  * STUB: form/form-alert
  * Auto-generated placeholder for web-only form component
  */
+import type { JSX } from "react";
 import { Text, View } from "react-native";
 
-export function FormAlert(props: Record<string, unknown>) {
+export function FormAlert(_props: Record<string, unknown>): JSX.Element {
   console.warn("🔶 Using stub: FormAlert");
   return (
     <View style={{ padding: 8, backgroundColor: "#FEF3C7", marginVertical: 4 }}>

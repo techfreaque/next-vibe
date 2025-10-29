@@ -2,7 +2,7 @@ import type { Config } from "drizzle-kit";
 
 // Directly use process.env without validation for drizzle-kit
 // This avoids circular dependencies with env validation
-// eslint-disable-next-line node/no-process-env
+
 const DATABASE_URL = process.env["DATABASE_URL"];
 
 if (!DATABASE_URL) {

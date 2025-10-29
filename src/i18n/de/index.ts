@@ -5,12 +5,12 @@ import { translations as coreTranslations } from "../core/i18n/de";
 import type enTranslations from "../en";
 
 const deTranslations: typeof enTranslations = {
-  app: apiTranslations,
+  "app": apiTranslations,
   "app-native": appNativeTranslations,
-  i18n: {
+  "i18n": {
     core: coreTranslations,
   },
-  packages: packagesTranslations,
+  "packages": packagesTranslations,
 };
 
 export default deTranslations;

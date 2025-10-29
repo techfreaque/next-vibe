@@ -7,11 +7,8 @@ import { and, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-import {
-  createMockUser,
-  getCliUserEmail,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/auth/cli-user-factory";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import { getCliUserEmail } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/auth/cli-user";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 

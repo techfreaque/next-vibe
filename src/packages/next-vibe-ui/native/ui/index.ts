@@ -267,9 +267,5 @@ export {
   toggleVariants,
 } from "./toggle";
 export { ToggleGroup, ToggleGroupIcon, ToggleGroupItem } from "./toggle-group";
-export {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "./tooltip";
+export { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 export { BlockQuote, Code, Large, Lead, Muted, Small } from "./typography";

@@ -3,7 +3,7 @@
  * Enums for vibe check system functionality
  */
 
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enum-helpers";
+import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/enum";
 
 /**
  * Check Type

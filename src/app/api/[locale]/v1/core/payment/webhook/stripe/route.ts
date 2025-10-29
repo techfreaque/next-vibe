@@ -11,7 +11,7 @@ import { NextResponse } from "next/server";
 import { parseError } from "next-vibe/shared/utils";
 import { Environment } from "next-vibe/shared/utils/env-util";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 
 import { paymentRepository } from "../../repository";

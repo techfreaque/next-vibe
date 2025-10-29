@@ -22,8 +22,8 @@ import {
   ErrorResponseTypes,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import { nativeEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react-native/native-endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import { nativeEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react-native/native-endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NewUser, User } from "./db";

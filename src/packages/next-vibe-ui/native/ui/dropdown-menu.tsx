@@ -9,26 +9,27 @@ import {
   View,
   type ViewStyle,
 } from "react-native";
-import { styled } from "nativewind";
 
+import { cn } from "../lib/utils";
 import { Check } from "./icons/Check";
 import { ChevronDown } from "./icons/ChevronDown";
 import { ChevronRight } from "./icons/ChevronRight";
 import { ChevronUp } from "./icons/ChevronUp";
-import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
 
 // Local styled components - use direct primitives to avoid type instantiation issues
 // The styled() function from nativewind has overly complex type inference for these components
-const StyledDropdownMenuSubTrigger = DropdownMenuPrimitive.SubTrigger as any;
-const StyledDropdownMenuSubContent = DropdownMenuPrimitive.SubContent as any;
-const StyledDropdownMenuContent = DropdownMenuPrimitive.Content as any;
-const StyledDropdownMenuItem = DropdownMenuPrimitive.Item as any;
-const StyledDropdownMenuCheckboxItem = DropdownMenuPrimitive.CheckboxItem as any;
-const StyledDropdownMenuRadioItem = DropdownMenuPrimitive.RadioItem as any;
-const StyledDropdownMenuLabel = DropdownMenuPrimitive.Label as any;
-const StyledDropdownMenuSeparator = DropdownMenuPrimitive.Separator as any;
-const StyledDropdownMenuItemIndicator = DropdownMenuPrimitive.ItemIndicator as any;
+const StyledDropdownMenuSubTrigger = DropdownMenuPrimitive.SubTrigger as typeof DropdownMenuPrimitive.SubTrigger;
+const StyledDropdownMenuSubContent = DropdownMenuPrimitive.SubContent as typeof DropdownMenuPrimitive.SubContent;
+const StyledDropdownMenuContent = DropdownMenuPrimitive.Content as typeof DropdownMenuPrimitive.Content;
+const StyledDropdownMenuItem = DropdownMenuPrimitive.Item as typeof DropdownMenuPrimitive.Item;
+const StyledDropdownMenuCheckboxItem =
+  DropdownMenuPrimitive.CheckboxItem as typeof DropdownMenuPrimitive.CheckboxItem;
+const StyledDropdownMenuRadioItem = DropdownMenuPrimitive.RadioItem as typeof DropdownMenuPrimitive.RadioItem;
+const StyledDropdownMenuLabel = DropdownMenuPrimitive.Label as typeof DropdownMenuPrimitive.Label;
+const StyledDropdownMenuSeparator = DropdownMenuPrimitive.Separator as typeof DropdownMenuPrimitive.Separator;
+const StyledDropdownMenuItemIndicator =
+  DropdownMenuPrimitive.ItemIndicator as typeof DropdownMenuPrimitive.ItemIndicator;
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -52,7 +53,8 @@ const DropdownMenuSubTrigger = React.forwardRef<
   const { open } = DropdownMenuPrimitive.useSubContext();
   const Icon =
     Platform.OS === "web" ? ChevronRight : open ? ChevronUp : ChevronDown;
-  const renderedChildren = typeof children === "function" ? children({ open } as any) : children;
+  const renderedChildren =
+    typeof children === "function" ? children({ open } as any) : children;
   return (
     <TextClassContext.Provider
       value={cn(
@@ -178,7 +180,8 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   DropdownMenuPrimitive.CheckboxItemRef,
   DropdownMenuPrimitive.CheckboxItemProps & { className?: string }
 >(({ className, children, checked, ...props }, ref) => {
-  const renderedChildren = typeof children === "function" ? children({ checked } as any) : children;
+  const renderedChildren =
+    typeof children === "function" ? children({ checked } as any) : children;
   return (
     <StyledDropdownMenuCheckboxItem
       ref={ref}
@@ -206,7 +209,10 @@ const DropdownMenuRadioItem = React.forwardRef<
   DropdownMenuPrimitive.RadioItemRef,
   DropdownMenuPrimitive.RadioItemProps & { className?: string }
 >(({ className, children, ...props }, ref) => {
-  const renderedChildren = typeof children === "function" ? children({ checked: props.value === props.value } as any) : children;
+  const renderedChildren =
+    typeof children === "function"
+      ? children({ checked: props.value === props.value } as any)
+      : children;
   return (
     <StyledDropdownMenuRadioItem
       ref={ref}

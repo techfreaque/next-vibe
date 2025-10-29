@@ -21,15 +21,15 @@ import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error"
 import { subscriptions } from "@/app/api/[locale]/v1/core/subscription/db";
 import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import type {
   CreditBalance,
   CreditIdentifier,
-} from "../system/unified-backend/shared/credits/base-credit-handler";
-import { BaseCreditHandler } from "../system/unified-backend/shared/credits/base-credit-handler";
+} from "../system/unified-interface/shared/server-only/credits/handler";
+import { BaseCreditHandler } from "../system/unified-interface/shared/server-only/credits/handler";
 import { creditTransactions, userCredits } from "./db";
 import { CreditTypeIdentifier, type CreditTypeIdentifierValue } from "./enum";
 
@@ -91,11 +91,12 @@ export interface CreditRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ leadId: string; credits: number }>>;
 
-  // Add credits (purchase or subscription) - legacy signature
+  // Add credits (purchase or subscription)
   addUserCredits(
     userId: string,
     amount: number,
     type: "subscription" | "permanent" | "free",
+    logger: EndpointLogger,
     expiresAt?: Date,
   ): Promise<ResponseType<void>>;
 
@@ -301,19 +302,42 @@ class CreditRepository
         return identifierResult;
       }
 
-      const { userId: effectiveUserId, leadId: effectiveLeadId } =
-        identifierResult.data;
+      const {
+        userId: effectiveUserId,
+        leadId: effectiveLeadId,
+        creditType,
+      } = identifierResult.data;
 
       // If user has subscription → return user credits
-      if (effectiveUserId && effectiveLeadId) {
+      if (
+        creditType === CreditTypeIdentifier.USER_SUBSCRIPTION &&
+        effectiveUserId
+      ) {
+        // For subscription users, we need to get their primary leadId
+        const [userLead] = await db
+          .select()
+          .from(userLeads)
+          .where(eq(userLeads.userId, effectiveUserId))
+          .limit(1);
+
+        if (!userLead) {
+          logger.error("No lead found for subscription user", {
+            userId: effectiveUserId,
+          });
+          return createErrorResponse(
+            "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
+            ErrorResponseTypes.NOT_FOUND,
+          );
+        }
+
         return await this.getBalance(
-          { leadId: effectiveLeadId, userId: effectiveUserId },
+          { leadId: userLead.leadId, userId: effectiveUserId },
           logger,
         );
       }
 
       // If user has no subscription → return lead credits
-      if (effectiveLeadId) {
+      if (creditType === CreditTypeIdentifier.LEAD_FREE && effectiveLeadId) {
         const leadBalanceResult = await this.getLeadBalance(effectiveLeadId);
 
         if (!leadBalanceResult.success) {
@@ -333,6 +357,11 @@ class CreditRepository
       }
 
       // Should never reach here
+      logger.error("Invalid credit type or missing identifiers", {
+        creditType,
+        effectiveUserId,
+        effectiveLeadId,
+      });
       return createErrorResponse(
         "app.api.v1.core.agent.chat.credits.errors.noCreditSource",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -456,6 +485,7 @@ class CreditRepository
         identifier.userId,
         amount,
         type as "subscription" | "permanent" | "free",
+        logger,
       );
     }
 
@@ -517,6 +547,7 @@ class CreditRepository
     userId: string,
     amount: number,
     type: "subscription" | "permanent" | "free",
+    logger: EndpointLogger,
     expiresAt?: Date,
   ): Promise<ResponseType<void>> {
     try {
@@ -536,6 +567,12 @@ class CreditRepository
 
       return createSuccessResponse(undefined);
     } catch (error) {
+      logger.error("Failed to add user credits", {
+        userId,
+        amount,
+        type,
+        error: parseError(error),
+      });
       return createErrorResponse(
         "app.api.v1.core.agent.chat.credits.errors.addCreditsFailed",
         ErrorResponseTypes.INTERNAL_ERROR,

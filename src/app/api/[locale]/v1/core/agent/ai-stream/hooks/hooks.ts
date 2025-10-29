@@ -12,7 +12,7 @@ import { useCallback, useRef } from "react";
 import type {
   EndpointLogger,
   LoggerMetadata,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -306,6 +306,8 @@ export function useAIStream(
                   model: eventData.model,
                   persona: eventData.persona,
                   isStreaming: eventData.role === ChatMessageRole.ASSISTANT,
+                  sequenceId: eventData.sequenceId,
+                  sequenceIndex: eventData.sequenceIndex,
                 });
 
                 // Save to localStorage if incognito mode
@@ -353,16 +355,20 @@ export function useAIStream(
                         depth: eventData.depth,
                         authorId: "incognito",
                         authorName: null,
-                        isAI: eventData.role === ChatMessageRole.ASSISTANT,
+                        isAI:
+                          eventData.role === ChatMessageRole.ASSISTANT ||
+                          eventData.role === ChatMessageRole.TOOL,
                         model: eventData.model ?? null,
                         persona: eventData.persona ?? null,
                         errorType: null,
                         errorMessage: null,
                         edited: false,
                         tokens: null,
-                        toolCalls: null,
+                        toolCalls: eventData.toolCalls ?? null,
                         upvotes: null,
                         downvotes: null,
+                        sequenceId: eventData.sequenceId ?? null,
+                        sequenceIndex: eventData.sequenceIndex ?? 0,
                         createdAt: new Date(),
                         updatedAt: new Date(),
                       });
@@ -387,14 +393,18 @@ export function useAIStream(
                           depth: eventData.depth,
                           authorId: "incognito",
                           authorName: null,
-                          isAI: eventData.role === ChatMessageRole.ASSISTANT,
+                          isAI:
+                            eventData.role === ChatMessageRole.ASSISTANT ||
+                            eventData.role === ChatMessageRole.TOOL,
                           model: eventData.model ?? null,
+                          sequenceId: eventData.sequenceId ?? null,
+                          sequenceIndex: eventData.sequenceIndex ?? 0,
                           persona: eventData.persona ?? null,
                           errorType: null,
                           errorMessage: null,
                           edited: false,
                           tokens: null,
-                          toolCalls: null,
+                          toolCalls: eventData.toolCalls ?? null,
                           upvotes: null,
                           downvotes: null,
                           createdAt: new Date(),
@@ -477,6 +487,8 @@ export function useAIStream(
                           toolCalls: currentMessage.toolCalls ?? null,
                           upvotes: null,
                           downvotes: null,
+                          sequenceId: currentMessage.sequenceId ?? null,
+                          sequenceIndex: currentMessage.sequenceIndex ?? 0,
                           createdAt: new Date(),
                           updatedAt: new Date(),
                         });
@@ -572,6 +584,8 @@ export function useAIStream(
                             toolCalls: currentMessage.toolCalls ?? null,
                             upvotes: null,
                             downvotes: null,
+                            sequenceId: currentMessage.sequenceId ?? null,
+                            sequenceIndex: currentMessage.sequenceIndex ?? 0,
                             createdAt: new Date(),
                             updatedAt: new Date(),
                           });
@@ -809,6 +823,8 @@ export function useAIStream(
                             metadata: {},
                             upvotes: 0,
                             downvotes: 0,
+                            sequenceId: message.sequenceId ?? null,
+                            sequenceIndex: message.sequenceIndex ?? 0,
                             createdAt: new Date(),
                             updatedAt: new Date(),
                             searchVector: null,

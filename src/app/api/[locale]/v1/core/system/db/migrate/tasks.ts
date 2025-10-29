@@ -4,7 +4,7 @@
  * MIGRATED TO NEW UNIFIED FORMAT
  */
 
-import type { Task } from "../../unified-backend/tasks/types/repository";
+import type { Task } from "../../unified-interface/tasks/types/repository";
 
 /**
  * Database Migration Health Check Cron Task

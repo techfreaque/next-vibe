@@ -2,12 +2,12 @@
 import type { Route } from "next";
 import type { RouteType } from "next/dist/lib/load-custom-routes";
 import { LOCALE_COOKIE_NAME } from "next-vibe/shared/constants";
-import { storage } from "next-vibe-ui/ui/storage";
 import { usePathname, useRouter } from "next-vibe-ui/hooks";
+import { storage } from "next-vibe-ui/ui/storage";
 import type { JSX, ReactNode } from "react";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-import { setCookie } from "@/app/api/[locale]/v1/core/system/unified-ui/react/storage-cookie-client";
+import { setCookie } from "@/app/api/[locale]/v1/core/system/unified-interface/react/storage-cookie-client";
 
 import { languageConfig } from "..";
 import type { CountryInfo, CountryLanguage } from "./config";

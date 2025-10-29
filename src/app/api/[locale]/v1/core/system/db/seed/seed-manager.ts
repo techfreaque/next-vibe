@@ -2,8 +2,8 @@ import path from "node:path";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import { findSeedFiles as findSeedFilesUtil } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/filesystem/directory-scanner";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { findSeedFiles as findSeedFilesUtil } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/filesystem/scanner";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 export type SeedFn = (

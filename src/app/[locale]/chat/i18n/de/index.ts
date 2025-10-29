@@ -480,6 +480,11 @@ export const translations: typeof enTranslations = {
       next: "Nächster Zweig",
     },
   },
+  reasoning: {
+    title: "Denken",
+    multiple: "{{count}} Denkschritte",
+    step: "Schritt {{number}}",
+  },
   modelUtilities: {
     general: "Allgemeiner Chat",
     coding: "Programmierung & Entwicklung",
@@ -789,7 +794,9 @@ export const translations: typeof enTranslations = {
       query: "Anfrage",
     },
     multiple: "{{count}} Tool-Aufrufe",
+    arguments: "Argumente",
     result: "Ergebnis",
+    error: "Fehler",
   },
   threadList: {
     deleteDialog: {

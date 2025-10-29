@@ -22,7 +22,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
@@ -34,9 +34,9 @@ import { db } from "../../system/db";
 import {
   type AuthContext,
   type AuthPlatform,
-} from "../../system/unified-backend/shared/auth/base-auth-handler";
-import { getPlatformAuthHandler } from "../../system/unified-backend/shared/auth/platform-auth-factory";
-import { detectPlatformFromRequest } from "../../system/unified-backend/shared/auth/platform-detection";
+} from "../../system/unified-interface/shared/server-only/auth/base-auth-handler";
+import { getPlatformAuthHandler } from "../../system/unified-interface/shared/server-only/auth/factory";
+import { detectPlatformFromRequest } from "../../system/unified-interface/shared/auth/platform-detection";
 import { users } from "../db";
 import { UserDetailLevel } from "../enum";
 import { sessionRepository } from "../private/session/repository";
@@ -516,11 +516,30 @@ class AuthRepositoryImpl implements AuthRepository {
         logger,
       );
       if (!userRolesResponse.success) {
-        // If we can't get user roles, but PUBLIC is allowed, return public user
-        if (requiredRoles.includes(UserRole.PUBLIC)) {
-          return createPublicUser<TRoles>(leadId);
+        // If we can't get user roles, but the user is authenticated,
+        // treat them as a CUSTOMER (all authenticated users have CUSTOMER role)
+        logger.warn("app.api.v1.core.user.auth.debug.failedToGetUserRoles", {
+          userId,
+          leadId,
+        });
+        // If CUSTOMER role is in required roles, return authenticated user
+        if (requiredRoles.includes(UserRole.CUSTOMER)) {
+          return createPrivateUser<TRoles>(userId, leadId);
         }
-        // Otherwise, return public user (will be rejected by endpoint handler)
+        // If PUBLIC role is in required roles, return authenticated user
+        // (authenticated users can access PUBLIC endpoints)
+        if (requiredRoles.includes(UserRole.PUBLIC)) {
+          return createPrivateUser<TRoles>(userId, leadId);
+        }
+        // Otherwise, user doesn't have required roles
+        logger.error(
+          "app.api.v1.core.user.auth.debug.userDoesNotHaveRequiredRoles",
+          {
+            userId,
+            leadId,
+            requiredRoles: [...requiredRoles] as string[],
+          },
+        );
         return createPublicUser<TRoles>(leadId);
       }
 
@@ -533,21 +552,36 @@ class AuthRepositoryImpl implements AuthRepository {
         return createPrivateUser<TRoles>(userId, leadId);
       }
 
-      // User doesn't have required roles - if PUBLIC is allowed, return public user
+      // User doesn't have required roles
+      // If CUSTOMER role is in required roles, we already handled it above
+      // If PUBLIC role is in required roles, the user is still authenticated
+      // so we should return the authenticated user, not downgrade to public
       if (requiredRoles.includes(UserRole.PUBLIC)) {
-        return createPublicUser<TRoles>(leadId);
+        // User is authenticated but doesn't have the specific role
+        // However, since PUBLIC is allowed, we can return the authenticated user
+        // as they have at least CUSTOMER role (all authenticated users have CUSTOMER)
+        return createPrivateUser<TRoles>(userId, leadId);
       }
 
-      // Otherwise, return public user (will be rejected by endpoint handler)
+      // User doesn't have required roles and PUBLIC is not allowed
+      logger.error(
+        "app.api.v1.core.user.auth.debug.userDoesNotHaveRequiredRoles",
+        {
+          userId,
+          leadId,
+          requiredRoles: [...requiredRoles] as string[],
+          userRoles: userRolesResponse.data.map((r) => r.role),
+        },
+      );
       return createPublicUser<TRoles>(leadId);
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorCheckingUserAuth",
         parseError(error),
       );
-      // If there's an error but PUBLIC is allowed, return public user
+      // If there's an error but PUBLIC is allowed, return authenticated user
       if (requiredRoles.includes(UserRole.PUBLIC)) {
-        return createPublicUser<TRoles>(leadId);
+        return createPrivateUser<TRoles>(userId, leadId);
       }
       // Otherwise, return public user (will be rejected by endpoint handler)
       return createPublicUser<TRoles>(leadId);
@@ -814,25 +848,15 @@ class AuthRepositoryImpl implements AuthRepository {
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     try {
-      // Locale is required for lead creation
-      if (!context.locale) {
-        logger.error("app.api.v1.core.user.auth.debug.missingLocaleInContext");
-        // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
-        throw new Error("Locale is required in AuthContext for lead creation");
-      }
-
-      // Default to Next.js platform for backward compatibility
-      const platform = context.platform || "next";
-
       // Get platform-specific auth handler
-      const authHandler = getPlatformAuthHandler(platform);
+      const authHandler = getPlatformAuthHandler(context.platform);
 
       // Authenticate using platform handler
       const authResult = await authHandler.authenticate(context, logger);
 
       if (!authResult.success) {
         logger.error("Platform authentication failed", {
-          platform,
+          platform: context.platform,
           error: authResult.message,
         });
         const leadId = await authHandler.getLeadIdFromDb(
@@ -857,7 +881,7 @@ class AuthRepositoryImpl implements AuthRepository {
         if (roles.includes(UserRole.PUBLIC as TRoles[number])) {
           return jwtPayload as InferUserType<TRoles>;
         }
-        logger.error("Public user not allowed for this endpoint", {
+        logger.debug("Public user not allowed for this endpoint", {
           roles: JSON.stringify(roles),
         });
         return throwErrorResponse(
@@ -874,7 +898,7 @@ class AuthRepositoryImpl implements AuthRepository {
         logger,
       );
     } catch (error) {
-      logger.error(
+      logger.debug(
         "app.api.v1.core.user.auth.debug.errorInUnifiedGetAuthMinimalUser",
         parseError(error),
       );
@@ -924,14 +948,16 @@ class AuthRepositoryImpl implements AuthRepository {
         },
       );
 
-      // Public role is always allowed, or if no roles specified (empty array means public)
-      if (roles.includes(UserRole.PUBLIC) || roles.length === 0) {
-        // Use leadId from payload (always present)
-        return createPublicUser<TRoles>(jwtPayload.leadId);
-      }
-
-      // Check if user is public
+      // This method is only called for private users (isPublic: false)
+      // If somehow a public user reaches here, it's an error
       if (jwtPayload.isPublic || !jwtPayload.id) {
+        logger.error(
+          "app.api.v1.core.user.auth.debug.publicUserInPrivateAuthMethod",
+          {
+            isPublic: jwtPayload.isPublic,
+            hasId: !!jwtPayload.id,
+          },
+        );
         // Use leadId from payload (always present)
         return createPublicUser<TRoles>(jwtPayload.leadId);
       }
@@ -939,9 +965,16 @@ class AuthRepositoryImpl implements AuthRepository {
       // Use leadId from payload (always present)
       const leadId = jwtPayload.leadId;
 
+      // TypeScript narrowing: we've already checked !jwtPayload.id above
+      const userId = jwtPayload.id;
+      if (!userId) {
+        // This should never happen due to check above, but satisfies TypeScript
+        return createPublicUser<TRoles>(leadId);
+      }
+
       // Use internal method to check authentication with roles
       return await this.getAuthenticatedUserInternal(
-        jwtPayload.id,
+        userId,
         leadId,
         roles,
         logger,

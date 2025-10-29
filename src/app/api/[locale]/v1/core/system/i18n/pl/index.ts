@@ -8,8 +8,8 @@ import { translations as launchpadTranslations } from "../../launchpad/i18n/pl";
 import { translations as releaseToolTranslations } from "../../release-tool/i18n/pl";
 import { translations as serverTranslations } from "../../server/i18n/pl";
 import { translations as translationsTranslations } from "../../translations/i18n/pl";
-import { translations as unifiedBackendTranslations } from "../../unified-backend/i18n/pl";
-import { translations as unifiedUiTranslations } from "../../unified-ui/i18n/pl";
+import { translations as unifiedBackendTranslations } from "../../unified-interface/i18n/pl";
+import { translations as unifiedUiTranslations } from "../../unified-interface/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {

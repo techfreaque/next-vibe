@@ -8,7 +8,7 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import loginDefinitions from "@/app/api/[locale]/v1/core/user/public/login/definition";
 import { useLogin } from "@/app/api/[locale]/v1/core/user/public/login/hooks";
 import type { LoginOptions } from "@/app/api/[locale]/v1/core/user/public/login/repository";

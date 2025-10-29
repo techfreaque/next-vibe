@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import { withTransaction } from "@/app/api/[locale]/v1/core/system/db/utils/repository-helpers";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import {
   convertCountryFilter,
   convertLanguageFilter,
@@ -1349,17 +1349,37 @@ class LeadsRepositoryImpl implements LeadsRepository {
             updateData.convertedAt = new Date();
             updateData.signedUpAt = new Date();
 
-            // Create user-lead relationship record
-            await tx.insert(userLeads).values({
-              userId: options.userId,
-              leadId: existingLead.id,
-              isPrimary: true,
-            });
+            // Check if user-lead relationship already exists
+            const [existingRelationship] = await tx
+              .select()
+              .from(userLeads)
+              .where(
+                and(
+                  eq(userLeads.userId, options.userId),
+                  eq(userLeads.leadId, existingLead.id),
+                ),
+              )
+              .limit(1);
 
-            logger.debug("User-lead relationship created (internal)", {
-              userId: options.userId,
-              leadId: existingLead.id,
-            });
+            if (!existingRelationship) {
+              // Create user-lead relationship record only if it doesn't exist
+              await tx.insert(userLeads).values({
+                userId: options.userId,
+                leadId: existingLead.id,
+                isPrimary: true,
+              });
+
+              logger.debug("User-lead relationship created (internal)", {
+                userId: options.userId,
+                leadId: existingLead.id,
+              });
+            } else {
+              logger.debug("User-lead relationship already exists (internal)", {
+                userId: options.userId,
+                leadId: existingLead.id,
+                relationshipId: existingRelationship.id,
+              });
+            }
           }
 
           // Apply updates

@@ -162,13 +162,13 @@ export function createStreamingResponse(response: Response): StreamingResponse {
  * Type guard to check if a response is a streaming response
  */
 export function isStreamingResponse(
-  value: unknown,
+  value: Record<string, string | number | boolean | null | object>,
 ): value is StreamingResponse {
   return (
     typeof value === "object" &&
     value !== null &&
     "__isStreamingResponse" in value &&
-    value.__isStreamingResponse === true
+    (value as Record<string, boolean>).__isStreamingResponse === true
   );
 }
 
