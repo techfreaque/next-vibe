@@ -103,7 +103,7 @@ export function isEmptySchema(schema: z.ZodSchema): boolean {
  * Check if schema expects never type specifically
  */
 export function isNeverSchema(schema: z.ZodSchema): boolean {
-  const testResult = schema.safeParse({},
+  const testResult = schema.safeParse({});
   return (
     !testResult.success &&
     testResult.error?.issues?.[0]?.code === "invalid_type"
@@ -153,7 +153,7 @@ export function mergeWithDefaults<T>(
   logger: EndpointLogger,
 ): Partial<T> | T {
   try {
-    const defaultsResult = schema.safeParse({},
+    const defaultsResult = schema.safeParse({});
     if (defaultsResult.success) {
       return {
         ...defaultsResult.data,
@@ -192,7 +192,7 @@ export function createUrlValidationError(error: string): ResponseType<never> {
     errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
     messageParams: {
       error,
-    });
+    },
   };
 }
 
@@ -208,7 +208,7 @@ export function createRequestValidationError(
     errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
     messageParams: {
       error,
-    });
+    },
   };
 }
 

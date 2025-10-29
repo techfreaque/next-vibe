@@ -103,7 +103,7 @@ export function useWidgetActions<
       metadata: {
         ...metadata,
         timestamp: Date.now(),
-      });
+      },
     };
 
     try {

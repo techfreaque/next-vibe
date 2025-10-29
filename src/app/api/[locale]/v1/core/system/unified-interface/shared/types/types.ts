@@ -14,7 +14,7 @@ import type {
   FieldActions,
   InteractiveActions,
   LifecycleActions,
-} from "../../unified-interface/shared/types/endpoint";
+} from "./endpoint";
 import type {
   CardLayout,
   ComponentSize,
@@ -27,7 +27,7 @@ import type {
   TextAlign,
   ValidationMode,
   WidgetType,
-} from "../../unified-interface/shared/types/enums";
+} from "./enums";
 
 // ============================================================================
 // LAYOUT CONFIGURATION

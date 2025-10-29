@@ -44,8 +44,8 @@ const { POST } = createEndpoint({
       description:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
-    });
-    { request: "data", response: true });
+    },
+    { request: "data", response: true },
     {
       name: requestDataField(
         {
@@ -78,7 +78,7 @@ const { POST } = createEndpoint({
               label:
                 "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.result.content.type" as const,
               type: FieldDataType.TEXT,
-            });
+            },
             {
               key: "text",
               label:
@@ -91,12 +91,12 @@ const { POST } = createEndpoint({
           {
             type: WidgetType.CONTAINER,
             layout: { type: LayoutType.VERTICAL },
-          });
-          { response: true });
+          },
+          { response: true },
           {
             type: responseField({ type: WidgetType.TEXT }, z.literal("text")),
             text: responseField({ type: WidgetType.TEXT }, z.string()),
-          });
+          },
         ),
       ),
       isError: responseField(
@@ -106,7 +106,7 @@ const { POST } = createEndpoint({
         },
         z.boolean(),
       ),
-    });
+    },
   ),
 
   // === ERROR HANDLING ===
@@ -116,56 +116,56 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.validation.title",
       description:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.validation.description",
-    });
+    },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.network.title",
       description:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.network.description",
-    });
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.unauthorized.description",
-    });
+    },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.forbidden.title",
       description:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.forbidden.description",
-    });
+    },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.notFound.title",
       description:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.notFound.description",
-    });
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.server.title",
       description:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.server.description",
-    });
+    },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.unknown.title",
       description:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.unknown.description",
-    });
+    },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.unsavedChanges.title",
       description:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.unsavedChanges.description",
-    });
+    },
     [EndpointErrorTypes.CONFLICT]: {
       title:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.conflict.title",
       description:
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.conflict.description",
-    });
-  });
+    },
+  },
 
   // === SUCCESS HANDLING ===
   successTypes: {
@@ -180,17 +180,17 @@ const { POST } = createEndpoint({
       default: {
         name: "core:system:db:ping",
         arguments: {},
-      });
+      },
     },
     responses: {
       default: {
         content: [{ type: "text" as const, text: '{"success": true}' }],
         isError: false,
-      });
+      },
     },
     urlPathParams: undefined,
-  });
-},
+  },
+});
 
 const executeDefinition = { POST };
 

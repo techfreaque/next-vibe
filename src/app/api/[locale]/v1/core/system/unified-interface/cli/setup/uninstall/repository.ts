@@ -14,7 +14,6 @@ import path from "node:path";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -61,8 +60,8 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
           error: t(
             "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.unauthorized.description",
           ),
-        });
-      );
+        },
+      });
     }
 
     try {
@@ -108,8 +107,9 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
           "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
-          error: parsedError.message });
-      );
+          error: parsedError.message,
+        },
+      });
     }
   }
 
@@ -124,9 +124,9 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
       const output = await this.runCommand(command, ["vibe"], {
         verbose: false,
         ignoreErrors: true,
-      },
+      });
 
-      if (output?.trim()) {
+      if (output) {
         // Get version
         let version: string | undefined;
         try {
@@ -161,7 +161,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
       cwd?: string;
       verbose?: boolean;
       ignoreErrors?: boolean;
-    } = {});
+    } = {},
   ): Promise<string> {
     return await new Promise((resolve, reject) => {
       const childProcess = spawn(command, args, {
@@ -169,7 +169,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
         stdio: options.verbose ? "inherit" : "pipe",
         shell: false,
         env: { NODE_ENV: "development" },
-      },
+      });
 
       let output = "";
       let errorOutput = "";
@@ -177,7 +177,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
       if (!options.verbose) {
         childProcess.stdout?.on("data", (data: Buffer) => {
           output += data.toString();
-        },
+        });
 
         childProcess.stderr?.on("data", (data: Buffer) => {
           errorOutput += data.toString();
@@ -190,7 +190,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
         } else {
           reject(new Error(errorOutput || output || String(code)));
         }
-      },
+      });
 
       childProcess.on("error", (error: Error) => {
         if (!options.ignoreErrors) {

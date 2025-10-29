@@ -251,8 +251,6 @@ export const appRouter = router({
             pulse: router({ ...route33 }),
             "unified-runner": router({ ...route34 }),
           }),
-        }),
-        "unified-interface": router({
           cli: router({
             setup: router({
               uninstall: router({ ...route35 }),

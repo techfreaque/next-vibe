@@ -6,9 +6,9 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { isErrorResponseType } from "next-vibe/shared/utils/parse-error";
@@ -62,7 +62,7 @@ export function useApiForm<
     TEndpoint["TRequestOutput"],
     TEndpoint["TResponseOutput"],
     TEndpoint["TUrlVariablesOutput"]
-  > = {}
+  > = {},
 ): ApiFormReturn<
   TEndpoint["TRequestOutput"],
   TEndpoint["TResponseOutput"],
@@ -215,7 +215,7 @@ export function useApiForm<
           }
         }, debounceMs);
       }
-    }
+    });
 
     return (): void => {
       subscription.unsubscribe();
@@ -227,12 +227,12 @@ export function useApiForm<
 
   // Error management functions
   const clearFormError = useCallback(
-    () => clearFormErrorStore(formId}),
+    () => clearFormErrorStore(formId),
     [clearFormErrorStore, formId],
   );
 
   const setError = useCallback(
-    (error: ErrorResponseType | null) => setFormErrorStore(formId, error}),
+    (error: ErrorResponseType | null) => setFormErrorStore(formId, error),
     [setFormErrorStore, formId],
   );
 
@@ -240,7 +240,7 @@ export function useApiForm<
   const setErrorType = useCallback(
     (error: ErrorResponseType | null): void => {
       setError(error);
-    });
+    },
     [setError],
   );
 
@@ -256,7 +256,7 @@ export function useApiForm<
         >,
   ): void => {
     logger.debug("submitForm called", {
-      endpoint: endpoint.path.join("/"}),
+      endpoint: endpoint.path.join("/"),
       eventType: event?.type,
       hasEvent: !!event,
     });
@@ -264,16 +264,16 @@ export function useApiForm<
     // Prevent default form submission behavior
     if (event) {
       logger.debug("Preventing default form submission", {
-        endpoint: endpoint.path.join("/"}),
-      },
+        endpoint: endpoint.path.join("/"),
+      });
       event.preventDefault();
     }
 
     const _submitForm = async (validatedData: FormData): Promise<void> => {
       logger.debug("_submitForm called with validated data", {
-        endpoint: endpoint.path.join("/"}),
+        endpoint: endpoint.path.join("/"),
         validatedData,
-      },
+      });
       try {
         // Clear any previous errors
         clearFormError();
@@ -284,7 +284,7 @@ export function useApiForm<
           logger,
           validatedData,
           (options?.urlParamVariables as TEndpoint["TUrlVariablesOutput"]) ||
-            ({} as TEndpoint["TUrlVariablesOutput"]}),
+            ({} as TEndpoint["TUrlVariablesOutput"]),
           t,
           locale,
           mutationOptions,
@@ -292,7 +292,7 @@ export function useApiForm<
 
         if (result === undefined) {
           logger.error("Mutation result is undefined", {
-            endpoint: [...endpoint.path].join("/"}),
+            endpoint: [...endpoint.path].join("/"),
           });
           return undefined;
         }
@@ -317,7 +317,7 @@ export function useApiForm<
         }
       } catch (error) {
         logger.error("Error in submitForm", parseError(error), {
-          endpoint: endpoint.path.join("/"}),
+          endpoint: endpoint.path.join("/"),
         });
 
         // Handle any errors that occur during submission
@@ -325,10 +325,10 @@ export function useApiForm<
         const errorResponse = isErrorResponseType(error)
           ? error
           : fail({
-        message: 
-              "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.mutation_failed.title",
+              message:
+                "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.mutation_failed.title",
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            );
+            });
 
         setError(errorResponse);
         const formData = formMethods.getValues();
@@ -341,21 +341,21 @@ export function useApiForm<
     };
     void formMethods.handleSubmit(_submitForm, (errors) => {
       logger.error("Form validation errors", {
-        endpoint: [...endpoint.path].join("/"}),
-        errors: JSON.stringify(errors}),
+        endpoint: [...endpoint.path].join("/"),
+        errors: JSON.stringify(errors),
       });
 
       // Create an error response for form validation errors
       const errorResponse = fail({
-        message: 
-        "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.validation_error.title",
+        message:
+          "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.validation_error.title",
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: { formErrors: JSON.stringify(errors) });
-      );
+        messageParams: { formErrors: JSON.stringify(errors) },
+      });
 
       options?.onError?.({
         error: errorResponse,
-        requestData: formMethods.getValues(}),
+        requestData: formMethods.getValues(),
         pathParams: options?.urlParamVariables,
       });
     })(event);
@@ -385,14 +385,15 @@ export function useApiForm<
     submitError:
       mutationState.error || formState.formError
         ? fail({
-        message: 
-            mutationState.error?.message ||
+            message:
+              mutationState.error?.message ||
               formState.formError?.message ||
               "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.unknown.title",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            mutationState.error?.messageParams ||
+            messageParams:
+              mutationState.error?.messageParams ||
               formState.formError?.messageParams,
-          )
+          })
         : undefined,
 
     isSubmitting: mutationState.isPending,

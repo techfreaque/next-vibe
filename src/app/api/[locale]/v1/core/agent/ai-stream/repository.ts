@@ -10,7 +10,6 @@ import { stepCountIs, streamText } from "ai";
 import { and, eq } from "drizzle-orm";
 import {
   fail,
-  fail,
   createStreamingResponse,
   ErrorResponseTypes,
   type ResponseType,
@@ -34,7 +33,6 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import type { DefaultFolderId } from "../chat/config";
 import {
-  fail,
   chatMessages,
   chatThreads,
   type MessageMetadata,
@@ -46,7 +44,6 @@ import { ChatMessageRole } from "../chat/enum";
 import { getModelCost } from "../chat/model-access/costs";
 import { getModelById, type ModelId } from "../chat/model-access/models";
 import {
-  fail,
   CONTINUE_CONVERSATION_PROMPT,
   TOOL_USAGE_GUIDELINES,
 } from "./constants";

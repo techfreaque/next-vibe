@@ -8,8 +8,8 @@ import "server-only";
 import type { FSWatcher } from "fs";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { createMockUser } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/auth/cli-user";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { createMockUser } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/auth/cli-user";
 
 import { generateAllRepository } from "../../../generators/generate-all/repository";
 import type { TaskRunner } from "../types/repository";
@@ -118,7 +118,7 @@ const devWatcherTaskRunner: TaskRunner = {
   async onShutdown({ logger }: { logger: EndpointLogger }): Promise<void> {
     logger.debug("Development file watcher shutting down...");
     await Promise.resolve();
-  }
+  },
 };
 
 /**
@@ -188,13 +188,13 @@ const startSmartFileWatcher = async (
       if (fs.existsSync(watchPath)) {
         const watcher = fs.watch(
           watchPath,
-          { recursive: true });
+          { recursive: true },
           (eventType, filename) => {
             if (filename && shouldTriggerGeneration(filename)) {
               logger.debug(`📝 File changed: ${filename} (${eventType})`);
               debouncedRunGenerators();
             }
-          }
+          },
         );
 
         watchers.push(watcher);
@@ -227,9 +227,9 @@ const startSmartFileWatcher = async (
         try {
           watcher.close();
         } catch (error) {
-          logger.debug("Error closing watcher:", { error: String(error) },
+          logger.debug("Error closing watcher:", { error: String(error) });
         }
-      },
+      });
 
       logger.debug("✅ File watchers stopped");
       resolve();
@@ -331,6 +331,7 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
         checkCount++;
 
         // Simple health check using raw pool
+        // eslint-disable-next-line i18next/no-literal-string
         await rawPool.query("SELECT 1");
 
         // Reset failure count on success
@@ -385,7 +386,7 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
   async onShutdown({ logger }: { logger: EndpointLogger }): Promise<void> {
     logger.info("Database health monitor shutting down...");
     await Promise.resolve();
-  });
+  },
 };
 
 /**

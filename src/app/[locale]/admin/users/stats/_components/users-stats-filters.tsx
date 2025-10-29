@@ -35,7 +35,11 @@ interface UsersStatsFiltersContainerProps {
   form: EndpointReturn<typeof statsEndpoints>["read"]["form"];
 }
 
-type StatsFormData = EndpointReturn<typeof statsEndpoints>["read"] extends { form: UseFormReturn<infer T> } ? T : never;
+type StatsFormData = EndpointReturn<typeof statsEndpoints>["read"] extends {
+  form: UseFormReturn<infer T>;
+}
+  ? T
+  : never;
 
 interface UsersStatsFiltersProps {
   control: Control<StatsFormData>;

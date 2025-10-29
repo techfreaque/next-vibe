@@ -333,7 +333,7 @@ export function useApiQuery<
     if (options.enabled === false) {
       logger.info("useApiQuery: Query disabled, skipping", {
         endpointPath: [...endpoint.path],
-      })
+      });
       return;
     }
 
@@ -343,7 +343,7 @@ export function useApiQuery<
         "useApiQuery: Document hidden (navigation in progress), skipping",
         {
           endpointPath: [...endpoint.path],
-        }
+        },
       );
       return;
     }
@@ -352,7 +352,7 @@ export function useApiQuery<
     if (isInitialMount.current && skipInitialFetch) {
       logger.debug("useApiQuery: Skipping initial fetch", {
         endpointPath: [...endpoint.path],
-      })
+      });
       isInitialMount.current = false;
       return;
     }
@@ -434,7 +434,7 @@ export function useApiQuery<
                   queryKey,
                   // Ensure onError has the correct signature
                   onError: queryOptions.onError
-                    ? ({ error }: messageParams: { error: ErrorResponseType }): void => {
+                    ? ({ error }: { error: ErrorResponseType }): void => {
                         if (queryOptions.onError) {
                           queryOptions.onError({
                             error,
@@ -444,12 +444,12 @@ export function useApiQuery<
                         }
                       }
                     : undefined,
-                });
+                },
               );
             } catch (error) {
               logger.error(
                 "useApiQuery: Throttled query execution failed",
-                parseError(error}),
+                parseError(error),
               );
             } finally {
               // Mark as no longer executing
@@ -460,7 +460,7 @@ export function useApiQuery<
                 "useApiQuery: Throttled execution completed, reset isExecutingRef",
                 {
                   endpointPath: [...endpoint.path],
-                });
+                },
               );
             }
           };
@@ -470,7 +470,7 @@ export function useApiQuery<
           // Update initial mount ref
           isInitialMount.current = false;
         },
-        minExecutionInterval - (now - lastExecutionTimeRef.current}),
+        minExecutionInterval - (now - lastExecutionTimeRef.current),
       );
 
       return (): void => clearTimeout(timeoutId);
@@ -522,7 +522,7 @@ export function useApiQuery<
             queryKey,
             // Ensure onError has the correct signature
             onError: queryOptions.onError
-              ? ({ error }: messageParams: { error: ErrorResponseType }): void => {
+              ? ({ error }: { error: ErrorResponseType }): void => {
                   if (queryOptions.onError) {
                     queryOptions.onError({
                       error,
@@ -532,7 +532,7 @@ export function useApiQuery<
                   }
                 }
               : undefined,
-          });
+          },
         );
 
         executionCompleted = true;
@@ -589,7 +589,7 @@ export function useApiQuery<
           disableLocalCache: true, // Force refetch
           // Ensure onError has the correct signature
           onError: queryOptions.onError
-            ? ({ error }: messageParams: { error: ErrorResponseType }): void => {
+            ? ({ error }: { error: ErrorResponseType }): void => {
                 if (queryOptions.onError) {
                   queryOptions.onError({
                     error,
@@ -599,7 +599,7 @@ export function useApiQuery<
                 }
               }
             : undefined,
-        });
+        },
       );
 
       // Ensure we return a proper ResponseType
@@ -611,11 +611,11 @@ export function useApiQuery<
     } catch (error) {
       // Create a properly typed error response
       return fail({
-        message: 
-        "app.common.errors.unknown" as const,
+        message:
+          "app.common.errors.unknown" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: error instanceof Error ? error.message : String(error) });
-      );
+        messageParams: { error: error instanceof Error ? error.message : String(error) },
+      });
     }
   }, [
     executeQuery,
@@ -653,7 +653,7 @@ export function useApiQuery<
         }
         return { queries };
       });
-    });
+    },
     [queryId],
   );
 

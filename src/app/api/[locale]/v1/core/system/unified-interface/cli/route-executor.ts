@@ -19,7 +19,6 @@ import { loadEndpointDefinition } from "../shared/server-only/execution/definiti
 import type {
   BaseExecutionContext,
   BaseExecutionResult,
-  ParameterValue,
 } from "../shared/server-only/execution/executor";
 import { loadRouteHandler } from "../shared/server-only/execution/route-loader";
 import type {
@@ -27,14 +26,11 @@ import type {
   UnifiedField,
 } from "../shared/types/endpoint";
 import type { Methods } from "../shared/types/enums";
-import type {
-  DefinitionModule,
-  InferJwtPayloadTypeFromRoles,
-  RouteModule,
-} from "../shared/types/handler";
+import type { InferJwtPayloadTypeFromRoles } from "../shared/types/handler";
 import { modularCLIResponseRenderer } from "./widgets/modular-response-renderer";
 import { responseMetadataExtractor } from "./widgets/response-metadata-extractor";
 import { schemaUIHandler } from "./widgets/schema-ui-handler";
+import type { RenderableValue } from "./widgets/types";
 
 // Default request data type for generic endpoint handling
 type DefaultRequestData = UnifiedField<z.ZodTypeAny>;
@@ -673,18 +669,11 @@ export class RouteDelegationHandler {
     let output = "";
 
     // Format cause error message - ErrorResponseType uses 'message' field
-    let causeMessage =
+    const causeTranslationKey: TranslationKey =
       result.cause.message ||
-      t("app.api.v1.core.system.unifiedUi.cli.vibe.errors.unknownError");
+      "app.api.v1.core.system.unifiedUi.cli.vibe.errors.unknownError";
 
-    // Try to translate if it looks like a translation key
-    if (causeMessage.includes(".")) {
-      try {
-        causeMessage = t(causeMessage, result.cause.messageParams);
-      } catch {
-        // If translation fails, use the key as-is
-      }
-    }
+    const causeMessage = t(causeTranslationKey, result.cause.messageParams);
 
     // Show error type in verbose mode or for root cause
     const errorTypeInfo =
@@ -724,18 +713,10 @@ export class RouteDelegationHandler {
    */
   private sanitizeDataForRenderer(
     data: CliResponseData,
-  ): Record<string, string | number | boolean | null | undefined> {
+  ): Record<string, RenderableValue> {
     if (typeof data !== "object" || data === null) {
       return { result: String(data) };
     }
-
-    type SanitizedValue =
-      | string
-      | number
-      | boolean
-      | null
-      | SanitizedValue[]
-      | { [key: string]: SanitizedValue };
 
     const sanitizeValue = (
       value:
@@ -746,7 +727,7 @@ export class RouteDelegationHandler {
         | boolean
         | null
         | undefined,
-    ): SanitizedValue => {
+    ): RenderableValue => {
       if (value === undefined) {
         return null;
       } else if (
@@ -759,7 +740,7 @@ export class RouteDelegationHandler {
       } else if (Array.isArray(value)) {
         return value.map(sanitizeValue);
       } else if (typeof value === "object") {
-        const sanitizedObj: { [key: string]: SanitizedValue } = {};
+        const sanitizedObj: { [key: string]: RenderableValue } = {};
         for (const [k, v] of Object.entries(value)) {
           sanitizedObj[k] = sanitizeValue(v);
         }
@@ -769,7 +750,7 @@ export class RouteDelegationHandler {
       }
     };
 
-    const sanitized: Record<string, SanitizedValue> = {};
+    const sanitized: Record<string, RenderableValue> = {};
     for (const [key, value] of Object.entries(data)) {
       sanitized[key] = sanitizeValue(value);
     }

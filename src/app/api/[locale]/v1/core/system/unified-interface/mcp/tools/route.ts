@@ -18,6 +18,6 @@ export const { GET, tools } = endpointsHandler({
         locale,
       );
       return createSuccessResponse(toolsData);
-    });
-  });
+    },
+  },
 });

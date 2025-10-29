@@ -189,7 +189,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
     ) {
       const icon = this.getMetricIcon(key, value, context);
       const label = this.formatMetricLabel(key);
-      const formattedValue = this.formatMetricValue(value, context);
+      const formattedValue = this.formatMetricValue(value);
       return `${icon}${label}: ${formattedValue}`;
     }
 

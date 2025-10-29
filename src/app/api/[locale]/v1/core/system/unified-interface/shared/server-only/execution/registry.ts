@@ -8,9 +8,9 @@ import "server-only";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
-import type { DiscoveredEndpoint } from "../types/registry";
-import { getDiscoveredEndpoints } from "../discovery/adapter";
 import { getErrorMessage } from "../../utils/error";
+import { getDiscoveredEndpoints } from "../discovery/adapter";
+import type { DiscoveredEndpoint } from "../types/registry";
 
 /**
  * Base registry configuration
@@ -41,17 +41,9 @@ export abstract class BaseRegistry {
   protected lastRefresh = 0;
 
   constructor(config: BaseRegistryConfig, logger?: EndpointLogger) {
-    this.logger = logger || this.createDefaultLogger();
+    this.logger =
+      logger || this.createEndpointLogger(false, Date.now(), config.locale);
     this.config = config;
-  }
-
-  /**
-   * Create default logger if none provided
-   */
-  private createDefaultLogger(): EndpointLogger {
-    // Import here to avoid circular dependency
-    const { createEndpointLogger } = require("../../logger/endpoint");
-    return createEndpointLogger(false, Date.now(), "en-GLOBAL");
   }
 
   /**
@@ -80,7 +72,7 @@ export abstract class BaseRegistry {
         `[${this.config.platformName}] Initialization complete`,
         {
           endpointsFound: this.endpoints.length,
-        });
+        },
       );
 
       this.lastRefresh = Date.now();
@@ -91,7 +83,7 @@ export abstract class BaseRegistry {
     } catch (error) {
       this.logger.error(`[${this.config.platformName}] Initialization failed`, {
         error: getErrorMessage(error),
-      },
+      });
       this.initialized = false;
       this.endpoints = [];
     }
@@ -116,8 +108,6 @@ export abstract class BaseRegistry {
   ): DiscoveredEndpoint[] {
     this.ensureInitialized();
 
-    // Import filter dynamically to avoid circular dependencies
-    const { toolFilter } = require("../permissions/filter");
     return toolFilter.filterEndpointsByPermissions(
       this.endpoints,
       user,
@@ -188,10 +178,9 @@ export abstract class BaseRegistry {
    */
   protected hasPermission(
     endpoint: DiscoveredEndpoint,
-    user: { id?: string; email?: string; role?: string; isPublic: boolean });
+    user: { id?: string; email?: string; role?: string; isPublic: boolean },
   ): boolean {
     // Import toolFilter dynamically to avoid circular dependencies
-    const { toolFilter } = require("../permissions/filter");
     return toolFilter.hasEndpointPermission(endpoint, user);
   }
 
@@ -206,7 +195,9 @@ export abstract class BaseRegistry {
 
     for (const endpoint of endpoints) {
       const keys = keyFn(endpoint);
-      if (!keys) continue;
+      if (!keys) {
+        continue;
+      }
 
       const keyArray = Array.isArray(keys) ? keys : [keys];
       for (const key of keyArray) {

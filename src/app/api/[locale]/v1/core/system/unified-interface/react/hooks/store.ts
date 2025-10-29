@@ -569,7 +569,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         isError: false,
         isSuccess: false,
         statusMessage:
-          "app.api.v1.core.system.unifiedInterface.react.store.status.loading_data" as const,
+          "app.api.v1.core.system.unifiedUi.react.store.status.loading_data" as const,
         isCachedData: false,
         lastFetchTime: existingLastFetchTime ?? null,
         isLoading: true,
@@ -621,7 +621,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isLoadingFresh: false,
                   isCachedData: true,
                   statusMessage:
-                    "app.api.v1.core.system.unifiedInterface.react.store.status.cached_data" as const,
+                    "app.api.v1.core.system.unifiedUi.react.store.status.cached_data" as const,
                   lastFetchTime: existingQuery.lastFetchTime ?? null,
                 },
               },
@@ -714,7 +714,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           // Create a proper error response
           const errorResponse = fail({
             message:
-            "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed",
+            "app.api.v1.core.system.unifiedUi.react.store.errors.validation_failed",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { endpoint: endpoint.path.join("/") },
           });
@@ -739,7 +739,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 isLoadingFresh: false,
                 isCachedData: state.queries[queryId]?.isCachedData ?? false,
                 statusMessage:
-                  "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
+                  "app.api.v1.core.system.unifiedUi.react.store.errors.validation_failed" as const,
                 lastFetchTime: Date.now(),
               },
             },
@@ -798,7 +798,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isError: true,
                   isSuccess: false,
                   statusMessage:
-                    "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed" as const,
+                    "app.api.v1.core.system.unifiedUi.react.store.errors.request_failed" as const,
                   isLoadingFresh: false,
                   isCachedData: existingQuery?.isCachedData ?? false,
                   lastFetchTime: Date.now(),
@@ -841,7 +841,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 isLoadingFresh: false,
                 isCachedData: false,
                 statusMessage:
-                  "app.api.v1.core.system.unifiedInterface.react.store.status.success" as const,
+                  "app.api.v1.core.system.unifiedUi.react.store.status.success" as const,
                 lastFetchTime: Date.now(),
               },
             },
@@ -894,7 +894,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isLoadingFresh: false,
                   isCachedData: state.queries[queryId]?.isCachedData ?? false,
                   statusMessage:
-                    "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
+                    "app.api.v1.core.system.unifiedUi.react.store.errors.validation_failed" as const,
                   lastFetchTime: Date.now(),
                 },
               },
@@ -921,7 +921,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         // Create a properly typed error response with translation key
         const errorResponse = fail({
           message:
-          "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed",
+          "app.api.v1.core.system.unifiedUi.react.store.errors.request_failed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: parseError(err).message,
@@ -949,7 +949,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               isLoadingFresh: false,
               isCachedData: state.queries[queryId]?.isCachedData ?? false,
               statusMessage:
-                "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed" as const,
+                "app.api.v1.core.system.unifiedUi.react.store.errors.request_failed" as const,
               lastFetchTime: Date.now(),
             },
           },
@@ -995,7 +995,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         ? error
         : fail({
             message:
-            "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed",
+            "app.api.v1.core.system.unifiedUi.react.store.errors.request_failed",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { error: parseError(error).message },
           });
@@ -1061,7 +1061,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           error: null,
           isSuccess: false,
           statusMessage:
-            "app.api.v1.core.system.unifiedInterface.react.store.status.mutation_pending" as const,
+            "app.api.v1.core.system.unifiedUi.react.store.status.mutation_pending" as const,
           data: undefined,
         },
       },
@@ -1075,7 +1075,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         // Create a proper error response
         const errorResponse = fail({
           message:
-          "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed",
+          "app.api.v1.core.system.unifiedUi.react.store.errors.validation_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { endpoint: endpoint.path.join("/") },
         });
@@ -1091,7 +1091,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               error: errorResponse,
               isSuccess: false,
               statusMessage:
-                "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
+                "app.api.v1.core.system.unifiedUi.react.store.errors.validation_failed" as const,
               data: undefined,
             },
           },
@@ -1140,7 +1140,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               error: response,
               isSuccess: false,
               statusMessage:
-                "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed" as const,
+                "app.api.v1.core.system.unifiedUi.react.store.errors.mutation_failed" as const,
               data: undefined,
             },
           },
@@ -1157,7 +1157,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
         // Return error response with proper translation key
         return fail({
-          message: "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed",
+          message: "app.api.v1.core.system.unifiedUi.react.store.errors.mutation_failed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: response.message, endpoint: endpoint.path.join("/") },
         });
@@ -1178,7 +1178,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             error: null,
             isSuccess: true,
             statusMessage:
-              "app.api.v1.core.system.unifiedInterface.react.store.status.mutation_success" as const,
+              "app.api.v1.core.system.unifiedUi.react.store.status.mutation_success" as const,
             data: responseData as AnyData,
           },
         },
@@ -1210,7 +1210,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 error: onSuccessResult,
                 isSuccess: false,
                 statusMessage:
-                  "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
+                  "app.api.v1.core.system.unifiedUi.react.store.errors.validation_failed" as const,
                 data: undefined,
               },
             },
@@ -1236,7 +1236,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         ? error
         : fail({
             message:
-            "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed",
+            "app.api.v1.core.system.unifiedUi.react.store.errors.mutation_failed",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { error: parseError(error).message },
           });
@@ -1252,7 +1252,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             error: errorResponse,
             isSuccess: false,
             statusMessage:
-              "app.api.v1.core.system.unifiedInterface.react.store.errors.unexpected_failure" as const,
+              "app.api.v1.core.system.unifiedUi.react.store.errors.unexpected_failure" as const,
             data: undefined,
           },
         },
@@ -1269,7 +1269,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
       // Return error response with proper translation key
       return fail({
-        message: "app.api.v1.core.system.unifiedInterface.react.store.errors.unexpected_failure",
+        message: "app.api.v1.core.system.unifiedUi.react.store.errors.unexpected_failure",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorResponse.message, endpoint: endpoint.path.join("/") },
       });
@@ -1322,7 +1322,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const errorMessage = err instanceof Error ? err.message : String(err);
       return fail({
         message:
-        "app.api.v1.core.system.unifiedInterface.react.store.errors.refetch_failed",
+        "app.api.v1.core.system.unifiedUi.react.store.errors.refetch_failed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage, queryKey: JSON.stringify(queryKey) },
       });

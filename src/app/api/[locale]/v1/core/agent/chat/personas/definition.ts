@@ -7,22 +7,26 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
+  objectField,
+  requestDataField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import {
-  objectField,
-  requestDataField,
-  responseArrayField,
-  responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { ModelId, ModelIdOptions } from "../model-access/models";
-import { CategoryOptions, DEFAULT_CATEGORIES } from "./config";
+import {
+  CategoryOptions,
+  DEFAULT_CATEGORIES,
+  type PersonaCategoryId,
+} from "./config";
 
 /**
  * Get Personas List Endpoint (GET)
@@ -109,7 +113,14 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.personas.get.response.personas.persona.category.content" as const,
               },
-              z.enum(DEFAULT_CATEGORIES.map((c) => c.id)),
+              z.enum([
+                "general",
+                "creative",
+                "technical",
+                "education",
+                "controversial",
+                "lifestyle",
+              ]),
             ),
             source: responseField(
               {
@@ -323,7 +334,14 @@ const { POST } = createEndpoint({
           options: CategoryOptions,
           layout: { columns: 6 },
         },
-        z.enum(DEFAULT_CATEGORIES.map((c) => c.id)),
+        z.enum([
+          "general",
+          "creative",
+          "technical",
+          "education",
+          "controversial",
+          "lifestyle",
+        ]),
       ),
       preferredModel: requestDataField(
         {

@@ -14,7 +14,6 @@ import path from "node:path";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -62,7 +61,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
             "app.api.v1.core.system.unifiedUi.cli.setup.status.post.errors.unauthorized.description",
           ),
         },
-      
+      });
     }
 
     try {
@@ -88,8 +87,9 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
           "app.api.v1.core.system.unifiedUi.cli.setup.status.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
-          error: parsedError.message },
-      
+          error: parsedError.message,
+        },
+      });
     }
   }
 
@@ -111,7 +111,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
           verbose: false,
           ignoreErrors: true,
         },
-      
+      );
 
       if (output?.trim()) {
         // Get version
@@ -151,7 +151,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
       cwd?: string;
       verbose?: boolean;
       ignoreErrors?: boolean;
-    } = {});
+    } = {},
   ): Promise<string> {
     return await new Promise((resolve, reject) => {
       const childProcess = spawn(command, args, {
@@ -160,7 +160,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
         shell: false,
 
         env: { ...process.env, NODE_ENV: "development" },
-      },
+      });
 
       let output = String();
       let errorOutput = String();
@@ -168,7 +168,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
       if (!options.verbose) {
         childProcess.stdout?.on("data", (data: Buffer) => {
           output += data.toString();
-        },
+        });
 
         childProcess.stderr?.on("data", (data: Buffer) => {
           errorOutput += data.toString();
@@ -181,7 +181,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
         } else {
           reject(new Error(errorOutput || output || String(code)));
         }
-      },
+      });
 
       childProcess.on("error", (error: Error) => {
         if (!options.ignoreErrors) {

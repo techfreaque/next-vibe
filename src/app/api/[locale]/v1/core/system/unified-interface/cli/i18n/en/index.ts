@@ -45,8 +45,31 @@ export const translations = {
       endpointHandler: {
         error: {
           form_validation_failed: "Form validation failed",
+          unauthorized: "Unauthorized access",
           errors: {
             unknown_validation_error: "Unknown validation error",
+            invalid_request_data: "Invalid request data",
+            invalid_url_parameters: "Invalid URL parameters",
+          },
+          general: {
+            internal_server_error: "Internal server error",
+          },
+        },
+      },
+      renderers: {
+        cliUi: {
+          helpHandler: {
+            noDescription: "No description available",
+            flagDataDesc: "Provide request data as JSON",
+            flagUserTypeDesc: "Specify user type (admin, customer, public)",
+            flagLocaleDesc: "Specify locale (en-GLOBAL, de-DE, pl-PL)",
+            flagOutputDesc: "Output format (pretty, json)",
+            flagVerboseDesc: "Enable verbose output",
+            flagDryRunDesc: "Perform a dry run without executing",
+            usageLabel: "Usage",
+            availableCommandsLabel: "Available Commands",
+            globalOptionsLabel: "Global Options",
+            examplesLabel: "Examples",
           },
         },
       },

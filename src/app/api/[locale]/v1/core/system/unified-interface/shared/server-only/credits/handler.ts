@@ -81,7 +81,7 @@ export abstract class BaseCreditHandler {
       return {
         success: false,
         error:
-          "app.api.v1.core.system.unifiedInterface.shared.credits.errors.missingLeadId",
+          "app.api.v1.core.system.unifiedUi.shared.credits.errors.missingLeadId",
       };
     }
 
@@ -94,7 +94,7 @@ export abstract class BaseCreditHandler {
       return {
         success: false,
         error:
-          "app.api.v1.core.system.unifiedInterface.shared.credits.errors.insufficientCredits",
+          "app.api.v1.core.system.unifiedUi.shared.credits.errors.insufficientCredits",
       };
     }
 
@@ -110,7 +110,7 @@ export abstract class BaseCreditHandler {
       return {
         success: false,
         error:
-          "app.api.v1.core.system.unifiedInterface.shared.credits.errors.deductionFailed",
+          "app.api.v1.core.system.unifiedUi.shared.credits.errors.deductionFailed",
       };
     }
     return { success: true, messageId };

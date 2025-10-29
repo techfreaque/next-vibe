@@ -13,13 +13,13 @@ import {
   type UserRoleValue,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { AI_CONFIG, Platform } from "../config";
 import type {
   AIToolExecutionContext,
-  DiscoveredEndpoint,
   IToolFilter,
   ToolFilterCriteria,
-} from "../../types/endpoint";
+} from "../../../ai/types";
+import { AI_CONFIG, Platform } from "../config";
+import type { DiscoveredEndpoint } from "../discovery/endpoint-registry-types";
 
 /**
  * Tool Filter Implementation with Opt-Out Logic
@@ -69,7 +69,7 @@ export class ToolFilter implements IToolFilter {
     // Filter by tags
     if (criteria.tags && criteria.tags.length > 0) {
       filtered = filtered.filter((e) =>
-        criteria.tags!.some((tag) => e.definition.tags?.includes(tag)),
+        criteria.tags!.some((tag: string) => e.definition.tags?.includes(tag)),
       );
     }
 

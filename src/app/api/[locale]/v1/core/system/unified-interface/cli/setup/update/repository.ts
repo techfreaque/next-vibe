@@ -9,7 +9,6 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -63,9 +62,9 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
           error: t(
               "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.server.description",
             ),
-          });
-        );
-      }
+        },
+      });
+    }
 
       // Then install CLI with force
       const installResult = await setupInstallRepository.installCli(
@@ -101,8 +100,9 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
           "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
-          error: parsedError.message });
-      );
+          error: parsedError.message,
+        },
+      });
     }
   }
 }

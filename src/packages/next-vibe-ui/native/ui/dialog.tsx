@@ -40,6 +40,7 @@ const DialogOverlayNative = React.forwardRef<
   DialogPrimitive.OverlayRef,
   DialogPrimitive.OverlayProps
 >(({ className, children, ...props }, ref) => {
+  const content = typeof children === "function" ? children({ pressed: false }) : children;
   return (
     <DialogPrimitive.Overlay
       style={StyleSheet.absoluteFill}
@@ -54,7 +55,7 @@ const DialogOverlayNative = React.forwardRef<
         entering={FadeIn.duration(150)}
         exiting={FadeOut.duration(150)}
       >
-        {children}
+        {content}
       </Animated.View>
     </DialogPrimitive.Overlay>
   );

@@ -23,9 +23,12 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import {
   CronTaskPriority,
+  CronTaskPriorityDB,
   CronTaskPriorityOptions,
   CronTaskStatus,
+  CronTaskStatusDB,
   TaskCategory,
+  TaskCategoryDB,
 } from "../../../enum";
 
 /**
@@ -80,9 +83,9 @@ const { GET } = createEndpoint({
           description: z.string().optional(),
           schedule: z.string(),
           enabled: z.boolean(),
-          priority: z.enum(CronTaskPriority),
-          status: z.enum(CronTaskStatus),
-          category: z.enum(TaskCategory),
+          priority: z.enum(CronTaskPriorityDB),
+          status: z.enum(CronTaskStatusDB),
+          category: z.enum(TaskCategoryDB),
           timeout: z.number().optional(),
           retries: z.number().optional(),
           lastRun: z.string().optional(),
@@ -297,7 +300,7 @@ const { PUT } = createEndpoint({
           options: CronTaskPriorityOptions,
           layout: { columns: 6 },
         },
-        z.enum(CronTaskPriority),
+        z.enum(CronTaskPriorityDB),
       ),
 
       timeout: requestDataField(
@@ -343,9 +346,9 @@ const { PUT } = createEndpoint({
           description: z.string().optional(),
           schedule: z.string(),
           enabled: z.boolean(),
-          priority: z.enum(CronTaskPriority),
-          status: z.enum(CronTaskStatus),
-          category: z.enum(TaskCategory),
+          priority: z.enum(CronTaskPriorityDB),
+          status: z.enum(CronTaskStatusDB),
+          category: z.enum(TaskCategoryDB),
           timeout: z.number().optional(),
           retries: z.number().optional(),
           lastRun: z.string().optional(),

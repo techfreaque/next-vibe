@@ -2,9 +2,9 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -42,7 +42,8 @@ export const voteRepository = {
       // Type guard to ensure user has id
       if (!user.id) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.unauthorized.title",
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -67,7 +68,8 @@ export const voteRepository = {
 
       if (!messageWithThread) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.notFound.title",
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }

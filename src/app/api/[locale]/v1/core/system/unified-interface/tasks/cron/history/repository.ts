@@ -50,7 +50,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
     const { t } = simpleT(locale);
 
     try {
-      logger.debug("Fetching task execution history", messageParams: { filters: data });
+      logger.debug("Fetching task execution history", { filters: data });
 
       // Parse pagination with type safety
       const limit = data?.limit ? parseInt(data.limit, 10) : 50;
@@ -84,13 +84,13 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
 
       if (data?.startDate) {
         conditions.push(
-          gte(cronTaskExecutions.startedAt, new Date(data.startDate)}),
+          gte(cronTaskExecutions.startedAt, new Date(data.startDate)),
         );
       }
 
       if (data?.endDate) {
         conditions.push(
-          lte(cronTaskExecutions.startedAt, new Date(data.endDate)}),
+          lte(cronTaskExecutions.startedAt, new Date(data.endDate)),
         );
       }
 
@@ -120,7 +120,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
       let executions = await executionsQuery;
       if (data?.taskName) {
         executions = executions.filter((exec) =>
-          exec.taskName?.toLowerCase().includes(data.taskName!.toLowerCase()}),
+          exec.taskName?.toLowerCase().includes(data.taskName!.toLowerCase()),
         );
       }
 
@@ -141,7 +141,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
 
       // Get total count
       const [countResult] = await db
-        .select(messageParams: { count: count() })
+        .select({ count: count() })
         .from(cronTaskExecutions)
         .where(conditions.length > 0 ? and(...conditions) : undefined);
 
@@ -150,14 +150,14 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
       // Calculate summary statistics
       const [statsResult] = await db
         .select({
-          totalExecutions: count(}),
+          totalExecutions: count(),
           successfulExecutions: count(
             sql`CASE WHEN ${cronTaskExecutions.status} = ${CronTaskStatus.COMPLETED} THEN 1 END`,
-          }),
+          ),
           failedExecutions: count(
             sql`CASE WHEN ${cronTaskExecutions.status} IN (${CronTaskStatus.FAILED}, ${CronTaskStatus.TIMEOUT}, ${CronTaskStatus.ERROR}) THEN 1 END`,
-          }),
-          averageDuration: avg(cronTaskExecutions.durationMs}),
+          ),
+          averageDuration: avg(cronTaskExecutions.durationMs),
         })
         .from(cronTaskExecutions)
         .where(conditions.length > 0 ? and(...conditions) : undefined);
@@ -175,19 +175,23 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
         t(
           "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.log.fetchSuccess",
           {
-            count: executions.length.toString(}),
-          });
-        }),
+            count: executions.length.toString(),
+          },
+        ),
       );
 
       // Zod schemas for runtime validation and type narrowing
-      const statusSchema = z.enum(CronTaskStatus);
-      const prioritySchema = z.enum(CronTaskPriority);
+      const statusSchema = z.enum(
+        Object.values(CronTaskStatus) as [string, ...string[]],
+      );
+      const prioritySchema = z.enum(
+        Object.values(CronTaskPriority) as [string, ...string[]],
+      );
       const errorSchema = z
         .object({
-          message: z.string(}),
-          messageParams: z.record(z.string(), z.unknown()).optional(}),
-          errorType: z.string(}),
+          message: z.string(),
+          messageParams: z.record(z.string(), z.unknown()).optional(),
+          errorType: z.string(),
         })
         .nullable();
 
@@ -200,31 +204,31 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
               exec.taskName ??
               t(
                 "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.unknownTask",
-              }),
-            status: statusSchema.parse(exec.status}),
+              ),
+            status: statusSchema.parse(exec.status),
             priority: prioritySchema.parse(
               exec.priority ?? CronTaskPriority.MEDIUM,
-            }),
-            startedAt: exec.startedAt.toISOString(}),
+            ),
+            startedAt: exec.startedAt.toISOString(),
             completedAt: exec.completedAt?.toISOString() ?? null,
             durationMs: exec.durationMs,
-            error: errorSchema.parse(exec.error}),
+            error: errorSchema.parse(exec.error),
             environment: exec.environment,
-            createdAt: exec.createdAt.toISOString(}),
+            createdAt: exec.createdAt.toISOString(),
           };
           return execution;
-        }}),
+        }),
         totalCount,
         hasMore: totalCount > offset + limit,
         summary: {
-          totalExecutions: Number(statsResult?.totalExecutions ?? 0}),
-          successfulExecutions: Number(statsResult?.successfulExecutions ?? 0}),
-          failedExecutions: Number(statsResult?.failedExecutions ?? 0}),
+          totalExecutions: Number(statsResult?.totalExecutions ?? 0),
+          successfulExecutions: Number(statsResult?.successfulExecutions ?? 0),
+          failedExecutions: Number(statsResult?.failedExecutions ?? 0),
           averageDuration: statsResult?.averageDuration
             ? Math.round(Number(statsResult.averageDuration))
             : null,
           successRate,
-        });
+        },
       };
 
       return createSuccessResponse(response);
@@ -235,7 +239,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
         limit: data.limit,
         offset: data.offset,
         error: parsedError.message,
-      },
+      });
 
       return fail({
         message:
@@ -245,8 +249,8 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
           error: parsedError.message,
           taskId: data.taskId || "unknown",
           limit: data.limit || 50,
-        });
-      );
+        },
+      });
     }
   }
 }

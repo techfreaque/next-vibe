@@ -114,7 +114,7 @@ function generateDescription(
           "app.api.v1.core.system.unifiedBackend.tasks.cron.patterns.everyIntervalMinutes",
           {
             interval,
-          });
+          },
         ),
       );
     } else {
@@ -124,7 +124,7 @@ function generateDescription(
           {
             interval,
             start,
-          });
+          },
         ),
       );
     }
@@ -143,7 +143,7 @@ function generateDescription(
         {
           start,
           end,
-        });
+        },
       ),
     );
   } else if (minute !== "0") {
@@ -171,7 +171,7 @@ function generateDescription(
           "app.api.v1.core.system.unifiedBackend.tasks.cron.patterns.everyIntervalHours",
           {
             interval,
-          });
+          },
         ),
       );
     } else {
@@ -181,7 +181,7 @@ function generateDescription(
           {
             interval,
             start: formatHour(start, locale),
-          });
+          },
         ),
       );
     }
@@ -200,7 +200,7 @@ function generateDescription(
         {
           start: formatHour(start, locale),
           end: formatHour(end, locale),
-        });
+        },
       ),
     );
   } else {
@@ -220,7 +220,7 @@ function generateDescription(
           "app.api.v1.core.system.unifiedBackend.tasks.cron.frequency.everyDays",
           {
             count: interval,
-          });
+          },
         ),
       );
     } else if (dayOfMonth.includes(",")) {
@@ -248,7 +248,7 @@ function generateDescription(
           "app.api.v1.core.system.unifiedBackend.tasks.cron.calendar.inMonths",
           {
             months: months.join(", "),
-          });
+          },
         ),
       );
     } else {
@@ -269,7 +269,7 @@ function generateDescription(
           "app.api.v1.core.system.unifiedBackend.tasks.cron.calendar.onWeekdays",
           {
             days: days.join(", "),
-          });
+          },
         ),
       );
     } else if (dayOfWeek.includes("-")) {
@@ -280,7 +280,7 @@ function generateDescription(
           {
             start: formatDayOfWeek(start, locale),
             end: formatDayOfWeek(end, locale),
-          });
+          },
         ),
       );
     } else {
@@ -289,7 +289,7 @@ function generateDescription(
           "app.api.v1.core.system.unifiedBackend.tasks.cron.calendar.onWeekday",
           {
             day: formatDayOfWeek(dayOfWeek, locale),
-          });
+          },
         ),
       );
     }
@@ -575,7 +575,7 @@ export function validateCronSchedule(
   timezone = "UTC",
 ): boolean {
   try {
-    cronParser.parse(schedule, { tz: timezone },
+    cronParser.parse(schedule, { tz: timezone });
     return true;
   } catch {
     return false;

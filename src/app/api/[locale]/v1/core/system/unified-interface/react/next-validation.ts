@@ -93,7 +93,7 @@ export async function validateNextRequestData<
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: urlValidation.message,
-        });
+        },
       };
     }
 
@@ -124,7 +124,7 @@ export async function validateNextRequestData<
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
-        });
+        },
       };
     }
 
@@ -135,7 +135,7 @@ export async function validateNextRequestData<
         requestData: requestValidation.data,
         urlPathParams: urlValidation.data as TUrlVariablesOutput,
         locale: validatedLocale,
-      });
+      },
     };
   } catch (error) {
     return {
@@ -148,7 +148,7 @@ export async function validateNextRequestData<
           error instanceof Error
             ? error.message
             : "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
-      });
+      },
     };
   }
 }
@@ -173,7 +173,7 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
   // Check if schema is z.never() by testing if it rejects empty object
   const isNeverSchema = (() => {
     try {
-      const testResult = endpoint.requestSchema.safeParse({},
+      const testResult = endpoint.requestSchema.safeParse({});
       return (
         !testResult.success &&
         testResult.error?.issues?.[0]?.code === "invalid_type" &&
@@ -344,7 +344,7 @@ async function validatePostRequestData<TRequestInput, TRequestOutput>(
   // Check if schema is z.never() by testing if it rejects empty object
   const isNeverSchema = (() => {
     try {
-      const testResult = endpoint.requestSchema.safeParse({},
+      const testResult = endpoint.requestSchema.safeParse({});
       return (
         !testResult.success &&
         testResult.error?.issues?.[0]?.code === "invalid_type" &&
@@ -395,7 +395,7 @@ async function validatePostRequestData<TRequestInput, TRequestOutput>(
           error instanceof Error
             ? error.message
             : "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_json_request_body",
-      });
+      },
     };
   }
 }

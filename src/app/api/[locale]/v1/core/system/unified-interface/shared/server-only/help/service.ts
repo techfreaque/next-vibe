@@ -130,7 +130,7 @@ export class HelpService {
             method: "POST",
             category,
             description: t(
-              "app.api.v1.core.system.unifiedInterface.cli.vibe.executeCommand",
+              "app.api.v1.core.system.unifiedUi.cli.vibe.executeCommand",
             ),
             aliases: [shortAlias, fullAlias],
             routePath: routeFile,
@@ -186,7 +186,7 @@ export class HelpService {
       // Use endpoint description or fallback
       const description =
         endpointDescription ||
-        t("app.api.v1.core.system.unifiedInterface.cli.vibe.executeCommand");
+        t("app.api.v1.core.system.unifiedUi.cli.vibe.executeCommand");
 
       // Combine all aliases
       const allAliases = [
@@ -224,7 +224,7 @@ export class HelpService {
         method: "POST",
         category,
         description: t(
-          "app.api.v1.core.system.unifiedInterface.cli.vibe.executeCommand",
+          "app.api.v1.core.system.unifiedUi.cli.vibe.executeCommand",
         ),
         aliases: [shortAlias, fullAlias],
         routePath: routeFile,

@@ -41,6 +41,39 @@ export const translations = {
       storeFailed: "Nie udało się zapisać sesji",
       clearFailed: "Nie udało się wyczyścić sesji",
     },
+    endpoints: {
+      endpointHandler: {
+        error: {
+          form_validation_failed: "Walidacja formularza nie powiodła się",
+          unauthorized: "Nieautoryzowany dostęp",
+          errors: {
+            unknown_validation_error: "Nieznany błąd walidacji",
+            invalid_request_data: "Nieprawidłowe dane żądania",
+            invalid_url_parameters: "Nieprawidłowe parametry URL",
+          },
+          general: {
+            internal_server_error: "Wewnętrzny błąd serwera",
+          },
+        },
+      },
+      renderers: {
+        cliUi: {
+          helpHandler: {
+            noDescription: "Brak dostępnego opisu",
+            flagDataDesc: "Podaj dane żądania jako JSON",
+            flagUserTypeDesc: "Określ typ użytkownika (admin, customer, public)",
+            flagLocaleDesc: "Określ locale (en-GLOBAL, de-DE, pl-PL)",
+            flagOutputDesc: "Format wyjścia (pretty, json)",
+            flagVerboseDesc: "Włącz szczegółowe wyjście",
+            flagDryRunDesc: "Wykonaj próbne uruchomienie bez wykonywania",
+            usageLabel: "Użycie",
+            availableCommandsLabel: "Dostępne polecenia",
+            globalOptionsLabel: "Opcje globalne",
+            examplesLabel: "Przykłady",
+          },
+        },
+      },
+    },
     interactive: {
       welcome: "Witamy w trybie interaktywnym Vibe",
       goodbye: "Do widzenia!",

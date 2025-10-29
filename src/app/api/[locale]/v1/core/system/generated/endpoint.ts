@@ -4,7 +4,7 @@
  *
  * Endpoints found: 142
  * Total paths (with aliases): 215
- * Generated at: 2025-10-29T13:54:08.986Z
+ * Generated at: 2025-10-29T17:18:19.511Z
  */
 
 /* eslint-disable prettier/prettier */

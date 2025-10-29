@@ -20,7 +20,7 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { CronTaskPriority, CronTaskStatus } from "../../enum";
+import { CronTaskPriority, CronTaskPriorityDB, CronTaskStatus, CronTaskStatusDB } from "../../enum";
 
 /**
  * GET endpoint definition - Get task execution history
@@ -164,8 +164,8 @@ export const { GET } = createEndpoint({
             id: z.string(),
             taskId: z.string(),
             taskName: z.string(),
-            status: z.enum(CronTaskStatus),
-            priority: z.enum(CronTaskPriority),
+            status: z.enum(CronTaskStatusDB),
+            priority: z.enum(CronTaskPriorityDB),
             startedAt: z.string(),
             completedAt: z.string().nullable(),
             durationMs: z.number().nullable(),

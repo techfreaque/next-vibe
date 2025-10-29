@@ -2,10 +2,9 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import {
-  fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -95,7 +94,8 @@ export const branchRepository = {
 
       if (!sourceMessage) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.messageNotFound.title",
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.messageNotFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -103,7 +103,8 @@ export const branchRepository = {
       // Cannot branch from root message (no parent)
       if (!sourceMessage.parentId) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.cannotBranchFromRoot.title",
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.cannotBranchFromRoot.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -155,7 +156,8 @@ export const branchRepository = {
     } catch (error) {
       logger.error("Failed to create branch", parseError(error));
       return fail({
-        message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.createFailed.title",
+        message:
+          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.createFailed.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

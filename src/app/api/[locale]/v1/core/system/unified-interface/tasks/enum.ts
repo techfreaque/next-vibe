@@ -170,6 +170,17 @@ export const {
   MONITORING:
     "app.api.v1.core.system.unifiedBackend.tasks.taskCategory.monitoring" as const,
 });
+export const TaskCategoryDB = [
+  TaskCategory.DEVELOPMENT,
+  TaskCategory.BUILD,
+  TaskCategory.WATCH,
+  TaskCategory.GENERATOR,
+  TaskCategory.TEST,
+  TaskCategory.MAINTENANCE,
+  TaskCategory.DATABASE,
+  TaskCategory.SYSTEM,
+  TaskCategory.MONITORING,
+] as const;
 
 /**
  * Sort Order

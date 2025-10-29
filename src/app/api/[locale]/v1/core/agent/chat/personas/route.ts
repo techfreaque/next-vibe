@@ -4,9 +4,9 @@
  */
 
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
@@ -40,7 +40,8 @@ export const { GET, POST, tools } = endpointsHandler({
 
       if (!userId) {
         return fail({
-          message: "app.api.v1.core.agent.chat.personas.post.errors.unauthorized.title",
+          message:
+            "app.api.v1.core.agent.chat.personas.post.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }

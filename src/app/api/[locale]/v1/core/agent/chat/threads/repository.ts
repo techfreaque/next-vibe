@@ -6,12 +6,11 @@
 import "server-only";
 
 import { and, count, desc, eq, gte, ilike, isNull, lte, or } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
+  type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -212,8 +211,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
     } catch (error) {
       logger.error("Error listing threads", parseError(error));
       return fail({
-        message:
-          "app.api.v1.core.agent.chat.threads.get.errors.server.title",
+        message: "app.api.v1.core.agent.chat.threads.get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -309,8 +307,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
     } catch (error) {
       logger.error("Error creating thread", parseError(error));
       return fail({
-        message:
-          "app.api.v1.core.agent.chat.threads.post.errors.server.title",
+        message: "app.api.v1.core.agent.chat.threads.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

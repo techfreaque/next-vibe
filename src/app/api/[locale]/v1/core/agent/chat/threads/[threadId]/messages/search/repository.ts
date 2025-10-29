@@ -6,12 +6,11 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
+  type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -74,7 +73,8 @@ export class MessageSearchRepositoryImpl
       // Type guard to ensure user has id
       if (!user.id) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.errors.unauthorized.title",
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -90,7 +90,8 @@ export class MessageSearchRepositoryImpl
 
       if (!thread) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.errors.notFound.title",
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -132,7 +133,7 @@ export class MessageSearchRepositoryImpl
         .offset(offset);
 
       // Get total count
-      const [ { count: totalCount }] = await db
+      const [{ count: totalCount }] = await db
         .select({
           count: sql<number>`count(*)::int`,
         })

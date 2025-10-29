@@ -11,5 +11,5 @@ export type NextHandlerReturnType<TResponseOutput, TUrlVariablesInput> = (
   request: NextRequest,
   {
     params,
-  }: { params: Promise<TUrlVariablesInput & { locale: CountryLanguage }> });
+  }: { params: Promise<TUrlVariablesInput & { locale: CountryLanguage }> },
 ) => Promise<NextResponse<ResponseType<TResponseOutput>> | Response>;

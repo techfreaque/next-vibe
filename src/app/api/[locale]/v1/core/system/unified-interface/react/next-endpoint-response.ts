@@ -58,7 +58,6 @@ export async function createHTTPSuccessResponse<TResponse>({
       message: "app.api.v1.core.shared.errorTypes.invalid_response_error",
       errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
       messageParams: { message: validationResult.message },
-      cause: validationResult,
       logger,
     });
   }
@@ -185,7 +184,7 @@ export async function validatePostRequest<T>(
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         message: parseError(error).message,
-      });
+      },
     });
   }
 }
@@ -288,7 +287,7 @@ export function validateGetRequest<T extends ZodSchema>(
       errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
       messageParams: {
         message: parseError(error).message,
-      });
+      },
     });
   }
 }

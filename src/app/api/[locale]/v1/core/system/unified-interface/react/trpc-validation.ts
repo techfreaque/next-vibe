@@ -85,7 +85,7 @@ export function validateTrpcRequestData<
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: urlValidation.message,
-        });
+        },
       };
     }
 
@@ -103,7 +103,7 @@ export function validateTrpcRequestData<
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
-        });
+        },
       };
     }
 
@@ -114,7 +114,7 @@ export function validateTrpcRequestData<
         requestData: requestValidation.data as TRequestOutput,
         urlPathParams: urlValidation.data as TUrlVariablesOutput,
         locale: validatedLocale,
-      });
+      },
     };
   } catch (error) {
     return {
@@ -127,7 +127,7 @@ export function validateTrpcRequestData<
           error instanceof Error
             ? error.message
             : "app.error.errors.unknown_validation_error",
-      });
+      },
     };
   }
 }

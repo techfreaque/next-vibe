@@ -6,9 +6,8 @@
 import "server-only";
 
 import {
-  fail,
-  fail,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 

@@ -47,8 +47,8 @@ export function validateCliRequestData<
     requestUrlPathParamsSchema: TUrlSchema;
   },
   context: CliValidationContext<
-    Parameters<TRequestSchema["parse"]>[0],
-    Parameters<TUrlSchema["parse"]>[0]
+    z.input<TRequestSchema>,
+    z.input<TUrlSchema>
   >,
   logger: EndpointLogger,
 ): ResponseType<
@@ -117,7 +117,8 @@ export function validateCliRequestData<
     // First, validate without applying defaults to see what was actually provided
     const rawValidation = endpoint.requestSchema.safeParse(context.requestData);
 
-    let finalRequestData = context.requestData;
+    let finalRequestData: z.input<TRequestSchema> | z.output<TRequestSchema> =
+      context.requestData;
     if (rawValidation.success) {
       // Use the validated data which includes defaults
       finalRequestData = rawValidation.data;

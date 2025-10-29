@@ -13,6 +13,7 @@ import { z } from "zod";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import { type CreateApiEndpoint } from "../endpoint/create";
 import type {
   ExamplesList,
   ExtractInput,
@@ -25,9 +26,8 @@ import type {
   PrimitiveField,
   UnifiedField,
 } from "../types/endpoint";
-import { type CreateApiEndpoint } from "../endpoint/create";
-import type { EndpointErrorTypes } from '../types/enums';
-import { FieldUsage, Methods } from '../types/enums';
+import type { EndpointErrorTypes } from "../types/enums";
+import { FieldUsage, Methods } from "../types/enums";
 
 /**
  * Configuration for a single method in a form endpoint
@@ -717,7 +717,7 @@ export function createFormEndpoint<
         Methods.GET,
         FieldUsage.RequestUrlParams
       >,
-    });
+    },
   };
 
   // Generate schemas for POST method using original fields
@@ -787,7 +787,7 @@ export function createFormEndpoint<
         Methods.POST,
         FieldUsage.RequestUrlParams
       >,
-    });
+    },
   };
 
   // Return the form endpoints

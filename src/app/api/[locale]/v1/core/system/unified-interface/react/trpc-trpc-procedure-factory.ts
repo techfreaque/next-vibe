@@ -83,7 +83,7 @@ export function createTRPCProcedureFromEndpoint<
       TUserRoleValue,
       TFields
     >["sms"];
-  });
+  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {
   // Create enhanced handler to get the tRPC procedure
@@ -115,7 +115,7 @@ export function createTRPCProcedureFromEndpoint<
             input as {
               requestData: TRequestOutput;
               urlPathParams?: TUrlVariablesOutput;
-            });
+            },
           );
 
           // Update context with URL variables
@@ -128,7 +128,7 @@ export function createTRPCProcedureFromEndpoint<
             { ...requestData, urlPathParams },
             enhancedCtx,
           );
-        },
+        });
 
     case Methods.POST:
     case Methods.PUT:
@@ -142,7 +142,7 @@ export function createTRPCProcedureFromEndpoint<
             input as {
               requestData: TRequestOutput;
               urlPathParams?: TUrlVariablesOutput;
-            });
+            },
           );
 
           // Update context with URL variables
@@ -155,7 +155,7 @@ export function createTRPCProcedureFromEndpoint<
             { ...requestData, urlPathParams },
             enhancedCtx,
           );
-        },
+        });
 
     default:
       // This should never happen in production as all supported methods are handled above

@@ -22,21 +22,21 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { EndpointLogger } from "../shared/logger/endpoint";
-import { createEndpointLogger } from "../shared/logger/endpoint";
-import type { Methods } from "../shared/types/enums";
-import {
-  authenticateUser,
-  executeHandler,
-} from "../shared/server-only/execution/core";
-import type {
-  ApiHandlerOptions,
-  NextHandlerReturnType,
-} from "../shared/types/handler";
 import {
   createHTTPErrorResponse,
   createHTTPSuccessResponse,
 } from "../../unified-interface/react/next-endpoint-response";
+import type { EndpointLogger } from "../shared/logger/endpoint";
+import { createEndpointLogger } from "../shared/logger/endpoint";
+import {
+  authenticateUser,
+  executeHandler,
+} from "../shared/server-only/execution/core";
+import type { Methods } from "../shared/types/enums";
+import type {
+  ApiHandlerOptions,
+  NextHandlerReturnType,
+} from "../shared/types/handler";
 import { validateNextRequestData } from "./next-validation";
 
 // Create email handling repository instance
@@ -97,7 +97,7 @@ export function createNextHandler<
       params,
     }: {
       params: Promise<TUrlVariablesOutput & { locale: CountryLanguage }>;
-    });
+    },
   ) => {
     // Get locale and translation function
     const { locale, ...resolvedParams } = await params;

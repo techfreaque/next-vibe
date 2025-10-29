@@ -30,11 +30,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { useCronStats } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/stats/hooks";
 import {
   CronTaskPriority,
   CronTaskStatus,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
-import { useCronStats } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/stats/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";

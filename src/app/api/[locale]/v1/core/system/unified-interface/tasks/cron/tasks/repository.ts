@@ -22,7 +22,14 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types"
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cronTasks } from "../../db";
-import { CronTaskPriority, CronTaskStatus, TaskCategory } from "../../enum";
+import {
+  CronTaskPriority,
+  CronTaskPriorityDB,
+  CronTaskStatus,
+  CronTaskStatusDB,
+  TaskCategory,
+  TaskCategoryDB,
+} from "../../enum";
 import type {
   CronTaskCreateRequestOutput,
   CronTaskCreateResponseOutput,
@@ -146,9 +153,9 @@ function formatTaskResponse(
 ): CronTaskResponseType {
   // Validate enum values from database using Zod schemas
   // This provides runtime validation and type narrowing without type assertions
-  const prioritySchema = z.enum(CronTaskPriority);
-  const statusSchema = z.enum(CronTaskStatus);
-  const categorySchema = z.enum(TaskCategory);
+  const prioritySchema = z.enum(CronTaskPriorityDB);
+  const statusSchema = z.enum(CronTaskStatusDB);
+  const categorySchema = z.enum(TaskCategoryDB);
 
   const formatted: CronTaskResponseType = {
     id: task.id,
@@ -381,16 +388,16 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
           description: createdTask.description || undefined,
           schedule: createdTask.schedule || DEFAULT_CRON_SCHEDULE,
           enabled: createdTask.enabled,
-          priority: z.enum(CronTaskPriority).parse(createdTask.priority),
+          priority: z.enum(CronTaskPriorityDB).parse(createdTask.priority),
           status: CronTaskStatus.PENDING, // New tasks are always pending
-          category: z.enum(TaskCategory).parse(createdTask.category),
+          category: z.enum(TaskCategoryDB).parse(createdTask.category),
           timeout: createdTask.timeout || 300000,
           retries: createdTask.retries || 3,
           retryDelay,
           version: parseInt(createdTask.version, 10) || 1,
           createdAt: createdTask.createdAt.toISOString(),
           updatedAt: createdTask.updatedAt.toISOString(),
-        });
+        }
       };
 
       logger.vibe("🚀 Successfully created cron task");

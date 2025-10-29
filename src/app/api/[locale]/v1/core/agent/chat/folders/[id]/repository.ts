@@ -1,12 +1,11 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";

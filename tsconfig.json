@@ -53,10 +53,11 @@
   ],
   "exclude": [
     "node_modules",
+    "**/node_modules",
     ".tmp",
     ".next",
     "to_migrate/**/*.ts",
     "to_migrate/**/*.tsx"
   ],
-  "extends": "expo/tsconfig.base"
+  // "extends": "expo/tsconfig.base"
 }

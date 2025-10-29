@@ -24,10 +24,13 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import {
   CronTaskPriority,
+  CronTaskPriorityDB,
   CronTaskPriorityOptions,
   CronTaskStatus,
+  CronTaskStatusDB,
   CronTaskStatusOptions,
   TaskCategory,
+  TaskCategoryDB,
   TaskCategoryOptions,
 } from "../../enum";
 
@@ -71,7 +74,7 @@ const { GET } = createEndpoint({
           options: CronTaskStatusOptions,
           layout: { columns: 6 },
         },
-        z.array(z.enum(CronTaskStatus)).optional(),
+        z.array(z.enum(CronTaskStatusDB)).optional(),
       ),
       priority: requestDataField(
         {
@@ -86,7 +89,7 @@ const { GET } = createEndpoint({
           options: CronTaskPriorityOptions,
           layout: { columns: 6 },
         },
-        z.array(z.enum(CronTaskPriority)).optional(),
+        z.array(z.enum(CronTaskPriorityDB)).optional(),
       ),
       category: requestDataField(
         {
@@ -101,7 +104,7 @@ const { GET } = createEndpoint({
           options: TaskCategoryOptions,
           layout: { columns: 6 },
         },
-        z.array(z.enum(TaskCategory)).optional(),
+        z.array(z.enum(TaskCategoryDB)).optional(),
       ),
       enabled: requestDataField(
         {
@@ -240,7 +243,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.get.response.task.priority",
               },
-              z.enum(CronTaskPriority),
+              z.enum(CronTaskPriorityDB),
             ),
             status: responseField(
               {
@@ -248,7 +251,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.get.response.task.status",
               },
-              z.enum(CronTaskStatus),
+              z.enum(CronTaskStatusDB),
             ),
             category: responseField(
               {
@@ -256,7 +259,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.get.response.task.category",
               },
-              z.enum(TaskCategory),
+              z.enum(TaskCategoryDB),
             ),
             lastRun: responseField(
               {
@@ -467,7 +470,7 @@ const { POST } = createEndpoint({
           options: CronTaskPriorityOptions,
           layout: { columns: 6 },
         },
-        z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
+        z.enum(CronTaskPriorityDB).default(CronTaskPriority.MEDIUM),
       ),
       category: requestDataField(
         {
@@ -480,7 +483,7 @@ const { POST } = createEndpoint({
           options: TaskCategoryOptions,
           layout: { columns: 6 },
         },
-        z.enum(TaskCategory).default(TaskCategory.SYSTEM),
+        z.enum(TaskCategoryDB).default(TaskCategory.SYSTEM),
       ),
       enabled: requestDataField(
         {
@@ -543,9 +546,9 @@ const { POST } = createEndpoint({
           description: z.string().optional(),
           schedule: z.string(),
           enabled: z.boolean(),
-          priority: z.enum(CronTaskPriority),
-          status: z.enum(CronTaskStatus),
-          category: z.enum(TaskCategory),
+          priority: z.enum(CronTaskPriorityDB),
+          status: z.enum(CronTaskStatusDB),
+          category: z.enum(TaskCategoryDB),
           timeout: z.number(),
           retries: z.number(),
           retryDelay: z.number(),

@@ -5,12 +5,11 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 

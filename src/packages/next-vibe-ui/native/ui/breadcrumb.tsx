@@ -23,8 +23,7 @@ export const Breadcrumb = React.forwardRef<View, BreadcrumbProps>(
     return (
       <View
         ref={ref}
-        accessibilityRole="navigation"
-        accessibilityLabel="breadcrumb"
+        accessibilityLabel="breadcrumb navigation"
         className={className}
         {...props}
       >

@@ -263,7 +263,7 @@ export function createCacheKey(
       (acc, key) => {
         acc[key] = obj[key];
         return acc;
-      });
+      },
       {} as Record<
         string,
         | string

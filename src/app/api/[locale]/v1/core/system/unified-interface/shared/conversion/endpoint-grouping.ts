@@ -310,7 +310,7 @@ export class UnifiedGroupingService {
           totalCount: endpoints.length,
           path: pathSegments,
           level: pathSegments.length,
-        });
+        },
       });
     }
 

@@ -147,14 +147,14 @@ export class MCPServer {
       this.logger.error("[MCP Server] Uncaught exception", {
         error: error.message,
         stack: error.stack,
-      })
+      });
       void shutdown("uncaughtException");
-    },
+    });
 
     process.on("unhandledRejection", (reason) => {
       this.logger.error("[MCP Server] Unhandled rejection", {
         reason: String(reason),
-      })
+      });
       void shutdown("unhandledRejection");
     });
   }

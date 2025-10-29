@@ -23,12 +23,12 @@ import React, { useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CronTaskResponseType } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/tasks/definition";
-import { formatCronSchedule } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron-formatter";
 import {
   useCronTaskEndpoint,
   useDeleteCronTask,
   useToggleCronTask,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/tasks/hooks";
+import { formatCronSchedule } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron-formatter";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";

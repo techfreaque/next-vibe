@@ -136,7 +136,7 @@ export class WebAuthHandler extends BaseAuthHandler {
       ) {
         return fail({
           message:
-            "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.invalidTokenPayload",
+            "app.api.v1.core.system.unifiedUi.cli.vibe.errors.invalidTokenPayload",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -150,7 +150,7 @@ export class WebAuthHandler extends BaseAuthHandler {
       logger.error("JWT verification failed", parseError(error));
       return fail({
         message:
-          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.invalidToken",
+          "app.api.v1.core.system.unifiedUi.cli.vibe.errors.invalidToken",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: { error: parseError(error).message },
       });
@@ -178,7 +178,7 @@ export class WebAuthHandler extends BaseAuthHandler {
       logger.error("JWT signing failed", parseError(error));
       return fail({
         message:
-          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.signingFailed",
+          "app.api.v1.core.system.unifiedUi.cli.vibe.errors.signingFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -282,7 +282,7 @@ export class WebAuthHandler extends BaseAuthHandler {
       logger.error("Error storing auth token", parseError(error));
       return fail({
         message:
-          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.storeFailed",
+          "app.api.v1.core.system.unifiedUi.cli.vibe.errors.storeFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -308,7 +308,7 @@ export class WebAuthHandler extends BaseAuthHandler {
       logger.error("Error clearing auth token", parseError(error));
       return fail({
         message:
-          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.clearFailed",
+          "app.api.v1.core.system.unifiedUi.cli.vibe.errors.clearFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

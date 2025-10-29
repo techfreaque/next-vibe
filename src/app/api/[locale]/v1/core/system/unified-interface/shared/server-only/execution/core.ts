@@ -23,13 +23,13 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import type { ApiEndpoint } from "../../endpoint/create";
 import type { EndpointLogger } from "../../logger/endpoint";
+import type { Methods } from "../../types/enums";
 import type {
   ApiHandlerFunction,
   InferJwtPayloadTypeFromRoles,
 } from "../../types/handler";
-import type { ApiEndpoint } from "../../endpoint/create";
-import type { Methods } from "../../types/enums";
 
 /**
  * Core handler context - everything needed to execute a handler
@@ -114,7 +114,7 @@ export async function executeHandler<
       locale,
       request,
       logger,
-    },
+    });
 
     return result;
   } catch (error) {
@@ -131,11 +131,11 @@ export async function executeHandler<
     // Return a standardized error response
     return fail({
       message:
-        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: parsedError.message,
-      });
+      },
     });
   }
 }
@@ -166,7 +166,7 @@ export async function authenticateUser<
     if (!user) {
       return fail({
         message:
-          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.unauthorized",
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.unauthorized",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -189,16 +189,16 @@ export async function authenticateUser<
 
     return fail({
       message:
-        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.unauthorized",
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.unauthorized",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
       cause: parsedError
         ? fail({
             message:
-              "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
+              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
               error: parsedError.message,
-            });
+            },
           })
         : undefined,
     });
@@ -228,7 +228,7 @@ export async function authenticateTypedUser<
     if (!user) {
       return fail({
         message:
-          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.unauthorized",
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.unauthorized",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -244,20 +244,20 @@ export async function authenticateTypedUser<
       method: endpoint.method,
       platform: context?.platform,
       error: parsedError,
-    },
+    });
 
     return fail({
       message:
-        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.unauthorized",
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.unauthorized",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
       cause: parsedError
         ? fail({
             message:
-              "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
+              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
               error: parsedError.message,
-            });
+            },
           })
         : undefined,
     });

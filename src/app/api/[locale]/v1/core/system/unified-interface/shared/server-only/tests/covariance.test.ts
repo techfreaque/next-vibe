@@ -42,7 +42,7 @@ const test1_2: Test1_2_Result = "✓ PASS";
 
 // Test 1.3: ObjectField with specific children extends UnifiedField
 type Test1_3_ObjectField = ObjectField<
-  { name: PrimitiveField<z.ZodString, { request: "data" }> });
+  { name: PrimitiveField<z.ZodString, { request: "data" }> },
   { request: "data" }
 >;
 type Test1_3_Result =
@@ -78,16 +78,16 @@ type Test2_1_NestedObjectField = ObjectField<
       {
         email: PrimitiveField<z.ZodString, { request: "data" }>;
         password: PrimitiveField<z.ZodString, { request: "data" }>;
-      });
+      },
       { request: "data" }
     >;
     options: ObjectField<
       {
         rememberMe: PrimitiveField<z.ZodBoolean, { request: "data" }>;
-      });
+      },
       { request: "data" }
     >;
-  });
+  },
   { request: "data" }
 >;
 type Test2_1_Result =
@@ -106,7 +106,7 @@ type Test3_1_Endpoint = ApiEndpoint<
   Methods.POST,
   readonly (typeof UserRoleValue)[],
   ObjectField<
-    { name: PrimitiveField<z.ZodString, { request: "data" }> });
+    { name: PrimitiveField<z.ZodString, { request: "data" }> },
     { request: "data" }
   >
 >;
@@ -150,7 +150,7 @@ type Test4_1_CreateEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly (typeof UserRoleValue)[],
   ObjectField<
-    { name: PrimitiveField<z.ZodString, { request: "data" }> });
+    { name: PrimitiveField<z.ZodString, { request: "data" }> },
     { request: "data" }
   >
 >;
@@ -194,17 +194,17 @@ type Test5_1_LoginFields = ObjectField<
       {
         email: PrimitiveField<z.ZodString, { request: "data" }>;
         password: PrimitiveField<z.ZodString, { request: "data" }>;
-      });
+      },
       { request: "data" }
     >;
     options: ObjectField<
       {
         rememberMe: PrimitiveField<z.ZodBoolean, { request: "data" }>;
-      });
+      },
       { request: "data" }
     >;
     leadId: PrimitiveField<z.ZodString, { request: "data" }>;
-  });
+  },
   { request: "data"; response: true }
 >;
 
@@ -395,7 +395,7 @@ type Test10_1_ArrayOfObjects = ArrayField<
     {
       id: PrimitiveField<z.ZodString, { request: "data" }>;
       name: PrimitiveField<z.ZodString, { request: "data" }>;
-    });
+    },
     { request: "data" }
   >,
   { request: "data" }
@@ -414,13 +414,13 @@ type Test10_2_DeeplyNested = ObjectField<
         level2: ObjectField<
           {
             level3: PrimitiveField<z.ZodString, { request: "data" }>;
-          });
+          },
           { request: "data" }
         >;
-      });
+      },
       { request: "data" }
     >;
-  });
+  },
   { request: "data" }
 >;
 type Test10_2_Result =
@@ -435,7 +435,7 @@ type Test10_3_MixedUsage = ObjectField<
     requestOnly: PrimitiveField<z.ZodString, { request: "data" }>;
     responseOnly: PrimitiveField<z.ZodString, { response: true }>;
     both: PrimitiveField<z.ZodString, { request: "data"; response: true }>;
-  });
+  },
   { request: "data"; response: true }
 >;
 type Test10_3_Result =
@@ -510,10 +510,10 @@ type Test12_1_CustomField = ObjectField<
     nested: ObjectField<
       {
         deep: PrimitiveField<z.ZodBoolean, { request: "data" }>;
-      });
+      },
       { request: "data" }
     >;
-  });
+  },
   { request: "data" }
 >;
 
@@ -555,7 +555,7 @@ type Test13_1_OptionalFields = ObjectField<
   {
     required: PrimitiveField<z.ZodString, { request: "data" }>;
     optional: PrimitiveField<z.ZodOptional<z.ZodString>, { request: "data" }>;
-  });
+  },
   { request: "data" }
 >;
 type Test13_1_Result =
@@ -592,7 +592,7 @@ type Test14_1_GetEndpoint = CreateApiEndpoint<
   ObjectField<
     {
       data: PrimitiveField<z.ZodString, { response: true }>;
-    });
+    },
     { response: true }
   >
 >;
@@ -615,7 +615,7 @@ type Test14_2_DeleteEndpoint = CreateApiEndpoint<
   ObjectField<
     {
       id: PrimitiveField<z.ZodString, { request: "urlPathParams" }>;
-    });
+    },
     { request: "urlPathParams" }
   >
 >;
@@ -643,7 +643,7 @@ type Test15_1_PaginationFields = ObjectField<
       {
         search: PrimitiveField<z.ZodString, { request: "data" }>;
         status: PrimitiveField<z.ZodString, { request: "data" }>;
-      });
+      },
       { request: "data" }
     >;
     results: ArrayField<
@@ -651,12 +651,12 @@ type Test15_1_PaginationFields = ObjectField<
         {
           id: PrimitiveField<z.ZodString, { response: true }>;
           name: PrimitiveField<z.ZodString, { response: true }>;
-        });
+        },
         { response: true }
       >,
       { response: true }
     >;
-  });
+  },
   { request: "data"; response: true }
 >;
 type Test15_1_Result =
@@ -674,17 +674,17 @@ type Test15_2_FileUploadFields = ObjectField<
         filename: PrimitiveField<z.ZodString, { request: "data" }>;
         size: PrimitiveField<z.ZodNumber, { request: "data" }>;
         mimeType: PrimitiveField<z.ZodString, { request: "data" }>;
-      });
+      },
       { request: "data" }
     >;
     uploadResult: ObjectField<
       {
         url: PrimitiveField<z.ZodString, { response: true }>;
         id: PrimitiveField<z.ZodString, { response: true }>;
-      });
+      },
       { response: true }
     >;
-  });
+  },
   { request: "data"; response: true }
 >;
 type Test15_2_Result =
@@ -821,7 +821,7 @@ type Test19_3_MixedField = ObjectField<
   {
     input: PrimitiveField<z.ZodString, { request: "data" }>;
     output: PrimitiveField<z.ZodString, { response: true }>;
-  });
+  },
   { request: "data"; response: true }
 >;
 type Test19_3_Result =
@@ -841,7 +841,7 @@ interface Test20_1_MultiEndpoint {
     ObjectField<
       {
         email: PrimitiveField<z.ZodString, { request: "data" }>;
-      });
+      },
       { request: "data" }
     >
   >;
@@ -852,7 +852,7 @@ interface Test20_1_MultiEndpoint {
     ObjectField<
       {
         code: PrimitiveField<z.ZodString, { request: "data" }>;
-      });
+      },
       { request: "data" }
     >
   >;

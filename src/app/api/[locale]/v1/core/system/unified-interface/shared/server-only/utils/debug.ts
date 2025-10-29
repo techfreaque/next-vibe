@@ -113,7 +113,7 @@ export class ResourceCleanupRegistry {
             ? { message: cleanupError.message, stack: cleanupError.stack }
             : { message: String(cleanupError) };
         logger.warn(
-          "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.cleanupFunctionFailed",
+          "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.cleanupFunctionFailed",
           { cleanupError: error },
         );
       }
@@ -345,7 +345,7 @@ export class DebugFormatter {
       // eslint-disable-next-line prefer-template
       "\n" +
       t(
-        "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.executionSummary",
+        "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.executionSummary",
         {
           executionSeconds,
           overheadSeconds,
@@ -461,11 +461,11 @@ export class CliResourceManager {
         if (verbose) {
           const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
           logger.info(
-            "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.executionTime",
+            "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.executionTime",
             { totalSeconds },
           );
           logger.info(
-            "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.performanceBreakdown",
+            "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.performanceBreakdown",
           );
           console.log(DebugFormatter.formatPerformanceBreakdown(breakdown));
         } else {
@@ -491,16 +491,16 @@ export class CliResourceManager {
 
         if (handles.length > 0 || requests > 0) {
           logger.info(
-            "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.remainingResources",
+            "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.remainingResources",
           );
           logger.info(
-            "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.activeHandles",
+            "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.activeHandles",
             {
               handles: DebugFormatter.formatActiveHandles(handles),
             },
           );
           logger.info(
-            "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.activeRequests",
+            "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.activeRequests",
             {
               requests: requests.toString(),
             },
@@ -518,7 +518,7 @@ export class CliResourceManager {
       if (hasProblematic) {
         if (verbose) {
           logger.warn(
-            "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.problematicHandlesDetected",
+            "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.problematicHandlesDetected",
           );
         }
         setTimeout(() => process.exit(0), 100);
@@ -532,7 +532,7 @@ export class CliResourceManager {
           ? { message: cleanupError.message, stack: cleanupError.stack }
           : { message: String(cleanupError) };
       logger.warn(
-        "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.cleanupError",
+        "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.cleanupError",
         { cleanupError: error },
       );
       process.exit(1);

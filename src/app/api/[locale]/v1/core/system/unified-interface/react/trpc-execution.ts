@@ -85,7 +85,7 @@ export async function safeExecuteTRPC<
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parseError(err).message,
+        },
       });
-    );
   }
 }

@@ -114,9 +114,9 @@ const testPublicEndpoint = createEndpoint({
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
-    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } });
-    {});
-    {});
+    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
+    {},
+    {},
   ),
   errorTypes: {} as Record<
     string,
@@ -127,8 +127,8 @@ const testPublicEndpoint = createEndpoint({
     requests: undefined,
     urlPathParams: undefined,
     responses: undefined,
-  });
-},
+  },
+});
 
 const testAdminEndpoint = createEndpoint({
   method: Methods.GET,
@@ -139,9 +139,9 @@ const testAdminEndpoint = createEndpoint({
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
   fields: objectField(
-    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } });
-    {});
-    {});
+    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
+    {},
+    {},
   ),
   errorTypes: {} as Record<
     string,
@@ -152,7 +152,7 @@ const testAdminEndpoint = createEndpoint({
     requests: undefined,
     urlPathParams: undefined,
     responses: undefined,
-  });
+  },
 });
 
 // Check what allowedRoles type is preserved as
@@ -180,8 +180,8 @@ const testResponseEndpoint = createEndpoint({
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
-    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } });
-    { response: true });
+    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
+    { response: true },
     {
       userId: responseField(
         { type: WidgetType.TEXT, content: "test" },
@@ -191,7 +191,7 @@ const testResponseEndpoint = createEndpoint({
         { type: WidgetType.TEXT, content: "test" },
         z.number(),
       ),
-    });
+    },
   ),
   errorTypes: {} as Record<
     string,
@@ -203,8 +203,8 @@ const testResponseEndpoint = createEndpoint({
     urlPathParams: undefined,
     responses: {
       default: { userId: "test-user-id", count: 42 },
-    });
-  });
+    },
+  },
 });
 
 // Extract the response type from GET method

@@ -72,8 +72,8 @@ import type {
 import type { NextHandlerReturnType } from "../../next-api/types";
 import type { TrpcHandlerReturnType } from "../../trpc/types";
 import type { CreateApiEndpoint } from "../endpoint/create";
-import type { Methods } from './enums';
 import type { EndpointLogger } from "../logger/endpoint";
+import type { Methods } from "./enums";
 
 // Re-export MCP types for convenience
 export type {
@@ -299,7 +299,7 @@ export type EndpointsHandlerReturn<T> = {
     request: NextRequest,
     context: {
       params: Promise<Record<string, string> & { locale: CountryLanguage }>;
-    });
+    },
   ) => Promise<
     NextResponse<ResponseType<Record<string, string | number | boolean>>>
   >;
@@ -327,7 +327,7 @@ export type EndpointsHandlerReturn<T> = {
               }
                 ? TUrlOut
                 : never;
-            });
+            },
           ) => Promise<
             T[K] extends { types: { ResponseOutput: infer TResOut } }
               ? TResOut

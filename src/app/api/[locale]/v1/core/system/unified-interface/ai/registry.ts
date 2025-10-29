@@ -100,7 +100,7 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
       return {
         success: false,
         error:
-          "app.api.v1.core.system.unifiedInterface.aiTool.errors.toolNotFound",
+          "app.api.v1.core.system.unifiedUi.aiTool.errors.toolNotFound",
         metadata: {
           executionTime: 0,
           endpointPath: "",
@@ -113,7 +113,7 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
       return {
         success: false,
         error:
-          "app.api.v1.core.system.unifiedInterface.aiTool.errors.permissionDenied",
+          "app.api.v1.core.system.unifiedUi.aiTool.errors.permissionDenied",
         metadata: {
           executionTime: 0,
           endpointPath: "",

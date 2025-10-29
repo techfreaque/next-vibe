@@ -7,7 +7,6 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
   fail,
-  fail,
 } from "next-vibe/shared/types/response.schema";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";

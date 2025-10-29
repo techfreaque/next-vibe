@@ -135,7 +135,7 @@ export function createPageWrapper<
                   ? err
                   : new Error(
                       t(
-                        "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+                        "app.api.v1.core.system.unifiedUi.reactNative.errors.failedToLoadPage",
                       ),
                     ),
               );
@@ -162,7 +162,7 @@ export function createPageWrapper<
         >
           <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
             {t(
-              "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+              "app.api.v1.core.system.unifiedUi.reactNative.errors.failedToLoadPage",
             )}
           </Text>
           <Text style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
@@ -341,7 +341,7 @@ export function createPageWrapperWithOptions<
                   ? err
                   : new Error(
                       t(
-                        "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+                        "app.api.v1.core.system.unifiedUi.reactNative.errors.failedToLoadPage",
                       ),
                     ),
               );
@@ -372,7 +372,7 @@ export function createPageWrapperWithOptions<
         >
           <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
             {t(
-              "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+              "app.api.v1.core.system.unifiedUi.reactNative.errors.failedToLoadPage",
             )}
           </Text>
           <Text style={{ fontSize: 14, color: "#666", textAlign: "center" }}>

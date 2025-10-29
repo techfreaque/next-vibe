@@ -21,7 +21,11 @@ import { memoryMonitor } from "../shared/server-only/utils/performance";
 import type { EndpointDefinition } from "../shared/types/endpoint";
 import type { InferJwtPayloadTypeFromRoles } from "../shared/types/handler";
 import { getConfig } from "./config";
-import type { CliRequestData, RouteExecutionResult } from "./route-executor";
+import type {
+  CliRequestData,
+  RouteExecutionContext,
+  RouteExecutionResult,
+} from "./route-executor";
 import { routeDelegationHandler } from "./route-executor";
 import { helpHandler } from "./widgets/help-handler";
 import { interactiveModeHandler } from "./widgets/interactive-mode-handler";

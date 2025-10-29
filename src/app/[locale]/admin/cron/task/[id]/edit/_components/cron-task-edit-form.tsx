@@ -12,6 +12,7 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import type React from "react";
 
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type {
   endpoints,
@@ -19,7 +20,6 @@ import type {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/task/[id]/definition";
 import { formatCronSchedule } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron-formatter";
 import { CronTaskPriorityOptions } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
-import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";

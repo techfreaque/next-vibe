@@ -16,13 +16,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import type { JSX, ReactNode } from "react";
 
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import type statsEndpoints from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/stats/definition";
 import {
   CronTaskPriorityFilter,
   CronTaskStatusFilter,
   PulseHealthStatus,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
-import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

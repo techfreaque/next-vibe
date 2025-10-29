@@ -252,7 +252,7 @@ export abstract class BaseExecutor {
         dryRun: options.dryRun || false,
         interactive: options.interactive || false,
         output: options.output || "json",
-      });
+      }
     };
   }
 
@@ -273,7 +273,7 @@ export abstract class BaseExecutor {
         endpointPath: endpoint.definition.path.join("/"),
         method: endpoint.definition.method,
         ...result.metadata,
-      });
+      }
     };
   }
 
@@ -291,7 +291,7 @@ export abstract class BaseExecutor {
         executionTime: Date.now() - startTime,
         endpointPath: "",
         method: "",
-      });
+      }
     };
   }
 
@@ -316,7 +316,7 @@ export abstract class BaseExecutor {
         executionTime: Date.now() - startTime,
         endpointPath: endpoint.definition.path.join("/"),
         method: endpoint.definition.method,
-      });
+      }
     };
   }
 }

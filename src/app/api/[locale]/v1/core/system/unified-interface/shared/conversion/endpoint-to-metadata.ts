@@ -70,7 +70,7 @@ export function zodSchemaToJsonSchema(schema: z.ZodSchema): JsonSchema {
     const jsonSchema = zodToJsonSchema(schema, {
       target: "jsonSchema7",
       $refStrategy: "none",
-    },
+    });
 
     if (typeof jsonSchema === "object" && jsonSchema !== null) {
       const schema = jsonSchema as {
@@ -186,6 +186,7 @@ export function endpointToBaseMetadata(
     method: endpoint.definition.method,
     routePath: endpoint.routePath,
     allowedRoles: endpoint.definition.allowedRoles,
+    requiresAuth: !endpoint.definition.allowedRoles.includes("PUBLIC"),
     requestSchema: endpoint.definition.requestSchema,
   };
 }

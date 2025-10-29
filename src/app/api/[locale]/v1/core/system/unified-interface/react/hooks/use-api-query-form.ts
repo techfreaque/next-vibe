@@ -307,7 +307,7 @@ export function useApiQueryForm<
           }
         }, persistDebounceMs);
       }
-    };
+    });
 
     return (): void => {
       subscription.unsubscribe();
@@ -645,7 +645,7 @@ export function useApiQueryForm<
         if (options.onError) {
           options.onError({
             error: errorResponse,
-            requestData: formMethods.getValues(}),
+            requestData: formMethods.getValues(),
             pathParams:
               options.urlParamVariables ||
               ({} as ExtractOutput<
@@ -653,7 +653,7 @@ export function useApiQueryForm<
                   TEndpoint["fields"],
                   FieldUsage.RequestUrlParams
                 >
-              >}),
+              >),
           });
         }
       } finally {
@@ -675,16 +675,16 @@ export function useApiQueryForm<
         if (options.onError) {
           // Create a proper error response for validation errors with translation key
           const errorResponse = fail({
-        message: 
-            "app.api.v1.core.system.unifiedUi.react.hooks.queryForm.errors.validation_failed",
+            message:
+              "app.api.v1.core.system.unifiedUi.react.hooks.queryForm.errors.validation_failed",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            { formId, errors: JSON.stringify(errors) });
-          );
+            messageParams: { formId, errors: JSON.stringify(errors) },
+          });
 
           // Call the onError callback with the validation error
           options.onError({
             error: errorResponse,
-            requestData: formMethods.getValues(}),
+            requestData: formMethods.getValues(),
             pathParams:
               options.urlParamVariables ||
               ({} as ExtractOutput<
@@ -692,10 +692,10 @@ export function useApiQueryForm<
                   TEndpoint["fields"],
                   FieldUsage.RequestUrlParams
                 >
-              >}),
+              >),
           });
         }
-      });
+      },
     )(event);
   };
 
@@ -732,7 +732,7 @@ export function useApiQueryForm<
       if (query.setErrorType) {
         query.setErrorType(error);
       }
-    });
+    },
 
     // Form persistence
     clearSavedForm,

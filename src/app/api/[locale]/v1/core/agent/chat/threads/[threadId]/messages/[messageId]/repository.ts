@@ -8,9 +8,9 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -173,7 +173,8 @@ class MessageRepository implements MessageRepositoryInterface {
       // Type guard to ensure user has id
       if (!user.id) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.unauthorized.title",
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -194,7 +195,8 @@ class MessageRepository implements MessageRepositoryInterface {
 
       if (!thread) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.threadNotFound.title" as const,
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.threadNotFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -223,7 +225,8 @@ class MessageRepository implements MessageRepositoryInterface {
 
       if (!existingMessage) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.messageNotFound.title" as const,
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.messageNotFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -257,7 +260,8 @@ class MessageRepository implements MessageRepositoryInterface {
     } catch (error) {
       logger.error("Error updating message:", parseError(error));
       return fail({
-        message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.server.description" as const,
+        message:
+          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.server.description" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -276,7 +280,8 @@ class MessageRepository implements MessageRepositoryInterface {
       // Type guard to ensure user has id
       if (!user.id) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.unauthorized.title",
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -297,7 +302,8 @@ class MessageRepository implements MessageRepositoryInterface {
 
       if (!thread) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.threadNotFound.title" as const,
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.threadNotFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -326,7 +332,8 @@ class MessageRepository implements MessageRepositoryInterface {
 
       if (!existingMessage) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.messageNotFound.title" as const,
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.messageNotFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -342,7 +349,8 @@ class MessageRepository implements MessageRepositoryInterface {
     } catch (error) {
       logger.error("Error deleting message:", parseError(error));
       return fail({
-        message: "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.server.description" as const,
+        message:
+          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.server.description" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

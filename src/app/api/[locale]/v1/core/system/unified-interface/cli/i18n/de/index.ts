@@ -42,6 +42,39 @@ export const translations: typeof enTranslations = {
       storeFailed: "Sitzung konnte nicht gespeichert werden",
       clearFailed: "Sitzung konnte nicht gelöscht werden",
         },
+    endpoints: {
+      endpointHandler: {
+        error: {
+          form_validation_failed: "Formularvalidierung fehlgeschlagen",
+          unauthorized: "Nicht autorisierter Zugriff",
+          errors: {
+            unknown_validation_error: "Unbekannter Validierungsfehler",
+            invalid_request_data: "Ungültige Anfragedaten",
+            invalid_url_parameters: "Ungültige URL-Parameter",
+          },
+          general: {
+            internal_server_error: "Interner Serverfehler",
+          },
+        },
+      },
+      renderers: {
+        cliUi: {
+          helpHandler: {
+            noDescription: "Keine Beschreibung verfügbar",
+            flagDataDesc: "Anfragedaten als JSON bereitstellen",
+            flagUserTypeDesc: "Benutzertyp angeben (admin, customer, public)",
+            flagLocaleDesc: "Locale angeben (en-GLOBAL, de-DE, pl-PL)",
+            flagOutputDesc: "Ausgabeformat (pretty, json)",
+            flagVerboseDesc: "Ausführliche Ausgabe aktivieren",
+            flagDryRunDesc: "Testlauf ohne Ausführung durchführen",
+            usageLabel: "Verwendung",
+            availableCommandsLabel: "Verfügbare Befehle",
+            globalOptionsLabel: "Globale Optionen",
+            examplesLabel: "Beispiele",
+          },
+        },
+      },
+    },
     interactive: {
       welcome: "Willkommen im Vibe Interaktiven Modus",
       goodbye: "Auf Wiedersehen!",

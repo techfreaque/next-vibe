@@ -25,7 +25,7 @@ import type { ApiMutationOptions } from "./types";
 
 /**
  * Type for mutation variables
- * When both TRequest and TUrlVariables are never (no request data needed}),
+ * When both TRequest and TUrlVariables are never (no request data needed),
  * the variables should be an empty object.
  * When TUrlVariables is never, urlPathParams is optional (can be omitted).
  */
@@ -34,10 +34,10 @@ export type MutationVariables<TRequest, TUrlVariables> = [TRequest] extends [
 ]
   ? [TUrlVariables] extends [never]
     ? Record<string, never> // Both are never - empty object
-    : messageParams: { requestData: TRequest; urlPathParams: TUrlVariables }
+    : { requestData: TRequest; urlPathParams: TUrlVariables }
   : [TUrlVariables] extends [never]
-    ? messageParams: { requestData: TRequest; urlPathParams?: never } // TRequest exists, TUrlVariables is never - urlPathParams is optional
-    : messageParams: { requestData: TRequest; urlPathParams: TUrlVariables };
+    ? { requestData: TRequest; urlPathParams?: never } // TRequest exists, TUrlVariables is never - urlPathParams is optional
+    : { requestData: TRequest; urlPathParams: TUrlVariables };
 
 /**
  * Mutation context type for tracking additional mutation state
@@ -125,7 +125,7 @@ export function useApiMutation<
     TEndpoint["TRequestOutput"],
     TEndpoint["TResponseOutput"],
     TEndpoint["TUrlVariablesOutput"]
-  > = {});
+  > = {},
 ): EnhancedMutationResult<
   TEndpoint["TResponseOutput"],
   TEndpoint["TRequestOutput"],
@@ -137,7 +137,7 @@ export function useApiMutation<
 
   // Get mutation ID
   const mutationId = useMemo(
-    () => getMutationId(endpoint}),
+    () => getMutationId(endpoint),
     [getMutationId, endpoint],
   );
 
@@ -154,7 +154,7 @@ export function useApiMutation<
       error: null,
       isSuccess: false,
       statusMessage: undefined,
-    }}),
+    }),
     [],
   );
 
@@ -166,7 +166,7 @@ export function useApiMutation<
         (mutation as MutationStoreType<TEndpoint["TResponseOutput"]>) ??
         defaultState
       );
-    });
+    },
     [mutationId, defaultState],
   );
 
@@ -203,7 +203,7 @@ export function useApiMutation<
         locale,
         options,
       );
-    });
+    },
     [executeMutation, endpoint, logger, t, locale, options],
   );
 
@@ -248,21 +248,21 @@ export function useApiMutation<
       } catch (error) {
         // Create a properly typed error response
         const errorResponse = fail({
-        message:
-          "app.common.errors.unknown",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: parseError(error).message,
-            endpoint: endpoint.path.join("/"}),
-          });
-        );
+          message:
+            "app.common.errors.unknown",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
+            error: parseError(error).message,
+            endpoint: endpoint.path.join("/"),
+          },
+        });
 
         // Set the local error state
         setLocalError(errorResponse);
 
         return errorResponse;
       }
-    });
+    },
     [executeMutation, endpoint, logger, t, locale, options],
   );
 
@@ -280,7 +280,7 @@ export function useApiMutation<
         }
         return { mutations };
       });
-    });
+    },
     [mutationId],
   );
 
@@ -311,7 +311,7 @@ export function useApiMutation<
           isSuccess: false,
         });
       }
-    });
+    },
     [updateMutationState],
   );
 

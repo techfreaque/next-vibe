@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { EndpointErrorTypes } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
   objectField,
@@ -127,13 +128,55 @@ const { POST } = createEndpoint({
   },
 
   errorTypes: {
-    validation_failed: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
         "app.api.v1.core.system.generators.route-handlers.post.errors.validation.title" as const,
       description:
         "app.api.v1.core.system.generators.route-handlers.post.errors.validation.description" as const,
     },
-    server_error: {
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.title" as const,
+      description:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.title" as const,
+      description:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.title" as const,
+      description:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.title" as const,
+      description:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.title" as const,
+      description:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.title" as const,
+      description:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.title" as const,
+      description:
+        "app.api.v1.core.system.generators.route-handlers.post.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
       title:
         "app.api.v1.core.system.generators.route-handlers.post.errors.server.title" as const,
       description:

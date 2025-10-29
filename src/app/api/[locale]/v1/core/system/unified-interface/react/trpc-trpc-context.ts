@@ -152,7 +152,7 @@ export async function createTRPCContext<
     // Authentication failed - get public user with proper leadId
     opts.logger.error("tRPC context: Authentication failed", {
       error: parseError(error),
-    },
+    });
     user = await authRepository.getAuthMinimalUser(
       [UserRole.PUBLIC],
       { platform: "trpc", request: req, locale: opts.locale },
@@ -191,7 +191,7 @@ export async function createAuthenticatedTRPCContext(opts: {
     ...opts,
     logger,
     locale: opts.locale,
-  },
+  });
 
   if (!context.user) {
     // eslint-disable-next-line no-restricted-syntax

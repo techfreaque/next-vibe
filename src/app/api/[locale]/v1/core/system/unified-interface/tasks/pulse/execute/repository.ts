@@ -9,9 +9,9 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -58,7 +58,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
         dryRun: data.dryRun,
         force: data.force,
         taskNames: data.taskNames,
-      },
+      });
 
       const executedAt = new Date().toISOString();
       const results: Array<{
@@ -107,7 +107,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
             success: taskResult.success,
             duration,
             message: taskResult.message,
-          },
+          });
 
           logger.debug(`Task ${taskName} completed`, {
             success: taskResult.success,
@@ -124,8 +124,8 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
             duration,
             message: t(
               "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.executionFailed",
-            }),
-          },
+            ),
+          });
 
           logger.error(`Task ${taskName} failed`, {
             error: parsedError.message,
@@ -146,7 +146,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
             )
           : t(
               "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.executionSuccess",
-            }),
+            ),
         executedAt,
         tasksExecuted: totalTasks,
         results,
@@ -157,7 +157,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
         tasksExecuted: totalTasks,
         successfulTasks,
         dryRun: data.dryRun,
-      },
+      });
 
       return createSuccessResponse(response);
     } catch (error) {
@@ -165,13 +165,13 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
       logger.error("Failed to execute pulse cycle", {
         error: parsedError.message,
         dryRun: data.dryRun,
-      },
+      });
 
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.internal.title",
+        message:
+          "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -182,7 +182,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
     taskName: string,
     dryRun: boolean,
     force: boolean,
-  ): Promise<messageParams: { success: boolean; message?: string }> {
+  ): Promise<{ success: boolean; message?: string }> {
     // Simulate task execution with different outcomes
     const TASK_MESSAGES = {
       healthCheck: "Health check completed",
@@ -197,7 +197,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
 
     const taskSimulations: Record<
       string,
-      () => Promise<messageParams: { success: boolean; message?: string }>
+      () => Promise<{ success: boolean; message?: string }>
     > = {
       "health-check": async () => {
         await this.delay(100);
@@ -205,7 +205,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
           success: true,
           message: TASK_MESSAGES.healthCheck,
         };
-      });
+      },
       "database-sync": async () => {
         await this.delay(200);
         // Simulate occasional failure
@@ -216,19 +216,19 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
             ? TASK_MESSAGES.databaseSynced
             : TASK_MESSAGES.databaseFailed,
         };
-      });
+      },
       "cache-warmup": async () => {
         await this.delay(150);
-        return messageParams: { success: true, message: TASK_MESSAGES.cacheWarmed };
-      });
+        return { success: true, message: TASK_MESSAGES.cacheWarmed };
+      },
       "memory-cleanup": async () => {
         await this.delay(80);
-        return messageParams: { success: true, message: TASK_MESSAGES.memoryCleanup };
-      });
+        return { success: true, message: TASK_MESSAGES.memoryCleanup };
+      },
       "log-rotation": async () => {
         await this.delay(50);
-        return messageParams: { success: true, message: TASK_MESSAGES.logRotation };
-      });
+        return { success: true, message: TASK_MESSAGES.logRotation };
+      },
     };
 
     const simulation = taskSimulations[taskName];

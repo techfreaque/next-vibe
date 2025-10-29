@@ -8,9 +8,9 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -80,7 +80,8 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
 
       if (!thread) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.notFound.title" as const,
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.notFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -108,7 +109,8 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       // Check read permission using permission system
       if (!canReadThread(user, thread, folder)) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.title" as const,
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.title" as const,
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -141,7 +143,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
           "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.server.title" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
-      );
+      });
     }
   }
 
@@ -161,7 +163,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
           errorType: ErrorResponseTypes.FORBIDDEN,
-        );
+        });
       }
 
       // Type guard to ensure user has id
@@ -170,7 +172,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.unauthorized.title" as const,
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-        );
+        });
       }
 
       const userId = user.id;
@@ -190,7 +192,8 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
 
       if (!thread) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.notFound.title",
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -218,7 +221,8 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       // Check write permission using permission system
       if (!canWriteThread(user, thread, folder)) {
         return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -239,7 +243,8 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
 
         if (!parentMessage) {
           return fail({
-            message: "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.validation.title",
+            message:
+              "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.validation.title",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: {
               error:
@@ -274,7 +279,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        });
       }
 
       // Update thread's updatedAt timestamp
