@@ -12,7 +12,7 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div, Span } from "next-vibe-ui/ui";
-import { P } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui";
 import type React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

@@ -20,7 +20,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div, Span } from "next-vibe-ui/ui";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import { H4, P } from "next-vibe-ui/ui/typography";
+import { H4, P } from "next-vibe-ui/ui";
 import type React from "react";
 
 import type { CronHistoryResponseOutput } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/history/definition";

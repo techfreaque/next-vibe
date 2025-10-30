@@ -4,6 +4,7 @@
  */
 
 import type React from "react";
+import { Div } from "next-vibe-ui/ui";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -20,9 +21,9 @@ export default async function AdminLeadsPage({
 }: AdminLeadsPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Stats Client Component */}
       <LeadsStatsClient locale={locale} />
-    </div>
+    </Div>
   );
 }

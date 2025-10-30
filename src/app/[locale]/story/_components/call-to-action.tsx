@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui";
+import { Link } from "next-vibe-ui/ui/link";
+import { H2, P } from "next-vibe-ui/ui/typography";
 import type { FC } from "react";
 import { useInView } from "react-intersection-observer";
 
@@ -33,20 +35,20 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
         transition={{ duration: 0.5 }}
       >
         {/* Background with overlay */}
-        <div className="absolute inset-0 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600" />
-        <div className="absolute inset-0 bg-blue-500/20 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 mix-blend-overlay opacity-50" />
+        <Div className="absolute inset-0 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600" />
+        <Div className="absolute inset-0 bg-blue-500/20 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 mix-blend-overlay opacity-50" />
 
         {/* Content */}
-        <div className="relative p-8 md:p-16 text-white text-center">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4 leading-tight">
+        <Div className="relative p-8 md:p-16 text-white text-center">
+          <Div className="max-w-3xl mx-auto">
+            <H2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4 leading-tight">
               {t("app.story._components.home.cta.title")}
-            </h2>
-            <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto mb-8 leading-relaxed">
+            </H2>
+            <P className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto mb-8 leading-relaxed">
               {t("app.story._components.home.cta.subtitle")}
-            </p>
+            </P>
 
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Div className="flex flex-col sm:flex-row justify-center gap-4">
               <Button
                 size="lg"
                 className="bg-white text-blue-600 hover:bg-gray-100 hover:text-blue-700 px-8"
@@ -67,13 +69,13 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
                   {t("app.story._components.home.cta.viewPlans")}
                 </Link>
               </Button>
-            </div>
+            </Div>
 
-            <p className="text-sm mt-6 text-blue-100">
+            <P className="text-sm mt-6 text-blue-100">
               {t("app.story._components.home.cta.noCredit")}
-            </p>
-          </div>
-        </div>
+            </P>
+          </Div>
+        </Div>
       </motion.div>
     </section>
   );

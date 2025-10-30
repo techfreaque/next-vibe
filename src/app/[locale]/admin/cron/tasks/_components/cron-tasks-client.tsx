@@ -8,6 +8,7 @@
 import { Plus, RefreshCw } from "lucide-react";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div, P } from "next-vibe-ui/ui";
 import type React from "react";
 import { useState } from "react";
 
@@ -33,19 +34,19 @@ export function CronTasksClient({
   const tasksEndpoint = useCronTasksList(logger);
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Tasks Table */}
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
+          <Div className="flex justify-between items-center">
+            <Div>
               <CardTitle>{t("app.admin.cron.taskManagement")}</CardTitle>
 
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <P className="text-sm text-gray-600 dark:text-gray-400">
                 {t("app.admin.cron.nav.tasks_description")}
-              </p>
-            </div>
-            <div className="flex space-x-2">
+              </P>
+            </Div>
+            <Div className="flex space-x-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -59,8 +60,8 @@ export function CronTasksClient({
                 <Plus className="h-4 w-4 mr-2" />
                 {t("app.admin.cron.buttons.createTask")}
               </Button>
-            </div>
-          </div>
+            </Div>
+          </Div>
         </CardHeader>
         <CardContent>
           <CronTasksTable
@@ -79,6 +80,6 @@ export function CronTasksClient({
         onTaskCreated={tasksEndpoint.read.refetch}
         locale={locale}
       />
-    </div>
+    </Div>
   );
 }

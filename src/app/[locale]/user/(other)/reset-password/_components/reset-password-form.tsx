@@ -11,10 +11,12 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  Div,
   Form,
 } from "next-vibe-ui/ui";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -53,9 +55,9 @@ export default function ResetPasswordForm({
       >
         <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl">
           <CardHeader className="text-center pb-4">
-            <div className="mx-auto mb-4 w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+            <Div className="mx-auto mb-4 w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
-            </div>
+            </Div>
             <CardTitle className="text-2xl font-bold text-green-700 dark:text-green-400">
               {t(
                 "app.user.other.resetPassword.auth.resetPassword.successTitle",
@@ -68,13 +70,13 @@ export default function ResetPasswordForm({
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <Div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <Mail className="w-6 h-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
-              <p className="text-sm text-blue-700 dark:text-blue-300">
+              <P className="text-sm text-blue-700 dark:text-blue-300">
                 {t("app.user.other.resetPassword.auth.resetPassword.emailSent")}
-              </p>
-            </div>
-            <div className="flex pt-2">
+              </P>
+            </Div>
+            <Div className="flex pt-2">
               <Button asChild variant="outline" className="flex-1">
                 <Link href={`/${locale}/user/login`}>
                   <ArrowLeft className="w-4 h-4 mr-2" />
@@ -83,7 +85,7 @@ export default function ResetPasswordForm({
                   )}
                 </Link>
               </Button>
-            </div>
+            </Div>
           </CardContent>
         </Card>
       </motion.div>
@@ -98,9 +100,9 @@ export default function ResetPasswordForm({
     >
       <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl">
         <CardHeader className="text-center pb-6">
-          <div className="mx-auto mb-4 w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+          <Div className="mx-auto mb-4 w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
             <Mail className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-          </div>
+          </Div>
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
             {t("app.user.other.resetPassword.auth.resetPassword.title")}
           </CardTitle>

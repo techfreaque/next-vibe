@@ -1,6 +1,7 @@
 "use client";
 
 import { Printer } from "lucide-react";
+import { Div, Span } from "next-vibe-ui/ui";
 import type { ReactElement } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -24,15 +25,15 @@ export function ImprintClientInteraction({
   const { t } = simpleT(locale);
 
   return (
-    <div className="flex justify-end mb-8">
+    <Div className="flex justify-end mb-8">
       <button
         onClick={handlePrint}
         className="flex items-center gap-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 rounded-md text-blue-700 dark:text-blue-300 transition-colors"
         aria-label={t("app.story.imprint.printAriaLabel")}
       >
         <Printer className="h-4 w-4" />
-        <span>{t("app.story.imprint.printButton")}</span>
+        <Span>{t("app.story.imprint.printButton")}</Span>
       </button>
-    </div>
+    </Div>
   );
 }

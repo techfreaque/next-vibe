@@ -10,7 +10,7 @@ import {
   DateRangePreset,
   TimePeriod,
 } from "next-vibe/shared/types/stats-filtering.schema";
-import { Form } from "next-vibe-ui/ui";
+import { Form, Div } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
@@ -84,7 +84,7 @@ export function CronStatsFilters({
   control,
 }: CronStatsFiltersProps): JSX.Element {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {/* Time Period Filters */}
       <EndpointFormField
         name="timePeriod"
@@ -266,7 +266,7 @@ export function CronStatsFilters({
       />
 
       {/* Search */}
-      <div className="md:col-span-2 lg:col-span-3 xl:col-span-4">
+      <Div className="md:col-span-2 lg:col-span-3 xl:col-span-4">
         <EndpointFormField
           name="search"
           control={control}
@@ -276,7 +276,7 @@ export function CronStatsFilters({
             placeholder: "app.admin.cron.stats.filters.searchPlaceholder",
           }}
         />
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }

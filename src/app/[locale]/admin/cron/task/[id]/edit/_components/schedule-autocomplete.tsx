@@ -22,7 +22,7 @@ import {
   PopoverTrigger,
 } from "next-vibe-ui/ui/popover";
 import { Div, Span } from "next-vibe-ui/ui";
-import { P } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 

@@ -6,6 +6,7 @@
 "use client";
 
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import type { Control } from "react-hook-form";
 
@@ -22,7 +23,7 @@ export function ImapServerConfigForm({
   control,
 }: ImapServerConfigFormProps): JSX.Element {
   return (
-    <div className="space-y-4">
+    <Div className="space-y-4">
       <EndpointFormField
         name="serverEnabled"
         config={{
@@ -70,6 +71,6 @@ export function ImapServerConfigForm({
         }}
         control={control}
       />
-    </div>
+    </Div>
   );
 }

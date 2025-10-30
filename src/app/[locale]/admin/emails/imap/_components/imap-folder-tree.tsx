@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div, Span } from "next-vibe-ui/ui";
-import { H3 } from "next-vibe-ui/ui/typography";
+import { H3 } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import { useState } from "react";
 

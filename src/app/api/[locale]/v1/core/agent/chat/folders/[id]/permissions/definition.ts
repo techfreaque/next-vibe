@@ -71,6 +71,14 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
+          allowedRoles: responseArrayField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.folders.id.permissions.get.response.allowedRoles.content" as const,
+            },
+            z.string(),
+          ),
           moderatorIds: responseArrayField(
             {
               type: WidgetType.TEXT,
@@ -156,6 +164,7 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         response: {
+          allowedRoles: ["PUBLIC", "CUSTOMER", "ADMIN"],
           moderatorIds: [
             "223e4567-e89b-12d3-a456-426614174001",
             "323e4567-e89b-12d3-a456-426614174002",
@@ -210,6 +219,18 @@ const { PATCH } = createEndpoint({
       ),
 
       // === REQUEST DATA ===
+      allowedRoles: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label:
+            "app.api.v1.core.agent.chat.folders.id.permissions.patch.allowedRoles.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.folders.id.permissions.patch.allowedRoles.description" as const,
+          layout: { columns: 12 },
+        },
+        z.array(z.string()).optional(),
+      ),
       moderatorIds: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -220,7 +241,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.moderatorIds.description" as const,
           layout: { columns: 12 },
         },
-        z.array(z.string()),
+        z.array(z.string()).optional(),
       ),
 
       // === RESPONSE ===
@@ -235,6 +256,14 @@ const { PATCH } = createEndpoint({
         },
         { response: true },
         {
+          allowedRoles: responseArrayField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.allowedRoles.content" as const,
+            },
+            z.string(),
+          ),
           moderatorIds: responseArrayField(
             {
               type: WidgetType.TEXT,
@@ -318,6 +347,7 @@ const { PATCH } = createEndpoint({
     },
     requests: {
       default: {
+        allowedRoles: ["PUBLIC", "CUSTOMER"],
         moderatorIds: [
           "223e4567-e89b-12d3-a456-426614174001",
           "323e4567-e89b-12d3-a456-426614174002",
@@ -327,6 +357,7 @@ const { PATCH } = createEndpoint({
     responses: {
       default: {
         response: {
+          allowedRoles: ["PUBLIC", "CUSTOMER"],
           moderatorIds: [
             "223e4567-e89b-12d3-a456-426614174001",
             "323e4567-e89b-12d3-a456-426614174002",

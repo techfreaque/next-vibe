@@ -15,6 +15,7 @@ import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import { useCampaignStarterConfigEndpoint } from "@/app/api/[locale]/v1/core/leads/campaigns/campaign-starter/campaign-starter-config/hooks";
@@ -46,7 +47,7 @@ export function CampaignStarterForm({
   }
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       <Form
         form={endpoint.create.form}
         onSubmit={handleSubmit}
@@ -105,8 +106,8 @@ export function CampaignStarterForm({
                 }
               >
                 {/* Enabled Days - Custom checkbox group */}
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
+                <Div className="space-y-3">
+                  <Div className="grid grid-cols-2 gap-3">
                     {[
                       { value: 1, key: "monday" },
                       { value: 2, key: "tuesday" },
@@ -116,7 +117,7 @@ export function CampaignStarterForm({
                       { value: 6, key: "saturday" },
                       { value: 7, key: "sunday" },
                     ].map((day) => (
-                      <div
+                      <Div
                         key={day.value}
                         className="flex items-center space-x-2"
                       >
@@ -148,10 +149,10 @@ export function CampaignStarterForm({
                         >
                           {day.key.charAt(0).toUpperCase() + day.key.slice(1)}
                         </Label>
-                      </div>
+                      </Div>
                     ))}
-                  </div>
-                </div>
+                  </Div>
+                </Div>
               </FormFieldGroup>
 
               <FormFieldGroup
@@ -204,9 +205,9 @@ export function CampaignStarterForm({
                 }
               >
                 {/* Leads Per Week - Custom inputs for each locale */}
-                <div className="space-y-4">
+                <Div className="space-y-4">
                   {Object.values(CountryLanguageValues).map((locale) => (
-                    <div key={locale} className="flex items-center space-x-4">
+                    <Div key={locale} className="flex items-center space-x-4">
                       <Label className="w-24 font-medium">{locale}:</Label>
                       <Input
                         type="number"
@@ -230,9 +231,9 @@ export function CampaignStarterForm({
                         }}
                         className="w-32"
                       />
-                    </div>
+                    </Div>
                   ))}
-                </div>
+                </Div>
               </FormFieldGroup>
 
               <FormFieldGroup
@@ -353,11 +354,11 @@ export function CampaignStarterForm({
               <FormAlert alert={endpoint.alert} />
 
               {/* Submit Button */}
-              <div className="pt-4">
+              <Div className="pt-4">
                 <Button type="submit" disabled={isSaving} className="w-full">
                   {isSaving ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                      <Div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                       {t("app.admin.common.actions.saving")}
                     </>
                   ) : isSuccess ? (
@@ -376,31 +377,31 @@ export function CampaignStarterForm({
                     </>
                   )}
                 </Button>
-              </div>
+              </Div>
             </CardContent>
           </Card>
         </FormSection>
       </Form>
-    </div>
+    </Div>
   );
 }
 
 function CampaignStarterFormSkeleton(): JSX.Element {
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       <Card>
         <CardContent className="space-y-6">
-          <div className="space-y-2">
+          <Div className="space-y-2">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-10 w-full" />
-          </div>
-          <div className="space-y-2">
+          </Div>
+          <Div className="space-y-2">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-10 w-full" />
-          </div>
+          </Div>
           <Skeleton className="h-10 w-full" />
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

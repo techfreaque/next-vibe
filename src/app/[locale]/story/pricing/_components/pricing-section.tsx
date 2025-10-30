@@ -17,6 +17,8 @@ import {
 } from "next-vibe-ui/ui/card";
 import { Label } from "next-vibe-ui/ui/label";
 import { Switch } from "next-vibe-ui/ui/switch";
+import { Div, Span } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
@@ -266,23 +268,23 @@ export default function PricingSection({
       ref={ref}
     >
       {/* Background decoration */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div
+      <Div className="absolute inset-0 -z-10 overflow-hidden">
+        <Div
           className="absolute left-1/2 top-0 -z-10 -translate-x-1/2 blur-3xl"
           aria-hidden="true"
         >
-          <div
+          <Div
             className="aspect-[1155/678] w-[72.1875rem] bg-pink-300 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-10"
             style={{
               clipPath:
                 "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
             }}
           />
-        </div>
-      </div>
+        </Div>
+      </Div>
 
       {!hideFooterAndHeader && (
-        <div className="text-center mb-16 relative">
+        <Div className="text-center mb-16 relative">
           <motion.div
             className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-600 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400 mb-4"
             initial={{ opacity: 0, y: 10 }}
@@ -290,9 +292,9 @@ export default function PricingSection({
             transition={{ duration: 0.5 }}
           >
             <Sparkles className="h-3.5 w-3.5 mr-1" />
-            <span className="font-medium">
+            <Span className="font-medium">
               {t("app.story.pricing.plans.badge")}
-            </span>
+            </Span>
           </motion.div>
 
           <motion.h2
@@ -312,7 +314,7 @@ export default function PricingSection({
           >
             {t("app.story.pricing.plans.subtitle")}
           </motion.p>
-        </div>
+        </Div>
       )}
 
       <motion.div
@@ -346,11 +348,11 @@ export default function PricingSection({
           } transition-colors flex items-center`}
         >
           {t("app.story.pricing.plans.annually")}{" "}
-          <span className="ml-1.5 text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2 py-0.5 rounded-full">
+          <Span className="ml-1.5 text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2 py-0.5 rounded-full">
             {t("app.story.pricing.plans.savePercent", {
               percent: calculateSavingsPercent(country),
             })}
-          </span>
+          </Span>
         </Label>
       </motion.div>
 
@@ -384,71 +386,71 @@ export default function PricingSection({
                 }`}
               >
                 {plan.highlighted && plan.badge && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                  <Div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
                     {t(plan.badge)}
-                  </div>
+                  </Div>
                 )}
                 {isCurrent && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-600 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                  <Div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-600 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
                     {t("app.story.pricing.currentPlan.badge")}
-                  </div>
+                  </Div>
                 )}
                 <CardHeader
                   className={`${plan.highlighted || isCurrent ? "pt-8" : ""} pb-4`}
                 >
-                  <div className="mb-6">
-                    <div className="flex justify-center mb-3">{plan.icon}</div>
+                  <Div className="mb-6">
+                    <Div className="flex justify-center mb-3">{plan.icon}</Div>
                     <CardTitle className="text-xl text-center">
                       {t(plan.name)}
                     </CardTitle>
-                  </div>
+                  </Div>
 
-                  <div className="flex items-baseline justify-center">
-                    <span className="text-4xl font-extrabold">
+                  <Div className="flex items-baseline justify-center">
+                    <Span className="text-4xl font-extrabold">
                       {t(plan.pricing, {
                         price: pricing,
                         currency: currentCountry.symbol,
                       })}
-                    </span>
-                    <span className="ml-1 text-gray-500 dark:text-gray-400">
+                    </Span>
+                    <Span className="ml-1 text-gray-500 dark:text-gray-400">
                       {t("app.story.pricing.plans.perMonth")}
-                    </span>
-                  </div>
+                    </Span>
+                  </Div>
                   <CardDescription className="mt-4 text-center">
                     {t(plan.description)}
                   </CardDescription>
 
                   {/* Add visual elements for Premium tier */}
                   {plan.premiumFeatures && (
-                    <div className="mt-4 space-y-2 justify-center">
+                    <Div className="mt-4 space-y-2 justify-center">
                       {plan.premiumFeatures.map((feature, i) => (
-                        <div key={`feature_${i}_${feature.feature}`}>
-                          <div
+                        <Div key={`feature_${i}_${feature.feature}`}>
+                          <Div
                             className={cn(
                               "p-2 rounded-lg flex items-center",
                               feature.className,
                             )}
                           >
                             {feature.icon}
-                            <span className="text-xs font-medium ml-2">
+                            <Span className="text-xs font-medium ml-2">
                               {t(feature.feature)}
-                            </span>
-                          </div>
+                            </Span>
+                          </Div>
                           {/* Add "or" separator between posts and reels for Premium and Professional plans */}
                           {i === 0 &&
                             plan.premiumFeatures &&
                             plan.premiumFeatures.length > 1 && (
-                              <div className="flex items-center justify-center my-2">
-                                <div className="flex-1 border-t border-gray-200 dark:border-gray-700" />
-                                <span className="px-3 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                              <Div className="flex items-center justify-center my-2">
+                                <Div className="flex-1 border-t border-gray-200 dark:border-gray-700" />
+                                <Span className="px-3 text-xs text-gray-500 dark:text-gray-400 font-medium">
                                   {t("app.story.pricing.plans.orSeparator")}
-                                </span>
-                                <div className="flex-1 border-t border-gray-200 dark:border-gray-700" />
-                              </div>
+                                </Span>
+                                <Div className="flex-1 border-t border-gray-200 dark:border-gray-700" />
+                              </Div>
                             )}
-                        </div>
+                        </Div>
                       ))}
-                    </div>
+                    </Div>
                   )}
                 </CardHeader>
                 <CardContent className="flex-grow">
@@ -458,7 +460,7 @@ export default function PricingSection({
                         key={`feature_${i}_${feature}`}
                         className="flex items-start"
                       >
-                        <div
+                        <Div
                           className={`flex-shrink-0 rounded-full p-1 mt-0.5 ${
                             plan.highlighted
                               ? "bg-cyan-100 dark:bg-cyan-900/30"
@@ -472,8 +474,8 @@ export default function PricingSection({
                                 : "text-gray-600 dark:text-gray-400"
                             }`}
                           />
-                        </div>
-                        <span className="ml-3 text-sm">{t(feature)}</span>
+                        </Div>
+                        <Span className="ml-3 text-sm">{t(feature)}</Span>
                       </li>
                     ))}
                   </ul>
@@ -520,19 +522,19 @@ export default function PricingSection({
                             disabled={isCurrent || isLoading}
                           >
                             {isLoading ? (
-                              <div className="flex items-center">
+                              <Div className="flex items-center">
                                 <Loader className="mr-2 h-4 w-4 animate-spin" />
                                 {t(
                                   "app.story.pricing.creditPricing.buttons.processing",
                                 )}
-                              </div>
+                              </Div>
                             ) : action === "downgrade" ? (
-                              <div className="flex flex-col items-center">
-                                <span>{getButtonText(plan.id)}</span>
-                                <span className="text-xs opacity-75">
+                              <Div className="flex flex-col items-center">
+                                <Span>{getButtonText(plan.id)}</Span>
+                                <Span className="text-xs opacity-75">
                                   {t("app.story.pricing.downgrade.nextCycle")}
-                                </span>
-                              </div>
+                                </Span>
+                              </Div>
                             ) : (
                               getButtonText(plan.id)
                             )}
@@ -571,19 +573,19 @@ export default function PricingSection({
                               disabled={isCurrent || isLoading}
                             >
                               {isLoading ? (
-                                <div className="flex items-center">
+                                <Div className="flex items-center">
                                   <Loader className="mr-2 h-4 w-4 animate-spin" />
                                   {t(
                                     "app.story.pricing.creditPricing.buttons.processing",
                                   )}
-                                </div>
+                                </Div>
                               ) : action === "downgrade" ? (
-                                <div className="flex flex-col items-center">
-                                  <span>{getButtonText(plan.id)}</span>
-                                  <span className="text-xs opacity-75">
+                                <Div className="flex flex-col items-center">
+                                  <Span>{getButtonText(plan.id)}</Span>
+                                  <Span className="text-xs opacity-75">
                                     {t("app.story.pricing.downgrade.nextCycle")}
-                                  </span>
-                                </div>
+                                  </Span>
+                                </Div>
                               ) : (
                                 getButtonText(plan.id)
                               )}
@@ -618,12 +620,12 @@ export default function PricingSection({
                                 disabled={isLoading}
                               >
                                 {isLoading ? (
-                                  <div className="flex items-center">
+                                  <Div className="flex items-center">
                                     <Loader className="mr-2 h-4 w-4 animate-spin" />
                                     {t(
                                       "app.story.pricing.creditPricing.buttons.processing",
                                     )}
-                                  </div>
+                                  </Div>
                                 ) : (
                                   getPlanCta(plan.id, t)
                                 )}
@@ -645,31 +647,31 @@ export default function PricingSection({
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <div className="flex flex-wrap justify-center items-center gap-4 mb-6">
+          <Div className="flex flex-wrap justify-center items-center gap-4 mb-6">
             <Badge
               variant="outline"
               className="py-1.5 px-4 flex items-center gap-2 text-sm bg-white dark:bg-gray-800 shadow-sm"
             >
               <Sparkles className="h-4 w-4 text-amber-500" />
-              <span>{t("app.story.pricing.plans.guaranteeBadge")}</span>
+              <Span>{t("app.story.pricing.plans.guaranteeBadge")}</Span>
             </Badge>
             <Badge
               variant="outline"
               className="py-1.5 px-4 flex items-center gap-2 text-sm bg-white dark:bg-gray-800 shadow-sm"
             >
               <Clock className="h-4 w-4 text-blue-500" />
-              <span>{t("app.story.pricing.plans.flexibleBadge")}</span>
+              <Span>{t("app.story.pricing.plans.flexibleBadge")}</Span>
             </Badge>
             <Badge
               variant="outline"
               className="py-1.5 px-4 flex items-center gap-2 text-sm bg-white dark:bg-gray-800 shadow-sm"
             >
               <Users className="h-4 w-4 text-purple-500" />
-              <span>{t("app.story.pricing.plans.supportBadge")}</span>
+              <Span>{t("app.story.pricing.plans.supportBadge")}</Span>
             </Badge>
-          </div>
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 max-w-2xl mx-auto">
-            <p className="text-gray-700 dark:text-gray-300">
+          </Div>
+          <Div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 max-w-2xl mx-auto">
+            <P className="text-gray-700 dark:text-gray-300">
               {t("app.story.pricing.plans.customSolutionText")}{" "}
               <Link
                 href={
@@ -682,8 +684,8 @@ export default function PricingSection({
                 {t("app.story.pricing.plans.contactUsLink")}
               </Link>{" "}
               {t("app.story.pricing.plans.tailoredPackageText")}
-            </p>
-          </div>
+            </P>
+          </Div>
         </motion.div>
       )}
     </section>

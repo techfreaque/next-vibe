@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe-ui/ui/select";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import { useImapAccountsList } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/hooks";
@@ -57,7 +58,7 @@ export function ImapFoldersManagement({
   const syncEndpoint = useImapFoldersSync(logger);
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>
@@ -66,13 +67,13 @@ export function ImapFoldersManagement({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <Div className="space-y-6">
             <FormAlert alert={foldersEndpoint.alert} />
 
             {/* Controls */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="flex flex-col space-y-2">
+            <Div className="flex items-center justify-between">
+              <Div className="flex items-center space-x-4">
+                <Div className="flex flex-col space-y-2">
                   <Label htmlFor="account-select">
                     {t("app.admin.emails.imap.common.selectAccount")}
                   </Label>
@@ -98,12 +99,12 @@ export function ImapFoldersManagement({
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
+                </Div>
 
                 {/* View Mode - not part of sync form, remove for now */}
-              </div>
+              </Div>
 
-              <div className="space-x-2">
+              <Div className="space-x-2">
                 <Button
                   type="button"
                   onClick={syncEndpoint.create.onSubmit}
@@ -120,14 +121,14 @@ export function ImapFoldersManagement({
                 >
                   {t("app.admin.emails.imap.common.refresh")}
                 </Button>
-              </div>
-            </div>
+              </Div>
+            </Div>
 
             {/* Folders Display */}
-            <div className="border rounded-lg">
+            <Div className="border rounded-lg">
               <ImapFoldersList accountId={selectedAccountId} logger={logger} />
-            </div>
-          </div>
+            </Div>
+          </Div>
         </CardContent>
       </Card>
 
@@ -140,56 +141,56 @@ export function ImapFoldersManagement({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold">
+          <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Div className="text-center">
+              <Div className="text-2xl font-bold">
                 {foldersEndpoint.read?.response?.success
                   ? foldersEndpoint.read.response.data.pagination.total
                   : 0}
-              </div>
-              <div className="text-sm text-gray-600">
+              </Div>
+              <Div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.dashboard.totalFolders")}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">
+              </Div>
+            </Div>
+            <Div className="text-center">
+              <Div className="text-2xl font-bold">
                 {foldersEndpoint.read?.response?.success
                   ? foldersEndpoint.read.response.data.folders.reduce(
                       (sum, folder) => sum + folder.messageCount,
                       0,
                     )
                   : 0}
-              </div>
-              <div className="text-sm text-gray-600">
+              </Div>
+              <Div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.dashboard.totalMessages")}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">
+              </Div>
+            </Div>
+            <Div className="text-center">
+              <Div className="text-2xl font-bold">
                 {foldersEndpoint.read?.response?.success
                   ? foldersEndpoint.read.response.data.folders.reduce(
                       (sum, folder) => sum + folder.unseenCount,
                       0,
                     )
                   : 0}
-              </div>
-              <div className="text-sm text-gray-600">
+              </Div>
+              <Div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.dashboard.unreadMessages")}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">
+              </Div>
+            </Div>
+            <Div className="text-center">
+              <Div className="text-2xl font-bold">
                 {foldersEndpoint.read?.response?.success
                   ? t("app.admin.emails.imap.dashboard.justNow")
                   : t("app.admin.emails.imap.dashboard.never")}
-              </div>
-              <div className="text-sm text-gray-600">
+              </Div>
+              <Div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.dashboard.lastSync")}
-              </div>
-            </div>
-          </div>
+              </Div>
+            </Div>
+          </Div>
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

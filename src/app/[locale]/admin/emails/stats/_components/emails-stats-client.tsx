@@ -26,6 +26,8 @@ import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Progress } from "next-vibe-ui/ui/progress";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
+import { Div, Span } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect } from "react";
 
@@ -80,23 +82,23 @@ export function EmailsStatsClient({
   // Loading state
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <Div className="space-y-6">
         {/* Filters Skeleton */}
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-32" />
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <Skeleton key={i} className="h-10 w-full" />
               ))}
-            </div>
+            </Div>
           </CardContent>
         </Card>
 
         {/* Key Metrics Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <Card key={i}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -109,28 +111,28 @@ export function EmailsStatsClient({
               </CardContent>
             </Card>
           ))}
-        </div>
+        </Div>
 
         {/* Tabs Skeleton */}
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-32" />
-            <div className="flex space-x-2 mt-4">
+            <Div className="flex space-x-2 mt-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-8 w-20" />
               ))}
-            </div>
+            </Div>
           </CardHeader>
           <CardContent>
             <Skeleton className="h-96 w-full" />
           </CardContent>
         </Card>
-      </div>
+      </Div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Filters */}
       <EmailStatsFiltersContainer
         locale={locale}
@@ -144,7 +146,7 @@ export function EmailsStatsClient({
       </EmailStatsFiltersContainer>
 
       {/* Key Metrics Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Emails */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -154,13 +156,13 @@ export function EmailsStatsClient({
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.totalEmails || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.sentEmails || 0)}{" "}
               {t("app.admin.emails.stats.admin.stats.metrics.sent")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -173,13 +175,13 @@ export function EmailsStatsClient({
             <Send className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.deliveredEmails || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.deliveryRate || 0)}{" "}
               {t("app.admin.emails.stats.admin.stats.metrics.deliveryRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -192,13 +194,13 @@ export function EmailsStatsClient({
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.openedEmails || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.openRate || 0)}{" "}
               {t("app.admin.emails.stats.admin.stats.openRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -211,13 +213,13 @@ export function EmailsStatsClient({
             <MousePointer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.clickedEmails || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.clickRate || 0)}{" "}
               {t("app.admin.emails.stats.admin.stats.clickRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -230,13 +232,13 @@ export function EmailsStatsClient({
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.bouncedEmails || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.bounceRate || 0)}{" "}
               {t("app.admin.emails.stats.admin.stats.bounceRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -249,13 +251,13 @@ export function EmailsStatsClient({
             <UserX className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.failedEmails || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.failureRate || 0)}{" "}
               {t("app.admin.emails.stats.admin.stats.failureRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -268,18 +270,18 @@ export function EmailsStatsClient({
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.draftEmails || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.emails.stats.admin.stats.pendingToSend")}
-            </p>
+            </P>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Additional Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Emails with User ID */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -289,15 +291,15 @@ export function EmailsStatsClient({
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.emailsWithUserId || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.emailsWithoutUserId || 0)}{" "}
               {t(
                 "app.admin.emails.stats.admin.stats.metrics.emailsWithoutUserId",
               )}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -310,15 +312,15 @@ export function EmailsStatsClient({
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.emailsWithLeadId || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.emailsWithoutLeadId || 0)}{" "}
               {t(
                 "app.admin.emails.stats.admin.stats.metrics.emailsWithoutLeadId",
               )}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -331,15 +333,15 @@ export function EmailsStatsClient({
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.emailsWithErrors || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.emailsWithoutErrors || 0)}{" "}
               {t(
                 "app.admin.emails.stats.admin.stats.metrics.emailsWithoutErrors",
               )}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -354,19 +356,19 @@ export function EmailsStatsClient({
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {(stats?.averageRetryCount || 0).toFixed(1)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.emails.stats.admin.stats.metrics.maxRetryCount")}:{" "}
               {stats?.maxRetryCount || 0}
-            </p>
+            </P>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Performance Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Average Processing Time */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -378,14 +380,14 @@ export function EmailsStatsClient({
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {(stats?.averageProcessingTime || 0).toFixed(2)}ms
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t(
                 "app.admin.emails.stats.admin.stats.metrics.processingTimeDescription",
               )}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -400,17 +402,17 @@ export function EmailsStatsClient({
             <Send className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {(stats?.averageDeliveryTime || 0).toFixed(2)}ms
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t(
                 "app.admin.emails.stats.admin.stats.metrics.deliveryTimeDescription",
               )}
-            </p>
+            </P>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Detailed Analytics with Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">
@@ -442,7 +444,7 @@ export function EmailsStatsClient({
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Performance Metrics */}
             <Card>
               <CardHeader>
@@ -452,48 +454,48 @@ export function EmailsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                <Div className="space-y-3">
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t(
                         "app.admin.emails.stats.admin.stats.performance.deliveryRate",
                       )}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatPercentage(stats?.deliveryRate || 0)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t(
                         "app.admin.emails.stats.admin.stats.performance.openRate",
                       )}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatPercentage(stats?.openRate || 0)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t(
                         "app.admin.emails.stats.admin.stats.performance.clickRate",
                       )}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatPercentage(stats?.clickRate || 0)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t(
                         "app.admin.emails.stats.admin.stats.performance.bounceRate",
                       )}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatPercentage(stats?.bounceRate || 0)}
-                    </span>
-                  </div>
-                </div>
+                    </Span>
+                  </Div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -508,7 +510,7 @@ export function EmailsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <Div className="space-y-3">
                   {stats?.topPerformingTemplates &&
                   Array.isArray(stats.topPerformingTemplates) &&
                   stats.topPerformingTemplates.length > 0 ? (
@@ -522,48 +524,48 @@ export function EmailsStatsClient({
                         },
                         index: number,
                       ) => (
-                        <div key={index} className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">
+                        <Div key={index} className="space-y-2">
+                          <Div className="flex items-center justify-between">
+                            <Span className="text-sm font-medium">
                               {template.templateName}
-                            </span>
+                            </Span>
                             <Badge variant="secondary">
                               {formatNumber(template.emailsSent)}{" "}
                               {t("app.admin.emails.stats.admin.stats.sent")}
                             </Badge>
-                          </div>
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <span>
+                          </Div>
+                          <Div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <Span>
                               {t("app.admin.emails.stats.admin.stats.openRate")}
                               : {formatPercentage(template.openRate)}
-                            </span>
-                            <span>
+                            </Span>
+                            <Span>
                               {t(
                                 "app.admin.emails.stats.admin.stats.clickRate",
                               )}
                               : {formatPercentage(template.clickRate)}
-                            </span>
-                          </div>
+                            </Span>
+                          </Div>
                           <Progress
                             value={template.openRate * 100}
                             className="h-1"
                           />
-                        </div>
+                        </Div>
                       ),
                     )
                   ) : (
-                    <p className="text-sm text-muted-foreground">
+                    <P className="text-sm text-muted-foreground">
                       {t("app.admin.emails.stats.admin.stats.noTemplateData")}
-                    </p>
+                    </P>
                   )}
-                </div>
+                </Div>
               </CardContent>
             </Card>
-          </div>
+          </Div>
         </TabsContent>
 
         <TabsContent value="distribution" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Status Distribution */}
             <Card>
               <CardHeader>
@@ -573,15 +575,15 @@ export function EmailsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <Div className="space-y-3">
                   {stats?.emailsByStatus &&
                   typeof stats.emailsByStatus === "object" &&
                   Object.keys(stats.emailsByStatus).length > 0 ? (
                     Object.entries(stats.emailsByStatus).map(
                       ([status, count], index) => (
-                        <div key={index} className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium capitalize">
+                        <Div key={index} className="space-y-2">
+                          <Div className="flex items-center justify-between">
+                            <Span className="text-sm font-medium capitalize">
                               {((): string => {
                                 const statusKey = status.toLowerCase();
                                 const statusTranslations = {
@@ -628,11 +630,11 @@ export function EmailsStatsClient({
                                   ] || status
                                 );
                               })()}
-                            </span>
-                            <span className="text-sm text-muted-foreground">
+                            </Span>
+                            <Span className="text-sm text-muted-foreground">
                               {formatNumber(count)}
-                            </span>
-                          </div>
+                            </Span>
+                          </Div>
                           <Progress
                             value={
                               stats.totalEmails
@@ -641,15 +643,15 @@ export function EmailsStatsClient({
                             }
                             className="h-2"
                           />
-                        </div>
+                        </Div>
                       ),
                     )
                   ) : (
-                    <p className="text-sm text-muted-foreground">
+                    <P className="text-sm text-muted-foreground">
                       {t("app.admin.emails.stats.admin.stats.noStatusData")}
-                    </p>
+                    </P>
                   )}
-                </div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -662,15 +664,15 @@ export function EmailsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <Div className="space-y-3">
                   {stats?.emailsByType &&
                   typeof stats.emailsByType === "object" &&
                   Object.keys(stats.emailsByType).length > 0 ? (
                     Object.entries(stats.emailsByType).map(
                       ([type, count], index) => (
-                        <div key={index} className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium capitalize">
+                        <Div key={index} className="space-y-2">
+                          <Div className="flex items-center justify-between">
+                            <Span className="text-sm font-medium capitalize">
                               {((): string => {
                                 const typeKey = type.toLowerCase();
                                 const typeTranslations = {
@@ -699,11 +701,11 @@ export function EmailsStatsClient({
                                   ] || type
                                 );
                               })()}
-                            </span>
-                            <span className="text-sm text-muted-foreground">
+                            </Span>
+                            <Span className="text-sm text-muted-foreground">
                               {formatNumber(count)}
-                            </span>
-                          </div>
+                            </Span>
+                          </Div>
                           <Progress
                             value={
                               stats.totalEmails
@@ -712,22 +714,22 @@ export function EmailsStatsClient({
                             }
                             className="h-2"
                           />
-                        </div>
+                        </Div>
                       ),
                     )
                   ) : (
-                    <p className="text-sm text-muted-foreground">
+                    <P className="text-sm text-muted-foreground">
                       {t("app.admin.emails.stats.admin.stats.noTypeData")}
-                    </p>
+                    </P>
                   )}
-                </div>
+                </Div>
               </CardContent>
             </Card>
-          </div>
+          </Div>
         </TabsContent>
 
         <TabsContent value="providers" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Provider Performance */}
             <Card>
               <CardHeader>
@@ -737,7 +739,7 @@ export function EmailsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <Div className="space-y-3">
                   {stats?.topPerformingProviders &&
                   Array.isArray(stats.topPerformingProviders) &&
                   stats.topPerformingProviders.length > 0 ? (
@@ -753,43 +755,43 @@ export function EmailsStatsClient({
                         },
                         index: number,
                       ) => (
-                        <div key={index} className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium capitalize">
+                        <Div key={index} className="space-y-2">
+                          <Div className="flex items-center justify-between">
+                            <Span className="text-sm font-medium capitalize">
                               {provider.provider}
-                            </span>
+                            </Span>
                             <Badge variant="outline">
                               {formatNumber(provider.emailsSent)}{" "}
                               {t("app.admin.emails.stats.admin.stats.sent")}
                             </Badge>
-                          </div>
-                          <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
-                            <span>
+                          </Div>
+                          <Div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
+                            <Span>
                               {t("app.admin.emails.stats.admin.stats.delivery")}
                               : {formatPercentage(provider.deliveryRate)}
-                            </span>
-                            <span>
+                            </Span>
+                            <Span>
                               {t("app.admin.emails.stats.admin.stats.open")}:{" "}
                               {formatPercentage(provider.openRate)}
-                            </span>
-                            <span>
+                            </Span>
+                            <Span>
                               {t("app.admin.emails.stats.admin.stats.click")}:{" "}
                               {formatPercentage(provider.clickRate)}
-                            </span>
-                          </div>
+                            </Span>
+                          </Div>
                           <Progress
                             value={provider.reliability * 100}
                             className="h-1"
                           />
-                        </div>
+                        </Div>
                       ),
                     )
                   ) : (
-                    <p className="text-sm text-muted-foreground">
+                    <P className="text-sm text-muted-foreground">
                       {t("app.admin.emails.stats.admin.stats.noProviderData")}
-                    </p>
+                    </P>
                   )}
-                </div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -802,7 +804,7 @@ export function EmailsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <Div className="space-y-3">
                   {stats?.recentActivity &&
                   Array.isArray(stats.recentActivity) &&
                   stats.recentActivity.length > 0 ? (
@@ -816,22 +818,22 @@ export function EmailsStatsClient({
                         },
                         index: number,
                       ) => (
-                        <div
+                        <Div
                           key={index}
                           className="flex items-center justify-between"
                         >
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium">
+                          <Div className="space-y-1">
+                            <P className="text-sm font-medium">
                               {(activity.details?.subject as string) ||
                                 activity.templateName ||
                                 t(
                                   "app.admin.emails.stats.admin.stats.noSubject",
                                 )}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
+                            </P>
+                            <P className="text-xs text-muted-foreground">
                               {activity.recipientEmail} • {activity.type}
-                            </p>
-                          </div>
+                            </P>
+                          </Div>
                           <Badge
                             variant={
                               activity.type === ActivityType.EMAIL_SENT ||
@@ -873,20 +875,20 @@ export function EmailsStatsClient({
                               );
                             })()}
                           </Badge>
-                        </div>
+                        </Div>
                       ),
                     )
                   ) : (
-                    <p className="text-sm text-muted-foreground">
+                    <P className="text-sm text-muted-foreground">
                       {t("app.admin.emails.stats.admin.stats.noRecentActivity")}
-                    </p>
+                    </P>
                   )}
-                </div>
+                </Div>
               </CardContent>
             </Card>
-          </div>
+          </Div>
         </TabsContent>
       </Tabs>
-    </div>
+    </Div>
   );
 }

@@ -7,6 +7,7 @@
 
 import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schema";
 import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
+import { Div, H4, P, Span } from "next-vibe-ui/ui";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import type { JSX } from "react";
@@ -225,12 +226,12 @@ export function LeadsStatsChart({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div
+          <Div
             className="flex items-center justify-center text-muted-foreground"
             style={{ height: `${height}px` }}
           >
             {t("app.admin.leads.leads.admin.stats.chart.noData")}
-          </div>
+          </Div>
         </CardContent>
       </Card>
     );
@@ -340,8 +341,8 @@ export function LeadsStatsChart({
         : undefined;
 
       return (
-        <div className="bg-background border border-border rounded-lg shadow-lg p-3 dark:bg-popover dark:border-border">
-          <p className="font-medium text-foreground mb-2">{label}</p>
+        <Div className="bg-background border border-border rounded-lg shadow-lg p-3 dark:bg-popover dark:border-border">
+          <P className="font-medium text-foreground mb-2">{label}</P>
           {payload.map((entry, index: number) => {
             // Find the series data to get translation parameters
             const seriesData = data?.series?.find(
@@ -357,12 +358,12 @@ export function LeadsStatsChart({
               originalValue !== undefined ? originalValue : entry.value;
 
             return (
-              <p key={index} className="text-sm" style={{ color: entry.color }}>
+              <P key={index} className="text-sm" style={{ color: entry.color }}>
                 {`${translatedName}: ${new Intl.NumberFormat(locale.split("-")[0]).format(displayValue)}`}
-              </p>
+              </P>
             );
           })}
-        </div>
+        </Div>
       );
     }
     return null;
@@ -507,7 +508,7 @@ export function LeadsStatsChart({
   };
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <Div className={`space-y-4 ${className}`}>
       {/* Main Chart */}
       <Card>
         <CardHeader>
@@ -515,7 +516,7 @@ export function LeadsStatsChart({
             {data.title || t("app.admin.leads.leads.admin.stats.chart.title")}
           </CardTitle>
           {data.subtitle && (
-            <p className="text-sm text-muted-foreground">{data.subtitle}</p>
+            <P className="text-sm text-muted-foreground">{data.subtitle}</P>
           )}
         </CardHeader>
         <CardContent>
@@ -526,12 +527,12 @@ export function LeadsStatsChart({
             {renderChart()}
           </ResponsiveContainer>
           {legendData.length > 0 && (
-            <div className="border-t">
-              <div className="flex items-center justify-between p-4 border-b">
-                <h4 className="text-sm font-medium">
+            <Div className="border-t">
+              <Div className="flex items-center justify-between p-4 border-b">
+                <H4 className="text-sm font-medium">
                   {t("app.admin.leads.leads.admin.stats.legend.title")}
-                </h4>
-                <div className="flex gap-2">
+                </H4>
+                <Div className="flex gap-2">
                   <button
                     onClick={showAllSeries}
                     className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
@@ -544,9 +545,9 @@ export function LeadsStatsChart({
                   >
                     {t("app.admin.leads.leads.admin.stats.legend.hideAll")}
                   </button>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-4 p-4">
+                </Div>
+              </Div>
+              <Div className="flex flex-wrap gap-4 p-4">
                 {legendData.map((item) => (
                   <button
                     key={item.name}
@@ -558,11 +559,11 @@ export function LeadsStatsChart({
                       "app.admin.leads.leads.admin.stats.legend.clickToToggle",
                     )}
                   >
-                    <div
+                    <Div
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: item.color }}
                     />
-                    <span
+                    <Span
                       className={
                         item.visible
                           ? "text-foreground"
@@ -570,11 +571,11 @@ export function LeadsStatsChart({
                       }
                     >
                       {t(item.name)}
-                    </span>
+                    </Span>
                   </button>
                 ))}
-              </div>
-            </div>
+              </Div>
+            </Div>
           )}
         </CardContent>
       </Card>
@@ -590,6 +591,6 @@ export function LeadsStatsChart({
           onHideAll={hideAllSources}
         />
       )}
-    </div>
+    </Div>
   );
 }

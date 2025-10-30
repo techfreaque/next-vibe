@@ -5,6 +5,7 @@ import { AlertCircle, AlertTriangle, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div, Span } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import { useState } from "react";
 
@@ -137,32 +138,32 @@ export default function SubscriptionBanner({
   };
 
   return (
-    <div className={`py-3 px-4 ${getStatusColor()} border-b`}>
-      <div className="container max-w-6xl mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+    <Div className={`py-3 px-4 ${getStatusColor()} border-b`}>
+      <Div className="container max-w-6xl mx-auto flex items-center justify-between">
+        <Div className="flex items-center space-x-2">
           {getStatusIcon()}
-          <span className="text-sm">
+          <Span className="text-sm">
             {getStatusMessage()}
             {subscription.currentPeriodEnd &&
               subscription.status === SubscriptionStatus.ACTIVE && (
-                <span className="ml-1">
+                <Span className="ml-1">
                   {t("app.story.pricing.subscriptionBanner.nextBillingDate", {
                     date: format(
                       new Date(subscription.currentPeriodEnd),
                       t("app.story.pricing.subscriptionBanner.dateFormat"),
                     ),
                   })}
-                </span>
+                </Span>
               )}
-          </span>
-        </div>
-        <div className="flex items-center space-x-2">
+          </Span>
+        </Div>
+        <Div className="flex items-center space-x-2">
           {getActionButton()}
           <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
             {t("app.story.pricing.subscriptionBanner.dismissButton")}
           </Button>
-        </div>
-      </div>
-    </div>
+        </Div>
+      </Div>
+    </Div>
   );
 }

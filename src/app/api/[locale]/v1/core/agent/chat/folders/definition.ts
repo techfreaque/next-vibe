@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
+  arrayField,
   objectField,
   requestDataField,
   responseArrayField,
@@ -19,7 +20,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { UserRole, UserRoleOptions } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { DEFAULT_FOLDER_IDS } from "../config";
 
@@ -193,6 +194,26 @@ const { GET } = createEndpoint({
                   "app.api.v1.core.agent.chat.folders.get.response.folders.folder.metadata.content" as const,
               },
               z.record(z.string(), z.any()),
+            ),
+            allowedRoles: arrayField(
+              { response: true },
+              {
+                type: WidgetType.MULTI_SELECT,
+                title:
+                  "app.api.v1.core.agent.chat.folders.get.response.folders.folder.allowedRoles.title" as const,
+                description:
+                  "app.api.v1.core.agent.chat.folders.get.response.folders.folder.allowedRoles.description" as const,
+                options: UserRoleOptions,
+              },
+              stringField(
+                { response: true },
+                {
+                  type: WidgetType.SELECT,
+                  options: UserRoleOptions,
+                },
+                z.string(),
+              ),
+              undefined,
             ),
             createdAt: responseField(
               {
@@ -520,6 +541,26 @@ const { POST } = createEndpoint({
                     "app.api.v1.core.agent.chat.folders.post.response.folder.metadata.content" as const,
                 },
                 z.record(z.string(), z.any()),
+              ),
+              allowedRoles: arrayField(
+                { response: true },
+                {
+                  type: WidgetType.MULTI_SELECT,
+                  title:
+                    "app.api.v1.core.agent.chat.folders.post.response.folder.allowedRoles.title" as const,
+                  description:
+                    "app.api.v1.core.agent.chat.folders.post.response.folder.allowedRoles.description" as const,
+                  options: UserRoleOptions,
+                },
+                stringField(
+                  { response: true },
+                  {
+                    type: WidgetType.SELECT,
+                    options: UserRoleOptions,
+                  },
+                  z.string(),
+                ),
+                undefined,
               ),
               createdAt: responseField(
                 {

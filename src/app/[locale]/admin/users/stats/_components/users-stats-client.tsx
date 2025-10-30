@@ -22,7 +22,7 @@ import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Progress } from "next-vibe-ui/ui/progress";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
-import { P } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -211,7 +211,7 @@ export function UsersStatsClient({
             <P className="text-xs text-muted-foreground">
               {formatPercentage(data?.leadAssociationRate || 0)}{" "}
               {t("app.admin.users.stats.leadAssociationRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -224,12 +224,12 @@ export function UsersStatsClient({
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatPercentage(data?.growthRate || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.users.stats.newUsers")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -242,15 +242,15 @@ export function UsersStatsClient({
             <Globe className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(data?.inactiveUsers || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(
                 (data?.inactiveUsers || 0) / (data?.totalUsers || 1),
               )}{" "}
               {t("app.admin.users.stats.ofTotal")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -263,15 +263,15 @@ export function UsersStatsClient({
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatPercentage(data?.retentionRate || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.users.stats.userRetention")}
-            </p>
+            </P>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Detailed Stats with Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">
@@ -296,28 +296,28 @@ export function UsersStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>{t("app.admin.users.stats.emailVerifiedUsers")}</span>
-                    <span>{formatNumber(data?.emailVerifiedUsers || 0)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>
+                <Div className="space-y-2">
+                  <Div className="flex justify-between text-sm">
+                    <Span>{t("app.admin.users.stats.emailVerifiedUsers")}</Span>
+                    <Span>{formatNumber(data?.emailVerifiedUsers || 0)}</Span>
+                  </Div>
+                  <Div className="flex justify-between text-sm">
+                    <Span>
                       {t("app.admin.users.stats.emailUnverifiedUsers")}
-                    </span>
-                    <span>{formatNumber(data?.emailUnverifiedUsers || 0)}</span>
-                  </div>
+                    </Span>
+                    <Span>{formatNumber(data?.emailUnverifiedUsers || 0)}</Span>
+                  </Div>
                   <Progress
                     value={
                       data?.verificationRate ? data.verificationRate * 100 : 0
                     }
                     className="mt-2"
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <P className="text-xs text-muted-foreground">
                     {formatPercentage(data?.verificationRate || 0)}{" "}
                     {t("app.admin.users.stats.verificationRate")}
-                  </p>
-                </div>
+                  </P>
+                </Div>
               </CardContent>
             </Card>
 
@@ -330,15 +330,15 @@ export function UsersStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>{t("app.admin.users.stats.usersWithStripeId")}</span>
-                    <span>{formatNumber(data?.usersWithStripeId || 0)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>{t("app.admin.users.stats.usersWithLeadId")}</span>
-                    <span>{formatNumber(data?.usersWithLeadId || 0)}</span>
-                  </div>
+                <Div className="space-y-2">
+                  <Div className="flex justify-between text-sm">
+                    <Span>{t("app.admin.users.stats.usersWithStripeId")}</Span>
+                    <Span>{formatNumber(data?.usersWithStripeId || 0)}</Span>
+                  </Div>
+                  <Div className="flex justify-between text-sm">
+                    <Span>{t("app.admin.users.stats.usersWithLeadId")}</Span>
+                    <Span>{formatNumber(data?.usersWithLeadId || 0)}</Span>
+                  </Div>
                   <Progress
                     value={
                       data?.stripeIntegrationRate
@@ -347,11 +347,11 @@ export function UsersStatsClient({
                     }
                     className="mt-2"
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <P className="text-xs text-muted-foreground">
                     {formatPercentage(data?.stripeIntegrationRate || 0)}{" "}
                     {t("app.admin.users.stats.stripeIntegrationRate")}
-                  </p>
-                </div>
+                  </P>
+                </Div>
               </CardContent>
             </Card>
 
@@ -364,26 +364,26 @@ export function UsersStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>{t("app.admin.users.stats.newUsers")}</span>
-                    <span>{formatNumber(data?.usersCreatedToday || 0)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>{t("app.admin.users.stats.activeUsers")}</span>
-                    <span>{formatNumber(data?.usersCreatedThisWeek || 0)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>{t("app.admin.users.stats.totalUsers")}</span>
-                    <span>
+                <Div className="space-y-2">
+                  <Div className="flex justify-between text-sm">
+                    <Span>{t("app.admin.users.stats.newUsers")}</Span>
+                    <Span>{formatNumber(data?.usersCreatedToday || 0)}</Span>
+                  </Div>
+                  <Div className="flex justify-between text-sm">
+                    <Span>{t("app.admin.users.stats.activeUsers")}</Span>
+                    <Span>{formatNumber(data?.usersCreatedThisWeek || 0)}</Span>
+                  </Div>
+                  <Div className="flex justify-between text-sm">
+                    <Span>{t("app.admin.users.stats.totalUsers")}</Span>
+                    <Span>
                       {formatNumber(data?.usersCreatedThisMonth || 0)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>{t("app.admin.users.stats.inactiveUsers")}</span>
-                    <span>
+                    </Span>
+                  </Div>
+                  <Div className="flex justify-between text-sm">
+                    <Span>{t("app.admin.users.stats.inactiveUsers")}</Span>
+                    <Span>
                       {formatNumber(data?.usersCreatedLastMonth || 0)}
-                    </span>
+                    </Span>
                   </Div>
                 </Div>
               </CardContent>
@@ -398,27 +398,27 @@ export function UsersStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>{t("app.admin.users.stats.growthRate")}</span>
-                    <span>{formatPercentage(data?.growthRate || 0)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>
+                <Div className="space-y-2">
+                  <Div className="flex justify-between text-sm">
+                    <Span>{t("app.admin.users.stats.growthRate")}</Span>
+                    <Span>{formatPercentage(data?.growthRate || 0)}</Span>
+                  </Div>
+                  <Div className="flex justify-between text-sm">
+                    <Span>
                       {t("app.admin.users.stats.leadToUserConversionRate")}
-                    </span>
-                    <span>
+                    </Span>
+                    <Span>
                       {formatPercentage(data?.leadToUserConversionRate || 0)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>{t("app.admin.users.stats.retentionRate")}</span>
-                    <span>{formatPercentage(data?.retentionRate || 0)}</span>
+                    </Span>
+                  </Div>
+                  <Div className="flex justify-between text-sm">
+                    <Span>{t("app.admin.users.stats.retentionRate")}</Span>
+                    <Span>{formatPercentage(data?.retentionRate || 0)}</Span>
                   </Div>
                 </Div>
               </CardContent>
             </Card>
-          </div>
+          </Div>
         </TabsContent>
 
         <TabsContent value="distribution" className="space-y-4">
@@ -437,7 +437,7 @@ export function UsersStatsClient({
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm font-medium">
                         {t("app.admin.users.role.public")}
-                      </span>
+                      </Span>
                       <Span className="text-sm text-muted-foreground">
                         {formatNumber(data?.publicUsers || 0)}
                       </Span>
@@ -449,13 +449,13 @@ export function UsersStatsClient({
                       }
                       className="h-2"
                     />
-                  </div>
+                  </Div>
 
                   <Div className="space-y-2">
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm font-medium">
                         {t("app.admin.users.role.customer")}
-                      </span>
+                      </Span>
                       <Span className="text-sm text-muted-foreground">
                         {formatNumber(data?.customerUsers || 0)}
                       </Span>
@@ -467,13 +467,13 @@ export function UsersStatsClient({
                       }
                       className="h-2"
                     />
-                  </div>
+                  </Div>
 
                   <Div className="space-y-2">
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm font-medium">
                         {t("app.admin.users.role.partner_admin")}
-                      </span>
+                      </Span>
                       <Span className="text-sm text-muted-foreground">
                         {formatNumber(data?.partnerAdminUsers || 0)}
                       </Span>
@@ -486,13 +486,13 @@ export function UsersStatsClient({
                       }
                       className="h-2"
                     />
-                  </div>
+                  </Div>
 
                   <Div className="space-y-2">
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm font-medium">
                         {t("app.admin.users.role.partner_employee")}
-                      </span>
+                      </Span>
                       <Span className="text-sm text-muted-foreground">
                         {formatNumber(data?.partnerEmployeeUsers || 0)}
                       </Span>
@@ -505,13 +505,13 @@ export function UsersStatsClient({
                       }
                       className="h-2"
                     />
-                  </div>
+                  </Div>
 
                   <Div className="space-y-2">
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm font-medium">
                         {t("app.admin.users.role.admin")}
-                      </span>
+                      </Span>
                       <Span className="text-sm text-muted-foreground">
                         {formatNumber(data?.adminUsers || 0)}
                       </Span>
@@ -527,9 +527,9 @@ export function UsersStatsClient({
                 </Div>
               </CardContent>
             </Card>
-          </div>
+          </Div>
         </TabsContent>
       </Tabs>
-    </div>
+    </Div>
   );
 }

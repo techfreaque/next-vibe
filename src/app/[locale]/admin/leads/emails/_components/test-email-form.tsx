@@ -6,7 +6,7 @@
 "use client";
 
 import { Mail, Send } from "lucide-react";
-import { FormAlert } from "next-vibe-ui/ui";
+import { Div, FormAlert, H3, P, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
@@ -172,7 +172,7 @@ export function TestEmailForm({
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <Mail className="h-5 w-5" />
-          <span>{t("app.admin.leads.leads.admin.emails.testEmail.title")}</span>
+          <Span>{t("app.admin.leads.leads.admin.emails.testEmail.title")}</Span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -182,12 +182,12 @@ export function TestEmailForm({
           className="space-y-6"
         >
           {/* Test Email Recipient */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">
+          <Div className="space-y-4">
+            <H3 className="text-lg font-medium">
               {t(
                 "app.admin.leads.leads.admin.emails.testEmail.recipient.title",
               )}
-            </h3>
+            </H3>
             <EndpointFormField
               name="testEmail"
               config={{
@@ -202,22 +202,22 @@ export function TestEmailForm({
               control={endpoint.create.form.control}
               schema={schema}
             />
-          </div>
+          </Div>
 
           <Separator />
 
           {/* SMTP Account Selection Criteria */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">
+          <Div className="space-y-4">
+            <H3 className="text-lg font-medium">
               {t("app.admin.emails.smtp.admin.form.selectionCriteria")}
-            </h3>
-            <p className="text-sm text-muted-foreground">
+            </H3>
+            <P className="text-sm text-muted-foreground">
               {t(
                 "app.admin.emails.smtp.admin.form.selectionCriteriaDescription",
               )}
-            </p>
+            </P>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <EndpointFormField
                 name="campaignType"
                 config={{
@@ -259,17 +259,17 @@ export function TestEmailForm({
                 control={endpoint.create.form.control}
                 schema={schema}
               />
-            </div>
-          </div>
+            </Div>
+          </Div>
 
           <Separator />
 
           {/* Lead Data for Template */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">
+          <Div className="space-y-4">
+            <H3 className="text-lg font-medium">
               {t("app.admin.leads.leads.admin.emails.testEmail.leadData.title")}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            </H3>
+            <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <EndpointFormField
                 name="leadData.businessName"
                 config={{
@@ -437,7 +437,7 @@ export function TestEmailForm({
                 control={endpoint.create.form.control}
                 schema={schema}
               />
-            </div>
+            </Div>
             <EndpointFormField
               name="leadData.notes"
               config={{
@@ -451,43 +451,43 @@ export function TestEmailForm({
               control={endpoint.create.form.control}
               schema={schema}
             />
-          </div>
+          </Div>
           <FormAlert alert={endpoint.alert} />
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-4">
-            <div className="flex items-center space-x-2">
+          <Div className="flex items-center justify-between pt-4">
+            <Div className="flex items-center space-x-2">
               {onClose && (
                 <Button type="button" variant="outline" onClick={onClose}>
                   {t("app.common.cancel")}
                 </Button>
               )}
-            </div>
+            </Div>
             <Button
               type="submit"
               disabled={isSubmitting}
               className="flex items-center space-x-2"
             >
               <Send className="h-4 w-4" />
-              <span>
+              <Span>
                 {isSubmitting
                   ? t("app.admin.leads.leads.admin.emails.testEmail.sending")
                   : t("app.admin.leads.leads.admin.emails.testEmail.send")}
-              </span>
+              </Span>
             </Button>
-          </div>
+          </Div>
 
           {/* Success Message */}
           {isSuccess && (
-            <div className="p-4 bg-green-50 border border-green-200 rounded-md">
-              <p className="text-green-800">
+            <Div className="p-4 bg-green-50 border border-green-200 rounded-md">
+              <P className="text-green-800">
                 {t("app.admin.leads.leads.admin.emails.testEmail.success", {
                   email: endpoint.create.response?.success
                     ? endpoint.create.response.data.result.testEmail
                     : "",
                 })}
-              </p>
-            </div>
+              </P>
+            </Div>
           )}
         </Form>
       </CardContent>

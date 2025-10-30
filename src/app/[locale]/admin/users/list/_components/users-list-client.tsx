@@ -12,7 +12,7 @@ import { Div, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import { P } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui";
 import React, { useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -84,17 +84,17 @@ export function UsersListClient({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <Div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2">
-            <span>{t("app.admin.users.list.title")}</span>
+            <Span>{t("app.admin.users.list.title")}</Span>
             {queryLoading && (
               <RefreshCw className="h-4 w-4 animate-spin text-gray-500" />
             )}
           </CardTitle>
 
-          <div className="flex items-center space-x-2">
+          <Div className="flex items-center space-x-2">
             {/* View Mode Toggle */}
-            <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-md">
+            <Div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-md">
               <Button
                 variant={viewMode === "table" ? "default" : "ghost"}
                 size="sm"
@@ -111,7 +111,7 @@ export function UsersListClient({
               >
                 <List className="h-4 w-4" />
               </Button>
-            </div>
+            </Div>
 
             {/* Add User */}
             <Button asChild size="sm">
@@ -131,8 +131,8 @@ export function UsersListClient({
                 className={cn("h-4 w-4", queryLoading && "animate-spin")}
               />
             </Button>
-          </div>
-        </div>
+          </Div>
+        </Div>
       </CardHeader>
       <CardContent>
         {/* Filter Form */}

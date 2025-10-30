@@ -5,6 +5,7 @@
 
 import type { Metadata } from "next";
 import type React from "react";
+import { Div } from "next-vibe-ui/ui";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -35,9 +36,9 @@ export default async function CronHistoryPage({
   const { locale } = await params;
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* History Content */}
       <CronHistoryClient locale={locale} />
-    </div>
+    </Div>
   );
 }

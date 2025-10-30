@@ -167,6 +167,10 @@ export const chatFolders = pgTable(
     // Moderators (array of user IDs who can moderate this folder)
     moderatorIds: jsonb("moderator_ids").$type<string[]>().default([]),
 
+    // Allowed roles (array of UserRole values who can see this folder)
+    // If empty, inherits from rootFolderId defaults
+    allowedRoles: jsonb("allowed_roles").$type<string[]>().default([]),
+
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -179,6 +183,11 @@ export const chatFolders = pgTable(
     ),
     parentIdIdx: index("chat_folders_parent_id_idx").on(table.parentId),
     sortOrderIdx: index("chat_folders_sort_order_idx").on(table.sortOrder),
+    // GIN index for array containment queries on allowedRoles
+    allowedRolesIdx: index("chat_folders_allowed_roles_idx").using(
+      "gin",
+      table.allowedRoles,
+    ),
   }),
 );
 
@@ -225,6 +234,10 @@ export const chatThreads = pgTable(
     // Moderators (array of user IDs who can moderate this thread)
     moderatorIds: jsonb("moderator_ids").$type<string[]>().default([]),
 
+    // Allowed roles (array of UserRole values who can see this thread)
+    // If empty, inherits from parent folder's allowedRoles
+    allowedRoles: jsonb("allowed_roles").$type<string[]>().default([]),
+
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -247,6 +260,11 @@ export const chatThreads = pgTable(
     statusIdx: index("chat_threads_status_idx").on(table.status),
     createdAtIdx: index("chat_threads_created_at_idx").on(table.createdAt),
     updatedAtIdx: index("chat_threads_updated_at_idx").on(table.updatedAt),
+    // GIN index for array containment queries on allowedRoles
+    allowedRolesIdx: index("chat_threads_allowed_roles_idx").using(
+      "gin",
+      table.allowedRoles,
+    ),
   }),
 );
 

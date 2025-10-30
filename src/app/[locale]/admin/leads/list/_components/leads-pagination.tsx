@@ -11,6 +11,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Select,
@@ -62,26 +63,26 @@ export function LeadsPagination({
   const endItem = Math.min(currentPage * currentLimit, totalItems);
 
   if (totalItems === 0) {
-    return <div />;
+    return <Div />;
   }
 
   return (
-    <div
+    <Div
       className={`flex flex-col sm:flex-row justify-between items-center gap-4 ${className}`}
     >
       {/* Results info */}
-      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-        <span>
+      <Div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <Span>
           {t("app.admin.leads.leads.list.results.showing", {
             start: startItem,
             end: endItem,
             total: totalItems,
           })}
-        </span>
+        </Span>
 
         {/* Page size selector */}
-        <div className="flex items-center gap-2">
-          <span>{t("app.admin.leads.leads.pagination.page_size")}:</span>
+        <Div className="flex items-center gap-2">
+          <Span>{t("app.admin.leads.leads.pagination.page_size")}:</Span>
           <Select
             value={currentLimit.toString()}
             onValueChange={handleLimitChange}
@@ -96,19 +97,19 @@ export function LeadsPagination({
               <SelectItem value="100">100</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-      </div>
+        </Div>
+      </Div>
 
       {/* Pagination controls */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">
+      <Div className="flex items-center gap-2">
+        <Span className="text-sm text-muted-foreground">
           {t("app.admin.leads.leads.pagination.page_info", {
             current: currentPage,
             total: totalPages,
           })}
-        </span>
+        </Span>
 
-        <div className="flex items-center gap-1">
+        <Div className="flex items-center gap-1">
           {/* First page */}
           <Button
             variant="outline"
@@ -164,7 +165,7 @@ export function LeadsPagination({
                   >
                     1
                   </Button>
-                  {currentPage > 4 && <span className="px-2">...</span>}
+                  {currentPage > 4 && <Span className="px-2">...</Span>}
                 </>
               )}
 
@@ -190,7 +191,7 @@ export function LeadsPagination({
               {currentPage < totalPages - 2 && (
                 <>
                   {currentPage < totalPages - 3 && (
-                    <span className="px-2">...</span>
+                    <Span className="px-2">...</Span>
                   )}
                   <Button
                     variant="outline"
@@ -214,9 +215,9 @@ export function LeadsPagination({
             className="h-8 w-8 p-0"
           >
             <ChevronRight className="h-4 w-4" />
-            <span className="sr-only">
+            <Span className="sr-only">
               {t("app.admin.leads.leads.pagination.next")}
-            </span>
+            </Span>
           </Button>
 
           {/* Last page */}
@@ -228,12 +229,12 @@ export function LeadsPagination({
             className="h-8 w-8 p-0"
           >
             <ChevronsRight className="h-4 w-4" />
-            <span className="sr-only">
+            <Span className="sr-only">
               {t("app.admin.leads.leads.pagination.last")}
-            </span>
+            </Span>
           </Button>
-        </div>
-      </div>
-    </div>
+        </Div>
+      </Div>
+    </Div>
   );
 }

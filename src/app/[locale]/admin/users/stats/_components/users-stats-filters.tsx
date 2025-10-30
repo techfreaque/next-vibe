@@ -13,6 +13,7 @@ import {
 } from "next-vibe/shared/types/stats-filtering.schema";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import type { JSX, ReactNode } from "react";
 import type { Control, UseFormReturn } from "react-hook-form";
@@ -48,9 +49,9 @@ export function UsersStatsFilters({
   control,
 }: UsersStatsFiltersProps): JSX.Element {
   return (
-    <div className="space-y-4">
+    <Div className="space-y-4">
       {/* Base time and chart filters */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Time Period */}
         <EndpointFormField
           control={control}
@@ -166,10 +167,10 @@ export function UsersStatsFilters({
             ],
           }}
         />
-      </div>
+      </Div>
 
       {/* User-specific filters */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Status Filter */}
         <EndpointFormField
           control={control}
@@ -253,10 +254,10 @@ export function UsersStatsFilters({
             ],
           }}
         />
-      </div>
+      </Div>
 
       {/* Advanced options */}
-      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-1 gap-4">
         {/* Include Comparison */}
         <EndpointFormField
           control={control}
@@ -267,8 +268,8 @@ export function UsersStatsFilters({
             description: "app.admin.users.filters.includeComparisonDescription",
           }}
         />
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }
 
@@ -285,7 +286,7 @@ export function UsersStatsFiltersContainer({
   const { t } = simpleT(locale);
 
   return (
-    <div className="space-y-4">
+    <Div className="space-y-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-lg font-semibold">
@@ -305,6 +306,6 @@ export function UsersStatsFiltersContainer({
         </CardHeader>
         <CardContent className="space-y-4">{children}</CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

@@ -11,6 +11,8 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Div, Span } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import React, { useState } from "react";
 
 import { SortOrder } from "@/app/api/[locale]/v1/core/emails/messages/enum";
@@ -71,16 +73,16 @@ export function SmtpAccountsClient({
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <Div className="flex justify-between items-center">
           <CardTitle className="flex items-center">
             <Users className="h-5 w-5 mr-2" />
             {t("app.admin.emails.smtp.list.titleWithCount", {
               count: totalAccounts,
             })}
           </CardTitle>
-          <div className="flex items-center space-x-2">
+          <Div className="flex items-center space-x-2">
             {/* View Mode Toggle */}
-            <div className="flex items-center border rounded-lg">
+            <Div className="flex items-center border rounded-lg">
               <Button
                 variant={viewMode === "list" ? "default" : "ghost"}
                 size="sm"
@@ -97,7 +99,7 @@ export function SmtpAccountsClient({
               >
                 <Table className="h-4 w-4" />
               </Button>
-            </div>
+            </Div>
 
             {/* Create Account */}
             <Button asChild>
@@ -118,21 +120,21 @@ export function SmtpAccountsClient({
                 className={cn("h-4 w-4", queryLoading && "animate-spin")}
               />
             </Button>
-          </div>
-        </div>
+          </Div>
+        </Div>
       </CardHeader>
       <CardContent>
         {/* Filter Form */}
-        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div className="flex items-center space-x-2 mb-4">
+        <Div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <Div className="flex items-center space-x-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <Span className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {t("app.admin.emails.smtp.list.filters.title")}:
-            </span>
-          </div>
+            </Span>
+          </Div>
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <Div className="space-y-4">
+            <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Search Field */}
               <EndpointFormField
                 name="search"
@@ -271,9 +273,9 @@ export function SmtpAccountsClient({
                   showAllRequired: false,
                 }}
               />
-            </div>
+            </Div>
 
-            <div className="flex justify-between items-center mt-4">
+            <Div className="flex justify-between items-center mt-4">
               <Button
                 type="button"
                 variant="outline"
@@ -282,39 +284,39 @@ export function SmtpAccountsClient({
                 {t("app.admin.emails.smtp.list.actions.clearFilters")}
               </Button>
 
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+              <Div className="flex items-center space-x-2">
+                <Span className="text-sm text-gray-600 dark:text-gray-400">
                   {t("app.admin.emails.smtp.list.results.showing", {
                     start: (currentPage - 1) * currentLimit + 1,
                     end: Math.min(currentPage * currentLimit, totalAccounts),
                     total: totalAccounts,
                   })}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+                </Span>
+              </Div>
+            </Div>
+          </Div>
+        </Div>
 
         {/* SMTP Accounts Content - List or Table View */}
         {accounts.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <Div className="text-center py-8 text-gray-500 dark:text-gray-400">
             {queryLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 dark:border-gray-100 mr-2" />
+              <Div className="flex items-center justify-center">
+                <Div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 dark:border-gray-100 mr-2" />
                 {t("app.admin.emails.smtp.list.loading")}
-              </div>
+              </Div>
             ) : (
-              <div>
-                <p>{t("app.admin.emails.smtp.list.noResults")}</p>
+              <Div>
+                <P>{t("app.admin.emails.smtp.list.noResults")}</P>
                 <Link href={`/${locale}/admin/emails/smtp/create`}>
                   <Button className="mt-4">
                     <Plus className="h-4 w-4 mr-2" />
                     {t("app.admin.emails.smtp.list.actions.createFirst")}
                   </Button>
                 </Link>
-              </div>
+              </Div>
             )}
-          </div>
+          </Div>
         ) : viewMode === "table" ? (
           <SmtpAccountsTable
             locale={locale}
@@ -322,36 +324,36 @@ export function SmtpAccountsClient({
             isLoading={queryLoading}
           />
         ) : (
-          <div className="space-y-3">
+          <Div className="space-y-3">
             {accounts.map((account) => (
-              <div
+              <Div
                 key={account.id}
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div>
+                <Div className="flex items-center justify-between">
+                  <Div className="flex items-center space-x-4">
+                    <Div>
                       <Link
                         href={`/${locale}/admin/emails/smtp/edit/${account.id}`}
                         className="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                       >
                         {account.name}
                       </Link>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <P className="text-sm text-gray-500 dark:text-gray-400">
                         {account.id.slice(0, 13)}...
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                      </P>
+                    </Div>
+                  </Div>
+                </Div>
+              </Div>
             ))}
-          </div>
+          </Div>
         )}
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center mt-6">
-            <div className="flex items-center space-x-2">
+          <Div className="flex justify-center mt-6">
+            <Div className="flex items-center space-x-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -365,12 +367,12 @@ export function SmtpAccountsClient({
               >
                 {t("app.admin.emails.smtp.list.pagination.previous")}
               </Button>
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <Span className="text-sm text-gray-600 dark:text-gray-400">
                 {t("app.admin.emails.smtp.list.pagination.pageOf", {
                   current: currentPage,
                   total: totalPages,
                 })}
-              </span>
+              </Span>
               <Button
                 variant="outline"
                 size="sm"
@@ -384,8 +386,8 @@ export function SmtpAccountsClient({
               >
                 {t("app.admin.emails.smtp.list.pagination.next")}
               </Button>
-            </div>
-          </div>
+            </Div>
+          </Div>
         )}
       </CardContent>
     </Card>

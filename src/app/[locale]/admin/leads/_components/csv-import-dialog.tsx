@@ -6,7 +6,7 @@
 "use client";
 
 import { CheckCircle, Download, FileText, Upload } from "lucide-react";
-import { Div, Form, FormAlert } from "next-vibe-ui/ui";
+import { Div, Form, FormAlert, P, Span } from "next-vibe-ui/ui";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
@@ -22,7 +22,6 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import { Input } from "next-vibe-ui/ui/input";
 import { Progress } from "next-vibe-ui/ui/progress";
-import { P } from "next-vibe-ui/ui/typography";
 import React from "react";
 
 import {
@@ -530,11 +529,11 @@ export function CsvImportDialog({
                       <P className="font-medium">
                         {t("app.admin.leads.leads.admin.import.progress.title")}
                       </P>
-                      <Div as="span" className="text-sm text-gray-500">
+                      <Span className="text-sm text-gray-500">
                         {t(
                           "app.admin.leads.leads.admin.import.progress.processing",
                         )}
-                      </Div>
+                      </Span>
                     </Div>
                     <Progress value={undefined} className="w-full" />
                   </Div>

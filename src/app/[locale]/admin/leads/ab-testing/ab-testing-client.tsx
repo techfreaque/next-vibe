@@ -7,7 +7,7 @@ import { BarChart3, Settings, TestTube, Users } from "lucide-react";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui";
-import { H2, H3, H4, P } from "next-vibe-ui/ui/typography";
+import { H2, H3, H4, P } from "next-vibe-ui/ui";
 import { Progress } from "next-vibe-ui/ui/progress";
 import type { CSSProperties, JSX } from "react";
 

@@ -27,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { P } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
@@ -390,10 +390,10 @@ export function ImapSyncOperations(): JSX.Element {
                     {new Date(sync.startTime).toLocaleString()}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center space-x-2">
+                    <Div className="flex items-center space-x-2">
                       {getStatusIcon(sync.status)}
                       {getStatusBadge(sync.status)}
-                    </div>
+                    </Div>
                   </TableCell>
                   <TableCell>{sync.duration}</TableCell>
                   <TableCell>{sync.accountsProcessed}</TableCell>

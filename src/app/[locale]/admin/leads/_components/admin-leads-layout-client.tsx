@@ -7,7 +7,7 @@
 
 import { usePathname } from "next/navigation";
 import { Div } from "next-vibe-ui/ui";
-import { H1 } from "next-vibe-ui/ui/typography";
+import { H1 } from "next-vibe-ui/ui";
 import type React from "react";
 import type { ReactNode } from "react";
 

@@ -6,6 +6,7 @@
 import { BarChart3 } from "lucide-react";
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui";
 import type React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -38,7 +39,7 @@ export default async function UsersStatsPage({
   const { t } = simpleT(locale);
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Stats Content */}
       <Card>
         <CardHeader>
@@ -51,6 +52,6 @@ export default async function UsersStatsPage({
           <UsersStatsClient locale={locale} />
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

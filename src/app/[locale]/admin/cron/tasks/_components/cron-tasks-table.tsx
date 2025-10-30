@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "next-vibe-ui/ui/table";
 import { Div } from "next-vibe-ui/ui";
-import { H3, P } from "next-vibe-ui/ui/typography";
+import { H3, P } from "next-vibe-ui/ui";
 import React, { useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

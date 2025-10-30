@@ -37,6 +37,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
+import { Div, Span } from "next-vibe-ui/ui";
+import { H3, H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
@@ -126,23 +128,23 @@ export default function CreditPricingSection({
       ref={ref}
     >
       {/* Background decoration */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div
+      <Div className="absolute inset-0 -z-10 overflow-hidden">
+        <Div
           className="absolute left-1/2 top-0 -z-10 -translate-x-1/2 blur-3xl"
           aria-hidden="true"
         >
-          <div
+          <Div
             className="aspect-[1155/678] w-[72.1875rem] bg-blue-300 bg-gradient-to-tr from-[#80b5ff] to-[#9089fc] opacity-10"
             style={{
               clipPath:
                 "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
             }}
           />
-        </div>
-      </div>
+        </Div>
+      </Div>
 
       {/* Header */}
-      <div className="text-center mb-16 relative">
+      <Div className="text-center mb-16 relative">
         <motion.div
           className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-600 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400 mb-4"
           initial={{ opacity: 0, y: 10 }}
@@ -150,9 +152,9 @@ export default function CreditPricingSection({
           transition={{ duration: 0.5 }}
         >
           <Sparkles className="h-3.5 w-3.5 mr-1" />
-          <span className="font-medium">
+          <Span className="font-medium">
             {t("app.story.pricing.creditPricing.badge")}
-          </span>
+          </Span>
         </motion.div>
 
         <motion.h2
@@ -172,7 +174,7 @@ export default function CreditPricingSection({
         >
           {t("app.story.pricing.creditPricing.subtitle")}
         </motion.p>
-      </div>
+      </Div>
 
       {/* Pricing Cards */}
       <motion.div
@@ -184,92 +186,92 @@ export default function CreditPricingSection({
         {/* Subscription Card */}
         <motion.div variants={item}>
           <Card className="flex flex-col h-full border-2 border-blue-500 shadow-xl relative hover:shadow-2xl hover:-translate-y-1 transition-all">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+            <Div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
               {t("app.story.pricing.creditPricing.subscription.badge")}
-            </div>
+            </Div>
             <CardHeader className="pt-8 pb-4">
-              <div className="mb-6">
-                <div className="flex justify-center mb-3">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/30">
+              <Div className="mb-6">
+                <Div className="flex justify-center mb-3">
+                  <Div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/30">
                     <Zap className="h-6 w-6" />
-                  </div>
-                </div>
+                  </Div>
+                </Div>
                 <CardTitle className="text-xl text-center">
                   {t("app.story.pricing.creditPricing.subscription.title")}
                 </CardTitle>
-              </div>
+              </Div>
 
-              <div className="flex items-baseline justify-center">
-                <span className="text-4xl font-extrabold">
+              <Div className="flex items-baseline justify-center">
+                <Span className="text-4xl font-extrabold">
                   {t("app.story.pricing.creditPricing.subscription.price", {
                     price: SUBSCRIPTION_PRICE,
                   })}
-                </span>
-                <span className="ml-1 text-gray-500 dark:text-gray-400">
+                </Span>
+                <Span className="ml-1 text-gray-500 dark:text-gray-400">
                   {t("app.story.pricing.creditPricing.subscription.perMonth")}
-                </span>
-              </div>
+                </Span>
+              </Div>
               <CardDescription className="mt-4 text-center">
                 {t("app.story.pricing.creditPricing.subscription.description", {
                   credits: SUBSCRIPTION_CREDITS,
                 })}
               </CardDescription>
 
-              <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
-                <div className="flex items-start gap-2">
+              <Div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                <Div className="flex items-start gap-2">
                   <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-amber-800 dark:text-amber-200">
+                  <P className="text-xs text-amber-800 dark:text-amber-200">
                     {t(
                       "app.story.pricing.creditPricing.subscription.expiryInfo",
                     )}
-                  </p>
-                </div>
-              </div>
+                  </P>
+                </Div>
+              </Div>
             </CardHeader>
             <CardContent className="flex-grow">
               <ul className="space-y-3">
                 <li className="flex items-start">
-                  <div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-cyan-100 dark:bg-cyan-900/30">
+                  <Div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-cyan-100 dark:bg-cyan-900/30">
                     <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
-                  </div>
-                  <span className="ml-3 text-sm">
+                  </Div>
+                  <Span className="ml-3 text-sm">
                     {t(
                       "app.story.pricing.creditPricing.subscription.features.credits",
                       {
                         credits: SUBSCRIPTION_CREDITS,
                       },
                     )}
-                  </span>
+                  </Span>
                 </li>
                 <li className="flex items-start">
-                  <div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-cyan-100 dark:bg-cyan-900/30">
+                  <Div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-cyan-100 dark:bg-cyan-900/30">
                     <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
-                  </div>
-                  <span className="ml-3 text-sm">
+                  </Div>
+                  <Span className="ml-3 text-sm">
                     {t(
                       "app.story.pricing.creditPricing.subscription.features.allModels",
                     )}
-                  </span>
+                  </Span>
                 </li>
                 <li className="flex items-start">
-                  <div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-cyan-100 dark:bg-cyan-900/30">
+                  <Div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-cyan-100 dark:bg-cyan-900/30">
                     <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
-                  </div>
-                  <span className="ml-3 text-sm">
+                  </Div>
+                  <Span className="ml-3 text-sm">
                     {t(
                       "app.story.pricing.creditPricing.subscription.features.allFeatures",
                     )}
-                  </span>
+                  </Span>
                 </li>
                 <li className="flex items-start">
-                  <div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-cyan-100 dark:bg-cyan-900/30">
+                  <Div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-cyan-100 dark:bg-cyan-900/30">
                     <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
-                  </div>
-                  <span className="ml-3 text-sm">
+                  </Div>
+                  <Span className="ml-3 text-sm">
                     {t(
                       "app.story.pricing.creditPricing.subscription.features.cancel",
                     )}
-                  </span>
+                  </Span>
                 </li>
               </ul>
             </CardContent>
@@ -281,10 +283,10 @@ export default function CreditPricingSection({
                 disabled={isProcessing}
               >
                 {isProcessing ? (
-                  <div className="flex items-center">
+                  <Div className="flex items-center">
                     <Loader className="mr-2 h-4 w-4 animate-spin" />
                     {t("app.story.pricing.creditPricing.common.processing")}
-                  </div>
+                  </Div>
                 ) : (
                   t("app.story.pricing.creditPricing.subscription.button")
                 )}
@@ -296,47 +298,47 @@ export default function CreditPricingSection({
         {/* Credit Pack Card */}
         <motion.div variants={item}>
           <Card className="flex flex-col h-full border-2 border-purple-500 shadow-xl relative hover:shadow-2xl hover:-translate-y-1 transition-all">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-purple-600 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+            <Div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-purple-600 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
               {t("app.story.pricing.creditPricing.creditPack.badge")}
-            </div>
+            </Div>
             <CardHeader className="pt-8 pb-4">
-              <div className="mb-6">
-                <div className="flex justify-center mb-3">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500 bg-gradient-to-br from-purple-400 to-purple-600 text-white shadow-md shadow-purple-200 dark:shadow-purple-900/30">
+              <Div className="mb-6">
+                <Div className="flex justify-center mb-3">
+                  <Div className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500 bg-gradient-to-br from-purple-400 to-purple-600 text-white shadow-md shadow-purple-200 dark:shadow-purple-900/30">
                     <Coins className="h-6 w-6" />
-                  </div>
-                </div>
+                  </Div>
+                </Div>
                 <CardTitle className="text-xl text-center">
                   {t("app.story.pricing.creditPricing.creditPack.title")}
                 </CardTitle>
-              </div>
+              </Div>
 
-              <div className="flex items-baseline justify-center">
-                <span className="text-4xl font-extrabold">
+              <Div className="flex items-baseline justify-center">
+                <Span className="text-4xl font-extrabold">
                   {t("app.story.pricing.creditPricing.creditPack.price", {
                     price: PACK_PRICE * packQuantity,
                   })}
-                </span>
-              </div>
+                </Span>
+              </Div>
               <CardDescription className="mt-4 text-center">
                 {t("app.story.pricing.creditPricing.creditPack.description", {
                   credits: PACK_CREDITS * packQuantity,
                 })}
               </CardDescription>
 
-              <div className="mt-4 space-y-3">
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                  <div className="flex items-start gap-2">
+              <Div className="mt-4 space-y-3">
+                <Div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <Div className="flex items-start gap-2">
                     <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                    <p className="text-xs text-green-800 dark:text-green-200">
+                    <P className="text-xs text-green-800 dark:text-green-200">
                       {t(
                         "app.story.pricing.creditPricing.creditPack.permanentInfo",
                       )}
-                    </p>
-                  </div>
-                </div>
+                    </P>
+                  </Div>
+                </Div>
 
-                <div className="space-y-2">
+                <Div className="space-y-2">
                   <Label htmlFor="quantity">
                     {t(
                       "app.story.pricing.creditPricing.creditPack.quantityLabel",
@@ -356,7 +358,7 @@ export default function CreditPricingSection({
                     }}
                     className="text-center font-bold"
                   />
-                  <p className="text-xs text-muted-foreground text-center">
+                  <P className="text-xs text-muted-foreground text-center">
                     {t(
                       "app.story.pricing.creditPricing.creditPack.pricePerPack",
                       {
@@ -364,54 +366,54 @@ export default function CreditPricingSection({
                         credits: PACK_CREDITS,
                       },
                     )}
-                  </p>
-                </div>
-              </div>
+                  </P>
+                </Div>
+              </Div>
             </CardHeader>
             <CardContent className="flex-grow">
               <ul className="space-y-3">
                 <li className="flex items-start">
-                  <div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-purple-100 dark:bg-purple-900/30">
+                  <Div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-purple-100 dark:bg-purple-900/30">
                     <Check className="h-3 w-3 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <span className="ml-3 text-sm">
+                  </Div>
+                  <Span className="ml-3 text-sm">
                     {t(
                       "app.story.pricing.creditPricing.creditPack.features.credits",
                       {
                         credits: PACK_CREDITS * packQuantity,
                       },
                     )}
-                  </span>
+                  </Span>
                 </li>
                 <li className="flex items-start">
-                  <div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-purple-100 dark:bg-purple-900/30">
+                  <Div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-purple-100 dark:bg-purple-900/30">
                     <Check className="h-3 w-3 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <span className="ml-3 text-sm">
+                  </Div>
+                  <Span className="ml-3 text-sm">
                     {t(
                       "app.story.pricing.creditPricing.creditPack.features.allModels",
                     )}
-                  </span>
+                  </Span>
                 </li>
                 <li className="flex items-start">
-                  <div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-purple-100 dark:bg-purple-900/30">
+                  <Div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-purple-100 dark:bg-purple-900/30">
                     <Check className="h-3 w-3 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <span className="ml-3 text-sm">
+                  </Div>
+                  <Span className="ml-3 text-sm">
                     {t(
                       "app.story.pricing.creditPricing.creditPack.features.allFeatures",
                     )}
-                  </span>
+                  </Span>
                 </li>
                 <li className="flex items-start">
-                  <div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-purple-100 dark:bg-purple-900/30">
+                  <Div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-purple-100 dark:bg-purple-900/30">
                     <Check className="h-3 w-3 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <span className="ml-3 text-sm">
+                  </Div>
+                  <Span className="ml-3 text-sm">
                     {t(
                       "app.story.pricing.creditPricing.creditPack.features.multiple",
                     )}
-                  </span>
+                  </Span>
                 </li>
               </ul>
             </CardContent>
@@ -423,10 +425,10 @@ export default function CreditPricingSection({
                 disabled={isProcessing}
               >
                 {isProcessing ? (
-                  <div className="flex items-center">
+                  <Div className="flex items-center">
                     <Loader className="mr-2 h-4 w-4 animate-spin" />
                     {t("app.story.pricing.creditPricing.common.processing")}
-                  </div>
+                  </Div>
                 ) : packQuantity > 1 ? (
                   t("app.story.pricing.creditPricing.creditPack.buttonPlural", {
                     quantity: packQuantity,
@@ -449,9 +451,9 @@ export default function CreditPricingSection({
         animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <h3 className="text-2xl font-bold text-center mb-6">
+        <H3 className="text-2xl font-bold text-center mb-6">
           {t("app.story.pricing.creditPricing.costTransparency.title")}
-        </h3>
+        </H3>
         <Card className="max-w-4xl mx-auto">
           <CardHeader>
             <CardTitle>
@@ -500,26 +502,26 @@ export default function CreditPricingSection({
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <div className="flex items-center gap-2 cursor-help">
+                              <Div className="flex items-center gap-2 cursor-help">
                                 {typeof model.icon === "string" ? (
-                                  <span className="text-base">
+                                  <Span className="text-base">
                                     {model.icon}
-                                  </span>
+                                  </Span>
                                 ) : (
                                   <model.icon className="h-4 w-4" />
                                 )}
-                                <span>{model.name}</span>
-                              </div>
+                                <Span>{model.name}</Span>
+                              </Div>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>{model.description}</p>
+                              <P>{model.description}</P>
                               {model.parameterCount && (
-                                <p className="text-xs text-muted-foreground">
+                                <P className="text-xs text-muted-foreground">
                                   {t(
                                     "app.story.pricing.creditPricing.costTransparency.table.parameters",
                                     { count: model.parameterCount },
                                   )}
-                                </p>
+                                </P>
                               )}
                             </TooltipContent>
                           </Tooltip>
@@ -533,7 +535,7 @@ export default function CreditPricingSection({
                             )}
                           </Badge>
                         ) : (
-                          <span className="font-mono">
+                          <Span className="font-mono">
                             {model.creditCost > 1
                               ? t(
                                   "app.story.pricing.creditPricing.costTransparency.table.creditsPlural",
@@ -543,7 +545,7 @@ export default function CreditPricingSection({
                                   "app.story.pricing.creditPricing.costTransparency.table.credits",
                                   { count: model.creditCost },
                                 )}
-                          </span>
+                          </Span>
                         )}
                       </TableCell>
                     </TableRow>
@@ -562,11 +564,11 @@ export default function CreditPricingSection({
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <span className="font-mono">
+                    <Span className="font-mono">
                       {t(
                         "app.story.pricing.creditPricing.costTransparency.table.braveSearchCost",
                       )}
-                    </span>
+                    </Span>
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -577,11 +579,11 @@ export default function CreditPricingSection({
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <span className="font-mono">
+                    <Span className="font-mono">
                       {t(
                         "app.story.pricing.creditPricing.costTransparency.table.ttsCost",
                       )}
-                    </span>
+                    </Span>
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -592,11 +594,11 @@ export default function CreditPricingSection({
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <span className="font-mono">
+                    <Span className="font-mono">
                       {t(
                         "app.story.pricing.creditPricing.costTransparency.table.sttCost",
                       )}
-                    </span>
+                    </Span>
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -611,9 +613,9 @@ export default function CreditPricingSection({
         animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
         transition={{ duration: 0.5, delay: 0.5 }}
       >
-        <h3 className="text-2xl font-bold text-center mb-6">
+        <H3 className="text-2xl font-bold text-center mb-6">
           {t("app.story.pricing.creditPricing.calculator.title")}
-        </h3>
+        </H3>
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
             <CardTitle>
@@ -639,86 +641,86 @@ export default function CreditPricingSection({
               />
             </div>
 
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">
+            <Div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <Div className="space-y-3">
+                <Div className="flex justify-between items-center">
+                  <Span className="text-sm">
                     {t(
                       "app.story.pricing.creditPricing.calculator.estimates.free",
                     )}
-                  </span>
-                  <span className="font-bold">
+                  </Span>
+                  <Span className="font-bold">
                     {t(
                       "app.story.pricing.creditPricing.calculator.estimates.freeCredits",
                     )}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">
+                  </Span>
+                </Div>
+                <Div className="flex justify-between items-center">
+                  <Span className="text-sm">
                     {t(
                       "app.story.pricing.creditPricing.calculator.estimates.basic",
                     )}
-                  </span>
-                  <span className="font-bold">
+                  </Span>
+                  <Span className="font-bold">
                     {t(
                       "app.story.pricing.creditPricing.calculator.estimates.basicCredits",
                       { count: calculatorMessages },
                     )}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">
+                  </Span>
+                </Div>
+                <Div className="flex justify-between items-center">
+                  <Span className="text-sm">
                     {t(
                       "app.story.pricing.creditPricing.calculator.estimates.pro",
                     )}
-                  </span>
-                  <span className="font-bold">
+                  </Span>
+                  <Span className="font-bold">
                     {t(
                       "app.story.pricing.creditPricing.calculator.estimates.proCredits",
                       { count: calculatorMessages * 2 },
                     )}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">
+                  </Span>
+                </Div>
+                <Div className="flex justify-between items-center">
+                  <Span className="text-sm">
                     {t(
                       "app.story.pricing.creditPricing.calculator.estimates.premium",
                     )}
-                  </span>
-                  <span className="font-bold">
+                  </Span>
+                  <Span className="font-bold">
                     {t(
                       "app.story.pricing.creditPricing.calculator.estimates.premiumCredits",
                       { count: calculatorMessages * 5 },
                     )}
-                  </span>
-                </div>
-              </div>
-            </div>
+                  </Span>
+                </Div>
+              </Div>
+            </Div>
 
-            <div className="p-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <p className="text-sm font-medium mb-2">
+            <Div className="p-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <P className="text-sm font-medium mb-2">
                 {t(
                   "app.story.pricing.creditPricing.calculator.recommendation.title",
                 )}
-              </p>
+              </P>
               {calculatorMessages <= 0 && (
-                <p className="text-sm">
+                <P className="text-sm">
                   {t(
                     "app.story.pricing.creditPricing.calculator.recommendation.freeTier",
                   )}
-                </p>
+                </P>
               )}
               {calculatorMessages > 0 &&
                 calculatorMessages * 2 <= SUBSCRIPTION_CREDITS && (
-                  <p className="text-sm">
+                  <P className="text-sm">
                     {t(
                       "app.story.pricing.creditPricing.calculator.recommendation.subscription",
                       { credits: SUBSCRIPTION_CREDITS },
                     )}
-                  </p>
+                  </P>
                 )}
               {calculatorMessages * 2 > SUBSCRIPTION_CREDITS && (
-                <p className="text-sm">
+                <P className="text-sm">
                   {t(
                     "app.story.pricing.creditPricing.calculator.recommendation.additionalPacks",
                     {
@@ -728,9 +730,9 @@ export default function CreditPricingSection({
                       ),
                     },
                   )}
-                </p>
+                </P>
               )}
-            </div>
+            </Div>
           </CardContent>
         </Card>
       </motion.div>
@@ -742,16 +744,16 @@ export default function CreditPricingSection({
         animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
         transition={{ duration: 0.5, delay: 0.6 }}
       >
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-6 rounded-xl shadow-md border border-green-200 dark:border-green-800 max-w-2xl mx-auto">
-          <div className="flex items-center justify-center gap-2 mb-2">
+        <Div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-6 rounded-xl shadow-md border border-green-200 dark:border-green-800 max-w-2xl mx-auto">
+          <Div className="flex items-center justify-center gap-2 mb-2">
             <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400" />
-            <h4 className="text-lg font-bold text-green-900 dark:text-green-100">
+            <H4 className="text-lg font-bold text-green-900 dark:text-green-100">
               {t("app.story.pricing.creditPricing.freeTier.title")}
-            </h4>
-          </div>
-          <p className="text-gray-700 dark:text-gray-300">
+            </H4>
+          </Div>
+          <P className="text-gray-700 dark:text-gray-300">
             {t("app.story.pricing.creditPricing.freeTier.description")}
-          </p>
+          </P>
           <Link
             href={
               currentUser
@@ -766,7 +768,7 @@ export default function CreditPricingSection({
               {t("app.story.pricing.creditPricing.freeTier.button")}
             </Button>
           </Link>
-        </div>
+        </Div>
       </motion.div>
     </section>
   );

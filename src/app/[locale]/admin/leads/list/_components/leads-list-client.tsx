@@ -8,7 +8,7 @@
 import { Filter, List, RefreshCw, Table, Users } from "lucide-react";
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
-import { FormAlert } from "next-vibe-ui/ui";
+import { Div, FormAlert, P, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
@@ -159,7 +159,7 @@ export function LeadsListClient({
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <Div className="flex justify-between items-center">
           <CardTitle className="flex items-center">
             <Users className="h-5 w-5 mr-2" />
             {t("app.admin.leads.leads.list.titleWithCount", {
@@ -167,9 +167,9 @@ export function LeadsListClient({
             })}
           </CardTitle>
 
-          <div className="flex items-center space-x-2">
+          <Div className="flex items-center space-x-2">
             {/* View Toggle */}
-            <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg">
+            <Div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg">
               <Button
                 variant={viewMode === "list" ? "default" : "ghost"}
                 size="sm"
@@ -186,7 +186,7 @@ export function LeadsListClient({
               >
                 <Table className="h-4 w-4" />
               </Button>
-            </div>
+            </Div>
 
             {/* CSV Import */}
             <CsvImportButton onImportComplete={handleRefresh} locale={locale} />
@@ -202,21 +202,21 @@ export function LeadsListClient({
                 className={cn("h-4 w-4", queryLoading && "animate-spin")}
               />
             </Button>
-          </div>
-        </div>
+          </Div>
+        </Div>
       </CardHeader>
       <CardContent>
         {/* Filter Form */}
-        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div className="flex items-center space-x-2 mb-4">
+        <Div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <Div className="flex items-center space-x-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <Span className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {t("app.admin.leads.leads.list.filters.title")}:
-            </span>
-          </div>
+            </Span>
+          </Div>
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <Div className="space-y-4">
+            <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Search Field */}
               <EndpointFormField
                 name="searchPagination.search"
@@ -380,10 +380,10 @@ export function LeadsListClient({
                   showAllRequired: false,
                 }}
               />
-            </div>
+            </Div>
 
             {/* Second row of filters */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Language Filter */}
               <EndpointFormField
                 name="locationFilters.language"
@@ -525,13 +525,13 @@ export function LeadsListClient({
                   showAllRequired: false,
                 }}
               />
-            </div>
+            </Div>
 
             {/* Quick filter buttons */}
-            <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-              <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+            <Div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+              <Span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
                 {t("app.admin.leads.leads.filter.quick_filters")}:
-              </span>
+              </Span>
               <Button
                 type="button"
                 variant="outline"
@@ -576,12 +576,12 @@ export function LeadsListClient({
               >
                 {t("app.admin.leads.leads.admin.filters.clear")}
               </Button>
-            </div>
+            </Div>
 
             {/* Form Alert for any filter errors */}
             <FormAlert alert={leadsEndpoint.alert} />
-          </div>
-        </div>
+          </Div>
+        </Div>
 
         {/* Batch Operations Toolbar */}
         {viewMode === "table" && leads.length > 0 && (
@@ -610,64 +610,64 @@ export function LeadsListClient({
 
         {/* Leads Content - List or Table View */}
         {leads.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <Div className="text-center py-8 text-gray-500 dark:text-gray-400">
             {queryLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 dark:border-gray-100 mr-2" />
+              <Div className="flex items-center justify-center">
+                <Div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 dark:border-gray-100 mr-2" />
                 {t("app.admin.leads.leads.list.loading")}
-              </div>
+              </Div>
             ) : (
               t("app.admin.leads.leads.list.noResults")
             )}
-          </div>
+          </Div>
         ) : viewMode === "table" ? (
           <LeadsTable locale={locale} leads={leads} isLoading={queryLoading} />
         ) : (
-          <div className="space-y-3">
+          <Div className="space-y-3">
             {leads.map((lead) => (
-              <div
+              <Div
                 key={lead.id}
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div>
+                <Div className="flex items-center justify-between">
+                  <Div className="flex items-center space-x-4">
+                    <Div>
                       <Link
                         href={`/${locale}/admin/leads/${lead.id}/edit`}
                         className="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                       >
                         {lead.businessName}
                       </Link>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <P className="text-sm text-gray-500 dark:text-gray-400">
                         {lead.email}
-                      </p>
-                    </div>
-                  </div>
+                      </P>
+                    </Div>
+                  </Div>
 
-                  <div className="flex items-center space-x-4">
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  <Div className="flex items-center space-x-4">
+                    <Div className="text-right">
+                      <Div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {lead.status}
-                      </div>
+                      </Div>
                       {lead.currentCampaignStage && (
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                        <Div className="text-xs text-gray-500 dark:text-gray-400">
                           {lead.currentCampaignStage}
-                        </div>
+                        </Div>
                       )}
-                    </div>
-                  </div>
-                </div>
+                    </Div>
+                  </Div>
+                </Div>
 
                 {lead.notes && (
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <Div className="mt-2">
+                    <P className="text-sm text-gray-600 dark:text-gray-300">
                       {lead.notes}
-                    </p>
-                  </div>
+                    </P>
+                  </Div>
                 )}
-              </div>
+              </Div>
             ))}
-          </div>
+          </Div>
         )}
 
         {/* Pagination */}

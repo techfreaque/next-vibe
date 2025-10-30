@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { P } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import type { ImapMessageResponseType } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/list/definition";

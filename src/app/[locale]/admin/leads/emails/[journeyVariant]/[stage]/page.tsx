@@ -6,6 +6,7 @@
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Div, H1, P, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import type React from "react";
 
@@ -83,12 +84,12 @@ export default async function EmailPreviewPage({
       : null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <Div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header with Back Button */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+      <Div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <Div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <Div className="flex items-center justify-between">
+            <Div className="flex items-center space-x-4">
               <Link href={`/${locale}/admin/leads/emails`}>
                 <Button
                   variant="ghost"
@@ -96,36 +97,36 @@ export default async function EmailPreviewPage({
                   className="flex items-center space-x-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  <span>{t("app.admin.common.actions.back")}</span>
+                  <Span>{t("app.admin.common.actions.back")}</Span>
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <Div>
+                <H1 className="text-2xl font-bold text-gray-900 dark:text-white">
                   {t("app.admin.leads.leads.admin.emails.preview_title")}
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
+                </H1>
+                <P className="text-gray-600 dark:text-gray-400">
                   {journeyInfo.name} -{" "}
                   {stage
                     .replace(/_/g, " ")
                     .replace(/\b\w/g, (l) => l.toUpperCase())}
-                </p>
-              </div>
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              <span className="font-medium">
+                </P>
+              </Div>
+            </Div>
+            <Div className="text-sm text-gray-500 dark:text-gray-400">
+              <Span className="font-medium">
                 {t("app.admin.leads.leads.admin.emails.subject")}:
-              </span>{" "}
+              </Span>{" "}
               {emailPreview.subject}
-            </div>
-          </div>
-        </div>
-      </div>
+            </Div>
+          </Div>
+        </Div>
+      </Div>
 
       {/* Stage Navigation */}
-      <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+      <Div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <Div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <Div className="flex items-center justify-between">
+            <Div className="flex items-center space-x-2">
               {previousStage ? (
                 <Link
                   href={`/${locale}/admin/leads/emails/${journeyVariant}/${previousStage}`}
@@ -136,11 +137,11 @@ export default async function EmailPreviewPage({
                     className="flex items-center space-x-1"
                   >
                     <ChevronLeft className="h-4 w-4" />
-                    <span>
+                    <Span>
                       {previousStage
                         .replace(/_/g, " ")
                         .replace(/\b\w/g, (l) => l.toUpperCase())}
-                    </span>
+                    </Span>
                   </Button>
                 </Link>
               ) : (
@@ -151,18 +152,18 @@ export default async function EmailPreviewPage({
                   className="flex items-center space-x-1"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  <span>{t("app.admin.common.actions.previous")}</span>
+                  <Span>{t("app.admin.common.actions.previous")}</Span>
                 </Button>
               )}
-            </div>
+            </Div>
 
-            <div className="text-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <Div className="text-center">
+              <Span className="text-sm text-gray-600 dark:text-gray-400">
                 {currentStageIndex + 1} of {currentJourneyStages.length} stages
-              </span>
-            </div>
+              </Span>
+            </Div>
 
-            <div className="flex items-center space-x-2">
+            <Div className="flex items-center space-x-2">
               {nextStage ? (
                 <Link
                   href={`/${locale}/admin/leads/emails/${journeyVariant}/${nextStage}`}
@@ -172,11 +173,11 @@ export default async function EmailPreviewPage({
                     size="sm"
                     className="flex items-center space-x-1"
                   >
-                    <span>
+                    <Span>
                       {nextStage
                         .replace(/_/g, " ")
                         .replace(/\b\w/g, (l) => l.toUpperCase())}
-                    </span>
+                    </Span>
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </Link>
@@ -187,23 +188,23 @@ export default async function EmailPreviewPage({
                   disabled
                   className="flex items-center space-x-1"
                 >
-                  <span>{t("app.admin.common.actions.next")}</span>
+                  <Span>{t("app.admin.common.actions.next")}</Span>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               )}
-            </div>
-          </div>
-        </div>
-      </div>
+            </Div>
+          </Div>
+        </Div>
+      </Div>
 
       {/* Journey Selector */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-center space-x-4">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+      <Div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <Div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <Div className="flex items-center justify-center space-x-4">
+            <Span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("app.admin.leads.leads.admin.emails.journey")}:
-            </span>
-            <div className="flex space-x-2">
+            </Span>
+            <Div className="flex space-x-2">
               {allJourneys.map((journey) => {
                 const isCurrentJourney = journey === journeyVariant;
                 const journeyStages = emailService.getAvailableStages(journey);
@@ -225,10 +226,10 @@ export default async function EmailPreviewPage({
                   </Link>
                 );
               })}
-            </div>
-          </div>
-        </div>
-      </div>
+            </Div>
+          </Div>
+        </Div>
+      </Div>
 
       {/* Email Content with Test Email Functionality */}
       <EmailPreviewClient
@@ -239,6 +240,6 @@ export default async function EmailPreviewPage({
         companyEmail={contactClientRepository.getSupportEmail(locale)}
         locale={locale}
       />
-    </div>
+    </Div>
   );
 }

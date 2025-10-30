@@ -23,6 +23,8 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
+import { Div, Span } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { SmtpHealthStatus } from "@/app/api/[locale]/v1/core/emails/smtp-client/enum";
@@ -63,34 +65,34 @@ export function SmtpAccountsTable({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p className="text-gray-500">
+      <Div className="flex items-center justify-center h-64">
+        <Div className="text-center">
+          <Div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
+          <P className="text-gray-500">
             {t("app.admin.emails.smtp.list.loading")}
-          </p>
-        </div>
-      </div>
+          </P>
+        </Div>
+      </Div>
     );
   }
 
   if (accounts.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">
+      <Div className="flex items-center justify-center h-64">
+        <Div className="text-center">
+          <P className="text-gray-500 mb-4">
             {t("app.admin.emails.smtp.list.no_results")}
-          </p>
-          <p className="text-sm text-gray-400">
+          </P>
+          <P className="text-sm text-gray-400">
             {t("app.admin.emails.smtp.list.description")}
-          </p>
-        </div>
-      </div>
+          </P>
+        </Div>
+      </Div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <Div className="space-y-4">
       <Table>
         <TableHeader>
           <TableRow>
@@ -120,23 +122,23 @@ export function SmtpAccountsTable({
           {accounts.map((account) => (
             <TableRow key={account.id}>
               <TableCell>
-                <div>
-                  <div className="font-medium">{account.name}</div>
-                  <div className="text-sm text-gray-500">
+                <Div>
+                  <Div className="font-medium">{account.name}</Div>
+                  <Div className="text-sm text-gray-500">
                     {account.id.slice(0, 13)}...
-                  </div>
-                </div>
+                  </Div>
+                </Div>
               </TableCell>
               <TableCell>
-                <div className="text-sm">
-                  <div className="text-gray-500">
+                <Div className="text-sm">
+                  <Div className="text-gray-500">
                     {t("app.admin.emails.smtp.list.table.status")}:{" "}
                     {account.status}
-                  </div>
-                </div>
+                  </Div>
+                </Div>
               </TableCell>
               <TableCell>
-                <span className="text-sm text-gray-500">-</span>
+                <Span className="text-sm text-gray-500">-</Span>
               </TableCell>
               <TableCell>
                 <Badge variant={getStatusBadgeVariant(account.status)}>
@@ -144,7 +146,7 @@ export function SmtpAccountsTable({
                 </Badge>
               </TableCell>
               <TableCell>
-                <div className="text-sm">
+                <Div className="text-sm">
                   {account.healthCheckStatus ? (
                     <Badge
                       variant={
@@ -159,25 +161,25 @@ export function SmtpAccountsTable({
                       {account.healthCheckStatus}
                     </Badge>
                   ) : (
-                    <span className="text-gray-400">
+                    <Span className="text-gray-400">
                       {t("app.admin.emails.smtp.admin.health.unknown")}
-                    </span>
+                    </Span>
                   )}
-                </div>
+                </Div>
               </TableCell>
               <TableCell>
-                <div className="text-sm">
-                  <div className="text-xs text-gray-500">
+                <Div className="text-sm">
+                  <Div className="text-xs text-gray-500">
                     {t("app.admin.emails.smtp.list.table.totalSent", {
                       count: account.totalEmailsSent,
                     })}
-                  </div>
-                </div>
+                  </Div>
+                </Div>
               </TableCell>
               <TableCell>
-                <div className="text-sm">
-                  <span className="font-medium">{account.priority}</span>
-                </div>
+                <Div className="text-sm">
+                  <Span className="font-medium">{account.priority}</Span>
+                </Div>
               </TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
@@ -206,6 +208,6 @@ export function SmtpAccountsTable({
           ))}
         </TableBody>
       </Table>
-    </div>
+    </Div>
   );
 }

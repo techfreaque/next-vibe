@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Button } from "next-vibe-ui/ui/button";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { Input } from "next-vibe-ui/ui/input";
+import { Div } from "next-vibe-ui/ui";
+import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useEffect, useRef } from "react";
 
@@ -56,26 +58,26 @@ export function UnsubscribePage({
   }, [prefilledEmail, isLoggedIn, setEmail]);
 
   return (
-    <div className="min-h-screen bg-red-50 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <Div className="min-h-screen bg-red-50 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Hero Section */}
       <section className="relative py-20 px-4 md:px-6">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+        <Div className="container mx-auto max-w-4xl text-center">
+          <H1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
             {t("app.story.newsletter.unsubscribe.page.title")}
-          </h1>
-          <h2 className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
+          </H1>
+          <H2 className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
             {t("app.story.newsletter.unsubscribe.page.subtitle")}
-          </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+          </H2>
+          <P className="text-lg text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
             {prefilledEmail
               ? t(
                   "app.story.newsletter.unsubscribe.page.emailProvided.description",
                 )
               : t("app.story.newsletter.unsubscribe.page.description")}
-          </p>
+          </P>
 
           {/* Unsubscribe Form */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-16 max-w-md mx-auto">
+          <Div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-16 max-w-md mx-auto">
             <Form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -88,7 +90,7 @@ export function UnsubscribePage({
               }}
               className="space-y-4"
             >
-              <div className="flex flex-col space-y-3">
+              <Div className="flex flex-col space-y-3">
                 <Input
                   type="email"
                   placeholder={t("app.story.newsletter.emailPlaceholder")}
@@ -124,9 +126,9 @@ export function UnsubscribePage({
                   disabled={isAnyOperationInProgress}
                 >
                   {isUnsubscribing ? (
-                    <div className="animate-spin mr-2">
-                      <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
-                    </div>
+                    <Div className="animate-spin mr-2">
+                      <Div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+                    </Div>
                   ) : showConfirmUnsubscribe ? (
                     <Check className="h-5 w-5 mr-2" />
                   ) : (
@@ -140,11 +142,11 @@ export function UnsubscribePage({
                         "app.story.newsletter.unsubscribe.page.unsubscribeButton",
                       )}
                 </Button>
-              </div>
+              </Div>
 
               {/* Notification display */}
               {notification && (
-                <div
+                <Div
                   className={`text-sm p-3 rounded-lg ${
                     notification.type === "error"
                       ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
@@ -156,13 +158,13 @@ export function UnsubscribePage({
                   }`}
                 >
                   {t(notification.message)}
-                </div>
+                </Div>
               )}
             </Form>
 
             {/* Subscribe link */}
-            <div className="text-center mt-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+            <Div className="text-center mt-4">
+              <P className="text-sm text-gray-500 dark:text-gray-400">
                 {t("app.story.newsletter.unsubscribe.page.subscribeText")}{" "}
                 <Link
                   href={`/${locale}/newsletter`}
@@ -170,72 +172,72 @@ export function UnsubscribePage({
                 >
                   {t("app.story.newsletter.unsubscribe.page.subscribeLink")}
                 </Link>
-              </p>
-            </div>
-          </div>
-        </div>
+              </P>
+            </Div>
+          </Div>
+        </Div>
       </section>
 
       {/* Information Section */}
       <section className="py-20 px-4 md:px-6 bg-white dark:bg-gray-800">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+        <Div className="container mx-auto max-w-4xl">
+          <Div className="text-center mb-16">
+            <H2 className="text-3xl md:text-4xl font-bold mb-4">
               {t("app.story.newsletter.unsubscribe.page.info.title")}
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+            </H2>
+            <P className="text-lg text-gray-600 dark:text-gray-400 mb-8">
               {t("app.story.newsletter.unsubscribe.page.info.description")}
-            </p>
-          </div>
+            </P>
+          </Div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="text-center p-6 rounded-xl bg-gray-50 dark:bg-gray-700">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-red-600 bg-gradient-to-r from-red-500 to-orange-600 rounded-full mb-4">
+          <Div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Div className="text-center p-6 rounded-xl bg-gray-50 dark:bg-gray-700">
+              <Div className="inline-flex items-center justify-center w-16 h-16 bg-red-600 bg-gradient-to-r from-red-500 to-orange-600 rounded-full mb-4">
                 <Mail className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">
+              </Div>
+              <H3 className="text-xl font-semibold mb-3">
                 {t(
                   "app.story.newsletter.unsubscribe.page.info.immediate.title",
                 )}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              </H3>
+              <P className="text-gray-600 dark:text-gray-400">
                 {t(
                   "app.story.newsletter.unsubscribe.page.info.immediate.description",
                 )}
-              </p>
-            </div>
+              </P>
+            </Div>
 
-            <div className="text-center p-6 rounded-xl bg-gray-50 dark:bg-gray-700">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-red-600 bg-gradient-to-r from-red-500 to-orange-600 rounded-full mb-4">
+            <Div className="text-center p-6 rounded-xl bg-gray-50 dark:bg-gray-700">
+              <Div className="inline-flex items-center justify-center w-16 h-16 bg-red-600 bg-gradient-to-r from-red-500 to-orange-600 rounded-full mb-4">
                 <Send className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">
+              </Div>
+              <H3 className="text-xl font-semibold mb-3">
                 {t(
                   "app.story.newsletter.unsubscribe.page.info.resubscribe.title",
                 )}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              </H3>
+              <P className="text-gray-600 dark:text-gray-400">
                 {t(
                   "app.story.newsletter.unsubscribe.page.info.resubscribe.description",
                 )}
-              </p>
-            </div>
-          </div>
-        </div>
+              </P>
+            </Div>
+          </Div>
+        </Div>
       </section>
 
       {/* Alternative Actions Section */}
       <section className="py-16 px-4 md:px-6">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+        <Div className="container mx-auto max-w-4xl text-center">
+          <H2 className="text-2xl md:text-3xl font-bold mb-4">
             {t("app.story.newsletter.unsubscribe.page.alternatives.title")}
-          </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+          </H2>
+          <P className="text-lg text-gray-600 dark:text-gray-400 mb-8">
             {t(
               "app.story.newsletter.unsubscribe.page.alternatives.description",
             )}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          </P>
+          <Div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               onClick={() => {
                 window.location.href = `/${locale}/newsletter`;
@@ -258,9 +260,9 @@ export function UnsubscribePage({
             >
               {t("app.story.newsletter.unsubscribe.page.alternatives.contact")}
             </Button>
-          </div>
-        </div>
+          </Div>
+        </Div>
       </section>
-    </div>
+    </Div>
   );
 }

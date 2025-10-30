@@ -9,6 +9,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import { Switch } from "next-vibe-ui/ui/switch";
 import type { JSX } from "react";
 
@@ -52,7 +53,7 @@ export function LeadsSourceLegend({
   return (
     <Card className="w-full">
       <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
+        <Div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold">
             {title ||
               t("app.admin.leads.leads.admin.stats.sources.legend.title")}
@@ -61,12 +62,12 @@ export function LeadsSourceLegend({
             {visibleCount}/{totalCount}{" "}
             {t("app.admin.leads.leads.admin.stats.sources.legend.visible")}
           </Badge>
-        </div>
+        </Div>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Control buttons */}
-        <div className="flex items-center justify-between pb-2 border-b">
-          <div className="flex gap-2">
+        <Div className="flex items-center justify-between pb-2 border-b">
+          <Div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -85,7 +86,7 @@ export function LeadsSourceLegend({
               <EyeOff className="h-4 w-4" />
               {t("app.admin.leads.leads.admin.stats.legend.hideAll")}
             </Button>
-          </div>
+          </Div>
           <Button
             variant="ghost"
             size="sm"
@@ -104,18 +105,18 @@ export function LeadsSourceLegend({
               </>
             )}
           </Button>
-        </div>
+        </Div>
 
         {/* Source legend items */}
-        <div className="space-y-3">
+        <Div className="space-y-3">
           {sources.map((source) => (
-            <div
+            <Div
               key={source.source}
               className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 dark:hover:bg-muted/20 transition-colors"
             >
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <div
+              <Div className="flex items-center gap-3">
+                <Div className="flex items-center gap-2">
+                  <Div
                     className="w-4 h-4 rounded-full"
                     style={{ backgroundColor: source.color }}
                   />
@@ -123,14 +124,14 @@ export function LeadsSourceLegend({
                     checked={source.visible}
                     onCheckedChange={() => onToggleSource(source.source)}
                   />
-                </div>
-                <div>
-                  <div
+                </Div>
+                <Div>
+                  <Div
                     className={`font-medium ${source.visible ? "text-foreground" : "text-muted-foreground"}`}
                   >
                     {t(source.source)}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
+                  </Div>
+                  <Div className="text-sm text-muted-foreground">
                     {t(
                       "app.admin.leads.leads.admin.stats.sources.legend.leads",
                       {
@@ -138,9 +139,9 @@ export function LeadsSourceLegend({
                         percentage: source.percentage.toFixed(1),
                       },
                     )}
-                  </div>
-                </div>
-              </div>
+                  </Div>
+                </Div>
+              </Div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -153,13 +154,13 @@ export function LeadsSourceLegend({
                   <EyeOff className="h-4 w-4" />
                 )}
               </Button>
-            </div>
+            </Div>
           ))}
-        </div>
+        </Div>
 
         {/* Summary */}
-        <div className="pt-2 border-t">
-          <div className="text-sm text-muted-foreground">
+        <Div className="pt-2 border-t">
+          <Div className="text-sm text-muted-foreground">
             {t("app.admin.leads.leads.admin.stats.sources.legend.summary", {
               visible: visibleCount,
               total: totalCount,
@@ -168,8 +169,8 @@ export function LeadsSourceLegend({
                   ? ((visibleCount / totalCount) * 100).toFixed(1)
                   : 0,
             })}
-          </div>
-        </div>
+          </Div>
+        </Div>
       </CardContent>
     </Card>
   );

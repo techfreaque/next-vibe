@@ -15,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import { useState } from "react";
 
@@ -41,11 +42,11 @@ export function ImapAccountsManagement(): JSX.Element {
   };
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Header with Create Button */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <Div className="flex items-center justify-between">
             <CardTitle>
               {t("app.admin.emails.imap.admin.accounts.management.title")}
             </CardTitle>
@@ -56,7 +57,7 @@ export function ImapAccountsManagement(): JSX.Element {
               <Plus className="h-4 w-4" />
               {t("app.admin.emails.imap.account.create")}
             </Button>
-          </div>
+          </Div>
         </CardHeader>
         <CardContent>
           {/* Accounts List - all state managed through useEndpoint */}
@@ -79,6 +80,6 @@ export function ImapAccountsManagement(): JSX.Element {
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </Div>
   );
 }

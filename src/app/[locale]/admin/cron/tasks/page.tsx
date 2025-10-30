@@ -5,6 +5,7 @@
 
 import type { Metadata } from "next";
 import type { JSX } from "react";
+import { Div } from "next-vibe-ui/ui";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -35,8 +36,8 @@ export default async function CronTasksPage({
   const { locale } = await params;
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       <CronTasksClient locale={locale} />
-    </div>
+    </Div>
   );
 }

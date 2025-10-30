@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div, Link, Span } from "next-vibe-ui/ui";
-import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
+import { H1, H2, H3, P } from "next-vibe-ui/ui";
 import { Separator } from "next-vibe-ui/ui/separator";
 import type { JSX } from "react";
 

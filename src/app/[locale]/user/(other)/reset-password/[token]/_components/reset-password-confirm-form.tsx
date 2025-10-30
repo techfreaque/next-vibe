@@ -12,6 +12,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  Div,
   Form,
   FormItem,
 } from "next-vibe-ui/ui";
@@ -68,7 +69,7 @@ export default function ResetPasswordConfirmForm({
         <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
           <CardContent className="pt-6">
             {alert && <FormAlert alert={alert} className="mb-6" />}
-            <div className="text-center">
+            <Div className="text-center">
               <Button asChild>
                 <Link href={`/${locale}/user/reset-password`}>
                   {t(
@@ -76,7 +77,7 @@ export default function ResetPasswordConfirmForm({
                   )}
                 </Link>
               </Button>
-            </div>
+            </Div>
           </CardContent>
         </Card>
       </motion.div>
@@ -94,7 +95,7 @@ export default function ResetPasswordConfirmForm({
         <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
           <CardContent className="pt-6">
             {alert && <FormAlert alert={alert} className="mb-6" />}
-            <div className="text-center">
+            <Div className="text-center">
               <Button
                 asChild
                 className="bg-green-600 hover:bg-green-700 text-white"
@@ -103,7 +104,7 @@ export default function ResetPasswordConfirmForm({
                   {t("app.user.other.login.auth.login.signInButton")}
                 </Link>
               </Button>
-            </div>
+            </Div>
           </CardContent>
         </Card>
       </motion.div>

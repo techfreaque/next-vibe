@@ -9,8 +9,14 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
+import {
+  canDeleteFolder,
+  canManageFolder,
+  canReadFolder,
+} from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { validateNoCircularReference } from "@/app/api/[locale]/v1/core/agent/chat/validation";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 
 import type {
@@ -26,20 +32,13 @@ import type {
 export async function getFolder(
   user: JwtPayloadType,
   data: { id: string },
+  logger: EndpointLogger,
 ): Promise<ResponseType<FolderGetResponseOutput>> {
-  if (user.isPublic) {
-    return fail({
-      message:
-        "app.api.v1.core.agent.chat.folders.id.get.errors.unauthorized.title",
-      errorType: ErrorResponseTypes.UNAUTHORIZED,
-    });
-  }
-
   try {
     const [folder] = await db
       .select()
       .from(chatFolders)
-      .where(and(eq(chatFolders.id, data.id), eq(chatFolders.userId, user.id)))
+      .where(eq(chatFolders.id, data.id))
       .limit(1);
 
     if (!folder) {
@@ -47,6 +46,15 @@ export async function getFolder(
         message:
           "app.api.v1.core.agent.chat.folders.id.get.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    // Check if user can read this folder
+    if (!(await canReadFolder(user, folder, logger))) {
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.folders.id.get.errors.forbidden.title",
+        errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
 

@@ -4,6 +4,7 @@
  */
 
 import Link from "next/link";
+import { Div, H3, P, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
@@ -42,21 +43,21 @@ export default async function LeadsEmailsPage({
   });
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Page Description */}
-      <div>
-        <p className="text-gray-600 dark:text-gray-400">
+      <Div>
+        <P className="text-gray-600 dark:text-gray-400">
           {t("app.admin.leads.leads.admin.emails.description")}
-        </p>
-      </div>
+        </P>
+      </Div>
 
       {/* Email Templates Overview */}
       <Card>
         <CardHeader>
           <CardTitle>{t("app.admin.leads.leads.admin.emails.title")}</CardTitle>
-          <p className="text-gray-600 dark:text-gray-400">
+          <P className="text-gray-600 dark:text-gray-400">
             {t("app.admin.leads.leads.admin.emails.subtitle")}
-          </p>
+          </P>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue={availableJourneys[0]} className="w-full">
@@ -75,17 +76,17 @@ export default async function LeadsEmailsPage({
                 className="space-y-4"
               >
                 {/* Journey Description */}
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <h3 className="font-semibold text-blue-900 dark:text-blue-100">
+                <Div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                  <H3 className="font-semibold text-blue-900 dark:text-blue-100">
                     {journey.info.name}
-                  </h3>
-                  <p className="text-blue-700 dark:text-blue-200 text-sm mt-1">
+                  </H3>
+                  <P className="text-blue-700 dark:text-blue-200 text-sm mt-1">
                     {journey.info.description}
-                  </p>
-                </div>
+                  </P>
+                </Div>
 
                 {/* Email Templates Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {journey.stages.map((stage) => (
                     <Card
                       key={`${journey.variant}-${stage}`}
@@ -97,20 +98,20 @@ export default async function LeadsEmailsPage({
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                          <p>
+                        <Div className="text-sm text-gray-600 dark:text-gray-400">
+                          <P>
                             <strong>
                               {t("app.admin.leads.leads.admin.emails.journey")}:
                             </strong>{" "}
                             {journey.info.name}
-                          </p>
-                          <p>
+                          </P>
+                          <P>
                             <strong>
                               {t("app.admin.leads.leads.admin.emails.stage")}:
                             </strong>{" "}
                             {getStageDisplayName(stage)}
-                          </p>
-                        </div>
+                          </P>
+                        </Div>
 
                         <Button asChild className="w-full">
                           <Link
@@ -124,25 +125,25 @@ export default async function LeadsEmailsPage({
                       </CardContent>
                     </Card>
                   ))}
-                </div>
+                </Div>
 
                 {/* Journey Stats */}
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">
+                <Div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <Div className="flex items-center justify-between text-sm">
+                    <Span className="text-gray-600 dark:text-gray-400">
                       {t("app.admin.leads.leads.admin.emails.total_templates")}:
-                    </span>
-                    <span className="font-medium">
+                    </Span>
+                    <Span className="font-medium">
                       {journey.stages.length}{" "}
                       {t("app.admin.leads.leads.admin.emails.templates")}
-                    </span>
-                  </div>
-                </div>
+                    </Span>
+                  </Div>
+                </Div>
               </TabsContent>
             ))}
           </Tabs>
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Form } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Input } from "next-vibe-ui/ui/input";
+import { Div } from "next-vibe-ui/ui";
+import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useRef } from "react";
 
@@ -83,26 +85,26 @@ export function NewsletterPage({
   ];
 
   return (
-    <div className="min-h-screen bg-blue-50 bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <Div className="min-h-screen bg-blue-50 bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Hero Section */}
       <section className="relative py-20 px-4 md:px-6">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+        <Div className="container mx-auto max-w-4xl text-center">
+          <H1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
             {prefilledEmail !== undefined && prefilledEmail.length > 0
               ? t("app.story.newsletter.page.emailProvided.title")
               : t("app.story.newsletter.page.title")}
-          </h1>
-          <h2 className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
+          </H1>
+          <H2 className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
             {t("app.story.newsletter.page.subtitle")}
-          </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+          </H2>
+          <P className="text-lg text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
             {prefilledEmail !== undefined && prefilledEmail.length > 0
               ? t("app.story.newsletter.page.emailProvided.description")
               : t("app.story.newsletter.page.heroDescription")}
-          </p>
+          </P>
 
           {/* Newsletter Form */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-16 max-w-md mx-auto">
+          <Div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-16 max-w-md mx-auto">
             <Form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -186,7 +188,7 @@ export function NewsletterPage({
 
               {/* Notification display */}
               {notification && (
-                <div
+                <Div
                   className={`text-sm p-3 rounded-lg ${
                     notification.type === "error"
                       ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
@@ -198,13 +200,13 @@ export function NewsletterPage({
                   }`}
                 >
                   {t(notification.message)}
-                </div>
+                </Div>
               )}
             </Form>
 
             {/* Unsubscribe link */}
-            <div className="text-center mt-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+            <Div className="text-center mt-4">
+              <P className="text-sm text-gray-500 dark:text-gray-400">
                 {t("app.story.newsletter.page.unsubscribeText")}{" "}
                 <Link
                   href={`/${locale}/newsletter/unsubscribe`}
@@ -212,69 +214,69 @@ export function NewsletterPage({
                 >
                   {t("app.story.newsletter.page.unsubscribeLink")}
                 </Link>
-              </p>
-            </div>
-          </div>
-        </div>
+              </P>
+            </Div>
+          </Div>
+        </Div>
       </section>
 
       {/* Benefits Section */}
       <section className="py-20 px-4 md:px-6 bg-white dark:bg-gray-800">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+        <Div className="container mx-auto max-w-6xl">
+          <Div className="text-center mb-16">
+            <H2 className="text-3xl md:text-4xl font-bold mb-4">
               {t("app.story.newsletter.page.benefits.title")}
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
+            </H2>
+            <P className="text-lg text-gray-600 dark:text-gray-400">
               {t("app.story.newsletter.page.benefits.subtitle")}
-            </p>
-          </div>
+            </P>
+          </Div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((benefit, index) => {
               const IconComponent = benefit.icon;
               return (
-                <div
+                <Div
                   key={`benefit_${index}_${benefit.title}`}
                   className="text-center p-6 rounded-xl bg-gray-50 dark:bg-gray-700 hover:shadow-lg transition-shadow"
                 >
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mb-4">
+                  <Div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mb-4">
                     <IconComponent className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3">
+                  </Div>
+                  <H3 className="text-xl font-semibold mb-3">
                     {benefit.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  </H3>
+                  <P className="text-gray-600 dark:text-gray-400">
                     {benefit.description}
-                  </p>
-                </div>
+                  </P>
+                </Div>
               );
             })}
-          </div>
-        </div>
+          </Div>
+        </Div>
       </section>
 
       {/* Frequency Section */}
       <section className="py-16 px-4 md:px-6">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+        <Div className="container mx-auto max-w-4xl text-center">
+          <H2 className="text-2xl md:text-3xl font-bold mb-4">
             {t("app.story.newsletter.page.frequency.title")}
-          </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
+          </H2>
+          <P className="text-lg text-gray-600 dark:text-gray-400">
             {t("app.story.newsletter.page.frequency.description")}
-          </p>
-        </div>
+          </P>
+        </Div>
       </section>
 
       {/* Final CTA Section */}
       <section className="py-20 px-4 md:px-6 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600">
-        <div className="container mx-auto max-w-4xl text-center text-white">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+        <Div className="container mx-auto max-w-4xl text-center text-white">
+          <H2 className="text-3xl md:text-4xl font-bold mb-4">
             {t("app.story.newsletter.page.cta.title")}
-          </h2>
-          <p className="text-xl mb-8 opacity-90">
+          </H2>
+          <P className="text-xl mb-8 opacity-90">
             {t("app.story.newsletter.page.cta.description")}
-          </p>
+          </P>
           <Button
             onClick={() => {
               // Scroll to top form
@@ -286,8 +288,8 @@ export function NewsletterPage({
           >
             {t("app.story.newsletter.page.cta.subscribeButton")}
           </Button>
-        </div>
+        </Div>
       </section>
-    </div>
+    </Div>
   );
 }

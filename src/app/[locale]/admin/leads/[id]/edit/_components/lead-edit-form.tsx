@@ -7,6 +7,7 @@
 
 import { ArrowLeft, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
@@ -52,30 +53,30 @@ export function LeadEditForm({
   const isSaving = endpoint.create.isSubmitting;
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Div>Loading...</Div>;
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <Div className="max-w-4xl mx-auto space-y-6">
       {/* Header with Navigation */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <Div className="flex items-center justify-between">
+        <Div className="flex items-center space-x-4">
           <Button variant="outline" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t("app.admin.leads.leads.edit.form.actions.back")}
           </Button>
-        </div>
-        <div className="text-sm text-gray-500 dark:text-gray-400">{leadId}</div>
-      </div>
+        </Div>
+        <Div className="text-sm text-gray-500 dark:text-gray-400">{leadId}</Div>
+      </Div>
 
       {/* Main Form Card */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <span>{t("app.admin.common.actions.edit")}</span>
-            <span className="text-lg font-normal text-gray-500">
+            <Span>{t("app.admin.common.actions.edit")}</Span>
+            <Span className="text-lg font-normal text-gray-500">
               - {lead.lead.basicInfo.businessName}
-            </span>
+            </Span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -364,7 +365,7 @@ export function LeadEditForm({
             </FormFieldGroup>
             <FormAlert alert={endpoint.alert} />
 
-            <div className="mt-6 flex justify-end space-x-3">
+            <Div className="mt-6 flex justify-end space-x-3">
               <Button
                 type="button"
                 variant="outline"
@@ -378,10 +379,10 @@ export function LeadEditForm({
                   ? t("app.admin.leads.leads.edit.form.actions.saving")
                   : t("app.admin.leads.leads.edit.form.actions.save")}
               </Button>
-            </div>
+            </Div>
           </Form>
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

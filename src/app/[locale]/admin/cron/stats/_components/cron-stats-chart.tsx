@@ -6,6 +6,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div, P } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import type { PieLabelRenderProps } from "recharts";
 import {
@@ -239,10 +240,10 @@ const CustomDistributionTooltip = ({
   if (active && payload?.length) {
     const data = payload[0];
     return (
-      <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
-        <p className="font-medium">{data.name}</p>
-        <p style={{ color: data.color }}>{data.value}</p>
-      </div>
+      <Div className="bg-background border border-border rounded-lg p-3 shadow-lg">
+        <P className="font-medium">{data.name}</P>
+        <P style={{ color: data.color }}>{data.value}</P>
+      </Div>
     );
   }
   return null;

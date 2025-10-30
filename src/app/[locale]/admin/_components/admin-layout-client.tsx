@@ -20,7 +20,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div, Span } from "next-vibe-ui/ui";
-import { H1 } from "next-vibe-ui/ui/typography";
+import { H1 } from "next-vibe-ui/ui";
+import { Link } from "next-vibe-ui/ui";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -122,7 +123,7 @@ export function AdminLayoutClient({
             >
               <X className="h-6 w-6" />
             </Button>
-          </div>
+          </Div>
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map((item) => (
               <NextLink
@@ -233,11 +234,12 @@ export function AdminLayoutClient({
               {/* Locale selector */}
               <CountrySelector isNavBar locale={locale} />
 
-              <Span className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                <a href={`/${locale}/`}>
-                  {t("app.admin.components.navigation.backToApp")}
-                </a>
-              </Span>
+              <Link
+                href={`/${locale}/`}
+                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                {t("app.admin.components.navigation.backToApp")}
+              </Link>
             </Div>
           </Div>
         </Div>

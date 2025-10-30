@@ -436,8 +436,14 @@ function FolderItem({
     setPermissionsDialogOpen(true);
   };
 
-  const handleSavePermissions = (moderatorIds: string[]): void => {
-    onUpdateFolder(folder.id, { moderatorIds });
+  const handleSavePermissions = (data: {
+    moderatorIds: string[];
+    allowedRoles?: string[];
+  }): void => {
+    onUpdateFolder(folder.id, {
+      moderatorIds: data.moderatorIds,
+      allowedRoles: data.allowedRoles,
+    });
   };
 
   // Determine if move up/down should be disabled
@@ -733,6 +739,7 @@ function FolderItem({
         resourceType="folder"
         resourceName={folderDisplayName}
         moderatorIds={(folder.moderatorIds as string[]) || []}
+        allowedRoles={(folder.allowedRoles as string[]) || []}
         onSave={handleSavePermissions}
         locale={locale}
       />

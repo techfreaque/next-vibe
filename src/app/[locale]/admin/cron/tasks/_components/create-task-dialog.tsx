@@ -6,7 +6,7 @@
 "use client";
 
 import { Plus, Save } from "lucide-react";
-import { Form, FormAlert } from "next-vibe-ui/ui";
+import { Form, FormAlert, Div, P } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import {
@@ -91,7 +91,7 @@ export function CreateTaskDialog({
                 }
               >
                 {/* Task Name and Priority */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EndpointFormField
                     name="name"
                     config={{
@@ -140,7 +140,7 @@ export function CreateTaskDialog({
                       showAllRequired: false,
                     }}
                   />
-                </div>
+                </Div>
 
                 {/* Description */}
                 <EndpointFormField
@@ -167,7 +167,7 @@ export function CreateTaskDialog({
                 }
               >
                 {/* Schedule and Timezone */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EndpointFormField
                     name="schedule"
                     config={{
@@ -183,7 +183,7 @@ export function CreateTaskDialog({
                       requiredColor: "red",
                     }}
                   />
-                </div>
+                </Div>
 
                 {/* Schedule Preview */}
                 <SchedulePreview
@@ -199,7 +199,7 @@ export function CreateTaskDialog({
                 }
               >
                 {/* Timeout and Retries */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EndpointFormField
                     name="timeout"
                     config={{
@@ -229,7 +229,7 @@ export function CreateTaskDialog({
                       showAllRequired: false,
                     }}
                   />
-                </div>
+                </Div>
 
                 {/* Retry Delay */}
                 <EndpointFormField
@@ -282,7 +282,7 @@ export function CreateTaskDialog({
           <Button type="submit" disabled={isSubmitting} onClick={handleSubmit}>
             {isSubmitting ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                <Div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                 {t("app.admin.cron.createTask.form.creating")}
               </>
             ) : (
@@ -329,12 +329,12 @@ function SchedulePreview({
     }
 
     return (
-      <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-        <p className="text-sm text-blue-800 font-medium">
+      <Div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+        <P className="text-sm text-blue-800 font-medium">
           {t("app.admin.cron.cronErrors.admin.interface.schedulePreview")}
-        </p>
-        <p className="text-sm text-blue-700">{humanReadable}</p>
-      </div>
+        </P>
+        <P className="text-sm text-blue-700">{humanReadable}</P>
+      </Div>
     );
   } catch {
     return null;

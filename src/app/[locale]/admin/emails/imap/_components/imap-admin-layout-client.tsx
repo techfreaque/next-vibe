@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "next-vibe/shared/utils";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div, Span } from "next-vibe-ui/ui";
-import { H2, P } from "next-vibe-ui/ui/typography";
+import { H2, P } from "next-vibe-ui/ui";
 import type { ComponentType, JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

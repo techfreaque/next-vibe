@@ -11,7 +11,6 @@ import {
   Twitter,
   Youtube,
 } from "lucide-react";
-import Link from "next/link";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Card,
@@ -20,6 +19,8 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe-ui/ui/card";
+import { Div, Span } from "next-vibe-ui/ui";
+import { Link } from "next-vibe-ui/ui/link";
 import type React from "react";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
@@ -124,8 +125,8 @@ export default function FreeSocialSetup({
       className="container px-4 md:px-6 py-24 md:py-32 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20"
       ref={ref}
     >
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
+      <Div className="max-w-6xl mx-auto">
+        <Div className="text-center mb-16">
           <motion.div
             className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-4"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -155,9 +156,9 @@ export default function FreeSocialSetup({
           >
             {t("app.story._components.home.freeSocialSetup.description")}
           </motion.p>
-        </div>
+        </Div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <Div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left side - Benefits */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -166,11 +167,11 @@ export default function FreeSocialSetup({
           >
             <Card className="border-2 border-blue-200 dark:border-blue-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
               <CardHeader>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <Div className="flex items-center gap-3 mb-4">
+                  <Div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                     <Settings className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div>
+                  </Div>
+                  <Div>
                     <CardTitle className="text-2xl">
                       {t(
                         "app.story._components.home.freeSocialSetup.card.title",
@@ -181,8 +182,8 @@ export default function FreeSocialSetup({
                         "app.story._components.home.freeSocialSetup.card.subtitle",
                       )}
                     </CardDescription>
-                  </div>
-                </div>
+                  </Div>
+                </Div>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-4">
@@ -198,9 +199,9 @@ export default function FreeSocialSetup({
                       transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
                     >
                       <CheckCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300">
+                      <Span className="text-gray-700 dark:text-gray-300">
                         {benefit}
-                      </span>
+                      </Span>
                     </motion.li>
                   ))}
                 </ul>
@@ -242,22 +243,22 @@ export default function FreeSocialSetup({
               {t("app.story._components.home.freeSocialSetup.platforms.title")}
             </motion.h3>
 
-            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+            <Div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-4">
               {socialPlatforms.map((platform) => (
                 <motion.div
                   key={platform.name}
                   variants={item}
                   className="flex flex-col items-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow duration-300"
                 >
-                  <div className={`${platform.color} mb-3`}>
+                  <Div className={`${platform.color} mb-3`}>
                     {platform.icon}
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  </Div>
+                  <Span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     {platform.name}
-                  </span>
+                  </Span>
                 </motion.div>
               ))}
-            </div>
+            </Div>
 
             <motion.p
               className="text-center text-gray-600 dark:text-gray-400 text-sm mt-6"
@@ -270,8 +271,8 @@ export default function FreeSocialSetup({
               )}
             </motion.p>
           </motion.div>
-        </div>
-      </div>
+        </Div>
+      </Div>
     </section>
   );
 }

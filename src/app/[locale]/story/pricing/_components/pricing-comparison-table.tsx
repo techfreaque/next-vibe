@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "next-vibe-ui/ui/button";
 import { Label } from "next-vibe-ui/ui/label";
 import { Switch } from "next-vibe-ui/ui/switch";
+import { Div, Span } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
@@ -44,7 +45,7 @@ export default function PricingComparison({
 
   return (
     <section className="container px-4 py-16 md:py-24" ref={ref}>
-      <div className="text-center mb-12">
+      <Div className="text-center mb-12">
         <motion.h2
           className="text-3xl font-bold tracking-tight sm:text-4xl mb-4"
           initial={{ opacity: 0, y: 20 }}
@@ -93,14 +94,14 @@ export default function PricingComparison({
             } transition-colors flex items-center`}
           >
             {t("app.story.pricing.plans.annually")}{" "}
-            <span className="ml-1.5 text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2 py-0.5 rounded-full">
+            <Span className="ml-1.5 text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2 py-0.5 rounded-full">
               {t("app.story.pricing.plans.savePercent", {
                 percent: calculateSavingsPercent(currentCountry.code),
               })}
-            </span>
+            </Span>
           </Label>
         </motion.div>
-      </div>
+      </Div>
 
       <motion.div
         className="overflow-x-auto"
@@ -121,9 +122,9 @@ export default function PricingComparison({
                       : ""
                   }`}
                 >
-                  <div className="text-center">
-                    <div className="font-bold text-lg">{t(plan.name)}</div>
-                    <div className="text-2xl font-bold mt-2 mb-1">
+                  <Div className="text-center">
+                    <Div className="font-bold text-lg">{t(plan.name)}</Div>
+                    <Div className="text-2xl font-bold mt-2 mb-1">
                       {t(plan.pricing, {
                         price: getPlanPriceForCountry(
                           plan,
@@ -133,16 +134,16 @@ export default function PricingComparison({
                         currency: currentCountry.symbol,
                       })}
                       {
-                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                        <Span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                           {t("app.story.pricing.plans.perMonth")}
-                        </span>
+                        </Span>
                       }
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    </Div>
+                    <Div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                       {annual
                         ? t("app.story.pricing.comparison.annually")
                         : t("app.story.pricing.comparison.monthly")}
-                    </div>
+                    </Div>
                     <Link
                       href={{
                         pathname: `/${locale}/user/signup`,
@@ -166,7 +167,7 @@ export default function PricingComparison({
                         })()}
                       </Button>
                     </Link>
-                  </div>
+                  </Div>
                 </th>
               ))}
             </tr>
@@ -247,7 +248,7 @@ export default function PricingComparison({
         </table>
       </motion.div>
 
-      <div className="mt-8 text-center">
+      <Div className="mt-8 text-center">
         <motion.p
           className="text-sm text-gray-500 dark:text-gray-400"
           initial={{ opacity: 0 }}
@@ -271,7 +272,7 @@ export default function PricingComparison({
             {t("app.story.pricing.plans.contactUsLink")}
           </Link>
         </motion.div>
-      </div>
+      </Div>
     </section>
   );
 }

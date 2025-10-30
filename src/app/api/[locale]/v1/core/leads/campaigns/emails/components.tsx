@@ -18,7 +18,7 @@ import {
   createDataUrl,
   createTransparentPixelDataUrl,
 } from "next-vibe/shared/utils";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui";
 import type React from "react";
 import type { JSX, ReactNode } from "react";
 

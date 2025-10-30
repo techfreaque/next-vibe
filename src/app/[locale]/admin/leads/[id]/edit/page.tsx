@@ -4,6 +4,7 @@
  */
 
 import { redirect } from "next/navigation";
+import { Div, H1, P } from "next-vibe-ui/ui";
 import type React from "react";
 
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
@@ -11,7 +12,6 @@ import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-
 import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Div, H1, P } from "next-vibe-ui/ui/typography";
 
 import { LeadEditForm } from "./_components/lead-edit-form";
 

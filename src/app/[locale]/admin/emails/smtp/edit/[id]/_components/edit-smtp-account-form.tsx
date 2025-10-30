@@ -13,6 +13,8 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
+import { Div } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { useSmtpAccountById } from "@/app/api/[locale]/v1/core/emails/smtp-client/edit/[id]/hooks";
@@ -74,43 +76,43 @@ export function EditSmtpAccountForm({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p className="text-gray-500">{t("app.admin.common.loading")}</p>
-        </div>
-      </div>
+      <Div className="flex items-center justify-center h-64">
+        <Div className="text-center">
+          <Div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
+          <P className="text-gray-500">{t("app.admin.common.loading")}</P>
+        </Div>
+      </Div>
     );
   }
 
   if (!account) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">
+      <Div className="flex items-center justify-center h-64">
+        <Div className="text-center">
+          <P className="text-gray-500 mb-4">
             {t("app.admin.emails.smtp.pages.edit.notFound")}
-          </p>
+          </P>
           <Button asChild>
             <Link href={`/${locale}/admin/emails/smtp`}>
               {t("app.admin.common.actions.back")}
             </Link>
           </Button>
-        </div>
-      </div>
+        </Div>
+      </Div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Back Button */}
-      <div>
+      <Div>
         <Button variant="outline" asChild>
           <Link href={`/${locale}/admin/emails/smtp`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t("app.admin.emails.smtp.pages.edit.actions.back")}
           </Link>
         </Button>
-      </div>
+      </Div>
 
       <Card>
         <CardHeader>
@@ -169,7 +171,7 @@ export function EditSmtpAccountForm({
               title="app.admin.emails.smtp.admin.form.connectionSettings"
               description="app.admin.emails.smtp.admin.form.connectionSettingsDescription"
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <EndpointFormField
                   name="updates.host"
                   config={{
@@ -215,7 +217,7 @@ export function EditSmtpAccountForm({
                     showAllRequired: false,
                   }}
                 />
-              </div>
+              </Div>
             </FormFieldGroup>
 
             {/* Authentication */}
@@ -271,7 +273,7 @@ export function EditSmtpAccountForm({
               title="app.admin.emails.smtp.admin.form.advancedSettings"
               description="app.admin.emails.smtp.admin.form.advancedSettingsDescription"
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* connectionTimeout, maxConnections, rateLimitPerHour, isDefault removed - not in definition.ts */}
 
                 <EndpointFormField
@@ -288,14 +290,14 @@ export function EditSmtpAccountForm({
                     showAllRequired: false,
                   }}
                 />
-              </div>
+              </Div>
             </FormFieldGroup>
 
             {/* Form Alert for errors and success */}
             <FormAlert alert={endpoint.alert} />
 
             {/* Submit Button */}
-            <div className="flex justify-end space-x-2">
+            <Div className="flex justify-end space-x-2">
               <Button
                 type="button"
                 variant="outline"
@@ -310,10 +312,10 @@ export function EditSmtpAccountForm({
                   ? t("app.admin.emails.smtp.admin.edit.submitting")
                   : t("app.admin.emails.smtp.admin.edit.submit")}
               </Button>
-            </div>
+            </Div>
           </Form>
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

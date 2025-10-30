@@ -6,6 +6,7 @@
 "use client";
 
 import type React from "react";
+import { Div } from "next-vibe-ui/ui";
 
 import { useTaskHistory } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/history/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -21,12 +22,12 @@ export function CronHistoryClient({
 }: CronHistoryClientProps): React.JSX.Element {
   const historyEndpoint = useTaskHistory();
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       <ExecutionHistory
         historyEndpoint={historyEndpoint}
         isLoading={historyEndpoint.read?.isLoading || false}
         locale={locale}
       />
-    </div>
+    </Div>
   );
 }

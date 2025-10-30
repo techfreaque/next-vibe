@@ -2,6 +2,7 @@
 
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -15,6 +16,7 @@ import { Plus, X } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -24,7 +26,8 @@ interface PermissionsDialogProps {
   resourceType: "folder" | "thread";
   resourceName: string;
   moderatorIds: string[];
-  onSave: (moderatorIds: string[]) => void;
+  allowedRoles?: string[];
+  onSave: (data: { moderatorIds: string[]; allowedRoles?: string[] }) => void;
   locale: CountryLanguage;
 }
 
@@ -34,21 +37,25 @@ export function PermissionsDialog({
   resourceType,
   resourceName,
   moderatorIds,
+  allowedRoles = [],
   onSave,
   locale,
 }: PermissionsDialogProps): JSX.Element {
   const { t } = simpleT(locale);
   const [localModeratorIds, setLocalModeratorIds] =
     useState<string[]>(moderatorIds);
+  const [localAllowedRoles, setLocalAllowedRoles] =
+    useState<string[]>(allowedRoles);
   const [newModeratorId, setNewModeratorId] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   // Update local state when props change
   useEffect(() => {
     setLocalModeratorIds(moderatorIds);
+    setLocalAllowedRoles(allowedRoles);
     setNewModeratorId("");
     setError(null);
-  }, [moderatorIds, open]);
+  }, [moderatorIds, allowedRoles, open]);
 
   const handleAddModerator = (): void => {
     const trimmedId = newModeratorId.trim();
@@ -80,8 +87,17 @@ export function PermissionsDialog({
     setLocalModeratorIds(localModeratorIds.filter((mid) => mid !== id));
   };
 
+  const handleToggleRole = (role: string): void => {
+    setLocalAllowedRoles((prev) =>
+      prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role],
+    );
+  };
+
   const handleSave = (): void => {
-    onSave(localModeratorIds);
+    onSave({
+      moderatorIds: localModeratorIds,
+      allowedRoles: localAllowedRoles,
+    });
     onOpenChange(false);
   };
 
@@ -116,6 +132,55 @@ export function PermissionsDialog({
                 ? "app.chat.permissions.folder.description"
                 : "app.chat.permissions.thread.description",
             )}
+          </Div>
+
+          {/* Visibility Settings */}
+          <Div className="space-y-2">
+            <Label>{t("app.chat.permissions.visibility.label")}</Label>
+            <Div className="space-y-2 p-3 border rounded-md">
+              <Div className="flex items-center space-x-2">
+                <Checkbox
+                  id="role-public"
+                  checked={localAllowedRoles.includes(UserRole.PUBLIC)}
+                  onCheckedChange={() => handleToggleRole(UserRole.PUBLIC)}
+                />
+                <Label
+                  htmlFor="role-public"
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {t("app.chat.permissions.visibility.public")}
+                </Label>
+              </Div>
+              <Div className="flex items-center space-x-2">
+                <Checkbox
+                  id="role-customer"
+                  checked={localAllowedRoles.includes(UserRole.CUSTOMER)}
+                  onCheckedChange={() => handleToggleRole(UserRole.CUSTOMER)}
+                />
+                <Label
+                  htmlFor="role-customer"
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {t("app.chat.permissions.visibility.customer")}
+                </Label>
+              </Div>
+              <Div className="flex items-center space-x-2">
+                <Checkbox
+                  id="role-admin"
+                  checked={localAllowedRoles.includes(UserRole.ADMIN)}
+                  onCheckedChange={() => handleToggleRole(UserRole.ADMIN)}
+                />
+                <Label
+                  htmlFor="role-admin"
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {t("app.chat.permissions.visibility.admin")}
+                </Label>
+              </Div>
+            </Div>
+            <Div className="text-xs text-muted-foreground">
+              {t("app.chat.permissions.visibility.description")}
+            </Div>
           </Div>
 
           {/* Add moderator input */}

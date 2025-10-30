@@ -8,6 +8,7 @@ import {
   type LeadStatusValues,
 } from "next-vibe/leads/enum";
 import type { LeadListGetResponseTypeOutput } from "next-vibe/leads/list/definition";
+import { Div, P, Span } from "next-vibe-ui/ui";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import {
@@ -138,40 +139,40 @@ export function LeadsTable({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mx-auto" />
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+      <Div className="flex items-center justify-center h-64">
+        <Div className="text-center">
+          <Div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mx-auto" />
+          <P className="mt-2 text-gray-600 dark:text-gray-400">
             {t("app.admin.leads.leads.list.loading")}
-          </p>
-        </div>
-      </div>
+          </P>
+        </Div>
+      </Div>
     );
   }
 
   if (leads.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-500 dark:text-gray-400">
+      <Div className="text-center py-8">
+        <P className="text-gray-500 dark:text-gray-400">
           {t("app.admin.leads.leads.list.noResults")}
-        </p>
+        </P>
         {onRefresh && (
           <Button onClick={onRefresh} variant="outline" className="mt-4">
             {t("app.common.refresh")}
           </Button>
         )}
-      </div>
+      </Div>
     );
   }
 
   return (
     <>
-      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-700">
+      <Div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <P className="text-sm text-blue-700">
           {t("app.admin.leads.leads.admin.table.scroll_hint")}
-        </p>
-      </div>
-      <div className="overflow-x-auto border rounded-lg">
+        </P>
+      </Div>
+      <Div className="overflow-x-auto border rounded-lg">
         <Table>
           <TableHeader>
             <TableRow>
@@ -318,42 +319,42 @@ export function LeadsTable({
                         {t("app.admin.leads.leads.admin.table.website")}
                       </button>
                     ) : (
-                      <span className="text-gray-400">
+                      <Span className="text-gray-400">
                         {t(
                           "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
                         )}
-                      </span>
+                      </Span>
                     )}
                   </TableCell>
                   <TableCell>
-                    <div className="text-center">
-                      <div className="text-sm font-medium">
+                    <Div className="text-center">
+                      <Div className="text-sm font-medium">
                         {lead.emailsSent}
-                      </div>
-                      <div className="text-xs text-gray-500">sent</div>
-                    </div>
+                      </Div>
+                      <Div className="text-xs text-gray-500">sent</Div>
+                    </Div>
                   </TableCell>
                   <TableCell>
-                    <div className="text-center">
-                      <div className="text-sm font-medium">
+                    <Div className="text-center">
+                      <Div className="text-sm font-medium">
                         {lead.emailsOpened}
-                      </div>
-                      <div className="text-xs text-gray-500">opened</div>
-                    </div>
+                      </Div>
+                      <Div className="text-xs text-gray-500">opened</Div>
+                    </Div>
                   </TableCell>
                   <TableCell>
-                    <div className="text-center">
-                      <div className="text-sm font-medium">
+                    <Div className="text-center">
+                      <Div className="text-sm font-medium">
                         {lead.emailsClicked}
-                      </div>
-                      <div className="text-xs text-gray-500">clicked</div>
-                    </div>
+                      </Div>
+                      <Div className="text-xs text-gray-500">clicked</Div>
+                    </Div>
                   </TableCell>
                   <TableCell>
                     {lead.lastEngagementAt ? (
-                      <div className="text-sm">
-                        <div>{formatDate(lead.lastEngagementAt)}</div>
-                        <div className="text-xs text-gray-500">
+                      <Div className="text-sm">
+                        <Div>{formatDate(lead.lastEngagementAt)}</Div>
+                        <Div className="text-xs text-gray-500">
                           {new Date(lead.lastEngagementAt).toLocaleTimeString(
                             locale,
                             {
@@ -361,21 +362,21 @@ export function LeadsTable({
                               minute: "2-digit",
                             },
                           )}
-                        </div>
-                      </div>
+                        </Div>
+                      </Div>
                     ) : (
-                      <span className="text-gray-400">
+                      <Span className="text-gray-400">
                         {t(
                           "app.admin.leads.leads.admin.formatting.fallbacks.never",
                         )}
-                      </span>
+                      </Span>
                     )}
                   </TableCell>
                   <TableCell>
                     {lead.lastEmailSentAt ? (
-                      <div className="text-sm">
-                        <div>{formatDate(lead.lastEmailSentAt)}</div>
-                        <div className="text-xs text-gray-500">
+                      <Div className="text-sm">
+                        <Div>{formatDate(lead.lastEmailSentAt)}</Div>
+                        <Div className="text-xs text-gray-500">
                           {new Date(lead.lastEmailSentAt).toLocaleTimeString(
                             locale,
                             {
@@ -383,36 +384,36 @@ export function LeadsTable({
                               minute: "2-digit",
                             },
                           )}
-                        </div>
-                      </div>
+                        </Div>
+                      </Div>
                     ) : (
-                      <span className="text-gray-400">
+                      <Span className="text-gray-400">
                         {t(
                           "app.admin.leads.leads.admin.formatting.fallbacks.never",
                         )}
-                      </span>
+                      </Span>
                     )}
                   </TableCell>
                   <TableCell>{formatDate(lead.createdAt)}</TableCell>
                   <TableCell>{formatDate(lead.updatedAt)}</TableCell>
                   <TableCell className="max-w-[200px]">
                     {lead.notes ? (
-                      <div
+                      <Div
                         className="text-sm text-gray-600 truncate"
                         title={lead.notes}
                       >
                         {lead.notes}
-                      </div>
+                      </Div>
                     ) : (
-                      <span className="text-gray-400">
+                      <Span className="text-gray-400">
                         {t(
                           "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
                         )}
-                      </span>
+                      </Span>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
+                    <Div className="flex justify-end gap-2">
                       <Button variant="ghost" size="sm" asChild>
                         <Link href={`/${locale}/admin/leads/${lead.id}/edit`}>
                           <Eye className="h-4 w-4" />
@@ -423,14 +424,14 @@ export function LeadsTable({
                           <Edit className="h-4 w-4" />
                         </Link>
                       </Button>
-                    </div>
+                    </Div>
                   </TableCell>
                 </TableRow>
               );
             })}
           </TableBody>
         </Table>
-      </div>
+      </Div>
     </>
   );
 }

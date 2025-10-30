@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe-ui/ui/select";
-import { P } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import type { UsersListEndpointReturn } from "@/app/api/[locale]/v1/core/users/list/hooks";

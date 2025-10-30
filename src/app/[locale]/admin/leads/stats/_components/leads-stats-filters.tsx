@@ -13,6 +13,7 @@ import {
 } from "next-vibe/shared/types/stats-filtering.schema";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import type { JSX, ReactNode } from "react";
 import type { Control } from "react-hook-form";
@@ -43,9 +44,9 @@ export function LeadsStatsFilters({
   control,
 }: LeadsStatsFiltersProps): JSX.Element {
   return (
-    <div className="space-y-4">
+    <Div className="space-y-4">
       {/* Base time and chart filters */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Time Period */}
         <EndpointFormField
           control={control}
@@ -300,8 +301,8 @@ export function LeadsStatsFilters({
             ],
           }}
         />
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }
 
@@ -318,7 +319,7 @@ export function LeadsStatsFiltersContainer({
   const { t } = simpleT(locale);
 
   return (
-    <div className="space-y-4">
+    <Div className="space-y-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-lg font-semibold">
@@ -338,6 +339,6 @@ export function LeadsStatsFiltersContainer({
         </CardHeader>
         <CardContent className="space-y-4">{children}</CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

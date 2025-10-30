@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { H3, P } from "next-vibe-ui/ui/typography";
+import { H3, P } from "next-vibe-ui/ui";
 import type React from "react";
 import { useCallback } from "react";
 

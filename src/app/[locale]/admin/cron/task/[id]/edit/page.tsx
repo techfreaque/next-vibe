@@ -5,7 +5,7 @@
 
 import type { Metadata } from "next";
 import { Div } from "next-vibe-ui/ui";
-import { H1, P } from "next-vibe-ui/ui/typography";
+import { H1, P } from "next-vibe-ui/ui";
 import type React from "react";
 
 import type { IndividualCronTaskType } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/task/[id]/definition";

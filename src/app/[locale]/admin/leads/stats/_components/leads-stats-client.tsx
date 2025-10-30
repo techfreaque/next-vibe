@@ -19,6 +19,8 @@ import {
   Users,
 } from "lucide-react";
 import type { HistoricalDataSeriesType } from "next-vibe/shared/types/stats-filtering.schema";
+import { Div, P, Span } from "next-vibe-ui/ui";
+import { H4 } from "next-vibe-ui/ui/typography";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
@@ -58,23 +60,23 @@ export function LeadsStatsClient({
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <Div className="space-y-6">
         {/* Filters Skeleton */}
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-24" />
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <Skeleton key={i} className="h-10 w-full" />
               ))}
-            </div>
+            </Div>
           </CardContent>
         </Card>
 
         {/* Overview Cards Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <Card key={i}>
               <CardHeader className="pb-2">
@@ -86,28 +88,28 @@ export function LeadsStatsClient({
               </CardContent>
             </Card>
           ))}
-        </div>
+        </Div>
 
         {/* Tabs Skeleton */}
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-32" />
-            <div className="flex space-x-2 mt-4">
+            <Div className="flex space-x-2 mt-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-8 w-20" />
               ))}
-            </div>
+            </Div>
           </CardHeader>
           <CardContent>
             <Skeleton className="h-96 w-full" />
           </CardContent>
         </Card>
-      </div>
+      </Div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Filters */}
       <LeadsStatsFiltersContainer
         locale={locale}
@@ -119,7 +121,7 @@ export function LeadsStatsClient({
       </LeadsStatsFiltersContainer>
 
       {/* Key Metrics Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Leads */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -129,13 +131,13 @@ export function LeadsStatsClient({
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.totalLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.newLeads || 0)}{" "}
               {t("app.admin.leads.leads.admin.stats.newThisMonth")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -148,15 +150,15 @@ export function LeadsStatsClient({
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.activeLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(
                 (stats?.activeLeads || 0) / (stats?.totalLeads || 1),
               )}{" "}
               {t("app.admin.leads.leads.admin.stats.ofTotal")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -169,13 +171,13 @@ export function LeadsStatsClient({
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatPercentage(stats?.conversionRate || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.convertedLeads || 0)}{" "}
               {t("app.admin.leads.leads.admin.stats.convertedLeads")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -188,19 +190,19 @@ export function LeadsStatsClient({
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatPercentage(stats?.averageOpenRate || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.totalEmailsSent || 0)}{" "}
               {t("app.admin.leads.leads.admin.stats.emailsSent")}
-            </p>
+            </P>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Secondary Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Campaign Running Leads */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -212,15 +214,15 @@ export function LeadsStatsClient({
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.campaignRunningLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(
                 (stats?.campaignRunningLeads || 0) / (stats?.totalLeads || 1),
               )}{" "}
               {t("app.admin.leads.leads.admin.stats.ofTotal")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -233,13 +235,13 @@ export function LeadsStatsClient({
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.consultationBookedLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.consultationBookingRate || 0)}{" "}
               {t("app.admin.leads.leads.admin.stats.bookingRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -252,12 +254,12 @@ export function LeadsStatsClient({
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatPercentage(stats?.dataCompletenessRate || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.leads.leads.admin.stats.profileCompleteness")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -270,18 +272,18 @@ export function LeadsStatsClient({
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.leadVelocity || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.leads.leads.admin.stats.leadsPerDay")}
-            </p>
+            </P>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Additional Lead Status Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Converted Leads */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -291,13 +293,13 @@ export function LeadsStatsClient({
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.convertedLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.conversionRate || 0)}{" "}
               {t("app.admin.leads.leads.admin.stats.conversionRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -310,13 +312,13 @@ export function LeadsStatsClient({
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.signedUpLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.signupRate || 0)}{" "}
               {t("app.admin.leads.leads.admin.stats.signupRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -329,13 +331,13 @@ export function LeadsStatsClient({
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.consultationBookedLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.consultationBookingRate || 0)}{" "}
               {t("app.admin.leads.leads.admin.stats.bookingRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -350,13 +352,13 @@ export function LeadsStatsClient({
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.subscriptionConfirmedLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.subscriptionConfirmationRate || 0)}{" "}
               {t("app.admin.leads.leads.admin.stats.confirmationRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -371,15 +373,15 @@ export function LeadsStatsClient({
             <Monitor className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.websiteUserLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(
                 (stats?.websiteUserLeads || 0) / (stats?.totalLeads || 1),
               )}{" "}
               {t("app.admin.leads.leads.admin.stats.ofTotal")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -394,22 +396,22 @@ export function LeadsStatsClient({
             <MailOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.newsletterSubscriberLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(
                 (stats?.newsletterSubscriberLeads || 0) /
                   (stats?.totalLeads || 1),
               )}{" "}
               {t("app.admin.leads.leads.admin.stats.ofTotal")}
-            </p>
+            </P>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Negative Status Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Unsubscribed Leads */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -419,15 +421,15 @@ export function LeadsStatsClient({
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.unsubscribedLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(
                 (stats?.unsubscribedLeads || 0) / (stats?.totalLeads || 1),
               )}{" "}
               {t("app.admin.leads.leads.admin.stats.ofTotal")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -440,15 +442,15 @@ export function LeadsStatsClient({
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.bouncedLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(
                 (stats?.bouncedLeads || 0) / (stats?.totalLeads || 1),
               )}{" "}
               {t("app.admin.leads.leads.admin.stats.ofTotal")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -461,21 +463,21 @@ export function LeadsStatsClient({
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.invalidLeads || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(
                 (stats?.invalidLeads || 0) / (stats?.totalLeads || 1),
               )}{" "}
               {t("app.admin.leads.leads.admin.stats.ofTotal")}
-            </p>
+            </P>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Email Engagement Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Leads with Email Engagement */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -485,16 +487,16 @@ export function LeadsStatsClient({
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.leadsWithEmailEngagement || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(
                 (stats?.leadsWithEmailEngagement || 0) /
                   (stats?.totalLeads || 1),
               )}{" "}
               {t("app.admin.leads.leads.admin.stats.ofTotal")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -509,16 +511,16 @@ export function LeadsStatsClient({
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.leadsWithoutEmailEngagement || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(
                 (stats?.leadsWithoutEmailEngagement || 0) /
                   (stats?.totalLeads || 1),
               )}{" "}
               {t("app.admin.leads.leads.admin.stats.ofTotal")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -533,12 +535,12 @@ export function LeadsStatsClient({
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.averageEmailEngagementScore || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.leads.leads.admin.stats.engagementScore")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -551,18 +553,18 @@ export function LeadsStatsClient({
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.totalEmailEngagements || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.leads.leads.admin.stats.totalEngagements")}
-            </p>
+            </P>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Time-based Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Today's Activity */}
         <Card>
           <CardHeader>
@@ -572,22 +574,22 @@ export function LeadsStatsClient({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">
+            <Div className="flex items-center justify-between">
+              <Span className="text-sm font-medium">
                 {t("app.admin.leads.leads.admin.stats.leadsCreatedToday")}
-              </span>
-              <span className="text-sm text-muted-foreground">
+              </Span>
+              <Span className="text-sm text-muted-foreground">
                 {formatNumber(stats?.leadsCreatedToday || 0)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">
+              </Span>
+            </Div>
+            <Div className="flex items-center justify-between">
+              <Span className="text-sm font-medium">
                 {t("app.admin.leads.leads.admin.stats.leadsUpdatedToday")}
-              </span>
-              <span className="text-sm text-muted-foreground">
+              </Span>
+              <Span className="text-sm text-muted-foreground">
                 {formatNumber(stats?.leadsUpdatedToday || 0)}
-              </span>
-            </div>
+              </Span>
+            </Div>
           </CardContent>
         </Card>
 
@@ -600,22 +602,22 @@ export function LeadsStatsClient({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">
+            <Div className="flex items-center justify-between">
+              <Span className="text-sm font-medium">
                 {t("app.admin.leads.leads.admin.stats.leadsCreatedThisWeek")}
-              </span>
-              <span className="text-sm text-muted-foreground">
+              </Span>
+              <Span className="text-sm text-muted-foreground">
                 {formatNumber(stats?.leadsCreatedThisWeek || 0)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">
+              </Span>
+            </Div>
+            <Div className="flex items-center justify-between">
+              <Span className="text-sm font-medium">
                 {t("app.admin.leads.leads.admin.stats.leadsUpdatedThisWeek")}
-              </span>
-              <span className="text-sm text-muted-foreground">
+              </Span>
+              <Span className="text-sm text-muted-foreground">
                 {formatNumber(stats?.leadsUpdatedThisWeek || 0)}
-              </span>
-            </div>
+              </Span>
+            </Div>
           </CardContent>
         </Card>
 
@@ -628,28 +630,28 @@ export function LeadsStatsClient({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">
+            <Div className="flex items-center justify-between">
+              <Span className="text-sm font-medium">
                 {t("app.admin.leads.leads.admin.stats.leadsCreatedThisMonth")}
-              </span>
-              <span className="text-sm text-muted-foreground">
+              </Span>
+              <Span className="text-sm text-muted-foreground">
                 {formatNumber(stats?.leadsCreatedThisMonth || 0)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">
+              </Span>
+            </Div>
+            <Div className="flex items-center justify-between">
+              <Span className="text-sm font-medium">
                 {t("app.admin.leads.leads.admin.stats.leadsUpdatedThisMonth")}
-              </span>
-              <span className="text-sm text-muted-foreground">
+              </Span>
+              <Span className="text-sm text-muted-foreground">
                 {formatNumber(stats?.leadsUpdatedThisMonth || 0)}
-              </span>
-            </div>
+              </Span>
+            </Div>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Campaign Stage Distribution */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -658,45 +660,45 @@ export function LeadsStatsClient({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <Div className="space-y-3">
               {stats?.leadsByCampaignStage &&
                 Object.entries(stats.leadsByCampaignStage).map(
                   ([stage, count]) => (
-                    <div key={stage} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{stage}</span>
-                        <span className="text-sm text-muted-foreground">
+                    <Div key={stage} className="space-y-2">
+                      <Div className="flex items-center justify-between">
+                        <Span className="text-sm font-medium">{stage}</Span>
+                        <Span className="text-sm text-muted-foreground">
                           {formatNumber(count)}
-                        </span>
-                      </div>
+                        </Span>
+                      </Div>
                       <Progress
                         value={(count / (stats?.totalLeads || 1)) * 100}
                         className="h-2"
                       />
-                    </div>
+                    </Div>
                   ),
                 )}
-              <div className="mt-4 pt-3 border-t">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">
+              <Div className="mt-4 pt-3 border-t">
+                <Div className="flex items-center justify-between">
+                  <Span className="text-sm font-medium">
                     {t(
                       "app.admin.leads.leads.admin.stats.leadsInActiveCampaigns",
                     )}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
+                  </Span>
+                  <Span className="text-sm text-muted-foreground">
                     {formatNumber(stats?.leadsInActiveCampaigns || 0)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">
+                  </Span>
+                </Div>
+                <Div className="flex items-center justify-between">
+                  <Span className="text-sm font-medium">
                     {t("app.admin.leads.leads.admin.stats.leadsNotInCampaigns")}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
+                  </Span>
+                  <Span className="text-sm text-muted-foreground">
                     {formatNumber(stats?.leadsNotInCampaigns || 0)}
-                  </span>
-                </div>
-              </div>
-            </div>
+                  </Span>
+                </Div>
+              </Div>
+            </Div>
           </CardContent>
         </Card>
 
@@ -711,16 +713,16 @@ export function LeadsStatsClient({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <Div className="space-y-3">
               {stats?.leadsByJourneyVariant &&
                 Object.entries(stats.leadsByJourneyVariant).map(
                   ([variant, count]) => (
-                    <div key={variant} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">
+                    <Div key={variant} className="space-y-2">
+                      <Div className="flex items-center justify-between">
+                        <Span className="text-sm font-medium">
                           {variant.replace("_", " ")}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
+                        </Span>
+                        <Span className="text-sm text-muted-foreground">
                           {t(
                             "app.admin.leads.leads.admin.stats.countWithPercentage",
                             {
@@ -730,19 +732,19 @@ export function LeadsStatsClient({
                               ),
                             },
                           )}
-                        </span>
-                      </div>
+                        </Span>
+                      </Div>
                       <Progress
                         value={(count / (stats?.totalLeads || 1)) * 100}
                         className="h-2"
                       />
-                    </div>
+                    </Div>
                   ),
                 )}
-            </div>
+            </Div>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Comprehensive Analytics Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">
@@ -795,7 +797,7 @@ export function LeadsStatsClient({
         </TabsContent>
 
         <TabsContent value="campaigns" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Campaign Performance */}
             <Card>
               <CardHeader>
@@ -805,40 +807,40 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">
+                <Div className="grid grid-cols-2 gap-4">
+                  <Div className="space-y-2">
+                    <P className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.emailsSent")}
-                    </p>
-                    <p className="text-2xl font-bold">
+                    </P>
+                    <P className="text-2xl font-bold">
                       {formatNumber(stats?.totalEmailsSent || 0)}
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">
+                    </P>
+                  </Div>
+                  <Div className="space-y-2">
+                    <P className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.emailsOpened")}
-                    </p>
-                    <p className="text-2xl font-bold">
+                    </P>
+                    <P className="text-2xl font-bold">
                       {formatNumber(stats?.totalEmailsOpened || 0)}
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">
+                    </P>
+                  </Div>
+                  <Div className="space-y-2">
+                    <P className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.open_rate")}
-                    </p>
-                    <p className="text-2xl font-bold">
+                    </P>
+                    <P className="text-2xl font-bold">
                       {formatPercentage(stats?.averageOpenRate || 0)}
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">
+                    </P>
+                  </Div>
+                  <Div className="space-y-2">
+                    <P className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.click_rate")}
-                    </p>
-                    <p className="text-2xl font-bold">
+                    </P>
+                    <P className="text-2xl font-bold">
                       {formatPercentage(stats?.averageClickRate || 0)}
-                    </p>
-                  </div>
-                </div>
+                    </P>
+                  </Div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -851,38 +853,38 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <Div className="space-y-3">
                   {stats?.topPerformingCampaigns
                     ?.slice(0, 5)
                     .map((campaign, index) => (
-                      <div
+                      <Div
                         key={index}
                         className="flex items-center justify-between"
                       >
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium">
+                        <Div className="space-y-1">
+                          <P className="text-sm font-medium">
                             {campaign.campaignName}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
+                          </P>
+                          <P className="text-xs text-muted-foreground">
                             {formatNumber(campaign.leadsGenerated)}{" "}
                             {t(
                               "app.admin.leads.leads.admin.stats.leadsGenerated",
                             )}
-                          </p>
-                        </div>
+                          </P>
+                        </Div>
                         <Badge variant="secondary">
                           {formatPercentage(campaign.conversionRate)}
                         </Badge>
-                      </div>
+                      </Div>
                     ))}
-                </div>
+                </Div>
               </CardContent>
             </Card>
-          </div>
+          </Div>
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Performance Metrics */}
             <Card>
               <CardHeader>
@@ -892,36 +894,36 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                <Div className="space-y-3">
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t(
                         "app.admin.leads.leads.admin.stats.avgTimeToConversion",
                       )}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.averageTimeToConversion || 0)} days
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.avgTimeToSignup")}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.averageTimeToSignup || 0)} days
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t(
                         "app.admin.leads.leads.admin.stats.avgTimeToConsultation",
                       )}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.averageTimeToConsultation || 0)} days
-                    </span>
-                  </div>
-                </div>
+                    </Span>
+                  </Div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -934,44 +936,44 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <Div className="space-y-3">
                   {stats?.topPerformingSources
                     ?.slice(0, 5)
                     .map((source, index) => (
-                      <div
+                      <Div
                         key={index}
                         className="flex items-center justify-between"
                       >
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium">{source.source}</p>
-                          <p className="text-xs text-muted-foreground">
+                        <Div className="space-y-1">
+                          <P className="text-sm font-medium">{source.source}</P>
+                          <P className="text-xs text-muted-foreground">
                             {formatNumber(source.leadsGenerated)}{" "}
                             {t(
                               "app.admin.leads.leads.admin.stats.leadsGenerated",
                             )}
-                          </p>
-                        </div>
-                        <div className="text-right">
+                          </P>
+                        </Div>
+                        <Div className="text-right">
                           <Badge variant="secondary">
                             {formatPercentage(source.conversionRate)}
                           </Badge>
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <P className="text-xs text-muted-foreground mt-1">
                             {t(
                               "app.admin.leads.leads.admin.stats.qualityScore",
                             )}
                             : {formatNumber(source.qualityScore)}
-                          </p>
-                        </div>
-                      </div>
+                          </P>
+                        </Div>
+                      </Div>
                     ))}
-                </div>
+                </Div>
               </CardContent>
             </Card>
-          </div>
+          </Div>
         </TabsContent>
 
         <TabsContent value="distribution" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Status Distribution */}
             <Card>
               <CardHeader>
@@ -981,14 +983,14 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <Div className="space-y-3">
                   {stats?.groupedStats?.byStatus?.map((status, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">
+                    <Div key={index} className="space-y-2">
+                      <Div className="flex items-center justify-between">
+                        <Span className="text-sm font-medium">
                           {status.label}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
+                        </Span>
+                        <Span className="text-sm text-muted-foreground">
                           {t(
                             "app.admin.leads.leads.admin.stats.countWithPercentage",
                             {
@@ -998,12 +1000,12 @@ export function LeadsStatsClient({
                               ),
                             },
                           )}
-                        </span>
-                      </div>
+                        </Span>
+                      </Div>
                       <Progress value={status.percentage} className="h-2" />
-                    </div>
+                    </Div>
                   ))}
-                </div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -1016,14 +1018,14 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <Div className="space-y-3">
                   {stats?.groupedStats?.bySource?.map((source, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">
+                    <Div key={index} className="space-y-2">
+                      <Div className="flex items-center justify-between">
+                        <Span className="text-sm font-medium">
                           {source.label}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
+                        </Span>
+                        <Span className="text-sm text-muted-foreground">
                           {t(
                             "app.admin.leads.leads.admin.stats.countWithPercentage",
                             {
@@ -1033,12 +1035,12 @@ export function LeadsStatsClient({
                               ),
                             },
                           )}
-                        </span>
-                      </div>
+                        </Span>
+                      </Div>
                       <Progress value={source.percentage} className="h-2" />
-                    </div>
+                    </Div>
                   ))}
-                </div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -1053,14 +1055,14 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <Div className="space-y-3">
                   {stats?.groupedStats?.byCountry?.map((country, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">
+                    <Div key={index} className="space-y-2">
+                      <Div className="flex items-center justify-between">
+                        <Span className="text-sm font-medium">
                           {country.label}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
+                        </Span>
+                        <Span className="text-sm text-muted-foreground">
                           {t(
                             "app.admin.leads.leads.admin.stats.countWithPercentage",
                             {
@@ -1070,12 +1072,12 @@ export function LeadsStatsClient({
                               ),
                             },
                           )}
-                        </span>
-                      </div>
+                        </Span>
+                      </Div>
                       <Progress value={country.percentage} className="h-2" />
-                    </div>
+                    </Div>
                   ))}
-                </div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -1090,47 +1092,47 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                <Div className="space-y-3">
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.withBusinessName")}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.leadsWithBusinessName || 0)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.withContactName")}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.leadsWithContactName || 0)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.withPhone")}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.leadsWithPhone || 0)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.withWebsite")}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.leadsWithWebsite || 0)}
-                    </span>
-                  </div>
-                </div>
+                    </Span>
+                  </Div>
+                </Div>
               </CardContent>
             </Card>
-          </div>
+          </Div>
         </TabsContent>
 
         <TabsContent value="activity" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Recent Activity */}
             <Card>
               <CardHeader>
@@ -1140,33 +1142,33 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <Div className="space-y-4">
                   {stats?.recentActivity
                     ?.slice(0, 10)
                     .map((activity, index) => (
-                      <div
+                      <Div
                         key={index}
                         className="flex items-start space-x-3 p-3 rounded-lg border"
                       >
-                        <div className="flex-1 space-y-1">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium">
+                        <Div className="flex-1 space-y-1">
+                          <Div className="flex items-center justify-between">
+                            <P className="text-sm font-medium">
                               {activity.leadBusinessName || activity.leadEmail}
-                            </p>
+                            </P>
                             <Badge variant="outline" className="text-xs">
                               {activity.type}
                             </Badge>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
+                          </Div>
+                          <P className="text-xs text-muted-foreground">
                             {activity.leadEmail}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
+                          </P>
+                          <P className="text-xs text-muted-foreground">
                             {new Date(activity.timestamp).toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
+                          </P>
+                        </Div>
+                      </Div>
                     ))}
-                </div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -1181,15 +1183,15 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <Div className="space-y-3">
                   {stats?.groupedStats?.byEngagementLevel?.map(
                     (engagement, index) => (
-                      <div key={index} className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">
+                      <Div key={index} className="space-y-2">
+                        <Div className="flex items-center justify-between">
+                          <Span className="text-sm font-medium">
                             {engagement.label}
-                          </span>
-                          <span className="text-sm text-muted-foreground">
+                          </Span>
+                          <Span className="text-sm text-muted-foreground">
                             {t(
                               "app.admin.leads.leads.admin.stats.countWithPercentage",
                               {
@@ -1199,23 +1201,23 @@ export function LeadsStatsClient({
                                 ),
                               },
                             )}
-                          </span>
-                        </div>
+                          </Span>
+                        </Div>
                         <Progress
                           value={engagement.percentage}
                           className="h-2"
                         />
-                      </div>
+                      </Div>
                     ),
                   )}
-                </div>
+                </Div>
               </CardContent>
             </Card>
-          </div>
+          </Div>
         </TabsContent>
 
         <TabsContent value="topPerformers" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Top Performing Campaigns */}
             <Card>
               <CardHeader>
@@ -1227,61 +1229,61 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <Div className="space-y-4">
                   {stats?.topPerformingCampaigns?.map((campaign, index) => (
-                    <div
+                    <Div
                       key={index}
                       className="p-3 rounded-lg border space-y-2"
                     >
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-medium">
+                      <Div className="flex items-center justify-between">
+                        <H4 className="text-sm font-medium">
                           {campaign.campaignName}
-                        </h4>
+                        </H4>
                         <Badge variant="secondary">#{index + 1}</Badge>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 text-xs">
-                        <div>
-                          <span className="text-muted-foreground">
+                      </Div>
+                      <Div className="grid grid-cols-2 gap-4 text-xs">
+                        <Div>
+                          <Span className="text-muted-foreground">
                             {t(
                               "app.admin.leads.leads.admin.stats.leadsGenerated",
                             )}
                             :
-                          </span>
-                          <span className="ml-1 font-medium">
+                          </Span>
+                          <Span className="ml-1 font-medium">
                             {formatNumber(campaign.leadsGenerated)}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
+                          </Span>
+                        </Div>
+                        <Div>
+                          <Span className="text-muted-foreground">
                             {t(
                               "app.admin.leads.leads.admin.stats.conversionRate",
                             )}
                             :
-                          </span>
-                          <span className="ml-1 font-medium">
+                          </Span>
+                          <Span className="ml-1 font-medium">
                             {formatPercentage(campaign.conversionRate)}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
+                          </Span>
+                        </Div>
+                        <Div>
+                          <Span className="text-muted-foreground">
                             {t("app.admin.leads.leads.admin.stats.openRate")}:
-                          </span>
-                          <span className="ml-1 font-medium">
+                          </Span>
+                          <Span className="ml-1 font-medium">
                             {formatPercentage(campaign.openRate)}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
+                          </Span>
+                        </Div>
+                        <Div>
+                          <Span className="text-muted-foreground">
                             {t("app.admin.leads.leads.admin.stats.clickRate")}:
-                          </span>
-                          <span className="ml-1 font-medium">
+                          </Span>
+                          <Span className="ml-1 font-medium">
                             {formatPercentage(campaign.clickRate)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                          </Span>
+                        </Div>
+                      </Div>
+                    </Div>
                   ))}
-                </div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -1294,59 +1296,59 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <Div className="space-y-4">
                   {stats?.topPerformingSources?.map((source, index) => (
-                    <div
+                    <Div
                       key={index}
                       className="p-3 rounded-lg border space-y-2"
                     >
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-medium">{source.source}</h4>
+                      <Div className="flex items-center justify-between">
+                        <H4 className="text-sm font-medium">{source.source}</H4>
                         <Badge variant="secondary">#{index + 1}</Badge>
-                      </div>
-                      <div className="grid grid-cols-3 gap-4 text-xs">
-                        <div>
-                          <span className="text-muted-foreground">
+                      </Div>
+                      <Div className="grid grid-cols-3 gap-4 text-xs">
+                        <Div>
+                          <Span className="text-muted-foreground">
                             {t(
                               "app.admin.leads.leads.admin.stats.leadsGenerated",
                             )}
                             :
-                          </span>
-                          <span className="ml-1 font-medium">
+                          </Span>
+                          <Span className="ml-1 font-medium">
                             {formatNumber(source.leadsGenerated)}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
+                          </Span>
+                        </Div>
+                        <Div>
+                          <Span className="text-muted-foreground">
                             {t(
                               "app.admin.leads.leads.admin.stats.conversionRate",
                             )}
                             :
-                          </span>
-                          <span className="ml-1 font-medium">
+                          </Span>
+                          <Span className="ml-1 font-medium">
                             {formatPercentage(source.conversionRate)}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
+                          </Span>
+                        </Div>
+                        <Div>
+                          <Span className="text-muted-foreground">
                             {t(
                               "app.admin.leads.leads.admin.stats.qualityScore",
                             )}
                             :
-                          </span>
-                          <span className="ml-1 font-medium">
+                          </Span>
+                          <Span className="ml-1 font-medium">
                             {formatNumber(source.qualityScore)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                          </Span>
+                        </Div>
+                      </Div>
+                    </Div>
                   ))}
-                </div>
+                </Div>
               </CardContent>
             </Card>
-          </div>
+          </Div>
         </TabsContent>
       </Tabs>
-    </div>
+    </Div>
   );
 }

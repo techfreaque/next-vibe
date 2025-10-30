@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe-ui/ui/select";
+import { Div } from "next-vibe-ui/ui";
 import React from "react";
 
 import type {
@@ -131,10 +132,10 @@ export function BatchOperationsToolbar({
   return (
     <Card className="mb-4 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
       <CardContent className="p-4">
-        <div className="flex items-center justify-between gap-4">
+        <Div className="flex items-center justify-between gap-4">
           {/* Filter info and controls */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
+          <Div className="flex items-center gap-4">
+            <Div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               <Badge
                 variant="secondary"
@@ -149,9 +150,9 @@ export function BatchOperationsToolbar({
                       total: totalCount,
                     })}
               </Badge>
-            </div>
+            </Div>
 
-            <div className="flex items-center gap-2">
+            <Div className="flex items-center gap-2">
               <Select
                 value={operationScope}
                 onValueChange={(value: typeof BatchOperationScopeValues) =>
@@ -171,11 +172,11 @@ export function BatchOperationsToolbar({
                   </SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
+            </Div>
+          </Div>
 
           {/* Batch actions */}
-          <div className="flex items-center gap-2">
+          <Div className="flex items-center gap-2">
             <Select
               value={selectedAction}
               onValueChange={setSelectedAction}
@@ -241,8 +242,8 @@ export function BatchOperationsToolbar({
                 ? t("app.admin.leads.leads.admin.batch.delete")
                 : t("app.admin.leads.leads.admin.batch.apply")}
             </Button>
-          </div>
-        </div>
+          </Div>
+        </Div>
       </CardContent>
     </Card>
   );

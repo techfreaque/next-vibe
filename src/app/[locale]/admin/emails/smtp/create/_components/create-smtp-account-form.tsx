@@ -13,6 +13,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
+import { Div } from "next-vibe-ui/ui";
 import React from "react";
 
 import { useSmtpAccountCreateEndpoint } from "@/app/api/[locale]/v1/core/emails/smtp-client/create/hooks";
@@ -47,16 +48,16 @@ export function CreateSmtpAccountForm({
   }, [endpoint.create.response?.success, router, locale]);
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Back Button */}
-      <div>
+      <Div>
         <Button variant="outline" asChild>
           <Link href={`/${locale}/admin/emails/smtp`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t("app.admin.emails.smtp.list.actions.back")}
           </Link>
         </Button>
-      </div>
+      </Div>
 
       <Card>
         <CardHeader>
@@ -64,7 +65,7 @@ export function CreateSmtpAccountForm({
         </CardHeader>
         <CardContent>
           <Form form={endpoint.create.form} onSubmit={handleSubmit}>
-            <div className="space-y-6">
+            <Div className="space-y-6">
               {/* Basic Information */}
               <FormFieldGroup
                 title="app.admin.emails.smtp.admin.form.basicInfo"
@@ -114,7 +115,7 @@ export function CreateSmtpAccountForm({
                 title="app.admin.emails.smtp.admin.form.connectionSettings"
                 description="app.admin.emails.smtp.admin.form.connectionSettingsDescription"
               >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <EndpointFormField
                     name="serverConfig.host"
                     config={{
@@ -172,7 +173,7 @@ export function CreateSmtpAccountForm({
                       requiredColor: "red",
                     }}
                   />
-                </div>
+                </Div>
               </FormFieldGroup>
 
               {/* Authentication */}
@@ -180,7 +181,7 @@ export function CreateSmtpAccountForm({
                 title="app.admin.emails.smtp.admin.form.connectionSettings"
                 description="app.admin.emails.smtp.admin.form.connectionSettingsDescription"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EndpointFormField
                     name="authentication.username"
                     config={{
@@ -218,7 +219,7 @@ export function CreateSmtpAccountForm({
                       requiredColor: "red",
                     }}
                   />
-                </div>
+                </Div>
               </FormFieldGroup>
 
               {/* Email Settings */}
@@ -250,7 +251,7 @@ export function CreateSmtpAccountForm({
               <FormAlert alert={endpoint.alert} />
 
               {/* Submit Button */}
-              <div className="flex justify-end space-x-2">
+              <Div className="flex justify-end space-x-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -265,11 +266,11 @@ export function CreateSmtpAccountForm({
                     ? t("app.admin.emails.smtp.list.actions.creating")
                     : t("app.admin.emails.smtp.list.actions.create")}
                 </Button>
-              </div>
-            </div>
+              </Div>
+            </Div>
           </Form>
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

@@ -109,42 +109,40 @@ export function isOwner(userId: string, resourceUserId: string): boolean {
 
 /**
  * Check if user can read a folder
- * - PRIVATE: Owner only
- * - SHARED: Owner or link holders (not implemented yet)
- * - PUBLIC: All authenticated users
- * - INCOGNITO: Local only (not applicable for server-side checks)
+ * Checks allowedRoles field to determine visibility
+ * - Owner can always read
+ * - If allowedRoles is not empty, user's role must be in the list
+ * - If allowedRoles is empty, only owner can read
  */
-export function canReadFolder(
+export async function canReadFolder(
   user: JwtPayloadType,
   folder: ChatFolder,
-): boolean {
-  // Public users cannot read server-side folders
-  if (user.isPublic) {
-    return false;
-  }
-
+  logger: EndpointLogger,
+): Promise<boolean> {
   const userId = user.id;
-  if (!userId) {
-    return false;
-  }
 
   // Owner can always read
-  if (isOwner(userId, folder.userId)) {
+  if (userId && isOwner(userId, folder.userId)) {
     return true;
   }
 
-  // PUBLIC folders: all authenticated users can read
-  if (folder.rootFolderId === "public") {
-    return true;
+  // Check allowedRoles
+  if (folder.allowedRoles && folder.allowedRoles.length > 0) {
+    // Public users
+    if (user.isPublic) {
+      return folder.allowedRoles.includes(UserRole.PUBLIC);
+    }
+
+    // Authenticated users - check their roles
+    if (userId) {
+      const userRoles = await userRolesRepository.getUserRoles(userId, logger);
+      if (userRoles.success && userRoles.data) {
+        return folder.allowedRoles.some((role) => userRoles.data?.includes(role));
+      }
+    }
   }
 
-  // SHARED folders: check share token or allowed users (future implementation)
-  if (folder.rootFolderId === "shared") {
-    // Share token and allowedUserIds check not yet implemented
-    return false;
-  }
-
-  // PRIVATE folders: owner only
+  // Empty allowedRoles = owner only
   return false;
 }
 
@@ -455,6 +453,33 @@ export async function canManageThread(
 // ============================================================================
 
 /**
+ * Check if user can read a message
+ * Inherits from thread permissions
+ */
+export function canReadMessage(
+  user: JwtPayloadType,
+  message: ChatMessage,
+  thread: ChatThread,
+  folder: ChatFolder | null,
+): boolean {
+  // Messages inherit thread permissions
+  return canReadThread(user, thread, folder);
+}
+
+/**
+ * Check if user can create a message in a thread
+ * Inherits from thread permissions
+ */
+export function canWriteMessage(
+  user: JwtPayloadType,
+  thread: ChatThread,
+  folder: ChatFolder | null,
+): boolean {
+  // Messages inherit thread write permissions
+  return canWriteThread(user, thread, folder);
+}
+
+/**
  * Check if user can edit a message
  * - Own messages: Yes (if owner or author)
  * - Others' messages: Only if moderator in public threads
@@ -488,14 +513,18 @@ export function canEditMessage(
 
 /**
  * Check if user can delete a message
- * - Own messages: Yes (if author)
- * - Others' messages: Only if moderator or thread owner in public threads
+ * - Owner can delete their own messages
+ * - Thread moderators can delete any message
+ * - Folder moderators can delete any message
+ * - Admins can delete any message
  */
-export function canDeleteMessage(
+export async function canDeleteMessage(
   user: JwtPayloadType,
   message: ChatMessage,
   thread: ChatThread,
-): boolean {
+  folder: ChatFolder | null,
+  logger: EndpointLogger,
+): Promise<boolean> {
   if (user.isPublic) {
     return false;
   }
@@ -505,20 +534,21 @@ export function canDeleteMessage(
     return false;
   }
 
-  // Author can delete own message
-  if (message.authorId === userId) {
+  // Owner can delete their own messages
+  if (isOwner(userId, message.userId)) {
     return true;
   }
 
-  // Thread owner can delete any message
-  if (isOwner(userId, thread.userId)) {
+  // Thread moderators can delete
+  if (isThreadModerator(userId, thread)) {
     return true;
   }
 
-  // PUBLIC threads: moderators can delete others' messages
-  if (thread.rootFolderId === "public") {
-    return isThreadModerator(userId, thread);
+  // Folder moderators can delete
+  if (folder && isFolderModerator(userId, folder)) {
+    return true;
   }
 
-  return false;
+  // Admins can delete
+  return await isAdmin(userId, logger);
 }

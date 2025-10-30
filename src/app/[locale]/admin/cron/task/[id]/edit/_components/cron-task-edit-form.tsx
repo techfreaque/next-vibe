@@ -5,7 +5,7 @@
  * Form for editing cron task details
  */
 
-import { Form, FormAlert } from "next-vibe-ui/ui";
+import { Form, FormAlert, Div, P } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
@@ -45,7 +45,7 @@ export function CronTaskEditForm({
   const isLoading = endpoint.create?.isSubmitting ?? false;
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Task Information (Read-only) */}
       <Card>
         <CardHeader>
@@ -56,55 +56,55 @@ export function CronTaskEditForm({
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+          <Div>
             <label className="text-sm font-medium text-muted-foreground">
               {t(
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.fields.id.label",
               )}
             </label>
-            <p className="text-sm font-mono">{task.id}</p>
-          </div>
-          <div>
+            <P className="text-sm font-mono">{task.id}</P>
+          </Div>
+          <Div>
             <label className="text-sm font-medium text-muted-foreground">
               {t(
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.label",
               )}
             </label>
-            <p className="text-sm">{task.version}</p>
-          </div>
-          <div>
+            <P className="text-sm">{task.version}</P>
+          </Div>
+          <Div>
             <label className="text-sm font-medium text-muted-foreground">
               {t(
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.list.columns.createdAt",
               )}
             </label>
-            <p className="text-sm">
+            <P className="text-sm">
               {new Date(task.createdAt).toLocaleString()}
-            </p>
-          </div>
-          <div>
+            </P>
+          </Div>
+          <Div>
             <label className="text-sm font-medium text-muted-foreground">
               {t(
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.list.columns.updatedAt",
               )}
             </label>
-            <p className="text-sm">
+            <P className="text-sm">
               {new Date(task.updatedAt).toLocaleString()}
-            </p>
-          </div>
-          <div className="md:col-span-2">
+            </P>
+          </Div>
+          <Div className="md:col-span-2">
             <label className="text-sm font-medium text-muted-foreground">
               {t(
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.label",
               )}
             </label>
-            <p className="text-sm">
+            <P className="text-sm">
               {formatCronSchedule(task.schedule, userTimezone, locale, logger)}
-            </p>
-            <p className="text-xs text-muted-foreground font-mono">
+            </P>
+            <P className="text-xs text-muted-foreground font-mono">
               {task.schedule}
-            </p>
-          </div>
+            </P>
+          </Div>
         </CardContent>
       </Card>
 
@@ -131,7 +131,7 @@ export function CronTaskEditForm({
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.container.description"
               }
             >
-              <div className="grid grid-cols-1 gap-4">
+              <Div className="grid grid-cols-1 gap-4">
                 <EndpointFormField
                   name="name"
                   config={{
@@ -164,7 +164,7 @@ export function CronTaskEditForm({
                     showAllRequired: false,
                   }}
                 />
-              </div>
+              </Div>
             </FormFieldGroup>
 
             <FormFieldGroup
@@ -202,7 +202,7 @@ export function CronTaskEditForm({
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.container.description"
               }
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <EndpointFormField
                   name="enabled"
                   config={{
@@ -267,7 +267,7 @@ export function CronTaskEditForm({
                     showAllRequired: false,
                   }}
                 />
-              </div>
+              </Div>
             </FormFieldGroup>
 
             {/* Form Alert for errors and success */}
@@ -277,7 +277,7 @@ export function CronTaskEditForm({
             <Button type="submit" disabled={isLoading} className="w-full">
               {isLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                  <Div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                   {t(
                     "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.success.updated.title",
                   )}
@@ -291,6 +291,6 @@ export function CronTaskEditForm({
           </Form>
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

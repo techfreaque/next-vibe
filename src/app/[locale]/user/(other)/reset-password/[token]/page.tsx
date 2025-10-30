@@ -1,7 +1,7 @@
 import { AlertCircle } from "lucide-react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui";
+import { Alert, AlertDescription, AlertTitle, Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import { Suspense } from "react";
 
@@ -101,14 +101,14 @@ export default async function ResetPasswordConfirmPage({
       }
       locale={locale}
     >
-      <Suspense fallback={<div>{t("app.user.common.loading")}</div>}>
-        <div className="max-w-md mx-auto">
+      <Suspense fallback={<Div>{t("app.user.common.loading")}</Div>}>
+        <Div className="max-w-md mx-auto">
           <ResetPasswordConfirmForm
             locale={locale}
             token={token}
             tokenValidationResponse={tokenValidationResponse}
           />
-        </div>
+        </Div>
       </Suspense>
     </ErrorBoundary>
   );

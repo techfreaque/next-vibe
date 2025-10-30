@@ -5,6 +5,9 @@
 
 import type { JSX } from "react";
 
+import { Div } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
+
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -19,16 +22,16 @@ export default async function SmtpAccountsPage({
   const { t } = simpleT(locale);
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Page Description */}
-      <div>
-        <p className="text-gray-600 dark:text-gray-400">
+      <Div>
+        <P className="text-gray-600 dark:text-gray-400">
           {t("app.admin.emails.smtp.list.description")}
-        </p>
-      </div>
+        </P>
+      </Div>
 
       {/* Client Component handles all interactions */}
       <SmtpAccountsClient locale={locale} />
-    </div>
+    </Div>
   );
 }

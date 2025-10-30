@@ -33,7 +33,7 @@ export default function ContactForm({
   // Type assertion: contactResult.create is always defined because definition has POST
   if (!contactResult.create) {
     logger.error("Contact form endpoint not properly configured");
-    return <div>{t("app.help.components.pages.help.form.error")}</div>;
+    return <Div>{t("app.help.components.pages.help.form.error")}</Div>;
   }
 
   const form = contactResult.create.form;

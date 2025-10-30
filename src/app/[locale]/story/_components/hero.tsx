@@ -3,8 +3,10 @@
 import { motion } from "framer-motion";
 import { ArrowDown, Play } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div, Span } from "next-vibe-ui/ui";
+import { Link } from "next-vibe-ui/ui/link";
+import { H1, P } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -18,8 +20,8 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
   return (
     <section className="w-full relative">
       {/* Background elements */}
-      <div className="absolute inset-0 bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-900 dark:from-gray-900 dark:to-background -z-10" />
-      <div className="absolute top-0 right-0 -z-10 opacity-70 dark:opacity-30">
+      <Div className="absolute inset-0 bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-900 dark:from-gray-900 dark:to-background -z-10" />
+      <Div className="absolute top-0 right-0 -z-10 opacity-70 dark:opacity-30">
         <svg
           width="800"
           height="800"
@@ -43,31 +45,31 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
             </radialGradient>
           </defs>
         </svg>
-      </div>
+      </Div>
 
-      <div className="container px-4 md:px-6 py-20 md:py-32">
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-center">
+      <Div className="container px-4 md:px-6 py-20 md:py-32">
+        <Div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-center">
           <motion.div
             className="flex flex-col justify-center space-y-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-600 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400 mb-2 w-fit">
-              <span className="font-medium">
+            <Div className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-600 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400 mb-2 w-fit">
+              <Span className="font-medium">
                 {t("app.story._components.home.hero.badge")}
-              </span>
-            </div>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600 leading-[1.15]">
+              </Span>
+            </Div>
+            <H1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600 leading-[1.15]">
               {t("app.story._components.home.hero.title")}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 text-lg md:text-xl max-w-[600px] leading-relaxed">
+            </H1>
+            <P className="text-gray-600 dark:text-gray-300 text-lg md:text-xl max-w-[600px] leading-relaxed">
               {t("app.story._components.home.hero.subtitle")}
-            </p>
-            <p className="text-gray-500 md:text-lg dark:text-gray-400 max-w-[600px] leading-relaxed">
+            </P>
+            <P className="text-gray-500 md:text-lg dark:text-gray-400 max-w-[600px] leading-relaxed">
               {t("app.story._components.home.hero.description")}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 pt-3">
+            </P>
+            <Div className="flex flex-col sm:flex-row gap-3 pt-3">
               <Button
                 size="lg"
                 className="bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 text-white font-medium px-8"
@@ -84,9 +86,9 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
                   {t("app.story._components.home.hero.learnMore")}
                 </Link>
               </Button>
-            </div>
-            <div className="flex items-center gap-4 pt-4">
-              <div className="flex -space-x-2">
+            </Div>
+            <Div className="flex items-center gap-4 pt-4">
+              <Div className="flex -space-x-2">
                 <Image
                   src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&auto=format&fit=crop&crop=face"
                   width={40}
@@ -108,14 +110,14 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
                   alt={t("app.story._components.home.hero.userAvatarAlt")}
                   className="rounded-full border-2 border-white dark:border-gray-800"
                 />
-              </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                <span className="font-semibold text-gray-900 dark:text-white">
+              </Div>
+              <Div className="text-sm text-gray-500 dark:text-gray-400">
+                <Span className="font-semibold text-gray-900 dark:text-white">
                   {clientCount}+
-                </span>{" "}
+                </Span>{" "}
                 {t("app.story._components.home.hero.satisfiedClients")}
-              </div>
-            </div>
+              </Div>
+            </Div>
           </motion.div>
           <motion.div
             className="flex justify-center lg:justify-end"
@@ -123,9 +125,9 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <div className="relative w-full max-w-[600px] aspect-video md:aspect-square">
-              <div className="absolute inset-0 rounded-2xl bg-cyan-500/20 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-3xl -z-10" />
-              <div className="relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl">
+            <Div className="relative w-full max-w-[600px] aspect-video md:aspect-square">
+              <Div className="absolute inset-0 rounded-2xl bg-cyan-500/20 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-3xl -z-10" />
+              <Div className="relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl">
                 <Image
                   src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=600&h=600&auto=format&fit=crop"
                   alt={t("app.story._components.home.hero.imageAlt")}
@@ -134,81 +136,81 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
                   className="object-cover w-full h-full"
                   priority
                 />
-                <div className="absolute inset-0 bg-black/40 bg-gradient-to-tr from-black/40 via-black/0 to-black/0 rounded-2xl" />
-                <div className="absolute bottom-0 left-0 p-6">
-                  <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-lg p-4 shadow-lg max-w-sm">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="h-3 w-3 rounded-full bg-blue-500" />
-                      <span className="text-sm font-medium">
+                <Div className="absolute inset-0 bg-black/40 bg-gradient-to-tr from-black/40 via-black/0 to-black/0 rounded-2xl" />
+                <Div className="absolute bottom-0 left-0 p-6">
+                  <Div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-lg p-4 shadow-lg max-w-sm">
+                    <Div className="flex items-center gap-3 mb-3">
+                      <Div className="h-3 w-3 rounded-full bg-blue-500" />
+                      <Span className="text-sm font-medium">
                         {t(
                           "app.story._components.home.hero.imageOverlay.title",
                         )}
-                      </span>
-                    </div>
+                      </Span>
+                    </Div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <Div className="grid grid-cols-2 gap-4">
                       {/* Yearly Growth with Chart */}
-                      <div className="col-span-2 flex items-center justify-between gap-3 bg-blue-50/50 dark:bg-blue-900/20 p-2 rounded-md">
-                        <div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <Div className="col-span-2 flex items-center justify-between gap-3 bg-blue-50/50 dark:bg-blue-900/20 p-2 rounded-md">
+                        <Div>
+                          <P className="text-xs text-gray-500 dark:text-gray-400">
                             {t(
                               "app.story._components.home.hero.imageOverlay.metrics.yearlyGrowth.label",
                             )}
-                          </p>
-                          <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                          </P>
+                          <P className="text-lg font-bold text-blue-600 dark:text-blue-400">
                             {t(
                               "app.story._components.home.hero.imageOverlay.metrics.yearlyGrowth.value",
                               { growth: 187 },
                             )}
-                          </p>
-                        </div>
-                        <div className="h-10 w-20 bg-blue-500/20 rounded-md flex items-end">
-                          <div className="w-2 h-3 bg-blue-500 rounded-t-sm mx-0.5" />
-                          <div className="w-2 h-5 bg-blue-500 rounded-t-sm mx-0.5" />
-                          <div className="w-2 h-7 bg-blue-500 rounded-t-sm mx-0.5" />
-                          <div className="w-2 h-6 bg-blue-500 rounded-t-sm mx-0.5" />
-                          <div className="w-2 h-8 bg-blue-500 rounded-t-sm mx-0.5" />
-                          <div className="w-2 h-10 bg-blue-500 rounded-t-sm mx-0.5" />
-                        </div>
-                      </div>
+                          </P>
+                        </Div>
+                        <Div className="h-10 w-20 bg-blue-500/20 rounded-md flex items-end">
+                          <Div className="w-2 h-3 bg-blue-500 rounded-t-sm mx-0.5" />
+                          <Div className="w-2 h-5 bg-blue-500 rounded-t-sm mx-0.5" />
+                          <Div className="w-2 h-7 bg-blue-500 rounded-t-sm mx-0.5" />
+                          <Div className="w-2 h-6 bg-blue-500 rounded-t-sm mx-0.5" />
+                          <Div className="w-2 h-8 bg-blue-500 rounded-t-sm mx-0.5" />
+                          <Div className="w-2 h-10 bg-blue-500 rounded-t-sm mx-0.5" />
+                        </Div>
+                      </Div>
 
                       {/* Engagement Rate */}
-                      <div className="p-2 bg-green-50/50 dark:bg-green-900/20 rounded-md">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <Div className="p-2 bg-green-50/50 dark:bg-green-900/20 rounded-md">
+                        <P className="text-xs text-gray-500 dark:text-gray-400">
                           {t(
                             "app.story._components.home.hero.imageOverlay.metrics.engagement.label",
                           )}
-                        </p>
-                        <p className="text-md font-bold text-green-600 dark:text-green-400">
+                        </P>
+                        <P className="text-md font-bold text-green-600 dark:text-green-400">
                           {t(
                             "app.story._components.home.hero.imageOverlay.metrics.engagement.value",
                             { engagement: 42 },
                           )}
-                        </p>
-                      </div>
+                        </P>
+                      </Div>
 
                       {/* Reach Increase */}
-                      <div className="p-2 bg-purple-50/50 dark:bg-purple-900/20 rounded-md">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <Div className="p-2 bg-purple-50/50 dark:bg-purple-900/20 rounded-md">
+                        <P className="text-xs text-gray-500 dark:text-gray-400">
                           {t(
                             "app.story._components.home.hero.imageOverlay.metrics.reach.label",
                           )}
-                        </p>
-                        <p className="text-md font-bold text-purple-600 dark:text-purple-400">
+                        </P>
+                        <P className="text-md font-bold text-purple-600 dark:text-purple-400">
                           {t(
                             "app.story._components.home.hero.imageOverlay.metrics.reach.value",
                             { reach: 215 },
                           )}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                        </P>
+                      </Div>
+                    </Div>
+                  </Div>
+                </Div>
+              </Div>
+            </Div>
           </motion.div>
-        </div>
-      </div>
+        </Div>
+      </Div>
     </section>
   );
 };

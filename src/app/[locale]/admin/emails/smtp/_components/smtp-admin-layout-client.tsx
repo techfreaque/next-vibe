@@ -9,7 +9,9 @@ import { Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "next-vibe/shared/utils";
+import { Div, P, Span } from "next-vibe-ui/ui";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { H2 } from "next-vibe-ui/ui/typography";
 import type { ComponentType, JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -60,22 +62,22 @@ export function SmtpAdminLayoutClient({
   );
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* SMTP Sub-Navigation */}
       <Card>
         <CardContent className="p-4">
-          <div className="flex flex-col space-y-4">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <Div className="flex flex-col space-y-4">
+            <Div>
+              <H2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {t("app.admin.emails.smtp.list.title")}
-              </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              </H2>
+              <P className="text-sm text-gray-600 dark:text-gray-400">
                 {t("app.admin.emails.smtp.list.description")}
-              </p>
-            </div>
+              </P>
+            </Div>
 
             {/* Sub Navigation Tabs */}
-            <div className="border-b border-gray-200 dark:border-gray-700">
+            <Div className="border-b border-gray-200 dark:border-gray-700">
               <nav
                 className="flex space-x-8"
                 aria-label={t("app.admin.emails.smtp.list.title")}
@@ -103,27 +105,27 @@ export function SmtpAdminLayoutClient({
                             : "text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300",
                         )}
                       />
-                      <span>{item.label}</span>
+                      <Span>{item.label}</Span>
                     </Link>
                   );
                 })}
               </nav>
-            </div>
+            </Div>
 
             {/* Current Sub-Section Description */}
             {currentSubSection && (
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+              <Div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                <P className="text-sm text-gray-600 dark:text-gray-400">
                   {currentSubSection.description}
-                </p>
-              </div>
+                </P>
+              </Div>
             )}
-          </div>
+          </Div>
         </CardContent>
       </Card>
 
       {/* Page Content */}
-      <div className="min-h-[400px]">{children}</div>
-    </div>
+      <Div className="min-h-[400px]">{children}</Div>
+    </Div>
   );
 }

@@ -4,6 +4,7 @@
  */
 
 import type { JSX } from "react";
+import { Div, P } from "next-vibe-ui/ui";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -19,16 +20,16 @@ export default async function UsersListPage({
   const { t } = simpleT(locale);
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Page Description */}
-      <div>
-        <p className="text-gray-600 dark:text-gray-400">
+      <Div>
+        <P className="text-gray-600 dark:text-gray-400">
           {t("app.admin.users.list.description")}
-        </p>
-      </div>
+        </P>
+      </Div>
 
       {/* Client Component handles all interactions */}
       <UsersListClient locale={locale} />
-    </div>
+    </Div>
   );
 }

@@ -29,7 +29,7 @@ import {
   TabsTrigger,
 } from "next-vibe-ui/ui";
 import { Container } from "next-vibe-ui/ui/container";
-import { H1, H3, H4, P } from "next-vibe-ui/ui/typography";
+import { H1, H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div, Span } from "next-vibe-ui/ui";
+import { Link } from "next-vibe-ui/ui/link";
+import { H1, H2, H3, P } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
@@ -105,167 +107,167 @@ export default async function CareersPage({
   ];
 
   return (
-    <div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
-      <div className="container max-w-6xl mx-auto py-8 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+    <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
+      <Div className="container max-w-6xl mx-auto py-8 px-4">
+        <Div className="max-w-4xl mx-auto">
+          <H1 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
             {t("app.story._components.home.careers.title")}
-          </h1>
+          </H1>
 
-          <p className="text-xl text-gray-700 dark:text-gray-300 mb-8">
+          <P className="text-xl text-gray-700 dark:text-gray-300 mb-8">
             {t("app.story._components.home.careers.description", {
               appName: t("app.common.appName"),
             })}
-          </p>
+          </P>
 
           {/* Hero Section with Image */}
-          <div className="relative h-[300px] rounded-xl overflow-hidden shadow-xl mb-12">
-            <div className="absolute inset-0 bg-blue-600/20 bg-gradient-to-r from-blue-600/20 to-cyan-500/20 z-10" />
-            <div className="absolute inset-0 bg-black/60 bg-gradient-to-t from-black/60 to-transparent z-10" />
-            <div className="absolute bottom-0 left-0 p-8 z-20 text-white">
-              <h2 className="text-3xl font-bold mb-2">
+          <Div className="relative h-[300px] rounded-xl overflow-hidden shadow-xl mb-12">
+            <Div className="absolute inset-0 bg-blue-600/20 bg-gradient-to-r from-blue-600/20 to-cyan-500/20 z-10" />
+            <Div className="absolute inset-0 bg-black/60 bg-gradient-to-t from-black/60 to-transparent z-10" />
+            <Div className="absolute bottom-0 left-0 p-8 z-20 text-white">
+              <H2 className="text-3xl font-bold mb-2">
                 {t("app.story._components.home.careers.joinTeam")}
-              </h2>
-              <p className="text-lg max-w-lg">
+              </H2>
+              <P className="text-lg max-w-lg">
                 {t("app.story._components.home.careers.subtitle")}
-              </p>
-            </div>
-          </div>
+              </P>
+            </Div>
+          </Div>
 
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">
+            <H2 className="text-2xl font-semibold mb-4">
               {t("app.story._components.home.careers.whyWorkWithUs")}
-            </h2>
-            <p className="text-gray-700 dark:text-gray-300 mb-6">
+            </H2>
+            <P className="text-gray-700 dark:text-gray-300 mb-6">
               {t("app.story._components.home.careers.workplaceDescription")}
-            </p>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
+            </P>
+            <Div className="grid md:grid-cols-2 gap-6">
+              <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
                   {t("app.story._components.home.careers.benefits.growthTitle")}
-                </h3>
-                <p className="text-gray-700 dark:text-gray-300">
+                </H3>
+                <P className="text-gray-700 dark:text-gray-300">
                   {t("app.story._components.home.careers.benefits.growthDesc")}
-                </p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
+                </P>
+              </Div>
+              <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
                   {t(
                     "app.story._components.home.careers.benefits.meaningfulTitle",
                   )}
-                </h3>
-                <p className="text-gray-700 dark:text-gray-300">
+                </H3>
+                <P className="text-gray-700 dark:text-gray-300">
                   {t(
                     "app.story._components.home.careers.benefits.meaningfulDesc",
                   )}
-                </p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
+                </P>
+              </Div>
+              <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
                   {t(
                     "app.story._components.home.careers.benefits.balanceTitle",
                   )}
-                </h3>
-                <p className="text-gray-700 dark:text-gray-300">
+                </H3>
+                <P className="text-gray-700 dark:text-gray-300">
                   {t("app.story._components.home.careers.benefits.balanceDesc")}
-                </p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
+                </P>
+              </Div>
+              <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
                   {t(
                     "app.story._components.home.careers.benefits.compensationTitle",
                   )}
-                </h3>
-                <p className="text-gray-700 dark:text-gray-300">
+                </H3>
+                <P className="text-gray-700 dark:text-gray-300">
                   {t(
                     "app.story._components.home.careers.benefits.compensationDesc",
                   )}
-                </p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
+                </P>
+              </Div>
+              <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
                   {t(
                     "app.story._components.home.careers.benefits.innovationTitle",
                   )}
-                </h3>
-                <p className="text-gray-700 dark:text-gray-300">
+                </H3>
+                <P className="text-gray-700 dark:text-gray-300">
                   {t(
                     "app.story._components.home.careers.benefits.innovationDesc",
                   )}
-                </p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
+                </P>
+              </Div>
+              <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
                   {t("app.story._components.home.careers.benefits.teamTitle")}
-                </h3>
-                <p className="text-gray-700 dark:text-gray-300">
+                </H3>
+                <P className="text-gray-700 dark:text-gray-300">
                   {t("app.story._components.home.careers.benefits.teamDesc")}
-                </p>
-              </div>
-            </div>
+                </P>
+              </Div>
+            </Div>
           </section>
 
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-6">
+            <H2 className="text-2xl font-semibold mb-6">
               {t("app.story._components.home.careers.openPositions")}
-            </h2>
-            <div className="grid md:grid-cols-2 gap-8">
+            </H2>
+            <Div className="grid md:grid-cols-2 gap-8">
               {openPositions.map((position) => (
-                <div
+                <Div
                   key={position.id}
                   className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6"
                 >
-                  <h3 className="text-xl font-bold mb-2">{position.title}</h3>
-                  <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  <H3 className="text-xl font-bold mb-2">{position.title}</H3>
+                  <P className="text-gray-700 dark:text-gray-300 mb-4">
                     {position.description}
-                  </p>
-                  <div className="flex flex-col space-y-2 mb-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                  </P>
+                  <Div className="flex flex-col space-y-2 mb-4">
+                    <Div className="flex items-center justify-between">
+                      <Span className="text-sm text-gray-500 dark:text-gray-400">
                         {t(
                           "app.story._components.home.careers.jobDetail.department",
                         )}
                         :
-                      </span>
-                      <span className="text-sm font-medium">
+                      </Span>
+                      <Span className="text-sm font-medium">
                         {position.department}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                      </Span>
+                    </Div>
+                    <Div className="flex items-center justify-between">
+                      <Span className="text-sm text-gray-500 dark:text-gray-400">
                         {t(
                           "app.story._components.home.careers.jobDetail.employmentType",
                         )}
                         :
-                      </span>
-                      <span className="text-sm font-medium">
+                      </Span>
+                      <Span className="text-sm font-medium">
                         {position.type}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                      </Span>
+                    </Div>
+                    <Div className="flex items-center justify-between">
+                      <Span className="text-sm text-gray-500 dark:text-gray-400">
                         {t(
                           "app.story._components.home.careers.jobDetail.location",
                         )}
                         :
-                      </span>
-                      <span className="text-sm font-medium">
+                      </Span>
+                      <Span className="text-sm font-medium">
                         {position.location}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                      </Span>
+                    </Div>
+                    <Div className="flex items-center justify-between">
+                      <Span className="text-sm text-gray-500 dark:text-gray-400">
                         {t(
                           "app.story._components.home.careers.jobDetail.applicationDeadline",
                         )}
                         :
-                      </span>
-                      <span className="text-sm font-medium">
+                      </Span>
+                      <Span className="text-sm font-medium">
                         {position.applicationDeadline}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex space-x-3">
+                      </Span>
+                    </Div>
+                  </Div>
+                  <Div className="flex space-x-3">
                     <Button className="flex-1" asChild>
                       <Link href={`/${locale}/careers/${position.id}`}>
                         {t(
@@ -280,25 +282,25 @@ export default async function CareersPage({
                         {t("app.story._components.home.careers.applyNow")}
                       </Link>
                     </Button>
-                  </div>
-                </div>
+                  </Div>
+                </Div>
               ))}
-            </div>
+            </Div>
           </section>
 
           <section className="text-center bg-blue-50 bg-gradient-to-r from-blue-50 to-cyan-50 dark:bg-gray-800 dark:from-gray-800 dark:to-gray-700 p-8 rounded-xl">
-            <h2 className="text-2xl font-semibold mb-4">
+            <H2 className="text-2xl font-semibold mb-4">
               {t("app.story._components.home.careers.readyToJoin")}
-            </h2>
-            <p className="text-gray-700 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
+            </H2>
+            <P className="text-gray-700 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
               {t("app.story._components.home.careers.explorePositions")}
-            </p>
+            </P>
             <Button size="lg" asChild>
               <Link href={`/${locale}/help`}>{t("app.nav.contact")}</Link>
             </Button>
           </section>
-        </div>
-      </div>
-    </div>
+        </Div>
+      </Div>
+    </Div>
   );
 }

@@ -13,6 +13,7 @@ import { canCreateFolder } from "@/app/api/[locale]/v1/core/agent/chat/permissio
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -108,6 +109,7 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
           expanded: folder.expanded,
           sortOrder: folder.sortOrder,
           metadata: (folder.metadata || {}) as FolderMetadata,
+          allowedRoles: (folder.allowedRoles || []) as string[],
           createdAt: folder.createdAt.toISOString(),
           updatedAt: folder.updatedAt.toISOString(),
         })),
@@ -212,6 +214,16 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
 
       const nextSortOrder = existingFolders.length;
 
+      // Set allowedRoles based on rootFolderId
+      let allowedRoles: string[] = [];
+      if (folderData.rootFolderId === "public") {
+        // PUBLIC folders visible to all by default
+        allowedRoles = [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN];
+      } else {
+        // PRIVATE/SHARED folders: owner only (empty array)
+        allowedRoles = [];
+      }
+
       const [newFolder] = await db
         .insert(chatFolders)
         .values({
@@ -224,6 +236,7 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
           expanded: true,
           sortOrder: nextSortOrder,
           metadata: {},
+          allowedRoles,
         })
         .returning();
 
@@ -253,6 +266,7 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
             expanded: newFolder.expanded,
             sortOrder: newFolder.sortOrder,
             metadata: (newFolder.metadata || {}) as FolderMetadata,
+            allowedRoles: (newFolder.allowedRoles || []) as string[],
             createdAt: newFolder.createdAt.toISOString(),
             updatedAt: newFolder.updatedAt.toISOString(),
           },

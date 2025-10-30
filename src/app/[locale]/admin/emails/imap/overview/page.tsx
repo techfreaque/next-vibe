@@ -4,7 +4,7 @@
  */
 
 import { Div, P } from "next-vibe-ui/ui";
-import { H1 } from "next-vibe-ui/ui/typography";
+import { H1 } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

@@ -9,6 +9,7 @@ import { BarChart3, Database, List, Settings } from "lucide-react";
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -57,7 +58,7 @@ export function EmailsNavigation({
   ] as const;
 
   return (
-    <div className="flex space-x-1 rounded-lg bg-muted p-1">
+    <Div className="flex space-x-1 rounded-lg bg-muted p-1">
       {navigationItems.map((item) => {
         const Icon = item.icon;
         const isActive = currentPage === item.key;
@@ -82,6 +83,6 @@ export function EmailsNavigation({
           </Button>
         );
       })}
-    </div>
+    </Div>
   );
 }

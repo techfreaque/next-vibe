@@ -64,9 +64,13 @@ export async function getFolderPermissions(
     const moderatorIds = Array.isArray(folder.moderatorIds)
       ? folder.moderatorIds
       : [];
+    const allowedRoles = Array.isArray(folder.allowedRoles)
+      ? folder.allowedRoles
+      : [];
 
     return createSuccessResponse({
       response: {
+        allowedRoles,
         moderatorIds,
       },
     });
@@ -96,7 +100,7 @@ export async function updateFolderPermissions(
   }
 
   try {
-    const { id, moderatorIds } = data;
+    const { id, moderatorIds, allowedRoles } = data;
 
     // Verify folder exists
     const [existingFolder] = await db
@@ -123,23 +127,47 @@ export async function updateFolderPermissions(
       });
     }
 
-    // Update the moderator IDs
+    // Prepare update data - only update fields that are provided
+    const updateData: {
+      moderatorIds?: string[];
+      allowedRoles?: string[];
+      updatedAt: Date;
+    } = {
+      updatedAt: new Date(),
+    };
+
+    if (moderatorIds !== undefined) {
+      updateData.moderatorIds = moderatorIds;
+    }
+
+    if (allowedRoles !== undefined) {
+      updateData.allowedRoles = allowedRoles;
+    }
+
+    // Update the permissions
     await db
       .update(chatFolders)
-      .set({
-        moderatorIds,
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(eq(chatFolders.id, id));
 
     logger.info("Folder permissions updated", {
       folderId: id,
-      moderatorCount: moderatorIds.length,
+      moderatorCount: moderatorIds?.length ?? 0,
+      allowedRolesCount: allowedRoles?.length ?? 0,
     });
+
+    // Return updated values
+    const finalModeratorIds = moderatorIds ?? existingFolder.moderatorIds ?? [];
+    const finalAllowedRoles = allowedRoles ?? existingFolder.allowedRoles ?? [];
 
     return createSuccessResponse({
       response: {
-        moderatorIds,
+        allowedRoles: Array.isArray(finalAllowedRoles)
+          ? finalAllowedRoles
+          : [],
+        moderatorIds: Array.isArray(finalModeratorIds)
+          ? finalModeratorIds
+          : [],
       },
     });
   } catch {

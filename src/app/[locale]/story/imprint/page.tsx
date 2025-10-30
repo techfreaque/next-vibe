@@ -1,6 +1,8 @@
 import { Building, FileText, Info } from "lucide-react";
 import type { Metadata, ResolvingMetadata } from "next";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
+import { Div, Span } from "next-vibe-ui/ui";
+import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
@@ -55,40 +57,40 @@ export default async function ImprintPage({
 
   return (
     <main className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
-      <div className="container max-w-4xl mx-auto py-16 px-4">
+      <Div className="container max-w-4xl mx-auto py-16 px-4">
         {/* Header with icon */}
-        <div className="mb-12 text-center">
-          <div className="inline-flex items-center justify-center p-2 bg-blue-100 dark:bg-blue-900 rounded-full mb-4">
+        <Div className="mb-12 text-center">
+          <Div className="inline-flex items-center justify-center p-2 bg-blue-100 dark:bg-blue-900 rounded-full mb-4">
             <Building className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-          </div>
-          <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+          </Div>
+          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
             {t("app.story._components.home.imprint.title")}
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
+          </H1>
+          <P className="text-lg text-gray-600 dark:text-gray-400">
             {t("app.story._components.home.imprint.lastUpdated")}
-          </p>
-        </div>
+          </P>
+        </Div>
 
         {/* Main content */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-8">
-          <div className="prose dark:prose-invert max-w-none">
-            <p className="lead text-lg">
+        <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-8">
+          <Div className="prose dark:prose-invert max-w-none">
+            <P className="lead text-lg">
               {t("app.story._components.home.imprint.introduction")}
-            </p>
+            </P>
 
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             {/* Partnerships Section */}
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
               {t(
                 "app.story._components.home.imprint.sections.partnerships.title",
               )}
-            </h2>
-            <p className="mt-2">
+            </H2>
+            <P className="mt-2">
               {t(
                 "app.story._components.home.imprint.sections.partnerships.description",
               )}
-            </p>
+            </P>
             <Alert variant="default" className="mt-4">
               <Info className="h-4 w-4" />
               <AlertDescription>
@@ -98,157 +100,157 @@ export default async function ImprintPage({
               </AlertDescription>
             </Alert>
 
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             {/* Company Information Section */}
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
+            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <Building className="h-5 w-5 mr-2" />
               {t(
                 "app.story._components.home.imprint.sections.companyInfo.title",
               )}
-            </h2>
-            <p className="mt-2">
+            </H2>
+            <P className="mt-2">
               {t(
                 "app.story._components.home.imprint.sections.companyInfo.description",
               )}
-            </p>
+            </P>
             <ul className="space-y-2 mt-4">
               <li className="flex items-start">
-                <span className="mr-2 text-blue-500">•</span>
-                <span>{t("app.common.company.name")}</span>
+                <Span className="mr-2 text-blue-500">•</Span>
+                <Span>{t("app.common.company.name")}</Span>
               </li>
               <li className="flex items-start">
-                <span className="mr-2 text-blue-500">•</span>
-                <span>{t("app.common.company.legalForm")}</span>
+                <Span className="mr-2 text-blue-500">•</Span>
+                <Span>{t("app.common.company.legalForm")}</Span>
               </li>
               <li className="flex items-start">
-                <span className="mr-2 text-blue-500">•</span>
-                <span>{t("app.common.company.registrationNumber")}</span>
+                <Span className="mr-2 text-blue-500">•</Span>
+                <Span>{t("app.common.company.registrationNumber")}</Span>
               </li>
               {/* <li className="flex items-start">
-                <span className="mr-2 text-blue-500">•</span>
-                <span>{t("app.common.company.vatId")}</span>
+                <Span className="mr-2 text-blue-500">•</Span>
+                <Span>{t("app.common.company.vatId")}</Span>
               </li> */}
               {/* <li className="flex items-start">
-                <span className="mr-2 text-blue-500">•</span>
-                <span>{t("app.common.company.registrationCourt")}</span>
+                <Span className="mr-2 text-blue-500">•</Span>
+                <Span>{t("app.common.company.registrationCourt")}</Span>
               </li> */}
             </ul>
 
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             {/* Contact Information Section */}
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
               {t(
                 "app.story._components.home.imprint.sections.contactInfo.title",
               )}
-            </h2>
-            <p className="mt-2">
+            </H2>
+            <P className="mt-2">
               {t(
                 "app.story._components.home.imprint.sections.contactInfo.description",
               )}
-            </p>
+            </P>
 
-            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
-              <h3 className="font-medium text-lg mb-2">
+            <Div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
+              <H3 className="font-medium text-lg mb-2">
                 {t("app.common.company.address.title")}
-              </h3>
-              <p>{t("app.common.company.address.street")}</p>
-              <p>{t("app.common.company.address.city")}</p>
-              <p>{t("app.common.company.address.country")}</p>
-              <p>{supportEmail}</p>
-              {/* <p>{t("app.story._components.home.imprint.sections.contactInfo.communication.phone")}</p> */}
-            </div>
+              </H3>
+              <P>{t("app.common.company.address.street")}</P>
+              <P>{t("app.common.company.address.city")}</P>
+              <P>{t("app.common.company.address.country")}</P>
+              <P>{supportEmail}</P>
+              {/* <P>{t("app.story._components.home.imprint.sections.contactInfo.communication.phone")}</P> */}
+            </Div>
 
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             {/* Responsible Person Section */}
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
               {t(
                 "app.story._components.home.imprint.sections.responsiblePerson.title",
               )}
-            </h2>
-            <p className="mt-2">
+            </H2>
+            <P className="mt-2">
               {t(
                 "app.story._components.home.imprint.sections.responsiblePerson.description",
               )}
-            </p>
-            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
-              <p>
+            </P>
+            <Div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
+              <P>
                 <strong>
                   {t("app.common.company.responsiblePerson.name")}
                 </strong>
-              </p>
-              <p>{t("app.common.company.address.addressIn1Line")}</p>
-            </div>
+              </P>
+              <P>{t("app.common.company.address.addressIn1Line")}</P>
+            </Div>
 
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             {/* Dispute Resolution Section */}
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
               {t(
                 "app.story._components.home.imprint.sections.disputeResolution.title",
               )}
-            </h2>
-            <p className="mt-2">
+            </H2>
+            <P className="mt-2">
               {t(
                 "app.story._components.home.imprint.sections.disputeResolution.description",
               )}
-            </p>
-            <p className="mt-4">
+            </P>
+            <P className="mt-4">
               {t(
                 "app.story._components.home.imprint.sections.disputeResolution.content",
               )}
-            </p>
+            </P>
 
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             {/* Disclaimer Section */}
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
+            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <FileText className="h-5 w-5 mr-2" />
               {t(
                 "app.story._components.home.imprint.sections.disclaimer.title",
               )}
-            </h2>
+            </H2>
 
-            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
+            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
               {t(
                 "app.story._components.home.imprint.sections.disclaimer.liability.title",
               )}
-            </h3>
-            <p className="mt-2">
+            </H3>
+            <P className="mt-2">
               {t(
                 "app.story._components.home.imprint.sections.disclaimer.liability.content",
               )}
-            </p>
+            </P>
 
-            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
+            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
               {t(
                 "app.story._components.home.imprint.sections.disclaimer.links.title",
               )}
-            </h3>
-            <p className="mt-2">
+            </H3>
+            <P className="mt-2">
               {t(
                 "app.story._components.home.imprint.sections.disclaimer.links.content",
               )}
-            </p>
+            </P>
 
-            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
+            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
               {t(
                 "app.story._components.home.imprint.sections.disclaimer.copyright.title",
               )}
-            </h3>
-            <p className="mt-2">
+            </H3>
+            <P className="mt-2">
               {t(
                 "app.story._components.home.imprint.sections.disclaimer.copyright.content",
               )}
-            </p>
-          </div>
-        </div>
+            </P>
+          </Div>
+        </Div>
 
         {/* Client component for interactive elements only */}
         <ImprintClientInteraction locale={locale} />
-      </div>
+      </Div>
     </main>
   );
 }

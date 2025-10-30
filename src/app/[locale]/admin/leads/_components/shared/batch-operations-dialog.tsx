@@ -6,7 +6,7 @@
 "use client";
 
 import { AlertTriangle, CheckCircle, Eye, Users } from "lucide-react";
-import { Div } from "next-vibe-ui/ui";
+import { Div, H4, P, Span } from "next-vibe-ui/ui";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
@@ -27,7 +27,6 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { H4, P, Span } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import type {
