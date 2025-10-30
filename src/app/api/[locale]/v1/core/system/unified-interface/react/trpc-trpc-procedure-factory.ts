@@ -37,7 +37,7 @@ import {
 export function createTRPCProcedureFromEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields,
   TRequestInput,
   TRequestOutput,
@@ -84,8 +84,7 @@ export function createTRPCProcedureFromEndpoint<
       TFields
     >["sms"];
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any {
+): ReturnType<typeof publicProcedure.query> | ReturnType<typeof publicProcedure.mutation> {
   // Create enhanced handler to get the tRPC procedure
 
   const trpcHandler = createTRPCHandler({
@@ -171,7 +170,7 @@ export function createTRPCProcedureFromEndpoint<
  * Select the appropriate base tRPC procedure based on required roles
  */
 function selectBaseProcedure<
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 >(
   allowedRoles: TUserRoleValue,
   locale: CountryLanguage,
@@ -217,9 +216,9 @@ function selectBaseProcedure<
 export function createTRPCProceduresFromEndpoints<
   T extends Record<
     string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
+    CreateApiEndpoint<string, Methods, readonly UserRoleValue[], TFields>
   >,
+  TFields = Record<string, never>,
 >(
   endpoints: T,
   handlers: Record<
@@ -241,7 +240,7 @@ export function createTRPCProceduresFromEndpoints<
         string,
         Methods,
         readonly string[],
-        any
+        TFields
       >["email"];
       sms?: ApiHandlerOptions<
         Record<string, string | number | boolean>,
@@ -250,7 +249,7 @@ export function createTRPCProceduresFromEndpoints<
         string,
         Methods,
         readonly string[],
-        any
+        TFields
       >["sms"];
     }
   >,
@@ -289,7 +288,7 @@ export function createTRPCProceduresFromEndpoints<
 export function createTRPCProceduresFromRouteExports(routeExports: {
   definitions?: Record<
     string,
-    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
+    CreateApiEndpoint<string, Methods, readonly UserRoleValue[], Record<string, never>>
   >;
   handlers?: Record<
     string,
@@ -343,16 +342,16 @@ export function createTRPCProceduresFromRouteExports(routeExports: {
  * Type helper to extract procedure types from endpoints
  */
 export type ExtractTRPCProcedures<T> = {
-  [K in keyof T]: T[K] extends ApiEndpoint<
+  [K in keyof T]: T[K] extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
-    any
+    readonly UserRoleValue[],
+    infer TFields
   >
-    ? T[K]["method"] extends Methods.GET
-      ? ReturnType<typeof publicProcedure.query>
-      : ReturnType<typeof publicProcedure.mutation>
-    : never;
+  ? T[K]["method"] extends Methods.GET
+  ? ReturnType<typeof publicProcedure.query>
+  : ReturnType<typeof publicProcedure.mutation>
+  : never;
 };
 
 /**
@@ -361,7 +360,7 @@ export type ExtractTRPCProcedures<T> = {
 export interface RouteFileStructure {
   definitions?: Record<
     string,
-    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
+    CreateApiEndpoint<string, Methods, readonly UserRoleValue[], Record<string, never>>
   >;
   handlers?: Record<
     string,
@@ -475,7 +474,7 @@ function createCombinedInputSchema<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields,
 >(
   endpoint: CreateApiEndpoint<

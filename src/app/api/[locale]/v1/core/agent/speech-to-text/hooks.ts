@@ -7,15 +7,13 @@
 
 import { useCallback, useRef, useState } from "react";
 
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import speechToTextDefinitions, {
-  type SpeechToTextPostResponseOutput,
-} from "./definition";
+import speechToTextDefinitions from "./definition";
 
 interface UseEdenAISpeechOptions {
   onTranscript?: (text: string) => void;
@@ -129,11 +127,7 @@ export function useEdenAISpeech({
 
       // Submit form with callbacks
       await endpoint.create.submitForm(undefined, {
-        onSuccess: ({
-          responseData,
-        }: {
-          responseData: SpeechToTextPostResponseOutput;
-        }) => {
+        onSuccess: ({ responseData }) => {
           if (responseData.response.success) {
             const transcribedText = responseData.response.text;
             logger.debug("STT", "Success! Transcription received", {
@@ -152,7 +146,7 @@ export function useEdenAISpeech({
             cleanup();
           }
         },
-        onError: ({ error }: { error: Error }) => {
+        onError: ({ error }) => {
           const errorMessage =
             error.message ?? t("app.chat.hooks.stt.transcription-failed");
           logger.error("STT", errorMessage, { error });
@@ -161,7 +155,7 @@ export function useEdenAISpeech({
           setIsProcessing(false);
           cleanup();
         },
-      } as never);
+      });
     } catch (err) {
       const errorMsg =
         err instanceof Error

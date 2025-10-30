@@ -44,16 +44,19 @@ export const DataTableWidget = ({
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  if (!isDataTableWidgetData(data)) {
-    return <div className={className}>—</div>;
-  }
-
-  const typedData = data;
+  const isValidData = isDataTableWidgetData(data);
+  const typedData = isValidData ? data : null;
 
   useEffect(() => {
-    setSortBy(typedData.sortBy ?? null);
-    setSortOrder(typedData.sortOrder ?? "asc");
-  }, [typedData.sortBy, typedData.sortOrder]);
+    if (typedData) {
+      setSortBy(typedData.sortBy ?? null);
+      setSortOrder(typedData.sortOrder ?? "asc");
+    }
+  }, [typedData]);
+
+  if (!isValidData || !typedData) {
+    return <div className={className}>—</div>;
+  }
 
   // Handle column sort
   const handleSort = (columnKey: string): void => {
@@ -66,7 +69,7 @@ export const DataTableWidget = ({
   };
 
   // Sort rows
-  const sortedRows = [...typedData.rows].sort((a, b) => {
+  const sortedRows = typedData.rows.toSorted((a, b) => {
     if (!sortBy) {
       return 0;
     }
@@ -107,6 +110,21 @@ export const DataTableWidget = ({
                     handleSort(column.key);
                   }
                 }}
+                onKeyDown={(e): void => {
+                  if (column.sortable && (e.key === "Enter" || e.key === " ")) {
+                    e.preventDefault();
+                    handleSort(column.key);
+                  }
+                }}
+                role={column.sortable ? "button" : undefined}
+                tabIndex={column.sortable ? 0 : undefined}
+                aria-sort={
+                  column.sortable && sortBy === column.key
+                    ? sortOrder === "asc"
+                      ? "ascending"
+                      : "descending"
+                    : undefined
+                }
               >
                 <div className="flex items-center gap-2">
                   {column.label}

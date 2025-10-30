@@ -7,12 +7,12 @@
 import "server-only";
 
 import {
-  type CliRequestData,
   type DiscoveredRoute,
   RouteDelegationHandler,
   type RouteExecutionContext,
   type RouteExecutionResult,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/route-executor";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -47,13 +47,8 @@ export interface BaseExecutionContext<
   /** Request data/parameters */
   data: TData;
 
-  /** User context */
-  user: {
-    id?: string;
-    email?: string;
-    role?: string;
-    isPublic: boolean;
-  };
+  /** User context - uses JWT payload type for consistency */
+  user: JwtPayloadType;
 
   /** Locale for translations */
   locale: CountryLanguage;
@@ -115,7 +110,7 @@ export abstract class BaseExecutor {
   /**
    * Execute a tool via route delegation
    */
-  protected async executeViaRoute<TData = { [key: string]: ParameterValue }>(
+  protected async executeViaRoute<TData extends { [key: string]: ParameterValue }>(
     context: BaseExecutionContext<TData>,
     options: BaseExecutionOptions,
     t: TFunction,
@@ -239,8 +234,8 @@ export abstract class BaseExecutor {
   /**
    * Create route execution context
    */
-  protected createRouteContext(
-    context: BaseExecutionContext,
+  protected createRouteContext<TData extends { [key: string]: ParameterValue }>(
+    context: BaseExecutionContext<TData>,
     options: BaseExecutionOptions,
   ): RouteExecutionContext {
     return {

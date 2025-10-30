@@ -40,13 +40,26 @@ interface TranslationContextType {
   changeLocale: (country: Countries) => void;
 }
 
+// Default no-op handlers for context initialization
+function defaultSetLanguage(): void {
+  // No-op default - overridden by provider
+}
+
+function defaultSetCountry(): void {
+  // No-op default - overridden by provider
+}
+
+function defaultChangeLocale(): void {
+  // No-op default - overridden by provider
+}
+
 // Create context with default values
 export const TranslationContext = createContext<TranslationContextType>({
   language: defaultLocaleConfig.language,
   country: defaultLocaleConfig.country,
   locale: `${defaultLocaleConfig.language}-${defaultLocaleConfig.country}`,
-  setLanguage: () => {},
-  setCountry: () => {},
+  setLanguage: defaultSetLanguage,
+  setCountry: defaultSetCountry,
   t: (<K extends TranslationKey>(
     key: K,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -57,7 +70,7 @@ export const TranslationContext = createContext<TranslationContextType>({
   isRTL: false,
   countries: availableCountries,
   currentCountry: globalCountryInfo,
-  changeLocale: () => {},
+  changeLocale: defaultChangeLocale,
 });
 
 // Translation provider props

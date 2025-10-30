@@ -35,6 +35,13 @@ interface ImapMessageDetailProps {
 }
 
 /**
+ * Format date string to localized string
+ */
+function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleString();
+}
+
+/**
  * IMAP Message Detail Component
  * Production-ready with real API integration and edit capabilities
  */
@@ -102,24 +109,15 @@ export function ImapMessageDetail({
 
   const handleSave = async (): Promise<void> => {
     try {
-      // Use the form's onSubmit method for PATCH operations
-      const syntheticEvent = {
-        preventDefault: () => {},
-        stopPropagation: () => {},
-      } as React.FormEvent<HTMLFormElement>;
-
-      await messageEndpoint.create?.onSubmit(syntheticEvent);
+      // Use the form's handleSubmit for PATCH operations
+      await messageEndpoint.create.submitForm(undefined);
       setIsEditMode(false);
       // Refetch data to get updated values
-      await messageEndpoint.read?.refetch();
+      await messageEndpoint.read.refetch();
     } catch {
       // Error handling is done by the endpoint
       // No need to log as the endpoint handles error display
     }
-  };
-
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleString();
   };
 
   const formatSize = (bytes: number): string => {

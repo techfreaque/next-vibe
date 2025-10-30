@@ -83,40 +83,38 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
         const definition = endpoint.definition;
 
         // Resolve translation keys to actual text
-        const descriptionKey = String(
-          definition.description || definition.title || "",
-        );
-        const categoryKey = String(definition.category);
-        const tags: readonly string[] = Array.isArray(definition.tags)
-          ? definition.tags
-          : [];
+        const descriptionKey = definition.description || definition.title;
+        const categoryKey = definition.category;
+        const tags = definition.tags;
 
-        let description: string = descriptionKey;
+        let description = "";
         try {
           // Try to translate description
           if (descriptionKey) {
-            description = t(descriptionKey as never);
+            description = t(descriptionKey);
           }
         } catch {
           // Keep original if translation fails
+          description = String(descriptionKey);
         }
 
-        let category: string = categoryKey;
+        let category = "";
         try {
           // Try to translate category
           if (categoryKey) {
-            category = t(categoryKey as never);
+            category = t(categoryKey);
           }
         } catch {
           // Keep original if translation fails
+          category = String(categoryKey);
         }
 
         // Try to translate tags
         const translatedTags = tags.map((tag) => {
           try {
-            return t(tag as never);
+            return t(tag);
           } catch {
-            return tag;
+            return String(tag);
           }
         });
 
@@ -127,7 +125,7 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
           tags: translatedTags,
           endpointId: endpoint.id,
           allowedRoles: endpoint.definition.allowedRoles
-            ? Array.from(endpoint.definition.allowedRoles)
+            ? [...endpoint.definition.allowedRoles]
             : [],
           // Omit parameters as Zod schemas cannot be JSON serialized
         };

@@ -10,6 +10,7 @@ import type { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslationKey } from "@/i18n/core/static-types";
 import { simpleT } from "@/i18n/core/shared";
 
 import type {
@@ -18,24 +19,24 @@ import type {
 } from "../server-only/types/registry";
 
 /**
- * JSON Schema value type
+ * JSON Schema type from zod-to-json-schema
  */
-export type JsonSchemaValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonSchemaValue[]
-  | { [key: string]: JsonSchemaValue };
+export type JsonSchema = ReturnType<typeof zodToJsonSchema>;
 
 /**
- * JSON Schema type
+ * Convert Zod schema to JSON Schema
  */
-export interface JsonSchema {
-  type: string;
-  properties?: Record<string, JsonSchemaValue>;
-  required?: string[];
-  additionalProperties?: boolean;
+export function zodSchemaToJsonSchema(schema: z.ZodSchema): JsonSchema {
+  try {
+    return zodToJsonSchema(schema, {
+      target: "jsonSchema7",
+      $refStrategy: "none",
+    });
+  } catch {
+    return {
+      type: "object",
+    };
+  }
 }
 
 /**
@@ -55,50 +56,10 @@ export interface BaseToolMetadata {
 }
 
 /**
- * Convert Zod schema to JSON Schema
- */
-export function zodSchemaToJsonSchema(schema: z.ZodSchema): JsonSchema {
-  try {
-    const jsonSchema = zodToJsonSchema(schema, {
-      target: "jsonSchema7",
-      $refStrategy: "none",
-    });
-
-    if (typeof jsonSchema === "object" && jsonSchema !== null) {
-      const schema = jsonSchema as {
-        properties?: Record<string, JsonSchemaValue>;
-        required?: string[];
-        additionalProperties?: boolean;
-      };
-      return {
-        type: "object",
-        properties: schema.properties,
-        required: schema.required,
-        additionalProperties: schema.additionalProperties,
-      };
-    }
-
-    // Fallback to empty object schema
-    return {
-      type: "object",
-      properties: {},
-      required: [],
-    };
-  } catch {
-    // If conversion fails, return empty object schema
-    return {
-      type: "object",
-      properties: {},
-      required: [],
-    };
-  }
-}
-
-/**
  * Safe translation helper
  */
 export function safeTranslate(
-  key: string | undefined,
+  key: TranslationKey | undefined,
   locale: CountryLanguage,
   fallback?: string,
 ): string {
@@ -108,9 +69,9 @@ export function safeTranslate(
 
   try {
     const { t } = simpleT(locale);
-    return t(key as Parameters<typeof t>[0]);
+    return t(key);
   } catch {
-    return fallback || key;
+    return fallback || String(key);
   }
 }
 
@@ -197,6 +158,12 @@ export function endpointToMetadata(
 ): DiscoveredEndpointMetadata {
   const definition = endpoint.definition;
   const aliases = definition.aliases;
+  const title = definition.title;
+  const description = definition.description;
+  const category = definition.category;
+  const tags = definition.tags;
+  const credits = definition.credits;
+
   return {
     id: endpoint.id,
     name: endpoint.toolName,
@@ -204,18 +171,15 @@ export function endpointToMetadata(
     routePath: endpoint.routePath,
     definitionPath: endpoint.definitionPath,
     method: definition.method,
-    title: typeof definition.title === "string" ? definition.title : "",
-    description:
-      typeof definition.description === "string" ? definition.description : "",
-    category:
-      typeof definition.category === "string" ? definition.category : "",
-    tags: Array.isArray(definition.tags) ? definition.tags : [],
+    title: String(title || ""),
+    description: String(description || ""),
+    category: String(category || ""),
+    tags: Array.isArray(tags) ? tags : [],
     allowedRoles: definition.allowedRoles,
     requiresAuth: !definition.allowedRoles.includes("PUBLIC"),
     requestSchema: definition.requestSchema,
     responseSchema: definition.responseSchema,
-    credits:
-      typeof definition.credits === "number" ? definition.credits : undefined,
+    credits: typeof credits === "number" ? credits : undefined,
     aiTool: definition.aiTool,
     aliases: aliases && Array.isArray(aliases) ? aliases : undefined,
   };
@@ -304,11 +268,16 @@ export function extractTags(endpoint: DiscoveredEndpoint): readonly string[] {
   const tags = endpoint.definition.tags || [];
   const category = endpoint.definition.category;
 
-  if (category && !tags.includes(category)) {
-    return [...tags, category];
+  if (category) {
+    const categoryValue = String(category);
+    const tagStrings = tags.map((tag) => String(tag));
+    if (!tagStrings.includes(categoryValue)) {
+      return [...tagStrings, categoryValue];
+    }
+    return tagStrings;
   }
 
-  return tags;
+  return tags.map((tag) => String(tag));
 }
 
 /**

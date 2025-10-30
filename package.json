@@ -254,6 +254,7 @@
     "ts-node": "10.9.2",
     "typescript-eslint": "8.46.2",
     "vite-tsconfig-paths": "5.1.4",
+    "oxlint": "^1.25.0",
     "vitest": "3.2.4"
   },
   "workspaces": [
@@ -266,6 +267,10 @@
     "vibe": "./src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts"
   },
   "overrides": {
-    "lightningcss": "1.30.1"
+    "lightningcss": "1.30.1",
+    "vite": "7.1.11"
+  },
+  "resolutions": {
+    "vite": "7.1.11"
   }
 }

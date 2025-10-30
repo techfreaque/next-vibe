@@ -10,14 +10,52 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { Countries } from "@/i18n/core/config";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { FieldConfig } from "./endpoint-form-field-types";
+
+/**
+ * Type for endpoint field structure
+ */
+interface EndpointFieldStructure {
+  type?: string;
+  children?: Record<string, EndpointFieldStructure>;
+  ui?: {
+    type: WidgetType;
+    fieldType?: FieldDataType;
+    label?: TranslationKey;
+    placeholder?: TranslationKey;
+    description?: TranslationKey;
+    disabled?: boolean;
+    className?: string;
+    defaultCountry?: Countries;
+    preferredCountries?: Countries[];
+    min?: number;
+    max?: number;
+    step?: number;
+    minDate?: Date;
+    maxDate?: Date;
+    rows?: number;
+    maxLength?: number;
+    options?: Array<{
+      value: string | number;
+      label: TranslationKey;
+      labelParams?: Record<string, string | number>;
+      disabled?: boolean;
+      icon?: string;
+    }>;
+    maxTags?: number;
+  };
+}
 
 /**
  * Navigate through nested field structure to find a field by path
  * Handles dot notation like "credentials.email"
  */
-export function getFieldByPath(fields: any, path: string): any | null {
+export function getFieldByPath(
+  fields: EndpointFieldStructure,
+  path: string,
+): EndpointFieldStructure | null {
   const parts = path.split(".");
   let current = fields;
 
@@ -41,7 +79,9 @@ export function getFieldByPath(fields: any, path: string): any | null {
  * Extract FieldConfig from a UnifiedField's WidgetConfig
  * Converts FieldDataType to the appropriate FieldConfig type
  */
-export function extractFieldConfig(field: any): FieldConfig | null {
+export function extractFieldConfig(
+  field: EndpointFieldStructure,
+): FieldConfig | null {
   if (!field?.ui) {
     return null;
   }
@@ -123,9 +163,10 @@ export function extractFieldConfig(field: any): FieldConfig | null {
         ...baseConfig,
         type: "select" as const,
         options:
-          widget.options?.map((opt: any) => ({
+          widget.options?.map((opt) => ({
             value: String(opt.value),
             label: opt.label,
+            labelParams: opt.labelParams,
             disabled: opt.disabled,
           })) || [],
       };
@@ -135,10 +176,11 @@ export function extractFieldConfig(field: any): FieldConfig | null {
         ...baseConfig,
         type: "multiselect" as const,
         options:
-          widget.options?.map((opt: any) => ({
+          widget.options?.map((opt) => ({
             value: String(opt.value),
             label: opt.label,
             disabled: opt.disabled,
+            icon: opt.icon,
           })) || [],
       };
 
@@ -171,7 +213,10 @@ export function extractFieldConfig(field: any): FieldConfig | null {
  * Get FieldConfig for a specific field path in endpoint fields
  * This is the main function used by EndpointFormField
  */
-export function getFieldConfig(fields: any, path: string): FieldConfig | null {
+export function getFieldConfig(
+  fields: EndpointFieldStructure,
+  path: string,
+): FieldConfig | null {
   const field = getFieldByPath(fields, path);
   if (!field) {
     return null;

@@ -6,7 +6,7 @@
 
 "use client";
 
-import { Form, FormAlert } from "next-vibe-ui/ui";
+import { FormAlert } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Label } from "next-vibe-ui/ui/label";
@@ -66,11 +66,7 @@ export function ImapFoldersManagement({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Form
-            form={foldersEndpoint.read?.form}
-            onSubmit={() => {}}
-            className="space-y-6"
-          >
+          <div className="space-y-6">
             <FormAlert alert={foldersEndpoint.alert} />
 
             {/* Controls */}
@@ -131,7 +127,7 @@ export function ImapFoldersManagement({
             <div className="border rounded-lg">
               <ImapFoldersList accountId={selectedAccountId} logger={logger} />
             </div>
-          </Form>
+          </div>
         </CardContent>
       </Card>
 

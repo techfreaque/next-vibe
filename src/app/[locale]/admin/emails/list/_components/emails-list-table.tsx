@@ -28,50 +28,50 @@ interface EmailsListTableProps {
   locale: CountryLanguage;
 }
 
+const getStatusBadgeVariant = (
+  status: string,
+): "default" | "secondary" | "outline" | "destructive" => {
+  switch (status) {
+    case "sent":
+    case "delivered":
+      return "default";
+    case "opened":
+      return "secondary";
+    case "clicked":
+      return "outline";
+    case "bounced":
+    case "failed":
+      return "destructive";
+    case "pending":
+      return "secondary";
+    default:
+      return "outline";
+  }
+};
+
+const getTypeBadgeVariant = (
+  type: string,
+): "default" | "secondary" | "outline" | "destructive" => {
+  switch (type) {
+    case "transactional":
+      return "default";
+    case "marketing":
+      return "secondary";
+    case "notification":
+      return "outline";
+    case "system":
+      return "destructive";
+    default:
+      return "outline";
+  }
+};
+
 export function EmailsListTable({
   emails,
   loading,
   locale,
 }: EmailsListTableProps): JSX.Element {
   const { t } = simpleT(locale);
-
-  const getStatusBadgeVariant = (
-    status: string,
-  ): "default" | "secondary" | "outline" | "destructive" => {
-    switch (status) {
-      case "sent":
-      case "delivered":
-        return "default";
-      case "opened":
-        return "secondary";
-      case "clicked":
-        return "outline";
-      case "bounced":
-      case "failed":
-        return "destructive";
-      case "pending":
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
-
-  const getTypeBadgeVariant = (
-    type: string,
-  ): "default" | "secondary" | "outline" | "destructive" => {
-    switch (type) {
-      case "transactional":
-        return "default";
-      case "marketing":
-        return "secondary";
-      case "notification":
-        return "outline";
-      case "system":
-        return "destructive";
-      default:
-        return "outline";
-    }
-  };
 
   if (loading) {
     return (

@@ -80,6 +80,24 @@ interface ChatSidebarProps {
   user: JwtPayloadType | undefined;
 }
 
+const getButtonColorClasses = (color: string | null): string => {
+  if (!color) {
+    return "";
+  }
+
+  /* eslint-disable i18next/no-literal-string */
+  const colorMap: Record<string, string> = {
+    sky: "bg-sky-500/15 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 border-sky-500/30",
+    teal: "bg-teal-500/15 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20 border-teal-500/30",
+    amber:
+      "bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 border-amber-500/30",
+    zinc: "bg-zinc-500/15 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-500/20 border-zinc-500/30",
+  };
+  /* eslint-enable i18next/no-literal-string */
+
+  return colorMap[color] || "";
+};
+
 export function ChatSidebar({
   chat,
   activeThreadId,
@@ -138,25 +156,6 @@ export function ChatSidebar({
         : activeRootFolderId === DEFAULT_FOLDER_IDS.PUBLIC
           ? "purple"
           : "gray";
-
-  // Get button color classes based on root folder color
-  const getButtonColorClasses = (color: string | null): string => {
-    if (!color) {
-      return "";
-    }
-
-    /* eslint-disable i18next/no-literal-string */
-    const colorMap: Record<string, string> = {
-      sky: "bg-sky-500/15 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 border-sky-500/30",
-      teal: "bg-teal-500/15 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20 border-teal-500/30",
-      amber:
-        "bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 border-amber-500/30",
-      zinc: "bg-zinc-500/15 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-500/20 border-zinc-500/30",
-    };
-    /* eslint-enable i18next/no-literal-string */
-
-    return colorMap[color] || "";
-  };
 
   const handleSelectFolder = (folderId: string): void => {
     const rootFolderId = getRootFolderId(chat.folders, folderId);

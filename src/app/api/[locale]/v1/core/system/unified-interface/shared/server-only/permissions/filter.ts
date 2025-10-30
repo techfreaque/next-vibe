@@ -69,7 +69,7 @@ export class ToolFilter implements IToolFilter {
     // Filter by tags
     if (criteria.tags && criteria.tags.length > 0) {
       filtered = filtered.filter((e) =>
-        criteria.tags!.some((tag: string) => e.definition.tags?.includes(tag)),
+        criteria.tags!.some((tag) => e.definition.tags?.includes(tag)),
       );
     }
 
@@ -286,13 +286,13 @@ export class ToolFilter implements IToolFilter {
       return 3; // Limited for public users
     }
 
-    const maxTools =
-      typeof AI_CONFIG.platformSpecific?.maxToolsPerRequest === "number"
-        ? AI_CONFIG.platformSpecific.maxToolsPerRequest
-        : 10;
+    // AI_CONFIG.platformSpecific is typed as AIPlatformSpecific which includes maxToolsPerRequest
+    if (AI_CONFIG.platformSpecific) {
+      return AI_CONFIG.platformSpecific.maxToolsPerRequest;
+    }
 
-    // Authenticated users get full access
-    return maxTools;
+    // Fallback if platformSpecific is not defined
+    return 10;
   }
 
   /**

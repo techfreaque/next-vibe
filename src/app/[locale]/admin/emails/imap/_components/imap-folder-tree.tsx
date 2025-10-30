@@ -54,6 +54,47 @@ interface FolderTreeNodeProps {
 }
 
 /**
+ * Get sync status color based on status string
+ */
+function getSyncStatusColor(status: string): string {
+  switch (status) {
+    case "synced":
+      return "text-green-600";
+    case "syncing":
+      return "text-blue-600";
+    case "pending":
+      return "text-yellow-600";
+    case "error":
+      return "text-red-600";
+    default:
+      return "text-gray-600";
+  }
+}
+
+/**
+ * Convert API folder data to tree structure
+ */
+function buildFolderTree(
+  folders: NonNullable<ImapFoldersListResponseOutput["folders"]>,
+): FolderNode[] {
+  return folders.map((folder) => ({
+    id: folder.id,
+    name: folder.name,
+    displayName: folder.displayName || folder.name,
+    path: folder.path,
+    specialUseType: folder.specialUseType || undefined,
+    messageCount: folder.messageCount,
+    unseenCount: folder.unseenCount,
+    recentCount: 0, // API doesn't provide recentCount yet
+    isSelectable: folder.isSelectable,
+    hasChildren: folder.hasChildren,
+    syncStatus: folder.syncStatus,
+    lastSyncAt: folder.createdAt, // Use createdAt as placeholder until API provides lastSyncAt
+    children: [], // Hierarchical structure will be implemented when folder nesting is required
+  }));
+}
+
+/**
  * Individual Folder Tree Node Component
  */
 function FolderTreeNode({
@@ -87,21 +128,6 @@ function FolderTreeNode({
         ) : (
           <Folder className="h-4 w-4 text-gray-600" />
         );
-    }
-  };
-
-  const getSyncStatusColor = (status: string): string => {
-    switch (status) {
-      case "synced":
-        return "text-green-600";
-      case "syncing":
-        return "text-blue-600";
-      case "pending":
-        return "text-yellow-600";
-      case "error":
-        return "text-red-600";
-      default:
-        return "text-gray-600";
     }
   };
 
@@ -243,27 +269,6 @@ export function ImapFolderTree({
   const handleView = (folderId: string): void => {
     // Navigate to messages view for the specific folder
     router.push(`/admin/emails/imap/messages?folderId=${folderId}`);
-  };
-
-  // Convert API folder data to tree structure
-  const buildFolderTree = (
-    folders: NonNullable<ImapFoldersListResponseOutput["folders"]>,
-  ): FolderNode[] => {
-    return folders.map((folder) => ({
-      id: folder.id,
-      name: folder.name,
-      displayName: folder.displayName || folder.name,
-      path: folder.path,
-      specialUseType: folder.specialUseType || undefined,
-      messageCount: folder.messageCount,
-      unseenCount: folder.unseenCount,
-      recentCount: 0, // API doesn't provide recentCount yet
-      isSelectable: folder.isSelectable,
-      hasChildren: folder.hasChildren,
-      syncStatus: folder.syncStatus,
-      lastSyncAt: folder.createdAt, // Use createdAt as placeholder until API provides lastSyncAt
-      children: [], // Hierarchical structure will be implemented when folder nesting is required
-    }));
   };
 
   const folderTree = buildFolderTree(folders);

@@ -8,11 +8,16 @@
 import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
 
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 export interface Toast {
   id: string;
   title?: ReactNode;
   description?: ReactNode;
-  action?: any;
+  action?: ToastAction;
   variant?: "default" | "destructive";
 }
 

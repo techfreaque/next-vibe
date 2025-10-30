@@ -10,7 +10,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {
-  DeleteEndpointTypes,
   EndpointReturn,
   EndpointUrlVariables,
   FormAlertState,
@@ -98,13 +97,8 @@ function normalizeOptions<T>(options: UseEndpointOptions<T> = {}): {
  * @returns Object with all available operations based on endpoint methods
  */
 export function useEndpoint<
-  T extends Partial<
-    Record<
-      Methods,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
-    >
-  >,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends Partial<Record<Methods, CreateApiEndpoint<any, any, any, any>>>,
 >(
   endpoints: T,
   options: UseEndpointOptions<T> = {},

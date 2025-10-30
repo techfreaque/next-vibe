@@ -52,7 +52,9 @@ export function useIntersectionObserver<T extends Element>(
     const node = ref.current;
 
     if (!node) {
-      return (): void => {};
+      return (): void => {
+        // No cleanup needed when node is null
+      };
     }
 
     const observer = new IntersectionObserver(

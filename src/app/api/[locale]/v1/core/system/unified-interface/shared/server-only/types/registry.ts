@@ -23,7 +23,7 @@ export interface DiscoveredEndpoint {
   definition: CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     UnifiedField<z.ZodTypeAny>
   >;
   enabled: boolean;
@@ -54,7 +54,7 @@ export interface DiscoveredEndpointMetadata {
   tags: readonly string[]; // Translation keys for tags
 
   // Access Control
-  allowedRoles: readonly (typeof UserRoleValue)[];
+  allowedRoles: readonly UserRoleValue[];
   requiresAuth: boolean;
 
   // Schemas
@@ -124,7 +124,7 @@ export interface IEndpointRegistry {
  */
 export interface EndpointFilterCriteria {
   methods?: Methods[];
-  roles?: (typeof UserRoleValue)[];
+  roles?: UserRoleValue[];
   categories?: string[];
   tags?: string[];
   requiresAuth?: boolean;

@@ -29,13 +29,11 @@ import type { Methods } from "../../types/enums";
 
 // Test 1.1: PrimitiveField extends UnifiedField
 type Test1_1_PrimitiveField = PrimitiveField<z.ZodString, { request: "data" }>;
-type Test1_1_Result =
-  Test1_1_PrimitiveField extends UnifiedField<z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
-// Test 1.2: ObjectField with any children extends UnifiedField
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Test1_2_ObjectField = ObjectField<any, { request: "data" }>;
+// Test 1.2: ObjectField with record children extends UnifiedField
+type Test1_2_ObjectField = ObjectField<
+  Record<string, UnifiedField<z.ZodTypeAny>>,
+  { request: "data" }
+>;
 type Test1_2_Result =
   Test1_2_ObjectField extends UnifiedField<z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test1_2: Test1_2_Result = "✓ PASS";
@@ -49,10 +47,10 @@ type Test1_3_Result =
   Test1_3_ObjectField extends UnifiedField<z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test1_3: Test1_3_Result = "✓ PASS";
 
-// Test 1.4: ObjectField with any usage extends UnifiedField
+// Test 1.4: ObjectField with flexible usage extends UnifiedField
 type Test1_4_ObjectField = ObjectField<
   { name: PrimitiveField<z.ZodString, { request: "data" }> },
-  any
+  { request: "data" } | { response: true } | { request: "data"; response: true }
 >;
 type Test1_4_Result =
   Test1_4_ObjectField extends UnifiedField<z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
@@ -104,7 +102,7 @@ const test2_1: Test2_1_Result = "✓ PASS";
 type Test3_1_Endpoint = ApiEndpoint<
   "test",
   Methods.POST,
-  readonly (typeof UserRoleValue)[],
+  readonly UserRoleValue[],
   ObjectField<
     { name: PrimitiveField<z.ZodString, { request: "data" }> },
     { request: "data" }
@@ -115,8 +113,8 @@ type Test3_1_Result =
   Test3_1_Endpoint extends ApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
-    any
+    readonly UserRoleValue[],
+    UnifiedField<z.ZodTypeAny>
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -126,14 +124,14 @@ const test3_1: Test3_1_Result = "✓ PASS";
 type Test3_2_Endpoint = ApiEndpoint<
   "test",
   Methods.POST,
-  readonly (typeof UserRoleValue)[],
+  readonly UserRoleValue[],
   Test2_1_NestedObjectField
 >;
 type Test3_2_Result =
   Test3_2_Endpoint extends ApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >
     ? "✓ PASS"
@@ -148,7 +146,7 @@ const test3_2: Test3_2_Result = "✓ PASS";
 type Test4_1_CreateEndpoint = CreateApiEndpoint<
   "test",
   Methods.POST,
-  readonly (typeof UserRoleValue)[],
+  readonly UserRoleValue[],
   ObjectField<
     { name: PrimitiveField<z.ZodString, { request: "data" }> },
     { request: "data" }
@@ -158,7 +156,7 @@ type Test4_1_Result =
   Test4_1_CreateEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >
     ? "✓ PASS"
@@ -169,14 +167,14 @@ const test4_1: Test4_1_Result = "✓ PASS";
 type Test4_2_CreateEndpoint = CreateApiEndpoint<
   "test",
   Methods.POST,
-  readonly (typeof UserRoleValue)[],
+  readonly UserRoleValue[],
   Test2_1_NestedObjectField
 >;
 type Test4_2_Result =
   Test4_2_CreateEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >
     ? "✓ PASS"
@@ -216,7 +214,7 @@ const test5_1: Test5_1_Result = "✓ PASS";
 type Test5_2_LoginEndpoint = CreateApiEndpoint<
   "default",
   Methods.POST,
-  readonly (typeof UserRoleValue)[],
+  readonly UserRoleValue[],
   Test5_1_LoginFields
 >;
 
@@ -224,7 +222,7 @@ type Test5_2_Result =
   Test5_2_LoginEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >
     ? "✓ PASS"
@@ -261,7 +259,7 @@ type Test6_3_NestedGeneric<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     TFields
   >,
 > = TEndpoint;
@@ -273,7 +271,7 @@ type Test6_3_Result =
   > extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >
     ? "✓ PASS"
@@ -289,7 +287,7 @@ type Test7_1_UseApiForm = <
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >,
 >(
@@ -309,7 +307,7 @@ type Test7_2_AcceptsAnyEndpoint = (
   endpoint: CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >,
 ) => void;
@@ -330,7 +328,7 @@ type Test8_1_UseApiFormCurrent = <
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >,
 >(
@@ -346,8 +344,6 @@ const test8_1: Test8_1_Result = "✓ PASS";
 
 // Test 8.2: Test that we can infer types from the endpoint
 type Test8_2_InferredRequest = Test5_2_LoginEndpoint["TRequestOutput"];
-type Test8_2_InferredResponse = Test5_2_LoginEndpoint["TResponseOutput"];
-type Test8_2_InferredUrlVars = Test5_2_LoginEndpoint["TUrlVariablesOutput"];
 
 // Check that inferred types are not 'never'
 type Test8_2_RequestResult = Test8_2_InferredRequest extends never
@@ -461,17 +457,13 @@ const test10_4: Test10_4_Result = "✓ PASS";
 // ============================================================================
 
 // Test 11.1: Record of endpoints with different methods
-type Test11_1_EndpointRecord = Record<
-  string,
-  CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
->;
 
 interface Test11_1_LoginEndpoints {
   POST: Test5_2_LoginEndpoint;
   GET: CreateApiEndpoint<
     "status",
     Methods.GET,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     ObjectField<Record<string, never>, { response: true }>
   >;
 }
@@ -486,7 +478,7 @@ const test11_1: Test11_1_Result = "✓ PASS";
 type Test11_2_UseEndpoint = <
   T extends Record<
     string,
-    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
+    CreateApiEndpoint<string, Methods, readonly UserRoleValue[], any>
   >,
 >(
   endpoints: T,
@@ -520,7 +512,7 @@ type Test12_1_CustomField = ObjectField<
 type Test12_1_CustomEndpoint = CreateApiEndpoint<
   "custom",
   Methods.POST,
-  readonly (typeof UserRoleValue)[],
+  readonly UserRoleValue[],
   Test12_1_CustomField
 >;
 
@@ -528,7 +520,7 @@ type Test12_1_Result =
   Test12_1_CustomEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >
     ? "✓ PASS"
@@ -568,7 +560,7 @@ const test13_1: Test13_1_Result = "✓ PASS";
 type Test13_2_OptionalEndpoint = CreateApiEndpoint<
   "optional",
   Methods.POST,
-  readonly (typeof UserRoleValue)[],
+  readonly UserRoleValue[],
   Test13_1_OptionalFields
 >;
 type Test13_2_Request = Test13_2_OptionalEndpoint["TRequestOutput"];
@@ -588,7 +580,7 @@ const test13_2: Test13_2_Result = "✓ PASS";
 type Test14_1_GetEndpoint = CreateApiEndpoint<
   "get",
   Methods.GET,
-  readonly (typeof UserRoleValue)[],
+  readonly UserRoleValue[],
   ObjectField<
     {
       data: PrimitiveField<z.ZodString, { response: true }>;
@@ -600,7 +592,7 @@ type Test14_1_Result =
   Test14_1_GetEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >
     ? "✓ PASS"
@@ -623,7 +615,7 @@ type Test14_2_Result =
   Test14_2_DeleteEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >
     ? "✓ PASS"
@@ -702,7 +694,7 @@ type Test16_1_UseApiFormSignature = <
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >,
 >(
@@ -720,14 +712,6 @@ type Test16_1_Result = Test5_2_LoginEndpoint extends Test16_1_CanCall
 const test16_1: Test16_1_Result = "✓ PASS";
 
 // Test 16.2: useEndpoint with Record of endpoints
-type Test16_2_UseEndpointSignature = <
-  T extends Record<
-    string,
-    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
-  >,
->(
-  endpoints: T,
-) => any;
 
 // Create a test record
 interface Test16_2_TestRecord {
@@ -735,7 +719,7 @@ interface Test16_2_TestRecord {
   logout: CreateApiEndpoint<
     "logout",
     Methods.POST,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     ObjectField<Record<string, never>, { response: true }>
   >;
 }
@@ -837,7 +821,7 @@ interface Test20_1_MultiEndpoint {
   default: CreateApiEndpoint<
     "default",
     Methods.POST,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     ObjectField<
       {
         email: PrimitiveField<z.ZodString, { request: "data" }>;
@@ -848,7 +832,7 @@ interface Test20_1_MultiEndpoint {
   verify: CreateApiEndpoint<
     "verify",
     Methods.POST,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     ObjectField<
       {
         code: PrimitiveField<z.ZodString, { request: "data" }>;
@@ -859,7 +843,7 @@ interface Test20_1_MultiEndpoint {
   resend: CreateApiEndpoint<
     "resend",
     Methods.POST,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     ObjectField<Record<string, never>, { response: true }>
   >;
 }
@@ -869,7 +853,7 @@ type Test20_1_DefaultValid =
   Test20_1_MultiEndpoint["default"] extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     any
   >
     ? "✓ PASS"

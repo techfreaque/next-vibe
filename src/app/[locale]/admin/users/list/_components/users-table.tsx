@@ -32,6 +32,30 @@ interface UsersTableProps {
   isLoading: boolean;
 }
 
+const getStatusConfig = (
+  user: UserType,
+): {
+  variant: "default" | "destructive" | "secondary";
+  label: TranslationKey;
+} => {
+  if (!user.isActive) {
+    return {
+      variant: "destructive" as const,
+      label: "app.admin.users.status.inactive",
+    };
+  }
+  if (!user.emailVerified) {
+    return {
+      variant: "secondary" as const,
+      label: "app.admin.users.status.email_unverified",
+    };
+  }
+  return {
+    variant: "default" as const,
+    label: "app.admin.users.status.active",
+  };
+};
+
 export function UsersTable({
   locale,
   users,
@@ -53,31 +77,6 @@ export function UsersTable({
     },
     [locale, t],
   );
-
-  // Get status configuration
-  const getStatusConfig = (
-    user: UserType,
-  ): {
-    variant: "default" | "destructive" | "secondary";
-    label: TranslationKey;
-  } => {
-    if (!user.isActive) {
-      return {
-        variant: "destructive" as const,
-        label: "app.admin.users.status.inactive",
-      };
-    }
-    if (!user.emailVerified) {
-      return {
-        variant: "secondary" as const,
-        label: "app.admin.users.status.email_unverified",
-      };
-    }
-    return {
-      variant: "default" as const,
-      label: "app.admin.users.status.active",
-    };
-  };
 
   if (isLoading && users.length === 0) {
     return (

@@ -8,7 +8,6 @@
 import { Filter, List, Plus, RefreshCw, Table, Users } from "lucide-react";
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
-import { Form } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
@@ -132,11 +131,7 @@ export function SmtpAccountsClient({
             </span>
           </div>
 
-          <Form
-            form={smtpAccountsEndpoint.read.form}
-            onSubmit={() => {}}
-            className="space-y-4"
-          >
+          <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Search Field */}
               <EndpointFormField
@@ -297,7 +292,7 @@ export function SmtpAccountsClient({
                 </span>
               </div>
             </div>
-          </Form>
+          </div>
         </div>
 
         {/* SMTP Accounts Content - List or Table View */}

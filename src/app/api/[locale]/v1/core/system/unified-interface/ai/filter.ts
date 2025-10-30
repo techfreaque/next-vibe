@@ -13,7 +13,11 @@ import {
   type UserRoleValue,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { AI_CONFIG, Platform } from "../shared/server-only/config";
+import {
+  AI_CONFIG,
+  type AIPlatformSpecific,
+  Platform,
+} from "../shared/server-only/config";
 import type {
   AIToolExecutionContext,
   DiscoveredEndpoint,
@@ -286,9 +290,10 @@ export class ToolFilter implements IToolFilter {
       return 3; // Limited for public users
     }
 
+    const aiSpecific = AI_CONFIG.platformSpecific as AIPlatformSpecific;
     const maxTools =
-      typeof AI_CONFIG.platformSpecific?.maxToolsPerRequest === "number"
-        ? AI_CONFIG.platformSpecific.maxToolsPerRequest
+      typeof aiSpecific?.maxToolsPerRequest === "number"
+        ? aiSpecific.maxToolsPerRequest
         : 10;
 
     // Authenticated users get full access

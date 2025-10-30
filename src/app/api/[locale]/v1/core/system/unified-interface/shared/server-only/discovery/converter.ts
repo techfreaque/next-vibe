@@ -22,7 +22,7 @@ interface SimpleEndpointDefinition {
   description?: string;
   category?: string;
   tags?: readonly string[];
-  allowedRoles?: readonly (typeof UserRoleValue)[];
+  allowedRoles?: readonly UserRoleValue[];
   requestSchema?: z.ZodTypeAny;
   responseSchema?: z.ZodTypeAny;
   credits?: number;
@@ -126,7 +126,7 @@ export function convertEndpointsToMetadata(
                   : "",
               tags: Array.isArray(methodDef.tags) ? methodDef.tags : [],
               allowedRoles: Array.isArray(methodDef.allowedRoles)
-                ? (methodDef.allowedRoles as readonly (typeof UserRoleValue)[])
+                ? (methodDef.allowedRoles as readonly UserRoleValue[])
                 : [],
               requiresAuth: !methodDef.allowedRoles?.includes("PUBLIC"),
               requestSchema: methodDef.requestSchema,

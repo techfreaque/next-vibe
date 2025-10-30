@@ -67,6 +67,49 @@ interface SubscriptionClientContentProps {
   } | null;
 }
 
+const getTransactionTypeKey = (
+  type: string,
+):
+  | "app.subscription.subscription.history.types.purchase"
+  | "app.subscription.subscription.history.types.subscription"
+  | "app.subscription.subscription.history.types.usage"
+  | "app.subscription.subscription.history.types.expiry"
+  | "app.subscription.subscription.history.types.free_tier" => {
+  switch (type) {
+    case "purchase":
+      return "app.subscription.subscription.history.types.purchase";
+    case "subscription":
+      return "app.subscription.subscription.history.types.subscription";
+    case "usage":
+      return "app.subscription.subscription.history.types.usage";
+    case "expiry":
+      return "app.subscription.subscription.history.types.expiry";
+    case "free_tier":
+      return "app.subscription.subscription.history.types.free_tier";
+    default:
+      return "app.subscription.subscription.history.types.usage"; // fallback
+  }
+};
+
+const formatDate = (
+  date: string | Date,
+  locale: CountryLanguage,
+): string => {
+  try {
+    const dateObject = new Date(date);
+    return formatSimpleDate(dateObject, locale);
+  } catch {
+    return new Date(date).toLocaleDateString();
+  }
+};
+
+const formatPrice = (amount: number, locale: CountryLanguage): string => {
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(amount);
+};
+
 export function SubscriptionClientContent({
   locale,
   initialCredits,
@@ -75,49 +118,6 @@ export function SubscriptionClientContent({
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
   const [packQuantity, setPackQuantity] = useState(1);
-
-  // Helper to get transaction type translation key
-  const getTransactionTypeKey = (
-    type: string,
-  ):
-    | "app.subscription.subscription.history.types.purchase"
-    | "app.subscription.subscription.history.types.subscription"
-    | "app.subscription.subscription.history.types.usage"
-    | "app.subscription.subscription.history.types.expiry"
-    | "app.subscription.subscription.history.types.free_tier" => {
-    switch (type) {
-      case "purchase":
-        return "app.subscription.subscription.history.types.purchase";
-      case "subscription":
-        return "app.subscription.subscription.history.types.subscription";
-      case "usage":
-        return "app.subscription.subscription.history.types.usage";
-      case "expiry":
-        return "app.subscription.subscription.history.types.expiry";
-      case "free_tier":
-        return "app.subscription.subscription.history.types.free_tier";
-      default:
-        return "app.subscription.subscription.history.types.usage"; // fallback
-    }
-  };
-
-  // Format date with locale support
-  const formatDate = (date: string | Date): string => {
-    try {
-      const dateObject = new Date(date);
-      return formatSimpleDate(dateObject, locale);
-    } catch {
-      return new Date(date).toLocaleDateString();
-    }
-  };
-
-  // Format currency
-  const formatPrice = (amount: number): string => {
-    return new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: "EUR",
-    }).format(amount);
-  };
 
   return (
     <Container className="py-8 space-y-8">
@@ -218,7 +218,7 @@ export function SubscriptionClientContent({
                     {t("app.subscription.subscription.balance.nextExpiration")}
                   </div>
                   <div className="text-lg font-semibold">
-                    {formatDate(initialCredits.expiresAt)}
+                    {formatDate(initialCredits.expiresAt, locale)}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
                     {initialCredits.expiring}{" "}
@@ -487,7 +487,7 @@ export function SubscriptionClientContent({
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <div className="text-4xl font-bold">{formatPrice(10)}</div>
+                  <div className="text-4xl font-bold">{formatPrice(10, locale)}</div>
                   <div className="text-sm text-muted-foreground">
                     {t(
                       "app.subscription.subscription.buy.subscription.perMonth",
@@ -540,7 +540,7 @@ export function SubscriptionClientContent({
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <div className="text-4xl font-bold">{formatPrice(5)}</div>
+                  <div className="text-4xl font-bold">{formatPrice(5, locale)}</div>
                   <div className="text-sm text-muted-foreground">
                     {t("app.subscription.subscription.buy.pack.perPack")}
                   </div>
@@ -612,7 +612,7 @@ export function SubscriptionClientContent({
                   </div>
                   <div className="text-center text-sm text-muted-foreground">
                     {t("app.subscription.subscription.buy.pack.totalPrice", {
-                      price: formatPrice(5 * packQuantity),
+                      price: formatPrice(5 * packQuantity, locale),
                     })}
                   </div>
                 </div>
@@ -687,7 +687,7 @@ export function SubscriptionClientContent({
                             )}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {formatDate(transaction.createdAt)}
+                            {formatDate(transaction.createdAt, locale)}
                           </div>
                         </div>
                         <div className="text-right space-y-1">

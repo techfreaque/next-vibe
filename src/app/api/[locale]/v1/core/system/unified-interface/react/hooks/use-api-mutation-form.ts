@@ -51,8 +51,8 @@ export function useApiForm<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
-    any
+    readonly UserRoleValue[],
+    unknown
   >,
 >(
   endpoint: TEndpoint,

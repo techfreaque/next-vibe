@@ -15,6 +15,28 @@ import { env } from "@/config/env";
 import type { MCPServerConfig } from "./types";
 
 /**
+ * Get MCP capabilities from platform config
+ */
+function getMCPCapabilities(): {
+  tools: boolean;
+  prompts: boolean;
+  resources: boolean;
+} {
+  const platformSpecific = MCP_CONFIG.platformSpecific;
+
+  if (platformSpecific) {
+    return platformSpecific.capabilities;
+  }
+
+  // Fallback to defaults
+  return {
+    tools: true,
+    prompts: false,
+    resources: false,
+  };
+}
+
+/**
  * MCP Server Configuration
  * @deprecated Use MCP_CONFIG from unified platform instead
  */
@@ -24,15 +46,7 @@ export const mcpConfig: MCPServerConfig = {
   version: "1.0.0",
   locale: env.VIBE_LOCALE,
   debug: process.env.DEBUG === "true" || process.env.VIBE_LOG_LEVEL === "debug",
-  capabilities: (MCP_CONFIG.platformSpecific?.capabilities as {
-    tools: boolean;
-    prompts: boolean;
-    resources: boolean;
-  }) || {
-    tools: true,
-    prompts: false,
-    resources: false,
-  },
+  capabilities: getMCPCapabilities(),
   rootDir: MCP_CONFIG.rootDir,
   excludePaths: MCP_CONFIG.excludePaths,
 };

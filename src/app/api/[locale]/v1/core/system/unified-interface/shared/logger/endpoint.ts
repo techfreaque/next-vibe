@@ -15,7 +15,7 @@ export type { EndpointLogger, LoggerMetadata };
 export function createEndpointLogger(
   debugEnabled = false,
   startTime: number = Date.now(),
-  locale: CountryLanguage,
+  _locale: CountryLanguage,
 ): EndpointLogger {
   const getElapsedTime = (): string => {
     const elapsed = (Date.now() - startTime) / 1000;

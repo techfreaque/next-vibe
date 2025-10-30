@@ -658,7 +658,7 @@ export interface EndpointFormFieldProps<
     "requiredFields"
   > {
   schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
-  endpointFields?: any; // Endpoint fields for auto-inference (from definition.POST.fields)
+  endpointFields?: unknown; // Endpoint fields for auto-inference (from definition.POST.fields)
 }
 
 /**
@@ -767,7 +767,7 @@ export interface EndpointFormFieldsProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
   requiredFields?: string[];
   schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
-  endpointFields?: any; // Endpoint fields for auto-inference
+  endpointFields?: unknown; // Endpoint fields for auto-inference
   theme?: RequiredFieldTheme;
   className?: string;
   fieldClassName?: string;

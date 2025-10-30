@@ -8,7 +8,6 @@
 import { Filter, List, RefreshCw, Table } from "lucide-react";
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
-import { Form } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
@@ -143,11 +142,7 @@ export function UsersListClient({
             </span>
           </div>
 
-          <Form
-            form={usersEndpoint.read.form}
-            onSubmit={() => {}}
-            className="space-y-4"
-          >
+          <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Search Field */}
               <EndpointFormField
@@ -317,7 +312,7 @@ export function UsersListClient({
                 {t("app.admin.users.list.filters.clear")}
               </Button>
             </div>
-          </Form>
+          </div>
         </div>
 
         {/* Results Summary */}

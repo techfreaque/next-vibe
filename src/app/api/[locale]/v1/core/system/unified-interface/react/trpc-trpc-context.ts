@@ -9,7 +9,7 @@ import { validateData } from "next-vibe/shared/utils";
 import { z } from "zod";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/leads/types";
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import { authRepository } from "@/app/api/[locale]/v1/core/user/auth/repository";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -31,7 +31,7 @@ import type { InferJwtPayloadTypeFromRoles } from "./trpc-types";
  */
 export interface TRPCContext<
   TUrlParams,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > {
   user: InferJwtPayloadTypeFromRoles<TUserRoleValue> | null;
 
@@ -60,7 +60,7 @@ export interface TRPCContext<
  */
 export async function createTRPCContext<
   TUrlParams,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 >(opts: {
   req: NextRequest;
   urlPathParams?: TUrlParams;
@@ -104,7 +104,7 @@ export async function createTRPCContext<
   // Authenticate user using the existing auth system
   // Use getAuthMinimalUser which properly handles PUBLIC role with leadId creation
   let user: JwtPayloadType;
-  let userRoles: (typeof UserRoleValue)[] = [];
+  let userRoles: UserRoleValue[] = [];
 
   try {
     // Try to get authenticated user first
@@ -179,10 +179,10 @@ export async function createTRPCContext<
 export async function createAuthenticatedTRPCContext(opts: {
   req: NextRequest;
   urlPathParams?: Record<string, string>;
-  requiredRoles?: readonly (typeof UserRoleValue)[];
+  requiredRoles?: readonly UserRoleValue[];
   locale: CountryLanguage;
 }): Promise<
-  TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]> & {
+  TRPCContext<Record<string, string>, readonly UserRoleValue[]> & {
     user: JwtPayloadType;
   }
 > {

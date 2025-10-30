@@ -64,7 +64,7 @@ export type ValidationMode =
 export interface ApiEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields,
 > {
   // Core endpoint metadata - all required for type safety
@@ -291,7 +291,7 @@ function generateResponseSchema<F>(
 export type CreateApiEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields,
   RequestInput = ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.RequestData>
@@ -344,7 +344,7 @@ export type CreateEndpointReturnInMethod<
   TFields,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > = {
   readonly [KMethod in TMethod]: CreateApiEndpoint<
     TExampleKey,
@@ -362,7 +362,7 @@ export function createEndpoint<
   const TFields,
   const TExampleKey extends string,
   const TMethod extends Methods,
-  const TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  const TUserRoleValue extends readonly UserRoleValue[],
 >(
   config: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
 ): CreateEndpointReturnInMethod<TFields, TExampleKey, TMethod, TUserRoleValue> {

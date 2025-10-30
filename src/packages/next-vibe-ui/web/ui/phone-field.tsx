@@ -159,6 +159,7 @@ export function PhoneField({
             variant="outline"
             role="combobox"
             aria-expanded={open}
+            aria-controls="country-listbox"
             className={cn(
               "w-[120px] justify-between rounded-r-none border-r-0 h-10",
               disabled && "cursor-not-allowed opacity-50",
@@ -173,7 +174,7 @@ export function PhoneField({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-0" align="start">
-          <Command>
+          <Command id="country-listbox">
             <CommandInput placeholder={t("app.common.searchCountries")} />
             <CommandList className="max-h-[200px]">
               <CommandEmpty>{t("app.common.noCountryFound")}</CommandEmpty>

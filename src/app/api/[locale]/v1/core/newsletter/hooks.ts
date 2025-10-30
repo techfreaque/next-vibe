@@ -2,7 +2,7 @@
 
 /**
  * Newsletter API Hooks
- * Simplified hooks for interacting with the Newsletter API
+ * Type-safe hooks for newsletter subscription management
  */
 
 import { type ChangeEvent, useCallback, useMemo } from "react";
@@ -11,16 +11,8 @@ import {
   createCustomStateKey,
   useCustomState,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
-import type {
-  ApiFormReturn,
-  ApiQueryReturn,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/types";
-import type { EnhancedMutationResult } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-api-mutation";
-import {
-  useApiForm,
-  useApiMutation,
-  useApiQuery,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
+import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useUser } from "@/app/api/[locale]/v1/core/user/private/me/hooks";
 import { useTranslation } from "@/i18n/core/client";
@@ -29,22 +21,12 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import statusEndpoints, {
   type StatusGetResponseOutput,
 } from "./status/definition";
-import type {
-  SubscribePostRequestOutput,
-  SubscribePostResponseOutput,
-} from "./subscribe/definition";
 import subscribeEndpoints from "./subscribe/definition";
-import type {
-  UnsubscribePostRequestOutput,
-  UnsubscribePostResponseOutput,
-} from "./unsubscribe/definition";
 import unsubscribeEndpoints from "./unsubscribe/definition";
 
 /****************************
  * TYPED STATE KEYS
  ****************************/
-
-// Create typed state keys for newsletter-related state
 
 // eslint-disable-next-line i18next/no-literal-string
 const manualEmailKey = createCustomStateKey<string>("newsletter_manual_email");
@@ -54,45 +36,41 @@ const showConfirmUnsubscribeKey = createCustomStateKey<boolean>(
 );
 
 /****************************
- * QUERY HOOKS
+ * BASIC HOOKS
  ****************************/
 
 /**
- * Hook for fetching newsletter status
+ * Hook for newsletter status
  */
 export function useNewsletterStatus(params: {
   email: string;
   enabled?: boolean;
-}): ApiQueryReturn<StatusGetResponseOutput> {
+}): EndpointReturn<typeof statusEndpoints> {
   const { locale } = useTranslation();
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
 
-  return useApiQuery({
-    endpoint: statusEndpoints.GET,
-    requestData: { email: params.email },
-    urlPathParams: undefined,
-    logger,
-    options: {
-      enabled: params.enabled !== false,
+  return useEndpoint(
+    statusEndpoints,
+    {
+      queryOptions: {
+        enabled: params.enabled !== false,
+      },
+      formOptions: {
+        defaultValues: { email: params.email },
+      },
     },
-  });
+    logger,
+  );
 }
 
-/****************************
- * FORM HOOKS
- ****************************/
-
 /**
- * Hook for newsletter subscription with form validation
- * Server gets leadId from JWT payload (user.leadId)
+ * Hook for newsletter subscription
  */
-export function useNewsletterSubscription(): ApiFormReturn<
-  SubscribePostRequestOutput,
-  SubscribePostResponseOutput,
-  never
+export function useNewsletterSubscription(): EndpointReturn<
+  typeof subscribeEndpoints
 > {
   const { locale } = useTranslation();
   const logger = useMemo(
@@ -100,25 +78,26 @@ export function useNewsletterSubscription(): ApiFormReturn<
     [locale],
   );
 
-  const formResult = useApiForm(subscribeEndpoints.POST, logger, {
-    defaultValues: {
-      email: "",
-      name: "",
-      preferences: [],
-      // Note: leadId removed - server gets it from JWT
+  return useEndpoint(
+    subscribeEndpoints,
+    {
+      formOptions: {
+        defaultValues: {
+          email: "",
+          name: "",
+          preferences: [],
+        },
+      },
     },
-  });
-
-  return formResult;
+    logger,
+  );
 }
 
 /**
  * Hook for newsletter unsubscription
  */
-export function useNewsletterUnsubscription(): ApiFormReturn<
-  UnsubscribePostRequestOutput,
-  UnsubscribePostResponseOutput,
-  never
+export function useNewsletterUnsubscription(): EndpointReturn<
+  typeof unsubscribeEndpoints
 > {
   const { locale } = useTranslation();
   const logger = useMemo(
@@ -126,57 +105,17 @@ export function useNewsletterUnsubscription(): ApiFormReturn<
     [locale],
   );
 
-  return useApiForm(unsubscribeEndpoints.POST, logger, {
-    defaultValues: {
-      email: "",
+  return useEndpoint(
+    unsubscribeEndpoints,
+    {
+      formOptions: {
+        defaultValues: {
+          email: "",
+        },
+      },
     },
-  });
-}
-
-/****************************
- * MUTATION HOOKS
- ****************************/
-
-/**
- * Hook for subscription mutations
- * @deprecated Use useNewsletterManager instead for comprehensive newsletter management
- */
-export function useSubscriptionMutation(): EnhancedMutationResult<
-  SubscribePostResponseOutput,
-  SubscribePostRequestOutput,
-  never
-> {
-  const { locale } = useTranslation();
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
+    logger,
   );
-
-  return useApiMutation(subscribeEndpoints.POST, logger, {
-    onSuccess: () => {},
-    onError: () => {},
-  });
-}
-
-/**
- * Hook for unsubscription mutations
- * @deprecated Use useNewsletterManager instead for comprehensive newsletter management
- */
-export function useUnsubscriptionMutation(): EnhancedMutationResult<
-  UnsubscribePostResponseOutput,
-  UnsubscribePostRequestOutput,
-  never
-> {
-  const { locale } = useTranslation();
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
-
-  return useApiMutation(unsubscribeEndpoints.POST, logger, {
-    onSuccess: () => {},
-    onError: () => {},
-  });
 }
 
 /****************************
@@ -215,6 +154,7 @@ export function useNewsletterManager(): NewsletterManagerResult {
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
+
   // Fetch current user data to get email
   const { user, isLoggedIn } = useUser(logger);
 
@@ -239,19 +179,9 @@ export function useNewsletterManager(): NewsletterManagerResult {
 
   const isCurrentEmailValid = email ? isValidEmail(email) : false;
 
-  // Hooks for newsletter operations using mutations
-  const subscriptionMutation = useApiMutation(subscribeEndpoints.POST, logger, {
-    onSuccess: () => {},
-    onError: () => {},
-  });
-  const unsubscribeMutation = useApiMutation(
-    unsubscribeEndpoints.POST,
-    logger,
-    {
-      onSuccess: () => {},
-      onError: () => {},
-    },
-  );
+  // Hooks for newsletter operations
+  const subscriptionEndpoint = useEndpoint(subscribeEndpoints, {}, logger);
+  const unsubscribeEndpoint = useEndpoint(unsubscribeEndpoints, {}, logger);
 
   // Handle email change - only allow changes when not logged in
   const handleEmailChange = useCallback(
@@ -265,16 +195,19 @@ export function useNewsletterManager(): NewsletterManagerResult {
 
   // Check if any operation is in progress
   const isAnyOperationInProgress = useMemo(() => {
-    return subscriptionMutation.isPending || unsubscribeMutation.isPending;
-  }, [subscriptionMutation.isPending, unsubscribeMutation.isPending]);
+    return (
+      (subscriptionEndpoint.create?.isPending ?? false) ||
+      (unsubscribeEndpoint.create?.isPending ?? false)
+    );
+  }, [subscriptionEndpoint.create?.isPending, unsubscribeEndpoint.create?.isPending]);
 
-  // Check status when we have a valid email but don't auto-trigger on typing
-  const statusQuery = useNewsletterStatus({
+  // Check status when we have a valid email
+  const statusEndpoint = useNewsletterStatus({
     email: email || "",
     enabled:
       isCurrentEmailValid &&
-      !subscriptionMutation.isPending &&
-      !unsubscribeMutation.isPending,
+      !(subscriptionEndpoint.create?.isPending ?? false) &&
+      !(unsubscribeEndpoint.create?.isPending ?? false),
   });
 
   // Type guard for newsletter status response
@@ -290,40 +223,41 @@ export function useNewsletterManager(): NewsletterManagerResult {
     );
   };
 
-  const isSubscribed = isNewsletterStatusResponse(statusQuery.data)
-    ? statusQuery.data.subscribed
+  const isSubscribed = isNewsletterStatusResponse(statusEndpoint.read?.data)
+    ? statusEndpoint.read.data.subscribed
     : false;
 
   // Override subscription status based on recent mutations for immediate UI feedback
-  const effectiveIsSubscribed = unsubscribeMutation.isSuccess
-    ? false
-    : subscriptionMutation.isSuccess
-      ? true
-      : isSubscribed;
+  const effectiveIsSubscribed =
+    unsubscribeEndpoint.create?.isSuccess ?? false
+      ? false
+      : subscriptionEndpoint.create?.isSuccess ?? false
+        ? true
+        : isSubscribed;
 
-  // Single notification state (priority: errors > success > confirmation > subscription status)
+  // Single notification state
   const notification: NewsletterManagerResult["notification"] =
     useMemo((): NewsletterManagerResult["notification"] => {
-      if (subscriptionMutation.error) {
+      if (subscriptionEndpoint.create?.error) {
         return {
           type: "error",
           message: "app.api.v1.core.newsletter.subscription.error.description",
         };
       }
-      if (unsubscribeMutation.error) {
+      if (unsubscribeEndpoint.create?.error) {
         return {
           type: "error",
           message: "app.api.v1.core.newsletter.subscription.unsubscribe.error",
         };
       }
-      if (subscriptionMutation.isSuccess) {
+      if (subscriptionEndpoint.create?.isSuccess ?? false) {
         return {
           type: "success",
           message:
             "app.api.v1.core.newsletter.subscribe.post.success.description",
         };
       }
-      if (unsubscribeMutation.isSuccess) {
+      if (unsubscribeEndpoint.create?.isSuccess ?? false) {
         return {
           type: "success",
           message:
@@ -346,10 +280,10 @@ export function useNewsletterManager(): NewsletterManagerResult {
       }
       return null;
     }, [
-      subscriptionMutation.error,
-      subscriptionMutation.isSuccess,
-      unsubscribeMutation.error,
-      unsubscribeMutation.isSuccess,
+      subscriptionEndpoint.create?.error,
+      subscriptionEndpoint.create?.isSuccess,
+      unsubscribeEndpoint.create?.error,
+      unsubscribeEndpoint.create?.isSuccess,
       showConfirmUnsubscribe,
       isSubscribed,
       isCurrentEmailValid,
@@ -362,19 +296,13 @@ export function useNewsletterManager(): NewsletterManagerResult {
         ? isValidEmail(emailParam)
         : isCurrentEmailValid;
 
-      if (emailToUse && isEmailValid) {
-        // Reset unsubscribe mutation to clear any previous unsubscribe success/error
-        unsubscribeMutation.reset();
-        // Reset confirmation state
+      if (emailToUse && isEmailValid && subscriptionEndpoint.create) {
+        // Reset unsubscribe endpoint
+        unsubscribeEndpoint.create?.reset();
         setShowConfirmUnsubscribe(false);
 
-        // Server gets leadId from JWT payload (user.leadId)
-        subscriptionMutation.mutate({
-          requestData: {
-            email: emailToUse,
-            // Note: leadId removed - server gets it from JWT
-          },
-          urlPathParams: undefined,
+        subscriptionEndpoint.create.mutate({
+          email: emailToUse,
         });
       }
     },
@@ -382,8 +310,8 @@ export function useNewsletterManager(): NewsletterManagerResult {
       email,
       isCurrentEmailValid,
       isValidEmail,
-      unsubscribeMutation,
-      subscriptionMutation,
+      unsubscribeEndpoint.create,
+      subscriptionEndpoint.create,
       setShowConfirmUnsubscribe,
     ],
   );
@@ -395,25 +323,20 @@ export function useNewsletterManager(): NewsletterManagerResult {
         ? isValidEmail(emailParam)
         : isCurrentEmailValid;
 
-      if (emailToUse && isEmailValid) {
+      if (emailToUse && isEmailValid && unsubscribeEndpoint.create) {
         if (!showConfirmUnsubscribe) {
           // Clear any existing messages before showing confirmation
-          subscriptionMutation.reset();
-          unsubscribeMutation.reset();
+          subscriptionEndpoint.create?.reset();
+          unsubscribeEndpoint.create?.reset();
           setShowConfirmUnsubscribe(true);
           return;
         }
 
-        // Reset subscription mutation to clear any previous subscription success/error
-        subscriptionMutation.reset();
+        // Reset subscription endpoint
+        subscriptionEndpoint.create?.reset();
 
-        // Server gets leadId from JWT payload (user.leadId)
-        const requestData = {
+        unsubscribeEndpoint.create.mutate({
           email: emailToUse,
-        };
-        unsubscribeMutation.mutate({
-          requestData,
-          urlPathParams: undefined,
         });
         setShowConfirmUnsubscribe(false);
       }
@@ -423,8 +346,8 @@ export function useNewsletterManager(): NewsletterManagerResult {
       isCurrentEmailValid,
       isValidEmail,
       showConfirmUnsubscribe,
-      subscriptionMutation,
-      unsubscribeMutation,
+      subscriptionEndpoint.create,
+      unsubscribeEndpoint.create,
       setShowConfirmUnsubscribe,
     ],
   );
@@ -433,21 +356,27 @@ export function useNewsletterManager(): NewsletterManagerResult {
     (newEmail: string): void => {
       if (!isLoggedIn) {
         setManualEmail(newEmail);
-        setShowConfirmUnsubscribe(false); // Reset confirmation state when email changes
+        setShowConfirmUnsubscribe(false);
 
         // Clear success/error messages when user starts typing
-        if (subscriptionMutation.isSuccess || subscriptionMutation.isError) {
-          subscriptionMutation.reset();
+        if (
+          subscriptionEndpoint.create?.isSuccess ||
+          subscriptionEndpoint.create?.isError
+        ) {
+          subscriptionEndpoint.create?.reset();
         }
-        if (unsubscribeMutation.isSuccess || unsubscribeMutation.isError) {
-          unsubscribeMutation.reset();
+        if (
+          unsubscribeEndpoint.create?.isSuccess ||
+          unsubscribeEndpoint.create?.isError
+        ) {
+          unsubscribeEndpoint.create?.reset();
         }
       }
     },
     [
       isLoggedIn,
-      subscriptionMutation,
-      unsubscribeMutation,
+      subscriptionEndpoint.create,
+      unsubscribeEndpoint.create,
       setManualEmail,
       setShowConfirmUnsubscribe,
     ],
@@ -458,8 +387,8 @@ export function useNewsletterManager(): NewsletterManagerResult {
     setEmail,
     isLoggedIn,
     isSubscribed: effectiveIsSubscribed,
-    isSubmitting: subscriptionMutation.isPending,
-    isUnsubscribing: unsubscribeMutation.isPending,
+    isSubmitting: subscriptionEndpoint.create?.isPending ?? false,
+    isUnsubscribing: unsubscribeEndpoint.create?.isPending ?? false,
     isAnyOperationInProgress,
     subscribe,
     unsubscribe,
@@ -467,9 +396,13 @@ export function useNewsletterManager(): NewsletterManagerResult {
     notification,
     handleEmailChange,
     clearMessages: useCallback((): void => {
-      subscriptionMutation.reset();
-      unsubscribeMutation.reset();
+      subscriptionEndpoint.create?.reset();
+      unsubscribeEndpoint.create?.reset();
       setShowConfirmUnsubscribe(false);
-    }, [subscriptionMutation, unsubscribeMutation, setShowConfirmUnsubscribe]),
+    }, [
+      subscriptionEndpoint.create,
+      unsubscribeEndpoint.create,
+      setShowConfirmUnsubscribe,
+    ]),
   };
 }

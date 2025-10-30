@@ -12,7 +12,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
@@ -51,12 +51,7 @@ interface SerializableObject {
  * @returns Enhanced query result with extra loading state information
  */
 export function useApiQuery<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    any
-  >,
+  TEndpoint extends CreateApiEndpoint<string, Methods, readonly string[], unknown>,
 >({
   endpoint,
   requestData,
@@ -175,7 +170,7 @@ export function useApiQuery<
         logger.error("Failed to stringify request data", parseError(err));
         requestDataKey =
           typeof requestData === "object"
-            ? Object.keys(requestData).sort().join(",")
+            ? Object.keys(requestData).toSorted().join(",")
             : String(requestData);
       }
     }
@@ -227,7 +222,7 @@ export function useApiQuery<
         logger.error("Failed to stringify URL parameters", parseError(err));
         urlPathParamsKey =
           typeof urlPathParams === "object"
-            ? Object.keys(urlPathParams).sort().join(",")
+            ? Object.keys(urlPathParams).toSorted().join(",")
             : String(urlPathParams);
       }
     }

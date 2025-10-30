@@ -10,6 +10,10 @@ interface PrivacyPolicyClientInteractionProps {
   locale: CountryLanguage;
 }
 
+const handlePrint = (): void => {
+  window.print();
+};
+
 /**
  * Client component for handling user interactions on the Privacy Policy page.
  * This is separated from the main content rendering to minimize client-side JavaScript.
@@ -18,12 +22,6 @@ export function PrivacyPolicyClientInteraction({
   locale,
 }: PrivacyPolicyClientInteractionProps): ReactElement {
   const { t } = simpleT(locale);
-
-  // This component is kept minimal since there's limited interactivity
-  // needed for the Privacy Policy page.
-  const handlePrint = (): void => {
-    window.print();
-  };
 
   return (
     <div className="flex justify-end mb-8">

@@ -69,6 +69,20 @@ export interface TrackingPixelResult {
 export type ClickTrackingResult = ClickTrackingResponseOutput;
 
 /**
+ * Helper to safely extract number from metadata
+ */
+const getMetadataNumber = (
+  meta: Record<string, string | number | boolean> | undefined,
+  key: string,
+): number => {
+  if (!meta) {
+    return 0;
+  }
+  const value = meta[key];
+  return typeof value === "number" ? value : 0;
+};
+
+/**
  * Lead Tracking Repository Interface
  */
 export interface ILeadTrackingRepository {
@@ -731,18 +745,6 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
               },
             );
 
-            // Helper to safely extract number from metadata
-            const getMetadataNumber = (
-              meta: Record<string, string | number | boolean> | undefined,
-              key: string,
-            ): number => {
-              if (!meta) {
-                return 0;
-              }
-              const value = meta[key];
-              return typeof value === "number" ? value : 0;
-            };
-
             // Build properly typed metadata - filter existing metadata to only include valid types
             const filteredMetadata: Record<string, string | number | boolean> =
               {};
@@ -970,7 +972,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
       // Convert typed metadata to flat format for storage
       const flatMetadata: Record<string, string | number | boolean> = {};
-      const customDataPrefix = "custom" + "_"; // Avoid literal string ESLint rule
+      const customDataPrefix = "custom_"; // Avoid literal string ESLint rule
 
       if (data.metadata) {
         // Add simple fields directly
@@ -1334,8 +1336,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    */
   ensureFullUrl(url: string, baseUrl: string): string {
     // Skip mailto, tel, and anchor links
-    const mailtoPrefix = "mailto" + ":";
-    const telPrefix = "tel" + ":";
+    const mailtoPrefix = "mailto:";
+    const telPrefix = "tel:";
     const anchorPrefix = "#";
 
     if (

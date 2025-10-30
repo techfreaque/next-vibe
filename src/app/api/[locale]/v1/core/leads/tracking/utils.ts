@@ -94,8 +94,8 @@ export function isTrackingUrl(url: string, locale: CountryLanguage): boolean {
  */
 export function ensureFullUrl(url: string, baseUrl: string): string {
   // Skip mailto, tel, and anchor links
-  const mailtoPrefix = "mailto" + ":";
-  const telPrefix = "tel" + ":";
+  const mailtoPrefix = "mailto:";
+  const telPrefix = "tel:";
   const anchorPrefix = "#";
 
   if (

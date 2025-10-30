@@ -37,29 +37,29 @@ interface SmtpAccountsTableProps {
   viewMode?: "list" | "table";
 }
 
+const getStatusBadgeVariant = (
+  status: string,
+): "default" | "secondary" | "destructive" | "outline" => {
+  switch (status) {
+    case "active":
+      return "default";
+    case "inactive":
+      return "secondary";
+    case "error":
+      return "destructive";
+    case "testing":
+      return "outline";
+    default:
+      return "secondary";
+  }
+};
+
 export function SmtpAccountsTable({
   accounts,
   isLoading,
   locale,
 }: SmtpAccountsTableProps): React.JSX.Element {
   const { t } = simpleT(locale);
-
-  const getStatusBadgeVariant = (
-    status: string,
-  ): "default" | "secondary" | "destructive" | "outline" => {
-    switch (status) {
-      case "active":
-        return "default";
-      case "inactive":
-        return "secondary";
-      case "error":
-        return "destructive";
-      case "testing":
-        return "outline";
-      default:
-        return "secondary";
-    }
-  };
 
   if (isLoading) {
     return (

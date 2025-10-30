@@ -31,12 +31,24 @@ import type {
 /**
  * No-op logger for preview contexts where logging is not needed
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 const createNoOpLogger = (): EndpointLogger => ({
-  info: (): void => {},
-  error: (): void => {},
-  warn: (): void => {},
-  debug: (): void => {},
-  vibe: (): void => {},
+  // No-op functions intentionally empty for preview context
+  info: (): void => {
+    // No-op
+  },
+  error: (): void => {
+    // No-op
+  },
+  warn: (): void => {
+    // No-op
+  },
+  debug: (): void => {
+    // No-op
+  },
+  vibe: (): void => {
+    // No-op
+  },
   isDebugEnabled: false,
 });
 

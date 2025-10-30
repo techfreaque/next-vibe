@@ -142,12 +142,12 @@ export function ImapAccountsList({
         <Input
           placeholder={t("app.admin.emails.imap.account.search_placeholder")}
           value={searchValue}
-          onChange={(e) => form.setValue("search", e.target.value)}
+          onChange={(e) => form?.setValue("search", e.target.value)}
           className="max-w-sm"
         />
         <Button
           variant="outline"
-          onClick={() => accountsEndpoint.read.refetch()}
+          onClick={() => accountsEndpoint.read?.refetch()}
         >
           {t("app.admin.emails.imap.common.refresh")}
         </Button>
@@ -253,7 +253,7 @@ export function ImapAccountsList({
               variant="outline"
               size="sm"
               disabled={currentPage === 1}
-              onClick={() => form.setValue("page", currentPage - 1)}
+              onClick={() => form?.setValue("page", currentPage - 1)}
             >
               {t("app.admin.emails.imap.common.previous")}
             </Button>
@@ -261,7 +261,7 @@ export function ImapAccountsList({
               variant="outline"
               size="sm"
               disabled={currentPage * limit >= totalAccounts}
-              onClick={() => form.setValue("page", currentPage + 1)}
+              onClick={() => form?.setValue("page", currentPage + 1)}
             >
               {t("app.admin.emails.imap.common.next")}
             </Button>

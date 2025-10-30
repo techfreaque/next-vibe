@@ -552,7 +552,7 @@ export class RouteDelegationHandler {
   formatResult(
     result: RouteExecutionResult,
     outputFormat = "pretty",
-    endpointDefinition: CreateApiEndpoint | null,
+    endpointDefinition: unknown | null,
     locale: CountryLanguage,
     verbose = false,
     logger: EndpointLogger,
@@ -768,7 +768,7 @@ export class RouteDelegationHandler {
    */
   private formatWithEnhancedRenderer(
     data: CliResponseData,
-    endpointDefinition: CreateApiEndpoint,
+    endpointDefinition: unknown,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): string {

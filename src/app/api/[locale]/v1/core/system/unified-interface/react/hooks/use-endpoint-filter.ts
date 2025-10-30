@@ -36,7 +36,7 @@ export function useEndpointFilter<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     // eslint-disable-next-line no-restricted-syntax
     unknown
   >,

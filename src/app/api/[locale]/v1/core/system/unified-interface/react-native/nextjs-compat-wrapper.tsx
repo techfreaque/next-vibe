@@ -32,7 +32,7 @@ import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -67,23 +67,11 @@ export interface ExpoRouterParams extends Record<string, string | string[]> {
 
 /**
  * Type for any Next.js page component (handles various signatures)
+ * Using a single flexible signature to avoid intersection type issues
  */
-type AnyNextPageComponent =
-  // Standard async page with Promise params
-  | ((props: NextPageProps<ExpoRouterParams>) => Promise<JSX.Element>)
-  // Sync page with Promise params
-  | ((props: NextPageProps<ExpoRouterParams>) => JSX.Element)
-  // Page that redirects (returns never)
-  | ((props: NextPageProps<ExpoRouterParams>) => never)
-  // Legacy sync params (non-Next.js 15)
-  | ((props: {
-      params: ExpoRouterParams;
-    }) => Promise<JSX.Element> | JSX.Element | never)
-  // Any other Next.js page shape with generic props
-  | ((
-      // eslint-disable-next-line no-restricted-syntax
-      props: Record<string, unknown>,
-    ) => Promise<JSX.Element> | JSX.Element | never);
+type AnyNextPageComponent<TParams extends RouteParams = ExpoRouterParams> = (
+  props: { params: Promise<TParams> } | { params: TParams } | Record<string, unknown>
+) => Promise<JSX.Element> | JSX.Element | never;
 
 /**
  * Creates a wrapper for Next.js page components to work in Expo Router
@@ -100,7 +88,7 @@ type AnyNextPageComponent =
  */
 export function createPageWrapper<
   TParams extends ExpoRouterParams = ExpoRouterParams,
->(PageComponent: AnyNextPageComponent): () => React.ReactElement {
+>(PageComponent: AnyNextPageComponent<TParams>): () => React.ReactElement {
   return function PageWrapper(): React.ReactElement {
     const params = useLocalSearchParams<TParams>();
     const [content, setContent] = useState<JSX.Element | null>(null);
@@ -119,9 +107,11 @@ export function createPageWrapper<
       queueMicrotask(() => {
         void (async (): Promise<void> => {
           try {
+            // Create a proper Promise<TParams> for Next.js 15 async params
+            const paramsPromise: Promise<TParams> = Promise.resolve(params);
             // Call the async page component with Next.js 15 format params
             const result = await PageComponent({
-              params: Promise.resolve(params),
+              params: paramsPromise,
             });
 
             if (!cancelled) {
@@ -194,19 +184,14 @@ export function createPageWrapper<
 
 /**
  * Type for any Next.js layout component (handles various signatures)
+ * Using a single flexible signature to avoid intersection type issues
  */
-type AnyNextLayoutComponent =
-  // Standard async layout with Promise params
-  | ((props: NextLayoutProps<ExpoRouterParams>) => Promise<JSX.Element>)
-  // Sync layout with Promise params
-  | ((props: NextLayoutProps<ExpoRouterParams>) => JSX.Element)
-  // Legacy sync params (non-Next.js 15)
-  | ((props: {
-      params: ExpoRouterParams;
-      children: React.ReactNode;
-    }) => Promise<JSX.Element> | JSX.Element)
-  // Any other Next.js layout shape
-  | ((props: any) => Promise<JSX.Element> | JSX.Element);
+type AnyNextLayoutComponent<TParams extends RouteParams = ExpoRouterParams> = (
+  props:
+    | { params: Promise<TParams>; children: React.ReactNode }
+    | { params: TParams; children: React.ReactNode }
+    | Record<string, unknown>
+) => Promise<JSX.Element> | JSX.Element;
 
 /**
  * Creates a wrapper for Next.js layout components to work in Expo Router
@@ -227,7 +212,7 @@ type AnyNextLayoutComponent =
  */
 export function createLayoutWrapper<
   TParams extends ExpoRouterParams = ExpoRouterParams,
->(LayoutComponent: AnyNextLayoutComponent): () => React.ReactElement {
+>(LayoutComponent: AnyNextLayoutComponent<TParams>): () => React.ReactElement {
   return function LayoutWrapper(): React.ReactElement {
     const params = useLocalSearchParams<TParams>();
     const [content, setContent] = useState<React.ReactElement | null>(null);
@@ -246,9 +231,11 @@ export function createLayoutWrapper<
       queueMicrotask(() => {
         void (async (): Promise<void> => {
           try {
+            // Create a proper Promise<TParams> for Next.js 15 async params
+            const paramsPromise: Promise<TParams> = Promise.resolve(params);
             // Call the async layout component with Next.js 15 format params
             const result = await LayoutComponent({
-              params: Promise.resolve(params),
+              params: paramsPromise,
               children: slotElement,
             });
 
@@ -303,13 +290,13 @@ export interface WrapperOptions {
 export function createPageWrapperWithOptions<
   TParams extends ExpoRouterParams = ExpoRouterParams,
 >(
-  PageComponent: AnyNextPageComponent,
+  PageComponent: AnyNextPageComponent<TParams>,
   options: WrapperOptions = {},
 ): () => React.ReactElement {
   return function PageWrapperWithOptions(): React.ReactElement {
     const routeParams = useLocalSearchParams<TParams>();
-    const params = useMemo(
-      () => ({ ...routeParams, ...options.additionalParams }) as TParams,
+    const params: TParams = useMemo(
+      () => ({ ...routeParams, ...options.additionalParams }),
       [routeParams],
     );
     const [content, setContent] = useState<JSX.Element | null>(null);
@@ -326,8 +313,10 @@ export function createPageWrapperWithOptions<
       queueMicrotask(() => {
         void (async (): Promise<void> => {
           try {
+            // Create a proper Promise<TParams> for Next.js 15 async params
+            const paramsPromise: Promise<TParams> = Promise.resolve(params);
             const result = await PageComponent({
-              params: Promise.resolve(params),
+              params: paramsPromise,
             });
 
             if (!cancelled) {
@@ -335,7 +324,7 @@ export function createPageWrapperWithOptions<
             }
           } catch (err) {
             if (!cancelled) {
-              logger.error("Failed to load page", err);
+              logger.error("Failed to load page", { error: parseError(err) });
               setError(
                 err instanceof Error
                   ? err

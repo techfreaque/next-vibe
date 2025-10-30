@@ -9,7 +9,6 @@ import "server-only";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
-  type JsonSchemaValue,
   safeTranslate,
   zodSchemaToJsonSchema,
 } from "../shared/conversion/endpoint-to-metadata";
@@ -26,33 +25,33 @@ export function toolMetadataToMCPTool(
   // Convert Zod schema to JSON Schema
   const baseSchema = metadata.requestSchema
     ? zodSchemaToJsonSchema(metadata.requestSchema)
-    : { type: "object" as const, properties: {}, required: [] };
+    : { type: "object", properties: {}, required: [] };
 
-  const inputSchema: {
-    type: "object";
-    properties?: Record<string, JsonSchemaValue>;
-    required?: string[];
-    additionalProperties?: boolean;
-  } = {
-    type: "object",
-    properties: baseSchema.properties,
-    required: baseSchema.required,
-    additionalProperties: baseSchema.additionalProperties,
-  };
+  // Extract properties safely from JSON Schema
+  const hasProperties = baseSchema && typeof baseSchema === "object" && "properties" in baseSchema;
+  const hasRequired = baseSchema && typeof baseSchema === "object" && "required" in baseSchema;
+  const hasAdditionalProperties = baseSchema && typeof baseSchema === "object" && "additionalProperties" in baseSchema;
+
+  const properties = hasProperties ? baseSchema.properties : undefined;
+  const required = hasRequired ? baseSchema.required : undefined;
+  const additionalProperties = hasAdditionalProperties ? baseSchema.additionalProperties : undefined;
+
+  // Safely handle properties as Record<string, unknown>
+  const typedProperties: Record<string, Record<string, string | number | boolean | object | null>> | undefined =
+    properties && typeof properties === "object" ? properties : undefined;
+  const typedRequired: string[] | undefined =
+    Array.isArray(required) ? required : undefined;
+  const typedAdditionalProperties: boolean | undefined =
+    typeof additionalProperties === "boolean" ? additionalProperties : undefined;
 
   return {
     name: metadata.name,
     description: safeTranslate(metadata.description, locale, metadata.name),
-    inputSchema: inputSchema as {
-      type: "object";
-      properties?:
-        | Record<
-            string,
-            Record<string, string | number | boolean | object | null>
-          >
-        | undefined;
-      required?: string[] | undefined;
-      additionalProperties?: boolean | undefined;
+    inputSchema: {
+      type: "object",
+      properties: typedProperties,
+      required: typedRequired,
+      additionalProperties: typedAdditionalProperties,
     },
   };
 }

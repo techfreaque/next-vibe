@@ -47,7 +47,6 @@
     "@types/inquirer": "9.0.9",
     "@types/node": "24.5.2",
     "fs-extra": "11.3.2",
-    "lint": "workspace:*",
     "builder": "workspace:*",
     "typescript": "5.9.2",
     "typescript-eslint": "8.44.0",

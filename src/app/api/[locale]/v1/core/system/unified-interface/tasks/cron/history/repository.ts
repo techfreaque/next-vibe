@@ -6,15 +6,14 @@
 import "server-only";
 
 import { and, avg, count, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
-import { z } from "zod";
-
-import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createSuccessResponse,
   ErrorResponseTypes,
   fail,
-} from "@/app/api/[locale]/v1/core/shared/types/response.schema";
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
+} from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
+import { z } from "zod";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -165,10 +164,10 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
       const successRate =
         statsResult && statsResult.totalExecutions > 0
           ? Math.round(
-              (Number(statsResult.successfulExecutions) /
-                Number(statsResult.totalExecutions)) *
-                100,
-            )
+            (Number(statsResult.successfulExecutions) /
+              Number(statsResult.totalExecutions)) *
+            100,
+          )
           : 0;
 
       logger.info(

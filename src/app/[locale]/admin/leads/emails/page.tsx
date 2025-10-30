@@ -19,6 +19,10 @@ interface LeadsEmailsPageProps {
   }>;
 }
 
+const getStageDisplayName = (stage: string): string => {
+  return stage.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+};
+
 export default async function LeadsEmailsPage({
   params,
 }: LeadsEmailsPageProps): Promise<React.JSX.Element> {
@@ -36,10 +40,6 @@ export default async function LeadsEmailsPage({
       stages,
     };
   });
-
-  const getStageDisplayName = (stage: string): string => {
-    return stage.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
-  };
 
   return (
     <div className="space-y-6">

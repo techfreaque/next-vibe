@@ -144,6 +144,7 @@ export function AutocompleteField({
             variant="outline"
             role="combobox"
             aria-expanded={open}
+            aria-controls="autocomplete-listbox"
             className={cn(
               "w-full justify-between h-10 font-normal",
               !value && "text-muted-foreground",
@@ -163,22 +164,24 @@ export function AutocompleteField({
             </div>
             <div className="flex items-center gap-1">
               {value && !disabled && (
-                <div
+                <button
+                  type="button"
                   className="h-4 w-4 p-0 rounded-sm hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center"
                   onClick={(e) => {
                     e.stopPropagation();
                     clearValue();
                   }}
+                  title="Clear value"
                 >
                   <X className="h-3 w-3" />
-                </div>
+                </button>
               )}
               <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
             </div>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0" align="start">
-          <Command>
+          <Command id="autocomplete-listbox">
             <div className="flex items-center border-b px-3">
               <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
               <CommandInput

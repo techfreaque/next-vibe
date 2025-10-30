@@ -3,8 +3,6 @@
  * Specialized renderer for grouped lists with beautiful CLI output
  */
 
-import type { z } from "zod";
-
 import { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import { BaseWidgetRenderer } from "./base-widget-renderer";
@@ -164,7 +162,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
 
     // Sort groups by filename (alphabetically)
     return new Map(
-      [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0])),
+      [...groups.entries()].toSorted((a, b) => a[0].localeCompare(b[0])),
     );
   }
 
@@ -304,7 +302,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     items: GroupedListItem[],
     sortBy: string,
   ): GroupedListItem[] {
-    return [...items].sort((a, b) => {
+    return items.toSorted((a, b) => {
       if (sortBy === "severity") {
         const severityOrder = { error: 0, warning: 1, info: 2 };
         const aOrder =
@@ -533,7 +531,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     output += `${this.styleText(separator, "dim", context)}${String.fromCharCode(10)}`;
 
     // Sort files by filename (alphabetically)
-    const sortedFiles = Array.from(groups.entries()).sort(([aKey], [bKey]) =>
+    const sortedFiles = [...groups.entries()].toSorted(([aKey], [bKey]) =>
       aKey.localeCompare(bKey),
     );
 
@@ -667,7 +665,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     const indent = "  ".repeat(depth);
 
     // Sort children alphabetically
-    const sortedChildren = Array.from(node.children.entries()).sort((a, b) =>
+    const sortedChildren = [...node.children.entries()].toSorted((a, b) =>
       a[0].localeCompare(b[0]),
     );
 
@@ -727,10 +725,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
   /**
    * Count items recursively including all children
    */
-  private countItemsRecursive(node: {
-    items: GroupedListItem[];
-    children: Map<string, z.ZodTypeAny>;
-  }): number {
+  private countItemsRecursive(node: TreeNode): number {
     let count = node.items.length;
     for (const childEntry of node.children) {
       const child = childEntry[1];

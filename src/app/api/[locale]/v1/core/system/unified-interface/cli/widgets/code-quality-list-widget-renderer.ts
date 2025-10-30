@@ -129,7 +129,7 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer {
 
     // Sort groups by file path alphabetically
     return new Map(
-      [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0])),
+      [...groups.entries()].toSorted((a, b) => a[0].localeCompare(b[0])),
     );
   }
 
@@ -263,7 +263,7 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer {
    */
   private sortBySeverity(items: CodeQualityItem[]): CodeQualityItem[] {
     const severityOrder = { error: 0, warning: 1, info: 2 };
-    return [...items].sort((a, b) => {
+    return items.toSorted((a, b) => {
       const aOrder = severityOrder[a.severity] ?? 3;
       const bOrder = severityOrder[b.severity] ?? 3;
       if (aOrder !== bOrder) {

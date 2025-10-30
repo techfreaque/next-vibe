@@ -22,12 +22,9 @@ import {
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import {
-  CronTaskPriority,
   CronTaskPriorityDB,
   CronTaskPriorityOptions,
-  CronTaskStatus,
   CronTaskStatusDB,
-  TaskCategory,
   TaskCategoryDB,
 } from "../../../enum";
 

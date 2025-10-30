@@ -5,14 +5,13 @@
 
 import { confirm, select } from "@inquirer/prompts";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import type { z } from "zod";
+import { z } from "zod";
 
 import type {
   DiscoveredRoute,
   RouteExecutionContext,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/route-executor";
 import { routeDelegationHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/route-executor";
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -407,29 +406,32 @@ export class InteractiveModeHandler {
       return;
     }
 
-    const findNodeByPath = (
-      node: DirectoryNode,
-      path: string,
-    ): DirectoryNode | null => {
-      if (node.path === path) {
-        return node;
-      }
-      if (node.children) {
-        for (const child of node.children) {
-          const found = findNodeByPath(child, path);
-          if (found) {
-            return found;
-          }
-        }
-      }
-      return null;
-    };
-
-    const targetNode = findNodeByPath(this.routeTree, targetPath);
+    const targetNode = this.findNodeByPath(this.routeTree, targetPath);
     if (targetNode) {
       this.currentNode = targetNode;
       this.updateBreadcrumbs();
     }
+  }
+
+  /**
+   * Find a node by its path (recursive helper)
+   */
+  private findNodeByPath(
+    node: DirectoryNode,
+    path: string,
+  ): DirectoryNode | null {
+    if (node.path === path) {
+      return node;
+    }
+    if (node.children) {
+      for (const child of node.children) {
+        const found = this.findNodeByPath(child, path);
+        if (found) {
+          return found;
+        }
+      }
+    }
+    return null;
   }
 
   /**
@@ -440,28 +442,31 @@ export class InteractiveModeHandler {
       return;
     }
 
-    const findRouteByPath = (
-      node: DirectoryNode,
-      path: string,
-    ): DiscoveredRoute | null => {
-      if (node.route && node.route.path === path) {
-        return node.route;
-      }
-      if (node.children) {
-        for (const child of node.children) {
-          const found = findRouteByPath(child, path);
-          if (found) {
-            return found;
-          }
-        }
-      }
-      return null;
-    };
-
-    const route = findRouteByPath(this.routeTree, routePath);
+    const route = this.findRouteByPath(this.routeTree, routePath);
     if (route) {
       await this.executeRouteWithDataDrivenUI(route);
     }
+  }
+
+  /**
+   * Find a route by its path (recursive helper)
+   */
+  private findRouteByPath(
+    node: DirectoryNode,
+    path: string,
+  ): DiscoveredRoute | null {
+    if (node.route && node.route.path === path) {
+      return node.route;
+    }
+    if (node.children) {
+      for (const child of node.children) {
+        const found = this.findRouteByPath(child, path);
+        if (found) {
+          return found;
+        }
+      }
+    }
+    return null;
   }
 
   /**
@@ -720,12 +725,17 @@ export class InteractiveModeHandler {
    */
   private async getCreateApiEndpoint(
     route: DiscoveredRoute,
-  ): Promise<CreateApiEndpoint | null> {
+  ): Promise<{
+    title?: string;
+    description?: string;
+    requestSchema?: z.ZodTypeAny;
+    requestUrlPathParamsSchema?: z.ZodTypeAny;
+  } | null> {
     const { loadEndpointDefinition } = await import(
       "../../shared/server-only/execution/definition-loader"
     );
 
-    const result = await loadEndpointDefinition<CreateApiEndpoint>(
+    const result = await loadEndpointDefinition(
       {
         routePath: route.routePath,
         method: route.method,
@@ -742,9 +752,36 @@ export class InteractiveModeHandler {
           error: result.error,
         },
       );
+      return null;
     }
 
-    return result.definition;
+    // Type guard: ensure the definition matches our expected structure
+    const definition = result.definition;
+    if (!definition || typeof definition !== "object") {
+      return null;
+    }
+
+    // Return with proper typing
+    return {
+      title:
+        "title" in definition && typeof definition.title === "string"
+          ? definition.title
+          : undefined,
+      description:
+        "description" in definition && typeof definition.description === "string"
+          ? definition.description
+          : undefined,
+      requestSchema:
+        "requestSchema" in definition &&
+        definition.requestSchema instanceof z.ZodType
+          ? definition.requestSchema
+          : undefined,
+      requestUrlPathParamsSchema:
+        "requestUrlPathParamsSchema" in definition &&
+        definition.requestUrlPathParamsSchema instanceof z.ZodType
+          ? definition.requestUrlPathParamsSchema
+          : undefined,
+    };
   }
 
   /**

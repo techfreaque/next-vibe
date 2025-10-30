@@ -26,7 +26,7 @@ export default async function LocaleLayout({
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="auto" />
+      <StatusBar />
       <TranslationProvider currentLocale={locale}>
         <Stack
           screenOptions={{

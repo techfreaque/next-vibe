@@ -20,7 +20,7 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 
 import { UserRole } from "../../user-roles/enum";
-import { SignupType, SignupTypeOptions } from "./enum";
+import { SignupType, SignupTypeDB, SignupTypeOptions } from "./enum";
 
 /**
  * POST /signup - User registration
@@ -224,7 +224,7 @@ const { POST } = createEndpoint({
               helpText:
                 "app.api.v1.core.user.public.signup.fields.signupType.help" as const,
             },
-            z.enum(SignupType),
+            z.enum(SignupTypeDB),
           ),
         },
       ),

@@ -32,6 +32,91 @@ import { useImapHealth } from "@/app/api/[locale]/v1/core/emails/imap-client/hea
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
+const getStatusIcon = (status: string): JSX.Element => {
+  switch (status) {
+    case "healthy":
+    case "good":
+    case "online":
+    case "connected":
+      return <CheckCircle className="h-5 w-5 text-green-600" />;
+    case "warning":
+      return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
+    case "error":
+    case "disconnected":
+      return <AlertTriangle className="h-5 w-5 text-red-600" />;
+    default:
+      return <Server className="h-5 w-5 text-gray-600" />;
+  }
+};
+
+const getStatusColor = (status: string): string => {
+  switch (status) {
+    case "healthy":
+    case "good":
+    case "online":
+    case "connected":
+      return "text-green-600";
+    case "warning":
+      return "text-yellow-600";
+    case "error":
+    case "disconnected":
+      return "text-red-600";
+    default:
+      return "text-gray-600";
+  }
+};
+
+const getStatusBadge = (
+  status: string,
+  t: ReturnType<typeof useTranslation>["t"],
+): JSX.Element => {
+  switch (status) {
+    case "online":
+    case "connected":
+      return (
+        <Badge variant="default" className="bg-green-100 text-green-800">
+          {t("app.admin.emails.imap.account.status.connected")}
+        </Badge>
+      );
+    case "synced":
+      return (
+        <Badge variant="default" className="bg-green-100 text-green-800">
+          {t("app.admin.emails.imap.account.status.completed")}
+        </Badge>
+      );
+    case "syncing":
+      return (
+        <Badge variant="default" className="bg-blue-100 text-blue-800">
+          {t("app.admin.emails.imap.account.status.syncing")}
+        </Badge>
+      );
+    case "disconnected":
+      return (
+        <Badge variant="destructive">
+          {t("app.admin.emails.imap.account.status.disconnected")}
+        </Badge>
+      );
+    case "error":
+      return (
+        <Badge variant="destructive">
+          {t("app.admin.emails.imap.account.status.error")}
+        </Badge>
+      );
+    case "pending":
+      return (
+        <Badge variant="secondary">
+          {t("app.admin.emails.imap.account.status.pending")}
+        </Badge>
+      );
+    default:
+      return (
+        <Badge variant="outline">
+          {t("app.admin.emails.imap.account.status.pending")}
+        </Badge>
+      );
+  }
+};
+
 /**
  * IMAP Overview Dashboard Component
  * Consolidated component that replaces separate health, status, and overview components
@@ -55,88 +140,6 @@ export function ImapOverviewDashboard(): JSX.Element {
     : [];
   const isLoading =
     healthEndpoint.read.isLoading || accountsEndpoint.read.isLoading;
-
-  const getStatusIcon = (status: string): JSX.Element => {
-    switch (status) {
-      case "healthy":
-      case "good":
-      case "online":
-      case "connected":
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case "warning":
-        return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
-      case "error":
-      case "disconnected":
-        return <AlertTriangle className="h-5 w-5 text-red-600" />;
-      default:
-        return <Server className="h-5 w-5 text-gray-600" />;
-    }
-  };
-
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case "healthy":
-      case "good":
-      case "online":
-      case "connected":
-        return "text-green-600";
-      case "warning":
-        return "text-yellow-600";
-      case "error":
-      case "disconnected":
-        return "text-red-600";
-      default:
-        return "text-gray-600";
-    }
-  };
-
-  const getStatusBadge = (status: string): JSX.Element => {
-    switch (status) {
-      case "online":
-      case "connected":
-        return (
-          <Badge variant="default" className="bg-green-100 text-green-800">
-            {t("app.admin.emails.imap.account.status.connected")}
-          </Badge>
-        );
-      case "synced":
-        return (
-          <Badge variant="default" className="bg-green-100 text-green-800">
-            {t("app.admin.emails.imap.account.status.completed")}
-          </Badge>
-        );
-      case "syncing":
-        return (
-          <Badge variant="default" className="bg-blue-100 text-blue-800">
-            {t("app.admin.emails.imap.account.status.syncing")}
-          </Badge>
-        );
-      case "disconnected":
-        return (
-          <Badge variant="destructive">
-            {t("app.admin.emails.imap.account.status.disconnected")}
-          </Badge>
-        );
-      case "error":
-        return (
-          <Badge variant="destructive">
-            {t("app.admin.emails.imap.account.status.error")}
-          </Badge>
-        );
-      case "pending":
-        return (
-          <Badge variant="secondary">
-            {t("app.admin.emails.imap.account.status.pending")}
-          </Badge>
-        );
-      default:
-        return (
-          <Badge variant="outline">
-            {t("app.admin.emails.imap.account.status.pending")}
-          </Badge>
-        );
-    }
-  };
 
   const handleRefresh = (): void => {
     setLastUpdate(new Date());
@@ -454,10 +457,11 @@ export function ImapOverviewDashboard(): JSX.Element {
                       )}
                       {getStatusBadge(
                         account.isConnected ? "connected" : "disconnected",
+                        t,
                       )}
                     </div>
                   </TableCell>
-                  <TableCell>{getStatusBadge(account.syncStatus)}</TableCell>
+                  <TableCell>{getStatusBadge(account.syncStatus, t)}</TableCell>
                   <TableCell>
                     {account.lastSyncAt
                       ? new Date(account.lastSyncAt).toLocaleString()

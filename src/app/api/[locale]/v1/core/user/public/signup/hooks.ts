@@ -5,9 +5,9 @@ import { useMemo } from "react";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type {
   FormAlertState,
-  InferApiFormReturn,
   InferApiQueryReturn,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
+import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/types";
 import {
   useApiForm,
   useApiQuery,
@@ -20,16 +20,20 @@ import { useUser } from "../../private/me/hooks";
 import signupEndpoints from "./definition";
 import { SignupType } from "./enum";
 
+type SignupFormReturn = ApiFormReturn<
+  typeof signupEndpoints.POST.TRequestOutput,
+  typeof signupEndpoints.POST.TResponseOutput,
+  typeof signupEndpoints.POST.TUrlVariablesOutput
+> & {
+  alert: FormAlertState | null;
+  logger: ReturnType<typeof createEndpointLogger>;
+};
+
 /**
  * Hook for registration functionality
  * @returns Registration form and submission handling with enhanced error typing
  */
-export function useRegister(): InferApiFormReturn<
-  typeof signupEndpoints.POST
-> & {
-  alert: FormAlertState | null;
-  logger: ReturnType<typeof createEndpointLogger>;
-} {
+export function useRegister(): SignupFormReturn {
   const { toast } = useToast();
   const router = useRouter();
   const { t, locale } = useTranslation();
@@ -157,14 +161,7 @@ export function useRegister(): InferApiFormReturn<
   }, [formResult.response]);
 
   return {
-    form: formResult.form,
-    response: formResult.response,
-    isSubmitSuccessful: formResult.isSubmitSuccessful,
-    submitError: formResult.submitError,
-    isSubmitting: formResult.isSubmitting,
-    submitForm: formResult.submitForm,
-    clearSavedForm: formResult.clearSavedForm,
-    setErrorType: formResult.setErrorType,
+    ...formResult,
     alert,
     logger,
   };

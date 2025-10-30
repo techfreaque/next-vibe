@@ -75,8 +75,8 @@ export interface IAiStreamRepository {
  * Type guard for tool result values
  * Validates that value is JSON-serializable and matches ToolCallResult type
  */
- 
-function isValidToolResult(value: any): value is ToolCallResult {
+
+function isValidToolResult(value: unknown): value is ToolCallResult {
   if (value === null) {
     return true;
   }

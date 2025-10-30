@@ -27,7 +27,7 @@ export abstract class BasePermissionHandler {
    */
   protected hasRequiredRoles(
     user: JwtPayloadType,
-    requiredRoles: readonly (typeof UserRoleValue)[],
+    requiredRoles: readonly UserRoleValue[],
   ): boolean {
     // Public role is always allowed
     if (requiredRoles.includes(UserRole.PUBLIC)) {
@@ -78,7 +78,7 @@ export abstract class BasePermissionHandler {
   protected canAccess(
     user: JwtPayloadType,
     resourceOwnerId: string,
-    requiredRoles: readonly (typeof UserRoleValue)[],
+    requiredRoles: readonly UserRoleValue[],
   ): boolean {
     // Public users cannot access private resources
     if (user.isPublic) {
@@ -125,7 +125,7 @@ export abstract class BasePermissionHandler {
     action: string,
     resource: {
       ownerId?: string;
-      requiredRoles?: readonly (typeof UserRoleValue)[];
+      requiredRoles?: readonly UserRoleValue[];
     },
     logger: EndpointLogger,
   ): Promise<PermissionResult> {

@@ -82,7 +82,7 @@ export class HelpService {
       }
     }
 
-    let result = Array.from(uniqueCommands.values());
+    let result = [...uniqueCommands.values()];
 
     // Filter by category if specified
     if (options.category) {

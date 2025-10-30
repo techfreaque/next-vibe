@@ -197,8 +197,8 @@ export function SidebarWrapper({
             onCreateFolder={handleCreateFolder}
             onUpdateFolder={onUpdateFolder}
             onDeleteFolder={chat.deleteFolder}
-            onToggleFolderExpanded={() => {}}
-            onReorderFolder={() => {}}
+            onToggleFolderExpanded={undefined}
+            onReorderFolder={undefined}
             onMoveFolderToParent={handleMoveFolderToParent}
             onUpdateThreadTitle={onUpdateThreadTitle}
             searchThreads={() => []}

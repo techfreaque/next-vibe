@@ -11,12 +11,10 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types"
 import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
- * Type for tool metadata - JSON-serializable object
+ * Type for tool metadata - any JSON-serializable object
+ * Using unknown instead of strict Record to support various tool formats (MCP, AI, etc.)
  */
-type ToolMetadata = Record<
-  string,
-  string | number | boolean | null | ToolMetadata | ToolMetadata[]
->;
+type ToolMetadata = unknown;
 
 /**
  * Base tools repository interface
@@ -34,8 +32,10 @@ export interface BaseToolsRepository<TRequest, TResponse> {
  * Base tools repository implementation
  * Provides common logging and error handling patterns
  */
-export abstract class BaseToolsRepositoryImpl<TRequest, TResponse>
-  implements BaseToolsRepository<TRequest, TResponse>
+export abstract class BaseToolsRepositoryImpl<
+  TRequest,
+  TResponse extends Record<string, unknown>,
+>implements BaseToolsRepository<TRequest, TResponse>
 {
   protected platformName: string;
 
@@ -82,7 +82,7 @@ export abstract class BaseToolsRepositoryImpl<TRequest, TResponse>
     sampleTool?: ToolMetadata,
   ): void {
     logger.info(`[${this.platformName}] Returning result`, {
-      resultKeys: Object.keys(result as object),
+      resultKeys: Object.keys(result),
       toolsCount,
       sampleTool:
         sampleTool !== undefined ? JSON.stringify(sampleTool) : undefined,

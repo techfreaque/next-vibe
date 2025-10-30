@@ -5,6 +5,7 @@
 
 import { relations, sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   boolean,
   index,
   integer,
@@ -151,9 +152,8 @@ export const chatFolders = pgTable(
     icon: text("icon"), // lucide icon name or si icon name
     color: text("color"), // hex color for visual distinction
 
-    // Hierarchy - self-reference requires any type to break circular inference
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    parentId: uuid("parent_id").references((): any => chatFolders.id, {
+    // Hierarchy - self-reference requires AnyPgColumn to break circular inference
+    parentId: uuid("parent_id").references((): AnyPgColumn => chatFolders.id, {
       onDelete: "cascade",
     }),
 
@@ -266,9 +266,8 @@ export const chatMessages = pgTable(
     role: text("role", { enum: ChatMessageRoleDB }).notNull(),
     content: text("content").notNull(),
 
-    // Threading/branching - self-reference requires any type to break circular inference
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    parentId: uuid("parent_id").references((): any => chatMessages.id, {
+    // Threading/branching - self-reference requires AnyPgColumn to break circular inference
+    parentId: uuid("parent_id").references((): AnyPgColumn => chatMessages.id, {
       onDelete: "cascade",
     }),
     depth: integer("depth").default(0).notNull(),

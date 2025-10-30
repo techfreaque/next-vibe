@@ -7,7 +7,6 @@
 import type { Route } from "next";
 import type { z } from "zod";
 
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type {
@@ -20,6 +19,7 @@ import type {
   Methods,
 } from "./enums";
 import { FieldUsage } from "./enums";
+import type { CreateApiEndpoint } from "../endpoint/create";
 
 // Re-export FieldUsage for convenience
 export { FieldUsage };
@@ -50,9 +50,8 @@ export type FieldUIConfig = {
 
 /**
  * Type alias for CreateApiEndpoint - accepts any generic parameters
- * Uses inline import to avoid circular dependency with create.ts
  */
-export type CreateApiEndpointAny = import("../endpoint/create").CreateApiEndpoint;
+export type CreateApiEndpointAny = CreateApiEndpoint;
 
 /**
  * Export for backward compatibility
@@ -65,14 +64,14 @@ export type EndpointDefinition = CreateApiEndpointAny;
  * Used in generated endpoints.ts file
  * Accepts CreateApiEndpoint with any type parameters
  */
-export type ApiSection = {
+export interface ApiSection {
   readonly GET?: CreateApiEndpointAny;
   readonly POST?: CreateApiEndpointAny;
   readonly PUT?: CreateApiEndpointAny;
   readonly PATCH?: CreateApiEndpointAny;
   readonly DELETE?: CreateApiEndpointAny;
   readonly [key: string]: CreateApiEndpointAny | ApiSection | undefined;
-};
+}
 
 // ============================================================================
 // SCHEMA TYPE PRESERVATION AND BACK-PROPAGATION SYSTEM

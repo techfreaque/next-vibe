@@ -38,7 +38,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private renderMetricObject(
-    value: { [key: string]: import("./types").RenderableValue },
+    value: { [key: string]: RenderableValue },
     config: MetricConfig,
     context: WidgetRenderContext,
     indent: string,
@@ -68,11 +68,10 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private renderLintSummary(
-    summary: { [key: string]: import("./types").RenderableValue },
+    summary: { [key: string]: RenderableValue },
     context: WidgetRenderContext,
     indent: string,
   ): string {
-    const total = Number(summary.total || 0);
     const errors = Number(summary.errors || 0);
     const warnings = Number(summary.warnings || 0);
     const info = Number(summary.info || 0);

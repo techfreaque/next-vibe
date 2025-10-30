@@ -32,26 +32,31 @@ import { envClient } from "@/config/env-client";
  */
 
 type InferRequestInput<T> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
     ? T["types"]["RequestInput"]
     : never;
 
 type InferRequestOutput<T> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
     ? T["types"]["RequestOutput"]
     : never;
 
 type InferResponseOutput<T> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
     ? T["types"]["ResponseOutput"]
     : never;
 
 type InferUrlVariablesInput<T> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
     ? T["types"]["UrlVariablesInput"]
     : never;
 
 type InferUrlVariablesOutput<T> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
     ? T["types"]["UrlVariablesOutput"]
     : never;
@@ -153,6 +158,7 @@ function constructUrl<
  * ```
  */
 export async function nativeEndpoint<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TEndpoint extends CreateApiEndpoint<any, Methods, any, any>,
 >(
   endpoint: TEndpoint,
@@ -184,7 +190,7 @@ export async function nativeEndpoint<
           messageParams: {
             error: String(validationError),
           },
-        }) as ResponseType<InferResponseOutput<TEndpoint>>;
+        });
       }
     }
 
@@ -249,9 +255,7 @@ export async function nativeEndpoint<
     // Try to parse as JSON
     let jsonResponse: ResponseType<InferResponseOutput<TEndpoint>>;
     try {
-      jsonResponse = JSON.parse(responseText) as ResponseType<
-        InferResponseOutput<TEndpoint>
-      >;
+      jsonResponse = JSON.parse(responseText);
     } catch (parseError) {
       logger.error("Failed to parse response as JSON", {
         error:
@@ -277,7 +281,7 @@ export async function nativeEndpoint<
             // eslint-disable-next-line i18next/no-literal-string
             hint: "Server returned HTML instead of JSON. Check that the API server is running and the endpoint exists.",
           },
-        }) as ResponseType<InferResponseOutput<TEndpoint>>;
+        });
       }
 
       throw parseError;
@@ -305,7 +309,7 @@ export async function nativeEndpoint<
       messageParams: {
         error: String(error),
       },
-    }) as ResponseType<InferResponseOutput<TEndpoint>>;
+    });
   }
 }
 

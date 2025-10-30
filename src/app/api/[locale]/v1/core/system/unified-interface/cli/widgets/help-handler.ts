@@ -184,7 +184,7 @@ export class HelpHandler {
       }
     }
 
-    return commands.sort((a, b) => a.name.localeCompare(b.name));
+    return commands.toSorted((a, b) => a.name.localeCompare(b.name));
   }
 
   /**

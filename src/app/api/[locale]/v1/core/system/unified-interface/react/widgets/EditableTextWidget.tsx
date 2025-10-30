@@ -82,7 +82,6 @@ export function EditableTextWidget({
           onKeyDown={handleKeyDown}
           disabled={isProcessing}
           className="h-8"
-          autoFocus
         />
         <Button
           size="sm"

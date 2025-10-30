@@ -111,13 +111,7 @@ export type EnhancedMutationResult<TResponse, TRequest, TUrlVariables> = Omit<
  * @returns Mutation result
  */
 export function useApiMutation<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
+  TEndpoint extends CreateApiEndpoint<string, Methods, readonly string[], unknown>,
 >(
   endpoint: TEndpoint,
   logger: EndpointLogger,

@@ -282,11 +282,11 @@ export class ResourceNotFoundError extends CliError {
 /**
  * Error handler utility
  */
-export class ErrorHandler {
+export namespace ErrorHandler {
   /**
    * Safely convert error to string
    */
-  private static errorToString(error: UnknownError): string {
+  function errorToString(error: UnknownError): string {
     if (error instanceof Error) {
       return error.message;
     }
@@ -302,7 +302,7 @@ export class ErrorHandler {
   /**
    * Handle and format error for CLI output
    */
-  static handleError(
+  export function handleError(
     error: UnknownError,
     logger: EndpointLogger,
   ): {
@@ -313,9 +313,9 @@ export class ErrorHandler {
     if (error instanceof CliError) {
       return {
         message: logger.isDebugEnabled
-          ? this.formatVerboseError(error)
+          ? formatVerboseError(error)
           : error.getUserMessage(),
-        exitCode: this.getExitCode(error.statusCode),
+        exitCode: getExitCode(error.statusCode),
         shouldExit: true,
       };
     }
@@ -324,7 +324,7 @@ export class ErrorHandler {
       const cliError = new RouteExecutionError("unknown", error);
       return {
         message: logger.isDebugEnabled
-          ? this.formatVerboseError(cliError)
+          ? formatVerboseError(cliError)
           : cliError.getUserMessage(),
         exitCode: 1,
         shouldExit: true,
@@ -333,7 +333,7 @@ export class ErrorHandler {
 
     // Unknown error type
     // eslint-disable-next-line i18next/no-literal-string
-    const message = `❌ Unknown error: ${this.errorToString(error)}`;
+    const message = `❌ Unknown error: ${errorToString(error)}`;
     return {
       message: logger.isDebugEnabled
         ? // eslint-disable-next-line i18next/no-literal-string
@@ -347,7 +347,7 @@ export class ErrorHandler {
   /**
    * Format error with full details for verbose output
    */
-  private static formatVerboseError(error: CliError): string {
+  function formatVerboseError(error: CliError): string {
     // eslint-disable-next-line i18next/no-literal-string
     let output = `❌ ${error.name}: ${error.message}\n`;
     // eslint-disable-next-line i18next/no-literal-string
@@ -373,7 +373,7 @@ export class ErrorHandler {
   /**
    * Convert HTTP status code to process exit code
    */
-  private static getExitCode(statusCode: number): number {
+  function getExitCode(statusCode: number): number {
     if (statusCode >= 400 && statusCode < 500) {
       return 2; // Client error
     }
@@ -386,7 +386,7 @@ export class ErrorHandler {
   /**
    * Create error from unknown value
    */
-  static createError(error: UnknownError, context?: ErrorContext): CliError {
+  export function createError(error: UnknownError, context?: ErrorContext): CliError {
     if (error instanceof CliError) {
       return error;
     }
@@ -397,7 +397,7 @@ export class ErrorHandler {
 
     return new RouteExecutionError(
       "unknown",
-      new Error(this.errorToString(error)),
+      new Error(errorToString(error)),
       context,
     );
   }
@@ -405,7 +405,7 @@ export class ErrorHandler {
   /**
    * Wrap async function with error handling
    */
-  static async withErrorHandling<T>(
+  export async function withErrorHandling<T>(
     fn: () => Promise<T>,
     context?: ErrorContext,
   ): Promise<T> {
@@ -413,14 +413,14 @@ export class ErrorHandler {
       return await fn();
     } catch (error) {
       // eslint-disable-next-line no-restricted-syntax
-      throw this.createError(error as UnknownError, context);
+      throw createError(error as UnknownError, context);
     }
   }
 
   /**
    * Check if error is recoverable
    */
-  static isRecoverable(error: CliError): boolean {
+  export function isRecoverable(error: CliError): boolean {
     const recoverableCodes = [
       "VALIDATION_ERROR",
       "COMMAND_NOT_FOUND",

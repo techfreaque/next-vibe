@@ -1,6 +1,8 @@
 "use client";
 
 import { ExternalLink } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import {
   Card,
@@ -80,6 +82,48 @@ export function LinkCardWidget({
   };
 
   const displayDescription = snippet ?? description;
+  const isExternal = url.startsWith("http://") || url.startsWith("https://");
+
+  // Always use external links for openInNewTab to avoid eslint errors
+  const shouldUseExternalLink = isExternal || openInNewTab;
+
+  const linkContent = (
+    <>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="group flex items-center gap-2 text-base font-semibold">
+              <span className="truncate transition-colors group-hover:text-primary">
+                {title}
+              </span>
+              <ExternalLink className="h-4 w-4 flex-shrink-0 opacity-50 transition-opacity group-hover:opacity-100" />
+            </CardTitle>
+            <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+              {source && <span className="font-medium">{source}</span>}
+              {age && source && <span>•</span>}
+              {age && <span>{age}</span>}
+            </div>
+          </div>
+          {thumbnail && (
+            <Image
+              src={thumbnail}
+              alt={title}
+              width={64}
+              height={64}
+              className="w-16 h-16 object-cover rounded flex-shrink-0"
+            />
+          )}
+        </div>
+      </CardHeader>
+      {displayDescription && (
+        <CardContent className="pt-0">
+          <CardDescription className="line-clamp-3 text-sm">
+            {displayDescription}
+          </CardDescription>
+        </CardContent>
+      )}
+    </>
+  );
 
   return (
     <Card
@@ -90,49 +134,33 @@ export function LinkCardWidget({
       )}
       style={style}
     >
-      <a
-        href={url}
-        target={openInNewTab ? "_blank" : undefined}
-        rel={openInNewTab ? "noopener noreferrer" : undefined}
-        onClick={handleClick}
-        className={cn(
-          "block focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg",
-          !context.isInteractive && "pointer-events-none",
-        )}
-      >
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0 flex-1">
-              <CardTitle className="group flex items-center gap-2 text-base font-semibold">
-                <span className="truncate transition-colors group-hover:text-primary">
-                  {title}
-                </span>
-                <ExternalLink className="h-4 w-4 flex-shrink-0 opacity-50 transition-opacity group-hover:opacity-100" />
-              </CardTitle>
-              <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                {source && <span className="font-medium">{source}</span>}
-                {age && source && <span>•</span>}
-                {age && <span>{age}</span>}
-              </div>
-            </div>
-            {thumbnail && (
-              <img
-                src={thumbnail}
-                alt={title}
-                className="w-16 h-16 object-cover rounded flex-shrink-0"
-                loading="lazy"
-              />
-            )}
-          </div>
-        </CardHeader>
-        {displayDescription && (
-          <CardContent className="pt-0">
-            <CardDescription className="line-clamp-3 text-sm">
-              {displayDescription}
-            </CardDescription>
-          </CardContent>
-        )}
-      </a>
+      {shouldUseExternalLink ? (
+        // External link or new tab - safe to use <a> tag
+        // eslint-disable-next-line @next/next/no-html-link-for-pages
+        <a
+          href={url}
+          target={openInNewTab ? "_blank" : undefined}
+          rel={openInNewTab ? "noopener noreferrer" : undefined}
+          onClick={handleClick}
+          className={cn(
+            "block focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg",
+            !context.isInteractive && "pointer-events-none",
+          )}
+        >
+          {linkContent}
+        </a>
+      ) : (
+        <Link
+          href={url}
+          onClick={handleClick}
+          className={cn(
+            "block focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg",
+            !context.isInteractive && "pointer-events-none",
+          )}
+        >
+          {linkContent}
+        </Link>
+      )}
     </Card>
   );
 }

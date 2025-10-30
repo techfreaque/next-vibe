@@ -50,7 +50,9 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   /**
    * Handle incoming JSON-RPC request
    */
-  async handleRequest(request: JsonRpcRequest): Promise<JsonRpcResponse> {
+  async handleRequest(
+    request: JsonRpcRequest<unknown>,
+  ): Promise<JsonRpcResponse> {
     this.logger.debug("[MCP Protocol] Received request", {
       method: request.method,
       id: request.id,
@@ -68,16 +70,13 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       }
 
       // Route to appropriate handler
-      let result: Record<string, string | number | boolean | null | object>;
+      let result: unknown;
 
       switch (request.method) {
         case MCPMethod.INITIALIZE:
-          result = (await this.handleInitialize(
-            request.params as unknown as MCPInitializeParams,
-          )) as unknown as Record<
-            string,
-            string | number | boolean | null | object
-          >;
+          result = await this.handleInitialize(
+            request.params as MCPInitializeParams,
+          );
           this.initialized = true;
           break;
 
@@ -94,12 +93,9 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
               "Server not initialized. Call initialize first.",
             );
           }
-          result = (await this.handleToolsList(
+          result = await this.handleToolsList(
             request.params as MCPToolsListParams,
-          )) as unknown as Record<
-            string,
-            string | number | boolean | null | object
-          >;
+          );
           break;
 
         case MCPMethod.TOOLS_CALL:
@@ -111,12 +107,9 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
               "Server not initialized. Call initialize first.",
             );
           }
-          result = (await this.handleToolCall(
-            request.params as unknown as MCPToolCallParams,
-          )) as unknown as Record<
-            string,
-            string | number | boolean | null | object
-          >;
+          result = await this.handleToolCall(
+            request.params as MCPToolCallParams,
+          );
           break;
 
         default:
@@ -217,10 +210,10 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
 
     const registry = getMCPRegistry(this.locale);
 
-    // Execute tool
+    // Execute tool - params.arguments is already properly typed from MCPToolCallParams
     const result = await registry.executeTool({
       toolName: params.name,
-      data: (params.arguments || {}) as { [key: string]: never },
+      data: params.arguments || {},
       user: this.user,
       locale: this.locale,
       requestId: Date.now(),
@@ -249,7 +242,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    */
   private createSuccessResponse(
     id: string | number | null,
-    result: Record<string, string | number | boolean | null | object>,
+    result: unknown,
   ): JsonRpcResponse {
     return {
       jsonrpc: "2.0",
@@ -265,7 +258,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     id: string | number | null,
     code: MCPErrorCode,
     message: string,
-    data?: Record<string, string | number | boolean | null | object>,
+    data?: Record<string, unknown>,
   ): JsonRpcResponse {
     const error: JsonRpcError = {
       code,

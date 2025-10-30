@@ -5,7 +5,7 @@ import type { ComponentPropsWithoutRef, ForwardedRef } from "react";
 import { forwardRef } from "react";
 
 export const H1 = forwardRef(function H1(
-  { className, ...props }: ComponentPropsWithoutRef<"h1">,
+  { className, children, ...props }: ComponentPropsWithoutRef<"h1">,
   ref: ForwardedRef<HTMLHeadingElement>,
 ) {
   return (
@@ -16,12 +16,14 @@ export const H1 = forwardRef(function H1(
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </h1>
   );
 });
 
 export const H2 = forwardRef(function H2(
-  { className, ...props }: ComponentPropsWithoutRef<"h2">,
+  { className, children, ...props }: ComponentPropsWithoutRef<"h2">,
   ref: ForwardedRef<HTMLHeadingElement>,
 ) {
   return (
@@ -32,12 +34,14 @@ export const H2 = forwardRef(function H2(
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </h2>
   );
 });
 
 export const H3 = forwardRef(function H3(
-  { className, ...props }: ComponentPropsWithoutRef<"h3">,
+  { className, children, ...props }: ComponentPropsWithoutRef<"h3">,
   ref: ForwardedRef<HTMLHeadingElement>,
 ) {
   return (
@@ -48,12 +52,14 @@ export const H3 = forwardRef(function H3(
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </h3>
   );
 });
 
 export const H4 = forwardRef(function H4(
-  { className, ...props }: ComponentPropsWithoutRef<"h4">,
+  { className, children, ...props }: ComponentPropsWithoutRef<"h4">,
   ref: ForwardedRef<HTMLHeadingElement>,
 ) {
   return (
@@ -64,7 +70,9 @@ export const H4 = forwardRef(function H4(
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </h4>
   );
 });
 

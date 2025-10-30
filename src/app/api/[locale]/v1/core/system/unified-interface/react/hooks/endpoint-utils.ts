@@ -24,7 +24,7 @@ export function useAvailableMethods<
     Record<
       Methods,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
+      CreateApiEndpoint<string, Methods, readonly UserRoleValue[], any>
     >
   >,
 >(endpoints: T): Methods[] {

@@ -846,18 +846,16 @@ class SmtpRepositoryImpl implements SmtpRepository {
       currentHour.setMinutes(0, 0, 0);
 
       // Count emails sent within the last hour for this specific account
-      const [emailsCount] = await Promise.all([
-        db
-          .select({ count: sql<number>`COUNT(*)::int` })
-          .from(emails)
-          .where(
-            and(
-              eq(emails.smtpAccountId, account.id),
-              gte(emails.sentAt, currentHour),
-              eq(emails.status, EmailStatus.SENT),
-            ),
+      const emailsCount = await db
+        .select({ count: sql<number>`COUNT(*)::int` })
+        .from(emails)
+        .where(
+          and(
+            eq(emails.smtpAccountId, account.id),
+            gte(emails.sentAt, currentHour),
+            eq(emails.status, EmailStatus.SENT),
           ),
-      ]);
+        );
 
       const emailsSentThisHour = emailsCount[0]?.count || 0;
 

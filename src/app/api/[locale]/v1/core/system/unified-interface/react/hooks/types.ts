@@ -31,9 +31,8 @@ export type InferApiFormReturn<T> =
   T extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
+    readonly UserRoleValue[],
+    unknown
   >
     ? T extends {
         types: {
@@ -54,8 +53,8 @@ export type InferApiQueryReturn<T> =
   T extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
-    any
+    readonly UserRoleValue[],
+    unknown
   >
     ? T extends { types: { ResponseOutput: infer TResponseOutput } }
       ? ApiQueryReturn<TResponseOutput>
@@ -70,9 +69,8 @@ export type InferApiQueryFormReturn<T> =
   T extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
+    readonly UserRoleValue[],
+    unknown
   >
     ? T extends {
         types: {
@@ -93,8 +91,8 @@ export type InferEnhancedMutationResult<T> =
   T extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
-    any
+    readonly UserRoleValue[],
+    unknown
   >
     ? T extends {
         types: {
@@ -284,7 +282,7 @@ export type SubmitFormFunction<TRequest, TResponse, TUrlVariables> = (
 ) => Promise<void> | void;
 
 export interface SubmitFormFunctionOptions<TRequest, TResponse, TUrlVariables> {
-  urlParamVariables: TUrlVariables;
+  urlParamVariables?: TUrlVariables;
   onSuccess?: (data: {
     requestData: TRequest;
     pathParams: TUrlVariables;

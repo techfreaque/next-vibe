@@ -12,12 +12,12 @@ import type { z } from "zod";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+} from "next-vibe/shared/types/response.schema";
 import {
   createSuccessResponse,
   ErrorResponseTypes,
   fail,
-} from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+} from "next-vibe/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 

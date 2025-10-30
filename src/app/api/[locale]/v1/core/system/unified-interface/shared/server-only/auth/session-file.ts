@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import { promises as fs } from "node:fs";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createSuccessResponse,
@@ -6,7 +6,7 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import { join } from "path";
+import { join } from "node:path";
 
 import type { EndpointLogger } from "../../types/logger";
 import type { SessionData } from "./base-auth-handler";

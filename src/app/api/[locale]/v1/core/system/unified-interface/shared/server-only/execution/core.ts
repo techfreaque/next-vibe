@@ -41,7 +41,7 @@ export interface HandlerContext<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields,
 > {
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>;
@@ -79,7 +79,7 @@ export async function executeHandler<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields,
 >(
   context: HandlerContext<
@@ -147,7 +147,7 @@ export async function executeHandler<
 export async function authenticateUser<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields,
 >(
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
@@ -211,7 +211,7 @@ export async function authenticateUser<
 export async function authenticateTypedUser<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields,
 >(
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,

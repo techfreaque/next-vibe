@@ -34,8 +34,8 @@ function getSmsMessage(
 
   // Replace parameters in template
   Object.entries(params).forEach(([key, value]) => {
-    const startPattern = "{" + "{";
-    const endPattern = "}" + "}";
+    const startPattern = "{{";
+    const endPattern = "}}";
     const pattern = startPattern + key + endPattern;
     template = template.replaceAll(pattern, value);
   });

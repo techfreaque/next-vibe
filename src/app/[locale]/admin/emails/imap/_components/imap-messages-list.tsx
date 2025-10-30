@@ -37,6 +37,51 @@ interface ImapMessagesListProps {
 }
 
 /**
+ * Format date to relative display string
+ */
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - date.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 1) {
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } else if (diffDays < 7) {
+    return date.toLocaleDateString([], { weekday: "short" });
+  } else {
+    return date.toLocaleDateString([], { month: "short", day: "numeric" });
+  }
+}
+
+/**
+ * Placeholder for marking messages as read
+ */
+function handleMarkAsRead(): void {
+  // TODO: Mark selected messages as read through IMAP message API
+  // Implementation needed for: selectedMessages
+}
+
+/**
+ * Placeholder for marking messages as unread
+ */
+function handleMarkAsUnread(): void {
+  // TODO: Mark selected messages as unread through IMAP message API
+  // Implementation needed for: selectedMessages
+}
+
+/**
+ * Placeholder for toggling flag status
+ */
+function handleToggleFlag(): void {
+  // TODO: Toggle flag status of selected messages through IMAP message API
+  // Implementation needed for: selectedMessages
+}
+
+/**
  * IMAP Messages List Component
  */
 export function ImapMessagesList({
@@ -106,24 +151,6 @@ export function ImapMessagesList({
   const totalMessages = apiResponse?.success ? apiResponse.data.total : 0;
   const isLoading = messagesEndpoint.read?.isLoading || false;
 
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 1) {
-      return date.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } else if (diffDays < 7) {
-      return date.toLocaleDateString([], { weekday: "short" });
-    } else {
-      return date.toLocaleDateString([], { month: "short", day: "numeric" });
-    }
-  };
-
   // TODO: Re-enable when messageSize is added to API definition
   // const formatSize = (bytes: number): string => {
   //   if (bytes < 1024) {
@@ -149,21 +176,6 @@ export function ImapMessagesList({
     } else {
       setSelectedMessages([]);
     }
-  };
-
-  const handleMarkAsRead = (): void => {
-    // TODO: Mark selected messages as read through IMAP message API
-    // Implementation needed for: selectedMessages
-  };
-
-  const handleMarkAsUnread = (): void => {
-    // TODO: Mark selected messages as unread through IMAP message API
-    // Implementation needed for: selectedMessages
-  };
-
-  const handleToggleFlag = (): void => {
-    // TODO: Toggle flag status of selected messages through IMAP message API
-    // Implementation needed for: selectedMessages
   };
 
   const handleViewMessage = (messageId: string): void => {

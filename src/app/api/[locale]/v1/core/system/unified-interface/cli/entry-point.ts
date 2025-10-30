@@ -6,15 +6,14 @@
  * Integrates with schema-driven handlers for enhanced CLI experience
  */
 
-import * as fs from "fs";
+import * as fs from "node:fs";
 import { parseError } from "next-vibe/shared/utils";
-import * as path from "path";
+import * as path from "node:path";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { CreateApiEndpoint } from "../shared/endpoint/create";
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import type { EndpointDefinition } from "../shared/types/endpoint";
 import { getCliUserForCommand } from "../shared/server-only/auth/cli-user";
@@ -304,7 +303,7 @@ export class CliEntryPoint {
         if (firstMethodKey) {
           const firstMethod = defaultExport[firstMethodKey];
           if (firstMethod?.aliases) {
-            customAliases = Array.from(firstMethod.aliases);
+            customAliases = [...firstMethod.aliases];
           }
           // Extract description from endpoint definition
           if (
@@ -447,17 +446,17 @@ export class CliEntryPoint {
 
       try {
         const definitionImport = (await import(definitionPath)) as
-          | Record<string, CreateApiEndpoint>
-          | { default: Record<string, CreateApiEndpoint> };
+          | Record<string, unknown>
+          | { default: Record<string, unknown> };
         const definitionModule =
           "default" in definitionImport
             ? definitionImport.default
             : definitionImport;
 
         // Check default export
-        let definitions: Record<string, CreateApiEndpoint> | undefined;
+        let definitions: Record<string, unknown> | undefined;
         if (typeof definitionModule === "object" && definitionModule !== null) {
-          definitions = definitionModule as Record<string, CreateApiEndpoint>;
+          definitions = definitionModule as Record<string, unknown>;
         }
 
         if (definitions && typeof definitions === "object") {
@@ -466,9 +465,10 @@ export class CliEntryPoint {
             if (
               methodDef &&
               typeof methodDef === "object" &&
+              "aliases" in methodDef &&
               methodDef.aliases
             ) {
-              const aliasArray = Array.from(methodDef.aliases);
+              const aliasArray = [...(methodDef.aliases as Iterable<string>)];
               if (aliasArray.includes(command)) {
                 const existingRoute = this.routes.find(
                   (r) => r.routePath === routeFile,
@@ -521,7 +521,7 @@ export class CliEntryPoint {
     }
 
     // Display routes grouped by base path
-    for (const [basePath, routes] of Array.from(routeGroups)) {
+    for (const [basePath, routes] of routeGroups) {
       console.log(`📁 ${basePath || "root"}:`);
       for (const route of routes) {
         console.log(`  ✅ ${route.alias} → ${route.path}`);
@@ -605,12 +605,12 @@ export class CliEntryPoint {
    */
   private async getCreateApiEndpoint(
     route: CliRouteMetadata,
-  ): Promise<CreateApiEndpoint | null> {
+  ): Promise<unknown | null> {
     try {
       // Import the route module dynamically
       const routeModule = (await import(route.routePath)) as {
         tools?: {
-          definitions?: Record<string, CreateApiEndpoint>;
+          definitions?: Record<string, unknown>;
         };
       };
 
@@ -627,7 +627,7 @@ export class CliEntryPoint {
       );
       try {
         const definitionModule = (await import(definitionPath)) as {
-          default?: Record<string, CreateApiEndpoint>;
+          default?: Record<string, unknown>;
         };
         const definitions = definitionModule.default;
         if (definitions?.[route.method]) {

@@ -66,7 +66,7 @@ export class WidgetRegistry {
    * Get all registered widget types
    */
   getRegisteredTypes(): WidgetType[] {
-    return Array.from(this.widgets.keys());
+    return [...this.widgets.keys()];
   }
 
   /**

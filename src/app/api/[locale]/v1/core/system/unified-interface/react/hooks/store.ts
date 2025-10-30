@@ -86,11 +86,13 @@ function cleanupInFlightRequests(): void {
   // If we have too many requests, remove the oldest ones
   if (inFlightRequests.size > MAX_IN_FLIGHT_REQUESTS) {
     // Convert to array, sort by timestamp, and keep only the newest MAX_IN_FLIGHT_REQUESTS
-    const entries = Array.from(inFlightRequests.entries());
-    entries.sort((a, b) => b[1].timestamp - a[1].timestamp); // Sort newest first
+    const entries = [...inFlightRequests.entries()];
+    const sortedEntries = entries.toSorted(
+      (a, b) => b[1].timestamp - a[1].timestamp,
+    ); // Sort newest first
 
     // Keep only the newest MAX_IN_FLIGHT_REQUESTS
-    const toKeep = entries.slice(0, MAX_IN_FLIGHT_REQUESTS);
+    const toKeep = sortedEntries.slice(0, MAX_IN_FLIGHT_REQUESTS);
 
     // Clear the map and add back only the ones we want to keep
     inFlightRequests.clear();
@@ -203,13 +205,12 @@ export interface ApiStore {
 
   // Methods
   executeQuery: <
-    TFields,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
+    TUserRoleValue extends readonly UserRoleValue[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
       TUserRoleValue,
-      TFields
+      unknown
     >,
   >(
     endpoint: TEndpoint,
@@ -231,13 +232,12 @@ export interface ApiStore {
   ) => Promise<ResponseType<TEndpoint["TResponseOutput"]>>;
 
   executeMutation: <
-    TFields,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
+    TUserRoleValue extends readonly UserRoleValue[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
       TUserRoleValue,
-      TFields
+      unknown
     >,
   >(
     endpoint: TEndpoint,
@@ -279,7 +279,7 @@ export interface ApiStore {
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
+      readonly UserRoleValue[],
       UnifiedField<z.ZodTypeAny>
     >,
   >(
@@ -361,13 +361,12 @@ export const useApiStore = create<ApiStore>((set, get) => ({
   }): string => `form-${endpoint.path.join("-")}-${endpoint.method}`,
 
   executeQuery: async <
-    TFields,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
+    TUserRoleValue extends readonly UserRoleValue[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
       TUserRoleValue,
-      TFields
+      unknown
     >,
   >(
     endpoint: TEndpoint,
@@ -431,10 +430,13 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     // Clean up the throttle map if it gets too large
     if (throttleMap.size > MAX_IN_FLIGHT_REQUESTS * 2) {
       // Keep only the most recent entries
-      const entries = Array.from(throttleMap.entries());
-      entries.sort((a, b) => b[1] - a[1]); // Sort by timestamp, newest first
+      const entries = [...throttleMap.entries()];
+      const sortedEntries = entries.toSorted((a, b) => b[1] - a[1]); // Sort by timestamp, newest first
       throttleMap.clear();
-      for (const [key, timestamp] of entries.slice(0, MAX_IN_FLIGHT_REQUESTS)) {
+      for (const [key, timestamp] of sortedEntries.slice(
+        0,
+        MAX_IN_FLIGHT_REQUESTS,
+      )) {
         throttleMap.set(key, timestamp);
       }
     }
@@ -753,12 +755,10 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         // Check if requestData contains File objects - if so, use FormData
         let postBody: string | FormData | undefined;
         if (endpoint.method !== Methods.GET) {
-          if (containsFile(requestData as FormDataValue)) {
+          if (containsFile(requestData)) {
             // Convert to FormData
             // eslint-disable-next-line no-restricted-syntax
-            postBody = objectToFormData(
-              requestData as Record<string, FormDataValue>,
-            );
+            postBody = objectToFormData(requestData as Record<string, unknown>);
           } else {
             // Use JSON
             postBody = JSON.stringify(requestData);
@@ -997,13 +997,12 @@ export const useApiStore = create<ApiStore>((set, get) => ({
   },
 
   executeMutation: async <
-    TFields,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
+    TUserRoleValue extends readonly UserRoleValue[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
       TUserRoleValue,
-      TFields
+      unknown
     >,
   >(
     endpoint: TEndpoint,
@@ -1377,7 +1376,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
+      readonly UserRoleValue[],
       UnifiedField<z.ZodTypeAny>
     >,
   >(
@@ -1410,7 +1409,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       } catch {
         requestDataKey =
           typeof requestData === "object"
-            ? Object.keys(requestData).sort().join(",")
+            ? Object.keys(requestData).toSorted().join(",")
             : String(requestData);
       }
     }
@@ -1424,7 +1423,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       } catch {
         urlPathParamsKey =
           typeof urlPathParams === "object"
-            ? Object.keys(urlPathParams).sort().join(",")
+            ? Object.keys(urlPathParams).toSorted().join(",")
             : String(urlPathParams);
       }
     }
@@ -1487,16 +1486,8 @@ export const apiClient = {
     TRequestOutput,
     TResponseOutput,
     TUrlVariablesOutput,
-    TEndpoint extends {
-      readonly TRequestOutput: TRequestOutput;
-      readonly TResponseOutput: TResponseOutput;
-      readonly TUrlVariablesOutput: TUrlVariablesOutput;
-      readonly requestSchema: UnifiedField<z.ZodTypeAny>;
-      readonly responseSchema: UnifiedField<z.ZodTypeAny>;
-      readonly method: Methods;
-      readonly path: readonly string[];
-      readonly requiresAuthentication: () => boolean;
-    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    TEndpoint extends CreateApiEndpoint<any, any, any, any>,
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
@@ -1561,13 +1552,12 @@ export const apiClient = {
    * Mutate data through an API endpoint without using React hooks
    */
   mutate: async <
-    TFields,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
+    TUserRoleValue extends readonly UserRoleValue[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
       TUserRoleValue,
-      TFields
+      unknown
     >,
   >(
     endpoint: TEndpoint,
@@ -1638,13 +1628,12 @@ export const apiClient = {
    * Get current mutation state without using React hooks
    */
   getMutationState: <
-    TFields,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
+    TUserRoleValue extends readonly UserRoleValue[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
       TUserRoleValue,
-      TFields
+      unknown
     >,
   >(
     endpoint: TEndpoint,
@@ -1686,7 +1675,7 @@ export const apiClient = {
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
+      readonly UserRoleValue[],
       UnifiedField<z.ZodTypeAny>
     >,
   >(

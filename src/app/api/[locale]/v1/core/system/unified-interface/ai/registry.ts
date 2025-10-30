@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { defaultLocale } from "@/i18n/core/config";
 
 import { Platform } from "../shared/server-only/config";
 import { BaseRegistry } from "../shared/server-only/execution/registry";
@@ -41,6 +41,7 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
     const platformName = "AI Tool Registry";
     super({
       platformName,
+      locale: defaultLocale,
     });
   }
 

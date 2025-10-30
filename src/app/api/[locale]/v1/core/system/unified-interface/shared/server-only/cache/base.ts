@@ -7,6 +7,13 @@
 import "server-only";
 
 /**
+ * Default eviction handler (no-op)
+ */
+function defaultOnEvict(): void {
+  // No-op function for default eviction handler
+}
+
+/**
  * Cache entry with expiration
  */
 export interface CacheEntry<T> {
@@ -53,7 +60,7 @@ export class BaseCache<T> {
     this.options = {
       ttl: options.ttl || 5 * 60 * 1000, // Default 5 minutes
       maxSize: options.maxSize || 1000,
-      onEvict: options.onEvict || ((): void => {}),
+      onEvict: options.onEvict || defaultOnEvict,
     };
   }
 
@@ -145,7 +152,7 @@ export class BaseCache<T> {
    * Get all keys
    */
   keys(): string[] {
-    return Array.from(this.cache.keys());
+    return [...this.cache.keys()];
   }
 
   /**
@@ -159,7 +166,7 @@ export class BaseCache<T> {
    * Get cache statistics
    */
   getStats(): CacheStats {
-    const entries = Array.from(this.cache.values());
+    const entries = [...this.cache.values()];
     const timestamps = entries.map((e) => e.createdAt);
 
     return {
@@ -258,7 +265,7 @@ export function createCacheKey(
   >,
 ): string {
   const sorted = Object.keys(obj)
-    .sort()
+    .toSorted()
     .reduce(
       (acc, key) => {
         acc[key] = obj[key];

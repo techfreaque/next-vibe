@@ -147,7 +147,7 @@ export class PixelTrackingRepository {
 
       if (!result.success) {
         // Use Zod's built-in error formatting
-        const fallbackError = "validation" + "." + "failed"; // Avoid i18next literal string
+        const fallbackError = "validation.failed"; // Avoid i18next literal string
         return {
           success: false,
           error: result.error.message || fallbackError,

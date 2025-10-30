@@ -27,6 +27,54 @@ interface ImapMessagesTableProps {
   loading?: boolean;
 }
 
+const getStatusIcon = (message: ImapMessageResponseType): JSX.Element => {
+  if (message.isRead) {
+    return <MailOpen className="h-4 w-4 text-gray-600" />;
+  }
+  return <Mail className="h-4 w-4 text-blue-600" />;
+};
+
+const getStatusBadge = (
+  message: ImapMessageResponseType,
+  t: ReturnType<typeof useTranslation>["t"],
+): JSX.Element => {
+  if (!message.isRead) {
+    return (
+      <Badge variant="default" className="bg-blue-100 text-blue-800">
+        {t("app.admin.emails.imap.messages.unread")}
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="outline">
+      {t("app.admin.emails.imap.messages.read")}
+    </Badge>
+  );
+};
+
+const formatDate = (
+  dateString: string | null,
+  t: ReturnType<typeof useTranslation>["t"],
+): string => {
+  if (!dateString) {
+    return t("app.admin.emails.imap.common.unknown");
+  }
+
+  try {
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+  } catch {
+    return t("app.admin.emails.imap.common.unknown");
+  }
+};
+
+const truncateText = (text: string, maxLength = 50): string => {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return `${text.substring(0, maxLength)}...`;
+};
+
 /**
  * IMAP Messages Table Component
  */
@@ -39,48 +87,6 @@ export function ImapMessagesTable({
 
   const handleViewMessage = (messageId: string): void => {
     router.push(`/admin/emails/imap/messages/${messageId}`);
-  };
-
-  const getStatusIcon = (message: ImapMessageResponseType): JSX.Element => {
-    if (message.isRead) {
-      return <MailOpen className="h-4 w-4 text-gray-600" />;
-    }
-    return <Mail className="h-4 w-4 text-blue-600" />;
-  };
-
-  const getStatusBadge = (message: ImapMessageResponseType): JSX.Element => {
-    if (!message.isRead) {
-      return (
-        <Badge variant="default" className="bg-blue-100 text-blue-800">
-          {t("app.admin.emails.imap.messages.unread")}
-        </Badge>
-      );
-    }
-    return (
-      <Badge variant="outline">
-        {t("app.admin.emails.imap.messages.read")}
-      </Badge>
-    );
-  };
-
-  const formatDate = (dateString: string | null): string => {
-    if (!dateString) {
-      return t("app.admin.emails.imap.common.unknown");
-    }
-
-    try {
-      const date = new Date(dateString);
-      return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-    } catch {
-      return t("app.admin.emails.imap.common.unknown");
-    }
-  };
-
-  const truncateText = (text: string, maxLength = 50): string => {
-    if (text.length <= maxLength) {
-      return text;
-    }
-    return `${text.substring(0, maxLength)}...`;
   };
 
   if (loading) {
@@ -144,7 +150,7 @@ export function ImapMessagesTable({
                       t("app.admin.emails.imap.messages.noSubject"),
                   )}
                 </div>
-                {getStatusBadge(message)}
+                {getStatusBadge(message, t)}
               </div>
             </TableCell>
             <TableCell>
@@ -163,7 +169,7 @@ export function ImapMessagesTable({
               <div className="text-sm text-muted-foreground">-</div>
             </TableCell>
             <TableCell>
-              <div className="text-sm">{formatDate(message.sentAt)}</div>
+              <div className="text-sm">{formatDate(message.sentAt, t)}</div>
             </TableCell>
             <TableCell>
               {message.hasAttachments && (

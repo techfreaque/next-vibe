@@ -7,7 +7,6 @@
 
 import { Filter, Mail, RefreshCw } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
-import { Form } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import type React from "react";
@@ -85,16 +84,12 @@ export function EmailsListClient({
             </span>
           </div>
 
-          <Form
-            form={emailsEndpoint.read.form}
-            onSubmit={() => {}}
-            className="space-y-4"
-          >
+          <div className="space-y-4">
             <EmailsListFilters
               form={emailsEndpoint.read.form}
               locale={locale}
             />
-          </Form>
+          </div>
         </div>
 
         {/* Results */}

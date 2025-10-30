@@ -22,7 +22,6 @@
     "build": "builder build && chmod +x .dist/launchpad.mjs",
     "prepare": "builder build && chmod +x .dist/launchpad.mjs",
     "dev": "bun src/scripts/launchpad.ts",
-    "lint": "eslint --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "pub": "release-tool"
@@ -45,7 +44,6 @@
   "devDependencies": {
     "@types/node": "^24.8.1",
     "builder": "workspace:*",
-    "lint": "workspace:*",
     "release-tool": "workspace:*"
   }
 }

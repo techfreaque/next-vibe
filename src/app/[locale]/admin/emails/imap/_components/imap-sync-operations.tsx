@@ -69,7 +69,7 @@ export function ImapSyncOperations(): JSX.Element {
   );
 
   // Extract sync status from accounts data
-  const accountsResponse = accountsEndpoint.read?.response;
+  const accountsResponse = accountsEndpoint.read.response;
   let accounts: ImapAccountsListResponseOutput["accounts"] = [];
   if (accountsResponse) {
     if (accountsResponse.success === true) {
@@ -176,26 +176,16 @@ export function ImapSyncOperations(): JSX.Element {
   };
 
   const handleStartSync = (): void => {
-    const createEndpoint = syncEndpoint.create;
-    if (!createEndpoint) {
-      return;
-    }
-
     setIsSyncing(true);
     // Trigger sync using the sync endpoint
     // Set form values and submit using the form's handleSubmit
-    createEndpoint.form.setValue("accountIds", []);
-    createEndpoint.form.setValue("force", false);
-    createEndpoint.form.setValue("dryRun", false);
-    createEndpoint.form.setValue("maxMessages", 1000);
+    syncEndpoint.create.form.setValue("accountIds", []);
+    syncEndpoint.create.form.setValue("force", false);
+    syncEndpoint.create.form.setValue("dryRun", false);
+    syncEndpoint.create.form.setValue("maxMessages", 1000);
 
-    // Create a synthetic form event and submit
-    const syntheticEvent = {
-      preventDefault: () => {},
-      stopPropagation: () => {},
-    } as React.FormEvent<HTMLFormElement>;
-
-    void createEndpoint.onSubmit(syntheticEvent);
+    // Submit the form directly - handleSubmit handles the event internally
+    void syncEndpoint.create.submitForm(undefined);
   };
 
   const handleStopSync = (): void => {

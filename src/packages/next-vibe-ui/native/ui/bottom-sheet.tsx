@@ -17,13 +17,11 @@ export {
 
 interface BottomSheetViewProps {
   children: ReactNode;
-  hadHeader?: boolean;
   className?: string;
 }
 
 export function BottomSheetView({
   children,
-  hadHeader,
   className,
 }: BottomSheetViewProps): React.JSX.Element {
   return <View className={className}>{children}</View>;

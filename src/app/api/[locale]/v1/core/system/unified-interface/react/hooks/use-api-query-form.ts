@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
+import type { z } from "zod";
 import {
   createSuccessResponse,
   ErrorResponseTypes,
@@ -53,9 +54,8 @@ export function useApiQueryForm<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
+    readonly UserRoleValue[],
+    unknown
   >,
 >({
   endpoint,
@@ -219,9 +219,7 @@ export function useApiQueryForm<
 
   const formConfig = {
     ...restFormOptions,
-    resolver: zodResolver<FormData, FormData>(
-      endpoint.requestSchema as z.ZodType<FormData, any, FormData>,
-    ),
+    resolver: zodResolver(endpoint.requestSchema as z.ZodType<FormData>),
   };
 
   // Generate a storage key based on the endpoint if not provided

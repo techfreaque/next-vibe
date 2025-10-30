@@ -7,7 +7,7 @@
  * Performance monitoring and optimization for Vibe CLI
  */
 
-import { performance } from "perf_hooks";
+import { performance } from "node:perf_hooks";
 
 /**
  * Performance metric metadata type
@@ -192,7 +192,7 @@ export class PerformanceMonitor {
     const durations = metrics
       .map((m) => m.duration)
       .filter((d): d is number => d !== undefined)
-      .sort((a, b) => a - b);
+      .toSorted((a, b) => a - b);
 
     const errorCount = metrics.filter(
       (m) => m.metadata?.success === false,
@@ -215,7 +215,7 @@ export class PerformanceMonitor {
    */
   getOperationNames(): string[] {
     const names = new Set(this.completedMetrics.map((m) => m.name));
-    return Array.from(names).sort();
+    return [...names].toSorted();
   }
 
   /**
@@ -230,7 +230,7 @@ export class PerformanceMonitor {
    * Get current active timers
    */
   getActiveTimers(): string[] {
-    return Array.from(this.metrics.keys());
+    return [...this.metrics.keys()];
   }
 
   /**

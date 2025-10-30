@@ -20,8 +20,10 @@ interface ModuleWithDefault {
   default: ReleaseConfig;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type LoadedModule = Record<string, any>;
+type LoadedModule =
+  | { default: ReleaseConfig }
+  | ReleaseConfig
+  | Record<string, ReleaseConfig | Array<unknown> | string | number | boolean | null>;
 
 /**
  * Type guard to check if module has a default export with ReleaseConfig

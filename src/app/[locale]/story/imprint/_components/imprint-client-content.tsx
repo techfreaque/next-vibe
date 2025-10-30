@@ -10,6 +10,10 @@ interface ImprintClientInteractionProps {
   locale: CountryLanguage;
 }
 
+const handlePrint = (): void => {
+  window.print();
+};
+
 /**
  * Client component for handling user interactions on the Imprint page.
  * This is separated from the main content rendering to minimize client-side JavaScript.
@@ -18,12 +22,6 @@ export function ImprintClientInteraction({
   locale,
 }: ImprintClientInteractionProps): ReactElement {
   const { t } = simpleT(locale);
-
-  // This component is kept minimal since there's limited interactivity
-  // needed for the Imprint page.
-  const handlePrint = (): void => {
-    window.print();
-  };
 
   return (
     <div className="flex justify-end mb-8">

@@ -11,18 +11,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
 
-// Type for values that can be in FormData
-type FormDataValue =
-  | string
-  | number
-  | boolean
-  | File
-  | Blob
-  | null
-  | undefined
-  | FormDataValue[]
-  | { [key: string]: FormDataValue };
-
 /**
  * Check if an object contains File instances (recursively)
  */

@@ -210,7 +210,7 @@ interface FormFieldFieldProps<T> {
   disabled?: boolean;
 }
 
-type FormItemProps<T extends React.ElementType<any>, U> = Override<
+type FormItemProps<T extends React.ElementType, U> = Override<
   React.ComponentPropsWithoutRef<T>,
   FormFieldFieldProps<U>
 > & {

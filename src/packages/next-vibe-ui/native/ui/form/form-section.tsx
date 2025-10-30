@@ -5,7 +5,7 @@
 import type { ReactNode } from "react";
 import { Text, View } from "react-native";
 
-export function FormSection(props: { children?: ReactNode }): ReactNode {
+export function FormSection(_props: { children?: ReactNode }): ReactNode {
   console.warn("🔶 Using stub: FormSection");
   return (
     <View style={{ padding: 8, backgroundColor: "#FEF3C7", marginVertical: 4 }}>

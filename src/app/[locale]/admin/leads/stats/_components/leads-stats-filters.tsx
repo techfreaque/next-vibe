@@ -11,7 +11,6 @@ import {
   DateRangePreset,
   TimePeriod,
 } from "next-vibe/shared/types/stats-filtering.schema";
-import { Form } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
@@ -314,12 +313,12 @@ export function LeadsStatsFiltersContainer({
   children,
   onRefresh,
   title,
-  form,
+  form: _form,
 }: LeadsStatsFiltersContainerProps): JSX.Element {
   const { t } = simpleT(locale);
 
   return (
-    <Form form={form} onSubmit={() => {}} className="space-y-4">
+    <div className="space-y-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-lg font-semibold">
@@ -339,6 +338,6 @@ export function LeadsStatsFiltersContainer({
         </CardHeader>
         <CardContent className="space-y-4">{children}</CardContent>
       </Card>
-    </Form>
+    </div>
   );
 }

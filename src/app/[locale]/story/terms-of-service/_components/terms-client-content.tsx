@@ -10,6 +10,10 @@ interface TermsClientInteractionProps {
   locale: CountryLanguage;
 }
 
+const handlePrint = (): void => {
+  window.print();
+};
+
 /**
  * Client component for handling user interactions on the Terms of Service page.
  * This is separated from the main content rendering to minimize client-side JavaScript.
@@ -26,10 +30,6 @@ export function TermsClientInteraction({
   // - Print functionality
   // - Copy link to section
   // - etc.
-
-  const handlePrint = (): void => {
-    window.print();
-  };
 
   return (
     <div className="flex justify-end mb-8">

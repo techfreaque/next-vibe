@@ -5,12 +5,10 @@
 import "server-only";
 
 import type { Prettify } from "next-vibe/shared/types/utils";
-import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type { CreateApiEndpoint } from "../../endpoint/create";
-import type { UnifiedField } from "../../types/endpoint";
 import { Methods } from "../../types/enums";
 import type {
   EndpointHandlerConfig,
@@ -21,7 +19,7 @@ import { endpointHandler } from "./single";
 export function endpointsHandler<const T>(
   config: EndpointHandlerConfig<T>,
 ): Prettify<EndpointsHandlerReturn<T>> {
-  const { endpoint: definitions, ...methodHandlers } = config;
+  const { endpoint: definitions, ...methodConfigs } = config;
 
   // Extract available methods from definitions
   const availableMethods = Object.keys(
@@ -30,7 +28,7 @@ export function endpointsHandler<const T>(
       CreateApiEndpoint<
         string,
         Methods,
-        readonly (typeof UserRoleValue)[],
+        readonly UserRoleValue[],
         Record<string, string | number | boolean | null>
       >
     >,
@@ -38,25 +36,22 @@ export function endpointsHandler<const T>(
     keyof T & Methods
   >;
 
-  // Initialize result with proper structure
-  const result = {
-    tools: {
-      trpc: {},
-      cli: {},
-    },
-    definitions,
-    methods: availableMethods,
-  } as EndpointsHandlerReturn<T>;
+  // Build handlers for each method
+  interface HandlerEntry {
+    method: keyof T & Methods;
+    handler: ReturnType<typeof endpointHandler>;
+  }
 
-  // Process each method and merge handler results
+  const handlers: HandlerEntry[] = [];
+
   for (const method of availableMethods) {
     const endpoint = definitions[method] as CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
+      readonly UserRoleValue[],
       Record<string, string | number | boolean | null>
     >;
-    const methodConfig = methodHandlers[method];
+    const methodConfig = methodConfigs[method];
 
     if (!endpoint || !methodConfig) {
       continue;
@@ -79,20 +74,29 @@ export function endpointsHandler<const T>(
         : undefined,
     });
 
-    // Merge the handler result into our result
-    // The handler returns { [method]: nextHandler, tools: { trpc, cli } }
-    const methodHandler = handler[method];
-    if (methodHandler) {
-      result[method] = methodHandler;
-    }
-
-    // Merge tools separately to avoid overwriting
-    // For TRPC, assign the procedure to the specific method key
-    result.tools.trpc[method] = handler.tools.trpc;
-
-    // For CLI, assign the handler to the specific method
-    result.tools.cli[method] = handler.tools.cli;
+    handlers.push({ method, handler });
   }
 
-  return result as Prettify<EndpointsHandlerReturn<T>>;
+  // Build result from handlers
+  const methodHandlers = Object.fromEntries(
+    handlers.map(({ method, handler }) => [method, handler[method]])
+  );
+
+  const trpcHandlers = Object.fromEntries(
+    handlers.map(({ method, handler }) => [method, handler.tools.trpc])
+  );
+
+  const cliHandlers = Object.fromEntries(
+    handlers.map(({ method, handler }) => [method, handler.tools.cli])
+  );
+
+  return {
+    ...methodHandlers,
+    tools: {
+      trpc: trpcHandlers,
+      cli: cliHandlers,
+    },
+    definitions,
+    methods: availableMethods,
+  } as Prettify<EndpointsHandlerReturn<T>>;
 }

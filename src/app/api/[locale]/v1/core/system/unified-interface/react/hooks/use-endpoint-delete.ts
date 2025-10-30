@@ -30,8 +30,8 @@ export function useEndpointDelete<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
-    any
+    readonly UserRoleValue[],
+    unknown
   >,
 >(
   deleteEndpoint: TEndpoint | null,

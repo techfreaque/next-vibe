@@ -15,7 +15,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import type { ErrorResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
 import { CronTaskPriorityDB, CronTaskStatusDB } from "../enum";
 

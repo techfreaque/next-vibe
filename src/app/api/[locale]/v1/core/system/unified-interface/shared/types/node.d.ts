@@ -47,8 +47,10 @@ declare global {
       /**
        * Register event listeners
        */
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      on: (event: string, listener: (...args: any[]) => any) => this;
+      on: (
+        event: string,
+        listener: (...args: string[] | number[] | boolean[]) => void,
+      ) => this;
 
       /**
        * Internal Node.js API to get active handles
@@ -82,4 +84,4 @@ declare module "node:crypto" {
   export * from "crypto";
 }
 
-export {};
+

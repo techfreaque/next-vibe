@@ -20,16 +20,22 @@ import type {
  */
 export type JsonRpcVersion = "2.0";
 
-export interface JsonRpcRequest {
+/**
+ * JSON-RPC Request (generic version)
+ */
+export interface JsonRpcRequest<TParams = unknown> {
   jsonrpc: JsonRpcVersion;
   method: string;
-  params?: Record<string, string | number | boolean | null | object>;
+  params?: TParams;
   id?: string | number;
 }
 
-export interface JsonRpcResponse {
+/**
+ * JSON-RPC Response (generic version)
+ */
+export interface JsonRpcResponse<TResult = unknown> {
   jsonrpc: JsonRpcVersion;
-  result?: Record<string, string | number | boolean | null | object>;
+  result?: TResult;
   error?: JsonRpcError;
   id: string | number | null;
 }
@@ -229,7 +235,7 @@ export interface IMCPTransport {
  * MCP Protocol Handler Interface
  */
 export interface IMCPProtocolHandler {
-  handleRequest(request: JsonRpcRequest): Promise<JsonRpcResponse>;
+  handleRequest(request: JsonRpcRequest<unknown>): Promise<JsonRpcResponse>;
   handleInitialize(params: MCPInitializeParams): Promise<MCPInitializeResult>;
   handleToolsList(params: MCPToolsListParams): Promise<MCPToolsListResult>;
   handleToolCall(params: MCPToolCallParams): Promise<MCPToolCallResult>;

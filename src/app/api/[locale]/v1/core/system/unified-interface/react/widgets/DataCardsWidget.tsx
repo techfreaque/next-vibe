@@ -5,6 +5,7 @@
 
 "use client";
 
+import Image from "next/image";
 import type { JSX } from "react";
 
 import type { RenderableValue, WidgetComponentProps } from "../types";
@@ -87,9 +88,11 @@ export const DataCardsWidget = ({
           >
             {image && (
               <div className="aspect-video w-full overflow-hidden bg-gray-100 dark:bg-gray-700">
-                <img
+                <Image
                   src={image}
                   alt={title}
+                  width={400}
+                  height={225}
                   className="h-full w-full object-cover"
                 />
               </div>

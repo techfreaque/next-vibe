@@ -11,3 +11,9 @@ export const {
   MEETING: "app.api.v1.core.user.public.signup.enums.signupType.meeting",
   PRICING: "app.api.v1.core.user.public.signup.enums.signupType.pricing",
 });
+
+// Create DB enum array for Drizzle and Zod
+export const SignupTypeDB = [
+  SignupType.MEETING,
+  SignupType.PRICING,
+] as const;

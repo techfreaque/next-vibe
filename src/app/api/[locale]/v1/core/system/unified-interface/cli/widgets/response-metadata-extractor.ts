@@ -138,11 +138,11 @@ export class ResponseMetadataExtractor {
     responseData?: ExtractOutput<TEndpoint["responseSchema"]>,
   ): ResponseContainerMetadata | null;
   extractResponseMetadata(
-    definition: CreateApiEndpoint,
+    definition: unknown,
     responseData?: ResponseData,
   ): ResponseContainerMetadata | null;
   extractResponseMetadata(
-    definition: CreateApiEndpoint,
+    definition: unknown,
     responseData?: ResponseData,
   ): ResponseContainerMetadata | null {
     try {
@@ -154,8 +154,12 @@ export class ResponseMetadataExtractor {
         definition.fields !== null &&
         !Array.isArray(definition.fields)
       ) {
+        // Type narrowing: after all checks, cast to expected union type
+        // This is safe because extractFromFieldsDefinition handles both cases
         return this.extractFromFieldsDefinition(
-          definition.fields,
+          definition.fields as
+            | UnifiedField<z.ZodTypeAny>
+            | Record<string, UnifiedField<z.ZodTypeAny>>,
           responseData,
         );
       }
@@ -163,10 +167,12 @@ export class ResponseMetadataExtractor {
       if (
         typeof definition === "object" &&
         definition !== null &&
-        "responseSchema" in definition &&
-        this.isZodSchema(definition.responseSchema)
+        "responseSchema" in definition
       ) {
-        return this.extractFromSchema(definition.responseSchema, responseData);
+        const responseSchemaCandidate = definition.responseSchema;
+        if (this.isZodSchema(responseSchemaCandidate)) {
+          return this.extractFromSchema(responseSchemaCandidate, responseData);
+        }
       }
 
       return null;
@@ -923,7 +929,7 @@ export class ResponseMetadataExtractor {
   /**
    * Type guard to check if value is a Zod schema
    */
-  private isZodSchema(value: z.ZodTypeAny | undefined): value is z.ZodTypeAny {
+  private isZodSchema(value: unknown): value is z.ZodTypeAny {
     return (
       typeof value === "object" &&
       value !== null &&

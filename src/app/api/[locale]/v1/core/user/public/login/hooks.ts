@@ -35,6 +35,19 @@ type LoginUrlVars = LoginEndpoint["TUrlVariablesOutput"];
  * FORM HOOKS
  ****************************/
 
+type LoginFormReturn = ApiFormReturn<LoginRequest, LoginResponse, LoginUrlVars> & {
+  emailForOptions: string | null;
+  handleEmailChange: (email: string | undefined) => void;
+  handleEmailFieldChange: (
+    e: ChangeEvent<HTMLInputElement>,
+    field: { onChange: (e: ChangeEvent<HTMLInputElement>) => void },
+  ) => void;
+  errorMessage: TranslationKey | null;
+  isAccountLocked: boolean;
+  loginOptions: LoginOptions;
+  alert: FormAlertState | null;
+};
+
 /**
  * Hook for user login
  *
@@ -54,18 +67,7 @@ export function useLogin(
     allowSocialAuth: false,
   },
   logger: EndpointLogger,
-): ApiFormReturn<LoginRequest, LoginResponse, LoginUrlVars> & {
-  emailForOptions: string | null;
-  handleEmailChange: (email: string | undefined) => void;
-  handleEmailFieldChange: (
-    e: ChangeEvent<HTMLInputElement>,
-    field: { onChange: (e: ChangeEvent<HTMLInputElement>) => void },
-  ) => void;
-  errorMessage: TranslationKey | null;
-  isAccountLocked: boolean;
-  loginOptions: LoginOptions;
-  alert: FormAlertState | null;
-} {
+): LoginFormReturn {
   const { toast } = useToast();
   const router = useRouter();
   useUser(logger); // Keep user state in sync
@@ -290,14 +292,7 @@ export function useLogin(
   const alert = getAlert();
 
   return {
-    form: formResult.form,
-    response: formResult.response,
-    isSubmitSuccessful: formResult.isSubmitSuccessful,
-    submitError: formResult.submitError,
-    isSubmitting: formResult.isSubmitting,
-    submitForm: formResult.submitForm,
-    clearSavedForm: formResult.clearSavedForm,
-    setErrorType: formResult.setErrorType,
+    ...formResult,
     emailForOptions,
     handleEmailChange,
     handleEmailFieldChange,

@@ -20,12 +20,7 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import {
-  CronTaskPriority,
-  CronTaskPriorityDB,
-  CronTaskStatus,
-  CronTaskStatusDB,
-} from "../../enum";
+import { CronTaskPriorityDB, CronTaskStatusDB } from "../../enum";
 
 /**
  * GET endpoint definition - Get task execution history

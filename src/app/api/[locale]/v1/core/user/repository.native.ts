@@ -97,12 +97,14 @@ class UserRepositoryNativeImpl implements UserRepository {
     const response = await nativeEndpoint(getUserMeEndpoint, {}, logger);
 
     // The response from /me endpoint has shape: { user: CompleteUserType }
-    // Extract the user field to match the repository interface
-    // Type is correctly inferred from endpoint definition
+    // Since native always calls GET /me which returns CompleteUserType,
+    // and CompleteUserType satisfies all UserType<T> variants (it's the most complete),
+    // TypeScript should infer this correctly. The generic T parameter doesn't affect
+    // what data we fetch - we always get complete user data from the endpoint.
     if (response.success) {
       return {
         success: true,
-        data: response.data.user as UserType<T>,
+        data: response.data.user,
         message: response.message,
       };
     }
@@ -214,7 +216,25 @@ class UserRepositoryNativeImpl implements UserRepository {
       roles?: (typeof UserRoleValue)[];
     },
     logger: EndpointLogger,
-  ) {
+  ): Promise<
+    ResponseType<{
+      users: Array<StandardUserType & { createdAt: string; updatedAt: string }>;
+      pagination: {
+        currentPage: number;
+        totalPages: number;
+        itemsPerPage: number;
+        totalItems: number;
+        hasMore: boolean;
+        hasPrevious: boolean;
+      };
+      searchInfo: {
+        searchTerm: string | undefined;
+        appliedFilters: (typeof UserRoleValue)[];
+        searchTime: string;
+        totalResults: number;
+      };
+    }>
+  > {
     logger.warn(
       "searchUsersWithPagination not implemented on native - not used in page.tsx",
     );
@@ -233,7 +253,7 @@ class UserRepositoryNativeImpl implements UserRepository {
         };
         searchInfo: {
           searchTerm: string | undefined;
-          appliedFilters: (typeof UserRole)[];
+          appliedFilters: (typeof UserRoleValue)[];
           searchTime: string;
           totalResults: number;
         };

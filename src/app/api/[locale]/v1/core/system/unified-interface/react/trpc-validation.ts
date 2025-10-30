@@ -42,7 +42,7 @@ export interface TrpcValidationContext<TRequestOutput, TUrlParametersOutput> {
 export function validateTrpcRequestData<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields,
   TRequestInput,
   TRequestOutput,

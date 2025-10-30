@@ -2,7 +2,7 @@
 import { execSync } from "node:child_process";
 import { join } from "node:path";
 
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import type { ReleaseOptions, ReleasePackage } from "../types/index.js";

@@ -19,7 +19,7 @@ import type { TRPCContext } from "./trpc-trpc-context";
  */
 const t = initTRPC
   .context<
-    TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]>
+    TRPCContext<Record<string, string>, readonly UserRoleValue[]>
   >()
   .create({
     errorFormatter({ shape, error }) {
@@ -79,14 +79,14 @@ export const authenticatedProcedure = publicProcedure.use(isAuthenticated);
  * Creates middleware that checks for specific user roles
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
+export function requireRoles<TRoles extends readonly UserRoleValue[]>(
   roles: TRoles,
   logger: EndpointLogger,
 ) {
   return middleware(async ({ ctx, next }) => {
     if (!ctx.user || ctx.user.isPublic) {
       logger.error("tRPC: Role check failed - user not authenticated", {
-        requiredRoles: Array.from(roles),
+        requiredRoles: [...roles],
       });
       // eslint-disable-next-line no-restricted-syntax
       throw new TRPCError({
@@ -100,8 +100,8 @@ export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
 
     if (!hasRequiredRole) {
       logger.error("tRPC: Role check failed - insufficient permissions", {
-        requiredRoles: Array.from(roles),
-        userRoles: Array.from(ctx.userRoles),
+        requiredRoles: [...roles],
+        userRoles: [...ctx.userRoles],
       });
       // eslint-disable-next-line no-restricted-syntax
       throw new TRPCError({

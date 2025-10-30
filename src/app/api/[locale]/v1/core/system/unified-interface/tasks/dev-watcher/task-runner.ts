@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import type { FSWatcher } from "fs";
+import type { FSWatcher } from "node:fs";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

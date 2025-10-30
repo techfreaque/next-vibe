@@ -7,7 +7,7 @@
 "use client";
 
 import { Filter, RefreshCw } from "lucide-react";
-import { Form, FormAlert } from "next-vibe-ui/ui";
+import { FormAlert } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
@@ -111,11 +111,7 @@ export function ImapMessagesManagement(): JSX.Element {
             </div>
           </CardHeader>
           <CardContent>
-            <Form
-              form={messagesEndpoint.read.form}
-              onSubmit={() => {}}
-              className="space-y-6"
-            >
+            <div className="space-y-6">
               <FormAlert alert={messagesEndpoint.alert} />
 
               {/* Filters Grid */}
@@ -290,7 +286,7 @@ export function ImapMessagesManagement(): JSX.Element {
                   />
                 </div>
               </div>
-            </Form>
+            </div>
           </CardContent>
         </Card>
 

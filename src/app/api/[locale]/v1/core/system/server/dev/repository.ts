@@ -199,8 +199,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           );
           return;
         } catch {
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
-          await pool.end().catch(() => {});
+          // Intentionally suppress pool.end() errors - pool might already be closed
+          await pool.end().catch(() => undefined);
           // Log progress every 10 attempts
           if (attempt % 10 === 0) {
             logger.debug(
@@ -267,8 +267,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
               // Start Next.js anyway
               logger.vibe(`🌐 Starting Next.js on http://localhost:${port}`);
               this.startNextJsProcess(port);
-              // eslint-disable-next-line @typescript-eslint/no-empty-function
-              return await new Promise<never>(() => {});
+              // Intentionally never resolve - keep process running indefinitely
+              return await new Promise<never>(() => undefined);
             }
           } else {
             // Just start the database without reset
@@ -299,8 +299,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
                 // Start Next.js anyway
                 logger.vibe(`🌐 Starting Next.js on http://localhost:${port}`);
                 this.startNextJsProcess(port);
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-              return await new Promise<never>(() => {});
+                // Intentionally never resolve - keep process running indefinitely
+              return await new Promise<never>(() => undefined);
               }
 
               logger.vibe("✅ Database started");
@@ -316,8 +316,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
               // Start Next.js anyway
               logger.vibe(`🌐 Starting Next.js on http://localhost:${port}`);
               this.startNextJsProcess(port);
-              // eslint-disable-next-line @typescript-eslint/no-empty-function
-              return await new Promise<never>(() => {});
+              // Intentionally never resolve - keep process running indefinitely
+              return await new Promise<never>(() => undefined);
             }
           }
 

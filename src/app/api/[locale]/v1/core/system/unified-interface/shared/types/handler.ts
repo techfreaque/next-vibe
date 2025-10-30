@@ -72,7 +72,6 @@ import type {
 import type { NextHandlerReturnType } from "../../next-api/types";
 import type { TrpcHandlerReturnType } from "../../trpc/types";
 import type { CreateApiEndpoint } from "../endpoint/create";
-import type { UnifiedField } from "./endpoint";
 import type { EndpointLogger } from "../logger/endpoint";
 import type { Methods } from "./enums";
 
@@ -145,10 +144,10 @@ type ExtractUrlVariablesOutput<TEndpoint> = TEndpoint extends {
  * Helper type to extract allowed roles from endpoint, with fallback
  */
 type ExtractAllowedRoles<TEndpoint> = TEndpoint extends {
-  allowedRoles: infer Roles extends readonly (typeof UserRoleValue)[];
+  allowedRoles: infer Roles extends readonly UserRoleValue[];
 }
   ? Roles
-  : readonly (typeof UserRoleValue)[];
+  : readonly UserRoleValue[];
 
 export interface RouteModule<
   TEndpoint extends CreateApiEndpoint = CreateApiEndpoint,
@@ -209,12 +208,12 @@ export interface DefinitionModule<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     DefaultRequestData
   > = CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     DefaultRequestData
   >,
 > {
@@ -245,7 +244,7 @@ export type InferJwtPayloadType<TUserRoleValue extends typeof UserRoleValue> =
  * - Otherwise → JwtPrivatePayloadType (no PUBLIC, guaranteed authenticated)
  */
 export type InferJwtPayloadTypeFromRoles<
-  TRoles extends readonly (typeof UserRoleValue)[],
+  TRoles extends readonly UserRoleValue[],
 > =
   Exclude<TRoles[number], "PUBLIC"> extends never
     ? JWTPublicPayloadType
@@ -296,7 +295,7 @@ export interface MethodHandlerConfig<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > {
   handler: ApiHandlerFunction<
     TRequestOutput,
@@ -320,21 +319,13 @@ export type EndpointHandlerConfig<T> = {
   [K in Methods]?: K extends keyof T
     ? T[K] extends {
         types: {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          RequestOutput: any;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ResponseOutput: any;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          UrlVariablesOutput: any;
+          RequestOutput: infer TReqOut;
+          ResponseOutput: infer TResOut;
+          UrlVariablesOutput: infer TUrlOut;
         };
-        allowedRoles: readonly (typeof UserRoleValue)[];
+        allowedRoles: readonly UserRoleValue[];
       }
-      ? MethodHandlerConfig<
-          T[K]["types"]["RequestOutput"],
-          T[K]["types"]["ResponseOutput"],
-          T[K]["types"]["UrlVariablesOutput"],
-          T[K]["allowedRoles"]
-        >
+      ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, T[K]["allowedRoles"]>
       : never
     : never;
 };
@@ -393,7 +384,7 @@ export type EndpointsHandlerReturn<T> = {
         Record<string, string | number | boolean>,
         Record<string, string | number | boolean>,
         Record<string, string | number | boolean>,
-        readonly (typeof UserRoleValue)[]
+        readonly UserRoleValue[]
       >
     >;
   };
@@ -407,7 +398,7 @@ export type EndpointsHandlerReturn<T> = {
 export interface ApiHandlerProps<
   TRequestOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > {
   /** Request data (validated by Zod schema) */
   data: TRequestOutput;
@@ -444,7 +435,7 @@ export type ApiHandlerFunction<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > = (
   props: ApiHandlerProps<TRequestOutput, TUrlVariablesOutput, TUserRoleValue>,
 ) =>
@@ -500,14 +491,11 @@ export interface ApiHandlerOptions<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TRequestInput = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TResponseInput = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TUrlVariablesInput = any,
+  TRequestInput = TRequestOutput,
+  TResponseInput = TResponseOutput,
+  TUrlVariablesInput = TUrlVariablesOutput,
 > {
   /** API endpoint definition */
   endpoint: CreateApiEndpoint<
@@ -559,7 +547,7 @@ export type EndpointHandlerReturn<
   TResponseOutput,
   TUrlVariablesOutput,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > = {
   [K in TMethod]: NextHandlerReturnType<TResponseOutput, TUrlVariablesOutput>;
 } & {

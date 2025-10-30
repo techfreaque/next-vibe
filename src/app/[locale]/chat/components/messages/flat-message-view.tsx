@@ -559,7 +559,7 @@ function FlatMessage({
                       content,
                       onBranchMessage,
                     )
-                : async (): Promise<void> => {}
+                : undefined
             }
             onCancel={messageActions.cancelAction}
             onModelChange={onModelChange}
@@ -575,8 +575,8 @@ function FlatMessage({
             descriptionKey="app.chat.flatView.retryModal.description"
             selectedModel={selectedModel}
             selectedPersona={selectedPersona}
-            onModelChange={onModelChange || ((): void => {})}
-            onPersonaChange={onPersonaChange || ((): void => {})}
+            onModelChange={onModelChange || undefined}
+            onPersonaChange={onPersonaChange || undefined}
             onConfirm={(): Promise<void> =>
               messageActions.handleConfirmRetry(message.id, onRetryMessage)
             }
@@ -647,8 +647,8 @@ function FlatMessage({
             descriptionKey="app.chat.flatView.answerModal.description"
             selectedModel={selectedModel}
             selectedPersona={selectedPersona}
-            onModelChange={onModelChange || ((): void => {})}
-            onPersonaChange={onPersonaChange || ((): void => {})}
+            onModelChange={onModelChange || undefined}
+            onPersonaChange={onPersonaChange || undefined}
             showInput={true}
             inputValue={messageActions.answerContent}
             onInputChange={messageActions.setAnswerContent}

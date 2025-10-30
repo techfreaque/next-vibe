@@ -41,18 +41,19 @@ export const GroupedListWidget = ({
   // Initialize hooks before any early returns
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
-  if (!isGroupedListWidgetData(data)) {
-    return <div className={className}>—</div>;
-  }
-
-  const typedData = data;
+  const isValidData = isGroupedListWidgetData(data);
+  const typedData = isValidData ? data : null;
 
   // Set initial expanded groups on mount
   useEffect(() => {
-    if (typedData.groups.length > 0) {
+    if (typedData && typedData.groups.length > 0) {
       setExpandedGroups(new Set(typedData.groups.map((g) => g.key)));
     }
-  }, [typedData.groups]);
+  }, [typedData]);
+
+  if (!isValidData || !typedData) {
+    return <div className={className}>—</div>;
+  }
 
   const toggleGroup = (groupKey: string): void => {
     setExpandedGroups((prev) => {

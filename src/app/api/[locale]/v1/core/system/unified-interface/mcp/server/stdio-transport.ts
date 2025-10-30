@@ -4,7 +4,7 @@
  */
 
 import { parseError } from "next-vibe/shared/utils";
-import * as readline from "readline";
+import * as readline from "node:readline";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { IMCPTransport, JsonRpcRequest, JsonRpcResponse } from "../types";

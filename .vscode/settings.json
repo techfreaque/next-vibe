@@ -10,12 +10,10 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-
   // Oxlint configuration
   "oxc.enable": true,
   "oxc.lint.run": "onSave",
   "oxc.configPath": ".tmp/.oxlintrc.json",
-
   // ESLint configuration (for i18n and custom AST rules)
   "eslint.enable": true,
   "eslint.format.enable": false,
@@ -25,17 +23,14 @@
     "typescript",
     "typescriptreact"
   ],
-
   // Prettier configuration
   "prettier.enable": true,
   "prettier.requireConfig": true,
-
   // TypeScript configuration
   "typescript.validate.enable": true,
   "typescript.suggest.autoImports": true,
-
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "TypeScriptTeam.native-preview",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit"

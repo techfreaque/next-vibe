@@ -1,6 +1,7 @@
 "use client";
 
 import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX, MouseEvent } from "react";
 
@@ -53,30 +54,75 @@ export function LinkWidget({
     }
   };
 
-  /* eslint-disable-next-line i18next/no-literal-string */
-  const linkRel = rel ?? (openInNewTab ? "noopener noreferrer" : undefined);
+  const isExternal = url.startsWith("http://") || url.startsWith("https://");
 
-  return (
-    <a
-      href={url}
-      target={openInNewTab ? "_blank" : undefined}
-      rel={linkRel}
-      onClick={handleClick}
-      className={cn(
-        "inline-flex items-center gap-1.5 text-primary hover:underline transition-colors",
-        "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm",
-        !context.isInteractive && "pointer-events-none",
-        className,
-      )}
-      style={style}
-      aria-label={title ?? url}
-    >
+  const linkContent = (
+    <>
       <span className="truncate">{title ?? url}</span>
       {openInNewTab && (
         <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" />
       )}
       {description && <span className="sr-only">{description}</span>}
-    </a>
+    </>
+  );
+
+  const commonClassName = cn(
+    "inline-flex items-center gap-1.5 text-primary hover:underline transition-colors",
+    "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm",
+    !context.isInteractive && "pointer-events-none",
+    className,
+  );
+
+  // For external links, we must use <a> tag with proper security attributes
+  // Next.js Link component doesn't support external URLs properly
+  if (isExternal) {
+    // For target="_blank", always use "noopener noreferrer" for security
+    // Note: We ignore custom rel prop when opening in new tab to ensure security
+    if (openInNewTab) {
+      return (
+        // External link with target="_blank" - safe to use <a> tag
+        // eslint-disable-next-line @next/next/no-html-link-for-pages
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleClick}
+          className={commonClassName}
+          style={style}
+          aria-label={title ?? url}
+        >
+          {linkContent}
+        </a>
+      );
+    }
+
+    // External link without target="_blank"
+    return (
+      // External link - safe to use <a> tag
+      // eslint-disable-next-line @next/next/no-html-link-for-pages
+      <a
+        href={url}
+        rel={rel}
+        onClick={handleClick}
+        className={commonClassName}
+        style={style}
+        aria-label={title ?? url}
+      >
+        {linkContent}
+      </a>
+    );
+  }
+
+  return (
+    <Link
+      href={url}
+      onClick={handleClick}
+      className={commonClassName}
+      style={style}
+      aria-label={title ?? url}
+    >
+      {linkContent}
+    </Link>
   );
 }
 

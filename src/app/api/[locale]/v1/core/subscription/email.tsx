@@ -383,6 +383,7 @@ function renderAdminSubscriptionNotificationEmailContent(
               )}
               :
             </Text>{" "}
+            {/* eslint-disable-next-line eslint-plugin-next/no-html-link-for-pages */}
             <a
               href={`mailto:${user.email}`}
               style={{ color: "#3b82f6", textDecoration: "none" }}

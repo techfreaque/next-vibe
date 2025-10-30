@@ -26,7 +26,7 @@ export interface OxlintConfig {
     nursery?: Severity;
     restriction?: Severity;
   };
-  rules?: Record<string, Severity | [Severity, Record<string, string | number | boolean>]>;
+  rules?: LintConfigElement
   settings?: {
     "jsx-a11y"?: {
       polymorphicPropName?: string | null;
@@ -77,6 +77,21 @@ export interface PrettierConfig {
   proseWrap: "always" | "never" | "preserve";
 }
 
+type LintPrimitive = string | number | boolean;
+
+type LintConfigValue =
+  | LintPrimitive
+  | LintPrimitive[]
+  | LintConfigObject
+  | LintConfigObject[]
+  | (LintPrimitive | LintConfigObject)[];
+
+interface LintConfigObject {
+  [key: string]: LintConfigValue;
+}
+
+type LintConfigElement = Record<string, LintConfigValue>;
+
 /**
  * ESLint Configuration
  * For i18n checking and custom AST rules that oxlint doesn't support
@@ -89,11 +104,11 @@ export interface EslintConfig {
     config: {
       files: string[];
       ignores: string[];
-      rules: Record<string, string | number | boolean | [string, Record<string, string | number | boolean>]>;
+      rules: LintConfigElement
     };
   };
-  customRules: Record<string, string | number | boolean | [string, Record<string, string | number | boolean>]>;
-  ruleOverrides: Record<string, Record<string, string | number | boolean | [string, Record<string, string | number | boolean>]>>;
+  customRules: LintConfigElement;
+  ruleOverrides: LintConfigElement;
   parserOptions: {
     project: string;
     tsconfigRootDir: string;

@@ -32,29 +32,19 @@ import type {
 import { MCPErrorCode } from "./types";
 
 /**
- * Type for MCP execution result data - JSON-serializable value
- */
-type MCPResultData =
-  | string
-  | number
-  | boolean
-  | null
-  | MCPResultData[]
-  | { [key: string]: MCPResultData };
-
-/**
  * MCP Registry Implementation
  * Extends BaseRegistry to eliminate duplication
  */
 export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
   private tools: MCPToolMetadata[] = [];
 
-  constructor(logger: EndpointLogger) {
+  constructor(logger: EndpointLogger, locale: CountryLanguage) {
     super(
       {
         // Platform name is an internal identifier for logging, not user-facing
         // eslint-disable-next-line i18next/no-literal-string
         platformName: "MCP Registry",
+        locale,
         enabledCheck: isMCPServerEnabled,
       },
       logger,
@@ -302,7 +292,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
 export const getMCPRegistry = createKeyedSingletonGetter(
   (key: string, locale: CountryLanguage) => {
     const logger = createEndpointLogger(false, Date.now(), locale);
-    return new MCPRegistry(logger);
+    return new MCPRegistry(logger, locale);
   },
 );
 

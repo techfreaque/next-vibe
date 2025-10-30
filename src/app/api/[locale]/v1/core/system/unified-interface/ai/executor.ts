@@ -23,10 +23,6 @@ import type {
  * Extends BaseExecutor to eliminate duplication
  */
 export class ToolExecutor extends BaseExecutor implements IToolExecutor {
-  constructor() {
-    super();
-  }
-
   /**
    * Execute a tool using shared base executor logic
    */

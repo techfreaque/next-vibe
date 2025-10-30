@@ -27,7 +27,7 @@ type EndpointNode =
       [K in Methods]?: CreateApiEndpoint<
         string,
         K,
-        readonly (typeof UserRoleValue)[],
+        readonly UserRoleValue[],
         UnifiedField<z.ZodTypeAny>
       >;
     }
@@ -62,7 +62,7 @@ export function getDiscoveredEndpoints(): DiscoveredEndpoint[] {
           | CreateApiEndpoint<
               string,
               Methods,
-              readonly (typeof UserRoleValue)[],
+              readonly UserRoleValue[],
               UnifiedField<z.ZodTypeAny>
             >
           | undefined;

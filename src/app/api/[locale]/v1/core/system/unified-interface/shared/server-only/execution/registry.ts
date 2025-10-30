@@ -6,10 +6,15 @@
 
 import "server-only";
 
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getErrorMessage } from "../../utils/error";
+import type { Platform } from "../config";
 import { getDiscoveredEndpoints } from "../discovery/adapter";
+import { toolFilter } from "../permissions/filter";
 import type { DiscoveredEndpoint } from "../types/registry";
 
 /**
@@ -17,6 +22,7 @@ import type { DiscoveredEndpoint } from "../types/registry";
  */
 export interface BaseRegistryConfig {
   platformName: string;
+  locale: CountryLanguage;
   enabledCheck?: () => boolean;
 }
 
@@ -41,8 +47,7 @@ export abstract class BaseRegistry {
   protected lastRefresh = 0;
 
   constructor(config: BaseRegistryConfig, logger?: EndpointLogger) {
-    this.logger =
-      logger || this.createEndpointLogger(false, Date.now(), config.locale);
+    this.logger = logger || createEndpointLogger(false, Date.now(), config.locale);
     this.config = config;
   }
 
@@ -99,12 +104,12 @@ export abstract class BaseRegistry {
 
   /**
    * Get endpoints filtered by user permissions
-   * @param user - User context for permission filtering
+   * @param user - User context for permission filtering (JwtPayloadType)
    * @param platform - Platform to filter by (optional)
    */
   getEndpointsByPermissions(
-    user: { id?: string; email?: string; role?: string; isPublic: boolean },
-    platform?: string,
+    user: JwtPayloadType,
+    platform?: Platform,
   ): DiscoveredEndpoint[] {
     this.ensureInitialized();
 
@@ -178,7 +183,7 @@ export abstract class BaseRegistry {
    */
   protected hasPermission(
     endpoint: DiscoveredEndpoint,
-    user: { id?: string; email?: string; role?: string; isPublic: boolean },
+    user: JwtPayloadType,
   ): boolean {
     // Import toolFilter dynamically to avoid circular dependencies
     return toolFilter.hasEndpointPermission(endpoint, user);

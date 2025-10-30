@@ -80,7 +80,7 @@ export class SingletonFactory<T> {
    * Get all instance keys
    */
   getKeys(): string[] {
-    return Array.from(this.instances.keys());
+    return [...this.instances.keys()];
   }
 
   /**

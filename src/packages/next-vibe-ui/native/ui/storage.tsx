@@ -35,6 +35,10 @@ export const storage = {
 // Synchronous fallback for compatibility (returns empty/does nothing)
 export const syncStorage = {
   getItem: (): string | null => null,
-  setItem: (): void => {},
-  removeItem: (): void => {},
+  setItem: (): void => {
+    // No-op sync storage
+  },
+  removeItem: (): void => {
+    // No-op sync storage
+  },
 };

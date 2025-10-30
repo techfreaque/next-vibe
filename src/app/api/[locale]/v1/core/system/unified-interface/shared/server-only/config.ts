@@ -22,9 +22,65 @@ export enum Platform {
 }
 
 /**
- * Platform-specific configuration
+ * MCP-specific configuration
  */
-export interface PlatformConfig {
+export interface MCPPlatformSpecific {
+  protocolVersion: string;
+  capabilities: {
+    tools: boolean;
+    prompts: boolean;
+    resources: boolean;
+  };
+}
+
+/**
+ * CLI-specific configuration
+ */
+export interface CLIPlatformSpecific {
+  colorOutput: boolean;
+  verboseErrors: boolean;
+  interactiveMode: boolean;
+}
+
+/**
+ * AI-specific configuration
+ */
+export interface AIPlatformSpecific {
+  maxToolsPerRequest: number;
+  enableConfirmation: boolean;
+  dangerousOperations: boolean;
+}
+
+/**
+ * Web-specific configuration
+ */
+export interface WebPlatformSpecific {
+  enableWebSockets: boolean;
+  enableSSE: boolean;
+}
+
+/**
+ * Mobile-specific configuration
+ */
+export interface MobilePlatformSpecific {
+  offlineMode: boolean;
+  reducedPayloads: boolean;
+}
+
+/**
+ * Union type for all platform-specific configurations
+ */
+export type PlatformSpecific =
+  | MCPPlatformSpecific
+  | CLIPlatformSpecific
+  | AIPlatformSpecific
+  | WebPlatformSpecific
+  | MobilePlatformSpecific;
+
+/**
+ * Base platform configuration without platform-specific settings
+ */
+export interface BasePlatformConfig {
   /** Platform identifier */
   platform: Platform;
 
@@ -65,11 +121,41 @@ export interface PlatformConfig {
     /** Enable tool composition (tools calling tools) */
     composition: boolean;
   };
-
-  /** Platform-specific settings */
-  // eslint-disable-next-line no-restricted-syntax
-  platformSpecific?: Record<string, unknown>;
 }
+
+/**
+ * Platform-specific configuration (generic version)
+ */
+export interface PlatformConfig<T extends PlatformSpecific = PlatformSpecific>
+  extends BasePlatformConfig {
+  /** Platform-specific settings */
+  platformSpecific?: T;
+}
+
+/**
+ * MCP Platform Configuration
+ */
+export type MCPPlatformConfig = PlatformConfig<MCPPlatformSpecific>;
+
+/**
+ * CLI Platform Configuration
+ */
+export type CLIPlatformConfig = PlatformConfig<CLIPlatformSpecific>;
+
+/**
+ * AI Platform Configuration
+ */
+export type AIPlatformConfig = PlatformConfig<AIPlatformSpecific>;
+
+/**
+ * Web Platform Configuration
+ */
+export type WebPlatformConfig = PlatformConfig<WebPlatformSpecific>;
+
+/**
+ * Mobile Platform Configuration
+ */
+export type MobilePlatformConfig = PlatformConfig<MobilePlatformSpecific>;
 
 /**
  * Default configuration for all platforms
@@ -123,7 +209,7 @@ export const CLI_CONFIG: PlatformConfig = {
 /**
  * AI Tools configuration
  */
-export const AI_CONFIG: PlatformConfig = {
+export const AI_CONFIG: PlatformConfig<AIPlatformSpecific> = {
   ...DEFAULT_CONFIG,
   platform: Platform.AI,
   excludePaths: [
@@ -154,7 +240,7 @@ export const AI_CONFIG: PlatformConfig = {
 /**
  * MCP configuration
  */
-export const MCP_CONFIG: PlatformConfig = {
+export const MCP_CONFIG: MCPPlatformConfig = {
   ...DEFAULT_CONFIG,
   platform: Platform.MCP,
   excludePaths: [
@@ -260,16 +346,16 @@ export function mergePlatformConfig(
     ...customConfig,
     cache: {
       ...baseConfig.cache,
-      ...(customConfig.cache || {}),
+      ...customConfig.cache,
     },
     features: {
       ...baseConfig.features,
-      ...(customConfig.features || {}),
+      ...customConfig.features,
     },
     platformSpecific: {
       ...baseConfig.platformSpecific,
-      ...(customConfig.platformSpecific || {}),
-    },
+      ...customConfig.platformSpecific,
+    } as PlatformSpecific,
   };
 }
 
@@ -292,7 +378,7 @@ export function platformToAuthPlatform(platform: Platform): AuthPlatform {
       // Email uses web auth
       return "web";
     default: {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+       
       const _exhaustiveCheck: never = platform;
       return "web";
     }

@@ -158,10 +158,8 @@ export class UnifiedGroupingService {
     const groups = new Map<string, DiscoveredEndpoint[]>();
 
     for (const endpoint of endpoints) {
-      const category =
-        typeof endpoint.definition.category === "string"
-          ? endpoint.definition.category
-          : "uncategorized";
+      const categoryValue = endpoint.definition.category;
+      const category = String(categoryValue || "uncategorized");
 
       if (!groups.has(category)) {
         groups.set(category, []);
@@ -338,7 +336,7 @@ export class UnifiedGroupingService {
     const methods = new Set(endpoints.map((e) => e.definition.method));
     const count = endpoints.length;
     const plural = count > 1 ? "s" : "";
-    const methodList = Array.from(methods).join(", ");
+    const methodList = [...methods].join(", ");
     // eslint-disable-next-line i18next/no-literal-string
     return `${count} endpoint${plural} (${methodList})`;
   }
@@ -354,7 +352,7 @@ export class UnifiedGroupingService {
     const direction = options.sortDirection || "asc";
     const multiplier = direction === "asc" ? 1 : -1;
 
-    return groups.sort((a, b) => {
+    return groups.toSorted((a, b) => {
       let comparison = 0;
 
       switch (sortBy) {

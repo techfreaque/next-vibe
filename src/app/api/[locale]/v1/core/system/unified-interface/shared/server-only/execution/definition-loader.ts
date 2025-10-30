@@ -7,7 +7,6 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import type { CreateApiEndpoint } from "../../endpoint/create";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Methods } from "../../types/enums";
 import type { DefinitionModule } from "../../types/handler";
@@ -112,7 +111,7 @@ async function loadDefinitionFromFile<TEndpoint = unknown>(
  * 1. Try to load from route module (route.ts -> tools.definitions)
  * 2. Fallback to definition file (definition.ts)
  */
-export async function loadEndpointDefinition<TEndpoint = CreateApiEndpoint>(
+export async function loadEndpointDefinition<TEndpoint = unknown>(
   options: DefinitionLoaderOptions,
   logger: EndpointLogger,
 ): Promise<DefinitionLoaderResult<TEndpoint>> {

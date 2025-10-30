@@ -7,13 +7,20 @@
 
 /* eslint-disable no-console */
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../types/node.d.ts" />
+/// <reference path="../../types/node.d.ts" />
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { binaryStartTime } from "../../../cli/vibe-runtime";
 import type { EndpointLogger } from "../../logger/endpoint";
+
+/**
+ * No-op logger function for minimal logger contexts
+ */
+function noopLoggerFunction(): void {
+  // No-op logger function
+}
 
 /**
  * Safe handle types that should not be forcefully closed
@@ -288,73 +295,77 @@ export class ResourceMonitor {
 }
 
 /**
+ * Format performance breakdown for verbose output
+ */
+function formatPerformanceBreakdown(breakdown: PerformanceBreakdown): string {
+  return JSON.stringify(
+    {
+      binaryStartup: `${breakdown.binaryOverhead}ms`,
+      routeDiscovery: `${Math.round(breakdown.preRouteOverhead * 0.7)}ms`,
+      cliInit: `${breakdown.initOverhead}ms`,
+      dataParsing: `${breakdown.parseOverhead}ms`,
+      routeExecution: `${breakdown.routeExecution}ms`,
+      rendering: `${breakdown.renderOverhead}ms`,
+      cleanup: `${Math.round(breakdown.postRouteOverhead)}ms`,
+      totalOverhead: `${breakdown.totalDuration - breakdown.routeExecution}ms`,
+    },
+    null,
+    2,
+  );
+}
+
+/**
+ * Format active handles for debugging
+ */
+function formatActiveHandles(handles: ActiveHandle[]): string {
+  const grouped = handles.reduce(
+    (acc, handle) => {
+      acc[handle.type] = (acc[handle.type] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  return Object.entries(grouped)
+    .map(([type, count]) => `${type}: ${count}`)
+    .join(", ");
+}
+
+/**
+ * Format simple execution summary for non-verbose output
+ */
+function formatExecutionSummary(
+  breakdown: PerformanceBreakdown,
+  locale: CountryLanguage,
+): string {
+  const { t } = simpleT(locale);
+  const overhead = breakdown.totalDuration - breakdown.routeExecution;
+  const executionSeconds = (breakdown.routeExecution / 1000).toFixed(2);
+  const overheadSeconds = (overhead / 1000).toFixed(2);
+  const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
+
+  return (
+    // eslint-disable-next-line prefer-template
+    "\n" +
+    t(
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.executionSummary" as Parameters<typeof t>[0],
+      {
+        executionSeconds,
+        overheadSeconds,
+        totalSeconds,
+      },
+    )
+  );
+}
+
+/**
  * Debug output formatter
  */
-export class DebugFormatter {
-  /**
-   * Format performance breakdown for verbose output
-   */
-  static formatPerformanceBreakdown(breakdown: PerformanceBreakdown): string {
-    return JSON.stringify(
-      {
-        binaryStartup: `${breakdown.binaryOverhead}ms`,
-        routeDiscovery: `${Math.round(breakdown.preRouteOverhead * 0.7)}ms`,
-        cliInit: `${breakdown.initOverhead}ms`,
-        dataParsing: `${breakdown.parseOverhead}ms`,
-        routeExecution: `${breakdown.routeExecution}ms`,
-        rendering: `${breakdown.renderOverhead}ms`,
-        cleanup: `${Math.round(breakdown.postRouteOverhead)}ms`,
-        totalOverhead: `${breakdown.totalDuration - breakdown.routeExecution}ms`,
-      },
-      null,
-      2,
-    );
-  }
-
-  /**
-   * Format active handles for debugging
-   */
-  static formatActiveHandles(handles: ActiveHandle[]): string {
-    const grouped = handles.reduce(
-      (acc, handle) => {
-        acc[handle.type] = (acc[handle.type] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-
-    return Object.entries(grouped)
-      .map(([type, count]) => `${type}: ${count}`)
-      .join(", ");
-  }
-
-  /**
-   * Format simple execution summary for non-verbose output
-   */
-  static formatExecutionSummary(
-    breakdown: PerformanceBreakdown,
-    locale: CountryLanguage,
-  ): string {
-    const { t } = simpleT(locale);
-    const overhead = breakdown.totalDuration - breakdown.routeExecution;
-    const executionSeconds = (breakdown.routeExecution / 1000).toFixed(2);
-    const overheadSeconds = (overhead / 1000).toFixed(2);
-    const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
-
-    return (
-      // eslint-disable-next-line prefer-template
-      "\n" +
-      t(
-        "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.executionSummary" as Parameters<typeof t>[0],
-        {
-          executionSeconds,
-          overheadSeconds,
-          totalSeconds,
-        },
-      )
-    );
-  }
-}
+export const DebugFormatter = {
+  formatPerformanceBreakdown,
+  formatActiveHandles,
+  formatExecutionSummary,
+};
 
 /**
  * CLI resource manager for proper cleanup
@@ -422,11 +433,11 @@ export class CliResourceManager {
     const handleShutdown = async (): Promise<void> => {
       // Create a minimal logger for signal handler context
       const logger: EndpointLogger = {
-        info: () => {},
-        warn: () => {},
-        error: () => {},
-        debug: () => {},
-        vibe: () => {},
+        info: noopLoggerFunction,
+        warn: noopLoggerFunction,
+        error: noopLoggerFunction,
+        debug: noopLoggerFunction,
+        vibe: noopLoggerFunction,
         isDebugEnabled: false,
       };
 
