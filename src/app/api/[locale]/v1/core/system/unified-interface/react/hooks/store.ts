@@ -5,9 +5,9 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import {
   isErrorResponseType,
@@ -16,11 +16,11 @@ import {
 import { z } from "zod";
 import { create } from "zustand";
 
-import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
+import { generateStorageKey } from "@/app/api/[locale]/v1/core/system/unified-interface/react/storage-storage-client";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
-import { generateStorageKey } from "@/app/api/[locale]/v1/core/system/unified-interface/react/storage-storage-client";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
@@ -203,24 +203,19 @@ export interface ApiStore {
 
   // Methods
   executeQuery: <
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TEndpoint extends {
-      readonly TRequestOutput: TRequestOutput;
-      readonly TResponseOutput: TResponseOutput;
-      readonly TUrlVariablesOutput: TUrlVariablesOutput;
-      readonly requestSchema: UnifiedField<z.ZodTypeAny>;
-      readonly responseSchema: UnifiedField<z.ZodTypeAny>;
-      readonly method: Methods;
-      readonly path: readonly string[];
-      readonly requiresAuthentication: () => boolean;
-    }
+    TFields,
+    TUserRoleValue extends readonly (typeof UserRoleValue)[],
+    TEndpoint extends CreateApiEndpoint<
+      string,
+      Methods,
+      TUserRoleValue,
+      TFields
+    >,
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    requestData: TRequestOutput,
-    pathParams: TUrlVariablesOutput,
+    requestData: TEndpoint["TRequestOutput"],
+    pathParams: TEndpoint["TUrlVariablesOutput"],
     t: TFunction,
     locale: CountryLanguage,
     options?: Omit<
@@ -232,36 +227,31 @@ export interface ApiStore {
       "queryKey"
     > & {
       queryKey?: QueryKey;
-    }
+    },
   ) => Promise<ResponseType<TEndpoint["TResponseOutput"]>>;
 
   executeMutation: <
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TEndpoint extends {
-      readonly TRequestOutput: TRequestOutput;
-      readonly TResponseOutput: TResponseOutput;
-      readonly TUrlVariablesOutput: TUrlVariablesOutput;
-      readonly requestSchema: UnifiedField<z.ZodTypeAny>;
-      readonly responseSchema: UnifiedField<z.ZodTypeAny>;
-      readonly method: Methods;
-      readonly path: readonly string[];
-      readonly requiresAuthentication: () => boolean;
-    }
+    TFields,
+    TUserRoleValue extends readonly (typeof UserRoleValue)[],
+    TEndpoint extends CreateApiEndpoint<
+      string,
+      Methods,
+      TUserRoleValue,
+      TFields
+    >,
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    requestData: TRequestOutput,
-    pathParams: TUrlVariablesOutput,
+    requestData: TEndpoint["TRequestOutput"],
+    pathParams: TEndpoint["TUrlVariablesOutput"],
     t: TFunction,
     locale: CountryLanguage,
     options?: ApiMutationOptions<
-      TRequestOutput,
-      TResponseOutput,
-      TUrlVariablesOutput
+      TEndpoint["TRequestOutput"],
+      TEndpoint["TResponseOutput"],
+      TEndpoint["TUrlVariablesOutput"]
     >,
-  ) => Promise<ResponseType<TResponseOutput>>;
+  ) => Promise<ResponseType<TEndpoint["TResponseOutput"]>>;
 
   invalidateQueries: (queryKey: QueryKey) => Promise<void>;
   refetchQuery: <TResponse>(
@@ -371,24 +361,19 @@ export const useApiStore = create<ApiStore>((set, get) => ({
   }): string => `form-${endpoint.path.join("-")}-${endpoint.method}`,
 
   executeQuery: async <
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TEndpoint extends {
-      readonly TRequestOutput: TRequestOutput;
-      readonly TResponseOutput: TResponseOutput;
-      readonly TUrlVariablesOutput: TUrlVariablesOutput;
-      readonly requestSchema: UnifiedField<z.ZodTypeAny>;
-      readonly responseSchema: UnifiedField<z.ZodTypeAny>;
-      readonly method: Methods;
-      readonly path: readonly string[];
-      readonly requiresAuthentication: () => boolean;
-    }
+    TFields,
+    TUserRoleValue extends readonly (typeof UserRoleValue)[],
+    TEndpoint extends CreateApiEndpoint<
+      string,
+      Methods,
+      TUserRoleValue,
+      TFields
+    >,
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    requestData: TRequestOutput,
-    pathParams: TUrlVariablesOutput,
+    requestData: TEndpoint["TRequestOutput"],
+    pathParams: TEndpoint["TUrlVariablesOutput"],
     t: TFunction,
     locale: CountryLanguage,
     options: Omit<
@@ -400,7 +385,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       "queryKey"
     > & {
       queryKey?: QueryKey;
-    } = {}
+    } = {},
   ): Promise<ResponseType<TEndpoint["TResponseOutput"]>> => {
     // Check if the endpoint expects undefined for request data
     // This is determined by checking if the schema is undefinedSchema
@@ -414,7 +399,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       typeof requestData === "object" &&
       requestData !== null
     ) {
-      requestData = undefined as TRequestOutput;
+      requestData = undefined as TEndpoint["TRequestOutput"];
     }
 
     const queryId = get().getQueryId(
@@ -436,7 +421,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       if (existingRequestEntry) {
         // If we have a request in flight, return the existing request
         const result = await existingRequestEntry.promise;
-        return createSuccessResponse(result as TResponseOutput);
+        return createSuccessResponse(result as TEndpoint["TResponseOutput"]);
       }
     }
 
@@ -459,7 +444,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     if (existingRequestEntry && options.refreshDelay) {
       // If we have a request in flight and a refresh delay is set, return the existing request
       const result = await existingRequestEntry.promise;
-      return createSuccessResponse(result as TResponseOutput);
+      return createSuccessResponse(result as TEndpoint["TResponseOutput"]);
     }
 
     // Check if we have fresh data in the store
@@ -564,12 +549,12 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
       queries[queryId] = {
         response: undefined,
-        data: existingData,
+        data: existingData as AnyData,
         error: null,
         isError: false,
         isSuccess: false,
         statusMessage:
-          "app.api.v1.core.system.unifiedUi.react.store.status.loading_data" as const,
+          "app.api.v1.core.system.unifiedInterface.react.store.status.loading_data" as const,
         isCachedData: false,
         lastFetchTime: existingLastFetchTime ?? null,
         isLoading: true,
@@ -589,7 +574,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         const entry = inFlightRequests.get(requestKey);
         if (entry) {
           const result = await entry.promise;
-          return createSuccessResponse(result as TResponseOutput);
+          return createSuccessResponse(result as TEndpoint["TResponseOutput"]);
         }
       } catch (error) {
         // If the shared request fails, we'll continue and try again
@@ -621,7 +606,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isLoadingFresh: false,
                   isCachedData: true,
                   statusMessage:
-                    "app.api.v1.core.system.unifiedUi.react.store.status.cached_data" as const,
+                    "app.api.v1.core.system.unifiedInterface.react.store.status.cached_data" as const,
                   lastFetchTime: existingQuery.lastFetchTime ?? null,
                 },
               },
@@ -699,10 +684,11 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     const fetchPromise = (async (): Promise<TEndpoint["TResponseOutput"]> => {
       // Validate request data using the endpoint's schema
       // Skip validation for z.never() schemas (GET endpoints with no request data)
-      const isNeverSchema = endpoint.requestSchema instanceof z.ZodNever;
+      const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
+      const isNeverSchema = requestSchema instanceof z.ZodNever;
 
       if (!isNeverSchema) {
-        const requestValidation = endpoint.requestSchema.safeParse(requestData);
+        const requestValidation = requestSchema.safeParse(requestData);
 
         if (!requestValidation.success) {
           logger.error("executeQuery: request validation failed", {
@@ -714,7 +700,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           // Create a proper error response
           const errorResponse = fail({
             message:
-            "app.api.v1.core.system.unifiedUi.react.store.errors.validation_failed",
+              "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { endpoint: endpoint.path.join("/") },
           });
@@ -739,7 +725,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 isLoadingFresh: false,
                 isCachedData: state.queries[queryId]?.isCachedData ?? false,
                 statusMessage:
-                  "app.api.v1.core.system.unifiedUi.react.store.errors.validation_failed" as const,
+                  "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
                 lastFetchTime: Date.now(),
               },
             },
@@ -767,17 +753,24 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         // Check if requestData contains File objects - if so, use FormData
         let postBody: string | FormData | undefined;
         if (endpoint.method !== Methods.GET) {
-          if (containsFile(requestData)) {
+          if (containsFile(requestData as FormDataValue)) {
             // Convert to FormData
             // eslint-disable-next-line no-restricted-syntax
-            postBody = objectToFormData(requestData as Record<string, unknown>);
+            postBody = objectToFormData(
+              requestData as Record<string, FormDataValue>,
+            );
           } else {
             // Use JSON
             postBody = JSON.stringify(requestData);
           }
         }
 
-        const response = await callApi(endpoint, endpointUrl, postBody, logger);
+        const response = await callApi(
+          endpoint as never,
+          endpointUrl,
+          postBody,
+          logger,
+        );
 
         if (!response.success) {
           removeStorageItem(queryId);
@@ -798,7 +791,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isError: true,
                   isSuccess: false,
                   statusMessage:
-                    "app.api.v1.core.system.unifiedUi.react.store.errors.request_failed" as const,
+                    "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed" as const,
                   isLoadingFresh: false,
                   isCachedData: existingQuery?.isCachedData ?? false,
                   lastFetchTime: Date.now(),
@@ -841,7 +834,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 isLoadingFresh: false,
                 isCachedData: false,
                 statusMessage:
-                  "app.api.v1.core.system.unifiedUi.react.store.status.success" as const,
+                  "app.api.v1.core.system.unifiedInterface.react.store.status.success" as const,
                 lastFetchTime: Date.now(),
               },
             },
@@ -867,7 +860,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             urlPathParams: pathParams,
             responseData: (response.success
               ? response.data
-              : undefined) as TResponseOutput,
+              : undefined) as TEndpoint["TResponseOutput"],
           });
 
           // If onSuccess returns an error, treat it as an error
@@ -894,7 +887,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isLoadingFresh: false,
                   isCachedData: state.queries[queryId]?.isCachedData ?? false,
                   statusMessage:
-                    "app.api.v1.core.system.unifiedUi.react.store.errors.validation_failed" as const,
+                    "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
                   lastFetchTime: Date.now(),
                 },
               },
@@ -910,18 +903,18 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             }
 
             // Return undefined since we can't throw - the error is already handled in state
-            return undefined as TResponseOutput;
+            return undefined as TEndpoint["TResponseOutput"];
           }
         }
 
         return (
           response.success ? response.data : undefined
-        ) as TResponseOutput;
+        ) as TEndpoint["TResponseOutput"];
       } catch (err) {
         // Create a properly typed error response with translation key
         const errorResponse = fail({
           message:
-          "app.api.v1.core.system.unifiedUi.react.store.errors.request_failed",
+            "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: parseError(err).message,
@@ -949,7 +942,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               isLoadingFresh: false,
               isCachedData: state.queries[queryId]?.isCachedData ?? false,
               statusMessage:
-                "app.api.v1.core.system.unifiedUi.react.store.errors.request_failed" as const,
+                "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed" as const,
               lastFetchTime: Date.now(),
             },
           },
@@ -995,7 +988,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         ? error
         : fail({
             message:
-            "app.api.v1.core.system.unifiedUi.react.store.errors.request_failed",
+              "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { error: parseError(error).message },
           });
@@ -1004,32 +997,27 @@ export const useApiStore = create<ApiStore>((set, get) => ({
   },
 
   executeMutation: async <
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TEndpoint extends {
-      readonly TRequestOutput: TRequestOutput;
-      readonly TResponseOutput: TResponseOutput;
-      readonly TUrlVariablesOutput: TUrlVariablesOutput;
-      readonly requestSchema: UnifiedField<z.ZodTypeAny>;
-      readonly responseSchema: UnifiedField<z.ZodTypeAny>;
-      readonly method: Methods;
-      readonly path: readonly string[];
-      readonly requiresAuthentication: () => boolean;
-    }
+    TFields,
+    TUserRoleValue extends readonly (typeof UserRoleValue)[],
+    TEndpoint extends CreateApiEndpoint<
+      string,
+      Methods,
+      TUserRoleValue,
+      TFields
+    >,
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    requestData: TRequestOutput,
-    pathParams: TUrlVariablesOutput,
+    requestData: TEndpoint["TRequestOutput"],
+    pathParams: TEndpoint["TUrlVariablesOutput"],
     t: TFunction,
     locale: CountryLanguage,
     options: ApiMutationOptions<
-      TRequestOutput,
-      TResponseOutput,
-      TUrlVariablesOutput
+      TEndpoint["TRequestOutput"],
+      TEndpoint["TResponseOutput"],
+      TEndpoint["TUrlVariablesOutput"]
     > = {},
-  ): Promise<ResponseType<TResponseOutput>> => {
+  ): Promise<ResponseType<TEndpoint["TResponseOutput"]>> => {
     // Check if the endpoint expects undefined for request data
     // This is determined by checking if the schema is undefinedSchema
     const isUndefinedSchema =
@@ -1061,7 +1049,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           error: null,
           isSuccess: false,
           statusMessage:
-            "app.api.v1.core.system.unifiedUi.react.store.status.mutation_pending" as const,
+            "app.api.v1.core.system.unifiedInterface.react.store.status.mutation_pending" as const,
           data: undefined,
         },
       },
@@ -1075,7 +1063,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         // Create a proper error response
         const errorResponse = fail({
           message:
-          "app.api.v1.core.system.unifiedUi.react.store.errors.validation_failed",
+            "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { endpoint: endpoint.path.join("/") },
         });
@@ -1091,7 +1079,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               error: errorResponse,
               isSuccess: false,
               statusMessage:
-                "app.api.v1.core.system.unifiedUi.react.store.errors.validation_failed" as const,
+                "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
               data: undefined,
             },
           },
@@ -1140,7 +1128,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               error: response,
               isSuccess: false,
               statusMessage:
-                "app.api.v1.core.system.unifiedUi.react.store.errors.mutation_failed" as const,
+                "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed" as const,
               data: undefined,
             },
           },
@@ -1157,16 +1145,20 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
         // Return error response with proper translation key
         return fail({
-          message: "app.api.v1.core.system.unifiedUi.react.store.errors.mutation_failed",
+          message:
+            "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: response.message, endpoint: endpoint.path.join("/") },
+          messageParams: {
+            error: response.message,
+            endpoint: endpoint.path.join("/"),
+          },
         });
       }
 
       // Update success state
       const responseData = (
         response.success ? response.data : undefined
-      ) as TResponseOutput;
+      ) as TEndpoint["TResponseOutput"];
       const successResponse = createSuccessResponse(responseData);
       set((state) => ({
         mutations: {
@@ -1178,7 +1170,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             error: null,
             isSuccess: true,
             statusMessage:
-              "app.api.v1.core.system.unifiedUi.react.store.status.mutation_success" as const,
+              "app.api.v1.core.system.unifiedInterface.react.store.status.mutation_success" as const,
             data: responseData as AnyData,
           },
         },
@@ -1210,7 +1202,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 error: onSuccessResult,
                 isSuccess: false,
                 statusMessage:
-                  "app.api.v1.core.system.unifiedUi.react.store.errors.validation_failed" as const,
+                  "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
                 data: undefined,
               },
             },
@@ -1236,7 +1228,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         ? error
         : fail({
             message:
-            "app.api.v1.core.system.unifiedUi.react.store.errors.mutation_failed",
+              "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { error: parseError(error).message },
           });
@@ -1252,7 +1244,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             error: errorResponse,
             isSuccess: false,
             statusMessage:
-              "app.api.v1.core.system.unifiedUi.react.store.errors.unexpected_failure" as const,
+              "app.api.v1.core.system.unifiedInterface.react.store.errors.unexpected_failure" as const,
             data: undefined,
           },
         },
@@ -1269,9 +1261,13 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
       // Return error response with proper translation key
       return fail({
-        message: "app.api.v1.core.system.unifiedUi.react.store.errors.unexpected_failure",
+        message:
+          "app.api.v1.core.system.unifiedInterface.react.store.errors.unexpected_failure",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorResponse.message, endpoint: endpoint.path.join("/") },
+        messageParams: {
+          error: errorResponse.message,
+          endpoint: endpoint.path.join("/"),
+        },
       });
     }
   },
@@ -1322,9 +1318,12 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const errorMessage = err instanceof Error ? err.message : String(err);
       return fail({
         message:
-        "app.api.v1.core.system.unifiedUi.react.store.errors.refetch_failed",
+          "app.api.v1.core.system.unifiedInterface.react.store.errors.refetch_failed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage, queryKey: JSON.stringify(queryKey) },
+        messageParams: {
+          error: errorMessage,
+          queryKey: JSON.stringify(queryKey),
+        },
       });
     }
   },
@@ -1497,7 +1496,7 @@ export const apiClient = {
       readonly method: Methods;
       readonly path: readonly string[];
       readonly requiresAuthentication: () => boolean;
-    }
+    },
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
@@ -1510,12 +1509,13 @@ export const apiClient = {
       "queryKey"
     > & {
       queryKey?: QueryKey;
-    } = {}
+    } = {},
   ): Promise<ResponseType<TResponseOutput>> => {
     // Check if the endpoint expects undefined for request data
+    const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
     const isUndefinedSchema =
-      endpoint.requestSchema.safeParse(undefined).success &&
-      !endpoint.requestSchema.safeParse({}).success;
+      requestSchema.safeParse(undefined).success &&
+      !requestSchema.safeParse({}).success;
 
     // If the schema expects undefined but we received an object, set requestData to undefined
     if (

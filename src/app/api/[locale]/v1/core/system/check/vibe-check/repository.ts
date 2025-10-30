@@ -1,7 +1,7 @@
 /**
  * Vibe Check Repository
- * Orchestrates comprehensive code quality checks by running lint and typecheck in parallel
- * No duplicate check logic - imports from lint and typecheck repositories
+ * Orchestrates comprehensive code quality checks by running oxlint, eslint, and typecheck in parallel
+ * No duplicate check logic - imports from oxlint, lint, and typecheck repositories
  */
 
 import "server-only";
@@ -18,6 +18,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { lintRepository } from "../lint/repository";
+import { oxlintRepository } from "../oxlint/repository";
 import { typecheckRepository } from "../typecheck/repository";
 import type {
   VibeCheckRequestOutput,
@@ -57,14 +58,30 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
         pathsToCheck = [undefined]; // Default to no path (entire project with regular tsconfig) if no paths specified
       }
 
-      // Run lint and typecheck in parallel for each path
+      // Run oxlint, eslint, and typecheck in parallel for each path
       const allResults = await Promise.allSettled(
         pathsToCheck.map(async (path) => {
           const promises = [];
 
-          // Run lint if not skipped
+          // Run oxlint if not skipped (fast Rust linter)
+          if (!data.skipOxlint) {
+            promises.push(
+              oxlintRepository.execute(
+                {
+                  path: path || "./",
+                  verbose: logger.isDebugEnabled,
+                  fix: data.fix || false,
+                  timeout: data.timeout,
+                  cacheDir: "./.tmp",
+                },
+                locale,
+                logger,
+              ),
+            );
+          }
+
+          // Run ESLint if not skipped (i18n + custom AST rules)
           if (!data.skipLint) {
-            // Lint repository defaults to "./" when path is undefined
             promises.push(
               lintRepository.execute(
                 {
@@ -106,7 +123,7 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
         code?: string;
         severity: "error" | "warning" | "info";
         message: string;
-        type: "lint" | "type";
+        type: "oxlint" | "lint" | "type";
       }> = [];
 
       let hasErrors = false;

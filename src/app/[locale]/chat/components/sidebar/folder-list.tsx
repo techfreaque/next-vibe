@@ -345,7 +345,7 @@ function FolderItem({
   const threadsInFolder = useMemo(() => {
     return Object.values(chat.threads)
       .filter((t) => t.folderId === folder.id)
-      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+      .toSorted((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   }, [chat.threads, folder.id]);
 
   const groupedThreads = useMemo(() => {
@@ -436,7 +436,7 @@ function FolderItem({
         f.parentId === folder.parentId &&
         f.rootFolderId === folder.rootFolderId,
     )
-    .sort((a, b) => a.sortOrder - b.sortOrder);
+    .toSorted((a, b) => a.sortOrder - b.sortOrder);
   const currentIndex = siblingFolders.findIndex((f) => f.id === folder.id);
   const canMoveUp = currentIndex > 0;
   const canMoveDown = currentIndex < siblingFolders.length - 1;
@@ -596,7 +596,7 @@ function FolderItem({
           {/* Child folders */}
           {Object.values(chat.folders)
             .filter((f) => f.parentId === folder.id)
-            .sort((a, b) => a.sortOrder - b.sortOrder)
+            .toSorted((a, b) => a.sortOrder - b.sortOrder)
             .map((childFolder) => (
               <FolderItem
                 key={childFolder.id}

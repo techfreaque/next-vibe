@@ -91,11 +91,9 @@ class RouteHandlersGeneratorRepositoryImpl
 
       const duration = Date.now() - startTime;
 
-      logger.info("Generated route handlers file", {
-        routeCount: routeFiles.length,
-        duration,
-        outputPath: data.dryRun ? undefined : outputFile,
-      });
+      logger.info(
+        `Generated route handlers file with ${routeFiles.length} routes in ${duration}ms`,
+      );
 
       return createSuccessResponse({
         success: true,
@@ -154,7 +152,7 @@ class RouteHandlersGeneratorRepositoryImpl
       const importPath = pathMap[path];
       // eslint-disable-next-line i18next/no-literal-string
       cases.push(`    case "${path}":
-      return await import("${importPath}");`);
+      return ((await import("${importPath}")) as unknown) as RouteModule;`);
     }
 
     // eslint-disable-next-line i18next/no-literal-string

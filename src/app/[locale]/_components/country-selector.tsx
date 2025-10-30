@@ -22,6 +22,11 @@ interface CountrySelectorProps {
   locale: CountryLanguage;
 }
 
+// Type guard for tab values
+const isValidTab = (value: string): value is "country" | "language" => {
+  return value === "country" || value === "language";
+};
+
 const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
   const {
     countries,
@@ -35,11 +40,6 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"country" | "language">("country");
   const [tabHover, setTabHover] = useState<"country" | "language" | null>(null);
-
-  // Type guard for tab values
-  const isValidTab = (value: string): value is "country" | "language" => {
-    return value === "country" || value === "language";
-  };
 
   // Memoize the tab change handler
   const handleTabChange = useCallback((value: string) => {

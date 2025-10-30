@@ -38,6 +38,11 @@ interface CronStatsFiltersProps {
   control: EndpointReturn<typeof statsEndpoints>["read"]["form"]["control"];
 }
 
+// No-op submit handler for filter forms - changes are handled by form field onChange events
+const noOpSubmit = (): void => {
+  // Filter form submission is handled by form field changes
+};
+
 /**
  * Container for cron stats filters with refresh functionality
  */
@@ -51,7 +56,7 @@ export function CronStatsFiltersContainer({
   const { t } = simpleT(locale);
 
   return (
-    <Form form={form} onSubmit={() => {}} className="space-y-4">
+    <Form form={form} onSubmit={noOpSubmit} className="space-y-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-lg font-semibold">

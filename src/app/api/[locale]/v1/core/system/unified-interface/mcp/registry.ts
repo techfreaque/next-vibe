@@ -117,7 +117,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
     const toolMeta = this.getToolByName(context.toolName);
     if (!toolMeta) {
       return this.fail({
-        error: t("app.api.v1.core.system.unifiedUi.mcp.registry.toolNotFound"),
+        error: t("app.api.v1.core.system.unifiedInterface.mcp.registry.toolNotFound"),
         code: MCPErrorCode.TOOL_NOT_FOUND,
         details: { toolName: context.toolName },
       });
@@ -128,7 +128,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
     if (!endpoint) {
       return this.fail({
         error: t(
-          "app.api.v1.core.system.unifiedUi.mcp.registry.endpointNotFound",
+          "app.api.v1.core.system.unifiedInterface.mcp.registry.endpointNotFound",
         ),
         code: MCPErrorCode.TOOL_NOT_FOUND,
         details: { toolName: context.toolName },
@@ -138,7 +138,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
     if (!toolFilter.hasEndpointPermission(endpoint, context.user)) {
       return this.fail({
         error: t(
-          "app.api.v1.core.system.unifiedUi.mcp.registry.permissionDenied",
+          "app.api.v1.core.system.unifiedInterface.mcp.registry.permissionDenied",
         ),
         code: MCPErrorCode.PERMISSION_DENIED,
         details: {
@@ -196,7 +196,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
 
       return this.fail({
         error: t(
-          "app.api.v1.core.system.unifiedUi.mcp.registry.toolExecutionFailed",
+          "app.api.v1.core.system.unifiedInterface.mcp.registry.toolExecutionFailed",
         ),
         code: MCPErrorCode.TOOL_EXECUTION_FAILED,
         details: { toolName: context.toolName },
@@ -255,7 +255,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
     return this.fail({
       error:
         result.error ||
-        t("app.api.v1.core.system.unifiedUi.mcp.registry.toolExecutionFailed"),
+        t("app.api.v1.core.system.unifiedInterface.mcp.registry.toolExecutionFailed"),
       code: MCPErrorCode.TOOL_EXECUTION_FAILED,
       details: { toolName },
     });

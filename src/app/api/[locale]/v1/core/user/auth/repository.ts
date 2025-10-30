@@ -31,12 +31,12 @@ import { leadAuthService } from "../../leads/auth-service";
 import { leads, userLeads } from "../../leads/db";
 import { LeadSource, LeadStatus } from "../../leads/enum";
 import { db } from "../../system/db";
+import { detectPlatformFromRequest } from "../../system/unified-interface/shared/auth/platform-detection";
 import {
   type AuthContext,
   type AuthPlatform,
 } from "../../system/unified-interface/shared/server-only/auth/base-auth-handler";
 import { getPlatformAuthHandler } from "../../system/unified-interface/shared/server-only/auth/factory";
-import { detectPlatformFromRequest } from "../../system/unified-interface/shared/auth/platform-detection";
 import { users } from "../db";
 import { UserDetailLevel } from "../enum";
 import { sessionRepository } from "../private/session/repository";

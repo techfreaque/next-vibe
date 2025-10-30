@@ -55,7 +55,7 @@ const STAGE_PRIORITIES: Record<
 function sortStagesByPriority(
   stages: Array<(typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]>,
 ): Array<(typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]> {
-  return stages.sort((a, b) => {
+  return stages.toSorted((a, b) => {
     const priorityA = STAGE_PRIORITIES[a] ?? 999;
     const priorityB = STAGE_PRIORITIES[b] ?? 999;
     return priorityA - priorityB;

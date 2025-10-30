@@ -92,7 +92,7 @@ export class NewsletterSubscribeRepositoryImpl
           const updateData = {
             status: newStatus,
             metadata: {
-              ...(leadResult.data.lead.metadata.metadata || {}),
+              ...leadResult.data.lead.metadata.metadata,
               newsletterSubscribed: true,
               newsletterSubscriptionDate: new Date().toISOString(),
               subscribedEmail: data.email,

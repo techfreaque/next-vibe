@@ -10,9 +10,14 @@ import type { z } from "zod";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type {
-  FieldDataType,
-  InterfaceContext,
-} from './enums';
+  ChartWidgetConfig,
+  DataCardsWidgetConfig,
+  DataTableWidgetConfig,
+  FormFieldWidgetConfig,
+  LayoutConfig,
+  MetricCardWidgetConfig,
+  WidgetConfig,
+} from "../ui/widgets";
 import type {
   ActionConfig,
   BulkAction,
@@ -22,15 +27,7 @@ import type {
   InteractiveActions,
   LifecycleActions,
 } from "./actions";
-import type {
-  ChartWidgetConfig,
-  DataCardsWidgetConfig,
-  DataTableWidgetConfig,
-  FormFieldWidgetConfig,
-  LayoutConfig,
-  MetricCardWidgetConfig,
-  WidgetConfig,
-} from "../widgets";
+import type { FieldDataType, InterfaceContext } from "./enums";
 
 /**
  * UI configuration that can be attached to any field

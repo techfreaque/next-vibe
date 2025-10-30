@@ -238,7 +238,7 @@ export class DatabaseMigrateRepairRepositoryImpl
 
     return readdirSync(migrationsFolder)
       .filter((file) => file.endsWith(SQL_FILE_EXTENSION))
-      .sort();
+      .toSorted();
   }
 
   /**
@@ -303,7 +303,7 @@ export class DatabaseMigrateRepairRepositoryImpl
       };
 
       if (existsSync(journalPath)) {
-        const fs = await import("fs/promises");
+        const fs = await import("node:fs/promises");
         const journalContent = await fs.readFile(journalPath, "utf-8");
         journalData = JSON.parse(journalContent) as {
           entries: Array<{ tag: string; when: number }>;
@@ -331,17 +331,18 @@ export class DatabaseMigrateRepairRepositoryImpl
 
         const migrationExists = (exists.rows[0] as { exists: boolean })?.exists;
 
-        if (!migrationExists) {
-          // Insert migration record with correct timestamp
-          await db.execute(sql`
-            INSERT INTO drizzle.__drizzle_migrations__ (hash, created_at)
-            VALUES (${hash}, ${timestamp})
-          `);
-
-          logger.debug("Marked migration as applied", { hash, timestamp });
-        } else {
-          logger.debug("Migration already tracked", { hash });
+        if (migrationExists) {
+          logger.info(`Migration ${name} already exists`, { hash });
+          continue;
         }
+
+        // Insert migration record with correct timestamp
+        await db.execute(sql`
+          INSERT INTO drizzle.__drizzle_migrations__ (hash, created_at)
+          VALUES (${hash}, ${timestamp})
+        `);
+
+        logger.debug("Marked migration as applied", { hash, timestamp });
       }
 
       logger.info("Marked migrations as applied", {

@@ -6,13 +6,13 @@
 import { z } from "zod";
 
 import {
-  LayoutType,
-  WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import {
   objectField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
+  LayoutType,
+  WidgetType,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 // IMAP Message Response Schema using objectField pattern
 export const imapMessageResponseSchema = objectField(

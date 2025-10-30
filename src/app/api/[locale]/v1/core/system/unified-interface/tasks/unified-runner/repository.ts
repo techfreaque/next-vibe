@@ -12,9 +12,9 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type {
@@ -66,7 +66,7 @@ export class UnifiedTaskRunnerRepositoryImpl
 {
   name = "unified-task-runner" as const;
   description =
-    "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.description" as const;
+    "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.description" as const;
   environment: "development" | "production" | "serverless" = "development";
   supportsSideTasks = true;
 
@@ -96,7 +96,7 @@ export class UnifiedTaskRunnerRepositoryImpl
         taskFilter: data.taskFilter || "all",
         dryRun: data.dryRun,
         userId: user.id,
-      })
+      });
 
       const timestamp = new Date().toISOString();
 
@@ -106,9 +106,9 @@ export class UnifiedTaskRunnerRepositoryImpl
             success: true,
             actionResult: data.action,
             message:
-              "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.response.message",
+              "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
             timestamp,
-          })
+          });
 
         case "start":
           this.isRunning = true;
@@ -116,9 +116,9 @@ export class UnifiedTaskRunnerRepositoryImpl
             success: true,
             actionResult: data.action,
             message:
-              "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.response.message",
+              "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
             timestamp,
-          })
+          });
 
         case "stop":
           await this.stop(locale);
@@ -126,9 +126,9 @@ export class UnifiedTaskRunnerRepositoryImpl
             success: true,
             actionResult: data.action,
             message:
-              "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.response.message",
+              "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
             timestamp,
-          })
+          });
 
         case "restart":
           await this.stop(locale);
@@ -137,27 +137,27 @@ export class UnifiedTaskRunnerRepositoryImpl
             success: true,
             actionResult: data.action,
             message:
-              "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.response.message",
+              "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
             timestamp,
-          })
+          });
 
         default:
           return fail({
-        message: 
-            "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.errors.validation.title",
+            message:
+              "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.title",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: { action: data.action }}
-          );
+            messageParams: { action: data.action },
+          });
       }
     } catch (error) {
       logger.error("Failed to manage unified task runner", {
         error: parseError(error).message,
         action: data.action,
-      })
+      });
 
       return fail({
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.errors.internal.title",
+          "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -175,9 +175,9 @@ export class UnifiedTaskRunnerRepositoryImpl
       return createSuccessResponse({
         status: CronTaskStatus.SKIPPED,
         reason:
-          "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.reasons.previousInstanceRunning",
+          "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.reasons.previousInstanceRunning",
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.messages.taskSkipped",
+          "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.messages.taskSkipped",
       });
     }
 
@@ -191,7 +191,7 @@ export class UnifiedTaskRunnerRepositoryImpl
         this.markTaskAsFailed(taskName, errorMsg);
         return fail({
           message:
-            "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.errors.internal.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: errorMsg, taskName },
         });
@@ -211,7 +211,7 @@ export class UnifiedTaskRunnerRepositoryImpl
         this.markTaskAsFailed(taskName, errorMsg);
         return fail({
           message:
-            "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.errors.internal.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: errorMsg, taskName },
         });
@@ -221,14 +221,14 @@ export class UnifiedTaskRunnerRepositoryImpl
       return createSuccessResponse({
         status: CronTaskStatus.COMPLETED,
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.messages.taskCompleted",
+          "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.messages.taskCompleted",
       });
     } catch (error) {
       const errorMsg = parseError(error).message;
       this.markTaskAsFailed(taskName, errorMsg);
       return fail({
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.errors.internal.title",
+          "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMsg, taskName },
       });
@@ -244,7 +244,7 @@ export class UnifiedTaskRunnerRepositoryImpl
     if (this.isTaskRunning(taskName)) {
       return fail({
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.errors.validation.title",
+          "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.title",
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: { taskName },
       });
@@ -276,7 +276,7 @@ export class UnifiedTaskRunnerRepositoryImpl
       }
       return fail({
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.errors.internal.title",
+          "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMsg, taskName },
       });
@@ -353,7 +353,7 @@ export class UnifiedTaskRunnerRepositoryImpl
 
       return fail({
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.errors.internal.title",
+          "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMsg },
       });

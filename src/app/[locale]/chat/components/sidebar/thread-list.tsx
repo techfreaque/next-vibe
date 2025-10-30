@@ -250,7 +250,7 @@ function ThreadItem({
             onBlur={handleSaveEdit}
             onKeyDown={handleKeyDown}
             className="w-full px-2 py-1 text-sm bg-background border border-border rounded"
-            autoFocus
+            
             onClick={(e) => e.stopPropagation()}
           />
         </Div>

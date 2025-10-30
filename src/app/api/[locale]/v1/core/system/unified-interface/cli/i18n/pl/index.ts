@@ -61,7 +61,8 @@ export const translations = {
           helpHandler: {
             noDescription: "Brak dostępnego opisu",
             flagDataDesc: "Podaj dane żądania jako JSON",
-            flagUserTypeDesc: "Określ typ użytkownika (admin, customer, public)",
+            flagUserTypeDesc:
+              "Określ typ użytkownika (admin, customer, public)",
             flagLocaleDesc: "Określ locale (en-GLOBAL, de-DE, pl-PL)",
             flagOutputDesc: "Format wyjścia (pretty, json)",
             flagVerboseDesc: "Włącz szczegółowe wyjście",
@@ -70,6 +71,21 @@ export const translations = {
             availableCommandsLabel: "Dostępne polecenia",
             globalOptionsLabel: "Opcje globalne",
             examplesLabel: "Przykłady",
+          },
+          widgets: {
+            common: {
+              noDataAvailable: "Brak dostępnych danych",
+              andMoreItems: "i {count} więcej elementów",
+              affectedFiles: "Pliki, których dotyczy problem",
+              summary: "Podsumowanie",
+              files: "Pliki",
+              issues: "Problemy",
+              other: "Inne",
+              error: "Błąd",
+              errors: "Błędy",
+              warning: "Ostrzeżenie",
+              warnings: "Ostrzeżenia",
+            },
           },
         },
       },

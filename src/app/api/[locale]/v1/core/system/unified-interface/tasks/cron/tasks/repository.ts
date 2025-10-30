@@ -12,9 +12,9 @@ import { z } from "zod";
 
 import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
@@ -281,7 +281,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         filtersApplied: conditions.length,
         limit,
         offset,
-      })
+      });
 
       return createSuccessResponse(response);
     } catch (error) {
@@ -289,10 +289,10 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       logger.error("Failed to retrieve cron tasks", parsedError);
 
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.get.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-      );
+        message:
+          "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -318,10 +318,10 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
           name: data.name,
         });
         return fail({
-        message: 
-          "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.post.errors.conflict.title",
-          errorType: ErrorResponseTypes.CONFLICT,}
-        );
+          message:
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.conflict.title",
+          errorType: ErrorResponseTypes.CONFLICT,
+        });
       }
 
       // Calculate next execution time
@@ -358,10 +358,10 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       if (!createdTask) {
         logger.error("Failed to create task - no task returned");
         return fail({
-        message: 
-          "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.post.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-        );
+          message:
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       logger.info("Task created successfully", {
@@ -397,7 +397,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
           version: parseInt(createdTask.version, 10) || 1,
           createdAt: createdTask.createdAt.toISOString(),
           updatedAt: createdTask.updatedAt.toISOString(),
-        }
+        },
       };
 
       logger.vibe("🚀 Successfully created cron task");
@@ -411,17 +411,17 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       // Check for unique constraint violation
       if (parsedError.message?.includes(UNIQUE_CONSTRAINT_ERROR)) {
         return fail({
-        message: 
-          "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.post.errors.conflict.title",
-          errorType: ErrorResponseTypes.CONFLICT,}
-        );
+          message:
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.conflict.title",
+          errorType: ErrorResponseTypes.CONFLICT,
+        });
       }
 
       return fail({
-        message: 
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.post.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-      );
+        message:
+          "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }

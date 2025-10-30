@@ -150,11 +150,11 @@ export class HelpHandler {
       : routes;
 
     const helpContent: HelpContent = {
-      title: t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.title"),
+      title: t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.title"),
       description: t(
-        "app.api.v1.core.system.unifiedBackend.cli.vibe.help.description",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.help.description",
       ),
-      usage: t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.usage"),
+      usage: t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.usage"),
       commands: await this.generateCommandHelp(filteredRoutes, options),
       examples: this.generateExamples(),
       options: this.generateGlobalOptions(),
@@ -202,7 +202,7 @@ export class HelpHandler {
       description:
         route.description ||
         t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.noDescription",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.noDescription",
         ),
       usage: this.generateUsageString(route, endpoint),
     };
@@ -447,14 +447,14 @@ export class HelpHandler {
       {
         flag: CLI_FLAG_STRINGS.DATA,
         description: t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagDataDesc",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagDataDesc",
         ),
         type: "string",
       },
       {
         flag: CLI_FLAG_STRINGS.USER_TYPE,
         description: t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagUserTypeDesc",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagUserTypeDesc",
         ),
         type: "string",
         defaultValue: undefined,
@@ -462,7 +462,7 @@ export class HelpHandler {
       {
         flag: CLI_FLAG_STRINGS.LOCALE,
         description: t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagLocaleDesc",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagLocaleDesc",
         ),
         type: "string",
         defaultValue: defaultLocale,
@@ -470,7 +470,7 @@ export class HelpHandler {
       {
         flag: CLI_FLAG_STRINGS.OUTPUT,
         description: t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagOutputDesc",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagOutputDesc",
         ),
         type: "string",
         defaultValue: undefined,
@@ -478,7 +478,7 @@ export class HelpHandler {
       {
         flag: CLI_FLAG_STRINGS.VERBOSE,
         description: t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagVerboseDesc",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagVerboseDesc",
         ),
         type: "boolean",
         defaultValue: undefined,
@@ -486,11 +486,11 @@ export class HelpHandler {
       {
         flag: CLI_FLAG_STRINGS.DRY_RUN,
         description: t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagDryRunDesc",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagDryRunDesc",
         ),
         type: "boolean",
         defaultValue: undefined,
-      }
+      },
     ];
   }
 
@@ -521,12 +521,12 @@ export class HelpHandler {
     output += `${help.description}\n\n`;
 
     // eslint-disable-next-line i18next/no-literal-string
-    output += `${t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.usageLabel")}: ${help.usage}\n\n`;
+    output += `${t("app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.usageLabel")}: ${help.usage}\n\n`;
 
     // Commands
     if (help.commands && help.commands.length > 0) {
       // eslint-disable-next-line i18next/no-literal-string
-      output += `${t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.availableCommandsLabel")}:\n`;
+      output += `${t("app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.availableCommandsLabel")}:\n`;
       for (const command of help.commands) {
         // eslint-disable-next-line i18next/no-literal-string
         output += `  ${command.name.padEnd(20)} ${command.description}\n`;
@@ -537,7 +537,7 @@ export class HelpHandler {
     // Options
     if (help.options && help.options.length > 0) {
       // eslint-disable-next-line i18next/no-literal-string
-      output += `${t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.globalOptionsLabel")}:\n`;
+      output += `${t("app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.globalOptionsLabel")}:\n`;
       for (const option of help.options) {
         // eslint-disable-next-line i18next/no-literal-string
         output += `  ${option.flag.padEnd(25)} ${option.description}\n`;
@@ -548,7 +548,7 @@ export class HelpHandler {
     // Examples
     if (help.examples && help.examples.length > 0) {
       // eslint-disable-next-line i18next/no-literal-string
-      output += `${t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.examplesLabel")}:\n`;
+      output += `${t("app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.examplesLabel")}:\n`;
       for (const example of help.examples) {
         // eslint-disable-next-line i18next/no-literal-string
         output += `  ${example}\n`;

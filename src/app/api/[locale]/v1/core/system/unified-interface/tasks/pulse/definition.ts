@@ -8,17 +8,17 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
+  objectField,
+  requestDataField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import {
-  objectField,
-  requestDataField,
-  responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
@@ -29,77 +29,77 @@ const pulseExecuteEndpoint = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "tasks", "pulse", "execute"],
   title:
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.title",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.title",
   description:
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.description",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.description",
   category:
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.category",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.category",
   allowedRoles: [UserRole.ADMIN],
   aliases: ["pulse:execute"],
   tags: [
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.tags.execute",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.tags.execute",
   ],
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.internal.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.internal.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.unknown.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unknown.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.unknown.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.unsaved.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unsaved.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.unsaved.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.conflict.description",
     },
   },
   successTypes: {
     title:
-      "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.success.title",
+      "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.success.title",
     description:
-      "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.success.description",
+      "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.success.description",
   },
 
   fields: objectField(
@@ -107,7 +107,7 @@ const pulseExecuteEndpoint = createEndpoint({
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.container.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.container.title",
       layout: { columns: 12 },
     },
     { request: "data", response: true },
@@ -118,9 +118,9 @@ const pulseExecuteEndpoint = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.dryRun.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.dryRun.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.description",
           layout: { columns: 4 },
         },
         z.boolean().optional().default(false),
@@ -131,9 +131,9 @@ const pulseExecuteEndpoint = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.force.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.force.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.description",
           layout: { columns: 4 },
         },
         z.boolean().optional().default(false),
@@ -144,9 +144,9 @@ const pulseExecuteEndpoint = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.taskNames.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.taskNames.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.description",
           layout: { columns: 4 },
         },
         z.array(z.string()).optional(),
@@ -157,7 +157,7 @@ const pulseExecuteEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.success.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.success.title",
         },
         z.boolean(),
       ),
@@ -166,7 +166,7 @@ const pulseExecuteEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.message.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.message.title",
         },
         z.string(),
       ),
@@ -196,7 +196,7 @@ const pulseExecuteEndpoint = createEndpoint({
       },
     },
   },
-})
+});
 
 /**
  * GET endpoint definition - Get pulse status
@@ -206,24 +206,24 @@ const pulseStatusEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "system", "tasks", "pulse", "status"],
   title:
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.title",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.title",
   description:
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.description",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.description",
   category:
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.category",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.category",
   allowedRoles: [],
   aliases: ["pulse:status"],
   tags: [
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.tags.status",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.tags.status",
   ],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.container.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.container.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.container.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { response: true },
@@ -233,7 +233,7 @@ const pulseStatusEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.fields.status.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.fields.status.title",
         },
         z.string(),
       ),
@@ -242,7 +242,7 @@ const pulseStatusEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.fields.lastPulseAt.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.fields.lastPulseAt.title",
         },
         z.string().nullable(),
       ),
@@ -251,7 +251,7 @@ const pulseStatusEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.fields.successRate.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.fields.successRate.title",
         },
         z.number().nullable(),
       ),
@@ -260,7 +260,7 @@ const pulseStatusEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.fields.totalExecutions.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.fields.totalExecutions.title",
         },
         z.number(),
       ),
@@ -287,65 +287,65 @@ const pulseStatusEndpoint = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.internal.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.internal.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.internal.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.unknown.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unknown.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.unknown.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.unsaved.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unsaved.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.unsaved.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.errors.conflict.description",
     },
   },
 
   successTypes: {
     title:
-      "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.success.title",
+      "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.success.title",
     description:
-      "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.status.get.success.description",
+      "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.success.description",
   },
 });
 

@@ -95,7 +95,7 @@ function generateDescription(
     dayOfWeek === "*"
   ) {
     return t(
-      "app.api.v1.core.system.unifiedBackend.tasks.cron.frequency.everyMinute",
+      "app.api.v1.core.system.unifiedInterface.tasks.cron.frequency.everyMinute",
     );
   }
 
@@ -103,7 +103,7 @@ function generateDescription(
   if (minute === "*") {
     parts.push(
       t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.frequency.everyMinutes",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.frequency.everyMinutes",
       ),
     );
   } else if (minute.includes("/")) {
@@ -111,7 +111,7 @@ function generateDescription(
     if (start === "*") {
       parts.push(
         t(
-          "app.api.v1.core.system.unifiedBackend.tasks.cron.patterns.everyIntervalMinutes",
+          "app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.everyIntervalMinutes",
           {
             interval,
           },
@@ -120,7 +120,7 @@ function generateDescription(
     } else {
       parts.push(
         t(
-          "app.api.v1.core.system.unifiedBackend.tasks.cron.patterns.everyIntervalMinutesStarting",
+          "app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.everyIntervalMinutesStarting",
           {
             interval,
             start,
@@ -131,7 +131,7 @@ function generateDescription(
   } else if (minute.includes(",")) {
     const minutes = minute.split(",");
     parts.push(
-      t("app.api.v1.core.system.unifiedBackend.tasks.cron.patterns.atMinutes", {
+      t("app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.atMinutes", {
         minutes: minutes.join(", "),
       }),
     );
@@ -139,7 +139,7 @@ function generateDescription(
     const [start, end] = minute.split("-");
     parts.push(
       t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.patterns.fromMinuteToMinute",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.fromMinuteToMinute",
         {
           start,
           end,
@@ -148,7 +148,7 @@ function generateDescription(
     );
   } else if (minute !== "0") {
     parts.push(
-      t("app.api.v1.core.system.unifiedBackend.tasks.cron.patterns.atMinute", {
+      t("app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.atMinute", {
         minute,
       }),
     );
@@ -159,7 +159,7 @@ function generateDescription(
     if (!parts.some((p) => p.includes("minute"))) {
       parts.push(
         t(
-          "app.api.v1.core.system.unifiedBackend.tasks.cron.frequency.everyHour",
+          "app.api.v1.core.system.unifiedInterface.tasks.cron.frequency.everyHour",
         ),
       );
     }
@@ -168,7 +168,7 @@ function generateDescription(
     if (start === "*") {
       parts.push(
         t(
-          "app.api.v1.core.system.unifiedBackend.tasks.cron.patterns.everyIntervalHours",
+          "app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.everyIntervalHours",
           {
             interval,
           },
@@ -177,7 +177,7 @@ function generateDescription(
     } else {
       parts.push(
         t(
-          "app.api.v1.core.system.unifiedBackend.tasks.cron.patterns.everyIntervalHoursStarting",
+          "app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.everyIntervalHoursStarting",
           {
             interval,
             start: formatHour(start, locale),
@@ -188,7 +188,7 @@ function generateDescription(
   } else if (hour.includes(",")) {
     const hours = hour.split(",").map((h) => formatHour(h, locale));
     parts.push(
-      t("app.api.v1.core.system.unifiedBackend.tasks.cron.patterns.atHours", {
+      t("app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.atHours", {
         hours: hours.join(", "),
       }),
     );
@@ -196,7 +196,7 @@ function generateDescription(
     const [start, end] = hour.split("-");
     parts.push(
       t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.patterns.fromHourToHour",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.fromHourToHour",
         {
           start: formatHour(start, locale),
           end: formatHour(end, locale),
@@ -205,7 +205,7 @@ function generateDescription(
     );
   } else {
     parts.push(
-      t("app.api.v1.core.system.unifiedBackend.tasks.cron.patterns.atHour", {
+      t("app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.atHour", {
         hour: formatHour(hour, locale),
       }),
     );
@@ -217,7 +217,7 @@ function generateDescription(
       const [, interval] = dayOfMonth.split("/");
       parts.push(
         t(
-          "app.api.v1.core.system.unifiedBackend.tasks.cron.frequency.everyDays",
+          "app.api.v1.core.system.unifiedInterface.tasks.cron.frequency.everyDays",
           {
             count: interval,
           },
@@ -226,13 +226,13 @@ function generateDescription(
     } else if (dayOfMonth.includes(",")) {
       const days = dayOfMonth.split(",");
       parts.push(
-        t("app.api.v1.core.system.unifiedBackend.tasks.cron.calendar.onDays", {
+        t("app.api.v1.core.system.unifiedInterface.tasks.cron.calendar.onDays", {
           days: days.join(", "),
         }),
       );
     } else {
       parts.push(
-        t("app.api.v1.core.system.unifiedBackend.tasks.cron.calendar.onDay", {
+        t("app.api.v1.core.system.unifiedInterface.tasks.cron.calendar.onDay", {
           day: dayOfMonth,
         }),
       );
@@ -245,7 +245,7 @@ function generateDescription(
       const months = month.split(",").map((m) => formatMonth(m, locale));
       parts.push(
         t(
-          "app.api.v1.core.system.unifiedBackend.tasks.cron.calendar.inMonths",
+          "app.api.v1.core.system.unifiedInterface.tasks.cron.calendar.inMonths",
           {
             months: months.join(", "),
           },
@@ -253,7 +253,7 @@ function generateDescription(
       );
     } else {
       parts.push(
-        t("app.api.v1.core.system.unifiedBackend.tasks.cron.calendar.inMonth", {
+        t("app.api.v1.core.system.unifiedInterface.tasks.cron.calendar.inMonth", {
           month: formatMonth(month, locale),
         }),
       );
@@ -266,7 +266,7 @@ function generateDescription(
       const days = dayOfWeek.split(",").map((d) => formatDayOfWeek(d, locale));
       parts.push(
         t(
-          "app.api.v1.core.system.unifiedBackend.tasks.cron.calendar.onWeekdays",
+          "app.api.v1.core.system.unifiedInterface.tasks.cron.calendar.onWeekdays",
           {
             days: days.join(", "),
           },
@@ -276,7 +276,7 @@ function generateDescription(
       const [start, end] = dayOfWeek.split("-");
       parts.push(
         t(
-          "app.api.v1.core.system.unifiedBackend.tasks.cron.calendar.fromWeekdayToWeekday",
+          "app.api.v1.core.system.unifiedInterface.tasks.cron.calendar.fromWeekdayToWeekday",
           {
             start: formatDayOfWeek(start, locale),
             end: formatDayOfWeek(end, locale),
@@ -286,7 +286,7 @@ function generateDescription(
     } else {
       parts.push(
         t(
-          "app.api.v1.core.system.unifiedBackend.tasks.cron.calendar.onWeekday",
+          "app.api.v1.core.system.unifiedInterface.tasks.cron.calendar.onWeekday",
           {
             day: formatDayOfWeek(dayOfWeek, locale),
           },
@@ -298,7 +298,7 @@ function generateDescription(
   // Add timezone if not UTC
   if (timezone !== "UTC") {
     parts.push(
-      t("app.api.v1.core.system.unifiedBackend.tasks.cron.timezone", {
+      t("app.api.v1.core.system.unifiedInterface.tasks.cron.timezone", {
         timezone,
       }),
     );
@@ -320,17 +320,17 @@ function formatHour(hour: string, locale: CountryLanguage): string {
   const { t } = simpleT(locale);
   const h = parseInt(hour, 10);
   if (h === 0) {
-    return t("app.api.v1.core.system.unifiedBackend.tasks.cron.time.midnight");
+    return t("app.api.v1.core.system.unifiedInterface.tasks.cron.time.midnight");
   }
   if (h === 12) {
-    return t("app.api.v1.core.system.unifiedBackend.tasks.cron.time.noon");
+    return t("app.api.v1.core.system.unifiedInterface.tasks.cron.time.noon");
   }
   if (h < 12) {
-    return t("app.api.v1.core.system.unifiedBackend.tasks.cron.time.hourAm", {
+    return t("app.api.v1.core.system.unifiedInterface.tasks.cron.time.hourAm", {
       hour: h,
     });
   }
-  return t("app.api.v1.core.system.unifiedBackend.tasks.cron.time.hourPm", {
+  return t("app.api.v1.core.system.unifiedInterface.tasks.cron.time.hourPm", {
     hour: h - 12,
   });
 }
@@ -344,41 +344,41 @@ function formatMonth(month: string, locale: CountryLanguage): string {
   switch (m) {
     case 1:
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.months.january",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.months.january",
       );
     case 2:
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.months.february",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.months.february",
       );
     case 3:
-      return t("app.api.v1.core.system.unifiedBackend.tasks.cron.months.march");
+      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.months.march");
     case 4:
-      return t("app.api.v1.core.system.unifiedBackend.tasks.cron.months.april");
+      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.months.april");
     case 5:
-      return t("app.api.v1.core.system.unifiedBackend.tasks.cron.months.may");
+      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.months.may");
     case 6:
-      return t("app.api.v1.core.system.unifiedBackend.tasks.cron.months.june");
+      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.months.june");
     case 7:
-      return t("app.api.v1.core.system.unifiedBackend.tasks.cron.months.july");
+      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.months.july");
     case 8:
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.months.august",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.months.august",
       );
     case 9:
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.months.september",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.months.september",
       );
     case 10:
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.months.october",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.months.october",
       );
     case 11:
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.months.november",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.months.november",
       );
     case 12:
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.months.december",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.months.december",
       );
     default:
       return month;
@@ -393,24 +393,24 @@ function formatDayOfWeek(day: string, locale: CountryLanguage): string {
   const d = parseInt(day, 10);
   switch (d) {
     case 0:
-      return t("app.api.v1.core.system.unifiedBackend.tasks.cron.days.sunday");
+      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.days.sunday");
     case 1:
-      return t("app.api.v1.core.system.unifiedBackend.tasks.cron.days.monday");
+      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.days.monday");
     case 2:
-      return t("app.api.v1.core.system.unifiedBackend.tasks.cron.days.tuesday");
+      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.days.tuesday");
     case 3:
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.days.wednesday",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.days.wednesday",
       );
     case 4:
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.days.thursday",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.days.thursday",
       );
     case 5:
-      return t("app.api.v1.core.system.unifiedBackend.tasks.cron.days.friday");
+      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.days.friday");
     case 6:
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.days.saturday",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.days.saturday",
       );
     default:
       return day;
@@ -471,57 +471,57 @@ export function formatCronScheduleShort(
     // Common patterns
     if (schedule === "0 0 * * *") {
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.common.dailyAtMidnight",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.common.dailyAtMidnight",
       );
     }
     if (schedule === "0 12 * * *") {
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.common.dailyAtNoon",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.common.dailyAtNoon",
       );
     }
     if (schedule === "0 0 * * 0") {
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.common.weeklyOnSunday",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.common.weeklyOnSunday",
       );
     }
     if (schedule === "0 0 1 * *") {
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.common.monthlyOnFirst",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.common.monthlyOnFirst",
       );
     }
     if (schedule === "*/5 * * * *") {
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.common.everyFiveMinutes",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.common.everyFiveMinutes",
       );
     }
     if (schedule === "*/3 * * * *") {
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.common.everyThreeMinutes",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.common.everyThreeMinutes",
       );
     }
     if (schedule === "*/1 * * * *") {
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.common.everyOneMinutes",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.common.everyOneMinutes",
       );
     }
     if (schedule === "*/10 * * * *") {
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.common.everyTenMinutes",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.common.everyTenMinutes",
       );
     }
     if (schedule === "*/15 * * * *") {
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.common.everyFifteenMinutes",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.common.everyFifteenMinutes",
       );
     }
     if (schedule === "*/30 * * * *") {
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.common.everyThirtyMinutes",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.common.everyThirtyMinutes",
       );
     }
     if (schedule === "0 * * * *") {
       return t(
-        "app.api.v1.core.system.unifiedBackend.tasks.cron.frequency.hourly",
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.frequency.hourly",
       );
     }
 

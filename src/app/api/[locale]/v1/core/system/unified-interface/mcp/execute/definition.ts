@@ -25,24 +25,20 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "unified-interface", "mcp", "execute"],
   aliases: ["mcp-execute", "mcp:exec", "mcp:run"],
-  title:
-    "app.api.v1.core.system.unifiedUi.mcp.execute.post.title" as const,
+  title: "app.api.v1.core.system.unifiedInterface.mcp.execute.post.title" as const,
   description:
-    "app.api.v1.core.system.unifiedUi.mcp.execute.post.description" as const,
-  category:
-    "app.api.v1.core.system.unifiedUi.mcp.execute.category" as const,
-  tags: [
-    "app.api.v1.core.system.unifiedUi.mcp.execute.tags.mcp" as const,
-  ],
+    "app.api.v1.core.system.unifiedInterface.mcp.execute.post.description" as const,
+  category: "app.api.v1.core.system.unifiedInterface.mcp.execute.category" as const,
+  tags: ["app.api.v1.core.system.unifiedInterface.mcp.execute.tags.mcp" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.title" as const,
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.title" as const,
       description:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.description" as const,
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -51,9 +47,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           title:
-            "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.name.title" as const,
+            "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.name.title" as const,
           description:
-            "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.name.description" as const,
+            "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.name.description" as const,
           placeholder: "core:system:db:ping",
         },
         z.string().min(1),
@@ -62,9 +58,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           title:
-            "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.arguments.title" as const,
+            "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.arguments.title" as const,
           description:
-            "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.arguments.description" as const,
+            "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.arguments.description" as const,
           placeholder: "{}",
         },
         z.record(z.string(), z.unknown()).optional().default({}),
@@ -76,13 +72,13 @@ const { POST } = createEndpoint({
             {
               key: "type",
               label:
-                "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.result.content.type" as const,
+                "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.result.content.type" as const,
               type: FieldDataType.TEXT,
             },
             {
               key: "text",
               label:
-                "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.result.content.text" as const,
+                "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.result.content.text" as const,
               type: FieldDataType.TEXT,
             },
           ],
@@ -102,7 +98,7 @@ const { POST } = createEndpoint({
       isError: responseField(
         {
           type: WidgetType.BADGE,
-          text: "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.result.isError" as const,
+          text: "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.result.isError" as const,
         },
         z.boolean(),
       ),
@@ -113,66 +109,65 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.server.title",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.server.title",
       description:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.server.description",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.unknown.title",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.unknown.title",
       description:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.unknown.description",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.unsavedChanges.title",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.unsavedChanges.title",
       description:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.unsavedChanges.description",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.mcp.execute.post.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title:
-      "app.api.v1.core.system.unifiedUi.mcp.execute.post.success.title",
+    title: "app.api.v1.core.system.unifiedInterface.mcp.execute.post.success.title",
     description:
-      "app.api.v1.core.system.unifiedUi.mcp.execute.post.success.description",
+      "app.api.v1.core.system.unifiedInterface.mcp.execute.post.success.description",
   },
 
   examples: {

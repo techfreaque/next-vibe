@@ -87,11 +87,9 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
 
       const duration = Date.now() - startTime;
 
-      logger.info("Generated endpoint file", {
-        endpointCount: definitionFiles.length,
-        duration,
-        outputPath: data.dryRun ? undefined : outputFile,
-      });
+      logger.info(
+        `Generated endpoint file with ${definitionFiles.length} endpoints in ${duration}ms`,
+      );
 
       return createSuccessResponse({
         success: true,

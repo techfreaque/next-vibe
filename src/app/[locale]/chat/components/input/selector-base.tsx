@@ -1,3 +1,4 @@
+// oxlint-disable prefer-tag-over-role
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
@@ -149,7 +150,7 @@ export function SelectorBase<T extends string = string>({
         string,
         { options: SelectorOption<T>[]; icon?: IconValue }
       > = {};
-      const groupNames = Object.keys(grouped).sort((a, b) => {
+      const groupNames = Object.keys(grouped).toSorted((a, b) => {
         if (sortOrder === "asc") {
           return a.localeCompare(b);
         }

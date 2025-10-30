@@ -7,15 +7,15 @@ import { z } from "zod";
 
 import { createFormEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create-form";
 import {
+  field,
+  objectField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import {
-  field,
-  objectField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import {

@@ -158,7 +158,7 @@ export class DatabaseMigrateProdRepositoryImpl
   ): Promise<{ success: boolean; error?: string }> {
     try {
       // Run drizzle-kit generate command
-      const { spawnSync } = await import("child_process");
+      const { spawnSync } = await import("node:child_process");
       const result = spawnSync("npx", ["drizzle-kit", "generate"], {
         stdio: "pipe",
         encoding: "utf-8",
@@ -209,7 +209,7 @@ export class DatabaseMigrateProdRepositoryImpl
   ): Promise<{ success: boolean; error?: string }> {
     try {
       // Run production seeds by executing seed command
-      const { spawnSync } = await import("child_process");
+      const { spawnSync } = await import("node:child_process");
       const result = spawnSync(
         "npx",
         [...SEED_COMMAND, JSON.stringify(SEED_ENV_PROD)],

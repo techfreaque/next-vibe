@@ -541,7 +541,7 @@ export class MigrationTaskManagementRepositoryImpl
       setTimeout(() => resolve(), 10);
     }); // Add minimal await
     try {
-      const taskList = Array.from(this.migrationTasks.values()).map((task) => ({
+      const taskList = [...this.migrationTasks.values()].map((task) => ({
         name: task.name,
         description: task.description,
         type: task.type,
@@ -629,11 +629,11 @@ export class MigrationTaskManagementRepositoryImpl
           }
 
           // Wait for next check or abort signal
-          await new Promise((resolve) => {
+          await new Promise<void>((resolve) => {
             const timeout = setTimeout(resolve, checkInterval);
             signal.addEventListener("abort", () => {
               clearTimeout(timeout);
-              resolve(undefined);
+              // Don't resolve again - setTimeout already will
             });
           });
         }

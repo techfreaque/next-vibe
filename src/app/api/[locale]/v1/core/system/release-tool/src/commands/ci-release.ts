@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
-import { execSync } from "child_process";
-import { join } from "path";
+import { execSync } from "node:child_process";
+import { join } from "node:path";
 
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -236,13 +236,13 @@ function runCiReleaseCommand(
   try {
     execSync(commandStr, {
       stdio: "inherit",
-      env: ciEnv,
+      env: ciEnv as NodeJS.ProcessEnv,
     });
     logger.info(CLI_MESSAGES.ciCommandSuccess(packageName));
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     const errorMsg = CLI_MESSAGES.ciCommandFailed(packageName, msg);
     logger.error(errorMsg);
-    throw new Error(errorMsg);
+    throw new Error(errorMsg, { cause: error });
   }
 }

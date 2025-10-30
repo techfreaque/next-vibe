@@ -124,7 +124,7 @@ export interface WidgetRenderContext {
   options: CLIRenderingOptions;
   depth: number;
   translate: (
-    key: TranslationKey | string,
+    key: TranslationKey,
     params?: Record<string, string | number>,
   ) => string;
   formatValue: (field: ResponseFieldMetadata, value: RenderableValue) => string;

@@ -9,9 +9,9 @@ import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { stepCountIs, streamText } from "ai";
 import { and, eq } from "drizzle-orm";
 import {
-  fail,
   createStreamingResponse,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
   type StreamingResponse,
 } from "next-vibe/shared/types/response.schema";
@@ -20,12 +20,9 @@ import { parseError } from "next-vibe/shared/utils";
 import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
 import { creditValidator } from "@/app/api/[locale]/v1/core/credits/validator";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import { getToolExecutor } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/executor";
-import { createToolsFromEndpoints } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/factory";
-import { getToolRegistry } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/registry";
 import type { CoreTool } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/config";
+import { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -78,7 +75,7 @@ export interface IAiStreamRepository {
  * Type guard for tool result values
  * Validates that value is JSON-serializable and matches ToolCallResult type
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 function isValidToolResult(value: any): value is ToolCallResult {
   if (value === null) {
     return true;
@@ -102,7 +99,7 @@ function isValidToolResult(value: any): value is ToolCallResult {
   }
   if (typeof value === "object") {
     // Objects are valid - recursively check values
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+     
     return Object.values(value).every((v) => isValidToolResult(v));
   }
   // Reject functions, symbols, etc.
@@ -511,7 +508,7 @@ class AiStreamRepository implements IAiStreamRepository {
       id: params.messageId,
       threadId: params.threadId,
       role: ChatMessageRole.ASSISTANT,
-      content: "",
+      content: " ", // Use space instead of empty string (DB constraint requires non-empty)
       parentId: params.parentId,
       depth: params.depth,
       sequenceId: params.sequenceId,
@@ -629,16 +626,16 @@ class AiStreamRepository implements IAiStreamRepository {
   /**
    * Load and prepare tools for AI
    */
-  private loadTools(params: {
+  private async loadTools(params: {
     requestedTools: string[] | null | undefined;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
     systemPrompt: string;
-  }): {
+  }): Promise<{
     tools: Record<string, CoreTool> | undefined;
     systemPrompt: string;
-  } {
+  }> {
     let tools: Record<string, CoreTool> | undefined = undefined;
     let enhancedSystemPrompt = params.systemPrompt;
 
@@ -646,7 +643,11 @@ class AiStreamRepository implements IAiStreamRepository {
       return { tools, systemPrompt: enhancedSystemPrompt };
     }
 
+
     try {
+      const {getToolRegistry} = await import(
+        "@/app/api/[locale]/v1/core/system/unified-interface/ai/registry",
+      );
       const registry = getToolRegistry();
 
       // Get endpoints filtered by user permissions at framework level
@@ -666,6 +667,12 @@ class AiStreamRepository implements IAiStreamRepository {
       });
 
       if (enabledEndpoints.length > 0) {
+        const { getToolExecutor } = await import(
+          "@/app/api/[locale]/v1/core/system/unified-interface/ai/executor",
+        );
+        const { createToolsFromEndpoints } = await import(
+          "@/app/api/[locale]/v1/core/system/unified-interface/ai/factory",
+        );
         const toolExecutor = getToolExecutor();
         const toolsMap = createToolsFromEndpoints(
           enabledEndpoints,
@@ -681,7 +688,7 @@ class AiStreamRepository implements IAiStreamRepository {
 
         params.logger.info("Tools created", {
           count: toolsMap.size,
-          toolNames: Array.from(toolsMap.keys()),
+          toolNames: [...toolsMap.keys()],
         });
 
         // Add tool instructions to system prompt
@@ -756,7 +763,8 @@ class AiStreamRepository implements IAiStreamRepository {
         leadId,
       });
       return fail({
-        message: "app.api.v1.core.agent.chat.aiStream.route.errors.authenticationRequired",
+        message:
+          "app.api.v1.core.agent.chat.aiStream.route.errors.authenticationRequired",
         errorType: ErrorResponseTypes.AUTH_ERROR,
       });
     }
@@ -791,7 +799,8 @@ class AiStreamRepository implements IAiStreamRepository {
 
       if (!leadByIpResult.success) {
         return fail({
-          message: "app.api.v1.core.agent.chat.aiStream.route.errors.creditValidationFailed",
+          message:
+            "app.api.v1.core.agent.chat.aiStream.route.errors.creditValidationFailed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -804,15 +813,17 @@ class AiStreamRepository implements IAiStreamRepository {
     } else {
       // No identifier - should not happen
       logger.error("No user, lead, or IP address provided");
-      return fail({ 
-        message: "app.api.v1.core.agent.chat.aiStream.route.errors.noIdentifier",
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.aiStream.route.errors.noIdentifier",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
 
     if (!validationResult.success) {
       return fail({
-        message: "app.api.v1.core.agent.chat.aiStream.route.errors.creditValidationFailed",
+        message:
+          "app.api.v1.core.agent.chat.aiStream.route.errors.creditValidationFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -828,7 +839,8 @@ class AiStreamRepository implements IAiStreamRepository {
       });
 
       return fail({
-        message: "app.api.v1.core.agent.chat.aiStream.route.errors.insufficientCredits",
+        message:
+          "app.api.v1.core.agent.chat.aiStream.route.errors.insufficientCredits",
         errorType: ErrorResponseTypes.FORBIDDEN,
         messageParams: {
           cost: modelCost.toString(),
@@ -872,7 +884,8 @@ class AiStreamRepository implements IAiStreamRepository {
           );
           if (!retryResult) {
             return fail({
-              message: "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
+              message:
+                "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
               errorType: ErrorResponseTypes.NOT_FOUND,
             });
           }
@@ -892,7 +905,8 @@ class AiStreamRepository implements IAiStreamRepository {
           );
           if (!editResult) {
             return fail({
-              message: "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
+              message:
+                "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
               errorType: ErrorResponseTypes.NOT_FOUND,
             });
           }
@@ -931,7 +945,8 @@ class AiStreamRepository implements IAiStreamRepository {
         error: parseError(error).message,
       });
       return fail({
-        message: "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
+        message:
+          "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -1059,7 +1074,7 @@ class AiStreamRepository implements IAiStreamRepository {
       // Load tools if model supports them
       let tools: Record<string, CoreTool> | undefined = undefined;
       if (modelConfig?.supportsTools) {
-        const toolsResult = this.loadTools({
+        const toolsResult = await this.loadTools({
           requestedTools: data.tools,
           user,
           locale,
@@ -1222,6 +1237,9 @@ class AiStreamRepository implements IAiStreamRepository {
 
             // Get endpoint metadata for display info
             // Filter by user permissions to ensure we only show tools the user can access
+            const { getToolRegistry } = await import(
+              "@/app/api/[locale]/v1/core/system/unified-interface/ai/registry"
+            );
             const registry = getToolRegistry();
             const allEndpoints = registry.getEndpoints(user, Platform.AI);
             const endpointMap = new Map(
@@ -1230,6 +1248,48 @@ class AiStreamRepository implements IAiStreamRepository {
 
             // Stream the response
             logger.info("[AI Stream] Starting to process fullStream");
+
+            // Create initial ASSISTANT message immediately so it shows before any tool calls
+            logger.debug("[DEBUG] Creating initial ASSISTANT message", {
+              messageId: aiMessageId,
+              threadId: threadResult.threadId,
+              parentId: currentParentId,
+              depth: currentDepth,
+              sequenceIndex,
+            });
+
+            const initialMessageEvent = createStreamEvent.messageCreated({
+              messageId: aiMessageId,
+              threadId: threadResult.threadId,
+              role: ChatMessageRole.ASSISTANT,
+              content: "",
+              parentId: currentParentId,
+              depth: currentDepth,
+              model: data.model,
+              persona: data.persona ?? undefined,
+              sequenceId,
+              sequenceIndex,
+            });
+            controller.enqueue(encoder.encode(formatSSEEvent(initialMessageEvent)));
+            aiMessageCreated = true;
+
+            // Save to database if not incognito
+            if (!isIncognito && userId) {
+              await createAiMessagePlaceholder({
+                messageId: aiMessageId,
+                threadId: threadResult.threadId,
+                parentId: currentParentId,
+                depth: currentDepth,
+                userId,
+                model: data.model,
+                persona: data.persona ?? undefined,
+                sequenceId,
+                sequenceIndex,
+                logger,
+              });
+              lastAssistantMessageId = aiMessageId;
+            }
+
             for await (const part of streamResult.fullStream) {
               if (part.type === "text-delta") {
                 const textDelta = part.text;
@@ -1240,9 +1300,11 @@ class AiStreamRepository implements IAiStreamRepository {
                   textDelta !== ""
                 ) {
                   // If we need a new assistant message after tool calls, create it
-                  if (needsNewAssistantMessage) {
+                  // BUT only if we already have content in the previous message
+                  // If the previous message was empty (created before tool call), reuse it
+                  if (needsNewAssistantMessage && fullContent.length > 0) {
                     // Save the previous message content to database
-                    if (aiMessageCreated && fullContent.length > 0) {
+                    if (aiMessageCreated) {
                       if (!isIncognito && userId) {
                         await db
                           .update(chatMessages)
@@ -1277,8 +1339,6 @@ class AiStreamRepository implements IAiStreamRepository {
                     aiMessageId = crypto.randomUUID();
                     sequenceIndex++;
                     fullContent = ""; // Reset content for new message
-                    aiMessageCreated = false;
-                    needsNewAssistantMessage = false;
 
                     logger.debug(
                       "[DEBUG] Creating new assistant message after tool call",
@@ -1288,42 +1348,48 @@ class AiStreamRepository implements IAiStreamRepository {
                         parentId: currentParentId,
                       },
                     );
-                  }
 
-                  // Create AI message on first text delta if not already created
-                  if (!aiMessageCreated) {
-                    // Use current parent and depth (which may have been updated by reasoning messages)
-                    logger.debug("[DEBUG] Emitting AI MESSAGE_CREATED event", {
-                      messageId: aiMessageId,
-                      threadId: threadResult.threadId,
-                      parentId: currentParentId,
-                      depth: currentDepth,
-                      hasReasoning,
-                    });
-
-                    const aiMessageEvent = createStreamEvent.messageCreated({
+                    // Emit MESSAGE_CREATED for the new assistant message
+                    const newMessageEvent = createStreamEvent.messageCreated({
                       messageId: aiMessageId,
                       threadId: threadResult.threadId,
                       role: ChatMessageRole.ASSISTANT,
+                      content: "",
                       parentId: currentParentId,
                       depth: currentDepth,
-                      content: "",
                       model: data.model,
                       persona: data.persona ?? undefined,
-                      sequenceId, // Use the shared sequence ID
-                      sequenceIndex, // Position in sequence
+                      sequenceId,
+                      sequenceIndex,
                     });
                     controller.enqueue(
-                      encoder.encode(formatSSEEvent(aiMessageEvent)),
+                      encoder.encode(formatSSEEvent(newMessageEvent)),
                     );
-                    aiMessageCreated = true;
-                    lastAssistantMessageId = aiMessageId; // Track this as the last assistant message
 
-                    logger.debug("[DEBUG] AI MESSAGE_CREATED event emitted", {
-                      messageId: aiMessageId,
-                    });
+                    // Save to database if not incognito
+                    if (!isIncognito && userId) {
+                      await createAiMessagePlaceholder({
+                        messageId: aiMessageId,
+                        threadId: threadResult.threadId,
+                        parentId: currentParentId,
+                        depth: currentDepth,
+                        userId,
+                        model: data.model,
+                        persona: data.persona ?? undefined,
+                        sequenceId,
+                        sequenceIndex,
+                        logger,
+                      });
+                    }
+
+                    aiMessageCreated = true;
+                    lastAssistantMessageId = aiMessageId;
                   }
 
+                  // Reset the flag - either we created a new message or we're reusing the empty one
+                  needsNewAssistantMessage = false;
+
+                  // Accumulate the content
                   fullContent += textDelta;
 
                   logger.debug("[AI Stream] Text delta", {
@@ -1370,24 +1436,23 @@ class AiStreamRepository implements IAiStreamRepository {
               } else if (part.type === "tool-call") {
                 // Get endpoint metadata for display info
                 const endpoint = endpointMap.get(part.toolName);
-                const definition = endpoint?.definition;
 
                 // Try to get widget metadata from endpoint definition
                 let widgetMetadata: ToolCallWidgetMetadata | undefined;
 
                 // Extract widget metadata from endpoint definition
-                if (endpoint && definition) {
+                if (endpoint) {
                   try {
                     const { ResponseMetadataExtractor } = await import(
                       "@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/response-metadata-extractor"
                     );
                     const extractor = new ResponseMetadataExtractor();
                     const metadata =
-                      extractor.extractResponseMetadata(definition);
+                      extractor.extractResponseMetadata(endpoint);
 
                     if (metadata?.fields && metadata.fields.length > 0) {
                       widgetMetadata = {
-                        endpointId: endpoint.id,
+                        endpointId: endpoint.toolName,
                         responseFields: metadata.fields.map((field) => ({
                           name: field.name,
                           widgetType: field.widgetType,
@@ -1413,18 +1478,17 @@ class AiStreamRepository implements IAiStreamRepository {
                 }
 
                 // Collect tool call for database storage
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-                const rawArgs: any = "input" in part ? part.input : {};
+                const rawArgs = "input" in part ? part.input : {};
                 const validatedArgs: ToolCallResult = isValidToolResult(rawArgs)
                   ? rawArgs
                   : {};
 
                 const toolCallData: ToolCall = {
                   toolName: part.toolName,
-                  displayName: definition?.title || part.toolName,
-                  icon: definition?.aiTool?.icon,
+                  displayName: endpoint?.definition.title || part.toolName,
+                  icon: endpoint?.definition.aiTool?.icon,
                   args: validatedArgs,
-                  creditsUsed: definition?.credits ?? 0,
+                  creditsUsed: endpoint?.definition.credits ?? 0,
                   widgetMetadata,
                 };
                 collectedToolCalls.push(toolCallData);
@@ -1435,59 +1499,45 @@ class AiStreamRepository implements IAiStreamRepository {
                   toolCallsCount: collectedToolCalls.length,
                 });
 
-                // If this is the first tool call and we haven't created the assistant message yet,
-                // create it now with empty content
-                if (!aiMessageCreated) {
-                  logger.debug(
-                    "[DEBUG] Creating assistant message before first tool call",
-                    {
-                      messageId: aiMessageId,
-                      threadId: threadResult.threadId,
-                      parentId: currentParentId,
-                      depth: currentDepth,
-                      sequenceIndex,
-                    },
-                  );
-
-                  const messageCreatedEvent = createStreamEvent.messageCreated({
-                    messageId: aiMessageId,
-                    threadId: threadResult.threadId,
-                    role: ChatMessageRole.ASSISTANT,
-                    content: "",
-                    parentId: currentParentId,
-                    depth: currentDepth,
-                    model: data.model,
-                    persona: data.persona ?? undefined,
-                    sequenceId,
-                    sequenceIndex,
-                  });
-                  controller.enqueue(
-                    encoder.encode(formatSSEEvent(messageCreatedEvent)),
-                  );
-
-                  // Save to database if not incognito
+                // If the current ASSISTANT message has content, finalize it before creating tool message
+                // This handles the case where AI generates text BEFORE calling a tool
+                if (aiMessageCreated && fullContent.length > 0) {
+                  // Save the assistant message content to database
                   if (!isIncognito && userId) {
-                    await createAiMessagePlaceholder({
+                    await db
+                      .update(chatMessages)
+                      .set({
+                        content: fullContent,
+                        updatedAt: new Date(),
+                      })
+                      .where(eq(chatMessages.id, aiMessageId));
+
+                    logger.info("Saved assistant message before tool call", {
                       messageId: aiMessageId,
-                      threadId: threadResult.threadId,
-                      parentId: currentParentId,
-                      depth: currentDepth,
-                      userId,
-                      model: data.model,
-                      persona: data.persona,
-                      sequenceId,
-                      sequenceIndex,
-                      logger,
+                      contentLength: fullContent.length,
                     });
                   }
 
-                  aiMessageCreated = true;
-                  lastAssistantMessageId = aiMessageId;
+                  // Emit CONTENT_DONE for this assistant message
+                  const contentDoneEvent = createStreamEvent.contentDone({
+                    messageId: aiMessageId,
+                    content: fullContent,
+                    totalTokens: null,
+                    finishReason: null,
+                  });
+                  controller.enqueue(
+                    encoder.encode(formatSSEEvent(contentDoneEvent)),
+                  );
 
-                  // Update parent for next message (tool message)
-                  currentParentId = aiMessageId;
-                  currentDepth = currentDepth + 1;
+                  logger.debug("[DEBUG] Finalized assistant message before tool call", {
+                    messageId: aiMessageId,
+                    contentLength: fullContent.length,
+                  });
                 }
+
+                // Update parent for tool message to be a child of the current assistant message
+                currentParentId = aiMessageId;
+                currentDepth = currentDepth + 1;
 
                 // Create a separate TOOL message for this tool call
                 const toolMessageId = crypto.randomUUID();
@@ -1495,21 +1545,6 @@ class AiStreamRepository implements IAiStreamRepository {
 
                 // Store the tool message ID for later result updates
                 toolMessageIds.set(part.toolName, toolMessageId);
-
-                const toolMessageEvent = createStreamEvent.messageCreated({
-                  messageId: toolMessageId,
-                  threadId: threadResult.threadId,
-                  role: ChatMessageRole.TOOL as ChatMessageRole,
-                  parentId: currentParentId,
-                  depth: currentDepth,
-                  content: "", // Tool messages have empty content, data is in toolCalls
-                  sequenceId, // Link to the same sequence
-                  sequenceIndex, // Position in sequence
-                  toolCalls: [toolCallData], // Include the tool call data
-                });
-                controller.enqueue(
-                  encoder.encode(formatSSEEvent(toolMessageEvent)),
-                );
 
                 // Save tool message to database (if not incognito)
                 if (!isIncognito && userId) {
@@ -1550,7 +1585,7 @@ class AiStreamRepository implements IAiStreamRepository {
                     persona: undefined,
                     sequenceId,
                     sequenceIndex,
-                    toolCalls: [toolCallData],
+                    // DO NOT include toolCalls here - they are sent via TOOL_CALL and TOOL_RESULT events
                   });
                 controller.enqueue(
                   encoder.encode(formatSSEEvent(toolMessageCreatedEvent)),
@@ -1580,9 +1615,7 @@ class AiStreamRepository implements IAiStreamRepository {
 
                 if (toolCallIndex !== -1) {
                   // AI SDK returns 'output' as unknown type
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-                  const output: any =
-                    "output" in part ? part.output : undefined;
+                  const output = "output" in part ? part.output : undefined;
 
                   logger.info("[AI Stream] Tool result RAW output", {
                     toolName: part.toolName,
@@ -1599,21 +1632,26 @@ class AiStreamRepository implements IAiStreamRepository {
                     "success" in output &&
                     "error" in output
                   ) {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
                     if (output.success === false) {
                       toolError =
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
                         typeof output.error === "string"
-                          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                          ?
                             (output.error as string)
-                          : // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                          :
                             JSON.stringify(output.error);
                     }
                   }
 
+                  // Clean output by removing undefined values (they break validation)
+                  const cleanedOutput = output
+                    ? JSON.parse(JSON.stringify(output))
+                    : undefined;
+
                   // Validate and type the output using type guard
                   const validatedOutput: ToolCallResult | undefined =
-                    isValidToolResult(output) ? output : undefined;
+                    isValidToolResult(cleanedOutput) ? cleanedOutput : undefined;
 
                   collectedToolCalls[toolCallIndex].result = validatedOutput;
                   collectedToolCalls[toolCallIndex].error = toolError;
@@ -1623,7 +1661,8 @@ class AiStreamRepository implements IAiStreamRepository {
                     hasResult: !!validatedOutput,
                     hasError: !!toolError,
                     resultType: typeof validatedOutput,
-                    isValid: isValidToolResult(output),
+                    isValid: isValidToolResult(cleanedOutput),
+                    wasCleaned: output !== cleanedOutput,
                   });
 
                   // Get the tool message ID for this tool
@@ -1727,12 +1766,25 @@ class AiStreamRepository implements IAiStreamRepository {
               });
             }
 
-            // Emit content-done event
+            // Emit content-done event with tool calls
+            logger.info("[AI Stream] Sending contentDone event", {
+              messageId: aiMessageId,
+              toolCallsCount: collectedToolCalls.length,
+              hasResults: collectedToolCalls.some((tc) => tc.result !== undefined),
+              toolCalls: collectedToolCalls.map((tc) => ({
+                toolName: tc.toolName,
+                hasResult: !!tc.result,
+                hasError: !!tc.error,
+              })),
+            });
+
             const doneEvent = createStreamEvent.contentDone({
               messageId: aiMessageId,
               content: finalContent,
               totalTokens: usage.totalTokens ?? null,
               finishReason: finishReason || null,
+              toolCalls:
+                collectedToolCalls.length > 0 ? collectedToolCalls : undefined,
             });
             controller.enqueue(encoder.encode(formatSSEEvent(doneEvent)));
 

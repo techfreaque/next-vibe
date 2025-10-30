@@ -98,7 +98,7 @@ export class KeyUsageAnalyzer {
       }
     }
 
-    const usedKeysCount = Array.from(keyUsageMap.keys()).length;
+    const usedKeysCount = [...keyUsageMap.keys()].length;
     logger.debug(
       `Found usage for ${usedKeysCount} keys across ${sourceFiles.length} files`,
     );

@@ -226,7 +226,7 @@ function setupGuardJailEnvironment(
   projectPath: string,
   logger: EndpointLogger,
 ): { success: boolean; message: string } {
-  const username = `guard_${config.project.name.replace(/[^a-zA-Z0-9]/g, "_")}`;
+  const username = `guard_${config.project.name.replaceAll(/[^a-zA-Z0-9]/g, "_")}`;
   const jailRoot = path.join(projectPath, config.filesystem.jailRoot);
 
   logger.info(`Setting up guard jail for ${config.project.name}`, {
@@ -293,7 +293,11 @@ function setupVSCodeIntegration(
 
     // Create or update VSCode settings
     const settingsPath = path.join(vscodePath, "settings.json");
-    let existingSettings: Record<string, any> = {};
+    interface VSCodeSettings {
+      "terminal.integrated.profiles.linux"?: Record<string, { path: string }>;
+      "terminal.integrated.defaultProfile.linux"?: string;
+    }
+    let existingSettings: VSCodeSettings = {};
 
     // Load existing settings if they exist
     if (fs.existsSync(settingsPath)) {
@@ -308,19 +312,19 @@ function setupVSCodeIntegration(
     }
 
     // Merge guard settings with existing settings
-    const existingProfiles =
-      existingSettings["terminal.integrated.profiles.linux"] || {};
-    const guardSettings = {
+    const existingProfiles = existingSettings["terminal.integrated.profiles.linux"] || {};
+    const guardSettings: VSCodeSettings = {
       "terminal.integrated.profiles.linux": {
         ...existingProfiles,
         "Vibe Guard": {
-          path: "${workspaceFolder}/.vibe-guard-instance/.guard.sh",
+          // eslint-disable-next-line i18next/no-literal-string, eslint/no-template-curly-in-string
+          path: '${workspaceFolder}/.vibe-guard-instance/.guard.sh',
         },
       },
       "terminal.integrated.defaultProfile.linux": "Vibe Guard",
     };
 
-    const mergedSettings = {
+    const mergedSettings: VSCodeSettings = {
       ...existingSettings,
       ...guardSettings,
     };
@@ -591,14 +595,14 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
       );
     }
 
-    const guardId = `guard_${config.project.name.replace(/[^a-zA-Z0-9]/g, "_")}`;
-    const username = `guard_${config.project.name.replace(/[^a-zA-Z0-9]/g, "_")}`;
+    const guardId = `guard_${config.project.name.replaceAll(/[^a-zA-Z0-9]/g, "_")}`;
+    const username = `guard_${config.project.name.replaceAll(/[^a-zA-Z0-9]/g, "_")}`;
     const jailRoot = path.join(projectPath, config.filesystem.jailRoot);
     const startupScriptPath = path.join(jailRoot, "startup.sh");
 
-    // When called from CLI, start the guard jail session directly
+    // When called from CLI, log output through logger and return response
     if (process.env.VIBE_CLI_MODE === "1") {
-      console.log(`🛡️ Starting guard jail for ${config.project.name}...`);
+      logger.info(`🛡️ Starting guard jail for ${config.project.name}...`);
 
       // Change to project directory
       process.chdir(projectPath);
@@ -607,6 +611,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
       process.env.GUARD_MODE = "1";
       process.env.GUARD_PROJECT = projectPath;
       process.env.GUARD_JAIL_ROOT = jailRoot;
+      // eslint-disable-next-line i18next/no-literal-string
       process.env.PS1 = `🛡️ guard@${config.project.name} \\w $ `;
 
       // Apply whitelisted environment variables
@@ -616,24 +621,24 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
         }
       });
 
-      console.log("🚀 Guard jail environment loaded!");
-      console.log(`📁 Project: ${projectPath}`);
-      console.log(`🔒 Security: ${config.security.level}`);
-      console.log(`🏠 Jail root: ${jailRoot}`);
-      console.log("🛡️ Jail mode active - restricted environment");
-      console.log("");
-      console.log("🔧 To start an interactive guard session, run:");
-      console.log(`   cd ${projectPath}`);
-      console.log(`   export GUARD_MODE=1`);
-      console.log(`   export GUARD_PROJECT=${projectPath}`);
-      console.log(`   export GUARD_JAIL_ROOT=${jailRoot}`);
-      console.log("");
-      console.log("📋 Available whitelisted binaries:");
+      logger.info("🚀 Guard jail environment loaded!");
+      logger.info(`📁 Project: ${projectPath}`);
+      logger.info(`🔒 Security: ${config.security.level}`);
+      logger.info(`🏠 Jail root: ${jailRoot}`);
+      logger.info("🛡️ Jail mode active - restricted environment");
+      logger.info("");
+      logger.info("🔧 To start an interactive guard session, run:");
+      logger.info(`   cd ${projectPath}`);
+      logger.info(`   export GUARD_MODE=1`);
+      logger.info(`   export GUARD_PROJECT=${projectPath}`);
+      logger.info(`   export GUARD_JAIL_ROOT=${jailRoot}`);
+      logger.info("");
+      logger.info("📋 Available whitelisted binaries:");
       config.whitelist.binaries.forEach((binary) => {
-        console.log(`   ${binary}`);
+        logger.info(`   ${binary}`);
       });
-      console.log("");
-      console.log("🛡️ Guard jail setup complete!");
+      logger.info("");
+      logger.info("🛡️ Guard jail setup complete!");
 
       // Exit cleanly instead of trying to keep process alive
       process.exit(0);

@@ -89,11 +89,7 @@ class EndpointsIndexGeneratorRepositoryImpl
 
       const duration = Date.now() - startTime;
 
-      logger.info("Generated endpoints file", {
-        endpointCount: definitionFiles.length,
-        duration,
-        outputPath: data.dryRun ? undefined : outputFile,
-      });
+      logger.info(`Generated endpoints index with ${definitionFiles.length} endpoints in ${duration}ms`);
 
       return createSuccessResponse({
         success: true,

@@ -185,6 +185,7 @@ export function updatePackageVersion(
       );
 
       // Helper to escape regex special characters in a directory string
+      // eslint-disable-next-line eslint-plugin-unicorn/consistent-function-scoping
       const escapeRegex = (s: string): string =>
         // eslint-disable-next-line i18next/no-literal-string
         s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

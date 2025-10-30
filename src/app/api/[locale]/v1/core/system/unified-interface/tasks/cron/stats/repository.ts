@@ -121,7 +121,7 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
       });
       return fail({
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.server.title",
+          "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: errorDetails.message,

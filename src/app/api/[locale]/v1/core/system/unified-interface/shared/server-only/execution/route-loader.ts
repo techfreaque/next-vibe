@@ -8,6 +8,9 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
 
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+
+import type { CreateApiEndpoint } from "../../endpoint/create";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Methods } from "../../types/enums";
 import type { RouteModule } from "../../types/handler";
@@ -30,10 +33,25 @@ export interface RouteLoaderOptions {
 
 /**
  * Route loading result
+ * TEndpoint defaults to any CreateApiEndpoint
  */
-export interface RouteLoaderResult<TRequestData = unknown> {
+export interface RouteLoaderResult<
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
+  > = CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
+  >,
+> {
   /** Loaded route module */
-  module: RouteModule<TRequestData> | null;
+  module: RouteModule<TEndpoint> | null;
   /** Where the module was loaded from */
   source: "registry" | "dynamic" | null;
   /** Error if loading failed */
@@ -68,10 +86,24 @@ function normalizeRoutePath(routePath: string): string {
   return routePath;
 }
 
-export async function loadRouteModule<TRequestData = unknown>(
+export async function loadRouteModule<
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
+  > = CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
+  >,
+>(
   options: RouteLoaderOptions,
   logger: EndpointLogger,
-): Promise<RouteLoaderResult<TRequestData>> {
+): Promise<RouteLoaderResult<TEndpoint>> {
   const {
     routePath: originalRoutePath,
     method,
@@ -91,7 +123,7 @@ export async function loadRouteModule<TRequestData = unknown>(
     alias,
   });
 
-  let routeModule: RouteModule<TRequestData> | null = null;
+  let routeModule: RouteModule<TEndpoint> | null = null;
   let source: "registry" | "dynamic" | null = null;
 
   // Try registry first (for Next.js server bundle)
@@ -102,7 +134,7 @@ export async function loadRouteModule<TRequestData = unknown>(
       );
       const handler = await getRouteHandler(normalizedPath);
       if (handler) {
-        routeModule = handler as RouteModule<TRequestData>;
+        routeModule = handler as RouteModule<TEndpoint>;
         source = "registry";
         logger.debug(`[Route Loader] Route module loaded from registry`);
       }
@@ -117,7 +149,7 @@ export async function loadRouteModule<TRequestData = unknown>(
   if (!routeModule && fallbackToDynamic) {
     try {
       logger.debug(`[Route Loader] Attempting dynamic import`, { routePath });
-      const imported = (await import(routePath)) as RouteModule<TRequestData>;
+      const imported = (await import(routePath)) as RouteModule<TEndpoint>;
       routeModule = imported;
       source = "dynamic";
       logger.debug(`[Route Loader] Route module loaded via dynamic import`);
@@ -126,9 +158,9 @@ export async function loadRouteModule<TRequestData = unknown>(
       logger.error(`[Route Loader] Failed to load route module`, {
         routePath,
         normalizedPath,
-        error: errorMessage,
+        error: errorMessage.message || String(importError),
         errorType: typeof importError,
-        errorDetails: importError,
+        errorDetails: String(importError),
       });
       return {
         module: null,
@@ -164,8 +196,23 @@ export async function loadRouteModule<TRequestData = unknown>(
 /**
  * Extract handler from route module by platform and method
  */
-export function extractHandlerFromModule<THandler = unknown>(
-  module: RouteModule<unknown>,
+export function extractHandlerFromModule<
+  THandler = unknown,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
+  > = CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
+  >,
+>(
+  module: RouteModule<TEndpoint>,
   platform: "cli" | "ai" | "mcp",
   method: Methods | string,
   logger: EndpointLogger,
@@ -218,18 +265,30 @@ export function extractHandlerFromModule<THandler = unknown>(
  */
 export async function loadRouteHandler<
   THandler = unknown,
-  TRequestData = unknown,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
+  > = CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
+  >,
 >(
   options: RouteLoaderOptions,
   platform: "cli" | "ai" | "mcp",
   logger: EndpointLogger,
 ): Promise<{
   handler: THandler | null;
-  module: RouteModule<TRequestData> | null;
+  module: RouteModule<TEndpoint> | null;
   source: "registry" | "dynamic" | null;
   error?: string;
 }> {
-  const loadResult = await loadRouteModule<TRequestData>(options, logger);
+  const loadResult = await loadRouteModule<TEndpoint>(options, logger);
 
   if (!loadResult.module || loadResult.error) {
     return {

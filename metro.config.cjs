@@ -1,6 +1,6 @@
 const { getDefaultConfig } = require('expo/metro-config');
 const { withNativeWind } = require('nativewind/metro');
-const path = require('path');
+const path = require('node:path');
 
 // Now running from workspace root (so NativeWind can scan all of src/)
 const projectRoot = __dirname;

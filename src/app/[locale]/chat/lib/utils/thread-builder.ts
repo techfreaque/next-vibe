@@ -24,7 +24,7 @@ export function getRootMessages(
  * Sort messages by timestamp (oldest first)
  */
 export function sortMessagesByTime(messages: ChatMessage[]): ChatMessage[] {
-  return [...messages].sort(
+  return [...messages].toSorted(
     (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
   );
 }
@@ -48,7 +48,7 @@ export function buildMessagePath(
   // Find ALL root messages (messages with no parent)
   const rootMessages = messages
     .filter((msg) => !msg.parentId)
-    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
   if (rootMessages.length === 0) {
     return { path: [], branchInfo: {} };
@@ -68,7 +68,7 @@ export function buildMessagePath(
   for (const [parentId, siblings] of childrenMap.entries()) {
     childrenMap.set(
       parentId,
-      siblings.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+      siblings.toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
     );
   }
 

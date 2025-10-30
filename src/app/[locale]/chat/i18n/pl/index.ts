@@ -775,6 +775,7 @@ export const translations: typeof enTranslations = {
     arguments: "Argumenty",
     result: "Wynik",
     error: "Błąd",
+    executing: "Wykonywanie...",
   },
   threadList: {
     deleteDialog: {

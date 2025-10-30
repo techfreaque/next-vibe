@@ -121,11 +121,11 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
   }
 
   /**
-   * Generate seeds content
+   * Generate seeds content with dynamic imports
    */
   private generateContent(seedFiles: string[], outputFile: string): string {
-    const imports: string[] = [];
-    const setupStatements: string[] = [];
+    const switchCases: string[] = [];
+    const seedPaths: string[] = [];
 
     for (let i = 0; i < seedFiles.length; i++) {
       const seedFile = seedFiles[i];
@@ -133,10 +133,11 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
       const moduleName = extractModuleName(seedFile);
 
       // eslint-disable-next-line i18next/no-literal-string
-      imports.push(`import * as seedModule${i} from "${relativePath}";`);
+      seedPaths.push(`    "${moduleName}",`);
+
       // eslint-disable-next-line i18next/no-literal-string
-      const seedSetupStatement = `  seeds["${moduleName}"] = seedModule${i} as EnvironmentSeeds;`;
-      setupStatements.push(seedSetupStatement);
+      const caseStatement = `    case "${moduleName}":\n      return (await import("${relativePath}")) as EnvironmentSeeds;`;
+      switchCases.push(caseStatement);
     }
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -148,26 +149,38 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
 
-/* eslint-disable simple-import-sort/imports */
+/* eslint-disable prettier/prettier */
+/* eslint-disable i18next/no-literal-string */
 
 import type { EnvironmentSeeds } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
-${imports.join("\n")}
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
-
-export const seeds: Record<string, EnvironmentSeeds> = {};
+/**
+ * Dynamically import seed module by name
+ * @param moduleName - The seed module name (e.g., "user", "leads")
+ * @returns The seed module or null if not found
+ */
+export async function getSeedModule(moduleName: string): Promise<EnvironmentSeeds | null> {
+  switch (moduleName) {
+${switchCases.join("\n")}
+    default:
+      return null;
+  }
+}
 
 /**
- * Initialize the seeds registry
- * In development, this is called automatically
- * In production, this should only be called once
+ * Get all available seed module names
  */
-export function setupSeeds(
-  logger: EndpointLogger,
-): Record<string, EnvironmentSeeds> {
-${setupStatements.join("\n")}
-  logger.debug("Seeds setup complete.");
-  return seeds;
+export function getAllSeedModuleNames(): string[] {
+  return [
+${seedPaths.join("\n")}
+  ];
+}
+
+/**
+ * Check if a seed module exists
+ */
+export function hasSeedModule(moduleName: string): boolean {
+  return getAllSeedModuleNames().includes(moduleName);
 }
 `;
   }

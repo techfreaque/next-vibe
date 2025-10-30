@@ -13,9 +13,9 @@ import path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -54,11 +54,11 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
     if (!user?.id) {
       return fail({
         message:
-          "app.api.v1.core.system.unifiedUi.cli.setup.status.post.errors.unauthorized.title",
+          "app.api.v1.core.system.unifiedInterface.cli.setup.status.post.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: {
           error: t(
-            "app.api.v1.core.system.unifiedUi.cli.setup.status.post.errors.unauthorized.description",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.status.post.errors.unauthorized.description",
           ),
         },
       });
@@ -74,17 +74,17 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
         path: status.path,
         message: status.installed
           ? t(
-              "app.api.v1.core.system.unifiedUi.cli.setup.status.post.success.description",
+              "app.api.v1.core.system.unifiedInterface.cli.setup.status.post.success.description",
             )
           : t(
-              "app.api.v1.core.system.unifiedUi.cli.setup.status.post.description",
+              "app.api.v1.core.system.unifiedInterface.cli.setup.status.post.description",
             ),
       });
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
         message:
-          "app.api.v1.core.system.unifiedUi.cli.setup.status.post.errors.server.title",
+          "app.api.v1.core.system.unifiedInterface.cli.setup.status.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

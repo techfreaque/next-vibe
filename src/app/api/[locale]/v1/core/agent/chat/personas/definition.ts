@@ -24,8 +24,6 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { ModelId, ModelIdOptions } from "../model-access/models";
 import {
   CategoryOptions,
-  DEFAULT_CATEGORIES,
-  type PersonaCategoryId,
 } from "./config";
 
 /**

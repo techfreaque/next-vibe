@@ -39,7 +39,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
     if (!Array.isArray(data) || data.length === 0) {
       return context.renderEmptyState(
         t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
         ),
       );
     }
@@ -191,7 +191,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
       case FieldDataType.ARRAY:
         return (value) => {
           if (Array.isArray(value)) {
-            return this.formatter.formatArray(value, { maxItems: 3 })
+            return this.formatter.formatArray(value, { maxItems: 3 });
           }
           return this.safeToString(value);
         };
@@ -330,7 +330,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
     if (data.length === 0) {
       return context.renderEmptyState(
         t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
         ),
       );
     }
@@ -344,7 +344,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
     ) {
       return context.renderEmptyState(
         t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.invalidDataFormat",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.invalidDataFormat" as never,
         ),
       );
     }

@@ -13,7 +13,6 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
-import type React from "react";
 import type { JSX } from "react";
 
 import {

@@ -353,7 +353,7 @@ class BraveSearchService {
   getCacheStats(): { size: number; entries: string[] } {
     return {
       size: this.cache.size,
-      entries: Array.from(this.cache.keys()),
+      entries: [...this.cache.keys()],
     };
   }
 
@@ -537,8 +537,9 @@ class BraveSearchRepository implements IBraveSearchRepository {
     },
     logger: EndpointLogger,
   ): Promise<ResponseType<BraveSearchGetResponseOutput>> {
-    const { fail, createSuccessResponse, ErrorResponseTypes } =
-      await import("next-vibe/shared/types/response.schema");
+    const { fail, createSuccessResponse, ErrorResponseTypes } = await import(
+      "next-vibe/shared/types/response.schema"
+    );
 
     try {
       if (!query || typeof query !== "string" || query.trim() === "") {

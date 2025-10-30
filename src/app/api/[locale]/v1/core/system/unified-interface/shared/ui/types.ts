@@ -7,11 +7,11 @@
  * across all platforms (CLI, Web, Mobile).
  */
 
+import type { ResponseFieldMetadata } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/types";
 import type {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { ResponseFieldMetadata } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 /**

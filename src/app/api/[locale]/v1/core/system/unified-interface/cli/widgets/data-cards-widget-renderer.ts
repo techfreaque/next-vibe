@@ -71,7 +71,7 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
     if (!Array.isArray(data) || data.length === 0) {
       return context.renderEmptyState(
         t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable" as never,
         ),
       );
     }
@@ -156,7 +156,7 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
               template: "default",
               size: "medium",
               spacing: "normal",
-            }
+            },
     };
   }
 
@@ -475,7 +475,7 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
     if (totalCount === 0) {
       const icon = context.options.useEmojis ? SEVERITY_ICONS.SUCCESS : "";
       const text = t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound" as never,
       );
       return this.styleText(`${icon}${text}`, "green", context);
     }

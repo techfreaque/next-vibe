@@ -175,7 +175,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         // Extract last part of translation key (e.g., "card" from "app.api.v1.core.payment.enums.paymentMethodType.card")
         const parts = type.split(".");
         const value = parts[parts.length - 1];
-        if (!value) return "";
+        if (!value) {
+          return "";
+        }
         // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
         return value.replace(/([A-Z])/g, (match) => `_${match}`).toLowerCase();
       }) || [

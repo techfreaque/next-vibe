@@ -26,7 +26,7 @@ import type {
   SpacingSize,
   TextAlign,
   WidgetType,
-} from './enums';
+} from "./enums";
 
 // Import all enums from the consolidated core enums file
 export {
@@ -48,7 +48,7 @@ export {
   TextAlign,
   ValidationMode,
   WidgetType,
-} from './enums';
+} from "./enums";
 
 // ============================================================================
 // FIELD USAGE TYPES

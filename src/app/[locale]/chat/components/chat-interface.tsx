@@ -221,7 +221,7 @@ export function ChatInterface({
     lastMessageCountRef.current = currentMessageCount;
 
     // Find the most recently created message (any role)
-    const sortedMessages = [...activeThreadMessages].sort(
+    const sortedMessages = [...activeThreadMessages].toSorted(
       (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
     );
     const latestMessage = sortedMessages[0];
@@ -233,7 +233,7 @@ export function ChatInterface({
     // Find all siblings (messages with the same parent)
     const siblings = activeThreadMessages
       .filter((msg) => msg.parentId === latestMessage.parentId)
-      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+      .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
     if (siblings.length <= 1) {
       return; // No branches to switch to

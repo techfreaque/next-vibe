@@ -1,86 +1,93 @@
-import { createEslintConfig } from 'lint';
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from '@eslint/eslintrc';
-import { i18nConfig } from "./eslint.i18n.config.mjs";
-import tsParser from "@typescript-eslint/parser";
-import globals from "globals";
-import js from "@eslint/js";
-import ts from "@typescript-eslint/eslint-plugin";
-import importPlugin from "eslint-plugin-import";
-import eslintPluginPrettier from "eslint-plugin-prettier";
-import reactCompiler from "eslint-plugin-react-compiler";
-import reactHooks from "eslint-plugin-react-hooks";
-import simpleImportSort from "eslint-plugin-simple-import-sort";
-import unusedImports from "eslint-plugin-unused-imports";
-import nodePlugin from "eslint-plugin-node";
-import reactPlugin from "eslint-plugin-react";
-import jsxA11y from "eslint-plugin-jsx-a11y";
-import promisePlugin from "eslint-plugin-promise";
-import useServerPlugin from "@c-ehrlich/eslint-plugin-use-server";
+/**
+ * ESLint Configuration (Wrapper)
+ *
+ * This file wraps the unified lint.config.ts configuration for ESLint compatibility.
+ * ESLint handles only what oxlint doesn't support:
+ * - i18n checking (eslint-plugin-i18next)
+ * - Custom AST rules (no-restricted-syntax)
+ * - Additional TypeScript type-aware rules
+ *
+ * Main linting is handled by oxlint for performance.
+ */
 
-const enableI18n = true;
-// currently AI's don't like that, as it gets removed before they add the actual code
-// has to be reevaluated over time
-const autoFixUnusedImports = false;
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import tsParser from "@typescript-eslint/parser";
+import ts from "@typescript-eslint/eslint-plugin";
+import i18next from "eslint-plugin-i18next";
+import reactCompiler from "eslint-plugin-react-compiler";
+import promisePlugin from "eslint-plugin-promise";
+import importPlugin from "eslint-plugin-import";
+import useServerPlugin from "@c-ehrlich/eslint-plugin-use-server";
+import globals from "globals";
+
+// Import unified configuration
+import { eslintConfig as sharedConfig } from "./lint.config.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Clean up browser globals to remove any weird whitespace:
+// Clean up browser globals to remove any weird whitespace
 function cleanGlobals(globalsObj) {
   return Object.fromEntries(
-    Object.entries(globalsObj).map(([key, value]) => [key.trim(), value])
+    Object.entries(globalsObj).map(([key, value]) => [key.trim(), value]),
   );
 }
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
 const config = [
-  // 1) Files/Folders to ignore
+  // ============================================================
+  // Ignores (shared with oxlint)
+  // ============================================================
   {
-    ignores: [
-      ".dist",
-      ".next",
-      ".tmp",
-      "postcss.config.mjs",
-      "node_modules",
-      ".git",
-      "coverage",
-      "public",
-      "drizzle",
-      ".vscode",
-      ".vibe-guard-instance",
-      ".tmp",
-      ".next",
-      ".github",
-      ".claude",
-      "to_migrate",
-    ],
+    ignores: sharedConfig.ignores,
   },
 
-  ...enableI18n ? i18nConfig : [],
+  // ============================================================
+  // i18n Configuration (only if enabled)
+  // ============================================================
+  ...(sharedConfig.i18n.enabled
+    ? [
+        {
+          files: sharedConfig.i18n.config.files,
+          ignores: sharedConfig.i18n.config.ignores,
+          plugins: { i18next },
+          languageOptions: {
+            parser: tsParser,
+            ecmaVersion: 2022,
+            sourceType: "module",
+            parserOptions: {
+              ecmaFeatures: {
+                jsx: true,
+              },
+            },
+            globals: {
+              ...cleanGlobals(globals.browser),
+              ...cleanGlobals(globals.node),
+              ...cleanGlobals(globals.es2021),
+              JSX: "readonly",
+            },
+          },
+          settings: {
+            react: {
+              version: "detect",
+            },
+          },
+          rules: sharedConfig.i18n.config.rules,
+        },
+      ]
+    : []),
 
-  // 2) Base configuration for TypeScript files
+  // ============================================================
+  // TypeScript Configuration (custom rules not in oxlint)
+  // ============================================================
   {
-    files: [
-      "**/*.ts",
-      "**/*.tsx",
-      "**/*.d.ts",
-      "**/*.test.ts",
-      "**/*.test.tsx",
-      "**/*.spec.ts",
-      "**/*.spec.tsx",
-    ],
-
+    files: sharedConfig.files,
     languageOptions: {
       parser: tsParser,
       parserOptions: {
         ecmaVersion: 2021,
         sourceType: "module",
-        project: [resolve(__dirname, "tsconfig.json")],
+        project: [resolve(__dirname, sharedConfig.parserOptions.project)],
         tsconfigRootDir: __dirname,
         ecmaFeatures: { jsx: true },
       },
@@ -95,252 +102,48 @@ const config = [
         "@typescript-eslint/parser": [".ts", ".tsx"],
       },
       "import/resolver": {
-        typescript: { project: resolve(__dirname, "tsconfig.json"), alwaysTryTypes: true },
+        typescript: {
+          project: resolve(__dirname, sharedConfig.parserOptions.project),
+          alwaysTryTypes: true,
+        },
         node: { extensions: [".ts", ".tsx", ".js", ".jsx"] },
       },
       react: { version: "detect" },
     },
     plugins: {
-      js,
-      '@typescript-eslint': ts,
-      import: importPlugin,
-      prettier: eslintPluginPrettier,
-      'react-compiler': reactCompiler,
-      'react-hooks': reactHooks,
-      'simple-import-sort': simpleImportSort,
-      'unused-imports': unusedImports,
-      node: nodePlugin,
-      react: reactPlugin,
-      'jsx-a11y': jsxA11y,
+      "@typescript-eslint": ts,
+      "react-compiler": reactCompiler,
       promise: promisePlugin,
-      '@c-ehrlich/use-server': useServerPlugin,
+      import: importPlugin,
+      "@c-ehrlich/use-server": useServerPlugin,
     },
-
     rules: {
-      // ESLint base recommended rules
-      ...js.configs.recommended.rules,
-      // TypeScript recommended rules
-      ...ts.configs.recommended.rules,
-      ...ts.configs["recommended-requiring-type-checking"].rules,
-      // TypeScript already checks for undefined variables
-      "no-undef": "off",
-      // TypeScript custom rules
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          // we don't do shit like that
-          // argsIgnorePattern: "^_"
-        },
-      ],
-      "@typescript-eslint/explicit-function-return-type": "error",
-      "@typescript-eslint/no-explicit-any": "error",
-      "@typescript-eslint/await-thenable": "error",
-      "@typescript-eslint/no-floating-promises": "error",
-      "@typescript-eslint/no-misused-promises": "error",
-      "@typescript-eslint/consistent-type-imports": "error",
-      "@typescript-eslint/no-unsafe-assignment": "error",
-      "@typescript-eslint/restrict-template-expressions": "error",
-      "@typescript-eslint/no-empty-function": [
-        "error",
-        { allow: ["arrowFunctions"] },
-      ],
-      "@typescript-eslint/ban-ts-comment": ["error", { "ts-ignore": "allow-with-description" }],
-      "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
-      "@typescript-eslint/no-unnecessary-condition": "off",
-      "@typescript-eslint/prefer-nullish-coalescing": "off",
-      "@typescript-eslint/prefer-optional-chain": "error",
-      "@typescript-eslint/strict-boolean-expressions": "off",
-      "@typescript-eslint/no-unnecessary-type-assertion": "error",
-      "@typescript-eslint/return-await": ["error", "always"],
-      "@typescript-eslint/no-floating-promises": ["error", { "ignoreIIFE": true }],
-      "@typescript-eslint/no-for-in-array": "error",
-      "@typescript-eslint/no-inferrable-types": "error",
-      "@typescript-eslint/no-misused-promises": ["error", { "checksVoidReturn": false }],
-      "@typescript-eslint/prefer-includes": "error",
-      "@typescript-eslint/prefer-string-starts-ends-with": "error",
-      "@typescript-eslint/explicit-member-accessibility": ["error", { "accessibility": "no-public" }],
-
-      // Insane Strict rules
-
-      'react/no-unknown-property': 'error',
-      '@typescript-eslint/no-empty-object-type': 'error',
-      '@typescript-eslint/no-unsafe-function-type': 'error',
-      '@typescript-eslint/no-wrapper-object-types': 'error',
-
-      // React Hooks
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "error",
-
-      // React specific rules
-      "@c-ehrlich/use-server/no-top-level-use-server": "error",
-      "react/jsx-key": "error",
-      "react/jsx-no-duplicate-props": "error",
-      "react/jsx-no-undef": "error",
-      "react/jsx-uses-react": "error",
-      "react/jsx-uses-vars": "error",
-      "react/no-children-prop": "error",
-      "react/no-deprecated": "error",
-      "react/no-direct-mutation-state": "error",
-      "react/no-unknown-property": "error",
-      "react/self-closing-comp": "error",
-      "react/react-in-jsx-scope": "off", // Next.js doesn't require React import
-
-      // Accessibility
-      "jsx-a11y/alt-text": "error",
-      "jsx-a11y/aria-props": "error",
-      "jsx-a11y/aria-role": "error",
-      "jsx-a11y/anchor-has-content": "error",
-
-      // Promise rules
-      "promise/always-return": "error",
-      "promise/no-return-wrap": "error",
-      "promise/param-names": "error",
-      "promise/catch-or-return": "error",
-      "promise/no-nesting": "warn",
-
-      // Other plugin rules
-      "react-compiler/react-compiler": "error",
-      "simple-import-sort/imports": "error",
-      "simple-import-sort/exports": "error",
-
-      "unused-imports/no-unused-imports": autoFixUnusedImports ? "error" : "off",
-      "import/no-unresolved": "error",
-      "import/first": "error",
-      "import/no-duplicates": "error",
-      "import/extensions": ["error", "never", { "json": "always" }],
-      "import/namespace": "error",
-      "import/no-restricted-paths": "error",
-
-
-      // General code-quality rules
-      curly: "error",
-      eqeqeq: ["error", "always"],
-      "import/newline-after-import": "error",
-      "prefer-template": "error",
-      "no-console": "error",
-      "no-debugger": "error",
-      "no-template-curly-in-string": "error",
-      "no-unsafe-optional-chaining": "error",
-      "require-atomic-updates": "warn",
-      "array-callback-return": "error",
-      "no-constructor-return": "error",
-      "no-promise-executor-return": "error",
-      "no-self-compare": "error",
-      "no-unreachable-loop": "error",
-      "no-unused-private-class-members": "error",
-      "camelcase": ["error", { "properties": "never" }],
-
-      // force relative imports
-      "no-restricted-imports": [
-        "error",
-        {
-          "patterns": ["^(?!\\./|\\.\\./)"]
-        }
-      ],
-
-      // Prettier code style integration
-      "prettier/prettier": [
-        "error",
-        {
-          plugins: ["prettier-plugin-sort-json"],
-          jsonRecursiveSort: true,
-          printWidth: 80,
-          tabWidth: 2,
-          useTabs: false,
-          semi: true,
-          singleQuote: false,
-          trailingComma: "all",
-          bracketSpacing: true,
-          arrowParens: "always",
-          endOfLine: "lf",
-          jsxSingleQuote: false,
-          proseWrap: "preserve",
-          quoteProps: "consistent",
-        },
-      ],
-    },
-  },
-  ...compat.config({
-    extends: [
-      ...(enableI18n ? ["plugin:i18next/recommended"] : []),
-    ],
-  }),
-
-  // 3) Configuration for plain JavaScript files
-  {
-    files: ["**/*.js", "**/*.jsx"],
-    languageOptions: {
-      ecmaVersion: 2021,
-      sourceType: "module",
-      globals: {
-        ...globals.node,
-        ...cleanGlobals(globals.browser),
-        ...globals.webextensions,
-      },
+      ...sharedConfig.ruleOverrides.typescript,
+      ...sharedConfig.ruleOverrides.promise,
+      ...sharedConfig.ruleOverrides.import,
+      ...sharedConfig.ruleOverrides.react,
+      ...sharedConfig.ruleOverrides.custom,
     },
   },
 
-  // 2.1) Additional config for restricted syntax
+  // ============================================================
+  // Custom AST Rules (no-restricted-syntax)
+  // ============================================================
   {
-    files: [
-      "**/*.ts",
-      "**/*.tsx",
-      "**/*.d.ts",
-      "**/*.test.ts",
-      "**/*.test.tsx",
-      "**/*.spec.ts",
-      "**/*.spec.tsx",
-    ],
-    ignores: [
-      "**/seeds.ts",
-    ],
+    files: sharedConfig.files,
+    ignores: ["**/seeds.ts"],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
         ecmaVersion: 2021,
         sourceType: "module",
-        project: [resolve(__dirname, "tsconfig.json")],
+        project: [resolve(__dirname, sharedConfig.parserOptions.project)],
         tsconfigRootDir: __dirname,
         ecmaFeatures: { jsx: true },
       },
     },
-    rules: {
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector: "TSUnknownKeyword",
-          message: "Usage of the 'unknown' type isn't allowed. Consider using generics with interface or type alias for explicit structure.",
-        },
-        {
-          selector: "TSObjectKeyword",
-          message: "Usage of the 'object' type isn't allowed. Consider using generics with interface or type alias for explicit structure.",
-        },
-        {
-          selector: "ThrowStatement",
-          message: "Usage of 'throw' statements is not allowed. Use proper ResponseType<T> patterns instead.",
-        },
-        // Prohibit JSX inside object literals to ensure i18n rules work properly
-        // Exception: Allow JSX in properties named "icon"
-        {
-          selector: "Property[value.type='JSXElement']:not([key.name='icon'])",
-          message: "JSX elements inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
-        },
-        {
-          selector: "Property[value.type='JSXFragment']:not([key.name='icon'])",
-          message: "JSX fragments inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
-        },
-        {
-          selector: "Property[value.type='ParenthesizedExpression']:not([key.name='icon']) > ParenthesizedExpression > JSXElement",
-          message: "JSX elements inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
-        },
-        {
-          selector: "Property[value.type='ParenthesizedExpression']:not([key.name='icon']) > ParenthesizedExpression > JSXFragment",
-          message: "JSX fragments inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
-        },
-      ],
-    },
+    rules: sharedConfig.customRules,
   },
 ];
 
 export default config;
-

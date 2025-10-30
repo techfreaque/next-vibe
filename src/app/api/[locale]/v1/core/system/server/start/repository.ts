@@ -342,17 +342,14 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       output.push("💡 Press Ctrl+C to stop");
       output.push("");
 
-      // Log the initial output
-      // eslint-disable-next-line no-console
-      console.log(output.join("\n"));
+      // Log the initial output using stdout for CLI display
+      process.stdout.write(`${output.join("\n")}\n`);
 
       // Set up signal handlers for graceful shutdown
       const handleShutdown = (signal: string): void => {
-        // eslint-disable-next-line no-console
-        console.log(`\n🛑 Received ${signal}, shutting down gracefully...`);
+        process.stdout.write(`\n🛑 Received ${signal}, shutting down gracefully...\n`);
         this.stopAllProcesses();
-        // eslint-disable-next-line no-console
-        console.log("✅ All processes stopped. Goodbye! 👋");
+        process.stdout.write("✅ All processes stopped. Goodbye! 👋\n");
         process.exit(0);
       };
 
@@ -370,20 +367,15 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           const minutes = Math.floor(uptime / 60);
           const seconds = uptime % 60;
 
-          // eslint-disable-next-line no-console
-          console.log(
-            `📊 Status: ${runningServices.length} services running | Uptime: ${minutes}m ${seconds}s`,
+          logger.info(
+            `Status: ${runningServices.length} services running | Uptime: ${minutes}m ${seconds}s`,
           );
 
           // Check if processes are still alive
           if (this.nextServerProcess?.killed) {
-            // eslint-disable-next-line no-console
-            console.log(
-              "⚠️ Next.js server process died, attempting restart...",
-            );
+            logger.warn("Next.js server process died, attempting restart...");
             this.startNextServer(port, logger).catch((error) => {
-              // eslint-disable-next-line no-console
-              console.error("❌ Failed to restart Next.js server:", error);
+              logger.error("Failed to restart Next.js server", parseError(error));
             });
           }
         }
@@ -402,14 +394,11 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         `❌ Failed to start production server: ${parsedError.message}`,
       );
 
-      // eslint-disable-next-line no-console
-      console.error("❌ Production server startup failed:");
-      // eslint-disable-next-line no-console
-      console.error(output.join("\n"));
-      // eslint-disable-next-line no-console
-      console.error(`Error: ${parsedError.message}`);
-      // eslint-disable-next-line no-console
-      console.error(`Duration: ${(duration / 1000).toFixed(2)}s`);
+      logger.error("Production server startup failed", {
+        output: output.join("\n"),
+        error: parsedError.message,
+        duration: `${(duration / 1000).toFixed(2)}s`,
+      });
 
       process.exit(1);
     }
@@ -448,7 +437,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         // Set up timeout for server startup
         startupTimeout = setTimeout(() => {
           if (!serverStarted) {
+            serverStarted = true;
             logger.warn("Next.js server startup timeout");
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
             resolve({ success: false, message: "Server startup timeout" });
           }
         }, 30000); // 30 second timeout
@@ -468,6 +459,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
               serverStarted = true;
               clearTimeout(startupTimeout);
               logger.info("Next.js production server is ready", { port });
+              // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
               resolve({ success: true });
             }
           }
@@ -486,7 +478,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           this.nextServerProcess = null;
 
           if (!serverStarted) {
+            serverStarted = true;
             clearTimeout(startupTimeout);
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
             resolve({
               success: false,
               message: `Process exited with code ${code}`,
@@ -497,14 +491,17 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         // Handle process errors
         nextProcess.on("error", (error) => {
           logger.error("Next.js process error", { error: error.message });
-          clearTimeout(startupTimeout);
 
           if (!serverStarted) {
+            serverStarted = true;
+            clearTimeout(startupTimeout);
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
             resolve({ success: false, message: error.message });
           }
         });
 
         // Give the process a moment to start
+        // eslint-disable-next-line eslint-plugin-promise/no-multiple-resolved
         setTimeout(() => {
           if (!serverStarted && nextProcess.pid) {
             // Process started but not ready yet, that's normal

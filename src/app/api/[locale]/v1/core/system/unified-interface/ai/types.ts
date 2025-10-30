@@ -70,7 +70,7 @@ export type ToolParameterValue = ParameterValue;
  * Extends BaseExecutionContext with AI-specific fields
  */
 export interface AIToolExecutionContext<
-  TData = { [key: string]: ToolParameterValue }
+  TData = { [key: string]: ToolParameterValue },
 > extends Omit<BaseExecutionContext<TData>, "user" | "metadata"> {
   /** User context - must be a valid JWT payload */
   user: JwtPayloadType;

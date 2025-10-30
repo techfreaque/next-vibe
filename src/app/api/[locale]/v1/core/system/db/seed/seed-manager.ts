@@ -1,9 +1,10 @@
-import path from "node:path";
-
 import { parseError } from "next-vibe/shared/utils";
 
+import {
+  getAllSeedModuleNames,
+  getSeedModule,
+} from "@/app/api/[locale]/v1/core/system/generated/seeds";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { findSeedFiles as findSeedFilesUtil } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/filesystem/scanner";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 export type SeedFn = (
@@ -43,59 +44,38 @@ export function registerSeed(
 }
 
 /**
- * Find all seed files in the project
- * Looks for files named *.seeds.ts or *.seed.ts
+ * Load all seed modules using the generated index
  */
-async function discoverSeedFiles(logger: EndpointLogger): Promise<void> {
-  logger.debug("🔍 Discovering seed files...");
+async function loadSeedModules(logger: EndpointLogger): Promise<void> {
+  logger.debug("🔍 Loading seed modules from generated index...");
 
-  // Start from the project root
-  const projectRoot = process.cwd();
-  const apiRoot = path.join(projectRoot, "src", "app", "api");
+  const moduleNames = getAllSeedModuleNames();
+  logger.debug(`📦 Found ${moduleNames.length} seed modules in index`);
 
-  logger.debug(`📂 Project root: ${projectRoot}`);
-  logger.debug(`📂 API root: ${apiRoot}`);
-
-  // Find all seed files
-  const seedFiles = findSeedFiles(apiRoot);
-
-  logger.debug(`📄 Found ${seedFiles.length} seed files`);
-
-  // Import and register each seed file
-  for (const seedFile of seedFiles) {
+  // Load each seed module dynamically
+  for (const moduleName of moduleNames) {
     try {
-      // Convert to module path format
-      const modulePath = seedFile
-        .replace(projectRoot, "")
-        .replace(/\\/g, "/")
-        .replace(/^\//, "")
-        .replace(/\.(ts|js)$/, "");
+      logger.debug(`📥 Loading seed module: ${moduleName}`);
+      const seedModule = await getSeedModule(moduleName);
 
-      // Dynamic import of the seed file
-      const fullPath = path.join(projectRoot, modulePath);
-
-      logger.debug(`📥 Importing seed file: ${fullPath}`);
-
-      // This will execute the file which should call registerSeed
-      await import(fullPath);
-      logger.debug(`✅ Imported: ${modulePath}`);
+      if (seedModule) {
+        // Register the seed module
+        seedRegistry[moduleName] = seedModule;
+        logger.debug(
+          `✅ Loaded: ${moduleName} (priority: ${seedModule.priority ?? 0})`,
+        );
+      } else {
+        logger.warn(`⚠️  Seed module ${moduleName} returned null`);
+      }
     } catch (error) {
       logger.error(
-        `❌ Error importing seed file ${seedFile}:`,
+        `❌ Error loading seed module ${moduleName}:`,
         parseError(error),
       );
     }
   }
 
-  logger.debug(
-    `📦 Total modules registered: ${Object.keys(seedRegistry).length}`,
-  );
-}
-/**
- * Find all seed files in a directory and its subdirectories
- */
-function findSeedFiles(dir: string): string[] {
-  return findSeedFilesUtil(dir);
+  logger.debug(`📦 Total modules loaded: ${Object.keys(seedRegistry).length}`);
 }
 
 /**
@@ -106,19 +86,26 @@ export async function runSeeds(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
-  // First discover and load seed files
-  logger.debug("🔍 Discovering seed files...");
-  await discoverSeedFiles(logger);
+  // First load seed modules from generated index
+  logger.debug("🔍 Loading seed modules...");
+  await loadSeedModules(logger);
 
   logger.debug(
     `📦 Seed registry has ${Object.keys(seedRegistry).length} modules`,
   );
   logger.info(`🌱 Running ${environment} seeds...`);
 
-  for (const [moduleId, seeds] of Object.entries(seedRegistry)) {
+  // Sort modules by priority (higher priority runs first)
+  const sortedModules = Object.entries(seedRegistry).toSorted(
+    ([, a], [, b]) => (b.priority ?? 0) - (a.priority ?? 0),
+  );
+
+  for (const [moduleId, seeds] of sortedModules) {
     const seedFn = seeds[environment];
     if (seedFn) {
-      logger.debug(`🌱 Seeding ${moduleId}...`);
+      logger.debug(
+        `🌱 Seeding ${moduleId} (priority: ${seeds.priority ?? 0})...`,
+      );
       if (typeof seedFn === "function") {
         try {
           await seedFn(logger, locale);

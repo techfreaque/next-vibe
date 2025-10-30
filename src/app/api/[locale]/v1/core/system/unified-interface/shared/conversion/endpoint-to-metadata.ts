@@ -206,6 +206,12 @@ export function endpointToMetadata(
 ): DiscoveredEndpointMetadata {
   const definition = endpoint.definition;
   const aliases = definition.aliases;
+  const title = definition.title;
+  const description = definition.description;
+  const category = definition.category;
+  const tags = definition.tags;
+  const credits = definition.credits;
+
   return {
     id: endpoint.id,
     name: endpoint.toolName,
@@ -213,18 +219,15 @@ export function endpointToMetadata(
     routePath: endpoint.routePath,
     definitionPath: endpoint.definitionPath,
     method: definition.method,
-    title: typeof definition.title === "string" ? definition.title : "",
-    description:
-      typeof definition.description === "string" ? definition.description : "",
-    category:
-      typeof definition.category === "string" ? definition.category : "",
-    tags: Array.isArray(definition.tags) ? definition.tags : [],
+    title: String(title || ""),
+    description: String(description || ""),
+    category: String(category || ""),
+    tags: Array.isArray(tags) ? tags : [],
     allowedRoles: definition.allowedRoles,
     requiresAuth: !definition.allowedRoles.includes("PUBLIC"),
     requestSchema: definition.requestSchema,
     responseSchema: definition.responseSchema,
-    credits:
-      typeof definition.credits === "number" ? definition.credits : undefined,
+    credits: typeof credits === "number" ? credits : undefined,
     aiTool: definition.aiTool,
     aliases: aliases && Array.isArray(aliases) ? aliases : undefined,
   };
@@ -312,9 +315,10 @@ export function extractCategoryFromPath(path: string[]): string {
 export function extractTags(endpoint: DiscoveredEndpoint): readonly string[] {
   const tags = endpoint.definition.tags || [];
   const category = endpoint.definition.category;
+  const categoryStr = String(category || "");
 
-  if (category && !tags.includes(category)) {
-    return [...tags, category];
+  if (categoryStr && !tags.includes(categoryStr)) {
+    return [...tags, categoryStr];
   }
 
   return tags;

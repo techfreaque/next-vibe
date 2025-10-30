@@ -81,7 +81,9 @@ const MenubarSubTrigger = React.forwardRef<
         )}
         {...props}
       >
-        {typeof children === "function" ? children({ pressed: false }) : children}
+        {typeof children === "function"
+          ? children({ pressed: false })
+          : children}
         <Icon size={18} className="ml-auto text-foreground" />
       </MenubarPrimitive.SubTrigger>
     </TextClassContext.Provider>
@@ -197,7 +199,7 @@ const MenubarRadioItem = React.forwardRef<
         <View className="bg-foreground h-2 w-2 rounded-full" />
       </MenubarPrimitive.ItemIndicator>
     </View>
-    {children}
+    {typeof children === "function" ? children({ pressed: false }) : children}
   </MenubarPrimitive.RadioItem>
 ));
 MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName;

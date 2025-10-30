@@ -530,7 +530,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
       // Callers will handle the error and use fallback accounts if needed
       // eslint-disable-next-line no-restricted-syntax
       throw new Error(
-        `${SMTP_ERROR_MESSAGES.TRANSPORT_CREATION_FAILED}: ${parseError(error).message}`,
+        `${SMTP_ERROR_MESSAGES.TRANSPORT_CREATION_FAILED}: ${parseError(error).message}`, { cause: error },
       );
     }
   }

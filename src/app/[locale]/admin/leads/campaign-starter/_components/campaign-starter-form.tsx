@@ -132,7 +132,7 @@ export function CampaignStarterForm({
                               endpoint.create.form.getValues("enabledDays") ||
                               [];
                             const newDays = checked
-                              ? [...currentDays, day.value].sort()
+                              ? [...currentDays, day.value].toSorted()
                               : currentDays.filter(
                                   (d: number) => d !== day.value,
                                 );

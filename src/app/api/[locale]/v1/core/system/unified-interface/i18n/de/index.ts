@@ -13,4 +13,12 @@ export const translations: typeof enTranslations = {
   react: reactTranslations,
   reactNative: reactNativeTranslations,
   tasks: tasksTranslations,
+  shared: {
+    permissions: {
+      publicUsersCannotAccess:
+        "Öffentliche Benutzer können nicht auf diesen authentifizierten Endpunkt zugreifen",
+      insufficientPermissions:
+        "Unzureichende Berechtigungen für den Zugriff auf diesen Endpunkt",
+    },
+  },
 };

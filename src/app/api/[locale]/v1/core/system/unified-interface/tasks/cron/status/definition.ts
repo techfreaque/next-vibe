@@ -28,83 +28,83 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 const cronStatusGetEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "system", "tasks", "cron", "status"],
-  title: "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.title",
+  title: "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.title",
   description:
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.description",
-  category: "app.api.v1.core.system.unifiedBackend.tasks.taskCategory.system",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.description",
+  category: "app.api.v1.core.system.unifiedInterface.tasks.taskCategory.system",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["cron:status", "tasks:cron:status"],
-  tags: ["app.api.v1.core.system.unifiedBackend.tasks.type.cron"],
+  tags: ["app.api.v1.core.system.unifiedInterface.tasks.type.cron"],
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.server.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.server.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.server.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unknown.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.unknown.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unknown.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unsavedChanges.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.unsavedChanges.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unsavedChanges.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.conflict.description",
     },
   },
   successTypes: {
     title:
-      "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.success.title",
+      "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.success.title",
     description:
-      "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.description",
+      "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.description",
   },
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -115,9 +115,9 @@ const cronStatusGetEndpoint = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.taskName",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.taskName",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.taskNamesDescription",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.taskNamesDescription",
           layout: { columns: 6 },
         },
         z.string().optional(),
@@ -128,9 +128,9 @@ const cronStatusGetEndpoint = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.detailed",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.detailed",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.detailedDescription",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.detailedDescription",
           layout: { columns: 6 },
         },
         z.boolean().default(false),
@@ -141,7 +141,7 @@ const cronStatusGetEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.success.content",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.success.content",
         },
         z.boolean(),
       ),
@@ -150,7 +150,7 @@ const cronStatusGetEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulse.health.healthy",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulse.health.healthy",
         },
         z.enum(["healthy", "warning", "critical", "unknown"]),
       ),
@@ -159,7 +159,7 @@ const cronStatusGetEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.active",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.active",
         },
         z.number(),
       ),
@@ -168,7 +168,7 @@ const cronStatusGetEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.total",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.total",
         },
         z.number(),
       ),
@@ -177,7 +177,7 @@ const cronStatusGetEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.uptime",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.uptime",
         },
         z.string(),
       ),
@@ -189,37 +189,37 @@ const cronStatusGetEndpoint = createEndpoint({
             {
               key: "id",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.id",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.id",
               type: FieldDataType.TEXT,
             },
             {
               key: "name",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.taskName",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.taskName",
               type: FieldDataType.TEXT,
             },
             {
               key: "status",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.status",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.status",
               type: FieldDataType.TEXT,
             },
             {
               key: "lastRun",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.lastRun",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.lastRun",
               type: FieldDataType.TEXT,
             },
             {
               key: "nextRun",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.nextRun",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.nextRun",
               type: FieldDataType.TEXT,
             },
             {
               key: "schedule",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.schedule",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.schedule",
               type: FieldDataType.TEXT,
             },
           ],
@@ -228,7 +228,7 @@ const cronStatusGetEndpoint = createEndpoint({
           {
             type: WidgetType.TEXT,
             content:
-              "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.taskName",
+              "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.taskName",
           },
           z.object({
             id: z.string(),

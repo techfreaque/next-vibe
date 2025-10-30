@@ -532,7 +532,7 @@ class LeadAuthServiceImpl {
         }
       }
 
-      return Array.from(linkedIds);
+      return [...linkedIds];
     } catch (error) {
       logger.error(
         "app.api.v1.core.leads.auth.getLinkedLeads.error",
@@ -571,7 +571,7 @@ class LeadAuthServiceImpl {
         }
       }
 
-      return Array.from(allLeadIds);
+      return [...allLeadIds];
     } catch (error) {
       logger.error(
         "app.api.v1.core.leads.auth.getAllLinkedLeads.error",

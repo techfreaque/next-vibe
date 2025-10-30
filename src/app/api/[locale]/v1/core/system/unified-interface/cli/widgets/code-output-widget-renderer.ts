@@ -147,7 +147,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
       ? DEFAULT_SEVERITY_ICONS.SPARKLE
       : "";
     const text = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound" as never,
     );
     return this.styleText(`${icon}${text}`, "green", context);
   }
@@ -300,7 +300,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
         ? DEFAULT_SEVERITY_ICONS.SPARKLE
         : "";
       const text = t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound" as never,
       );
       return this.styleText(`${icon}${text}`, "green", context);
     }
@@ -391,7 +391,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
       }
       // eslint-disable-next-line i18next/no-literal-string
       return row.join(" | ");
-    })
+    });
 
     return [header, separator, ...rows].join("\n");
   }

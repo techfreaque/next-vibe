@@ -1,6 +1,6 @@
 import {
-  fail,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
@@ -26,7 +26,7 @@ type FormDataValue =
 /**
  * Check if an object contains File instances (recursively)
  */
-export function containsFile(obj: FormDataValue): boolean {
+export function containsFile(obj: unknown): boolean {
   if (obj instanceof File) {
     return true;
   }
@@ -46,7 +46,7 @@ export function containsFile(obj: FormDataValue): boolean {
  * Convert an object to FormData (recursively handles nested objects and arrays)
  */
 export function objectToFormData(
-  obj: Record<string, FormDataValue>,
+  obj: Record<string, unknown>,
   formData: FormData = new FormData(),
   parentKey = "",
 ): FormData {
@@ -64,7 +64,7 @@ export function objectToFormData(
           formData.append(arrayKey, item);
         } else if (item && typeof item === "object") {
           objectToFormData(
-            item as Record<string, FormDataValue>,
+            item as Record<string, unknown>,
             formData,
             arrayKey,
           );
@@ -76,7 +76,7 @@ export function objectToFormData(
     } else if (value && typeof value === "object") {
       // Handle nested objects
       objectToFormData(
-        value as Record<string, FormDataValue>,
+        value as Record<string, unknown>,
         formData,
         formKey,
       );
@@ -92,19 +92,15 @@ export function objectToFormData(
  * Core function to call an API endpoint
  * Handles request validation, authentication, and response parsing
  */
-export async function callApi<
-  TResponseInput,
-  TResponseOutput,
-  TEndpoint extends {
+export async function callApi<TResponseOutput>(
+  endpoint: {
     readonly TResponseOutput: TResponseOutput;
     readonly requestSchema: z.ZodTypeAny;
-    readonly responseSchema: z.ZodTypeAny;
+    readonly responseSchema: z.ZodType<TResponseOutput>;
     readonly method: Methods;
     readonly path: readonly string[];
     readonly requiresAuthentication: () => boolean;
-  }
->(
-  endpoint: TEndpoint,
+  },
   endpointUrl: string,
   postBody: string | FormData | undefined,
   logger: EndpointLogger,
@@ -125,7 +121,7 @@ export async function callApi<
         // Return error - server should provide proper translation key
         return fail({
           message:
-          "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.auth_required",
+            "app.api.v1.core.system.unifiedInterface.react.hooks.apiUtils.errors.auth_required",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -149,7 +145,7 @@ export async function callApi<
 
     // Make the API call
     const response = await fetch(endpointUrl, options);
-    const json = (await response.json()) as ResponseType<TResponseInput>;
+    const json = (await response.json()) as ResponseType<TResponseOutput>;
 
     // Handle API response
     if (!response.ok) {
@@ -161,7 +157,7 @@ export async function callApi<
       // Fallback error when server doesn't return proper error format
       return fail({
         message:
-        "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.http_error",
+          "app.api.v1.core.system.unifiedInterface.react.hooks.apiUtils.errors.http_error",
         errorType: ErrorResponseTypes.HTTP_ERROR,
         messageParams: {
           statusCode: response.status,
@@ -174,7 +170,7 @@ export async function callApi<
     if (json.success) {
       const validationResponse = validateData(
         json.data,
-        endpoint.responseSchema as z.ZodSchema<TResponseOutput, TResponseInput>,
+        endpoint.responseSchema,
         logger,
       );
 
@@ -182,7 +178,7 @@ export async function callApi<
         // Fallback error when response validation fails
         return fail({
           message:
-          "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.validation_error",
+            "app.api.v1.core.system.unifiedInterface.react.hooks.apiUtils.errors.validation_error",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             message: validationResponse.message,
@@ -204,7 +200,7 @@ export async function callApi<
     // Fallback error when server returns success but no data
     return fail({
       message:
-      "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.internal_error",
+        "app.api.v1.core.system.unifiedInterface.react.hooks.apiUtils.errors.internal_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         url: endpointUrl,
@@ -214,9 +210,12 @@ export async function callApi<
     // Fallback error when request fails completely
     return fail({
       message:
-      "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.internal_error",
+        "app.api.v1.core.system.unifiedInterface.react.hooks.apiUtils.errors.internal_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { error: parseError(error).message, endpoint: endpoint.path.join("/") },
+      messageParams: {
+        error: parseError(error).message,
+        endpoint: endpoint.path.join("/"),
+      },
     });
   }
 }

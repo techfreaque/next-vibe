@@ -103,7 +103,7 @@ export async function validateNextRequestData<
 
     if (context.method === Methods.GET) {
       // For GET requests, extract query parameters
-      requestValidation = validateGetRequestData(
+      requestValidation = validateGetRequestData<TRequestInput, TRequestOutput>(
         endpoint,
         context.request,
         logger,
@@ -120,7 +120,7 @@ export async function validateNextRequestData<
       return {
         success: false,
         message:
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
@@ -141,13 +141,13 @@ export async function validateNextRequestData<
     return {
       success: false,
       message:
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error:
           error instanceof Error
             ? error.message
-            : "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
+            : "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
       },
     };
   }
@@ -159,7 +159,7 @@ export async function validateNextRequestData<
  */
 function validateGetRequestData<TRequestInput, TRequestOutput>(
   endpoint: {
-    requestSchema: z.ZodSchema<TRequestOutput, TRequestInput>;
+    requestSchema: z.ZodTypeAny;
   },
   request: NextRequest,
   logger: EndpointLogger,
@@ -171,7 +171,7 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
     Object.keys(endpoint.requestSchema.shape).length === 0;
 
   // Check if schema is z.never() by testing if it rejects empty object
-  const isNeverSchema = (() => {
+  const isNeverSchema = ((): boolean => {
     try {
       const testResult = endpoint.requestSchema.safeParse({});
       return (
@@ -330,7 +330,7 @@ function parseFormDataToObject(formData: FormData): Record<string, unknown> {
  */
 async function validatePostRequestData<TRequestInput, TRequestOutput>(
   endpoint: {
-    requestSchema: z.ZodSchema<TRequestOutput, TRequestInput>;
+    requestSchema: z.ZodTypeAny;
   },
   request: NextRequest,
   logger: EndpointLogger,
@@ -342,7 +342,7 @@ async function validatePostRequestData<TRequestInput, TRequestOutput>(
     Object.keys(endpoint.requestSchema.shape).length === 0;
 
   // Check if schema is z.never() by testing if it rejects empty object
-  const isNeverSchema = (() => {
+  const isNeverSchema = ((): boolean => {
     try {
       const testResult = endpoint.requestSchema.safeParse({});
       return (
@@ -384,7 +384,11 @@ async function validatePostRequestData<TRequestInput, TRequestOutput>(
     }
 
     // Validate using schema - schema takes raw input and produces validated output
-    return validateEndpointRequestData(body, endpoint.requestSchema, logger);
+    return validateEndpointRequestData<TRequestOutput>(
+      body,
+      endpoint.requestSchema,
+      logger,
+    );
   } catch (error) {
     return {
       success: false,
@@ -394,7 +398,7 @@ async function validatePostRequestData<TRequestInput, TRequestOutput>(
         error:
           error instanceof Error
             ? error.message
-            : "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_json_request_body",
+            : "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_json_request_body",
       },
     };
   }

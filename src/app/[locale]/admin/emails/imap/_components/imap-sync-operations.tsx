@@ -83,7 +83,7 @@ export function ImapSyncOperations(): JSX.Element {
   const lastSyncTimes = accounts
     .map((acc) => acc.lastSyncAt)
     .filter((time): time is string => time !== null)
-    .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    .toSorted((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
   const syncStatus = {
     isRunning: syncingAccounts.length > 0 || isSyncing,

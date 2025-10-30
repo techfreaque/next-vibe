@@ -248,11 +248,11 @@ export type ApiFormOptions<TRequest extends FieldValues> =
   };
 
 export interface ApiFormReturn<
-  TRequest extends FieldValues,
+  TRequest,
   TResponse,
   TUrlVariables,
 > {
-  form: UseFormReturn<TRequest, z.ZodTypeAny>;
+  form: UseFormReturn<TRequest extends FieldValues ? TRequest : FieldValues, z.ZodTypeAny>;
 
   /** The complete response including success/error state */
   response: ResponseType<TResponse> | undefined;

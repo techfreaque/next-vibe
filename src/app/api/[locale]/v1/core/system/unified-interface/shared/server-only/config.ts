@@ -96,7 +96,7 @@ const DEFAULT_CONFIG: Omit<PlatformConfig, "platform"> = {
     streaming: true,
     resultCaching: true,
     composition: false, // Disabled by default for safety
-  }
+  },
 };
 
 /**
@@ -117,7 +117,7 @@ export const CLI_CONFIG: PlatformConfig = {
     colorOutput: true,
     verboseErrors: true,
     interactiveMode: true,
-  }
+  },
 };
 
 /**
@@ -148,7 +148,7 @@ export const AI_CONFIG: PlatformConfig = {
     maxToolsPerRequest: 10,
     enableConfirmation: true,
     dangerousOperations: false,
-  }
+  },
 };
 
 /**
@@ -181,8 +181,8 @@ export const MCP_CONFIG: PlatformConfig = {
       tools: true,
       prompts: false,
       resources: false,
-    }
-  }
+    },
+  },
 };
 
 /**
@@ -202,7 +202,7 @@ export const WEB_CONFIG: PlatformConfig = {
   platformSpecific: {
     enableWebSockets: true,
     enableSSE: true,
-  }
+  },
 };
 
 /**
@@ -223,7 +223,7 @@ export const MOBILE_CONFIG: PlatformConfig = {
   platformSpecific: {
     offlineMode: true,
     reducedPayloads: true,
-  }
+  },
 };
 
 /**
@@ -269,7 +269,7 @@ export function mergePlatformConfig(
     platformSpecific: {
       ...baseConfig.platformSpecific,
       ...(customConfig.platformSpecific || {}),
-    }
+    },
   };
 }
 

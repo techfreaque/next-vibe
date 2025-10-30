@@ -5,9 +5,8 @@
 
 import type { NextRequest } from "next/server";
 import {
-  fail,
-  fail,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -80,12 +79,12 @@ export async function safeExecuteTRPC<
     });
   } catch (err) {
     return fail({
-        message:
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: parseError(err).message,
-        },
-      });
+      message:
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: {
+        error: parseError(err).message,
+      },
+    });
   }
 }

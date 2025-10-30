@@ -118,7 +118,7 @@ export class BaseDataFormatter {
    */
   formatBoolean(
     value: boolean,
-    options: { style?: "symbol" | "text" | "emoji" } = {}
+    options: { style?: "symbol" | "text" | "emoji" } = {},
   ): string {
     const { style = "emoji" } = options;
 
@@ -141,7 +141,7 @@ export class BaseDataFormatter {
    */
   formatDuration(
     milliseconds: number,
-    options: DurationFormatOptions = {}
+    options: DurationFormatOptions = {},
   ): string {
     const { unit = "s", precision = 2 } = options;
 
@@ -167,7 +167,7 @@ export class BaseDataFormatter {
     locale: CountryLanguage,
     options: {
       format?: "short" | "long" | "iso";
-    }
+    },
   ): string {
     const { format = "short" } = options;
     const date = value instanceof Date ? value : new Date(value);
@@ -194,7 +194,7 @@ export class BaseDataFormatter {
    */
   formatArray(
     value: RenderableValue[],
-    options: ArrayFormatOptions = {}
+    options: ArrayFormatOptions = {},
   ): string {
     const { separator = ", ", maxItems = 10, showCount = true } = options;
 
@@ -216,7 +216,7 @@ export class BaseDataFormatter {
    */
   formatObject(
     value: Record<string, RenderableValue>,
-    options: { pretty?: boolean; maxDepth?: number } = {}
+    options: { pretty?: boolean; maxDepth?: number } = {},
   ): string {
     const { pretty = true, maxDepth = 10 } = options;
 

@@ -2,9 +2,9 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
@@ -29,7 +29,8 @@ export async function getFolder(
 ): Promise<ResponseType<FolderGetResponseOutput>> {
   if (user.isPublic) {
     return fail({
-      message: "app.api.v1.core.agent.chat.folders.id.get.errors.unauthorized.title",
+      message:
+        "app.api.v1.core.agent.chat.folders.id.get.errors.unauthorized.title",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
@@ -43,7 +44,8 @@ export async function getFolder(
 
     if (!folder) {
       return fail({
-        message: "app.api.v1.core.agent.chat.folders.id.get.errors.notFound.title",
+        message:
+          "app.api.v1.core.agent.chat.folders.id.get.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -59,7 +61,11 @@ export async function getFolder(
           parentId: folder.parentId,
           expanded: folder.expanded,
           sortOrder: folder.sortOrder,
-          metadata: (folder.metadata as Record<string, string | number | boolean | null>) || {},
+          metadata:
+            (folder.metadata as Record<
+              string,
+              string | number | boolean | null
+            >) || {},
           createdAt: new Date(folder.createdAt),
           updatedAt: new Date(folder.updatedAt),
         },
@@ -82,7 +88,8 @@ export async function updateFolder(
 ): Promise<ResponseType<FolderUpdateResponseOutput>> {
   if (user.isPublic) {
     return fail({
-      message: "app.api.v1.core.agent.chat.folders.id.patch.errors.unauthorized.title",
+      message:
+        "app.api.v1.core.agent.chat.folders.id.patch.errors.unauthorized.title",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
@@ -99,7 +106,8 @@ export async function updateFolder(
 
     if (!existingFolder) {
       return fail({
-        message: "app.api.v1.core.agent.chat.folders.id.patch.errors.notFound.title",
+        message:
+          "app.api.v1.core.agent.chat.folders.id.patch.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -127,7 +135,8 @@ export async function updateFolder(
 
     if (!updatedFolder) {
       return fail({
-        message: "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
+        message:
+          "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -143,7 +152,11 @@ export async function updateFolder(
           parentId: updatedFolder.parentId,
           expanded: updatedFolder.expanded,
           sortOrder: updatedFolder.sortOrder,
-          metadata: (updatedFolder.metadata as Record<string, string | number | boolean | null>) || {},
+          metadata:
+            (updatedFolder.metadata as Record<
+              string,
+              string | number | boolean | null
+            >) || {},
           createdAt: new Date(updatedFolder.createdAt),
           updatedAt: new Date(updatedFolder.updatedAt),
         },
@@ -151,7 +164,8 @@ export async function updateFolder(
     });
   } catch {
     return fail({
-      message: "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
+      message:
+        "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -166,7 +180,8 @@ export async function deleteFolder(
 ): Promise<ResponseType<FolderDeleteResponseOutput>> {
   if (user.isPublic) {
     return fail({
-      message: "app.api.v1.core.agent.chat.folders.id.delete.errors.unauthorized.title",
+      message:
+        "app.api.v1.core.agent.chat.folders.id.delete.errors.unauthorized.title",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
@@ -183,7 +198,8 @@ export async function deleteFolder(
 
     if (!existingFolder) {
       return fail({
-        message: "app.api.v1.core.agent.chat.folders.id.delete.errors.notFound.title",
+        message:
+          "app.api.v1.core.agent.chat.folders.id.delete.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -201,7 +217,8 @@ export async function deleteFolder(
     });
   } catch {
     return fail({
-      message: "app.api.v1.core.agent.chat.folders.id.delete.errors.server.title",
+      message:
+        "app.api.v1.core.agent.chat.folders.id.delete.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

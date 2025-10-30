@@ -22,7 +22,7 @@ const pulseTaskRunner: TaskRunner = {
   type: "task-runner",
   name: "pulse-runner",
   description:
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseRunner.description",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseRunner.description",
   category: TaskCategory.SYSTEM,
   enabled: true,
   priority: "HIGH",

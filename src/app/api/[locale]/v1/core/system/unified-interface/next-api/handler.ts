@@ -28,11 +28,11 @@ import {
 } from "../../unified-interface/react/next-endpoint-response";
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import { createEndpointLogger } from "../shared/logger/endpoint";
-import type { Methods } from "../shared/types/enums";
 import {
   authenticateUser,
   executeHandler,
 } from "../shared/server-only/execution/core";
+import type { Methods } from "../shared/types/enums";
 import type {
   ApiHandlerOptions,
   NextHandlerReturnType,
@@ -178,7 +178,7 @@ export function createNextHandler<
 
       // Create success response with email handling
       return await createHTTPSuccessResponse<TResponseOutput>({
-        data: result.data as Record<string, string | number | boolean | object | null>,
+        data: result.data as unknown as TResponseOutput,
         schema: endpoint.responseSchema as z.ZodType<TResponseOutput>,
         status: 200,
         onSuccess: async (data) => {

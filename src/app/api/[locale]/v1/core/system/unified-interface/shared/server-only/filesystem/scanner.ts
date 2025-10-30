@@ -114,7 +114,7 @@ const DEFAULT_EXCLUDE_DIRS = [
  */
 export function scanDirectory(
   baseDir: string,
-  options: DirectoryScanOptions = {}
+  options: DirectoryScanOptions = {},
 ): ScanResultWithSegments[] {
   const {
     filePattern,
@@ -227,7 +227,7 @@ export function scanDirectory(
 export function findFilesByName(
   baseDir: string,
   fileName: string,
-  options: Omit<DirectoryScanOptions, "filePattern"> = {}
+  options: Omit<DirectoryScanOptions, "filePattern"> = {},
 ): ScanResultWithSegments[] {
   return scanDirectory(baseDir, {
     ...options,
@@ -241,7 +241,7 @@ export function findFilesByName(
 export function findFilesByExtension(
   baseDir: string,
   extensions: string[],
-  options: Omit<DirectoryScanOptions, "extensions"> = {}
+  options: Omit<DirectoryScanOptions, "extensions"> = {},
 ): ScanResultWithSegments[] {
   return scanDirectory(baseDir, {
     ...options,
@@ -255,7 +255,7 @@ export function findFilesByExtension(
 export function findFilesByPattern(
   baseDir: string,
   pattern: RegExp,
-  options: Omit<DirectoryScanOptions, "filePattern"> = {}
+  options: Omit<DirectoryScanOptions, "filePattern"> = {},
 ): ScanResultWithSegments[] {
   return scanDirectory(baseDir, {
     ...options,

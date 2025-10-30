@@ -50,7 +50,7 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer {
     // Add section title if present
     if (field.title) {
       const title = field.title.includes(".")
-        ? context.translate(field.title)
+        ? context.translate(field.title as never)
         : field.title;
 
       result.push("");
@@ -116,10 +116,7 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer {
   /**
    * Render a simple field when no metadata is available
    */
-  private renderSimpleField(
-    key: string,
-    value: RenderableValue,
-  ): string {
+  private renderSimpleField(key: string, value: RenderableValue): string {
     if (value === null || value === undefined) {
       return "";
     }

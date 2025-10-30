@@ -64,11 +64,16 @@ export function executeDockerCommand(
 
     let output = "";
     let error = "";
+    let resolved = false;
     let timeoutId: ReturnType<typeof setTimeout>;
 
     // Set up timeout
     const timeoutPromise = new Promise<void>((_resolve, reject) => {
       timeoutId = setTimeout(() => {
+        if (resolved) {
+          return;
+        }
+        resolved = true;
         child.kill("SIGTERM");
         reject(
           new Error(
@@ -120,7 +125,11 @@ export function executeDockerCommand(
     });
 
     // Handle process completion
-    child.on("close", (code) => {
+    child.on("close", (code: number | null) => {
+      if (resolved) {
+        return;
+      }
+      resolved = true;
       clearTimeout(timeoutId);
       const success = code === 0;
 
@@ -133,6 +142,7 @@ export function executeDockerCommand(
         );
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
       resolve({
         success,
         output: output.trim(),
@@ -142,6 +152,10 @@ export function executeDockerCommand(
 
     // Handle process errors
     child.on("error", (err: Error) => {
+      if (resolved) {
+        return;
+      }
+      resolved = true;
       clearTimeout(timeoutId);
       logger.error(
         t("app.api.v1.core.system.db.utils.docker.execution_failed", {
@@ -149,6 +163,7 @@ export function executeDockerCommand(
         }),
         err,
       );
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
       resolve({
         success: false,
         output: output.trim(),

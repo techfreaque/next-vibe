@@ -478,6 +478,7 @@ export const translations = {
     arguments: "Arguments",
     result: "Result",
     error: "Error",
+    executing: "Executing...",
   },
   reasoning: {
     title: "Thinking",

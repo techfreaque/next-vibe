@@ -7,7 +7,6 @@ import { z } from "zod";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type {
-  EndpointDefinition,
   ExtractOutput,
   FieldUsageConfig,
   ObjectField,
@@ -139,11 +138,11 @@ export class ResponseMetadataExtractor {
     responseData?: ExtractOutput<TEndpoint["responseSchema"]>,
   ): ResponseContainerMetadata | null;
   extractResponseMetadata(
-    definition: EndpointDefinition,
+    definition: CreateApiEndpoint,
     responseData?: ResponseData,
   ): ResponseContainerMetadata | null;
   extractResponseMetadata(
-    definition: EndpointDefinition,
+    definition: CreateApiEndpoint,
     responseData?: ResponseData,
   ): ResponseContainerMetadata | null {
     try {

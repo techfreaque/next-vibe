@@ -7,11 +7,7 @@ import { parseError } from "next-vibe/shared/utils";
 import * as readline from "readline";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
-import type {
-  IMCPTransport,
-  JsonRpcRequest,
-  JsonRpcResponse,
-} from "../types";
+import type { IMCPTransport, JsonRpcRequest, JsonRpcResponse } from "../types";
 
 /**
  * STDIO Transport Implementation

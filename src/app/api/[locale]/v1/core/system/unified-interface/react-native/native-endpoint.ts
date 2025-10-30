@@ -17,8 +17,8 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -104,7 +104,7 @@ function constructUrl<
         if (paramValue === undefined) {
           return fail({
             message:
-            "app.api.v1.core.system.unifiedUi.reactNative.errors.missingUrlParam",
+              "app.api.v1.core.system.unifiedInterface.reactNative.errors.missingUrlParam",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { paramName, endpoint: endpoint.title },
           });
@@ -116,11 +116,11 @@ function constructUrl<
       }
     }
 
-    return { success: true, data: urlPath, message: "" };
+    return { success: true, data: urlPath };
   } catch (error) {
     return fail({
       message:
-        "app.api.v1.core.system.unifiedUi.reactNative.errors.urlConstructionFailed",
+        "app.api.v1.core.system.unifiedInterface.reactNative.errors.urlConstructionFailed",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: String(error),
@@ -179,7 +179,7 @@ export async function nativeEndpoint<
         logger.error("Request validation failed", parseError(validationError));
         return fail({
           message:
-            "app.api.v1.core.system.unifiedUi.reactNative.errors.validationFailed",
+            "app.api.v1.core.system.unifiedInterface.reactNative.errors.validationFailed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             error: String(validationError),
@@ -269,7 +269,7 @@ export async function nativeEndpoint<
       ) {
         return fail({
           message:
-            "app.api.v1.core.system.unifiedUi.reactNative.errors.htmlResponseReceived",
+            "app.api.v1.core.system.unifiedInterface.reactNative.errors.htmlResponseReceived",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             url: fetchUrl,
@@ -300,7 +300,7 @@ export async function nativeEndpoint<
     logger.error("Native endpoint call failed", parseError(error));
     return fail({
       message:
-        "app.api.v1.core.system.unifiedUi.reactNative.errors.networkError",
+        "app.api.v1.core.system.unifiedInterface.reactNative.errors.networkError",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: String(error),

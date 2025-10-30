@@ -293,7 +293,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const state = get();
     return Object.values(state.messages)
       .filter((msg) => msg.threadId === threadId)
-      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+      .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
   },
 
   // Folder actions

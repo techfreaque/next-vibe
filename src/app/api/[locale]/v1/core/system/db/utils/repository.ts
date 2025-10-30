@@ -206,7 +206,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
     try {
-      const { spawn } = await import("child_process");
+      const { spawn } = await import("node:child_process");
 
       return await new Promise((resolve) => {
         const docker = spawn("docker", ["--version"], { stdio: "ignore" });

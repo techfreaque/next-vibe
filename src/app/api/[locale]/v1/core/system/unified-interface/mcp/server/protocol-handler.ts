@@ -54,7 +54,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     this.logger.debug("[MCP Protocol] Received request", {
       method: request.method,
       id: request.id,
-    })
+    });
 
     try {
       // Validate JSON-RPC version
@@ -72,9 +72,12 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
 
       switch (request.method) {
         case MCPMethod.INITIALIZE:
-          result = await this.handleInitialize(
-            request.params as MCPInitializeParams,
-          );
+          result = (await this.handleInitialize(
+            request.params as unknown as MCPInitializeParams,
+          )) as unknown as Record<
+            string,
+            string | number | boolean | null | object
+          >;
           this.initialized = true;
           break;
 
@@ -91,9 +94,12 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
               "Server not initialized. Call initialize first.",
             );
           }
-          result = await this.handleToolsList(
+          result = (await this.handleToolsList(
             request.params as MCPToolsListParams,
-          );
+          )) as unknown as Record<
+            string,
+            string | number | boolean | null | object
+          >;
           break;
 
         case MCPMethod.TOOLS_CALL:
@@ -105,9 +111,12 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
               "Server not initialized. Call initialize first.",
             );
           }
-          result = await this.handleToolCall(
-            request.params as MCPToolCallParams,
-          );
+          result = (await this.handleToolCall(
+            request.params as unknown as MCPToolCallParams,
+          )) as unknown as Record<
+            string,
+            string | number | boolean | null | object
+          >;
           break;
 
         default:
@@ -211,10 +220,11 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     // Execute tool
     const result = await registry.executeTool({
       toolName: params.name,
-      arguments: params.arguments || {},
+      data: (params.arguments || {}) as { [key: string]: never },
       user: this.user,
       locale: this.locale,
       requestId: Date.now(),
+      logger: this.logger,
     });
 
     this.logger.info("[MCP Protocol] Tool call complete", {

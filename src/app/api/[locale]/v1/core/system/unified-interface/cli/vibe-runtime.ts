@@ -328,7 +328,9 @@ const { t } = simpleT(CLI_CONSTANTS.DEFAULT_LOCALE);
 
 program
   .name(CLI_CONSTANTS.CLI_NAME)
-  .description(t("app.api.v1.core.system.unifiedUi.cli.vibe.help.description"))
+  .description(
+    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.description"),
+  )
   .version(CLI_CONSTANTS.CLI_VERSION);
 
 // Main command - execute any route with schema-driven UI
@@ -336,50 +338,50 @@ program
 program
   .argument(
     "[command]",
-    t("app.api.v1.core.system.unifiedUi.cli.vibe.help.usage"),
+    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.usage"),
   )
   .argument(
     "[args...]",
-    t("app.api.v1.core.system.unifiedUi.cli.vibe.help.commands"),
+    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.commands"),
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-d, --data <json>",
-    t("app.api.v1.core.system.unifiedUi.cli.vibe.executeCommand"),
+    t("app.api.v1.core.system.unifiedInterface.cli.vibe.executeCommand"),
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-u, --user-type <type>",
-    t("app.api.v1.core.system.unifiedUi.cli.vibe.help.userType"),
+    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.userType"),
     "ADMIN",
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-l, --locale <locale>",
-    t("app.api.v1.core.system.unifiedUi.cli.vibe.help.locale"),
+    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.locale"),
     CLI_CONSTANTS.DEFAULT_LOCALE,
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-o, --output <format>",
-    t("app.api.v1.core.system.unifiedUi.cli.vibe.output"),
+    t("app.api.v1.core.system.unifiedInterface.cli.vibe.output"),
     CLI_CONSTANTS.DEFAULT_OUTPUT,
   )
 
   .option(
     "-v, --verbose", // eslint-disable-line i18next/no-literal-string
-    t("app.api.v1.core.system.unifiedUi.cli.vibe.help.verbose"),
+    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.verbose"),
     false,
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-i, --interactive",
-    t("app.api.v1.core.system.unifiedUi.cli.vibe.help.interactive"),
+    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.interactive"),
     false,
   )
   .option(
     "--dry-run",
-    t("app.api.v1.core.system.unifiedUi.cli.vibe.help.dryRun"),
+    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.dryRun"),
     false,
   )
   .allowUnknownOption() // Allow dynamic CLI arguments
@@ -431,7 +433,7 @@ program
         // If no command provided, start interactive mode
         if (!command) {
           logger.info(
-            t("app.api.v1.core.system.unifiedUi.cli.vibe.startingUp"),
+            t("app.api.v1.core.system.unifiedInterface.cli.vibe.startingUp"),
           );
           await cli.executeCommand("interactive", {
             user: createDefaultCliUser(),
@@ -516,12 +518,12 @@ program
         if (options.verbose) {
           logger.error(
             t(
-              "app.api.v1.core.system.unifiedUi.cli.vibe.errors.executionFailed",
+              "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.executionFailed",
             ),
             error as Error,
           );
           logger.info(
-            t("app.api.v1.core.system.unifiedUi.cli.vibe.help.options"),
+            t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.options"),
             {
               memoryUsage: memoryMonitor.getFormattedUsage(),
             },

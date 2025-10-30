@@ -2,8 +2,8 @@
 
 import type { JSX } from "react";
 
-import { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { ResponseFieldMetadata } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/types";
+import { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import type { RenderableValue, WidgetRenderContext } from "../types";
 import { CodeOutputWidget } from "./CodeOutputWidget";

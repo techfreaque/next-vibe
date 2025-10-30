@@ -137,7 +137,7 @@ export abstract class BasePermissionHandler {
       return {
         allowed: false,
         reason:
-          "app.api.v1.core.system.unifiedUi.shared.permissions.publicUsersCannotAccess",
+          "app.api.v1.core.system.unifiedInterface.shared.permissions.publicUsersCannotAccess",
       };
     }
 
@@ -166,7 +166,7 @@ export abstract class BasePermissionHandler {
     return {
       allowed: false,
       reason:
-        "app.api.v1.core.system.unifiedUi.shared.permissions.insufficientPermissions",
+        "app.api.v1.core.system.unifiedInterface.shared.permissions.insufficientPermissions",
     };
   }
 }

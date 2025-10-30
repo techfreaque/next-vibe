@@ -9,7 +9,7 @@ import { z } from "zod";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import { FieldDataType, WidgetType } from '../types/enums';
+import { FieldDataType, WidgetType } from "../types/enums";
 import { requestDataField } from "./utils";
 
 // ============================================================================

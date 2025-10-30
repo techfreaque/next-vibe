@@ -104,7 +104,7 @@ export async function createTRPCContext<
   // Authenticate user using the existing auth system
   // Use getAuthMinimalUser which properly handles PUBLIC role with leadId creation
   let user: JwtPayloadType;
-  let userRoles: string[] = [];
+  let userRoles: (typeof UserRoleValue)[] = [];
 
   try {
     // Try to get authenticated user first
@@ -179,7 +179,7 @@ export async function createTRPCContext<
 export async function createAuthenticatedTRPCContext(opts: {
   req: NextRequest;
   urlPathParams?: Record<string, string>;
-  requiredRoles?: string[];
+  requiredRoles?: readonly (typeof UserRoleValue)[];
   locale: CountryLanguage;
 }): Promise<
   TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]> & {

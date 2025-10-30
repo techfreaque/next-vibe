@@ -92,7 +92,7 @@ const migrationBackupMonitorTask: Task = {
         const timeout = setTimeout(() => resolve(), checkInterval);
         const abortHandler = (): void => {
           clearTimeout(timeout);
-          resolve();
+          // Don't resolve again - setTimeout already will
         };
         signal.addEventListener("abort", abortHandler, { once: true });
       });

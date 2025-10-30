@@ -7,18 +7,18 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
+  objectField,
+  requestDataField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import {
-  objectField,
-  requestDataField,
-  responseArrayField,
-  responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
@@ -31,22 +31,22 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
 
   title:
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.title",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.title",
   description:
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.description",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.description",
   category:
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.category",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.category",
   tags: [
-    "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.tags.execute",
+    "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.tags.execute",
   ],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.container.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.container.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.container.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -57,9 +57,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.dryRun.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.dryRun.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.description",
           layout: { columns: 6 },
         },
         z.boolean().optional().default(false),
@@ -70,9 +70,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.taskNames.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.taskNames.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.description",
           layout: { columns: 6 },
           options: [],
         },
@@ -84,9 +84,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.force.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.force.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.description",
           layout: { columns: 6 },
         },
         z.boolean().optional().default(false),
@@ -97,7 +97,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.success.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.success.title",
         },
         z.boolean(),
       ),
@@ -105,7 +105,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.fields.message.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.message.title",
         },
         z.string(),
       ),
@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.executedAt",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.executedAt",
         },
         z.string(),
       ),
@@ -121,7 +121,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.tasksExecuted",
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.tasksExecuted",
         },
         z.number(),
       ),
@@ -131,9 +131,9 @@ const { POST } = createEndpoint({
           {
             type: WidgetType.CONTAINER,
             title:
-              "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.results",
+              "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.results",
             description:
-              "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.resultsDescription",
+              "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.resultsDescription",
             layout: { type: LayoutType.GRID, columns: 4 },
           },
           { response: true },
@@ -142,7 +142,7 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.taskName",
+                  "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.taskName",
               },
               z.string(),
             ),
@@ -150,7 +150,7 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.success",
+                  "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.success",
               },
               z.boolean(),
             ),
@@ -158,7 +158,7 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.duration",
+                  "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.duration",
               },
               z.number(),
             ),
@@ -166,7 +166,7 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.message",
+                  "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.message",
               },
               z.string().optional(),
             ),
@@ -179,65 +179,65 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.internal.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.internal.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.unknown.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unknown.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.unknown.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.unsaved.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unsaved.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.unsaved.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unsaved.description",
     },
   },
 
   successTypes: {
     title:
-      "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.success.title",
+      "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.success.title",
     description:
-      "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.success.description",
+      "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.success.description",
   },
 
   examples: {
@@ -301,7 +301,7 @@ const { POST } = createEndpoint({
       },
     },
   },
-})
+});
 
 export type PulseExecuteRequestInput = typeof POST.types.RequestInput;
 export type PulseExecuteRequestOutput = typeof POST.types.RequestOutput;

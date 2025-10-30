@@ -520,7 +520,7 @@ function renderFieldInput<
                 }
                 return false;
               }}
-              autoFocus
+              
             />
           </PopoverContent>
         </Popover>

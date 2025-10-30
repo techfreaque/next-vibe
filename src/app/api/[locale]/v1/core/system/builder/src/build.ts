@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { existsSync, mkdirSync, renameSync, rmSync, unlinkSync } from "fs";
+import { existsSync, mkdirSync, renameSync, rmSync, unlinkSync } from "node:fs";
 import { copy } from "fs-extra";
-import { basename, dirname, join, resolve } from "path";
+import { basename, dirname, join, resolve } from "node:path";
 import type { OutputOptions, RollupOptions } from "rollup";
 import type { BuildOptions, InlineConfig, PluginOption } from "vite";
 import { build } from "vite";
@@ -157,7 +157,7 @@ export async function pweBuild(fileConfig: FileToCompile): Promise<void> {
   await build({
     root: "./",
     base: "./",
-    plugins: Array.from(new Set(plugins)),
+    plugins: [...new Set(plugins)],
     ...otherOptions,
     build: {
       ...buildOptions,
@@ -212,15 +212,15 @@ async function setPackageBuildConfig({
       `${outPutFilesNameWithoutExtension}.${format === "es" ? "mjs" : "cjs"}`,
   };
   outputOptions.exports = "auto";
-  const modulesToExternalize = Array.from(
-    new Set([
+  const modulesToExternalize = [
+    ...new Set([
       ...(fileConfig.options.modulesToExternalize || []),
       ...(fileConfig.options?.type?.includes("react") &&
       fileConfig.options?.bundleReact !== false
         ? ["react", "react-dom", "react/jsx-runtime"]
         : []),
     ]),
-  );
+  ];
 
   rollupOptions.external = (id): boolean => {
     // eslint-disable-next-line i18next/no-literal-string
@@ -330,7 +330,7 @@ export function cleanDistFolders(buildConfig: BuildConfig): void {
 }
 
 function logger(message: string): void {
-  // eslint-disable-next-line i18next/no-literal-string
+  // eslint-disable-next-line i18next/no-literal-string, no-console
   console.log(`[builder] ${message}`);
 }
 

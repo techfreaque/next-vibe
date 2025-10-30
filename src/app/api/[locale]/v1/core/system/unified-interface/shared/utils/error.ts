@@ -1,5 +1,3 @@
-"use client";
-
 /**
  * Shared Error Handling Utilities
  * Generic error handling functions used across all platforms (AI, CLI, MCP, React)

@@ -99,9 +99,11 @@ export function AdminLayoutClient({
           sidebarOpen ? "block" : "hidden",
         )}
       >
-        <div
-          className="fixed inset-0 bg-gray-600 bg-opacity-75"
+        <button
+          type="button"
+          className="fixed inset-0 bg-gray-600 bg-opacity-75 border-0 p-0 cursor-pointer"
           onClick={() => setSidebarOpen(false)}
+          aria-label="Close sidebar"
         />
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white dark:bg-gray-800 shadow-xl">
           <div className="flex h-16 items-center justify-between px-4">

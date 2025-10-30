@@ -62,9 +62,7 @@ const { POST } = createEndpoint({
           description: "app.api.v1.core.system.db.seed.post.description",
           layout: { columns: 6 },
         },
-        z
-          .string()
-          .default("src/app/api/[locale]/v1/core/system/generated/seeds"),
+        z.string().default("src/app/api/[locale]/v1/core/system/generated"),
       ),
 
       includeTestData: requestDataField(
@@ -153,7 +151,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        outputDir: "src/app/api/[locale]/v1/core/system/generated/seeds",
+        outputDir: "src/app/api/[locale]/v1/core/system/generated",
         includeTestData: true,
         includeProdData: false,
         verbose: false,
@@ -166,7 +164,7 @@ const { POST } = createEndpoint({
         message: "Generated seeds file with 5 seeds in 150ms",
         seedsFound: 5,
         duration: 150,
-        outputPath: "src/app/api/[locale]/v1/core/system/generated/seeds",
+        outputPath: "src/app/api/[locale]/v1/core/system/generated",
       },
     },
     urlPathParams: undefined,

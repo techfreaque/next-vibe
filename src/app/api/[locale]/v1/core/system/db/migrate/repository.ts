@@ -6,7 +6,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import * as path from "node:path";
 
-import { spawnSync } from "child_process";
+import { spawnSync } from "node:child_process";
 import { sql } from "drizzle-orm";
 import { migrate as drizzleMigrate } from "drizzle-orm/node-postgres/migrator";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -85,7 +85,6 @@ export class DatabaseMigrationRepositoryImpl
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateResponseType>> {
-    const { t } = simpleT(locale);
     const startTime = Date.now();
     let output = "";
     let migrationsRun = 0;
@@ -101,7 +100,9 @@ export class DatabaseMigrationRepositoryImpl
       }
 
       // Run migrations
-      if (!data.dryRun) {
+      if (data.dryRun) {
+        output += "\nDry run - migrations not executed\n";
+      } else {
         const migrateResult = await this.executeMigrations(data.schema, locale);
         output += migrateResult.output;
         migrationsRun = migrateResult.count;
@@ -111,9 +112,6 @@ export class DatabaseMigrationRepositoryImpl
           const redoResult = this.redoLastMigration(locale);
           output += redoResult.output;
         }
-      } else {
-        output += t("app.api.v1.core.system.db.migrate.messages.dryRun");
-        output += "\n";
       }
 
       const duration = Date.now() - startTime;
@@ -219,7 +217,7 @@ export class DatabaseMigrationRepositoryImpl
           const SQL_EXTENSION = ".sql";
           return file.endsWith(SQL_EXTENSION);
         })
-        .sort();
+        .toSorted();
 
       if (migrationFiles.length === 0) {
         return {

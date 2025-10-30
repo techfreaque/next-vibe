@@ -211,7 +211,7 @@ export async function navigateFolders(
         .filter(
           ([, item]) => item && typeof item === "object" && !("branch" in item),
         )
-        .sort(([a], [b]) => a.localeCompare(b));
+        .toSorted(([a], [b]) => a.localeCompare(b));
 
       const packageEntries = Object.entries(currentFolder)
         .filter(
@@ -221,7 +221,7 @@ export async function navigateFolders(
             "branch" in item &&
             "repoUrl" in item,
         )
-        .sort(([a], [b]) => a.localeCompare(b));
+        .toSorted(([a], [b]) => a.localeCompare(b));
 
       // Add folders with icons and description
       if (folderEntries.length > 0) {

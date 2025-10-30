@@ -174,7 +174,7 @@ export function ChatMessages({
           // Flat view (4chan style) - ALL messages in chronological order
           ((): JSX.Element => {
             // Get ALL messages from thread, sorted by timestamp
-            const allMessages = Object.values(messages).sort(
+            const allMessages = Object.values(messages).toSorted(
               (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
             );
             return (

@@ -19,16 +19,15 @@ import { TextClassContext } from "./text";
 
 // Local styled components - use direct primitives to avoid type instantiation issues
 // The styled() function from nativewind has overly complex type inference for these components
-const StyledContextMenuSubTrigger = ContextMenuPrimitive.SubTrigger as typeof ContextMenuPrimitive.SubTrigger;
-const StyledContextMenuSubContent = ContextMenuPrimitive.SubContent as typeof ContextMenuPrimitive.SubContent;
-const StyledContextMenuContent = ContextMenuPrimitive.Content as typeof ContextMenuPrimitive.Content;
-const StyledContextMenuItem = ContextMenuPrimitive.Item as typeof ContextMenuPrimitive.Item;
-const StyledContextMenuCheckboxItem = ContextMenuPrimitive.CheckboxItem as typeof ContextMenuPrimitive.CheckboxItem;
-const StyledContextMenuRadioItem = ContextMenuPrimitive.RadioItem as typeof ContextMenuPrimitive.RadioItem;
-const StyledContextMenuLabel = ContextMenuPrimitive.Label as typeof ContextMenuPrimitive.Label;
-const StyledContextMenuSeparator = ContextMenuPrimitive.Separator as typeof ContextMenuPrimitive.Separator;
-const StyledContextMenuItemIndicator =
-  ContextMenuPrimitive.ItemIndicator as typeof ContextMenuPrimitive.ItemIndicator;
+const StyledContextMenuSubTrigger = ContextMenuPrimitive.SubTrigger;
+const StyledContextMenuSubContent = ContextMenuPrimitive.SubContent;
+const StyledContextMenuContent = ContextMenuPrimitive.Content;
+const StyledContextMenuItem = ContextMenuPrimitive.Item;
+const StyledContextMenuCheckboxItem = ContextMenuPrimitive.CheckboxItem;
+const StyledContextMenuRadioItem = ContextMenuPrimitive.RadioItem;
+const StyledContextMenuLabel = ContextMenuPrimitive.Label;
+const StyledContextMenuSeparator = ContextMenuPrimitive.Separator;
+const StyledContextMenuItemIndicator = ContextMenuPrimitive.ItemIndicator;
 
 const ContextMenu = ContextMenuPrimitive.Root;
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger;

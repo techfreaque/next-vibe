@@ -347,7 +347,8 @@ export const endpointsGeneratorRepository = {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ) => functionalGeneratorsRepository.runGenerators(data, user, locale, logger),
+  ): Promise<BaseResponseType<ResponseOutputType>> =>
+    functionalGeneratorsRepository.runGenerators(data, user, locale, logger),
 };
 
 // Export the main function for backward compatibility

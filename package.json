@@ -245,8 +245,8 @@
     "eslint-import-resolver-typescript": "^4.4.4",
     "globals": "16.4.0",
     "jsdom": "27.0.1",
-    "lint": "workspace:*",
     "module-alias": "2.2.3",
+    "patch-package": "^8.0.1",
     "postcss": "8",
     "postcss-preset-env": "10.4.0",
     "release-tool": "workspace:*",
@@ -258,7 +258,6 @@
   },
   "workspaces": [
     "src/app/api/*/v1/core/system/builder",
-    "src/app/api/*/v1/core/system/check/lint",
     "src/app/api/*/v1/core/system/release-tool",
     "src/app/api/*/v1/core/system/launchpad",
     "src/app/api/*/v1/core/system/guard"

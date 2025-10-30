@@ -228,7 +228,7 @@ export function generateCacheKey(
   const pathHash = createHash("md5")
     .update(targetPath)
     .digest("hex")
-    .substring(0, 8);
+    .slice(0, 8);
 
   if (pathType === PathType.SINGLE_FILE) {
     // For single files, include file modification time in cache key
@@ -258,14 +258,14 @@ export function generateCacheKey(
             return file;
           }
         })
-        .sort();
+        .toSorted();
 
       // eslint-disable-next-line i18next/no-literal-string
       const contentHash = createHash("md5")
         // eslint-disable-next-line i18next/no-literal-string
         .update(fileHashes.join("|"))
         .digest("hex")
-        .substring(0, 8);
+        .slice(0, 8);
 
       // eslint-disable-next-line i18next/no-literal-string
       return `${baseKey}_folder_${pathHash}_${contentHash}`;

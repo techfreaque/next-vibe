@@ -105,11 +105,11 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
     // Validate user permissions
     if (!user?.id) {
       return createErrorResponse(
-        "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
         ErrorResponseTypes.UNAUTHORIZED,
         {
           error: t(
-            "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.description",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.description",
           ),
         },
       );
@@ -144,7 +144,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
               isValid: false,
               errors: [
                 t(
-                  "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.validation.title",
+                  "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.validation.title",
                 ),
               ],
             };
@@ -154,7 +154,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
           // Define new option (implementation would go here)
           response.options = [
             t(
-              "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.title",
+              "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.success.title",
             ),
           ];
           break;
@@ -162,7 +162,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
           // Parse option values (implementation would go here)
           response.options = [
             t(
-              "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.title",
+              "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.success.title",
             ),
           ];
           break;

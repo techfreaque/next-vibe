@@ -26,11 +26,11 @@ import { UserRole } from "../../../../../user/user-roles/enum";
  * Setup Uninstall Endpoint Definition
  */
 const { POST } = createEndpoint({
-  title: "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.title",
+  title: "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
   description:
-    "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.description",
-  category: "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.title",
-  tags: ["app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.title"],
+    "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.description",
+  category: "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
+  tags: ["app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title"],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["uninstall", "setup:uninstall"],
   method: Methods.POST,
@@ -44,9 +44,9 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.title",
+      title: "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
       description:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.description",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -57,9 +57,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.title",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
           description:
-            "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.description",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.description",
           layout: { columns: 6 },
         },
         z.boolean().default(false),
@@ -70,7 +70,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.success.title",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.success.title",
         },
         z.boolean(),
       ),
@@ -79,7 +79,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.title",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
         },
         z.boolean(),
       ),
@@ -88,7 +88,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.success.description",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.success.description",
         },
         z.string(),
       ),
@@ -97,7 +97,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.title",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
         },
         z.string().optional(),
       ),
@@ -108,66 +108,66 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.server.title",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.server.title",
       description:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.server.description",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.unknown.title",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.unknown.title",
       description:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.unknown.description",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.conflict.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
     title:
-      "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.success.title",
+      "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.success.title",
     description:
-      "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.success.description",
+      "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.success.description",
   },
 });
 

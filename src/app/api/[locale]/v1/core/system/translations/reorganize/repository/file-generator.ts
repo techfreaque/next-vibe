@@ -291,7 +291,7 @@ export class FileGenerator {
         const escapedValue =
           typeof value === "string"
             ? // eslint-disable-next-line i18next/no-literal-string
-              JSON.stringify(value.replace(/\n/g, "\\n"))
+              JSON.stringify(value.replaceAll(/\n/g, "\\n"))
             : JSON.stringify(value);
         return `${nextIndentStr}${keyStr}: ${escapedValue}`;
       }
@@ -380,7 +380,7 @@ export class FileGenerator {
       const fileContent = this.generateHierarchicalFileContent(path, node);
 
       // Ensure directory exists
-      const dir = filePath.substring(0, filePath.lastIndexOf("/"));
+      const dir = filePath.slice(0, filePath.lastIndexOf("/"));
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
@@ -474,7 +474,7 @@ export class FileGenerator {
       );
 
       // Create directory
-      const dir = filePath.substring(0, filePath.lastIndexOf("/"));
+      const dir = filePath.slice(0, filePath.lastIndexOf("/"));
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
         logger.debug(`Created directory: ${dir}`);
@@ -625,7 +625,7 @@ export class FileGenerator {
           path.dirname(filePath),
           path.join(process.cwd(), location, I18N_PATH, language, INDEX_FILE),
         )
-        .replace(/\\/g, "/")
+        .replaceAll(/\\/g, "/")
         .replace(/\.ts$/, "");
 
       const importName = `locationTranslations${importIndex}`;
@@ -672,7 +672,7 @@ export class FileGenerator {
     key = key.replace(/\/_components$/, "");
 
     // Convert to dot notation
-    key = key.replace(/\//g, ".");
+    key = key.replaceAll(/\//g, ".");
 
     return key;
   }
@@ -759,7 +759,7 @@ export class FileGenerator {
       );
 
       // Create directory
-      const dir = filePath.substring(0, filePath.lastIndexOf("/"));
+      const dir = filePath.slice(0, filePath.lastIndexOf("/"));
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
@@ -848,7 +848,7 @@ export class FileGenerator {
           path.join("src", I18N_PATH, language, currentPath),
           path.join(location, I18N_PATH, language, INDEX_FILE),
         )
-        .replace(/\\/g, "/")
+        .replaceAll(/\\/g, "/")
         .replace(/\.ts$/, "");
 
       const locationKey = this.locationToFlatKey(location);
@@ -1094,7 +1094,7 @@ export class FileGenerator {
           path.join("src", I18N_PATH, language, currentPath),
           path.join(colocatedFile, I18N_PATH, language, INDEX_FILE),
         )
-        .replace(/\\/g, "/")
+        .replaceAll(/\\/g, "/")
         .replace(/\.ts$/, "");
 
       // Create a unique import name for co-located file
@@ -1169,7 +1169,7 @@ export class FileGenerator {
 
     for (const [location] of groups) {
       if (location.startsWith(`${sourcePath}/`)) {
-        const relativePath = location.substring(sourcePath.length + 1);
+        const relativePath = location.slice(sourcePath.length + 1);
 
         if (relativePath.includes("/")) {
           // Has nested path - add first segment as direct child
@@ -1302,7 +1302,7 @@ export class FileGenerator {
       // Check if the section index file exists or will be created
       const relativePath = path
         .relative(path.dirname(mainIndexPath), sectionIndexPath)
-        .replace(/\\/g, "/")
+        .replaceAll(/\\/g, "/")
         .replace(/\.ts$/, "");
 
       imports.push(

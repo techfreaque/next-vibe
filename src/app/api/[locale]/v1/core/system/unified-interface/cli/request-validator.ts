@@ -46,10 +46,7 @@ export function validateCliRequestData<
     requestSchema: TRequestSchema;
     requestUrlPathParamsSchema: TUrlSchema;
   },
-  context: CliValidationContext<
-    z.input<TRequestSchema>,
-    z.input<TUrlSchema>
-  >,
+  context: CliValidationContext<z.input<TRequestSchema>, z.input<TUrlSchema>>,
   logger: EndpointLogger,
 ): ResponseType<
   ValidatedRequestData<z.output<TRequestSchema>, z.output<TUrlSchema>>
@@ -94,7 +91,7 @@ export function validateCliRequestData<
           return {
             success: false,
             message:
-              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
+              "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
             errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
             messageParams: {
               error: urlValidation.message,
@@ -117,8 +114,8 @@ export function validateCliRequestData<
     // First, validate without applying defaults to see what was actually provided
     const rawValidation = endpoint.requestSchema.safeParse(context.requestData);
 
-    let finalRequestData: z.input<TRequestSchema> | z.output<TRequestSchema> =
-      context.requestData;
+    let finalRequestData: z.output<TRequestSchema> =
+      context.requestData as z.output<TRequestSchema>;
     if (rawValidation.success) {
       // Use the validated data which includes defaults
       finalRequestData = rawValidation.data;
@@ -150,7 +147,7 @@ export function validateCliRequestData<
       return {
         success: false,
         message:
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
@@ -174,7 +171,7 @@ export function validateCliRequestData<
       return {
         success: false,
         message:
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: urlValidation.message,
@@ -194,13 +191,13 @@ export function validateCliRequestData<
     return {
       success: false,
       message:
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error:
           error instanceof Error
             ? error.message
-            : "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
+            : "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
       },
     };
   }

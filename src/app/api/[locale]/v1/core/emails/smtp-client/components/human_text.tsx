@@ -12,7 +12,7 @@ import type { ReactNode } from "react";
  */
 interface HumanTextProps {
   children: ReactNode;
-  style?: "greeting" | "body" | "signature" | "ps";
+  variant?: TextStyle;
 }
 
 const TEXT_STYLES = {
@@ -41,12 +41,15 @@ const TEXT_STYLES = {
     fontStyle: "italic",
   },
 };
+
+export type TextStyle = keyof typeof TEXT_STYLES;
+
 /**
  * Human-style text component with natural spacing
  */
 export function HumanText({
   children,
-  style = "body",
+  variant = "body",
 }: HumanTextProps): React.JSX.Element {
-  return <Text style={TEXT_STYLES[style]}>{children}</Text>;
+  return <Text style={TEXT_STYLES[variant]}>{children}</Text>;
 }

@@ -174,6 +174,10 @@ export const translations = {
         label: "Gesamtanzahl der Befehle",
         description: "Anzahl der verfügbaren Befehle",
       },
+      commandsText: {
+        label: "Verfügbare Befehle",
+        description: "Formatierte Liste aller verfügbaren Befehle",
+      },
     },
     response: {
       commands: {

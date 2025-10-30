@@ -10,9 +10,9 @@ import { z } from "zod";
 
 import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
@@ -173,7 +173,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
 
       logger.info(
         t(
-          "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.log.fetchSuccess",
+          "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.history.get.log.fetchSuccess",
           {
             count: executions.length.toString(),
           },
@@ -203,7 +203,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
             taskName:
               exec.taskName ??
               t(
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.unknownTask",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.history.get.unknownTask",
               ),
             status: statusSchema.parse(exec.status),
             priority: prioritySchema.parse(
@@ -243,7 +243,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
 
       return fail({
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.history.get.errors.internal.title",
+          "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.history.get.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

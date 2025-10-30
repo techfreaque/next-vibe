@@ -40,7 +40,8 @@ const DialogOverlayNative = React.forwardRef<
   DialogPrimitive.OverlayRef,
   DialogPrimitive.OverlayProps
 >(({ className, children, ...props }, ref) => {
-  const content = typeof children === "function" ? children({ pressed: false }) : children;
+  const content =
+    typeof children === "function" ? children({ pressed: false }) : children;
   return (
     <DialogPrimitive.Overlay
       style={StyleSheet.absoluteFill}

@@ -14,9 +14,9 @@ import path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -144,11 +144,11 @@ exec bun "${vibeTsPath}" "$@"
     if (!user?.id) {
       return fail({
         message:
-          "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.title",
+          "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: {
           error: t(
-            "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.description",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.description",
           ),
         },
       });
@@ -166,10 +166,10 @@ exec bun "${vibeTsPath}" "$@"
           path: status.path,
           message: status.path
             ? t(
-                "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.description",
+                "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.success.description",
               )
             : t(
-                "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.description",
+                "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.success.description",
               ),
         });
       }
@@ -179,7 +179,7 @@ exec bun "${vibeTsPath}" "$@"
       if (!bunAvailable) {
         return fail({
           message:
-            "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error:
@@ -213,7 +213,7 @@ exec bun "${vibeTsPath}" "$@"
       if (!existsSync(vibeTsPath)) {
         return fail({
           message:
-            "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             // eslint-disable-next-line i18next/no-literal-string
@@ -246,7 +246,7 @@ exec bun "${vibeTsPath}" "$@"
         const parsedError = parseError(error);
         return fail({
           message:
-            "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             // eslint-disable-next-line i18next/no-literal-string
@@ -292,10 +292,10 @@ exec bun "${vibeTsPath}" "$@"
         path: newStatus.path,
         message: newStatus.installed
           ? t(
-              "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.description",
+              "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.success.description",
             )
           : t(
-              "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.description",
+              "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.server.description",
             ),
         output: data.verbose ? output : undefined,
       });
@@ -303,7 +303,7 @@ exec bun "${vibeTsPath}" "$@"
       const parsedError = parseError(error);
       return fail({
         message:
-          "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
+          "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           // eslint-disable-next-line i18next/no-literal-string

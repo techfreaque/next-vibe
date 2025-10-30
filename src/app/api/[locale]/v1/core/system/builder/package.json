@@ -20,7 +20,6 @@
   },
   "scripts": {
     "build": "rm -rf ./dist && tsc -p tsconfig-build.json",
-    "lint": "eslint --fix",
     "test": "NODE_ENV=test vitest run",
     "pub": "release-tool"
   },
@@ -76,7 +75,6 @@
     "@types/node": "24.5.2",
     "@types/react": "19.1.13",
     "@types/react-dom": "19.1.9",
-    "lint": "workspace:*",
     "rollup": "4.52.0",
     "release-tool": "workspace:*",
     "typescript": "5.9.2",

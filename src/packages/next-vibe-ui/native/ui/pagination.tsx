@@ -24,7 +24,7 @@ export function Pagination({
 }: PaginationProps): React.JSX.Element {
   return (
     <View
-      accessibilityRole="navigation"
+      accessible={true}
       accessibilityLabel="pagination"
       className={cn("mx-auto flex w-full justify-center", className)}
       {...props}

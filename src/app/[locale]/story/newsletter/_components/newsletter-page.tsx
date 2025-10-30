@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Mail, Send, TrendingUp, Users, X, Zap } from "lucide-react";
+import Link from "next/link";
 import { Form } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Input } from "next-vibe-ui/ui/input";
@@ -205,12 +206,12 @@ export function NewsletterPage({
             <div className="text-center mt-4">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 {t("app.story.newsletter.page.unsubscribeText")}{" "}
-                <a
+                <Link
                   href={`/${locale}/newsletter/unsubscribe`}
                   className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
                 >
                   {t("app.story.newsletter.page.unsubscribeLink")}
-                </a>
+                </Link>
               </p>
             </div>
           </div>

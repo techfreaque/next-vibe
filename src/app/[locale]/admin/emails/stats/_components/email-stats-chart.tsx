@@ -263,7 +263,7 @@ function transformDataForChart(data: ChartDataType): ChartDataPoint[] {
   });
 
   // Sort dates
-  const sortedDates = Array.from(allDates).sort();
+  const sortedDates = [...allDates].toSorted();
 
   // Transform to recharts format
   return sortedDates.map((date) => {

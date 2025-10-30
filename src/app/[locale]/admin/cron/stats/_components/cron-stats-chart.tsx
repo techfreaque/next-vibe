@@ -104,7 +104,7 @@ export function CronStatsChart({
     [] as Array<Record<string, string | number | Date>>,
   );
 
-  // Format date for display
+  // Format date for display - needs locale from props
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString(locale, {
@@ -113,37 +113,6 @@ export function CronStatsChart({
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
-
-  // Custom tooltip
-  interface TooltipPayload {
-    color: string;
-    dataKey: string;
-    value: string | number;
-  }
-
-  const CustomTooltip = ({
-    active,
-    payload,
-    label,
-  }: {
-    active?: boolean;
-    payload?: TooltipPayload[];
-    label?: string;
-  }): JSX.Element | null => {
-    if (active && payload?.length) {
-      return (
-        <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
-          <p className="font-medium">{formatDate(label || "")}</p>
-          {payload.map((entry: TooltipPayload, index: number) => (
-            <p key={index} style={{ color: entry.color }}>
-              {entry.dataKey}: {entry.value}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
   };
 
   const renderChart = (): JSX.Element => {
@@ -162,7 +131,7 @@ export function CronStatsChart({
               tick={{ fontSize: 12 }}
             />
             <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomDistributionTooltip />} />
             <Legend />
             {Object.keys(data).map((key, index) => (
               <Area
@@ -192,7 +161,7 @@ export function CronStatsChart({
               scale="log"
               domain={["dataMin", "dataMax"]}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomDistributionTooltip />} />
             <Legend />
             {Object.keys(data).map((key, index) => (
               <Bar
@@ -218,7 +187,7 @@ export function CronStatsChart({
               scale="log"
               domain={["dataMin", "dataMax"]}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomDistributionTooltip />} />
             <Legend />
             {Object.keys(data).map((key, index) => (
               <Line
@@ -253,6 +222,32 @@ export function CronStatsChart({
 /**
  * Distribution chart component for categorical data
  */
+
+interface DistributionTooltipPayload {
+  color: string;
+  value: string | number;
+  name: string;
+}
+
+const CustomDistributionTooltip = ({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: DistributionTooltipPayload[];
+}): JSX.Element | null => {
+  if (active && payload?.length) {
+    const data = payload[0];
+    return (
+      <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
+        <p className="font-medium">{data.name}</p>
+        <p style={{ color: data.color }}>{data.value}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
 export function CronStatsDistributionChart({
   data,
   title,
@@ -272,31 +267,6 @@ export function CronStatsDistributionChart({
     "hsl(var(--chart-5))",
   ];
 
-  interface DistributionTooltipPayload {
-    color: string;
-    value: string | number;
-    name: string;
-  }
-
-  const CustomTooltip = ({
-    active,
-    payload,
-  }: {
-    active?: boolean;
-    payload?: DistributionTooltipPayload[];
-  }): JSX.Element | null => {
-    if (active && payload?.length) {
-      const data = payload[0];
-      return (
-        <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
-          <p className="font-medium">{data.name}</p>
-          <p style={{ color: data.color }}>{data.value}</p>
-        </div>
-      );
-    }
-    return null;
-  };
-
   const renderChart = (): JSX.Element => {
     if (type === "bar") {
       return (
@@ -310,7 +280,7 @@ export function CronStatsDistributionChart({
             scale="log"
             domain={["dataMin", "dataMax"]}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomDistributionTooltip />} />
           <Bar dataKey="value" fill="hsl(var(--chart-1))" />
         </BarChart>
       );
@@ -335,7 +305,7 @@ export function CronStatsDistributionChart({
             />
           ))}
         </Pie>
-        <Tooltip content={<CustomTooltip />} />
+        <Tooltip content={<CustomDistributionTooltip />} />
       </PieChart>
     );
   };

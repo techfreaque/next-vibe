@@ -95,7 +95,7 @@ export class LocationAnalyzer {
     const directories = usageFiles
       .map((filePath) => path.dirname(filePath))
       .map((dir) => path.resolve(dir))
-      .sort((a, b) => b.split(path.sep).length - a.split(path.sep).length);
+      .toSorted((a, b) => b.split(path.sep).length - a.split(path.sep).length);
 
     logger.debug(
       `Analyzing ${directories.length} directories for most specific location`,
@@ -175,7 +175,7 @@ export class LocationAnalyzer {
     keyUsageFrequency: Map<string, number>,
   ): boolean {
     const keyPath = originalKey.split(".").slice(0, -1).join(".");
-    const siblingCount = Array.from(keyUsageFrequency.keys()).filter(
+    const siblingCount = [...keyUsageFrequency.keys()].filter(
       (key) => key.startsWith(`${keyPath}.`) && key !== originalKey,
     ).length;
 
@@ -235,7 +235,7 @@ export class LocationAnalyzer {
     for (const key of keyUsageFrequency.keys()) {
       if (key.startsWith(parentPrefix)) {
         // Count direct children only (not nested grandchildren)
-        const remainingPath = key.substring(parentPrefix.length);
+        const remainingPath = key.slice(parentPrefix.length);
         if (!remainingPath.includes(".")) {
           count++;
         }

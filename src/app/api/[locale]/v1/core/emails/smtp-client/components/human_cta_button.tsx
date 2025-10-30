@@ -14,7 +14,7 @@ import type { TrackingContext } from "./tracking_context";
 interface HumanCTAButtonProps {
   href: string;
   text: string;
-  style?: "primary" | "secondary";
+  variant?: ButtonStyle;
   tracking: TrackingContext;
 }
 
@@ -41,6 +41,7 @@ const BUTTON_STYLE = {
     margin: "8px 0",
   },
 };
+export type ButtonStyle = keyof typeof BUTTON_STYLE;
 /**
  * Human-style CTA Button Component
  * More subtle, text-based CTA that looks like a natural part of the email
@@ -49,12 +50,12 @@ const BUTTON_STYLE = {
 export function HumanCTAButton({
   href,
   text,
-  style = "primary",
+  variant = "primary",
   tracking,
 }: HumanCTAButtonProps): React.JSX.Element {
   return (
     <div style={{ textAlign: "left", margin: "20px 0" }}>
-      <TrackedLink href={href} style={BUTTON_STYLE[style]} tracking={tracking}>
+      <TrackedLink href={href} style={BUTTON_STYLE[variant]} tracking={tracking}>
         {text}
       </TrackedLink>
     </div>

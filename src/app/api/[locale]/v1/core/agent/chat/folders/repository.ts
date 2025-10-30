@@ -2,12 +2,12 @@ import "server-only";
 
 import { and, desc, eq, isNull } from "drizzle-orm";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
-  type ResponseType,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+import type { JsonValue } from "type-fest";
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { canCreateFolder } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
@@ -16,13 +16,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { JsonValue } from "type-fest";
 
 import type {
   FolderCreateRequestOutput,
-  FolderCreateResponseOutput,
   FolderListRequestOutput,
-  FolderListResponseOutput,
 } from "./definition";
 
 /**
@@ -31,14 +28,15 @@ import type {
 export async function getFolders(
   user: JwtPayloadType,
   data: FolderListRequestOutput,
-): Promise<ResponseType<FolderListResponseOutput>> {
+) {
   // For anonymous users (public), use leadId instead of userId
   // For authenticated users, use userId
   const userIdentifier = user.isPublic ? user.leadId : user.id;
 
   if (!userIdentifier) {
     return fail({
-      message: "app.api.v1.core.agent.chat.folders.get.errors.unauthorized.title",
+      message:
+        "app.api.v1.core.agent.chat.folders.get.errors.unauthorized.title",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
@@ -93,7 +91,7 @@ export async function createFolder(
   data: FolderCreateRequestOutput,
   locale: CountryLanguage,
   logger: EndpointLogger,
-): Promise<ResponseType<FolderCreateResponseOutput>> {
+) {
   try {
     const { folder: folderData } = data;
 
@@ -108,14 +106,16 @@ export async function createFolder(
       // Determine the specific error message
       if (user.isPublic) {
         return fail({
-          message: "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
+          message:
+            "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
       if (folderData.rootFolderId === "incognito") {
         return fail({
-          message: "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
+          message:
+            "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
           messageParams: {
             message: simpleT(locale).t(
@@ -127,13 +127,15 @@ export async function createFolder(
 
       if (folderData.rootFolderId === "public") {
         return fail({
-          message: "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
+          message:
+            "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
       return fail({
-        message: "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
+        message:
+          "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -143,7 +145,8 @@ export async function createFolder(
 
     if (!userIdentifier) {
       return fail({
-        message: "app.api.v1.core.agent.chat.folders.post.errors.unauthorized.title",
+        message:
+          "app.api.v1.core.agent.chat.folders.post.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }

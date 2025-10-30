@@ -81,7 +81,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
       // eslint-disable-next-line i18next/no-literal-string
       const icon = context.options.useEmojis ? "✨ " : "";
       const text = context.translate(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound" as never,
       );
       return `${indent}${icon}${this.styleText(text, "green", context)}`;
     }
@@ -94,10 +94,10 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
       const errorWord =
         errors === 1
           ? context.translate(
-              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.error",
+              "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.error",
             )
           : context.translate(
-              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.errors",
+              "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.errors",
             );
       const text = `${errors} ${errorWord}`;
       parts.push(`${indent}${icon}${this.styleText(text, "red", context)}`);
@@ -109,10 +109,10 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
       const warningWord =
         warnings === 1
           ? context.translate(
-              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.warning",
+              "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.warning",
             )
           : context.translate(
-              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.warnings",
+              "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.warnings",
             );
       const text = `${warnings} ${warningWord}`;
       parts.push(`${indent}${icon}${this.styleText(text, "yellow", context)}`);
@@ -121,7 +121,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
     if (info > 0) {
       // eslint-disable-next-line i18next/no-literal-string
       const icon = context.options.useEmojis ? "ℹ " : "";
-      const text = `${info} ${context.translate("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.info")}`;
+      const text = `${info} ${context.translate("app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.info" as never)}`;
       parts.push(`${indent}${icon}${this.styleText(text, "blue", context)}`);
     }
 

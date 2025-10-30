@@ -21,19 +21,17 @@ import type {
   BaseExecutionResult,
 } from "../shared/server-only/execution/executor";
 import { loadRouteHandler } from "../shared/server-only/execution/route-loader";
-import type {
-  EndpointDefinition,
-  UnifiedField,
-} from "../shared/types/endpoint";
+import type { UnifiedField } from "../shared/types/endpoint";
 import type { Methods } from "../shared/types/enums";
 import type { InferJwtPayloadTypeFromRoles } from "../shared/types/handler";
 import { modularCLIResponseRenderer } from "./widgets/modular-response-renderer";
 import { responseMetadataExtractor } from "./widgets/response-metadata-extractor";
 import { schemaUIHandler } from "./widgets/schema-ui-handler";
-import type { RenderableValue } from "./widgets/types";
+import type { RenderableValue, ResponseFieldMetadata } from "./widgets/types";
 
-// Default request data type for generic endpoint handling
-type DefaultRequestData = UnifiedField<z.ZodTypeAny>;
+// Default fields type for generic endpoint handling
+// This is used as the TFields parameter in CreateApiEndpoint
+type DefaultFields = Record<string, string | number | boolean | null>;
 
 // CLI handler function type - matches createCliHandler signature
 interface CliHandlerFunction<
@@ -197,13 +195,13 @@ export class RouteDelegationHandler {
         return {
           success: false,
           error: t(
-            "app.api.v1.core.system.unifiedUi.cli.vibe.errors.routeNotFound",
+            "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.routeNotFound",
           ),
         };
       }
 
       // Get endpoint definition for schema-driven UI
-      const endpoint = await this.getEndpointDefinition(route, logger);
+      const endpoint = await this.getCreateApiEndpoint(route, logger);
 
       // Collect input data using schema-driven UI if needed
       const inputData = await this.collectInputData(endpoint, context, logger);
@@ -339,7 +337,12 @@ export class RouteDelegationHandler {
     try {
       const result = await loadRouteHandler<
         CliHandlerFunction<readonly (typeof UserRoleValue)[]>,
-        DefaultRequestData
+        CreateApiEndpoint<
+          string,
+          Methods,
+          readonly (typeof UserRoleValue)[],
+          DefaultFields
+        >
       >(
         {
           routePath: route.routePath,
@@ -379,7 +382,7 @@ export class RouteDelegationHandler {
   /**
    * Get endpoint definition from route
    */
-  private async getEndpointDefinition(
+  private async getCreateApiEndpoint(
     route: DiscoveredRoute,
     logger: EndpointLogger,
   ): Promise<CreateApiEndpoint<
@@ -549,7 +552,7 @@ export class RouteDelegationHandler {
   formatResult(
     result: RouteExecutionResult,
     outputFormat = "pretty",
-    endpointDefinition: EndpointDefinition | null,
+    endpointDefinition: CreateApiEndpoint | null,
     locale: CountryLanguage,
     verbose = false,
     logger: EndpointLogger,
@@ -559,7 +562,9 @@ export class RouteDelegationHandler {
       const { t } = simpleT(locale);
       let errorMessage =
         result.error ||
-        t("app.api.v1.core.system.unifiedUi.cli.vibe.errors.unknownError");
+        t(
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.unknownError",
+        );
 
       // Try to translate if it looks like a translation key (contains dots)
       if (errorMessage.includes(".")) {
@@ -671,7 +676,7 @@ export class RouteDelegationHandler {
     // Format cause error message - ErrorResponseType uses 'message' field
     const causeTranslationKey: TranslationKey =
       result.cause.message ||
-      "app.api.v1.core.system.unifiedUi.cli.vibe.errors.unknownError";
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.unknownError";
 
     const causeMessage = t(causeTranslationKey, result.cause.messageParams);
 
@@ -763,7 +768,7 @@ export class RouteDelegationHandler {
    */
   private formatWithEnhancedRenderer(
     data: CliResponseData,
-    endpointDefinition: EndpointDefinition,
+    endpointDefinition: CreateApiEndpoint,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): string {
@@ -771,13 +776,26 @@ export class RouteDelegationHandler {
       // Extract response metadata from endpoint definition
       const metadata = responseMetadataExtractor.extractResponseMetadata(
         endpointDefinition,
-        data,
+        data as
+          | string
+          | number
+          | boolean
+          | null
+          | (
+              | string
+              | number
+              | boolean
+              | null
+              | (string | number | boolean | null)[]
+            )[]
+          | { [key: string]: string | number | boolean | null },
       );
 
       // Use enhanced modular renderer with locale
+      const emptyMetadata: ResponseFieldMetadata[] = [];
       return modularCLIResponseRenderer.render(
         this.sanitizeDataForRenderer(data),
-        metadata || [],
+        metadata !== null ? metadata : emptyMetadata,
         locale,
       );
     } catch (error) {
@@ -866,7 +884,7 @@ export class RouteDelegationHandler {
       );
 
       // Convert string boolean values to actual booleans if not already parsed
-      let convertedValue: string | number | boolean | null = value;
+      let convertedValue: string | number | boolean | null | undefined = value;
       if (typeof value === "string") {
         const lowerValue = value.toLowerCase();
         if (lowerValue === "true") {

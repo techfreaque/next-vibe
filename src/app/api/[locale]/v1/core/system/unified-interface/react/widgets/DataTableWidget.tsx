@@ -18,7 +18,7 @@ import type {
  * Type guard for DataTableWidgetData
  */
 function isDataTableWidgetData(
-  data: RenderableValue,
+  data: RenderableValue | DataTableWidgetData,
 ): data is DataTableWidgetData {
   if (
     typeof data === "object" &&

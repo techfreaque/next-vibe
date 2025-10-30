@@ -6,31 +6,55 @@
     "vitest"
   ],
   "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "eslint.format.enable": true,
+
+  // Oxlint configuration
+  "oxc.enable": true,
+  "oxc.lint.run": "onSave",
+  "oxc.configPath": ".tmp/.oxlintrc.json",
+
+  // ESLint configuration (for i18n and custom AST rules)
+  "eslint.enable": true,
+  "eslint.format.enable": false,
   "eslint.validate": [
     "javascript",
     "javascriptreact",
     "typescript",
     "typescriptreact"
   ],
-  "prettier.enable": false,
+
+  // Prettier configuration
+  "prettier.enable": true,
+  "prettier.requireConfig": true,
+
+  // TypeScript configuration
   "typescript.validate.enable": true,
   "typescript.suggest.autoImports": true,
-  "prettier.requireConfig": true,
+
   "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit"
-    },
-    "editor.formatOnSave": false
+    }
   },
   "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit"
-    },
-    "editor.formatOnSave": false
+    }
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
   },
   "files.eol": "\n",
   "files.exclude": {

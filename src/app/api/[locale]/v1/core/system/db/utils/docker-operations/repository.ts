@@ -259,11 +259,16 @@ export class DockerOperationsRepositoryImpl
 
       let output = "";
       let error = "";
+      let resolved = false;
       let timeoutId: ReturnType<typeof setTimeout>;
 
       // Set up timeout
       const timeoutPromise = new Promise<void>((_resolve, reject) => {
         timeoutId = setTimeout(() => {
+          if (resolved) {
+            return;
+          }
+          resolved = true;
           child.kill("SIGTERM");
           const errorMessage = t(
             "app.api.v1.core.system.db.utils.dockerOperations.messages.timeoutError",
@@ -313,6 +318,10 @@ export class DockerOperationsRepositoryImpl
 
       // Handle process completion
       child.on("close", (code) => {
+        if (resolved) {
+          return;
+        }
+        resolved = true;
         clearTimeout(timeoutId);
         const success = code === 0;
 
@@ -325,6 +334,7 @@ export class DockerOperationsRepositoryImpl
           );
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
         resolve({
           success,
           output: output.trim(),
@@ -334,6 +344,10 @@ export class DockerOperationsRepositoryImpl
 
       // Handle process errors
       child.on("error", (err: Error) => {
+        if (resolved) {
+          return;
+        }
+        resolved = true;
         clearTimeout(timeoutId);
         logger.error(
           t(
@@ -342,6 +356,7 @@ export class DockerOperationsRepositoryImpl
           ),
           err,
         );
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
         resolve({
           success: false,
           output: output.trim(),

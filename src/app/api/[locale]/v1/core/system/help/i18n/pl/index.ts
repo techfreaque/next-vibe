@@ -173,6 +173,10 @@ export const translations = {
         label: "Łączna liczba poleceń",
         description: "Liczba dostępnych poleceń",
       },
+      commandsText: {
+        label: "Dostępne polecenia",
+        description: "Sformatowana lista wszystkich dostępnych poleceń",
+      },
     },
     response: {
       commands: {

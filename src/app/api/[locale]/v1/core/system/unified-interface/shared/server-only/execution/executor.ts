@@ -17,9 +17,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { DiscoveredEndpoint } from "../types/registry";
-import { getDiscoveredEndpoints } from "../discovery/adapter";
 import { getErrorMessage } from "../../utils/error";
+import { getDiscoveredEndpoints } from "../discovery/adapter";
+import type { DiscoveredEndpoint } from "../types/registry";
 
 /**
  * Recursive parameter value type
@@ -38,7 +38,9 @@ export type ParameterValue =
  * Base execution context
  * Shared across all platforms (AI, MCP, CLI)
  */
-export interface BaseExecutionContext<TData = { [key: string]: ParameterValue }> {
+export interface BaseExecutionContext<
+  TData = { [key: string]: ParameterValue },
+> {
   /** Endpoint/tool name being executed */
   toolName: string;
 
@@ -80,7 +82,7 @@ export interface BaseExecutionResult<
     endpointPath: string;
     method: string;
     [key: string]: ParameterValue;
-  }
+  },
 > {
   success: boolean;
   data?: ParameterValue;
@@ -164,7 +166,7 @@ export abstract class BaseExecutor {
         toolName: context.toolName,
         error: errorMessage,
         executionTime: Date.now() - startTime,
-      })
+      });
 
       return this.createErrorResult(errorMessage, startTime);
     }
@@ -252,7 +254,7 @@ export abstract class BaseExecutor {
         dryRun: options.dryRun || false,
         interactive: options.interactive || false,
         output: options.output || "json",
-      }
+      },
     };
   }
 
@@ -273,7 +275,7 @@ export abstract class BaseExecutor {
         endpointPath: endpoint.definition.path.join("/"),
         method: endpoint.definition.method,
         ...result.metadata,
-      }
+      },
     };
   }
 
@@ -291,7 +293,7 @@ export abstract class BaseExecutor {
         executionTime: Date.now() - startTime,
         endpointPath: "",
         method: "",
-      }
+      },
     };
   }
 
@@ -316,7 +318,7 @@ export abstract class BaseExecutor {
         executionTime: Date.now() - startTime,
         endpointPath: endpoint.definition.path.join("/"),
         method: endpoint.definition.method,
-      }
+      },
     };
   }
 }

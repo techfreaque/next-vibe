@@ -12,7 +12,6 @@ import type {
 import { parseError } from "next-vibe/shared/utils";
 import { useEffect } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import {
   createCustomStateKey,
   type EnhancedMutationResult,
@@ -20,6 +19,7 @@ import {
   useApiQuery,
   useCustomState,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 

@@ -6,7 +6,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { promisify } from "node:util";
 
-import { exec } from "child_process";
+import { exec } from "node:child_process";
 import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
@@ -69,13 +69,16 @@ function createTempTsConfig(
     const tsConfigContent = readFileSync("tsconfig.json", "utf8");
     const parsedJsonResult = parseJsonWithComments(tsConfigContent);
     if (!parsedJsonResult.success) {
+      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
       throw new Error("Failed to parse tsconfig.json");
     }
     mainTsConfig = TsConfigSchema.parse(parsedJsonResult.data);
   } catch (error) {
+    /* eslint-disable no-restricted-syntax, i18next/no-literal-string */
     throw new Error(
-      `Failed to read or parse tsconfig.json: ${error instanceof Error ? error.message : String(error)}`,
+      `Failed to read or parse tsconfig.json: ${error instanceof Error ? error.message : String(error)}`, { cause: error },
     );
+    /* eslint-enable no-restricted-syntax, i18next/no-literal-string */
   }
   const generalFilesToInclude = (mainTsConfig.include || []).filter(
     (includePattern) =>
@@ -137,7 +140,7 @@ function createTempTsConfig(
   const tempTsConfig: TsConfig = {
     ...mainTsConfig,
     compilerOptions: {
-      ...(mainTsConfig.compilerOptions || {}),
+      ...mainTsConfig.compilerOptions,
       // eslint-disable-next-line i18next/no-literal-string
       rootDir: "..", // Adjust rootDir to point to project root from .tmp/
       // Remove baseUrl as tsgo doesn't support it, use paths instead
@@ -329,7 +332,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
       // Strip ANSI color codes that tsgo adds to the output
       // eslint-disable-next-line no-control-regex
-      const cleanOutput = combinedOutput.replace(/\u001b\[[0-9;]*m/g, "");
+      const cleanOutput = combinedOutput.replaceAll(/\u001B\[[0-9;]*m/g, "");
       const outputLines = cleanOutput.split("\n");
 
       for (const line of outputLines) {

@@ -158,7 +158,6 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
           execSync("NODE_ENV=production bun run next build", {
             stdio: "inherit",
             cwd: process.cwd(),
-            shell: true,
           });
           output.push(MESSAGES.NEXTJS_BUILD_SUCCESS);
         } catch (buildError) {

@@ -78,7 +78,8 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
     const { t } = simpleT(locale);
 
     // Transform endpoints to serializable format and resolve translation keys
-    const serializableTools = filteredEndpoints.map((endpoint: DiscoveredEndpoint) => {
+    const serializableTools = filteredEndpoints.map(
+      (endpoint: DiscoveredEndpoint) => {
         const definition = endpoint.definition;
 
         // Resolve translation keys to actual text
@@ -141,7 +142,9 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
       logger,
       result,
       serializableTools.length,
-      serializableTools[0],
+      serializableTools[0] as
+        | Record<string, string | number | boolean | null | string[]>
+        | undefined,
     );
 
     // Return plain object - route handler will wrap with createSuccessResponse

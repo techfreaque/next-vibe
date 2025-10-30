@@ -61,7 +61,7 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer {
 
     if (!Array.isArray(data) || data.length === 0) {
       const successMsg = this.styleText(
-        t("app.api.v1.core.system.check.codeQuality.noIssues"),
+        t("app.api.v1.core.system.check.codeQuality.noIssues" as never),
         "green",
         context,
       );

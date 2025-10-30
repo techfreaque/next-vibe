@@ -10,5 +10,5 @@ export const { POST, tools } = endpointsHandler({
     email: undefined,
     handler: async ({ data, user, logger, locale }) =>
       await mcpExecuteRepository.executeTool(data, user, logger, locale),
-  }
+  },
 });

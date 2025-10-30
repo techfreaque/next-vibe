@@ -7,6 +7,7 @@
 import type { Route } from "next";
 import type { z } from "zod";
 
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type {
@@ -17,8 +18,8 @@ import type {
   ComponentVariant,
   InterfaceContext,
   Methods,
-} from './enums';
-import { FieldUsage } from './enums';
+} from "./enums";
+import { FieldUsage } from "./enums";
 
 // Re-export FieldUsage for convenience
 export { FieldUsage };
@@ -48,35 +49,30 @@ export type FieldUIConfig = {
 // ============================================================================
 
 /**
- * Endpoint definition type for CLI and generated files
- * This is a simplified type used for runtime endpoint discovery and CLI rendering
- * The actual CreateApiEndpoint type provides full type safety
+ * Type alias for CreateApiEndpoint - accepts any generic parameters
+ * Uses inline import to avoid circular dependency with create.ts
  */
-export interface EndpointDefinition {
-  title?: string;
-  description?: string;
-  requestSchema?: z.ZodTypeAny;
-  requestUrlPathParamsSchema?: z.ZodTypeAny;
-  responseSchema?: z.ZodTypeAny;
-  fields?: Record<string, UnifiedField<z.ZodTypeAny>>;
-  aliases?: readonly string[];
-}
+export type CreateApiEndpointAny = import("../endpoint/create").CreateApiEndpoint;
+
+/**
+ * Export for backward compatibility
+ * @deprecated Import CreateApiEndpoint from endpoint/create instead
+ */
+export type EndpointDefinition = CreateApiEndpointAny;
 
 /**
  * API section type for nested endpoint structure
  * Used in generated endpoints.ts file
- * Fixed circular reference by using explicit recursion depth limit
+ * Accepts CreateApiEndpoint with any type parameters
  */
-export interface ApiSection {
-  [key: string]: EndpointDefinition | ApiSectionNested;
-}
-
-/**
- * Nested API section type (one level deep to avoid circular reference)
- */
-interface ApiSectionNested {
-  [key: string]: EndpointDefinition | Record<string, EndpointDefinition>;
-}
+export type ApiSection = {
+  readonly GET?: CreateApiEndpointAny;
+  readonly POST?: CreateApiEndpointAny;
+  readonly PUT?: CreateApiEndpointAny;
+  readonly PATCH?: CreateApiEndpointAny;
+  readonly DELETE?: CreateApiEndpointAny;
+  readonly [key: string]: CreateApiEndpointAny | ApiSection | undefined;
+};
 
 // ============================================================================
 // SCHEMA TYPE PRESERVATION AND BACK-PROPAGATION SYSTEM

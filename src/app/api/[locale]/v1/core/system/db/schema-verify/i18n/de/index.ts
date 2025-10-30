@@ -90,7 +90,9 @@ export const translations: typeof enTranslations = {
     constraints: "✅ {{count}} Einschränkungen verifiziert",
   },
   fixed: "🔧 {{count}} Schema-Probleme behoben",
-  validationPassed: "\n✅ Schema-Validierung bestanden - alle Prüfungen erfolgreich",
-  validationFailed: "\n❌ Schema-Validierung fehlgeschlagen - {{count}} Probleme gefunden",
+  validationPassed:
+    "\n✅ Schema-Validierung bestanden - alle Prüfungen erfolgreich",
+  validationFailed:
+    "\n❌ Schema-Validierung fehlgeschlagen - {{count}} Probleme gefunden",
   dbConnectionFailed: "Verbindung zur Datenbank fehlgeschlagen",
 };

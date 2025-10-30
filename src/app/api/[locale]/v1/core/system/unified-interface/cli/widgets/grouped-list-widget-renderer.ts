@@ -3,7 +3,7 @@
  * Specialized renderer for grouped lists with beautiful CLI output
  */
 
-import { z } from "zod";
+import type { z } from "zod";
 
 import { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
@@ -79,7 +79,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     if (!Array.isArray(data) || data.length === 0) {
       return context.renderEmptyState(
         t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
         ),
       );
     }
@@ -141,7 +141,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     const t = context.translate;
     const groups = new Map<string, GroupedListItem[]>();
     const otherLabel = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.other",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.other",
     );
 
     for (const item of data) {
@@ -198,8 +198,8 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
       const remaining = items.length - config.maxItemsPerGroup;
       const truncationMsg = this.styleText(
         t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.andMoreItems",
-          { count: remaining.toString() }
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.andMoreItems",
+          { count: remaining.toString() },
         ),
         "dim",
         context,
@@ -417,7 +417,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     const summaryTitle =
       config.summaryTitle ||
       t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.summary",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.summary",
       );
     const headerText = this.styleText(
       `${headerIcon}${summaryTitle}`,
@@ -439,10 +439,10 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
 
     // Show meaningful metrics
     const filesLabel = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.files",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.files",
     );
     const issuesLabel = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.issues",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.issues",
     );
     output += `   ${this.styleText(`${filesLabel}:`, "dim", context).padEnd(12)} ${totalFiles}${String.fromCharCode(10)}`;
     output += `   ${this.styleText(`${issuesLabel}:`, "dim", context).padEnd(12)} ${totalIssues}${String.fromCharCode(10)}`;
@@ -522,7 +522,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
       ? `${String.fromCharCode(128203)} `
       : "";
     const headerText = this.styleText(
-      `${headerIcon}${t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.affectedFiles")}`,
+      `${headerIcon}${t("app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.affectedFiles")}`,
       "bold",
       context,
     );
@@ -548,8 +548,8 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
 
       let countText = "";
       if (errorCount > 0 && warningCount > 0) {
-        const errorText = `${errorCount} ${t(`app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.${errorCount === 1 ? "error" : "errors"}`)}`;
-        const warningText = `${warningCount} ${t(`app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.${warningCount === 1 ? "warning" : "warnings"}`)}`;
+        const errorText = `${errorCount} ${t(`app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.${errorCount === 1 ? "error" : "errors"}`)}`;
+        const warningText = `${warningCount} ${t(`app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.${warningCount === 1 ? "warning" : "warnings"}`)}`;
         countText = this.styleText(
           `${errorText}, ${warningText}`,
           "red",
@@ -695,8 +695,8 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
         const t = context.translate;
         const truncationMsg = this.styleText(
           t(
-            "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.andMoreItems",
-            { count: remaining.toString() }
+            "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.andMoreItems",
+            { count: remaining.toString() },
           ),
           "dim",
           context,

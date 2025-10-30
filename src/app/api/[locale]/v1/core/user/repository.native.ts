@@ -16,14 +16,14 @@
  * This allows the SAME code to work on both platforms!
  */
 
-import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   ErrorResponseTypes,
-} from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+} from "next-vibe/shared/types/response.schema";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import { nativeEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react-native/native-endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NewUser, User } from "./db";
@@ -214,25 +214,7 @@ class UserRepositoryNativeImpl implements UserRepository {
       roles?: (typeof UserRoleValue)[];
     },
     logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      users: Array<StandardUserType & { createdAt: string; updatedAt: string }>;
-      pagination: {
-        currentPage: number;
-        totalPages: number;
-        itemsPerPage: number;
-        totalItems: number;
-        hasMore: boolean;
-        hasPrevious: boolean;
-      };
-      searchInfo: {
-        searchTerm: string | undefined;
-        appliedFilters: (typeof UserRoleValue)[];
-        searchTime: string;
-        totalResults: number;
-      };
-    }>
-  > {
+  ) {
     logger.warn(
       "searchUsersWithPagination not implemented on native - not used in page.tsx",
     );

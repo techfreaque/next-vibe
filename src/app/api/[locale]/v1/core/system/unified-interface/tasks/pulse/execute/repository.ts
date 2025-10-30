@@ -123,7 +123,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
             success: false,
             duration,
             message: t(
-              "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.executionFailed",
+              "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.executionFailed",
             ),
           });
 
@@ -142,10 +142,10 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
         success: allSuccessful,
         message: data.dryRun
           ? t(
-              "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.dryRunSuccess",
+              "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.dryRunSuccess",
             )
           : t(
-              "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.response.executionSuccess",
+              "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.executionSuccess",
             ),
         executedAt,
         tasksExecuted: totalTasks,
@@ -169,7 +169,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
 
       return fail({
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.pulseSystem.execute.post.errors.internal.title",
+          "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

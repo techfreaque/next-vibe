@@ -19,17 +19,15 @@ import { TextClassContext } from "./text";
 
 // Local styled components - use direct primitives to avoid type instantiation issues
 // The styled() function from nativewind has overly complex type inference for these components
-const StyledDropdownMenuSubTrigger = DropdownMenuPrimitive.SubTrigger as typeof DropdownMenuPrimitive.SubTrigger;
-const StyledDropdownMenuSubContent = DropdownMenuPrimitive.SubContent as typeof DropdownMenuPrimitive.SubContent;
-const StyledDropdownMenuContent = DropdownMenuPrimitive.Content as typeof DropdownMenuPrimitive.Content;
-const StyledDropdownMenuItem = DropdownMenuPrimitive.Item as typeof DropdownMenuPrimitive.Item;
-const StyledDropdownMenuCheckboxItem =
-  DropdownMenuPrimitive.CheckboxItem as typeof DropdownMenuPrimitive.CheckboxItem;
-const StyledDropdownMenuRadioItem = DropdownMenuPrimitive.RadioItem as typeof DropdownMenuPrimitive.RadioItem;
-const StyledDropdownMenuLabel = DropdownMenuPrimitive.Label as typeof DropdownMenuPrimitive.Label;
-const StyledDropdownMenuSeparator = DropdownMenuPrimitive.Separator as typeof DropdownMenuPrimitive.Separator;
-const StyledDropdownMenuItemIndicator =
-  DropdownMenuPrimitive.ItemIndicator as typeof DropdownMenuPrimitive.ItemIndicator;
+const StyledDropdownMenuSubTrigger = DropdownMenuPrimitive.SubTrigger;
+const StyledDropdownMenuSubContent = DropdownMenuPrimitive.SubContent;
+const StyledDropdownMenuContent = DropdownMenuPrimitive.Content;
+const StyledDropdownMenuItem = DropdownMenuPrimitive.Item;
+const StyledDropdownMenuCheckboxItem = DropdownMenuPrimitive.CheckboxItem;
+const StyledDropdownMenuRadioItem = DropdownMenuPrimitive.RadioItem;
+const StyledDropdownMenuLabel = DropdownMenuPrimitive.Label;
+const StyledDropdownMenuSeparator = DropdownMenuPrimitive.Separator;
+const StyledDropdownMenuItemIndicator = DropdownMenuPrimitive.ItemIndicator;
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

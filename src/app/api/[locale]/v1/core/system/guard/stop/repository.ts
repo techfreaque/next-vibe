@@ -122,7 +122,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
     const projectName = projectPath.split("/").pop() || "unknown";
 
     // Mock guard data based on project
-    const sanitizedName = projectName.replace(/[^a-zA-Z0-9]/g, "_");
+    const sanitizedName = projectName.replaceAll(/[^a-zA-Z0-9]/g, "_");
     const guardId = `guard_${sanitizedName}_mock123`; // eslint-disable-line i18next/no-literal-string
     const username = `guard_${sanitizedName}`; // eslint-disable-line i18next/no-literal-string
 

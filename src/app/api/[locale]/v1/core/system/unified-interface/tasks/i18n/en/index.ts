@@ -10,7 +10,7 @@ export const translations = {
     cron: "Cron Task",
     side: "Side Task",
     task_runner: "Task Runner",
-      },
+  },
   priority: {
     critical: "Critical",
     high: "High",
@@ -21,8 +21,8 @@ export const translations = {
       all: "All Priorities",
       highAndAbove: "High and Above",
       mediumAndAbove: "Medium and Above",
-        },
-      },
+    },
+  },
   status: {
     pending: "Pending",
     running: "Running",
@@ -39,8 +39,8 @@ export const translations = {
       all: "All Statuses",
       active: "Active",
       error: "Error States",
-        },
-      },
+    },
+  },
   taskCategory: {
     development: "Development",
     build: "Build",
@@ -51,26 +51,26 @@ export const translations = {
     database: "Database",
     system: "System",
     monitoring: "Monitoring",
-      },
+  },
   sort: {
     asc: "Ascending",
     desc: "Descending",
-      },
+  },
   pulse: {
     health: {
       healthy: "Healthy",
       warning: "Warning",
       critical: "Critical",
       unknown: "Unknown",
-        },
+    },
     execution: {
       success: "Success",
       failure: "Failure",
       timeout: "Timeout",
       cancelled: "Cancelled",
       pending: "Pending",
-        },
-      },
+    },
+  },
   cron: {
     frequency: {
       everyMinute: "every minute",
@@ -78,7 +78,7 @@ export const translations = {
       everyHour: "every hour",
       everyDays: "every day",
       hourly: "hourly",
-        },
+    },
     days: {
       sunday: "Sunday",
       monday: "Monday",
@@ -87,7 +87,7 @@ export const translations = {
       thursday: "Thursday",
       friday: "Friday",
       saturday: "Saturday",
-        },
+    },
     common: {
       dailyAtMidnight: "daily at midnight",
       dailyAtNoon: "daily at noon",
@@ -99,7 +99,7 @@ export const translations = {
       everyTenMinutes: "every 10 minutes",
       everyFifteenMinutes: "every 15 minutes",
       everyThirtyMinutes: "every 30 minutes",
-        },
+    },
     patterns: {
       everyIntervalMinutes: "every {interval} minutes",
       everyIntervalMinutesStarting:
@@ -113,7 +113,7 @@ export const translations = {
       atHours: "at hours {hours}",
       fromHourToHour: "from hour {from} to {to}",
       atHour: "at hour {hour}",
-        },
+    },
     calendar: {
       onDays: "on days {days}",
       onDay: "on day {day}",
@@ -122,7 +122,7 @@ export const translations = {
       onWeekdays: "on {weekdays}",
       fromWeekdayToWeekday: "from {from} to {to}",
       onWeekday: "on {weekday}",
-        },
+    },
     timezone: "in {timezone}",
     time: {
       midnight: "midnight",
@@ -131,7 +131,7 @@ export const translations = {
       hourPm: "{hour} PM",
       hourMinuteAm: "{hour}:{minute} AM",
       hourMinutePm: "{hour}:{minute} PM",
-        },
+    },
     weekdays: {
       sunday: "Sunday",
       monday: "Monday",
@@ -140,7 +140,7 @@ export const translations = {
       thursday: "Thursday",
       friday: "Friday",
       saturday: "Saturday",
-        },
+    },
     months: {
       january: "January",
       february: "February",
@@ -154,8 +154,8 @@ export const translations = {
       october: "October",
       november: "November",
       december: "December",
-        },
-      },
+    },
+  },
   errors: {
     // Side Tasks errors
     fetchSideTaskByName: "Failed to fetch side task by name",
@@ -200,7 +200,7 @@ export const translations = {
     executePulse: "Failed to execute pulse",
     fetchPulseStatus: "Failed to fetch pulse status",
     pulseExecutionFailed: "Pulse execution failed",
-      },
+  },
   common: {
     cronRepositoryTaskUpdateFailed: "Failed to update cron task",
     cronRepositoryTaskDeleteFailed: "Failed to delete cron task",
@@ -212,7 +212,7 @@ export const translations = {
     cronRepositorySchedulesFetchFailed: "Failed to fetch cron task schedules",
     cronRepositoryScheduleUpdateFailed: "Failed to update cron task schedule",
     cronRepositoryStatisticsFetchFailed: "Failed to fetch cron task statistics",
-      },
+  },
   cronSystem: cronTranslations,
   pulseSystem: pulseTranslations,
   sideTasks: sideTasksTranslations,

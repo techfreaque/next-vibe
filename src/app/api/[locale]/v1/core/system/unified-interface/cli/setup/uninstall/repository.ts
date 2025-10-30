@@ -13,9 +13,9 @@ import path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -54,11 +54,11 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
     if (!user?.id) {
       return fail({
         message:
-          "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.unauthorized.title",
+          "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: {
           error: t(
-            "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.unauthorized.description",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.unauthorized.description",
           ),
         },
       });
@@ -73,7 +73,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
           success: true,
           installed: false,
           message: t(
-            "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.description",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.description",
           ),
         });
       }
@@ -93,10 +93,10 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
         installed: newStatus.installed,
         message: !newStatus.installed
           ? t(
-              "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.success.description",
+              "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.success.description",
             )
           : t(
-              "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.server.description",
+              "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.server.description",
             ),
         output: data.verbose ? output : undefined,
       });
@@ -104,7 +104,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
       const parsedError = parseError(error);
       return fail({
         message:
-          "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.server.title",
+          "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

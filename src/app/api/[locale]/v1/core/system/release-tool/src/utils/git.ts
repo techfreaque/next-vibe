@@ -95,7 +95,7 @@ export function createGitTag(
 
     logger.error("Failed to commit changes.", parseError(error));
     // eslint-disable-next-line i18next/no-literal-string
-    throw new Error("Failed to commit changes");
+    throw new Error("Failed to commit changes", { cause: error });
   }
 
   // Continue with tagging and pushing
@@ -127,7 +127,7 @@ export function createGitTag(
   } catch (error) {
     logger.error("Failed during tag operations.", parseError(error));
     // eslint-disable-next-line i18next/no-literal-string
-    throw new Error("Failed during tag operations");
+    throw new Error("Failed during tag operations", { cause: error });
   }
 }
 

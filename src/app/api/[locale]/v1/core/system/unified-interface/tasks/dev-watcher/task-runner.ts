@@ -69,7 +69,7 @@ const devWatcherTaskRunner: TaskRunner = {
   type: "task-runner",
   name: "dev-file-watcher",
   description:
-    "app.api.v1.core.system.unifiedBackend.tasks.devWatcher.description",
+    "app.api.v1.core.system.unifiedInterface.tasks.devWatcher.description",
   category: "DEVELOPMENT",
   enabled: getEnvVar("NODE_ENV") === "development",
   priority: "MEDIUM",
@@ -304,7 +304,7 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
   type: "task-runner",
   name: "db-health-monitor",
   description:
-    "app.api.v1.core.system.unifiedBackend.tasks.dbHealthMonitor.description",
+    "app.api.v1.core.system.unifiedInterface.tasks.dbHealthMonitor.description",
   category: "MONITORING",
   enabled: true,
   priority: "LOW",

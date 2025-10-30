@@ -6,5 +6,5 @@ export const translations = {
     htmlResponseReceived: "HTML response received instead of JSON",
     networkError: "Network error occurred",
     failedToLoadPage: "Failed to load page",
-      },
+  },
 };

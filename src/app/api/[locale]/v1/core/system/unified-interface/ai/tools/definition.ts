@@ -33,20 +33,20 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "system", "unified-interface", "ai", "tools"],
   aliases: ["ai-tools", "tools:list"],
-  title: "app.api.v1.core.system.unifiedUi.ai.tools.get.title" as const,
+  title: "app.api.v1.core.system.unifiedInterface.ai.tools.get.title" as const,
   description:
-    "app.api.v1.core.system.unifiedUi.ai.tools.get.description" as const,
-  category: "app.api.v1.core.system.unifiedUi.ai.tools.category" as const,
-  tags: ["app.api.v1.core.system.unifiedUi.ai.tools.tags.tools" as const],
+    "app.api.v1.core.system.unifiedInterface.ai.tools.get.description" as const,
+  category: "app.api.v1.core.system.unifiedInterface.ai.tools.category" as const,
+  tags: ["app.api.v1.core.system.unifiedInterface.ai.tools.tags.tools" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.response.title" as const,
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.response.title" as const,
       description:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.response.description" as const,
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.response.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { response: true },
@@ -55,7 +55,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedUi.ai.tools.get.fields.tools.title" as const,
+            "app.api.v1.core.system.unifiedInterface.ai.tools.get.fields.tools.title" as const,
         },
         z.array(aiToolMetadataSchema),
       ),
@@ -66,65 +66,65 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.server.title",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.server.title",
       description:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.server.description",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.unknown.title",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.unknown.title",
       description:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.unknown.description",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.unsavedChanges.title",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.unsavedChanges.title",
       description:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.unsavedChanges.description",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedUi.ai.tools.get.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.ai.tools.get.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.system.unifiedUi.ai.tools.get.success.title",
+    title: "app.api.v1.core.system.unifiedInterface.ai.tools.get.success.title",
     description:
-      "app.api.v1.core.system.unifiedUi.ai.tools.get.success.description",
+      "app.api.v1.core.system.unifiedInterface.ai.tools.get.success.description",
   },
 
   // === EXAMPLES ===

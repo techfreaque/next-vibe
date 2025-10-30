@@ -9,6 +9,7 @@ import {
   PenTool,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import type React from "react";
 import type { FC } from "react";
 import { useInView } from "react-intersection-observer";
@@ -282,12 +283,12 @@ const Process: FC<ProcessProps> = ({ locale }) => {
             <p className="text-gray-600 dark:text-gray-300 mb-4">
               {t("app.story._components.home.process.handleSocial")}
             </p>
-            <a
+            <Link
               href={`/${locale}/#pricing`}
               className="inline-flex items-center justify-center rounded-md bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all"
             >
               {t("app.story._components.home.process.getStarted")}
-            </a>
+            </Link>
           </div>
         </motion.div>
       </div>

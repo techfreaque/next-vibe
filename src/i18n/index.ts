@@ -1,7 +1,6 @@
 import type {
   LanguageConfig,
   LanguageDefaults,
-  TranslationsConfig,
 } from "./core/config";
 import deTranslations from "./de";
 import enTranslations from "./en";
@@ -17,7 +16,7 @@ export const languageDefaults = {
   translations: enTranslations,
 } satisfies LanguageDefaults<typeof enTranslations>;
 
-export const allTranslations: TranslationsConfig<typeof enTranslations> = {
+export const allTranslations = {
   de: deTranslations,
   pl: plTranslations,
   en: enTranslations,

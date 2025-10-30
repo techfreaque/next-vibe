@@ -597,16 +597,16 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
           issues: fixResult.issues,
           duration: Date.now() - startTime,
         };
-      } else {
-        // Just run normal check
-        const result = await this.runEslintCommand(baseArgs, task, logger);
-        return {
-          id: task.id,
-          success: true,
-          issues: result.issues,
-          duration: Date.now() - startTime,
-        };
       }
+
+      // Just run normal check
+      const result = await this.runEslintCommand(baseArgs, task, logger);
+      return {
+        id: task.id,
+        success: true,
+        issues: result.issues,
+        duration: Date.now() - startTime,
+      };
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error(`Worker ${task.id} failed`, { error: errorMessage });
@@ -701,7 +701,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     logger.debug(`Worker ${task.id} starting with ${task.files.length} files`);
 
     // Use spawn for parallel execution
-    const { spawn } = await import("child_process");
+    const { spawn } = await import("node:child_process");
     const stdout = await new Promise<string>((resolve, reject) => {
       const child = spawn("npx", args, {
         cwd: process.cwd(),
@@ -824,7 +824,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
             parseError instanceof Error
               ? parseError.message
               : String(parseError),
-          stdoutPreview: stdout.substring(0, 200),
+          stdoutPreview: stdout.slice(0, 200),
         });
         return { issues, hasFixableIssues };
       }

@@ -6,9 +6,9 @@
 import "server-only";
 
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -84,8 +84,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
     if (!env.EDEN_AI_API_KEY) {
       logger.error("Eden AI API key not configured");
       return fail({
-        message:
-          "app.api.v1.core.agent.textToSpeech.post.errors.apiKeyMissing",
+        message: "app.api.v1.core.agent.textToSpeech.post.errors.apiKeyMissing",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -147,8 +146,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
           responseKeys: Object.keys(responseData),
         });
         return fail({
-          message:
-            "app.api.v1.core.agent.textToSpeech.post.errors.noAudioUrl",
+          message: "app.api.v1.core.agent.textToSpeech.post.errors.noAudioUrl",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }

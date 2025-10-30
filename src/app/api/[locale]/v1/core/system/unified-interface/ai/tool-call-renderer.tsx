@@ -190,7 +190,9 @@ export function ToolCallRenderer({
                                 )}
                                 <Pre className="text-sm">
                                   {JSON.stringify(
-                                    toolCall.result?.[field.name as keyof typeof toolCall.result],
+                                    toolCall.result?.[
+                                      field.name as keyof typeof toolCall.result
+                                    ],
                                     null,
                                     2,
                                   )}

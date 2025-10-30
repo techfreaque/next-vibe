@@ -43,7 +43,17 @@ export function toolMetadataToMCPTool(
   return {
     name: metadata.name,
     description: safeTranslate(metadata.description, locale, metadata.name),
-    inputSchema: inputSchema as { type: "object"; properties?: Record<string, Record<string, string | number | boolean | object | null>> | undefined; required?: string[] | undefined; additionalProperties?: boolean | undefined; },
+    inputSchema: inputSchema as {
+      type: "object";
+      properties?:
+        | Record<
+            string,
+            Record<string, string | number | boolean | object | null>
+          >
+        | undefined;
+      required?: string[] | undefined;
+      additionalProperties?: boolean | undefined;
+    },
   };
 }
 

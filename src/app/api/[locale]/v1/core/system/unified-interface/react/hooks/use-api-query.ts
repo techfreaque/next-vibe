@@ -6,9 +6,9 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
@@ -163,7 +163,7 @@ export function useApiQuery<
                 }
               }
               return value;
-            }
+            },
           );
           requestDataKey = safeRequestData;
         } else {
@@ -215,7 +215,7 @@ export function useApiQuery<
                 }
               }
               return value;
-            }
+            },
           );
         } else {
           // For primitives, use string representation
@@ -611,10 +611,11 @@ export function useApiQuery<
     } catch (error) {
       // Create a properly typed error response
       return fail({
-        message:
-          "app.common.errors.unknown" as const,
+        message: "app.common.errors.unknown" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: error instanceof Error ? error.message : String(error) },
+        messageParams: {
+          error: error instanceof Error ? error.message : String(error),
+        },
       });
     }
   }, [

@@ -125,7 +125,7 @@ export class TranslationReorganizeRepositoryImpl {
         logger,
       );
 
-      const usedKeys = Array.from(keyUsageMap.keys()).length;
+      const usedKeys = [...keyUsageMap.keys()].length;
       const unusedKeys = allKeys.size - usedKeys;
 
       output.push(
@@ -1134,7 +1134,7 @@ export class TranslationReorganizeRepositoryImpl {
     logger: EndpointLogger,
   ): string[] {
     // Remove duplicates and sort by specificity (deeper paths first)
-    const uniqueDirs = [...new Set(directories)].sort((a, b) => {
+    const uniqueDirs = [...new Set(directories)].toSorted((a, b) => {
       const depthA = a.split("/").length;
       const depthB = b.split("/").length;
       return depthB - depthA; // Deeper first
@@ -1484,7 +1484,7 @@ export class TranslationReorganizeRepositoryImpl {
         logger,
       );
 
-      const usedKeys = Array.from(keyUsageMap.keys()).length;
+      const usedKeys = [...keyUsageMap.keys()].length;
       const unusedKeys = allKeys.size - usedKeys;
 
       // Count translation files

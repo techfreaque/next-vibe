@@ -3,8 +3,8 @@
  * Next.js API route handlers with validation and business logic
  */
 
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { authRepository } from "@/app/api/[locale]/v1/core/user/auth/repository";
 
 import definitions from "./definition";

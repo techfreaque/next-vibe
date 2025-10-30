@@ -13,6 +13,7 @@ import {
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type {
   CLIRenderingOptions,
@@ -68,7 +69,7 @@ export class ModularCLIResponseRenderer {
     const context: WidgetRenderContext = {
       options: this.options,
       depth: 0,
-      translate: (key, params) => t(key, params),
+      translate: (key: TranslationKey, params) => t(key, params),
       formatValue: (field, value) => this.formatFieldValue(field, value),
       getFieldIcon: (type) => this.getFieldIcon(type),
       renderEmptyState: (message) => this.renderEmptyState(message),
@@ -93,7 +94,7 @@ export class ModularCLIResponseRenderer {
     const result: string[] = [];
 
     if (container.title) {
-      const title = context.translate(container.title);
+      const title = context.translate(container.title as never);
       // eslint-disable-next-line i18next/no-literal-string
       const titleIcon = "📋 ";
       const titleWithIcon = titleIcon + title;
@@ -103,7 +104,7 @@ export class ModularCLIResponseRenderer {
     }
 
     if (container.description) {
-      const description = context.translate(container.description);
+      const description = context.translate(container.description as never);
       result.push(`   ${description}`);
       result.push("");
     }

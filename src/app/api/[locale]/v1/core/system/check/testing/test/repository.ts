@@ -48,7 +48,7 @@ class TestRepositoryImpl implements TestRepositoryInterface {
 
     try {
       // Ensure .tmp directory exists for caching
-      const { mkdirSync, existsSync } = await import("fs");
+      const { mkdirSync, existsSync } = await import("node:fs");
       const tmpDir = "./.tmp";
       if (!existsSync(tmpDir)) {
         mkdirSync(tmpDir, { recursive: true });
@@ -78,8 +78,8 @@ class TestRepositoryImpl implements TestRepositoryInterface {
 
       logger.info("system.check.testing.test.command.executing", { command });
 
-      const { exec } = await import("child_process");
-      const { promisify } = await import("util");
+      const { exec } = await import("node:child_process");
+      const { promisify } = await import("node:util");
       const execAsync = promisify(exec);
 
       const { stdout, stderr } = await execAsync(command, {

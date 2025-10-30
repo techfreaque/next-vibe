@@ -191,7 +191,7 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
     const syncTimes = accounts
       .map((account) => account.lastSyncAt)
       .filter((time): time is string => time !== null)
-      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+      .toSorted((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
     return syncTimes.length > 0 ? syncTimes[0] : null;
   }

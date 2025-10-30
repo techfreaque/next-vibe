@@ -1,4 +1,4 @@
-import type { ErrorResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 /**

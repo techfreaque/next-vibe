@@ -3,11 +3,14 @@
 // https://github.com/shadcn-ui/ui
 
 import * as React from "react";
+import type { JSX } from "react";
 import type {
   ControllerProps,
+  FieldError,
   FieldPath,
   FieldValues,
   Noop,
+  UseFormHandleSubmit,
 } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
 import { View } from "react-native";
@@ -75,9 +78,14 @@ interface UseFormFieldReturn {
   error?: FieldError;
   id: string;
   name: string;
+  nativeID: string;
   formItemId: string;
+  formItemNativeID: string;
   formDescriptionId: string;
+  formDescriptionNativeID: string;
   formMessageId: string;
+  formMessageNativeID: string;
+  handleSubmit: UseFormHandleSubmit<FieldValues, FieldValues>;
 }
 
 const useFormField = (): UseFormFieldReturn => {

@@ -20,6 +20,7 @@ import {
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import { generateSchemaForUsage as generateSchemaFromUtils } from "../field/utils";
 import type {
   ExamplesList,
   ExtractInput,
@@ -29,8 +30,7 @@ import type {
   UnifiedField,
 } from "../types/endpoint";
 import { FieldUsage } from "../types/endpoint";
-import type { EndpointErrorTypes, Methods } from '../types/enums';
-import { generateSchemaForUsage as generateSchemaFromUtils } from "../field/utils";
+import type { EndpointErrorTypes, Methods } from "../types/enums";
 
 // Extract schema type directly from field, bypassing complex field structure
 type ExtractSchemaType<F> = F extends { schema: z.ZodType<infer T> }

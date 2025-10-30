@@ -7,12 +7,12 @@ import { translations as seedsTranslations } from "../../seeds/i18n/en";
 import { translations as taskIndexTranslations } from "../../task-index/i18n/en";
 
 export const translations = {
-  category: "Generators",
-  endpoint: endpointTranslations,
-  endpoints: endpointsTranslations,
-  generateAll: generateAllTranslations,
-  generateTrpcRouter: generateTrpcRouterTranslations,
-  "route-handlers": routeHandlersTranslations,  // Use kebab-case to match folder name
-  seeds: seedsTranslations,
-  taskIndex: taskIndexTranslations,
+  "category": "Generators",
+  "endpoint": endpointTranslations,
+  "endpoints": endpointsTranslations,
+  "generateAll": generateAllTranslations,
+  "generateTrpcRouter": generateTrpcRouterTranslations,
+  "route-handlers": routeHandlersTranslations, // Use kebab-case to match folder name
+  "seeds": seedsTranslations,
+  "taskIndex": taskIndexTranslations,
 };

@@ -4,6 +4,7 @@
  * NO Vercel AI SDK - custom implementation with 100% type safety
  */
 
+// eslint-disable-next-line import/no-unassigned-import
 import "client-only";
 
 import { parseError } from "next-vibe/shared/utils";
@@ -770,6 +771,10 @@ export function useAIStream(
                 const isIncognitoFromStream =
                   streamThread?.rootFolderId === "incognito";
 
+                // Use tool calls from streaming message (already added via TOOL_CALL events)
+                // DO NOT use eventData.toolCalls as that would duplicate them
+                const finalToolCalls = message?.toolCalls || null;
+
                 // Check chat store asynchronously (for existing threads)
                 if (message) {
                   void (async (): Promise<void> => {
@@ -791,7 +796,10 @@ export function useAIStream(
                             "[DEBUG] Saving incognito message with tool calls",
                             {
                               messageId: message.messageId,
-                              toolCallsCount: message.toolCalls?.length ?? 0,
+                              toolCallsCount: finalToolCalls?.length ?? 0,
+                              hasResults: finalToolCalls?.some(
+                                (tc) => tc.result !== undefined,
+                              ),
                               contentPreview: eventData.content.substring(
                                 0,
                                 50,
@@ -818,7 +826,7 @@ export function useAIStream(
                             edited: false,
                             originalId: null,
                             tokens: eventData.totalTokens ?? null,
-                            toolCalls: message.toolCalls || null,
+                            toolCalls: finalToolCalls,
                             collapsed: false,
                             metadata: {},
                             upvotes: 0,
@@ -837,7 +845,7 @@ export function useAIStream(
                             .updateMessage(message.messageId, {
                               content: eventData.content,
                               tokens: eventData.totalTokens ?? null,
-                              toolCalls: message.toolCalls || null,
+                              toolCalls: finalToolCalls,
                             });
                         } catch (storageError) {
                           logger.error("Failed to update incognito message", {
@@ -851,7 +859,7 @@ export function useAIStream(
                           .updateMessage(message.messageId, {
                             content: eventData.content,
                             tokens: eventData.totalTokens,
-                            toolCalls: message.toolCalls || null,
+                            toolCalls: finalToolCalls,
                           });
                       }
                     } catch (error) {

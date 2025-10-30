@@ -13,10 +13,15 @@ import type { CountryLanguage } from "@/i18n/core/config";
 /**
  * Type for tool metadata - JSON-serializable object
  */
-type ToolMetadata = Record<
-  string,
-  string | number | boolean | null | ToolMetadata | ToolMetadata[]
->;
+type ToolMetadataValue =
+  | string
+  | number
+  | boolean
+  | null
+  | ToolMetadataValue[]
+  | { [key: string]: ToolMetadataValue };
+
+type ToolMetadata = Record<string, ToolMetadataValue>;
 
 /**
  * Base tools repository interface
@@ -81,8 +86,12 @@ export abstract class BaseToolsRepositoryImpl<TRequest, TResponse>
     toolsCount: number,
     sampleTool?: ToolMetadata,
   ): void {
+    const resultKeys =
+      typeof result === "object" && result !== null
+        ? Object.keys(result)
+        : [];
     logger.info(`[${this.platformName}] Returning result`, {
-      resultKeys: Object.keys(result as object),
+      resultKeys,
       toolsCount,
       sampleTool:
         sampleTool !== undefined ? JSON.stringify(sampleTool) : undefined,

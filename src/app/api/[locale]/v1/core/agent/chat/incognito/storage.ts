@@ -193,7 +193,7 @@ export function getMessagesForThread(threadId: string): ChatMessage[] {
 
   return Object.values(messages)
     .filter((msg) => msg.threadId === threadId)
-    .sort((a, b) => {
+    .toSorted((a, b) => {
       // Convert string dates to Date objects if needed
       const aDate =
         typeof a.createdAt === "string" ? new Date(a.createdAt) : a.createdAt;

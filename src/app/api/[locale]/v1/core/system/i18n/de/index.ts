@@ -8,11 +8,9 @@ import { translations as launchpadTranslations } from "../../launchpad/i18n/de";
 import { translations as releaseToolTranslations } from "../../release-tool/i18n/de";
 import { translations as serverTranslations } from "../../server/i18n/de";
 import { translations as translationsTranslations } from "../../translations/i18n/de";
-import { translations as unifiedBackendTranslations } from "../../unified-interface/i18n/de";
-import { translations as unifiedUiTranslations } from "../../unified-interface/i18n/de";
-import type { translations as enTranslations } from "../en";
+import { translations as unifiedInterfaceTranslations } from "../../unified-interface/i18n/de";
 
-export const translations: typeof enTranslations = {
+export const translations = {
   builder: builderTranslations,
   check: checkTranslations,
   db: dbTranslations,
@@ -73,6 +71,5 @@ export const translations: typeof enTranslations = {
   releaseTool: releaseToolTranslations,
   server: serverTranslations,
   translations: translationsTranslations,
-  unifiedBackend: unifiedBackendTranslations,
-  unifiedUi: unifiedUiTranslations,
+  unifiedInterface: unifiedInterfaceTranslations,
 };

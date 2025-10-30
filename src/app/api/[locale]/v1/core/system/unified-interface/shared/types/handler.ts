@@ -72,6 +72,7 @@ import type {
 import type { NextHandlerReturnType } from "../../next-api/types";
 import type { TrpcHandlerReturnType } from "../../trpc/types";
 import type { CreateApiEndpoint } from "../endpoint/create";
+import type { UnifiedField } from "./endpoint";
 import type { EndpointLogger } from "../logger/endpoint";
 import type { Methods } from "./enums";
 
@@ -104,48 +105,99 @@ export type {
  */
 type DefaultRequestData = Record<string, string | number | boolean | null>;
 
+/**
+ * Helper type to extract response output type from endpoint, with fallback
+ */
+type ExtractResponseOutput<TEndpoint> = TEndpoint extends {
+  types: { ResponseOutput: infer R };
+}
+  ? R
+  : DefaultRequestData;
+
+/**
+ * Helper type to extract request output type from endpoint, with fallback
+ */
+type ExtractRequestOutput<TEndpoint> = TEndpoint extends {
+  types: { RequestOutput: infer R };
+}
+  ? R
+  : DefaultRequestData;
+
+/**
+ * Helper type to extract URL variables input type from endpoint, with fallback
+ */
+type ExtractUrlVariablesInput<TEndpoint> = TEndpoint extends {
+  types: { UrlVariablesInput: infer U };
+}
+  ? U
+  : DefaultRequestData;
+
+/**
+ * Helper type to extract URL variables output type from endpoint, with fallback
+ */
+type ExtractUrlVariablesOutput<TEndpoint> = TEndpoint extends {
+  types: { UrlVariablesOutput: infer U };
+}
+  ? U
+  : DefaultRequestData;
+
+/**
+ * Helper type to extract allowed roles from endpoint, with fallback
+ */
+type ExtractAllowedRoles<TEndpoint> = TEndpoint extends {
+  allowedRoles: infer Roles extends readonly (typeof UserRoleValue)[];
+}
+  ? Roles
+  : readonly (typeof UserRoleValue)[];
+
 export interface RouteModule<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    DefaultRequestData
-  > = CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    DefaultRequestData
-  >,
+  TEndpoint extends CreateApiEndpoint = CreateApiEndpoint,
 > {
   // HTTP method handlers (GET, POST, PUT, PATCH, DELETE)
-  GET?: NextHandlerReturnType<DefaultRequestData, DefaultRequestData>;
-  POST?: NextHandlerReturnType<DefaultRequestData, DefaultRequestData>;
-  PUT?: NextHandlerReturnType<DefaultRequestData, DefaultRequestData>;
-  PATCH?: NextHandlerReturnType<DefaultRequestData, DefaultRequestData>;
-  DELETE?: NextHandlerReturnType<DefaultRequestData, DefaultRequestData>;
+  readonly GET?: NextHandlerReturnType<
+    ExtractResponseOutput<TEndpoint>,
+    ExtractUrlVariablesInput<TEndpoint>
+  >;
+  readonly POST?: NextHandlerReturnType<
+    ExtractResponseOutput<TEndpoint>,
+    ExtractUrlVariablesInput<TEndpoint>
+  >;
+  readonly PUT?: NextHandlerReturnType<
+    ExtractResponseOutput<TEndpoint>,
+    ExtractUrlVariablesInput<TEndpoint>
+  >;
+  readonly PATCH?: NextHandlerReturnType<
+    ExtractResponseOutput<TEndpoint>,
+    ExtractUrlVariablesInput<TEndpoint>
+  >;
+  readonly DELETE?: NextHandlerReturnType<
+    ExtractResponseOutput<TEndpoint>,
+    ExtractUrlVariablesInput<TEndpoint>
+  >;
 
-  tools?: {
-    definitions?: Record<string, TEndpoint>;
-    cli?:
+  readonly tools?: {
+    readonly definitions?: {
+      readonly [K in Methods]?: TEndpoint;
+    };
+    readonly cli?:
       | CliHandlerReturnType<
-          DefaultRequestData,
-          DefaultRequestData,
-          DefaultRequestData,
-          readonly (typeof UserRoleValue)[]
+          ExtractRequestOutput<TEndpoint>,
+          ExtractResponseOutput<TEndpoint>,
+          ExtractUrlVariablesOutput<TEndpoint>,
+          ExtractAllowedRoles<TEndpoint>
         >
-      | Record<
-          string,
-          CliHandlerReturnType<
-            DefaultRequestData,
-            DefaultRequestData,
-            DefaultRequestData,
-            readonly (typeof UserRoleValue)[]
-          >
-        >;
-    trpc?: TrpcHandlerReturnType<
-      DefaultRequestData,
-      DefaultRequestData,
-      DefaultRequestData
+      | {
+          readonly [key: string]: CliHandlerReturnType<
+            ExtractRequestOutput<TEndpoint>,
+            ExtractResponseOutput<TEndpoint>,
+            ExtractUrlVariablesOutput<TEndpoint>,
+            ExtractAllowedRoles<TEndpoint>
+          >;
+        };
+    readonly trpc?: TrpcHandlerReturnType<
+      ExtractRequestOutput<TEndpoint>,
+      ExtractResponseOutput<TEndpoint>,
+      ExtractUrlVariablesOutput<TEndpoint>
     >;
   };
 }

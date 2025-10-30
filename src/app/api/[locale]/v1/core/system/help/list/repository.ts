@@ -43,7 +43,7 @@ class HelpListRepository {
       });
 
       // Sort commands by category and alias
-      const sortedCommands = commands.sort((a, b) => {
+      const sortedCommands = commands.toSorted((a, b) => {
         const catCompare = a.category.localeCompare(b.category);
         if (catCompare !== 0) {
           return catCompare;

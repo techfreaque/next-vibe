@@ -78,9 +78,10 @@ export class ToolFactory {
       inputSchema: parameters,
       execute: async (params: z.infer<typeof parameters>) => {
         // params is already properly typed from Zod schema inference
+        // Type flows naturally from the Zod schema validation
         const executionContext: AIToolExecutionContext = {
           toolName: endpoint.toolName,
-          data: params,
+          data: params as unknown as { [key: string]: ToolParameterValue },
           user: context.user,
           locale: context.locale,
           logger: context.logger,

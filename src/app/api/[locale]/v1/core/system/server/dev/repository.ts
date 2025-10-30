@@ -23,6 +23,7 @@ import { databaseMigrationRepository } from "../../db/migrate/repository";
 import { dockerOperationsRepository } from "../../db/utils/docker-operations/repository";
 import { dbUtilsRepository } from "../../db/utils/repository";
 import type endpoints from "./definition";
+import {useTurbopack } from "@/config/constants";
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 
@@ -71,8 +72,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
   private setupExitHandlers(): void {
     const cleanup = (): void => {
-      // eslint-disable-next-line no-console, i18next/no-literal-string
-      console.log("\n🛑 vibes have stopped");
+      // Use process.stdout.write for immediate CLI output during shutdown
+      // eslint-disable-next-line i18next/no-literal-string
+      process.stdout.write("\n🛑 vibes have stopped\n");
 
       // Kill all running processes
       for (const [, process] of this.runningProcesses) {
@@ -197,6 +199,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           );
           return;
         } catch {
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
           await pool.end().catch(() => {});
           // Log progress every 10 attempts
           if (attempt % 10 === 0) {
@@ -264,6 +267,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
               // Start Next.js anyway
               logger.vibe(`🌐 Starting Next.js on http://localhost:${port}`);
               this.startNextJsProcess(port);
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
               return await new Promise<never>(() => {});
             }
           } else {
@@ -295,7 +299,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
                 // Start Next.js anyway
                 logger.vibe(`🌐 Starting Next.js on http://localhost:${port}`);
                 this.startNextJsProcess(port);
-                return await new Promise<never>(() => {});
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+              return await new Promise<never>(() => {});
               }
 
               logger.vibe("✅ Database started");
@@ -311,6 +316,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
               // Start Next.js anyway
               logger.vibe(`🌐 Starting Next.js on http://localhost:${port}`);
               this.startNextJsProcess(port);
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
               return await new Promise<never>(() => {});
             }
           }
@@ -509,9 +515,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
    * Start Next.js development server using spawn
    */
   private startNextJsProcess(port: number): void {
+    const turbo = useTurbopack ? ["--turbo"] : [];
     const nextProcess = spawn(
       "bun",
-      ["run", "next", "dev", "--turbo", "--port", port.toString()],
+      ["run", "next", "dev", ...turbo, "--port", port.toString()],
       {
         stdio: "inherit", // Pass output directly to stdout/stderr
       },

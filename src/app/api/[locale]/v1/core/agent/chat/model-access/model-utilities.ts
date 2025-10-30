@@ -99,5 +99,5 @@ export function getModelUtility(id: ModelUtility): ModelUtilityConfig {
  * Get all utilities sorted by order
  */
 export function getAllUtilities(): ModelUtilityConfig[] {
-  return Object.values(MODEL_UTILITIES).sort((a, b) => a.order - b.order);
+  return Object.values(MODEL_UTILITIES).toSorted((a, b) => a.order - b.order);
 }

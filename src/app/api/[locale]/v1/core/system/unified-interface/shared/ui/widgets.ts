@@ -8,6 +8,14 @@
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type {
+  BulkAction,
+  ButtonAction,
+  ContextMenuAction,
+  FieldActions,
+  InteractiveActions,
+  LifecycleActions,
+} from "../types/actions";
+import type {
   CardLayout,
   ChartType,
   ComponentSize,
@@ -21,14 +29,6 @@ import type {
   ValidationMode,
   WidgetType,
 } from "../types/enums";
-import type {
-  BulkAction,
-  ButtonAction,
-  ContextMenuAction,
-  FieldActions,
-  InteractiveActions,
-  LifecycleActions,
-} from "../actions";
 
 /**
  * Base widget configuration

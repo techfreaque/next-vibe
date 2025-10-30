@@ -6,9 +6,9 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useMemo, useState } from "react";
@@ -248,8 +248,7 @@ export function useApiMutation<
       } catch (error) {
         // Create a properly typed error response
         const errorResponse = fail({
-          message:
-            "app.common.errors.unknown",
+          message: "app.common.errors.unknown",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: parseError(error).message,

@@ -8,9 +8,9 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -55,16 +55,16 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
 
       if (!uninstallResult.success) {
         return fail({
-        message:
-          "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: t(
-              "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.server.description",
+          message:
+            "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
+            error: t(
+              "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.errors.server.description",
             ),
-        },
-      });
-    }
+          },
+        });
+      }
 
       // Then install CLI with force
       const installResult = await setupInstallRepository.installCli(
@@ -80,7 +80,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
           version: installResult.data.version,
           path: installResult.data.path,
           message: t(
-            "app.api.v1.core.system.unifiedUi.cli.setup.update.post.success.description",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.success.description",
           ),
           output: installResult.data.output,
         });
@@ -89,7 +89,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
           success: false,
           installed: false,
           message: t(
-            "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.server.description",
+            "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.errors.server.description",
           ),
         });
       }
@@ -97,7 +97,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
       const parsedError = parseError(err);
       return fail({
         message:
-          "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.server.title",
+          "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

@@ -11,8 +11,8 @@ import { AUTH_STATUS_COOKIE_PREFIX } from "next-vibe/shared/constants";
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -31,7 +31,7 @@ import {
   type ChatThread,
   useChatStore,
 } from "./store";
-import threadsDefinition from "./threads/definition";
+import { GET as threadsGetEndpoint } from "./threads/definition";
 
 // Re-export types for convenience
 export type { ChatFolder, ChatMessage, ChatThread };
@@ -276,7 +276,7 @@ export function useChat(
       // Load ALL threads (no rootFolderId filter)
       try {
         const threadsResponse = await apiClient.fetch(
-          threadsDefinition.GET,
+          threadsGetEndpoint,
           logger,
           {
             page: 1,
@@ -481,6 +481,7 @@ export function useChat(
           errorMessage: streamMsg.error || null,
           edited: false,
           tokens: streamMsg.totalTokens || null,
+          toolCalls: streamMsg.toolCalls || null,
           upvotes: null,
           downvotes: null,
           sequenceId: streamMsg.sequenceId ?? null,
@@ -488,15 +489,25 @@ export function useChat(
           createdAt: new Date(),
           updatedAt: new Date(),
         });
-      } else if (existingMsg.content !== streamMsg.content) {
-        chatStore.updateMessage(streamMsg.messageId, {
-          content: streamMsg.content,
-          tokens: streamMsg.totalTokens || null,
-          errorType: streamMsg.error
-            ? t("app.api.v1.core.agent.chat.errorTypes.streamError")
-            : null,
-          errorMessage: streamMsg.error || null,
-        });
+      } else {
+        // Check if we need to update the message
+        const needsUpdate =
+          existingMsg.content !== streamMsg.content ||
+          existingMsg.tokens !== (streamMsg.totalTokens || null) ||
+          JSON.stringify(existingMsg.toolCalls) !==
+            JSON.stringify(streamMsg.toolCalls || null);
+
+        if (needsUpdate) {
+          chatStore.updateMessage(streamMsg.messageId, {
+            content: streamMsg.content,
+            tokens: streamMsg.totalTokens || null,
+            toolCalls: streamMsg.toolCalls || null,
+            errorType: streamMsg.error
+              ? t("app.api.v1.core.agent.chat.aiStream.errorTypes.streamError")
+              : null,
+            errorMessage: streamMsg.error || null,
+          });
+        }
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

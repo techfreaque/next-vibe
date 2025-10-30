@@ -171,9 +171,7 @@ export function AIToolsModal({
       logger.debug("AIToolsModal", "All visible tools disabled");
     } else {
       // Enable all visible tools (merge with existing)
-      const uniqueEnabled = Array.from(
-        new Set([...enabledToolIds, ...allToolNames]),
-      );
+      const uniqueEnabled = [...new Set([...enabledToolIds, ...allToolNames])];
       onToolsChange(uniqueEnabled);
       logger.debug("AIToolsModal", "All visible tools enabled");
     }
@@ -215,7 +213,7 @@ export function AIToolsModal({
     } else {
       // Enable all tools in category
       const newIds = new Set([...enabledToolIds, ...categoryToolIds]);
-      onToolsChange(Array.from(newIds));
+      onToolsChange([...newIds]);
     }
   };
 

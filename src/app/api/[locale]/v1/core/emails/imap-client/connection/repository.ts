@@ -808,7 +808,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
       logger.debug("Closing all IMAP connections");
 
       // Close all connections synchronously (close() returns void, not Promise)
-      Array.from(this.connections.values()).forEach((connection) =>
+      [...this.connections.values()].forEach((connection) =>
         connection.close(),
       );
 

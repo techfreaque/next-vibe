@@ -45,7 +45,7 @@ export function validateLocale(
  * Types flow naturally from the schema without explicit constraints
  */
 export function validateRequestData<TSchema extends z.ZodTypeAny>(
-  data: z.input<TSchema>,
+  data: unknown,
   schema: TSchema,
   logger: EndpointLogger,
 ): ResponseType<z.output<TSchema>> {
@@ -69,7 +69,7 @@ export function validateRequestData<TSchema extends z.ZodTypeAny>(
  * Types flow naturally from the schema without explicit constraints
  */
 export function validateUrlParameters<TSchema extends z.ZodTypeAny>(
-  urlParameters: z.input<TSchema>,
+  urlParameters: unknown,
   schema: TSchema,
   logger: EndpointLogger,
 ): ResponseType<z.output<TSchema>> {

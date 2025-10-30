@@ -148,6 +148,6 @@ export async function loadConfig(
     const contextMessage = t(
       "app.api.v1.core.system.launchpad.errors.errorLoadingConfig" as const,
     );
-    throw new Error(`${contextMessage} ${errorMessage}`);
+    throw new Error(`${contextMessage} ${errorMessage}`, { cause: error });
   }
 }

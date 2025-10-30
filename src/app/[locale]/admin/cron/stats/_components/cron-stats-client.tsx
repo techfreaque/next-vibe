@@ -132,6 +132,10 @@ function getWeekdayTranslation(day: JSWeekday): TranslationKey {
   }
 }
 
+// Helper functions
+const formatNumber = (num: number): string => num.toLocaleString();
+const formatPercentage = (num: number): string => `${num.toFixed(1)}%`;
+
 export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -147,10 +151,6 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
   };
 
   const form = statsEndpoint.read.form;
-
-  // Helper functions
-  const formatNumber = (num: number): string => num.toLocaleString();
-  const formatPercentage = (num: number): string => `${num.toFixed(1)}%`;
 
   if (isLoading) {
     return (

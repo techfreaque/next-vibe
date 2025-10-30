@@ -5,7 +5,6 @@
 
 import { z } from "zod";
 
-import { EndpointErrorTypes } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
   objectField,
@@ -13,6 +12,7 @@ import {
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
+  EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,

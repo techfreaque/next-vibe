@@ -173,7 +173,7 @@ export class DatabaseMigrateSyncRepositoryImpl
 
     return readdirSync(migrationsFolder)
       .filter((file) => file.endsWith(SQL_FILE_EXTENSION))
-      .sort()
+      .toSorted()
       .map((filename) => ({
         filename,
         content: readFileSync(path.join(migrationsFolder, filename), "utf-8"),
@@ -188,7 +188,7 @@ export class DatabaseMigrateSyncRepositoryImpl
     logger: EndpointLogger,
   ): Promise<void> {
     try {
-      const fs = await import("fs/promises");
+      const fs = await import("node:fs/promises");
       const migrationsFolder = path.resolve(process.cwd(), "drizzle");
 
       // Backup original files
@@ -244,7 +244,7 @@ export class DatabaseMigrateSyncRepositoryImpl
     logger: EndpointLogger,
   ): Promise<void> {
     try {
-      const fs = await import("fs/promises");
+      const fs = await import("node:fs/promises");
       const migrationsFolder = path.resolve(process.cwd(), "drizzle");
       const backupFolder = path.join(migrationsFolder, BACKUP_FOLDER_NAME);
 

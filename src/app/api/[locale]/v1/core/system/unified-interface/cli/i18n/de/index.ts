@@ -21,7 +21,7 @@ export const translations: typeof enTranslations = {
       verbose: "Ausführliche Ausgabe aktivieren",
       dryRun: "Testlauf ohne Ausführung durchführen",
       interactive: "Interaktiven Modus aktivieren",
-        },
+    },
     errors: {
       routeNotFound: "Route nicht gefunden",
       executionFailed: "Ausführung fehlgeschlagen",
@@ -41,7 +41,7 @@ export const translations: typeof enTranslations = {
       deleteFailed: "Sitzung konnte nicht gelöscht werden",
       storeFailed: "Sitzung konnte nicht gespeichert werden",
       clearFailed: "Sitzung konnte nicht gelöscht werden",
-        },
+    },
     endpoints: {
       endpointHandler: {
         error: {
@@ -71,6 +71,21 @@ export const translations: typeof enTranslations = {
             availableCommandsLabel: "Verfügbare Befehle",
             globalOptionsLabel: "Globale Optionen",
             examplesLabel: "Beispiele",
+          },
+          widgets: {
+            common: {
+              noDataAvailable: "Keine Daten verfügbar",
+              andMoreItems: "und {count} weitere Elemente",
+              affectedFiles: "Betroffene Dateien",
+              summary: "Zusammenfassung",
+              files: "Dateien",
+              issues: "Probleme",
+              other: "Andere",
+              error: "Fehler",
+              errors: "Fehler",
+              warning: "Warnung",
+              warnings: "Warnungen",
+            },
           },
         },
       },
@@ -116,7 +131,7 @@ export const translations: typeof enTranslations = {
         german: "Deutsch",
         polish: "Polnisch",
         settingUpdated: "Einstellung erfolgreich aktualisiert",
-          },
-        },
       },
+    },
+  },
 };

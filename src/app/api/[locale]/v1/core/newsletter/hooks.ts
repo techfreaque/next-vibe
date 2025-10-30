@@ -7,7 +7,6 @@
 
 import { type ChangeEvent, useCallback, useMemo } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import {
   createCustomStateKey,
   useCustomState,
@@ -22,6 +21,7 @@ import {
   useApiMutation,
   useApiQuery,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useUser } from "@/app/api/[locale]/v1/core/user/private/me/hooks";
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";

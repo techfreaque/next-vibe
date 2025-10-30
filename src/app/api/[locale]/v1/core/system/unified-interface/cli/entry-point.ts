@@ -14,11 +14,13 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import type { CreateApiEndpoint } from "../shared/endpoint/create";
 import type { EndpointLogger } from "../shared/logger/endpoint";
+import type { EndpointDefinition } from "../shared/types/endpoint";
 import { getCliUserForCommand } from "../shared/server-only/auth/cli-user";
+import type { ParameterValue } from "../shared/server-only/execution/executor";
 import { findRouteFiles } from "../shared/server-only/filesystem/scanner";
 import { memoryMonitor } from "../shared/server-only/utils/performance";
-import type { EndpointDefinition } from "../shared/types/endpoint";
 import type { InferJwtPayloadTypeFromRoles } from "../shared/types/handler";
 import { getConfig } from "./config";
 import type {
@@ -88,7 +90,7 @@ export class CliEntryPoint {
 
     try {
       this.logger.debug(
-        this.t("app.api.v1.core.system.unifiedUi.cli.vibe.startingUp"),
+        this.t("app.api.v1.core.system.unifiedInterface.cli.vibe.startingUp"),
       );
 
       memoryMonitor.snapshot();
@@ -142,14 +144,14 @@ export class CliEntryPoint {
       const availableCommands = this.routes.map((r) => r.alias).slice(0, 10);
       this.logger.error(
         this.t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.errors.routeNotFound",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.routeNotFound",
         ),
         { command, availableCommands },
       );
       return {
         success: false,
         error: this.t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.errors.routeNotFound",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.routeNotFound",
         ),
       };
     }
@@ -175,7 +177,7 @@ export class CliEntryPoint {
     // Create execution context
     const context: RouteExecutionContext = {
       toolName: command,
-      data: options.data,
+      data: (options.data || {}) as { [key: string]: ParameterValue },
       urlPathParams: options.urlPathParams,
       cliArgs: options.cliArgs, // Pass CLI arguments
       user: cliUser,
@@ -200,7 +202,7 @@ export class CliEntryPoint {
 
       // Get endpoint definition for enhanced rendering
       const endpointDefinition =
-        await this.getEndpointDefinition(discoveredRoute);
+        await this.getCreateApiEndpoint(discoveredRoute);
 
       // Format and display result with enhanced rendering support
       const formattedResult = routeDelegationHandler.formatResult(
@@ -219,7 +221,7 @@ export class CliEntryPoint {
     } catch (error) {
       process.stderr.write(
         this.t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.errors.executionFailed",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.executionFailed",
           {
             error: error instanceof Error ? error.message : String(error),
           },
@@ -347,7 +349,9 @@ export class CliEntryPoint {
         }
         return endpointDescription;
       }
-      return this.t("app.api.v1.core.system.unifiedUi.cli.vibe.executeCommand");
+      return this.t(
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.executeCommand",
+      );
     };
 
     const description = getDescription();
@@ -443,17 +447,17 @@ export class CliEntryPoint {
 
       try {
         const definitionImport = (await import(definitionPath)) as
-          | Record<string, EndpointDefinition>
-          | { default: Record<string, EndpointDefinition> };
+          | Record<string, CreateApiEndpoint>
+          | { default: Record<string, CreateApiEndpoint> };
         const definitionModule =
           "default" in definitionImport
             ? definitionImport.default
             : definitionImport;
 
         // Check default export
-        let definitions: Record<string, EndpointDefinition> | undefined;
+        let definitions: Record<string, CreateApiEndpoint> | undefined;
         if (typeof definitionModule === "object" && definitionModule !== null) {
-          definitions = definitionModule as Record<string, EndpointDefinition>;
+          definitions = definitionModule as Record<string, CreateApiEndpoint>;
         }
 
         if (definitions && typeof definitions === "object") {
@@ -586,7 +590,7 @@ export class CliEntryPoint {
     } catch (error) {
       const parsedError = parseError(error);
       logger.error(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.errors.executionFailed",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.executionFailed",
         parsedError,
       );
       return {
@@ -599,14 +603,14 @@ export class CliEntryPoint {
   /**
    * Get endpoint definition from route for enhanced rendering
    */
-  private async getEndpointDefinition(
+  private async getCreateApiEndpoint(
     route: CliRouteMetadata,
-  ): Promise<EndpointDefinition | null> {
+  ): Promise<CreateApiEndpoint | null> {
     try {
       // Import the route module dynamically
       const routeModule = (await import(route.routePath)) as {
         tools?: {
-          definitions?: Record<string, EndpointDefinition>;
+          definitions?: Record<string, CreateApiEndpoint>;
         };
       };
 
@@ -623,7 +627,7 @@ export class CliEntryPoint {
       );
       try {
         const definitionModule = (await import(definitionPath)) as {
-          default?: Record<string, EndpointDefinition>;
+          default?: Record<string, CreateApiEndpoint>;
         };
         const definitions = definitionModule.default;
         if (definitions?.[route.method]) {

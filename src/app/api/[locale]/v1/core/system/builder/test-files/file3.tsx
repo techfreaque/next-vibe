@@ -9,7 +9,7 @@ const App = (): JSX.Element => (
   <div className="p-5 m-5 w-100">Hello from input3.ts</div>
 );
 
-const container = document.getElementById("root");
+const container = document.querySelector("#root");
 const root = createRoot(container!);
 
 root.render(<App />);

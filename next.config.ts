@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import path from "path";
+import path from "node:path";
 import type { Configuration } from "webpack";
 
 import { useTurbopack } from "./src/config/constants";

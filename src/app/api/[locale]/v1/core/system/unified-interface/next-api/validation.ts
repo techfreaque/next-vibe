@@ -15,14 +15,14 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import {
+  validateGetRequestData,
+  validatePostRequestData,
+} from "../shared/validation/platform";
+import {
   type ValidatedRequestData,
   validateEndpointUrlParameters,
   validateLocale,
 } from "../shared/validation/schema";
-import {
-  validateGetRequestData,
-  validatePostRequestData,
-} from "../shared/validation/platform";
 
 /**
  * Next.js validation context
@@ -95,7 +95,7 @@ export async function validateNextRequestData<
       return {
         success: false,
         message:
-          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
@@ -116,13 +116,13 @@ export async function validateNextRequestData<
     return {
       success: false,
       message:
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error:
           error instanceof Error
             ? error.message
-            : "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
+            : "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
       },
     };
   }

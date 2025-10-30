@@ -71,7 +71,7 @@ export class CliAuthHandler extends BaseAuthHandler {
         if (context.jwtPayload.isPublic) {
           return fail({
             message:
-              "app.api.v1.core.system.unifiedUi.cli.vibe.errors.publicPayloadNotSupported",
+              "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.publicPayloadNotSupported",
             errorType: ErrorResponseTypes.UNAUTHORIZED,
           });
         }
@@ -142,7 +142,7 @@ export class CliAuthHandler extends BaseAuthHandler {
       ) {
         return fail({
           message:
-            "app.api.v1.core.system.unifiedUi.cli.vibe.errors.invalidTokenPayload",
+            "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.invalidTokenPayload",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -157,7 +157,7 @@ export class CliAuthHandler extends BaseAuthHandler {
       logger.error("JWT verification failed", parsedError);
       return fail({
         message:
-          "app.api.v1.core.system.unifiedUi.cli.vibe.errors.invalidToken",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.invalidToken",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: { error: parsedError.message },
       });
@@ -186,7 +186,7 @@ export class CliAuthHandler extends BaseAuthHandler {
       logger.error("JWT signing failed", parsedError);
       return fail({
         message:
-          "app.api.v1.core.system.unifiedUi.cli.vibe.errors.signingFailed",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.signingFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -334,7 +334,7 @@ export class CliAuthHandler extends BaseAuthHandler {
         logger.debug("CLI user not found in database", { email });
         return fail({
           message:
-            "app.api.v1.core.system.unifiedUi.cli.vibe.errors.userNotFound",
+            "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.userNotFound",
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { email },
         });
@@ -351,7 +351,7 @@ export class CliAuthHandler extends BaseAuthHandler {
       logger.error("Error authenticating by email", parsedError);
       return fail({
         message:
-          "app.api.v1.core.system.unifiedUi.cli.vibe.errors.authenticationFailed",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.authenticationFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

@@ -3,18 +3,9 @@
  * Handles GET (list) and POST (create) requests for folders
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { ApiHandlerProps } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/handler";
 
-import type {
-  FolderCreateRequestOutput,
-  FolderCreateResponseOutput,
-  FolderListRequestOutput,
-  FolderListResponseOutput,
-} from "./definition";
 import definitions from "./definition";
 import { createFolder, getFolders } from "./repository";
 
@@ -22,25 +13,13 @@ export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async (
-      props: ApiHandlerProps<
-        FolderListRequestOutput,
-        Record<string, never>,
-        typeof definitions.GET.allowedRoles
-      >,
-    ): Promise<ResponseType<FolderListResponseOutput>> => {
+    handler: async (props) => {
       return await getFolders(props.user, props.data);
     },
   },
   [Methods.POST]: {
     email: undefined,
-    handler: async (
-      props: ApiHandlerProps<
-        FolderCreateRequestOutput,
-        Record<string, never>,
-        typeof definitions.POST.allowedRoles
-      >,
-    ): Promise<ResponseType<FolderCreateResponseOutput>> => {
+    handler: async (props) => {
       return await createFolder(
         props.user,
         props.data,

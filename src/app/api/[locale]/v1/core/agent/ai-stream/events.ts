@@ -74,6 +74,7 @@ export interface ContentDoneEventData {
   content: string;
   totalTokens: number | null;
   finishReason: string | null;
+  toolCalls?: ToolCall[]; // Tool calls with results
 }
 
 /**

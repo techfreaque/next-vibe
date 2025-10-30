@@ -98,7 +98,7 @@ export function ModelPersonaSelectorModal({
               placeholder={inputPlaceholder}
               rows={3}
               className="w-full min-h-[80px]"
-              autoFocus
+              
             />
           </Div>
         )}

@@ -12,4 +12,11 @@ export const translations = {
   react: reactTranslations,
   reactNative: reactNativeTranslations,
   tasks: tasksTranslations,
+  shared: {
+    permissions: {
+      publicUsersCannotAccess:
+        "Public users cannot access this authenticated endpoint",
+      insufficientPermissions: "Insufficient permissions to access this endpoint",
+    },
+  },
 };

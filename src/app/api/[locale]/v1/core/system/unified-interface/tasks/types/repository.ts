@@ -475,7 +475,7 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
       });
       return fail({
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.internal.title",
+          "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,
@@ -507,7 +507,7 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
       });
       return fail({
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.internal.title",
+          "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -561,7 +561,7 @@ export interface TaskStatus { /* ... */ }`;
           logger.error("Unsupported export format", { format });
           return fail({
             message:
-              "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.validation.title",
+              "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.validation.title",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { format },
           });
@@ -577,7 +577,7 @@ export interface TaskStatus { /* ... */ }`;
       });
       return fail({
         message:
-          "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.internal.title",
+          "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message, format },
       });

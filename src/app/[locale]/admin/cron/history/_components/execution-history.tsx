@@ -32,35 +32,10 @@ interface ExecutionHistoryProps {
   locale: CountryLanguage;
 }
 
-export function ExecutionHistory({
-  historyEndpoint,
-  isLoading,
-  locale,
-}: ExecutionHistoryProps): React.JSX.Element {
-  const { t } = simpleT(locale);
+type CronExecutionType = CronHistoryResponseOutput["executions"][number];
+type CronTaskStatusType = CronExecutionType["status"];
 
-  type CronExecutionType = CronHistoryResponseOutput["executions"][number];
-
-  const apiResponse = historyEndpoint.read.response;
-  const history: CronExecutionType[] = apiResponse?.success
-    ? apiResponse.data.executions
-    : [];
-  const totalExecutions = apiResponse?.success
-    ? apiResponse.data.totalCount
-    : 0;
-
-  const queryLoading = historyEndpoint.read.isLoading || false;
-
-  // Get current form values for pagination display
-  const currentOffset = parseInt(
-    historyEndpoint.read.form?.getValues("offset") || "0",
-  );
-  const currentLimit = parseInt(
-    historyEndpoint.read.form?.getValues("limit") || "20",
-  );
-  type CronTaskStatusType = CronExecutionType["status"];
-
-  const getStatusIcon = (status: CronTaskStatusType): React.ReactElement => {
+const getStatusIcon = (status: CronTaskStatusType): React.ReactElement => {
     switch (status) {
       case "COMPLETED":
         return <CheckCircle className="h-4 w-4 text-green-600" />;
@@ -81,29 +56,59 @@ export function ExecutionHistory({
     }
   };
 
-  const STATUS_COLORS: Record<CronTaskStatusType, string> = {
-    COMPLETED:
-      "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
-    FAILED: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-    TIMEOUT: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-    RUNNING: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
-    PENDING:
-      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
-    CANCELLED:
-      "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
-    SKIPPED:
-      "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
-    STOPPED: "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
-    ERROR: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-    BLOCKED:
-      "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
-    SCHEDULED:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
-  };
+const STATUS_COLORS: Record<CronTaskStatusType, string> = {
+  COMPLETED:
+    "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
+  FAILED: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  TIMEOUT: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  RUNNING: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
+  PENDING:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
+  CANCELLED:
+    "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
+  SKIPPED:
+    "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
+  STOPPED: "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
+  ERROR: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  BLOCKED:
+    "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
+  SCHEDULED:
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
+};
 
-  const getStatusColor = (status: CronTaskStatusType): string => {
-    return STATUS_COLORS[status] || STATUS_COLORS.PENDING;
-  };
+const getStatusColor = (status: CronTaskStatusType): string => {
+  return STATUS_COLORS[status] || STATUS_COLORS.PENDING;
+};
+
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleString();
+};
+
+export function ExecutionHistory({
+  historyEndpoint,
+  isLoading,
+  locale,
+}: ExecutionHistoryProps): React.JSX.Element {
+  const { t } = simpleT(locale);
+
+  const apiResponse = historyEndpoint.read.response;
+  const history: CronExecutionType[] = apiResponse?.success
+    ? apiResponse.data.executions
+    : [];
+  const totalExecutions = apiResponse?.success
+    ? apiResponse.data.totalCount
+    : 0;
+
+  const queryLoading = historyEndpoint.read.isLoading || false;
+
+  // Get current form values for pagination display
+  const currentOffset = parseInt(
+    historyEndpoint.read.form?.getValues("offset") || "0",
+  );
+  const currentLimit = parseInt(
+    historyEndpoint.read.form?.getValues("limit") || "20",
+  );
 
   const getDuration = (execution: CronExecutionType): string => {
     if (execution.durationMs) {
@@ -117,9 +122,8 @@ export function ExecutionHistory({
     return t("app.admin.cron.cronErrors.admin.interface.noResults");
   };
 
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleString();
+  const handleSubmit = (): void => {
+    historyEndpoint.read.refetch();
   };
 
   const handleClearFilters = (): void => {
@@ -172,7 +176,7 @@ export function ExecutionHistory({
 
           <Form
             form={historyEndpoint.read.form}
-            onSubmit={() => {}}
+            onSubmit={handleSubmit}
             className="space-y-4"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

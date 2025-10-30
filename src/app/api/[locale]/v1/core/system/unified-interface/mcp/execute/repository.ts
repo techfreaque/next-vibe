@@ -66,10 +66,11 @@ export class MCPExecuteRepositoryImpl implements MCPExecuteRepository {
     // Execute tool
     const result = await registry.executeTool({
       toolName: data.name,
-      arguments: data.arguments,
+      data: (data.arguments || {}) as { [key: string]: never },
       user,
       locale,
       requestId: Date.now(),
+      logger,
     });
 
     logger.info("[MCP Execute Repository] Tool execution complete", {
@@ -78,7 +79,7 @@ export class MCPExecuteRepositoryImpl implements MCPExecuteRepository {
       contentLength: result.content.length,
     });
 
-    return createSuccessResponse(result);
+    return createSuccessResponse(result as MCPExecuteResponseOutput);
   }
 }
 

@@ -7,18 +7,18 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
+  objectField,
+  requestDataField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import {
-  objectField,
-  requestDataField,
-  requestUrlPathParamsField,
-  responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import {
@@ -38,21 +38,21 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "system", "tasks", "cron", "task", "[id]"],
   title:
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.title",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.title",
   description:
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.description",
-  category: "app.api.v1.core.system.unifiedBackend.tasks.category",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.description",
+  category: "app.api.v1.core.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   tags: [
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.title",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.title",
   ],
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.container.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.container.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.container.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "urlPathParams", response: true },
@@ -63,9 +63,9 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.fields.id.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.fields.id.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.fields.id.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.fields.id.description",
         },
         z.string(),
       ),
@@ -75,7 +75,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.response.task.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.response.task.title",
         },
         z.object({
           id: z.string(),
@@ -101,64 +101,64 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.internal.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.internal.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.internal.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.internal.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.unknown.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.unknown.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.unknown.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.unsaved.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.unsaved.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.unsaved.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.errors.conflict.description",
     },
   },
   successTypes: {
     title:
-      "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.success.retrieved.title",
+      "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.success.retrieved.title",
     description:
-      "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.get.success.retrieved.description",
+      "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.success.retrieved.description",
   },
   examples: {
     urlPathParams: {
@@ -196,21 +196,21 @@ const { PUT } = createEndpoint({
   method: Methods.PUT,
   path: ["v1", "core", "system", "tasks", "cron", "task", "[id]"],
   title:
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.title",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.title",
   description:
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.description",
-  category: "app.api.v1.core.system.unifiedBackend.tasks.category",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.description",
+  category: "app.api.v1.core.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   tags: [
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.title",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.title",
   ],
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.container.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.container.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.container.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data&urlPathParams", response: true },
@@ -221,9 +221,9 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.id.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.id.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.id.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.id.description",
         },
         z.string(),
       ),
@@ -234,11 +234,11 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.name.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.name.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.description",
           placeholder:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.name.placeholder",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.placeholder",
           layout: { columns: 12 },
         },
         z.string().min(1),
@@ -249,11 +249,11 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.description.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.description.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.description.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.description.description",
           placeholder:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.description.placeholder",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.description.placeholder",
           layout: { columns: 12 },
         },
         z.string().optional(),
@@ -264,11 +264,11 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.schedule.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.schedule.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.description",
           placeholder:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.schedule.placeholder",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.placeholder",
           layout: { columns: 6 },
         },
         z.string().min(1),
@@ -279,9 +279,9 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.enabled.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.enabled.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.enabled.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.enabled.description",
           layout: { columns: 6 },
         },
         z.boolean(),
@@ -292,11 +292,11 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.priority.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.priority.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.description",
           placeholder:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.priority.placeholder",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.placeholder",
           options: CronTaskPriorityOptions,
           layout: { columns: 6 },
         },
@@ -308,11 +308,11 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.timeout.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.timeout.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.description",
           placeholder:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.timeout.placeholder",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.placeholder",
           layout: { columns: 6 },
         },
         z.number().optional(),
@@ -323,11 +323,11 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.retries.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.retries.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.description",
           placeholder:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.fields.retries.placeholder",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.placeholder",
           layout: { columns: 6 },
         },
         z.number().optional(),
@@ -338,7 +338,7 @@ const { PUT } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.response.task.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.response.task.title",
         },
         z.object({
           id: z.string(),
@@ -363,7 +363,7 @@ const { PUT } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.response.success.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.response.success.title",
         },
         z.boolean(),
       ),
@@ -373,64 +373,64 @@ const { PUT } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.internal.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.internal.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.internal.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.internal.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.forbidden.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.unknown.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.unknown.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.unknown.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.unsaved.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.unsaved.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.unsaved.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.errors.conflict.description",
     },
   },
   successTypes: {
     title:
-      "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.success.updated.title",
+      "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.success.updated.title",
     description:
-      "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.put.success.updated.description",
+      "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.success.updated.description",
   },
   examples: {
     urlPathParams: {
@@ -479,21 +479,21 @@ const { DELETE } = createEndpoint({
   method: Methods.DELETE,
   path: ["v1", "core", "system", "tasks", "cron", "task", "[id]"],
   title:
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.title",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.title",
   description:
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.description",
-  category: "app.api.v1.core.system.unifiedBackend.tasks.category",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.description",
+  category: "app.api.v1.core.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   tags: [
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.title",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.title",
   ],
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.container.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.container.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.container.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "urlPathParams", response: true },
@@ -504,9 +504,9 @@ const { DELETE } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.fields.id.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.fields.id.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.fields.id.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.fields.id.description",
         },
         z.string(),
       ),
@@ -516,7 +516,7 @@ const { DELETE } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.response.success.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.response.success.title",
         },
         z.boolean(),
       ),
@@ -525,7 +525,7 @@ const { DELETE } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.response.message.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.response.message.title",
         },
         z.string(),
       ),
@@ -535,64 +535,64 @@ const { DELETE } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.internal.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.internal.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.internal.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.internal.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.forbidden.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.unknown.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.unknown.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.unknown.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.unsaved.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.unsaved.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.unsaved.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.errors.conflict.description",
     },
   },
   successTypes: {
     title:
-      "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.success.deleted.title",
+      "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.success.deleted.title",
     description:
-      "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.task.delete.success.deleted.description",
+      "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.success.deleted.description",
   },
   examples: {
     urlPathParams: {

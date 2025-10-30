@@ -262,12 +262,12 @@ export function metadataGenerator(
     ...additionalMetadata,
     // Merge nested objects
     openGraph: {
-      ...(metadata.openGraph || {}),
-      ...(additionalMetadata.openGraph || {}),
+      ...metadata.openGraph,
+      ...additionalMetadata.openGraph,
     },
     twitter: {
-      ...(metadata.twitter || {}),
-      ...(additionalMetadata.twitter || {}),
+      ...metadata.twitter,
+      ...additionalMetadata.twitter,
     },
   };
 }

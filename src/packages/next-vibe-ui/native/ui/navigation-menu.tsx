@@ -82,7 +82,7 @@ const NavigationMenuTrigger = React.forwardRef<
       )}
       {...props}
     >
-      {children}
+      {typeof children === "function" ? children({ pressed: false }) : children}
       <Animated.View style={chevronStyle}>
         <ChevronDown
           size={12}

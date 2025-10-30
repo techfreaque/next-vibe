@@ -12,19 +12,13 @@ import type {
   RouteExecutionContext,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/route-executor";
 import { routeDelegationHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/route-executor";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { schemaUIHandler } from "./schema-ui-handler";
-
-// Type for endpoint fields
-interface EndpointField {
-  type: string;
-  usage: string[];
-  config?: Record<string, string | number | boolean>;
-}
 
 /**
  * Interactive session state
@@ -145,10 +139,10 @@ export class InteractiveModeHandler {
 
     // Show welcome message
     this.logger.info(
-      t("app.api.v1.core.system.unifiedUi.cli.vibe.interactive.welcome"),
+      t("app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.welcome"),
     );
     this.logger.info(
-      t("app.api.v1.core.system.unifiedUi.cli.vibe.help.description"),
+      t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.description"),
     );
     this.logger.info(""); // Empty line for better spacing
 
@@ -171,7 +165,7 @@ export class InteractiveModeHandler {
 
     this.routeTree = {
       name: t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.rootName",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.rootName",
       ),
       path: "/",
       type: "directory",
@@ -278,7 +272,7 @@ export class InteractiveModeHandler {
     // Display breadcrumbs
     const breadcrumbPath = this.breadcrumbs.map((b) => b.name).join(" > ");
     this.logger.info(
-      `${t("app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.directoryIcon")} ${breadcrumbPath}`,
+      `${t("app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.directoryIcon")} ${breadcrumbPath}`,
     );
 
     const choices: Array<{ name: string; value: string }> = [];
@@ -286,10 +280,10 @@ export class InteractiveModeHandler {
     // Add "up" option if not at root
     if (this.currentNode.parent) {
       const upIcon = t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.upIcon",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.upIcon",
       );
       const goUpText = t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.goUp",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.goUp",
       );
       // eslint-disable-next-line i18next/no-literal-string
       const upName = `${upIcon} (${goUpText})`;
@@ -302,16 +296,16 @@ export class InteractiveModeHandler {
     // Add directories and routes in current location
     if (this.currentNode.children) {
       const directoryIcon = t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.directoryIcon",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.directoryIcon",
       );
       const routeIcon = t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.routeIcon",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.routeIcon",
       );
       const routesText = t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.routes",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.routes",
       );
       const noDescriptionText = t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.errors.routeNotFound",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.routeNotFound",
       );
 
       for (const child of this.currentNode.children) {
@@ -344,19 +338,19 @@ export class InteractiveModeHandler {
 
     // Add global actions
     const settingsIcon = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.settingsIcon",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.settingsIcon",
     );
     const settingsText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.settings",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.settings",
     );
     const exitIcon = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.exitIcon",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.exitIcon",
     );
     const exitText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.exit",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.exit",
     );
     const navigateMessage = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.navigate",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.navigate",
     );
 
     choices.push(
@@ -479,16 +473,16 @@ export class InteractiveModeHandler {
     const { t } = simpleT(this.session!.locale);
 
     const executingText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.executing",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.executing",
     );
     const routeText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.route",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.route",
     );
     const methodText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.method",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.method",
     );
     const descriptionText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.description",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.description",
     );
 
     this.logger.info(`${executingText}: ${route.alias || route.path}`);
@@ -500,11 +494,11 @@ export class InteractiveModeHandler {
 
     try {
       // Get endpoint definition for data-driven UI
-      const endpoint = await this.getEndpointDefinition(route);
+      const endpoint = await this.getCreateApiEndpoint(route);
 
       if (!endpoint) {
         const noDefinitionText = t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.noDefinition",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.noDefinition",
         );
         this.logger.warn(noDefinitionText);
         await this.executeRouteBasic(route);
@@ -515,14 +509,14 @@ export class InteractiveModeHandler {
       await this.generateDataDrivenForm(route, endpoint);
     } catch (error) {
       const executionFailedText = t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.executionFailed",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.executionFailed",
       );
       this.logger.error(executionFailedText, parseError(error));
     }
 
     // Ask if user wants to continue
     const executeAnotherText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.executeAnother",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.executeAnother",
     );
     const shouldContinue = await confirm({
       message: executeAnotherText,
@@ -541,12 +535,12 @@ export class InteractiveModeHandler {
     const { t } = simpleT(this.session!.locale);
 
     const selectLocaleText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.selectLocale",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.selectLocale",
     );
 
     // Available locale combinations based on the actual language config
     const englishGlobalText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.englishGlobal",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.englishGlobal",
     );
 
     const localeOptions = [
@@ -600,7 +594,7 @@ export class InteractiveModeHandler {
     let requestData = {};
     if (endpoint.requestSchema && !this.isEmptySchema(endpoint.requestSchema)) {
       const requestDataText = tSelected(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.requestData",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.requestData",
       );
       this.logger.info(requestDataText);
       requestData = await this.generateFormFromSchema(
@@ -616,7 +610,7 @@ export class InteractiveModeHandler {
       !this.isEmptySchema(endpoint.requestUrlPathParamsSchema)
     ) {
       const urlParametersText = tSelected(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.urlParameters",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.urlParameters",
       );
       this.logger.info(urlParametersText);
       urlPathParams = await this.generateFormFromSchema(
@@ -631,16 +625,16 @@ export class InteractiveModeHandler {
       Object.keys(urlPathParams).length > 0
     ) {
       const previewText = tSelected(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.preview",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.preview",
       );
       const requestDataText = tSelected(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.requestData",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.requestData",
       );
       const urlParametersText = tSelected(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.urlParameters",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.urlParameters",
       );
       const executeWithParamsText = tSelected(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.executeWithParams",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.executeWithParams",
       );
 
       this.logger.info(previewText);
@@ -724,26 +718,14 @@ export class InteractiveModeHandler {
   /**
    * Get endpoint definition from route (reused from route-delegation-handler)
    */
-  private async getEndpointDefinition(route: DiscoveredRoute): Promise<{
-    title?: string;
-    description?: string;
-    requestSchema?: z.ZodTypeAny;
-    requestUrlPathParamsSchema?: z.ZodTypeAny;
-    responseSchema?: z.ZodTypeAny;
-    fields?: Record<string, EndpointField>;
-  } | null> {
+  private async getCreateApiEndpoint(
+    route: DiscoveredRoute,
+  ): Promise<CreateApiEndpoint | null> {
     const { loadEndpointDefinition } = await import(
       "../../shared/server-only/execution/definition-loader"
     );
 
-    const result = await loadEndpointDefinition<{
-      title?: string;
-      description?: string;
-      requestSchema?: z.ZodTypeAny;
-      requestUrlPathParamsSchema?: z.ZodTypeAny;
-      responseSchema?: z.ZodTypeAny;
-      fields?: Record<string, EndpointField>;
-    }>(
+    const result = await loadEndpointDefinition<CreateApiEndpoint>(
       {
         routePath: route.routePath,
         method: route.method,
@@ -774,12 +756,13 @@ export class InteractiveModeHandler {
     urlPathParams: Record<string, string | number | boolean>,
   ): Promise<void> {
     const context: RouteExecutionContext = {
-      command: route.alias,
+      toolName: route.alias,
       data: requestData,
       urlPathParams: urlPathParams,
       user: this.session!.user,
       locale: this.session!.locale,
       options: this.session!.options,
+      logger: this.logger,
     };
 
     try {
@@ -793,7 +776,7 @@ export class InteractiveModeHandler {
       );
 
       // Get endpoint definition for enhanced rendering
-      const endpointDefinition = await this.getEndpointDefinition(route);
+      const endpointDefinition = await this.getCreateApiEndpoint(route);
 
       const formattedResult = routeDelegationHandler.formatResult(
         result,
@@ -808,7 +791,7 @@ export class InteractiveModeHandler {
     } catch (error) {
       const { t } = simpleT(this.session!.locale);
       const executionFailedText = t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.executionFailed",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.executionFailed",
       );
       this.logger.error(executionFailedText, parseError(error));
     }
@@ -819,10 +802,12 @@ export class InteractiveModeHandler {
    */
   private async executeRouteBasic(route: DiscoveredRoute): Promise<void> {
     const context: RouteExecutionContext = {
-      command: route.alias,
+      toolName: route.alias,
+      data: {},
       user: this.session!.user,
       locale: this.session!.locale,
       options: this.session!.options,
+      logger: this.logger,
     };
 
     try {
@@ -836,7 +821,7 @@ export class InteractiveModeHandler {
       );
 
       // Get endpoint definition for enhanced rendering
-      const endpointDefinition = await this.getEndpointDefinition(route);
+      const endpointDefinition = await this.getCreateApiEndpoint(route);
 
       const formattedResult = routeDelegationHandler.formatResult(
         result,
@@ -851,7 +836,7 @@ export class InteractiveModeHandler {
     } catch (error) {
       const { t } = simpleT(this.session!.locale);
       const executionFailedText = t(
-        "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.executionFailed",
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.executionFailed",
       );
       this.logger.error(executionFailedText, parseError(error));
     }
@@ -868,7 +853,7 @@ export class InteractiveModeHandler {
         if (action === InteractiveModeHandler.EXIT_ACTION) {
           const { t } = simpleT(this.session!.locale);
           const goodbyeText = t(
-            "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.goodbye",
+            "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.goodbye",
           );
           this.logger.info(goodbyeText);
           break;
@@ -895,7 +880,7 @@ export class InteractiveModeHandler {
       } catch (error) {
         const { t } = simpleT(this.session!.locale);
         const navigationErrorText = t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.navigationError",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.navigationError",
         );
         this.logger.error(navigationErrorText, parseError(error));
       }
@@ -909,19 +894,19 @@ export class InteractiveModeHandler {
     const { t } = simpleT(this.session!.locale);
 
     const chooseSettingText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.chooseSettingToModify",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.chooseSettingToModify",
     );
     const outputFormatText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.outputFormatCurrent",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.outputFormatCurrent",
     );
     const verboseModeText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.verboseModeCurrent",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.verboseModeCurrent",
     );
     const localeText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.localeCurrent",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.localeCurrent",
     );
     const backToMainMenuText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.backToMainMenu",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.backToMainMenu",
     );
 
     const setting = await select({
@@ -967,13 +952,13 @@ export class InteractiveModeHandler {
       case "output": {
         const { t } = simpleT(this.session!.locale);
         const chooseOutputFormatText = t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.chooseOutputFormat",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.chooseOutputFormat",
         );
         const prettyFormattedText = t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.prettyFormatted",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.prettyFormatted",
         );
         const jsonRawText = t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.jsonRaw",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.jsonRaw",
         );
 
         const output = await select({
@@ -994,7 +979,7 @@ export class InteractiveModeHandler {
       case "verbose": {
         const { t } = simpleT(this.session!.locale);
         const enableVerboseOutputText = t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.enableVerboseOutput",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.enableVerboseOutput",
         );
 
         const verbose = await confirm({
@@ -1011,16 +996,16 @@ export class InteractiveModeHandler {
       case "locale": {
         const { t } = simpleT(this.session!.locale);
         const chooseLocaleText = t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.chooseLocale",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.chooseLocale",
         );
         const englishGlobalText = t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.englishGlobal",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.englishGlobal",
         );
         const germanText = t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.german",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.german",
         );
         const polishText = t(
-          "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.polish",
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.polish",
         );
 
         const locale = await select({
@@ -1040,7 +1025,7 @@ export class InteractiveModeHandler {
 
     const { t } = simpleT(this.session!.locale);
     const settingUpdatedText = t(
-      "app.api.v1.core.system.unifiedUi.cli.vibe.interactive.navigation.settingUpdated",
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.settingUpdated",
     );
     this.logger.info(settingUpdatedText);
   }

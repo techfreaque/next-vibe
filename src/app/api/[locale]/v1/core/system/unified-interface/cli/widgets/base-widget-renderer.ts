@@ -94,7 +94,7 @@ export abstract class BaseWidgetRenderer implements WidgetRenderer {
   ): string {
     const rawLabel = field.label || field.name;
     const label = rawLabel.includes(".")
-      ? context.translate(rawLabel)
+      ? context.translate(rawLabel as never)
       : rawLabel;
     return this.styleText(label, "bold", context);
   }

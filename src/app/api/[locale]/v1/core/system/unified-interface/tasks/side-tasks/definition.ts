@@ -40,13 +40,11 @@ const sideTaskActionSchema = z.enum([
 const sideTasksPostEndpoint = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "tasks", "side-tasks"],
-  title: "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.title",
+  title: "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.title",
   description:
-    "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.description",
-  category: "app.api.v1.core.system.unifiedUi.tasks.sideTasks.category",
-  tags: [
-    "app.api.v1.core.system.unifiedUi.tasks.sideTasks.tags.sidetasks",
-  ],
+    "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.description",
+  category: "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.category",
+  tags: ["app.api.v1.core.system.unifiedInterface.tasks.sideTasks.tags.sidetasks"],
   allowedRoles: [UserRole.ADMIN],
   aliases: ["tasks:side", "side-tasks"],
 
@@ -54,9 +52,9 @@ const sideTasksPostEndpoint = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.container.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.container.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.container.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -67,49 +65,49 @@ const sideTasksPostEndpoint = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksActionLabel",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionLabel",
           description:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksActionDescription",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionDescription",
           options: [
             {
               value: "list",
               label:
-                "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksActionList",
+                "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionList",
             },
             {
               value: "get",
               label:
-                "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksActionGet",
+                "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionGet",
             },
             {
               value: "create",
               label:
-                "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksActionCreate",
+                "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionCreate",
             },
             {
               value: "update",
               label:
-                "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksActionUpdate",
+                "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionUpdate",
             },
             {
               value: "delete",
               label:
-                "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksActionDelete",
+                "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionDelete",
             },
             {
               value: "stats",
               label:
-                "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksActionStats",
+                "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionStats",
             },
             {
               value: "executions",
               label:
-                "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksActionExecutions",
+                "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionExecutions",
             },
             {
               value: "health-check",
               label:
-                "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksActionHealthCheck",
+                "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionHealthCheck",
             },
           ],
           layout: { columns: 3 },
@@ -123,9 +121,9 @@ const sideTasksPostEndpoint = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksIdLabel",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdLabel",
           description:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksIdDescription",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdDescription",
           layout: { columns: 3 },
         },
         z.string().optional(),
@@ -136,9 +134,9 @@ const sideTasksPostEndpoint = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksNameLabel",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameLabel",
           description:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksNameDescription",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameDescription",
           layout: { columns: 3 },
         },
         z.string().optional(),
@@ -149,9 +147,9 @@ const sideTasksPostEndpoint = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksLimitLabel",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitLabel",
           description:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksLimitDescription",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitDescription",
           layout: { columns: 3 },
         },
         z.number().optional().default(50),
@@ -162,9 +160,9 @@ const sideTasksPostEndpoint = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
           label:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksDataLabel",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataLabel",
           description:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.common.sideTasksDataDescription",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataDescription",
           layout: { columns: 12 },
         },
         z.record(z.string(), z.unknown()).optional(),
@@ -175,7 +173,7 @@ const sideTasksPostEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.tasks.side.response.data.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.tasks.side.response.data.title",
         },
         z.unknown().optional(),
       ),
@@ -184,7 +182,7 @@ const sideTasksPostEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.tasks.side.response.count.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.tasks.side.response.count.title",
         },
         z.number().optional(),
       ),
@@ -238,65 +236,64 @@ const sideTasksPostEndpoint = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.serverError.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.serverError.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.unknownError.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.unknownError.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.unsavedChanges.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.unsavedChanges.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title:
-      "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.success.title",
+    title: "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.title",
     description:
-      "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.success.description",
+      "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.description",
   },
 });
 
@@ -307,13 +304,11 @@ const sideTasksPostEndpoint = createEndpoint({
 const sideTasksGetEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "system", "tasks", "side-tasks"],
-  title: "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.title",
+  title: "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.title",
   description:
-    "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.description",
-  category: "app.api.v1.core.system.unifiedUi.tasks.category",
-  tags: [
-    "app.api.v1.core.system.unifiedUi.tasks.sideTasks.tags.sidetasks",
-  ],
+    "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.description",
+  category: "app.api.v1.core.system.unifiedInterface.tasks.category",
+  tags: ["app.api.v1.core.system.unifiedInterface.tasks.sideTasks.tags.sidetasks"],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["tasks:side:status"],
 
@@ -321,9 +316,9 @@ const sideTasksGetEndpoint = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.container.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.container.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.container.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { response: true },
@@ -333,7 +328,7 @@ const sideTasksGetEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.response.totalTasks.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.response.totalTasks.title",
         },
         z.number(),
       ),
@@ -342,7 +337,7 @@ const sideTasksGetEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.response.runningTasks.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.response.runningTasks.title",
         },
         z.number(),
       ),
@@ -351,7 +346,7 @@ const sideTasksGetEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.response.healthyTasks.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.response.healthyTasks.title",
         },
         z.number(),
       ),
@@ -360,7 +355,7 @@ const sideTasksGetEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.response.unhealthyTasks.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.response.unhealthyTasks.title",
         },
         z.number(),
       ),
@@ -381,65 +376,64 @@ const sideTasksGetEndpoint = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.serverError.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.serverError.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.unknownError.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.unknownError.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.unsavedChanges.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.unsavedChanges.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title:
-      "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.success.title",
+    title: "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.title",
     description:
-      "app.api.v1.core.system.unifiedUi.tasks.sideTasks.get.success.description",
+      "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.description",
   },
 });
 

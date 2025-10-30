@@ -14,9 +14,8 @@ import { translations as subscriptionTranslations } from "../../subscription/i18
 import { translations as systemTranslations } from "../../system/i18n/pl";
 import { translations as userTranslations } from "../../user/i18n/pl";
 import { translations as usersTranslations } from "../../users/i18n/pl";
-import type { translations as enTranslations } from "../en";
 
-export const translations: typeof enTranslations = {
+export const translations = {
   agent: agentTranslations,
   contact: contactTranslations,
   emails: emailsTranslations,

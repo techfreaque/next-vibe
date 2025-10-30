@@ -21,7 +21,7 @@ import { WidgetRenderer } from "./WidgetRenderer";
  * Type guard for ContainerWidgetData
  */
 function isContainerWidgetData(
-  data: RenderableValue,
+  data: RenderableValue | ContainerWidgetData,
 ): data is ContainerWidgetData {
   return (
     typeof data === "object" &&

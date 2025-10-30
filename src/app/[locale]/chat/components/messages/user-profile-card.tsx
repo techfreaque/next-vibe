@@ -38,7 +38,7 @@ export function UserProfileCard({
   const userMessages = messages.filter((m) => m.authorId === userId);
 
   const postCount = userMessages.length;
-  const recentPosts = userMessages.slice(-5).reverse(); // Last 5 posts, newest first
+  const recentPosts = userMessages.slice(-5).toReversed(); // Last 5 posts, newest first
 
   return (
     <Div

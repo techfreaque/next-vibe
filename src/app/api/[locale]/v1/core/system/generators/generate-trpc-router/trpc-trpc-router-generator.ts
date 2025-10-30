@@ -394,6 +394,7 @@ function buildNestedRouterStructure(
  */
 function generateNestedRouterCode(
   structure: NestedRouterStructure,
+  // eslint-disable-next-line oxc/only-used-in-recursion
   allRouteFiles: RouteFileInfo[],
   indent = "  ",
 ): string {

@@ -3,21 +3,21 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type {
   ExtractOutput,
   FieldUsage,
   InferSchemaFromField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -329,7 +329,7 @@ export function useApiQueryForm<
         // Convert Error to ErrorResponseType
         const errorResponse = fail({
           message:
-            "app.api.v1.core.system.unifiedUi.react.hooks.queryForm.errors.validation_failed",
+            "app.api.v1.core.system.unifiedInterface.react.hooks.queryForm.errors.validation_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { formId, message: error.message },
         });
@@ -633,7 +633,7 @@ export function useApiQueryForm<
 
         const errorResponse = fail({
           message:
-            "app.api.v1.core.system.unifiedUi.react.hooks.queryForm.errors.network_failure",
+            "app.api.v1.core.system.unifiedInterface.react.hooks.queryForm.errors.network_failure",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { formId, error: errorMessage },
         });
@@ -676,7 +676,7 @@ export function useApiQueryForm<
           // Create a proper error response for validation errors with translation key
           const errorResponse = fail({
             message:
-              "app.api.v1.core.system.unifiedUi.react.hooks.queryForm.errors.validation_failed",
+              "app.api.v1.core.system.unifiedInterface.react.hooks.queryForm.errors.validation_failed",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { formId, errors: JSON.stringify(errors) },
           });

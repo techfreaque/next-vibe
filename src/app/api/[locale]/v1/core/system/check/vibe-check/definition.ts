@@ -59,6 +59,19 @@ const { POST } = createEndpoint({
         z.boolean().optional().default(false),
       ),
 
+      skipOxlint: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label:
+            "app.api.v1.core.system.check.vibeCheck.fields.skipOxlint.label",
+          description:
+            "app.api.v1.core.system.check.vibeCheck.fields.skipOxlint.description",
+          layout: { columns: 3 },
+        },
+        z.boolean().optional().default(false),
+      ),
+
       skipLint: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -66,9 +79,9 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.check.vibeCheck.fields.skipLint.label",
           description:
             "app.api.v1.core.system.check.vibeCheck.fields.skipLint.description",
-          layout: { columns: 4 },
+          layout: { columns: 3 },
         },
-        z.boolean().optional().default(false),
+        z.boolean().optional().default(true),
       ),
 
       skipTypecheck: requestDataField(
@@ -79,7 +92,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.vibeCheck.fields.skipTypecheck.label",
           description:
             "app.api.v1.core.system.check.vibeCheck.fields.skipTypecheck.description",
-          layout: { columns: 4 },
+          layout: { columns: 3 },
         },
         z.boolean().optional().default(false),
       ),
@@ -231,7 +244,7 @@ const { POST } = createEndpoint({
                 content:
                   "app.api.v1.core.system.check.vibeCheck.response.issues.title",
               },
-              z.enum(["lint", "type"]),
+              z.enum(["oxlint", "lint", "type"]),
             ),
           },
         ),

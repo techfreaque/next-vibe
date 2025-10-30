@@ -76,8 +76,14 @@ export function GroupedAssistantMessage({
     }
   });
 
-  // Get all tool calls from TOOL messages
-  const allToolCalls = toolMessages.flatMap((msg) => msg.toolCalls || []);
+  // Get all tool calls from TOOL messages AND from ASSISTANT messages
+  // Tool calls can be stored in either:
+  // 1. Separate TOOL messages (legacy)
+  // 2. ASSISTANT message's toolCalls property (new implementation)
+  const allToolCalls = [
+    ...toolMessages.flatMap((msg) => msg.toolCalls || []),
+    ...assistantMessages.flatMap((msg) => msg.toolCalls || []),
+  ];
 
   // Extract reasoning content from <think> tags and regular content from ASSISTANT messages
   let reasoningContent = "";
@@ -110,6 +116,9 @@ export function GroupedAssistantMessage({
 
   // Check if there's content after tool calls and reasoning
   const hasContent = regularContent.length > 0 || allToolCalls.length > 0;
+
+  // Show streaming placeholder when no regular content yet (even if tool calls or reasoning exist)
+  const isStreaming = regularContent.length === 0;
 
   return (
     <Div className="flex items-start gap-3">
@@ -155,11 +164,18 @@ export function GroupedAssistantMessage({
           )}
 
           {/* Regular content (without <think> tags) */}
-          {regularContent.length > 0 && (
+          {regularContent.length > 0 ? (
             <Div>
               <Markdown content={regularContent} />
             </Div>
-          )}
+          ) : isStreaming ? (
+            // Show streaming placeholder when no content yet
+            <Div className="flex items-center gap-2 text-muted-foreground">
+              <Div className="animate-pulse h-2 w-2 bg-blue-400 rounded-full" />
+              <Div className="animate-pulse h-2 w-2 bg-blue-400 rounded-full animation-delay-150" />
+              <Div className="animate-pulse h-2 w-2 bg-blue-400 rounded-full animation-delay-300" />
+            </Div>
+          ) : null}
         </Div>
 
         {/* Actions - Fixed height container to maintain consistent spacing */}

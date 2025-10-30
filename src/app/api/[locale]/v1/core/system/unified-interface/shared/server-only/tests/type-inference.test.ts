@@ -21,16 +21,6 @@ import { z } from "zod";
 import type imapAccountsListDefinition from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/definition";
 import type imapAccountTestDefinition from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/test/definition";
 import type imapConfigDefinition from "@/app/api/[locale]/v1/core/emails/imap-client/config/definition";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
-import {
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import {
-  objectField,
-  responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import type {
   DeleteEndpointTypes,
   EndpointReturn,
@@ -38,6 +28,16 @@ import type {
   GetEndpointTypes,
   PrimaryMutationTypes,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import {
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,

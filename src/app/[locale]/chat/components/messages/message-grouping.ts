@@ -28,7 +28,7 @@ export function groupMessagesBySequence(
   const sequenceMap = new Map<string, MessageGroup>();
 
   // Sort messages by createdAt to ensure correct order
-  const sortedMessages = [...messages].sort(
+  const sortedMessages = [...messages].toSorted(
     (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
   );
 

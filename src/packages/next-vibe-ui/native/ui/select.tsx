@@ -1,5 +1,6 @@
 import * as SelectPrimitive from "@rn-primitives/select";
 import * as React from "react";
+import type { JSX } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
@@ -29,7 +30,7 @@ const SelectTrigger = React.forwardRef<
     )}
     {...props}
   >
-    {children}
+    {typeof children === "function" ? children({ pressed: false }) : children}
     <ChevronDown
       size={16}
       aria-hidden={true}

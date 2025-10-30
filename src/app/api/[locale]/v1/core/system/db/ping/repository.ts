@@ -103,12 +103,12 @@ export class DatabasePingRepositoryImpl implements DatabasePingRepository {
           output: data.silent ? "" : SUCCESS_MESSAGE,
           connectionInfo,
         };
-      } else {
-        return {
-          isAccessible: false,
-          output: data.silent ? "" : EMPTY_RESPONSE_MESSAGE,
-        };
       }
+
+      return {
+        isAccessible: false,
+        output: data.silent ? "" : EMPTY_RESPONSE_MESSAGE,
+      };
     } catch (error) {
       logger.error("Database ping failed", parseError(error));
       return {

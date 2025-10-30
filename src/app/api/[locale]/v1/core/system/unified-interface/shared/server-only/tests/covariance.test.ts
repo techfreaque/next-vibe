@@ -14,13 +14,13 @@ import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
+import type { ApiEndpoint, CreateApiEndpoint } from "../../endpoint/create";
 import type {
   ArrayField,
   ObjectField,
   PrimitiveField,
   UnifiedField,
 } from "../../types/endpoint";
-import type { ApiEndpoint, CreateApiEndpoint } from "../../endpoint/create";
 import type { Methods } from "../../types/enums";
 
 // ============================================================================
@@ -890,7 +890,6 @@ const test20_2: Test20_2_RecordValid = "✓ PASS";
 // ============================================================================
 
 export interface AllTests {
-  test1_1: typeof test1_1;
   test1_2: typeof test1_2;
   test1_3: typeof test1_3;
   test1_4: typeof test1_4;

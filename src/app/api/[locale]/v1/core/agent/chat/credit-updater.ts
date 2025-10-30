@@ -5,9 +5,9 @@
 
 "use client";
 
-import creditsDefinition from "@/app/api/[locale]/v1/core/credits/definition";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { GET as creditsGetEndpoint } from "@/app/api/[locale]/v1/core/credits/definition";
 import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import type { ModelId } from "./model-access/models";
 import { getModelById } from "./model-access/models";
@@ -22,13 +22,13 @@ export function updateCreditBalance(
   const modelConfig = getModelById(modelId);
   const creditCost = modelConfig.creditCost;
 
-  if (creditCost <= 0 || !creditsDefinition.GET) {
+  if (creditCost <= 0 || !creditsGetEndpoint) {
     return;
   }
 
   // Update the credit balance using the built-in helper
   apiClient.updateEndpointData(
-    creditsDefinition.GET,
+    creditsGetEndpoint,
     (
       oldData:
         | {

@@ -64,6 +64,9 @@ export function ScheduleAutocomplete({
   const timezone = getDefaultTimezone(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
+  // Generate unique ID for aria-controls
+  const popoverId = React.useId();
+
   const options = Object.values(CRON_SCHEDULES).map((schedule) => ({
     value: schedule,
     label: formatCronScheduleShort(schedule, timezone, locale, logger),
@@ -119,6 +122,7 @@ export function ScheduleAutocomplete({
             variant="outline"
             role="combobox"
             aria-expanded={open}
+            aria-controls={popoverId}
             className={cn(
               "w-full justify-between h-10 font-normal",
               !value && "text-muted-foreground",
@@ -138,21 +142,24 @@ export function ScheduleAutocomplete({
             </div>
             <div className="flex items-center gap-1">
               {value && !disabled && (
-                <div
-                  className="h-4 w-4 p-0 rounded-sm hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center"
+                <button
+                  type="button"
+                  className="h-4 w-4 p-0 rounded-sm hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center cursor-pointer border-0 bg-transparent"
                   onClick={(e) => {
                     e.stopPropagation();
                     clearValue();
                   }}
+                  aria-label="Clear value"
                 >
                   <X className="h-3 w-3" />
-                </div>
+                </button>
               )}
               <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
             </div>
           </Button>
         </PopoverTrigger>
         <PopoverContent
+          id={popoverId}
           className="w-[--radix-popover-trigger-width] p-0"
           align="start"
         >

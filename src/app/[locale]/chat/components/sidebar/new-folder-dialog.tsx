@@ -77,7 +77,7 @@ export function NewFolderDialog({
                   handleSave();
                 }
               }}
-              autoFocus
+              
             />
           </Div>
           <Div className="space-y-2">

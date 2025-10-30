@@ -9,11 +9,7 @@ import type { Route } from "next";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type {
-  ActionType,
-  ComponentVariant,
-  InterfaceContext,
-} from './enums';
+import type { ActionType, ComponentVariant, InterfaceContext } from "./enums";
 
 /**
  * Action execution timing

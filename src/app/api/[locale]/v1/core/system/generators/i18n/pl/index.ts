@@ -8,12 +8,12 @@ import { translations as taskIndexTranslations } from "../../task-index/i18n/pl"
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  category: "Generatory",
-  endpoint: endpointTranslations,
-  endpoints: endpointsTranslations,
-  generateAll: generateAllTranslations,
-  generateTrpcRouter: generateTrpcRouterTranslations,
+  "category": "Generatory",
+  "endpoint": endpointTranslations,
+  "endpoints": endpointsTranslations,
+  "generateAll": generateAllTranslations,
+  "generateTrpcRouter": generateTrpcRouterTranslations,
   "route-handlers": routeHandlersTranslations,
-  seeds: seedsTranslations,
-  taskIndex: taskIndexTranslations,
+  "seeds": seedsTranslations,
+  "taskIndex": taskIndexTranslations,
 };

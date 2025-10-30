@@ -10,6 +10,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {
+  DeleteEndpointTypes,
   EndpointReturn,
   EndpointUrlVariables,
   FormAlertState,
@@ -100,6 +101,7 @@ export function useEndpoint<
   T extends Partial<
     Record<
       Methods,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
     >
   >,
@@ -126,13 +128,13 @@ export function useEndpoint<
 
   // Extract endpoints
 
-  const readEndpoint = endpoints.GET || null;
+  const readEndpoint = endpoints.GET ?? null;
 
   const primaryEndpoint = primaryMutationMethod
-    ? endpoints[primaryMutationMethod]
+    ? (endpoints[primaryMutationMethod] ?? null)
     : null;
 
-  const deleteEndpoint = endpoints.DELETE || null;
+  const deleteEndpoint = endpoints.DELETE ?? null;
 
   // Use read hook for GET endpoints (list filtering not implemented yet)
   const read = useEndpointRead(readEndpoint, logger, {

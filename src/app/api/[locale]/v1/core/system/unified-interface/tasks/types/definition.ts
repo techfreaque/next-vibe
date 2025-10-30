@@ -25,21 +25,21 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "system", "tasks", "types"],
-  title: "app.api.v1.core.system.unifiedBackend.tasks.types.get.title",
+  title: "app.api.v1.core.system.unifiedInterface.tasks.types.get.title",
   description:
-    "app.api.v1.core.system.unifiedBackend.tasks.types.get.description",
-  category: "app.api.v1.core.system.unifiedBackend.tasks.category",
+    "app.api.v1.core.system.unifiedInterface.tasks.types.get.description",
+  category: "app.api.v1.core.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["tasks:types"],
-  tags: ["app.api.v1.core.system.unifiedBackend.tasks.types.get.title"],
+  tags: ["app.api.v1.core.system.unifiedInterface.tasks.types.get.title"],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.container.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.container.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.container.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -50,24 +50,24 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.types.get.fields.operation.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.types.get.fields.operation.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.types.get.fields.operation.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.types.get.fields.operation.description",
           options: [
             {
               value: "list",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.types.get.operation.list",
+                "app.api.v1.core.system.unifiedInterface.tasks.types.get.operation.list",
             },
             {
               value: "validate",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.types.get.operation.validate",
+                "app.api.v1.core.system.unifiedInterface.tasks.types.get.operation.validate",
             },
             {
               value: "export",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.types.get.operation.export",
+                "app.api.v1.core.system.unifiedInterface.tasks.types.get.operation.export",
             },
           ],
           layout: { columns: 4 },
@@ -81,29 +81,29 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.types.get.fields.category.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.types.get.fields.category.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.types.get.fields.category.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.types.get.fields.category.description",
           options: [
             {
               value: "cron",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.types.get.category.cron",
+                "app.api.v1.core.system.unifiedInterface.tasks.types.get.category.cron",
             },
             {
               value: "side",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.types.get.category.side",
+                "app.api.v1.core.system.unifiedInterface.tasks.types.get.category.side",
             },
             {
               value: "config",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.types.get.category.config",
+                "app.api.v1.core.system.unifiedInterface.tasks.types.get.category.config",
             },
             {
               value: "execution",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.types.get.category.execution",
+                "app.api.v1.core.system.unifiedInterface.tasks.types.get.category.execution",
             },
           ],
           layout: { columns: 4 },
@@ -116,24 +116,24 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.types.get.fields.format.label",
+            "app.api.v1.core.system.unifiedInterface.tasks.types.get.fields.format.label",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.types.get.fields.format.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.types.get.fields.format.description",
           options: [
             {
               value: "json",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.types.get.format.json",
+                "app.api.v1.core.system.unifiedInterface.tasks.types.get.format.json",
             },
             {
               value: "typescript",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.types.get.format.typescript",
+                "app.api.v1.core.system.unifiedInterface.tasks.types.get.format.typescript",
             },
             {
               value: "schema",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.types.get.format.schema",
+                "app.api.v1.core.system.unifiedInterface.tasks.types.get.format.schema",
             },
           ],
           layout: { columns: 4 },
@@ -146,7 +146,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.types.get.response.success.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.types.get.response.success.title",
         },
         z.boolean(),
       ),
@@ -155,7 +155,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.types.get.response.types.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.types.get.response.types.title",
         },
         z.record(z.string(), z.unknown()),
       ),
@@ -164,7 +164,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.types.get.response.metadata.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.types.get.response.metadata.title",
         },
         z.object({
           totalTypes: z.number(),
@@ -225,65 +225,65 @@ const { GET } = createEndpoint({
   errorTypes: {
     validation_failed: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.validation.description",
     },
     unauthorized: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.unauthorized.description",
     },
     server_error: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.internal.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.internal.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.internal.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.internal.description",
     },
     forbidden: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.forbidden.description",
     },
     not_found: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.notFound.description",
     },
     network_error: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.network.description",
     },
     unknown_error: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.unknown.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.unknown.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.unknown.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.unknown.description",
     },
     unsaved_changes: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.unsaved.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.unsaved.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.unsaved.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.unsaved.description",
     },
     conflict: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.types.get.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.conflict.description",
     },
   },
 
   successTypes: {
     title:
-      "app.api.v1.core.system.unifiedBackend.tasks.types.get.success.title",
+      "app.api.v1.core.system.unifiedInterface.tasks.types.get.success.title",
     description:
-      "app.api.v1.core.system.unifiedBackend.tasks.types.get.success.description",
+      "app.api.v1.core.system.unifiedInterface.tasks.types.get.success.description",
   },
 });
 

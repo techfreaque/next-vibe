@@ -153,6 +153,7 @@ export async function findTargetByGitTag(
     try {
       // Load the release config
       const configPath = pathToFileURL(target.configPath).href;
+      // eslint-disable-next-line eslint-plugin-next/no-assign-module-variable
       const module = (await import(configPath)) as LoadedModule;
 
       let config: ReleaseConfig | null = null;
@@ -198,6 +199,7 @@ export async function listAvailableTagPrefixes(
   for (const target of targets) {
     try {
       const configPath = pathToFileURL(target.configPath).href;
+      // eslint-disable-next-line eslint-plugin-next/no-assign-module-variable
       const module = (await import(configPath)) as LoadedModule;
 
       let config: ReleaseConfig | null = null;

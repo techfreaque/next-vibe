@@ -38,10 +38,10 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "system", "tasks", "cron", "stats"],
   title:
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.title",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.title",
   description:
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.description",
-  category: "app.api.v1.core.system.unifiedBackend.tasks.category",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.description",
+  category: "app.api.v1.core.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["cron:stats", "tasks:cron:stats"],
 
@@ -49,9 +49,9 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.form.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.form.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.form.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.form.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -62,29 +62,29 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.period.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.period.title",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.period.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.period.description",
           options: [
             {
               value: "hour",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.period.hour",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.period.hour",
             },
             {
               value: "day",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.period.day",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.period.day",
             },
             {
               value: "week",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.period.week",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.period.week",
             },
             {
               value: "month",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.period.month",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.period.month",
             },
           ],
           layout: { columns: 3 },
@@ -97,29 +97,29 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.type.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.type.title",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.type.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.type.description",
           options: [
             {
               value: "overview",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.type.overview",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.type.overview",
             },
             {
               value: "performance",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.type.performance",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.type.performance",
             },
             {
               value: "errors",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.type.errors",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.type.errors",
             },
             {
               value: "trends",
               label:
-                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.type.trends",
+                "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.type.trends",
             },
           ],
           layout: { columns: 3 },
@@ -132,9 +132,9 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.taskId.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskId.title",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.taskId.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskId.description",
           layout: { columns: 3 },
         },
         z.string().optional(),
@@ -145,9 +145,9 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.limit.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.limit.title",
           description:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.limit.description",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.limit.description",
           layout: { columns: 3 },
         },
         z.number().optional().default(100),
@@ -159,7 +159,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.timePeriod.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.timePeriod.title",
           layout: { columns: 3 },
         },
         z.string().optional(),
@@ -170,7 +170,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.dateRangePreset.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.dateRangePreset.title",
           layout: { columns: 3 },
         },
         z.string().optional(),
@@ -181,7 +181,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.taskName.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskName.title",
           layout: { columns: 3 },
         },
         z.string().optional(),
@@ -192,7 +192,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.taskStatus.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskStatus.title",
           layout: { columns: 3 },
         },
         z.string().optional(),
@@ -203,7 +203,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.taskPriority.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskPriority.title",
           layout: { columns: 3 },
         },
         z.string().optional(),
@@ -214,7 +214,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.healthStatus.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.healthStatus.title",
           layout: { columns: 3 },
         },
         z.string().optional(),
@@ -225,7 +225,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.minDuration.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.minDuration.title",
           layout: { columns: 3 },
         },
         z.number().optional(),
@@ -236,7 +236,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.maxDuration.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.maxDuration.title",
           layout: { columns: 3 },
         },
         z.number().optional(),
@@ -247,7 +247,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.includeDisabled.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.includeDisabled.title",
           layout: { columns: 3 },
         },
         z.boolean().optional(),
@@ -258,7 +258,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.includeSystemTasks.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.includeSystemTasks.title",
           layout: { columns: 3 },
         },
         z.boolean().optional(),
@@ -269,7 +269,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.hasRecentFailures.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.hasRecentFailures.title",
           layout: { columns: 3 },
         },
         z.boolean().optional(),
@@ -280,7 +280,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.hasTimeout.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.hasTimeout.title",
           layout: { columns: 3 },
         },
         z.boolean().optional(),
@@ -291,7 +291,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.fields.search.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.search.title",
           layout: { columns: 12 },
         },
         z.string().optional(),
@@ -302,7 +302,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.response.success.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.response.success.title",
         },
         z.boolean(),
       ),
@@ -311,7 +311,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.response.data.title",
+            "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.response.data.title",
         },
         z.object({
           // Basic stats fields
@@ -479,71 +479,71 @@ const { GET } = createEndpoint({
   ),
 
   tags: [
-    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.tag",
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.tag",
   ],
 
   errorTypes: {
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.server.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.server.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.server.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.server.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.validation.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.validation.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.validation.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.unauthorized.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.forbidden.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.forbidden.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.notFound.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.notFound.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.notFound.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.conflict.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.conflict.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.conflict.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.network.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.network.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.network.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.unknown.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.unknown.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.unknown.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.unsavedChanges.title",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.unsavedChanges.title",
       description:
-        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.errors.unsavedChanges.description",
+        "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.unsavedChanges.description",
     },
   },
 
   successTypes: {
     title:
-      "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.success.title",
+      "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.success.title",
     description:
-      "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.stats.get.success.description",
+      "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.success.description",
   },
 
   examples: {
