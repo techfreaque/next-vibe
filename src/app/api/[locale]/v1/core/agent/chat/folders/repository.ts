@@ -143,6 +143,7 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
         user,
         folderData.rootFolderId,
         logger,
+        folderData.parentId,
       );
 
       if (!hasPermission) {

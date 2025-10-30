@@ -21,6 +21,12 @@ declare const process: {
   env: {
     [key: string]: string | undefined;
   };
+  stdout: {
+    write: (message: string) => boolean;
+  };
+  stderr: {
+    write: (message: string) => boolean;
+  };
 };
 
 export const envClientSchema = z.object({
@@ -54,18 +60,39 @@ export const envClientSchema = z.object({
 export type EnvFrontend = z.infer<typeof envClientSchema>;
 export type EnvFrontendInput = z.input<typeof envClientSchema>;
 
-// Simple console logger for environment validation to avoid circular dependencies
+// Simple logger for environment validation to avoid circular dependencies
+// Uses process streams directly for better performance
 export const envValidationLogger: EndpointLogger = {
-  info: (message: string, meta?: ExplicitAnyType) =>
-    console.log(`[ENV] ${message}`, meta || ""),
-  error: (message: string, meta?: ExplicitAnyType) =>
-    console.error(`[ENV] ${message}`, meta || ""),
-  debug: (message: string, meta?: ExplicitAnyType) =>
-    console.log(`[ENV] ${message}`, meta || ""),
-  warn: (message: string, meta?: ExplicitAnyType) =>
-    console.warn(`[ENV] ${message}`, meta || ""),
-  vibe: (message: string, meta?: ExplicitAnyType) =>
-    console.log(`[ENV] ${message}`, meta || ""),
+  info: (message: string, meta?: ExplicitAnyType) => {
+    const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
+    if (typeof window === "undefined") {
+      process.stdout.write(`[ENV] ${message}${metaStr}\n`);
+    }
+  },
+  error: (message: string, meta?: ExplicitAnyType) => {
+    const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
+    if (typeof window === "undefined") {
+      process.stderr.write(`[ENV] ${message}${metaStr}\n`);
+    }
+  },
+  debug: (message: string, meta?: ExplicitAnyType) => {
+    const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
+    if (typeof window === "undefined") {
+      process.stdout.write(`[ENV] ${message}${metaStr}\n`);
+    }
+  },
+  warn: (message: string, meta?: ExplicitAnyType) => {
+    const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
+    if (typeof window === "undefined") {
+      process.stderr.write(`[ENV] ${message}${metaStr}\n`);
+    }
+  },
+  vibe: (message: string, meta?: ExplicitAnyType) => {
+    const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
+    if (typeof window === "undefined") {
+      process.stdout.write(`[ENV] ${message}${metaStr}\n`);
+    }
+  },
   isDebugEnabled: false,
 };
 

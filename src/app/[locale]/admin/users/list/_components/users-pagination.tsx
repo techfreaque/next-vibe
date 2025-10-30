@@ -11,6 +11,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Select,
@@ -19,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe-ui/ui/select";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { UsersListEndpointReturn } from "@/app/api/[locale]/v1/core/users/list/hooks";
@@ -72,23 +74,23 @@ export function UsersPagination({
   const endItem = Math.min(currentPage * currentLimit, totalItems);
 
   return (
-    <div className={`flex items-center justify-between ${className}`}>
-      <div className="flex items-center space-x-2">
-        <p className="text-sm text-gray-700 dark:text-gray-300">
+    <Div className={`flex items-center justify-between ${className}`}>
+      <Div className="flex items-center space-x-2">
+        <P className="text-sm text-gray-700 dark:text-gray-300">
           {t("app.admin.users.list.pagination.showing", {
             start: startItem,
             end: endItem,
             total: totalItems,
           })}
-        </p>
-      </div>
+        </P>
+      </Div>
 
-      <div className="flex items-center space-x-6">
+      <Div className="flex items-center space-x-6">
         {/* Items per page */}
-        <div className="flex items-center space-x-2">
-          <p className="text-sm text-gray-700 dark:text-gray-300">
+        <Div className="flex items-center space-x-2">
+          <P className="text-sm text-gray-700 dark:text-gray-300">
             {t("app.admin.users.list.pagination.per_page")}
-          </p>
+          </P>
           <Select
             value={currentLimit.toString()}
             onValueChange={handleLimitChange}
@@ -103,10 +105,10 @@ export function UsersPagination({
               <SelectItem value="100">100</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </Div>
 
         {/* Page navigation */}
-        <div className="flex items-center space-x-2">
+        <Div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
@@ -124,14 +126,14 @@ export function UsersPagination({
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          <div className="flex items-center space-x-1">
-            <span className="text-sm text-gray-700 dark:text-gray-300">
+          <Div className="flex items-center space-x-1">
+            <Span className="text-sm text-gray-700 dark:text-gray-300">
               {t("app.admin.users.list.pagination.page", {
                 current: currentPage,
                 total: totalPages,
               })}
-            </span>
-          </div>
+            </Span>
+          </Div>
 
           <Button
             variant="outline"
@@ -149,8 +151,8 @@ export function UsersPagination({
           >
             <ChevronsRight className="h-4 w-4" />
           </Button>
-        </div>
-      </div>
-    </div>
+        </Div>
+      </Div>
+    </Div>
   );
 }

@@ -7,6 +7,7 @@
 
 import { Eye, Mail, MailOpen, Paperclip, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Div } from "next-vibe-ui/ui";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import {
@@ -17,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { ImapMessageResponseType } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/list/definition";
@@ -91,19 +93,19 @@ export function ImapMessagesTable({
 
   if (loading) {
     return (
-      <div className="text-center py-8">
-        <p>{t("app.admin.emails.imap.common.loading")}</p>
-      </div>
+      <Div className="text-center py-8">
+        <P>{t("app.admin.emails.imap.common.loading")}</P>
+      </Div>
     );
   }
 
   if (messages.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">
+      <Div className="text-center py-8">
+        <P className="text-muted-foreground">
           {t("app.admin.emails.imap.messages.noMessages")}
-        </p>
-      </div>
+        </P>
+      </Div>
     );
   }
 
@@ -136,46 +138,46 @@ export function ImapMessagesTable({
             className={!message.isRead ? "bg-blue-50 dark:bg-blue-950/20" : ""}
           >
             <TableCell>
-              <div className="flex items-center space-x-2">
+              <Div className="flex items-center space-x-2">
                 {getStatusIcon(message)}
-              </div>
+              </Div>
             </TableCell>
             <TableCell>
-              <div className="space-y-1">
-                <div
+              <Div className="space-y-1">
+                <Div
                   className={`font-medium ${!message.isRead ? "font-bold" : ""}`}
                 >
                   {truncateText(
                     message.subject ||
                       t("app.admin.emails.imap.messages.noSubject"),
                   )}
-                </div>
+                </Div>
                 {getStatusBadge(message, t)}
-              </div>
+              </Div>
             </TableCell>
             <TableCell>
-              <div className="space-y-1">
-                <div className="font-medium">
+              <Div className="space-y-1">
+                <Div className="font-medium">
                   {message.senderName || message.senderEmail}
-                </div>
+                </Div>
                 {message.senderName && (
-                  <div className="text-sm text-muted-foreground">
+                  <Div className="text-sm text-muted-foreground">
                     {message.senderEmail}
-                  </div>
+                  </Div>
                 )}
-              </div>
+              </Div>
             </TableCell>
             <TableCell>
-              <div className="text-sm text-muted-foreground">-</div>
+              <Div className="text-sm text-muted-foreground">-</Div>
             </TableCell>
             <TableCell>
-              <div className="text-sm">{formatDate(message.sentAt, t)}</div>
+              <Div className="text-sm">{formatDate(message.sentAt, t)}</Div>
             </TableCell>
             <TableCell>
               {message.hasAttachments && (
-                <div className="flex items-center space-x-1">
+                <Div className="flex items-center space-x-1">
                   <Paperclip className="h-4 w-4 text-gray-600" />
-                </div>
+                </Div>
               )}
             </TableCell>
             <TableCell>
@@ -184,7 +186,7 @@ export function ImapMessagesTable({
               )}
             </TableCell>
             <TableCell>
-              <div className="flex items-center space-x-2">
+              <Div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -193,7 +195,7 @@ export function ImapMessagesTable({
                   <Eye className="h-4 w-4 mr-1" />
                   {t("app.admin.emails.imap.common.view")}
                 </Button>
-              </div>
+              </Div>
             </TableCell>
           </TableRow>
         ))}

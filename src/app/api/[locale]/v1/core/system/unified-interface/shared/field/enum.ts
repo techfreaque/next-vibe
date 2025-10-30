@@ -53,7 +53,7 @@ export function createEnumOptions<
     enum: enumObj,
     options: optionsArray,
     // intentianally unsafe cast to get a enum value type
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Type placeholder for enum value extraction requires 'unknown' cast for type system compatibility
     Value: undefined as unknown as keyof T as keyof T,
   };
 }

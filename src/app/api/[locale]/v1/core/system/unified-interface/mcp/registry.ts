@@ -203,6 +203,8 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
   }: {
     error: string;
     code: MCPErrorCode;
+    // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Tool registration requires 'unknown' for flexible tool definitions
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Tool registration requires 'unknown' for flexible tool definitions
     details?: { [key: string]: unknown };
   }): MCPToolCallResult {
     return {

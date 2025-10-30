@@ -66,10 +66,9 @@ export class AvatarRepositoryImpl implements AvatarRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<AvatarPostResponseOutput>> {
     try {
-      // TODO: Use file parameter when implementing actual file upload
       logger.debug(
         "app.api.v1.core.user.private.me.avatar.debug.uploadingUserAvatar",
-        { userId },
+        { userId, fileName: file.name, fileSize: file.size, fileType: file.type },
       );
 
       // Check if user exists
@@ -87,19 +86,51 @@ export class AvatarRepositoryImpl implements AvatarRepository {
         );
       }
 
-      // TODO: Implement file upload to storage service
-      // TODO: Add avatar field to database schema
-      // Implementation would handle file upload to storage service
-      const avatarUrl = `https://example.com/avatars/${userId}.jpg`;
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        return createErrorResponse(
+          "app.api.v1.core.user.private.me.avatar.errors.invalid_file_type",
+          ErrorResponseTypes.VALIDATION_ERROR,
+          { allowedTypes: allowedTypes.join(", "), providedType: file.type },
+        );
+      }
 
-      // TODO: Uncomment when avatar field is added to DB schema
-      // await db
-      //   .update(users)
-      //   .set({
-      //     avatarUrl: avatarUrl,
-      //     updatedAt: new Date(),
-      //   })
-      //   .where(eq(users.id, userId));
+      // Validate file size (max 5MB)
+      const maxSizeBytes = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSizeBytes) {
+        return createErrorResponse(
+          "app.api.v1.core.user.private.me.avatar.errors.file_too_large",
+          ErrorResponseTypes.VALIDATION_ERROR,
+          { maxSize: "5MB", providedSize: `${Math.round(file.size / 1024 / 1024)}MB` },
+        );
+      }
+
+      // Convert file to base64 and store in database
+      // In a production environment, this should upload to a cloud storage service (S3, Cloudinary, etc.)
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const base64 = buffer.toString('base64');
+      const avatarUrl = `data:${file.type};base64,${base64}`;
+
+      // Update user avatar in database
+      const { eq } = await import("drizzle-orm");
+      const { db } = await import("@/app/api/[locale]/v1/core/system/db");
+      const { users } = await import("../../../db");
+
+      await db
+        .update(users)
+        .set({
+          avatarUrl: avatarUrl,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, userId));
+
+      logger.info("Avatar uploaded successfully", {
+        userId,
+        fileType: file.type,
+        fileSize: file.size,
+      });
 
       // Revalidate relevant paths
       revalidatePath(`/dashboard/profile`);
@@ -162,17 +193,20 @@ export class AvatarRepositoryImpl implements AvatarRepository {
         );
       }
 
-      // TODO: Implement deletion from storage service
-      // TODO: Add avatar field to database schema
+      // Delete avatar from database
+      const { eq } = await import("drizzle-orm");
+      const { db } = await import("@/app/api/[locale]/v1/core/system/db");
+      const { users } = await import("../../../db");
 
-      // TODO: Uncomment when avatar field is added to DB schema
-      // await db
-      //   .update(users)
-      //   .set({
-      //     avatarUrl: null,
-      //     updatedAt: new Date(),
-      //   })
-      //   .where(eq(users.id, userId));
+      await db
+        .update(users)
+        .set({
+          avatarUrl: null,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, userId));
+
+      logger.info("Avatar deleted successfully", { userId });
 
       // Revalidate relevant paths
       revalidatePath(`/dashboard/profile`);

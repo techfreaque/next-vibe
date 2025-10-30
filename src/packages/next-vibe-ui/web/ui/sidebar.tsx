@@ -44,7 +44,7 @@ const SidebarContext = React.createContext<SidebarContextType | null>(null);
 function useSidebar(): SidebarContextType {
   const context = React.useContext(SidebarContext);
   if (!context) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
     throw new Error("useSidebar must be used within a SidebarProvider.");
   }
 

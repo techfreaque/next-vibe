@@ -8,10 +8,12 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
+import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -66,13 +68,13 @@ function ValueCard({
   return (
     <Card className="h-full transition-all hover:shadow-md">
       <CardHeader>
-        <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-2">
+        <Div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-2">
           {icon}
-        </div>
+        </Div>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground">{description}</p>
+        <P className="text-muted-foreground">{description}</P>
       </CardContent>
     </Card>
   );
@@ -117,11 +119,11 @@ export default async function AboutUsPage({
   ];
 
   return (
-    <main className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
+    <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
       {/* Hero Section */}
-      <div className="relative bg-blue-600 dark:bg-blue-900 text-white">
-        <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070')] bg-cover bg-center" />
-        <div className="container mx-auto px-4 py-24 relative z-10">
+      <Div className="relative bg-blue-600 dark:bg-blue-900 text-white">
+        <Div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070')] bg-cover bg-center" />
+        <Div className="container mx-auto px-4 py-24 relative z-10">
           <Link
             href={`/${locale}/help`}
             className="inline-flex items-center text-sm text-white/80 hover:text-white mb-8 transition-colors"
@@ -130,60 +132,60 @@ export default async function AboutUsPage({
             {t("app.story._components.home.aboutUs.backToHome")}
           </Link>
 
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <Div className="max-w-3xl">
+            <H1 className="text-4xl md:text-5xl font-bold mb-6">
               {t("app.story._components.home.aboutUs.title")}
-            </h1>
-            <p className="text-xl md:text-2xl opacity-90 mb-8">
+            </H1>
+            <P className="text-xl md:text-2xl opacity-90 mb-8">
               {t("app.story._components.home.aboutUs.subtitle")}
-            </p>
-            <p className="text-lg opacity-80">
+            </P>
+            <P className="text-lg opacity-80">
               {t("app.story._components.home.aboutUs.description")}
-            </p>
-          </div>
-        </div>
-      </div>
+            </P>
+          </Div>
+        </Div>
+      </Div>
 
-      <div className="container mx-auto px-4 py-16">
+      <Div className="container mx-auto px-4 py-16">
         {/* Mission Section */}
-        <section className="mb-24">
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6">
+        <Div className="mb-24">
+          <Div className="max-w-4xl mx-auto text-center mb-16">
+            <H2 className="text-4xl font-bold mb-6">
               {t("app.story._components.home.aboutUs.mission.title")}
-            </h2>
-            <p className="text-xl text-blue-600 dark:text-blue-400 font-semibold mb-8">
+            </H2>
+            <P className="text-xl text-blue-600 dark:text-blue-400 font-semibold mb-8">
               {t("app.story._components.home.aboutUs.mission.subtitle")}
-            </p>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            </P>
+            <P className="text-lg text-muted-foreground leading-relaxed">
               {t("app.story._components.home.aboutUs.mission.description")}
-            </p>
-          </div>
+            </P>
+          </Div>
 
           {/* Mission Cards Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          <Div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             <Card className="h-full transition-all hover:shadow-lg border-l-4 border-l-blue-500">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-blue-150 bg-gradient-to-br from-blue-100 to-blue-200 dark:bg-blue-850 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center mb-4">
+                <Div className="w-14 h-14 rounded-full bg-blue-150 bg-gradient-to-br from-blue-100 to-blue-200 dark:bg-blue-850 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center mb-4">
                   <Lightbulb className="h-7 w-7 text-blue-600 dark:text-blue-400" />
-                </div>
+                </Div>
                 <CardTitle className="text-xl">
                   {t("app.story._components.home.aboutUs.mission.vision.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <P className="text-muted-foreground leading-relaxed">
                   {t(
                     "app.story._components.home.aboutUs.mission.vision.description",
                   )}
-                </p>
+                </P>
               </CardContent>
             </Card>
 
             <Card className="h-full transition-all hover:shadow-lg border-l-4 border-l-green-500">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-green-150 bg-gradient-to-br from-green-100 to-green-200 dark:bg-green-850 dark:from-green-900 dark:to-green-800 flex items-center justify-center mb-4">
+                <Div className="w-14 h-14 rounded-full bg-green-150 bg-gradient-to-br from-green-100 to-green-200 dark:bg-green-850 dark:from-green-900 dark:to-green-800 flex items-center justify-center mb-4">
                   <Globe className="h-7 w-7 text-green-600 dark:text-green-400" />
-                </div>
+                </Div>
                 <CardTitle className="text-xl">
                   {t(
                     "app.story._components.home.aboutUs.mission.approach.title",
@@ -191,19 +193,19 @@ export default async function AboutUsPage({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <P className="text-muted-foreground leading-relaxed">
                   {t(
                     "app.story._components.home.aboutUs.mission.approach.description",
                   )}
-                </p>
+                </P>
               </CardContent>
             </Card>
 
             <Card className="h-full transition-all hover:shadow-lg border-l-4 border-l-purple-500 md:col-span-2 lg:col-span-1">
               <CardHeader>
-                <div className="w-14 h-14 rounded-full bg-purple-150 bg-gradient-to-br from-purple-100 to-purple-200 dark:bg-purple-850 dark:from-purple-900 dark:to-purple-800 flex items-center justify-center mb-4">
+                <Div className="w-14 h-14 rounded-full bg-purple-150 bg-gradient-to-br from-purple-100 to-purple-200 dark:bg-purple-850 dark:from-purple-900 dark:to-purple-800 flex items-center justify-center mb-4">
                   <Handshake className="h-7 w-7 text-purple-600 dark:text-purple-400" />
-                </div>
+                </Div>
                 <CardTitle className="text-xl">
                   {t(
                     "app.story._components.home.aboutUs.mission.commitment.title",
@@ -211,47 +213,47 @@ export default async function AboutUsPage({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <P className="text-muted-foreground leading-relaxed">
                   {t(
                     "app.story._components.home.aboutUs.mission.commitment.description",
                   )}
-                </p>
+                </P>
               </CardContent>
             </Card>
-          </div>
+          </Div>
 
           {/* Hero Image */}
-          <div className="relative rounded-2xl overflow-hidden h-[400px] shadow-2xl">
+          <Div className="relative rounded-2xl overflow-hidden h-[400px] shadow-2xl">
             <Image
               src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070"
               alt={t("app.story._components.home.aboutUs.mission.title")}
               fill
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-black/60 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-            <div className="absolute bottom-8 left-8 right-8 text-white">
-              <h3 className="text-2xl font-bold mb-2">
+            <Div className="absolute inset-0 bg-black/60 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+            <Div className="absolute bottom-8 left-8 right-8 text-white">
+              <H3 className="text-2xl font-bold mb-2">
                 {t("app.common.logoPart1")} {t("app.common.logoPart2")}
-              </h3>
-              <p className="text-lg opacity-90">
+              </H3>
+              <P className="text-lg opacity-90">
                 {t("app.story._components.home.hero.subtitle")}
-              </p>
-            </div>
-          </div>
-        </section>
+              </P>
+            </Div>
+          </Div>
+        </Div>
 
         {/* Values Section */}
-        <section className="mb-24">
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">
+        <Div className="mb-24">
+          <Div className="max-w-3xl mx-auto text-center mb-12">
+            <H2 className="text-3xl font-bold mb-4">
               {t("app.story._components.home.aboutUs.values.title")}
-            </h2>
-            <p className="text-lg text-muted-foreground">
+            </H2>
+            <P className="text-lg text-muted-foreground">
               {t("app.story._components.home.aboutUs.values.description")}
-            </p>
-          </div>
+            </P>
+          </Div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((value, index) => (
               <ValueCard
                 key={index}
@@ -260,29 +262,29 @@ export default async function AboutUsPage({
                 icon={value.icon}
               />
             ))}
-          </div>
-        </section>
+          </Div>
+        </Div>
 
         {/* Contact Section */}
         <Separator className="my-16" />
 
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">
+        <Div className="max-w-3xl mx-auto text-center mb-12">
+          <H2 className="text-3xl font-bold mb-4">
             {t("app.story._components.home.aboutUs.contact.title")}
-          </h2>
-          <p className="text-lg text-muted-foreground">
+          </H2>
+          <P className="text-lg text-muted-foreground">
             {t("app.story._components.home.aboutUs.contact.description")}
-          </p>
-        </div>
+          </P>
+        </Div>
 
-        <div className="mt-12 text-center">
+        <Div className="mt-12 text-center">
           <Button asChild size="lg">
             <Link href={`/${locale}/help`}>
               {t("app.story._components.home.aboutUs.contact.cta")}
             </Link>
           </Button>
-        </div>
-      </div>
-    </main>
+        </Div>
+      </Div>
+    </Div>
   );
 }

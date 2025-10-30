@@ -23,6 +23,8 @@ CREATE TABLE "chat_messages" (
 	"content" text NOT NULL,
 	"parent_id" uuid,
 	"depth" integer DEFAULT 0 NOT NULL,
+	"sequence_id" uuid,
+	"sequence_index" integer DEFAULT 0 NOT NULL,
 	"author_id" text,
 	"author_name" text,
 	"author_avatar" text,
@@ -661,16 +663,25 @@ CREATE TABLE "subscriptions" (
 CREATE TABLE "cron_task_executions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"task_id" uuid NOT NULL,
+	"task_name" text NOT NULL,
+	"execution_id" text NOT NULL,
 	"status" text NOT NULL,
+	"priority" text NOT NULL,
 	"started_at" timestamp NOT NULL,
 	"completed_at" timestamp,
 	"duration_ms" integer,
 	"config" jsonb NOT NULL,
 	"result" jsonb,
 	"error" jsonb,
-	"skipped_reason" text,
-	"execution_environment" text,
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"error_stack" text,
+	"is_manual" boolean DEFAULT false NOT NULL,
+	"is_dry_run" boolean DEFAULT false NOT NULL,
+	"retry_attempt" integer DEFAULT 0 NOT NULL,
+	"parent_execution_id" text,
+	"triggered_by" text,
+	"environment" text DEFAULT 'production',
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "cron_task_executions_execution_id_unique" UNIQUE("execution_id")
 );
 --> statement-breakpoint
 CREATE TABLE "cron_task_schedules" (
@@ -691,69 +702,33 @@ CREATE TABLE "cron_task_schedules" (
 CREATE TABLE "cron_tasks" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
-	"schedule" text,
-	"schedule_function" text,
+	"description" text,
+	"version" text DEFAULT '1.0.0' NOT NULL,
+	"category" text NOT NULL,
+	"schedule" text NOT NULL,
+	"timezone" text DEFAULT 'UTC',
 	"enabled" boolean DEFAULT true NOT NULL,
 	"priority" text NOT NULL,
 	"timeout" integer DEFAULT 300000,
 	"retries" integer DEFAULT 3,
-	"description" text,
-	"version" text NOT NULL,
-	"category" text NOT NULL,
-	"tags" jsonb,
-	"dependencies" jsonb,
-	"default_config" jsonb NOT NULL,
-	"monitoring" jsonb,
-	"documentation" jsonb,
-	"last_run" timestamp,
-	"next_run" timestamp,
-	"run_count" integer DEFAULT 0 NOT NULL,
+	"retry_delay" integer DEFAULT 30000,
+	"default_config" jsonb DEFAULT '{}'::jsonb NOT NULL,
+	"last_executed_at" timestamp,
+	"last_execution_status" text,
+	"last_execution_error" text,
+	"last_execution_duration" integer,
+	"next_execution_at" timestamp,
+	"execution_count" integer DEFAULT 0 NOT NULL,
 	"success_count" integer DEFAULT 0 NOT NULL,
 	"error_count" integer DEFAULT 0 NOT NULL,
-	"average_execution_time" integer,
-	"last_execution_duration" integer,
-	"last_error" text,
+	"average_execution_time" integer DEFAULT 0,
+	"tags" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	"dependencies" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	"monitoring" jsonb,
+	"documentation" jsonb,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "cron_tasks_name_unique" UNIQUE("name")
-);
---> statement-breakpoint
-CREATE TABLE "side_tasks" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" text NOT NULL,
-	"description" text,
-	"version" text DEFAULT '1.0.0' NOT NULL,
-	"category" text NOT NULL,
-	"enabled" boolean DEFAULT true NOT NULL,
-	"priority" text NOT NULL,
-	"auto_restart" boolean DEFAULT true NOT NULL,
-	"restart_delay" integer DEFAULT 5000,
-	"max_restarts" integer DEFAULT 5,
-	"health_check_interval" integer DEFAULT 30000,
-	"process_id" text,
-	"started_at" timestamp,
-	"last_health_check" timestamp,
-	"restart_count" integer DEFAULT 0 NOT NULL,
-	"is_running" boolean DEFAULT false NOT NULL,
-	"default_config" jsonb DEFAULT '{}'::jsonb NOT NULL,
-	"environment" jsonb DEFAULT '{}'::jsonb NOT NULL,
-	"tags" jsonb DEFAULT '[]'::jsonb NOT NULL,
-	"monitoring" jsonb,
-	"documentation" jsonb,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "side_tasks_name_unique" UNIQUE("name")
-);
---> statement-breakpoint
-CREATE TABLE "task_runner_state" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"task_name" text NOT NULL,
-	"task_type" text NOT NULL,
-	"status" text NOT NULL,
-	"started_at" timestamp NOT NULL,
-	"environment" text NOT NULL,
-	"runner_instance_id" text NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "pulse_executions" (
@@ -855,6 +830,44 @@ CREATE TABLE "side_task_health_checks" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "side_tasks" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" text NOT NULL,
+	"description" text,
+	"version" text DEFAULT '1.0.0' NOT NULL,
+	"category" text NOT NULL,
+	"enabled" boolean DEFAULT true NOT NULL,
+	"priority" text NOT NULL,
+	"auto_restart" boolean DEFAULT true NOT NULL,
+	"restart_delay" integer DEFAULT 5000,
+	"max_restarts" integer DEFAULT 5,
+	"health_check_interval" integer DEFAULT 30000,
+	"process_id" text,
+	"started_at" timestamp,
+	"last_health_check" timestamp,
+	"restart_count" integer DEFAULT 0 NOT NULL,
+	"is_running" boolean DEFAULT false NOT NULL,
+	"default_config" jsonb DEFAULT '{}'::jsonb NOT NULL,
+	"environment" jsonb DEFAULT '{}'::jsonb NOT NULL,
+	"tags" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	"monitoring" jsonb,
+	"documentation" jsonb,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "side_tasks_name_unique" UNIQUE("name")
+);
+--> statement-breakpoint
+CREATE TABLE "task_runner_state" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"task_name" text NOT NULL,
+	"task_type" text NOT NULL,
+	"status" text NOT NULL,
+	"started_at" timestamp NOT NULL,
+	"environment" text NOT NULL,
+	"runner_instance_id" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "user_roles" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
@@ -876,6 +889,9 @@ CREATE TABLE "users" (
 	"is_banned" boolean DEFAULT false NOT NULL,
 	"banned_reason" text,
 	"stripe_customer_id" text,
+	"avatar_url" text,
+	"two_factor_enabled" boolean DEFAULT false NOT NULL,
+	"two_factor_secret" text,
 	"created_by" uuid,
 	"updated_by" uuid,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -938,7 +954,7 @@ ALTER TABLE "payment_refunds" ADD CONSTRAINT "payment_refunds_user_id_users_id_f
 ALTER TABLE "payment_refunds" ADD CONSTRAINT "payment_refunds_transaction_id_payment_transactions_id_fk" FOREIGN KEY ("transaction_id") REFERENCES "public"."payment_transactions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "payment_transactions" ADD CONSTRAINT "payment_transactions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "cron_task_executions" ADD CONSTRAINT "cron_task_executions_task_id_cron_tasks_id_fk" FOREIGN KEY ("task_id") REFERENCES "public"."cron_tasks"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "cron_task_executions" ADD CONSTRAINT "cron_task_executions_task_id_cron_tasks_id_fk" FOREIGN KEY ("task_id") REFERENCES "public"."cron_tasks"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "cron_task_schedules" ADD CONSTRAINT "cron_task_schedules_task_id_cron_tasks_id_fk" FOREIGN KEY ("task_id") REFERENCES "public"."cron_tasks"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "pulse_notifications" ADD CONSTRAINT "pulse_notifications_pulse_execution_id_pulse_executions_id_fk" FOREIGN KEY ("pulse_execution_id") REFERENCES "public"."pulse_executions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "side_task_executions" ADD CONSTRAINT "side_task_executions_task_id_side_tasks_id_fk" FOREIGN KEY ("task_id") REFERENCES "public"."side_tasks"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

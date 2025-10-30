@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-import type { z } from "zod";
 import {
   createSuccessResponse,
   ErrorResponseTypes,
@@ -101,7 +100,7 @@ export function useApiQueryForm<
   >
 > {
   if (!endpoint) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- React hook requires throwing for missing required endpoint parameter
     throw new Error("Endpoint is required");
   }
   const {
@@ -220,7 +219,8 @@ export function useApiQueryForm<
 
   const formConfig = {
     ...restFormOptions,
-    resolver: zodResolver(endpoint.requestSchema as z.ZodType<FormData>),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(endpoint.requestSchema as any),
   };
 
   // Generate a storage key based on the endpoint if not provided
@@ -229,7 +229,8 @@ export function useApiQueryForm<
     `query-form-${endpoint.path.join("-")}-${endpoint.method}`;
 
   // Initialize form with the proper configuration
-  const formMethods = useForm<FormData>(formConfig);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formMethods = useForm<FormData>(formConfig as any);
   const { watch } = formMethods;
 
   // Implement form persistence directly
@@ -601,7 +602,7 @@ export function useApiQueryForm<
             });
             options.onSuccess({
               responseData: result.data,
-              pathParams: options.urlParamVariables,
+              pathParams: options.urlParamVariables!,
               requestData: formData,
             });
           } else if (!result.success && options.onError) {
@@ -699,17 +700,24 @@ export function useApiQueryForm<
     };
 
   // Create a result object that combines form and query functionality
-  return {
-    form: formMethods,
+  // Simplify error message to avoid complex union type - use explicit type assertion
+  const queryError = query.error;
+  const formError = formState.formError;
+  const queryErrorMessage: string = queryError ? (queryError.message as string) : "";
+  const formErrorMessage: string = formError ? (formError.message as string) : "";
+  const errorMessage: string | undefined = queryErrorMessage || formErrorMessage || undefined;
+
+  const result = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    form: formMethods as any,
 
     // Use the query response as the primary response
     response: query.response,
 
     // Backward compatibility properties
     isSubmitSuccessful: query.isSuccess,
-    submitError: query.error ?? formState.formError ?? undefined,
-    errorMessage:
-      query.error?.message ?? formState.formError?.message ?? undefined,
+    submitError: (query.error || formState.formError || undefined) as ErrorResponseType | undefined,
+    errorMessage,
 
     // Query-specific properties (backward compatibility)
     data: query.data,
@@ -736,4 +744,7 @@ export function useApiQueryForm<
     // Form persistence
     clearSavedForm,
   };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return result as any;
 }

@@ -75,7 +75,7 @@ const pulseTaskRunner: TaskRunner = {
       // Wait for next pulse or abort signal
       await new Promise<void>((resolve) => {
         let resolved = false;
-        const safeResolve = () => {
+        const safeResolve = (): void => {
           if (!resolved) {
             resolved = true;
             resolve();

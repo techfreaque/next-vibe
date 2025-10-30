@@ -4,6 +4,8 @@
  */
 
 import type { Metadata } from "next";
+import { Div } from "next-vibe-ui/ui";
+import { H1, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import type { IndividualCronTaskType } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/task/[id]/definition";
@@ -50,22 +52,22 @@ export default async function CronTaskEditPage({
   };
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">
+    <Div className="container mx-auto py-6">
+      <Div className="mb-6">
+        <H1 className="text-3xl font-bold">
           {t("app.admin.cron.taskDetails.edit")}
-        </h1>
-        <p className="text-muted-foreground">
+        </H1>
+        <P className="text-muted-foreground">
           {t("app.admin.cron.taskDetails.editDescription")}
-        </p>
-      </div>
+        </P>
+      </Div>
 
       <CronTaskEditClient
         taskId={id}
         locale={locale}
         initialData={taskWithComputedFields}
       />
-    </div>
+    </Div>
   );
 }
 

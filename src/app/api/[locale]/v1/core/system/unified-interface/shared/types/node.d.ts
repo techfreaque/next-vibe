@@ -19,8 +19,8 @@ declare global {
    * Error constructor extensions
    */
   interface ErrorConstructor {
-    // eslint-disable-next-line no-restricted-syntax, @typescript-eslint/no-unsafe-function-type
-    captureStackTrace(targetObject: object, constructorOpt?: Function): void;
+    // eslint-disable-next-line no-restricted-syntax, @typescript-eslint/no-unsafe-function-type, oxlint-plugin-restricted/restricted-syntax
+    captureStackTrace(targetObject: Record<string, unknown>, constructorOpt?: Function): void;
   }
 
   namespace NodeJS {

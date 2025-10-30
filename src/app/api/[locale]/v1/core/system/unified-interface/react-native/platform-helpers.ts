@@ -56,7 +56,7 @@ export { Link } from "expo-router";
  */
 export function assertNative(): asserts this is typeof isNative {
   if (!isNative) {
-    // eslint-disable-next-line i18next/no-literal-string, no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Platform guard assertion requires throwing for incorrect platform
     throw new Error("This code should only run on native platforms");
   }
 }
@@ -66,7 +66,7 @@ export function assertNative(): asserts this is typeof isNative {
  */
 export function assertWeb(): asserts this is typeof isWeb {
   if (!isWeb) {
-    // eslint-disable-next-line i18next/no-literal-string, no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Platform guard assertion requires throwing for incorrect platform
     throw new Error("This code should only run on web platform");
   }
 }

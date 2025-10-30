@@ -10,6 +10,8 @@ import {
 } from "next-vibe-ui/ui/card";
 import type { JSX } from "react";
 
+import { simpleT } from "@/i18n/core/shared";
+
 import type {
   ContainerWidgetData,
   RenderableValue,
@@ -42,6 +44,8 @@ export function ContainerWidget({
   className,
   style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
+  const { t } = simpleT(context.locale);
+
   if (!isContainerWidgetData(data)) {
     return (
       <div
@@ -65,8 +69,9 @@ export function ContainerWidget({
           </CardHeader>
         )}
         <CardContent>
-          {/* eslint-disable-next-line i18next/no-literal-string */}
-          <p className="italic text-muted-foreground">No content</p>
+          <p className="italic text-muted-foreground">
+            {t("app.api.v1.core.system.unifiedInterface.react.widgets.container.noContent")}
+          </p>
         </CardContent>
       </Card>
     );

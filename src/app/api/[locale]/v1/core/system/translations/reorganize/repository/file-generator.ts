@@ -333,8 +333,9 @@ export class FileGenerator {
 
       // Set translations for the leaf node
       const leafPath = pathParts.join("/");
-      if (hierarchy.has(leafPath)) {
-        hierarchy.get(leafPath)!.translations = translations;
+      const leafNode = hierarchy.get(leafPath);
+      if (leafNode) {
+        leafNode.translations = translations;
       }
     }
 
@@ -347,8 +348,9 @@ export class FileGenerator {
       const pathParts = path.split("/");
       const parentPath = pathParts.slice(0, -1).join("/");
 
-      if (hierarchy.has(parentPath)) {
-        hierarchy.get(parentPath)!.children.add(path);
+      const parentNode = hierarchy.get(parentPath);
+      if (parentNode) {
+        parentNode.children.add(path);
       }
     }
 
@@ -704,7 +706,10 @@ export class FileGenerator {
 
         // Add location to leaf node
         if (i === parts.length) {
-          hierarchy.get(currentPath)!.locations.push(location);
+          const currentNode = hierarchy.get(currentPath);
+          if (currentNode) {
+            currentNode.locations.push(location);
+          }
         }
       }
     }
@@ -718,8 +723,9 @@ export class FileGenerator {
       const parts = path.split("/");
       const parentPath = parts.slice(0, -1).join("/");
 
-      if (hierarchy.has(parentPath)) {
-        hierarchy.get(parentPath)!.children.add(path);
+      const parentNode = hierarchy.get(parentPath);
+      if (parentNode) {
+        parentNode.children.add(path);
       }
     }
 
@@ -981,7 +987,10 @@ export class FileGenerator {
 
         // Add co-located file to leaf node
         if (i === parts.length) {
-          hierarchy.get(currentPath)!.colocatedFiles.push(location);
+          const currentNode = hierarchy.get(currentPath);
+          if (currentNode) {
+            currentNode.colocatedFiles.push(location);
+          }
         }
       }
     }
@@ -995,8 +1004,9 @@ export class FileGenerator {
       const parts = currentPath.split("/");
       const parentPath = parts.slice(0, -1).join("/");
 
-      if (hierarchy.has(parentPath)) {
-        hierarchy.get(parentPath)!.children.add(currentPath);
+      const parentNode = hierarchy.get(parentPath);
+      if (parentNode) {
+        parentNode.children.add(currentPath);
       }
     }
 

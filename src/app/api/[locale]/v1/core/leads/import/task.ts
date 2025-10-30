@@ -114,12 +114,41 @@ async function executeCsvProcessor(
           totalRows: job.totalRows,
         });
 
-        // TODO: Implement CSV import job processing
-        // For now, skip processing since processImportJob doesn't exist yet
-        logger.info("tasks.csv_processor.job_skipped", {
-          jobId: job.id,
-          reason: "processImportJob not implemented",
-        });
+        // Process the import job using the import repository
+        const { importRepository } = await import(
+          "@/app/api/[locale]/v1/core/import/repository"
+        );
+        const { leadsImportRepository } = await import("./repository");
+
+        // Process one batch of the job
+        const batchResult = await importRepository.processBatch(
+          job.id,
+          leadsImportRepository,
+          logger,
+        );
+
+        if (batchResult.success) {
+          successfulImports++;
+          totalRowsProcessed += batchResult.data.processed;
+
+          logger.info("tasks.csv_processor.job_batch_processed", {
+            jobId: job.id,
+            processed: batchResult.data.processed,
+            hasMore: batchResult.data.hasMore,
+          });
+        } else {
+          failedImports++;
+          errors.push({
+            jobId: job.id,
+            stage: "batch_processing",
+            error: batchResult.message,
+          });
+
+          logger.error("tasks.csv_processor.job_batch_failed", {
+            jobId: job.id,
+            error: batchResult.message,
+          });
+        }
       } catch (error) {
         failedImports++;
         const errorMessage: string =

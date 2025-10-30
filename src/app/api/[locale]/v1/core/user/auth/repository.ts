@@ -27,7 +27,7 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
-import { leadAuthService } from "../../leads/auth-service";
+import { leadAuthRepository } from "../../leads/auth/repository";
 import { leads, userLeads } from "../../leads/db";
 import { LeadSource, LeadStatus } from "../../leads/enum";
 import { db } from "../../system/db";
@@ -1131,7 +1131,7 @@ class AuthRepositoryImpl implements AuthRepository {
         userId,
       });
 
-      const leadIdResult = await leadAuthService.getAuthenticatedUserLeadId(
+      const leadIdResult = await leadAuthRepository.getAuthenticatedUserLeadId(
         userId,
         undefined,
         locale,

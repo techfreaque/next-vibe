@@ -5,7 +5,9 @@ export const translations: typeof enTranslations = {
   description: "Bezpiecznie zaktualizuj hasło do swojego konta",
   tag: "zmiana-hasła",
   debug: {
+    updatingPassword: "Aktualizowanie hasła",
     errorUpdatingPassword: "Błąd podczas aktualizacji hasła",
+    settingPassword: "Ustawianie hasła",
     errorSettingPassword: "Błąd podczas ustawiania hasła",
   },
   groups: {
@@ -66,6 +68,8 @@ export const translations: typeof enTranslations = {
     incorrect_password: "Nieprawidłowe hasło",
     update_failed: "Nie udało się zaktualizować hasła",
     token_creation_failed: "Nie udało się utworzyć tokenu hasła",
+    two_factor_code_required: "Wymagany kod uwierzytelniania dwuskładnikowego",
+    invalid_two_factor_code: "Nieprawidłowy kod uwierzytelniania dwuskładnikowego",
     invalid_request: {
       title: "Nieprawidłowe Żądanie",
       description: "Żądanie zmiany hasła jest nieprawidłowe",
@@ -108,6 +112,12 @@ export const translations: typeof enTranslations = {
     },
   },
   success: {
+    updated: "Hasło zaktualizowane pomyślnie",
+    securityTip: "Aby zwiększyć bezpieczeństwo, włącz uwierzytelnianie dwuskładnikowe",
+    nextSteps: {
+      logoutOther: "Wszystkie inne sesje zostały wylogowane ze względów bezpieczeństwa",
+      enable2fa: "Rozważ włączenie uwierzytelniania dwuskładnikowego dla lepszego bezpieczeństwa",
+    },
     title: "Hasło Zaktualizowane",
     description: "Twoje hasło zostało pomyślnie zaktualizowane",
   },

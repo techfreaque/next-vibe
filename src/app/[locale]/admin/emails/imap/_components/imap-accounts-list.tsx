@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
@@ -122,23 +123,23 @@ export function ImapAccountsList({
   };
 
   if (queryLoading) {
-    return <div>{t("app.admin.emails.imap.common.loading")}</div>;
+    return <Div>{t("app.admin.emails.imap.common.loading")}</Div>;
   }
 
   if (queryError) {
     return (
-      <div>
+      <Div>
         {t("app.admin.emails.imap.account.list_error", {
           error: queryError.message,
         })}
-      </div>
+      </Div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <Div className="space-y-4">
       {/* Search and Filters */}
-      <div className="flex items-center space-x-4">
+      <Div className="flex items-center space-x-4">
         <Input
           placeholder={t("app.admin.emails.imap.account.search_placeholder")}
           value={searchValue}
@@ -151,10 +152,10 @@ export function ImapAccountsList({
         >
           {t("app.admin.emails.imap.common.refresh")}
         </Button>
-      </div>
+      </Div>
 
       {/* Accounts Table */}
-      <div className="border rounded-lg">
+      <Div className="border rounded-lg">
         <Table>
           <TableHeader>
             <TableRow>
@@ -204,7 +205,7 @@ export function ImapAccountsList({
                   </TableCell>
                   <TableCell>{account.maxMessages}</TableCell>
                   <TableCell>
-                    <div className="flex items-center space-x-2">
+                    <Div className="flex items-center space-x-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -229,26 +230,26 @@ export function ImapAccountsList({
                       >
                         {t("app.admin.emails.imap.account.test")}
                       </Button>
-                    </div>
+                    </Div>
                   </TableCell>
                 </TableRow>
               ))
             )}
           </TableBody>
         </Table>
-      </div>
+      </Div>
 
       {/* Pagination */}
       {totalAccounts > 0 && (
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">
+        <Div className="flex items-center justify-between">
+          <Div className="text-sm text-gray-600">
             {t("app.admin.emails.imap.account.pagination.showing", {
               start: (currentPage - 1) * limit + 1,
               end: Math.min(currentPage * limit, totalAccounts),
               total: totalAccounts,
             })}
-          </div>
-          <div className="flex items-center space-x-2">
+          </Div>
+          <Div className="flex items-center space-x-2">
             <Button
               variant="outline"
               size="sm"
@@ -265,9 +266,9 @@ export function ImapAccountsList({
             >
               {t("app.admin.emails.imap.common.next")}
             </Button>
-          </div>
-        </div>
+          </Div>
+        </Div>
       )}
-    </div>
+    </Div>
   );
 }

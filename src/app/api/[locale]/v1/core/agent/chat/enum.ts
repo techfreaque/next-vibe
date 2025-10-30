@@ -5,7 +5,10 @@
 
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
-// using a regular enum as this needs no translation
+/**
+ * Chat Message Role enum
+ * IMPORTANT: Using regular TypeScript enum to be compatible with AI SDK
+ */
 export enum ChatMessageRole {
   USER = "user",
   ASSISTANT = "assistant",
@@ -27,28 +30,23 @@ export const ChatMessageRoleDB = [
 export const ChatMessageRoleOptions = [
   {
     value: ChatMessageRole.USER,
-    // eslint-disable-next-line i18next/no-literal-string
-    label: "User",
+    label: "app.api.v1.core.agent.chat.enums.role.user",
   },
   {
     value: ChatMessageRole.ASSISTANT,
-    // eslint-disable-next-line i18next/no-literal-string
-    label: "Assistant",
+    label: "app.api.v1.core.agent.chat.enums.role.assistant",
   },
   {
     value: ChatMessageRole.SYSTEM,
-    // eslint-disable-next-line i18next/no-literal-string
-    label: "System",
+    label: "app.api.v1.core.agent.chat.enums.role.system",
   },
   {
     value: ChatMessageRole.TOOL,
-    // eslint-disable-next-line i18next/no-literal-string
-    label: "Tool",
+    label: "app.api.v1.core.agent.chat.enums.role.tool",
   },
   {
     value: ChatMessageRole.ERROR,
-    // eslint-disable-next-line i18next/no-literal-string
-    label: "Error",
+    label: "app.api.v1.core.agent.chat.enums.role.error",
   },
 ] as const;
 

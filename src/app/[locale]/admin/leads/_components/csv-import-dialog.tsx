@@ -6,7 +6,7 @@
 "use client";
 
 import { CheckCircle, Download, FileText, Upload } from "lucide-react";
-import { Form, FormAlert } from "next-vibe-ui/ui";
+import { Div, Form, FormAlert } from "next-vibe-ui/ui";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
@@ -22,6 +22,7 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import { Input } from "next-vibe-ui/ui/input";
 import { Progress } from "next-vibe-ui/ui/progress";
+import { P } from "next-vibe-ui/ui/typography";
 import React from "react";
 
 import {
@@ -91,7 +92,7 @@ export function CsvImportDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto">
+        <Div className="flex-1 overflow-y-auto">
           <Card>
             <CardContent className="pt-6">
               <Form
@@ -106,22 +107,22 @@ export function CsvImportDialog({
                   }
                 >
                   {/* Template Download */}
-                  <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                    <div className="flex items-center gap-3">
+                  <Div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                    <Div className="flex items-center gap-3">
                       <FileText className="h-5 w-5 text-blue-600" />
-                      <div>
-                        <p className="font-medium text-blue-900 dark:text-blue-100">
+                      <Div>
+                        <P className="font-medium text-blue-900 dark:text-blue-100">
                           {t(
                             "app.admin.leads.leads.admin.import.template.title",
                           )}
-                        </p>
-                        <p className="text-sm text-blue-700 dark:text-blue-300">
+                        </P>
+                        <P className="text-sm text-blue-700 dark:text-blue-300">
                           {t(
                             "app.admin.leads.leads.admin.import.template.description",
                           )}
-                        </p>
-                      </div>
-                    </div>
+                        </P>
+                      </Div>
+                    </Div>
                     <Button
                       variant="outline"
                       size="sm"
@@ -133,11 +134,11 @@ export function CsvImportDialog({
                         "app.admin.leads.leads.admin.import.template.download",
                       )}
                     </Button>
-                  </div>
+                  </Div>
 
                   {/* File Upload */}
-                  <div className="space-y-4">
-                    <div
+                  <Div className="space-y-4">
+                    <Div
                       className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                         endpoint.dragOver
                           ? "border-blue-400 bg-blue-50 dark:bg-blue-950/20"
@@ -151,31 +152,31 @@ export function CsvImportDialog({
                       onDragLeave={() => endpoint.setDragOver(false)}
                     >
                       {endpoint.selectedFile ? (
-                        <div className="flex items-center justify-center gap-3">
+                        <Div className="flex items-center justify-center gap-3">
                           <FileText className="h-8 w-8 text-green-600" />
-                          <div>
-                            <p className="font-medium">
+                          <Div>
+                            <P className="font-medium">
                               {endpoint.selectedFile.name}
-                            </p>
-                            <p className="text-sm text-gray-500">
+                            </P>
+                            <P className="text-sm text-gray-500">
                               {(endpoint.selectedFile.size / 1024).toFixed(1)}{" "}
                               KB
-                            </p>
-                          </div>
-                        </div>
+                            </P>
+                          </Div>
+                        </Div>
                       ) : (
-                        <div>
+                        <Div>
                           <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-lg font-medium mb-2">
+                          <P className="text-lg font-medium mb-2">
                             {t(
                               "app.admin.leads.leads.admin.import.file.dropzone.title",
                             )}
-                          </p>
-                          <p className="text-gray-500 mb-4">
+                          </P>
+                          <P className="text-gray-500 mb-4">
                             {t(
                               "app.admin.leads.leads.admin.import.file.dropzone.description",
                             )}
-                          </p>
+                          </P>
                           <Input
                             type="file"
                             // eslint-disable-next-line i18next/no-literal-string
@@ -183,22 +184,22 @@ export function CsvImportDialog({
                             onChange={endpoint.handleFileInputChange}
                             className="max-w-xs mx-auto"
                           />
-                        </div>
+                        </Div>
                       )}
-                    </div>
-                  </div>
+                    </Div>
+                  </Div>
                 </FormFieldGroup>
 
                 {/* File validation - show errors if file is missing */}
                 {(!endpoint.selectedFile ||
                   !endpoint.create.form.watch("file")) && (
-                  <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800">
-                    <p className="text-red-800 dark:text-red-200 text-sm">
+                  <Div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800">
+                    <P className="text-red-800 dark:text-red-200 text-sm">
                       {t(
                         "app.admin.leads.leads.admin.import.file.validation.required",
                       )}
-                    </p>
-                  </div>
+                    </P>
+                  </Div>
                 )}
 
                 {/* Hidden form fields for validation */}
@@ -524,19 +525,19 @@ export function CsvImportDialog({
 
                 {/* Import Progress */}
                 {endpoint.create.isSubmitting && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium">
+                  <Div className="space-y-2">
+                    <Div className="flex items-center justify-between">
+                      <P className="font-medium">
                         {t("app.admin.leads.leads.admin.import.progress.title")}
-                      </p>
-                      <span className="text-sm text-gray-500">
+                      </P>
+                      <Div as="span" className="text-sm text-gray-500">
                         {t(
                           "app.admin.leads.leads.admin.import.progress.processing",
                         )}
-                      </span>
-                    </div>
+                      </Div>
+                    </Div>
                     <Progress value={undefined} className="w-full" />
-                  </div>
+                  </Div>
                 )}
 
                 {/* Import Results */}
@@ -558,13 +559,13 @@ export function CsvImportDialog({
               </Form>
             </CardContent>
           </Card>
-        </div>
+        </Div>
 
         <DialogFooter className="flex-shrink-0">
           {/* Form Alert for errors and success - positioned above submit button */}
-          <div className="w-full mb-4">
+          <Div className="w-full mb-4">
             <FormAlert alert={endpoint.alert} />
-          </div>
+          </Div>
 
           <Button
             variant="outline"
@@ -591,7 +592,7 @@ export function CsvImportDialog({
           >
             {endpoint.create.isSubmitting ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                <Div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                 {t("app.admin.leads.leads.admin.import.importing")}
               </>
             ) : (

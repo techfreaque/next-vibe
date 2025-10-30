@@ -1,6 +1,7 @@
 import * as TablePrimitive from "@rn-primitives/table";
 import * as React from "react";
 
+import type { WithClassName } from "../lib/types";
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
 
@@ -55,15 +56,17 @@ TableFooter.displayName = "TableFooter";
 
 const TableRow = React.forwardRef<
   TablePrimitive.RowRef,
-  TablePrimitive.RowProps
+  WithClassName<TablePrimitive.RowProps>
 >(({ className, ...props }, ref) => (
   <TablePrimitive.Row
     ref={ref}
-    className={cn(
-      "flex-row border-border border-b web:transition-colors web:hover:bg-muted/50 web:data-[state=selected]:bg-muted",
-      className,
-    )}
-    {...props}
+    {...({
+      className: cn(
+        "flex-row border-border border-b web:transition-colors web:hover:bg-muted/50 web:data-[state=selected]:bg-muted",
+        className,
+      ),
+      ...props,
+    } as any)}
   />
 ));
 TableRow.displayName = "TableRow";

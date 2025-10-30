@@ -87,7 +87,9 @@ export class PerformanceMonitor {
 
     const metric = this.metrics.get(name);
     if (!metric) {
-      console.warn(`Performance timer '${name}' not found`);
+      if (process.env.NODE_ENV !== "production") {
+        process.stderr.write(`Performance timer '${name}' not found\n`);
+      }
       return null;
     }
 
@@ -104,13 +106,12 @@ export class PerformanceMonitor {
     this.metrics.delete(name);
     this.addCompletedMetric(completedMetric);
 
-    console.debug(
-      `Performance: ${name} completed in ${duration.toFixed(2)}ms`,
-      {
-        duration,
-        metadata: completedMetric.metadata,
-      },
-    );
+    if (process.env.NODE_ENV !== "production") {
+      const metaStr = JSON.stringify({ duration, metadata: completedMetric.metadata });
+      process.stdout.write(
+        `Performance: ${name} completed in ${duration.toFixed(2)}ms ${metaStr}\n`,
+      );
+    }
 
     return duration;
   }
@@ -136,6 +137,7 @@ export class PerformanceMonitor {
       return result;
     } catch (error) {
       this.endTimer(name, { success: false, error: String(error) });
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Error re-throwing is necessary to propagate errors through call stack
       throw error;
     }
   }
@@ -161,6 +163,7 @@ export class PerformanceMonitor {
       return result;
     } catch (error) {
       this.endTimer(name, { success: false, error: String(error) });
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Error re-throwing is necessary to propagate errors through call stack
       throw error;
     }
   }

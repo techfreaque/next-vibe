@@ -2,19 +2,27 @@
 
 import { motion } from "framer-motion";
 import { Calendar, CreditCard, Loader2 } from "lucide-react";
-import Link from "next/link";
 import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Div,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
+  Link,
+  Span,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from "next-vibe-ui/ui";
-import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent, CardHeader } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
+import { H3 } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import signupDefinitions from "@/app/api/[locale]/v1/core/user/public/signup/definition";
@@ -35,7 +43,7 @@ export function renderTermsCheckboxLabel(
   locale: CountryLanguage,
 ): React.ReactElement {
   return (
-    <span>
+    <Span>
       {t("app.user.signup.auth.signup.termsAndConditions")}{" "}
       <Link
         href={`/${locale}/terms-of-service`}
@@ -43,7 +51,7 @@ export function renderTermsCheckboxLabel(
       >
         {t("app.user.common.footer.terms")}
       </Link>
-    </span>
+    </Span>
   );
 }
 
@@ -101,51 +109,51 @@ export default function SignUpForm({
                           className="flex items-center justify-start gap-2 text-md min-h-[3rem]"
                         >
                           <CreditCard className="h-7 w-7 flex-shrink-0" />
-                          <span>
+                          <Span>
                             {t(
                               "app.user.signup.auth.signup.meetingPreferenceOptions.direct",
                             )}
-                          </span>
+                          </Span>
                         </TabsTrigger>
                         <TabsTrigger
                           value={SignupType.MEETING}
                           className="flex items-center justify-start gap-2 text-md min-h-[3rem]"
                         >
                           <Calendar className="h-7 w-7 flex-shrink-0" />
-                          <span>
+                          <Span>
                             {t(
                               "app.user.signup.auth.signup.meetingPreferenceOptions.schedule",
                             )}
-                          </span>
+                          </Span>
                         </TabsTrigger>
                       </TabsList>
 
                       <TabsContent value="pricing" className="mt-0 mb-4">
-                        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
-                          <h3 className="font-medium text-blue-800 dark:text-blue-300 mb-1">
+                        <Div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
+                          <H3 className="font-medium text-blue-800 dark:text-blue-300 mb-1">
                             {t(
                               "app.user.signup.auth.signup.meetingPreferenceOptions.direct",
                             )}
-                          </h3>
-                          <p className="text-sm text-blue-700 dark:text-blue-400">
+                          </H3>
+                          <Div className="text-sm text-blue-700 dark:text-blue-400">
                             {t("app.user.signup.auth.signup.directDescription")}
-                          </p>
-                        </div>
+                          </Div>
+                        </Div>
                       </TabsContent>
 
                       <TabsContent value="meeting" className="mt-0 mb-4">
-                        <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-800">
-                          <h3 className="font-medium text-green-800 dark:text-green-300 mb-1">
+                        <Div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-800">
+                          <H3 className="font-medium text-green-800 dark:text-green-300 mb-1">
                             {t(
                               "app.user.signup.auth.signup.meetingPreferenceOptions.schedule",
                             )}
-                          </h3>
-                          <p className="text-sm text-green-700 dark:text-green-400">
+                          </H3>
+                          <Div className="text-sm text-green-700 dark:text-green-400">
                             {t(
                               "app.user.signup.auth.signup.scheduleDescription",
                             )}
-                          </p>
-                        </div>
+                          </Div>
+                        </Div>
                       </TabsContent>
                     </Tabs>
                   </FormControl>
@@ -153,7 +161,7 @@ export default function SignUpForm({
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <EndpointFormField
                 name="personalInfo.privateName"
                 control={form.control}
@@ -173,7 +181,7 @@ export default function SignUpForm({
                   showAllRequired: false,
                 }}
               />
-            </div>
+            </Div>
 
             <EndpointFormField
               name="personalInfo.email"
@@ -185,7 +193,7 @@ export default function SignUpForm({
               }}
             />
 
-            <div className="space-y-4">
+            <Div className="space-y-4">
               <FormField
                 control={form.control}
                 name="security.password"
@@ -228,7 +236,7 @@ export default function SignUpForm({
                 }}
               />
 
-              <div className="flex items-center">
+              <Div className="flex items-center">
                 <EndpointFormField
                   name="consent.acceptTerms"
                   control={form.control}
@@ -238,7 +246,7 @@ export default function SignUpForm({
                     showAllRequired: false,
                   }}
                 />
-              </div>
+              </Div>
               {/* Show form alert if any */}
               {alert && <FormAlert alert={alert} className="mb-6" />}
 
@@ -259,7 +267,7 @@ export default function SignUpForm({
                 )}
               </Button>
 
-              <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
+              <Div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
                 {t("app.user.signup.auth.signup.alreadyHaveAccount")}{" "}
                 <Link
                   href={`/${locale}/user/login`}
@@ -267,8 +275,8 @@ export default function SignUpForm({
                 >
                   {t("app.user.signup.auth.signup.signIn")}
                 </Link>
-              </div>
-            </div>
+              </Div>
+            </Div>
           </Form>
         </CardContent>
       </Card>

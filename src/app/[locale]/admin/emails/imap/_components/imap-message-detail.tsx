@@ -17,12 +17,13 @@ import {
   User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Form, FormAlert } from "next-vibe-ui/ui";
+import { Div, Form, FormAlert, Span } from "next-vibe-ui/ui";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Separator } from "next-vibe-ui/ui/separator";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -69,33 +70,33 @@ export function ImapMessageDetail({
   // Handle loading and error states
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p className="text-gray-600">
+      <Div className="flex items-center justify-center p-8">
+        <Div className="text-center">
+          <Div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
+          <P className="text-gray-600">
             {t("app.admin.emails.imap.common.loading")}
-          </p>
-        </div>
-      </div>
+          </P>
+        </Div>
+      </Div>
     );
   }
 
   if (readError || !messageData) {
     return (
-      <div className="p-8">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">
+      <Div className="p-8">
+        <Div className="text-center">
+          <P className="text-red-600 mb-4">
             {readError?.message ||
               t("app.admin.emails.imap.admin.messages.error.title", {
                 error: "",
               })}
-          </p>
+          </P>
           <Button variant="outline" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t("app.admin.emails.imap.forms.back")}
           </Button>
-        </div>
-      </div>
+        </Div>
+      </Div>
     );
   }
 
@@ -135,15 +136,15 @@ export function ImapMessageDetail({
   };
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Header with Back Button and Edit Toggle */}
-      <div className="flex items-center justify-between">
+      <Div className="flex items-center justify-between">
         <Button variant="outline" onClick={handleBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t("app.admin.emails.imap.forms.back")}
         </Button>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
+        <Div className="flex items-center space-x-4">
+          <Div className="flex items-center space-x-2">
             {!messageData.isRead && (
               <Badge variant="default" className="bg-blue-100 text-blue-800">
                 {t("app.admin.emails.imap.messages.unread")}
@@ -152,7 +153,7 @@ export function ImapMessageDetail({
             {messageData.isFlagged && (
               <Star className="h-5 w-5 text-yellow-500 fill-current" />
             )}
-          </div>
+          </Div>
           <Button variant="outline" size="sm" onClick={handleToggleEditMode}>
             {isEditMode ? (
               <>
@@ -176,8 +177,8 @@ export function ImapMessageDetail({
                 : t("app.admin.emails.imap.common.save")}
             </Button>
           )}
-        </div>
-      </div>
+        </Div>
+      </Div>
 
       {/* Edit Form or View Mode */}
       {isEditMode ? (
@@ -252,27 +253,27 @@ export function ImapMessageDetail({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span className="text-xl">{messageData.subject}</span>
-                <div className="flex items-center space-x-2">
+                <Span className="text-xl">{messageData.subject}</Span>
+                <Div className="flex items-center space-x-2">
                   {messageData.hasAttachments && (
-                    <div className="flex items-center space-x-1 text-sm text-gray-600">
+                    <Div className="flex items-center space-x-1 text-sm text-gray-600">
                       <Paperclip className="h-4 w-4" />
-                      <span>{messageData.attachmentCount}</span>
-                    </div>
+                      <Span>{messageData.attachmentCount}</Span>
+                    </Div>
                   )}
-                </div>
+                </Div>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Sender/Recipient Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center space-x-3">
+              <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Div className="flex items-center space-x-3">
                   <User className="h-5 w-5 text-gray-500" />
-                  <div>
-                    <div className="font-medium">
+                  <Div>
+                    <Div className="font-medium">
                       {t("app.admin.emails.imap.messages.from")}
-                    </div>
-                    <div className="text-sm text-gray-600">
+                    </Div>
+                    <Div className="text-sm text-gray-600">
                       {messageData.senderName ? (
                         <>
                           {messageData.senderName} &lt;{messageData.senderEmail}
@@ -281,16 +282,16 @@ export function ImapMessageDetail({
                       ) : (
                         messageData.senderEmail
                       )}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
+                    </Div>
+                  </Div>
+                </Div>
+                <Div className="flex items-center space-x-3">
                   <Mail className="h-5 w-5 text-gray-500" />
-                  <div>
-                    <div className="font-medium">
+                  <Div>
+                    <Div className="font-medium">
                       {t("app.admin.emails.imap.messages.to")}
-                    </div>
-                    <div className="text-sm text-gray-600">
+                    </Div>
+                    <Div className="text-sm text-gray-600">
                       {messageData.recipientName ? (
                         <>
                           {messageData.recipientName} &lt;
@@ -299,33 +300,33 @@ export function ImapMessageDetail({
                       ) : (
                         messageData.recipientEmail
                       )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                    </Div>
+                  </Div>
+                </Div>
+              </Div>
 
               {/* Date Info */}
-              <div className="flex items-center space-x-3">
+              <Div className="flex items-center space-x-3">
                 <Calendar className="h-5 w-5 text-gray-500" />
-                <div>
-                  <div className="font-medium">
+                <Div>
+                  <Div className="font-medium">
                     {t("app.admin.emails.imap.messages.sentAt")}
-                  </div>
-                  <div className="text-sm text-gray-600">
+                  </Div>
+                  <Div className="text-sm text-gray-600">
                     {messageData.sentAt
                       ? formatDate(messageData.sentAt)
                       : t("app.admin.emails.imap.common.unknown")}
-                  </div>
-                </div>
-              </div>
+                  </Div>
+                </Div>
+              </Div>
 
               {/* Message Size */}
-              <div className="text-sm text-gray-600">
+              <Div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.messages.size")}:{" "}
                 {messageData.messageSize
                   ? formatSize(messageData.messageSize)
                   : t("app.admin.emails.imap.common.unknown")}
-              </div>
+              </Div>
             </CardContent>
           </Card>
 
@@ -337,19 +338,19 @@ export function ImapMessageDetail({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose max-w-none">
+              <Div className="prose max-w-none">
                 {messageData.bodyHtml ? (
-                  <div
+                  <Div
                     dangerouslySetInnerHTML={{ __html: messageData.bodyHtml }}
                     className="whitespace-pre-wrap"
                   />
                 ) : (
-                  <div className="whitespace-pre-wrap">
+                  <Div className="whitespace-pre-wrap">
                     {messageData.bodyText ||
                       t("app.admin.emails.imap.messages.noContent")}
-                  </div>
+                  </Div>
                 )}
-              </div>
+              </Div>
             </CardContent>
           </Card>
 
@@ -361,54 +362,54 @@ export function ImapMessageDetail({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium">
+              <Div className="space-y-2">
+                <Div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <Div>
+                    <Span className="font-medium">
                       {t("app.admin.emails.imap.messages.messageId")}:
-                    </span>
-                    <div className="text-gray-600 font-mono break-all">
+                    </Span>
+                    <Div className="text-gray-600 font-mono break-all">
                       {messageData.headers?.["Message-ID"] ||
                         messageData.imapMessageId ||
                         messageData.id}
-                    </div>
-                  </div>
-                  <div>
-                    <span className="font-medium">
+                    </Div>
+                  </Div>
+                  <Div>
+                    <Span className="font-medium">
                       {t("app.admin.emails.imap.messages.returnPath")}:
-                    </span>
-                    <div className="text-gray-600">
+                    </Span>
+                    <Div className="text-gray-600">
                       {messageData.headers?.["Return-Path"] ||
                         messageData.senderEmail}
-                    </div>
-                  </div>
-                </div>
+                    </Div>
+                  </Div>
+                </Div>
                 <Separator />
-                <div className="text-sm">
-                  <span className="font-medium">
+                <Div className="text-sm">
+                  <Span className="font-medium">
                     {t("app.admin.emails.imap.messages.createdAt")}:
-                  </span>
-                  <span className="text-gray-600 ml-2">
+                  </Span>
+                  <Span className="text-gray-600 ml-2">
                     {messageData.createdAt
                       ? formatDate(messageData.createdAt)
                       : "-"}
-                  </span>
-                </div>
-                <div className="text-sm">
-                  <span className="font-medium">
+                  </Span>
+                </Div>
+                <Div className="text-sm">
+                  <Span className="font-medium">
                     {t("app.admin.emails.imap.messages.lastSync")}:
-                  </span>
-                  <span className="text-gray-600 ml-2">
+                  </Span>
+                  <Span className="text-gray-600 ml-2">
                     {messageData.lastSyncAt
                       ? formatDate(messageData.lastSyncAt)
                       : t("app.admin.emails.imap.common.never")}
-                  </span>
-                </div>
-              </div>
+                  </Span>
+                </Div>
+              </Div>
             </CardContent>
           </Card>
         </>
       )}
-    </div>
+    </Div>
   );
 }

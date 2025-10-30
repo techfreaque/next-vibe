@@ -1,4 +1,7 @@
+import { translations as permissionsTranslations } from "../../permissions/i18n/en";
+
 export const translations = {
+  permissions: permissionsTranslations,
   get: {
     title: "Get Folder",
     description: "Retrieve a specific folder by ID",

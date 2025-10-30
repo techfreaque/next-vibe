@@ -38,11 +38,20 @@ export function toolMetadataToMCPTool(
 }
 
 /**
+ * MCP property value type
+ */
+interface MCPPropertyValue {
+  [key: string]: string | number | boolean | null | MCPPropertyValue;
+}
+
+/**
  * Type guard for MCP property
  */
 function isMCPProperty(
+  // eslint-disable-next-line no-restricted-syntax -- Infrastructure: MCP tool conversion requires 'unknown' for flexible tool schemas
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: MCP tool conversion requires 'unknown' for flexible tool schemas
   value: unknown
-): value is Record<string, string | number | boolean | null | object> {
+): value is Record<string, string | number | boolean | null | MCPPropertyValue> {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return false;
   }

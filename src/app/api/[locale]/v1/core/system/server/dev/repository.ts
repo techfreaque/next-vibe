@@ -213,7 +213,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           logger.error(
             "❌ Database connection timeout - this will cause errors",
           );
-          // eslint-disable-next-line no-restricted-syntax -- Dev tooling requires throwing errors
+          // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Dev tooling requires throwing errors to halt execution
           throw new Error(getDatabaseTimeoutMessage(maxAttempts, delayMs));
         }
 

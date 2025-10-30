@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Span } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import type { RenderableValue, WidgetComponentProps } from "../types";
@@ -11,6 +12,8 @@ import type { RenderableValue, WidgetComponentProps } from "../types";
  */
 export function TextWidget({
   data,
+  metadata: _metadata,
+  context: _context,
   className,
   style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
@@ -23,19 +26,19 @@ export function TextWidget({
 
   if (!value) {
     return (
-      <span
+      <Span
         className={cn("text-muted-foreground italic", className)}
         style={style}
       >
         —
-      </span>
+      </Span>
     );
   }
 
   return (
-    <span className={cn("text-foreground", className)} style={style}>
+    <Span className={cn("text-foreground", className)} style={style}>
       {value}
-    </span>
+    </Span>
   );
 }
 

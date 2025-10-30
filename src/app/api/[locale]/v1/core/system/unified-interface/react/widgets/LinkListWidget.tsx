@@ -1,7 +1,11 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
+
+import { simpleT } from "@/i18n/core/shared";
 
 import type { RenderableValue, WidgetComponentProps } from "../types";
 import type { LinkCardData } from "./LinkCardWidget";
@@ -42,27 +46,28 @@ export function LinkListWidget({
   className,
   style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
+  const { t } = simpleT(context.locale);
+
   if (!isLinkListData(data)) {
     return (
-      <div
+      <Div
         className={cn("text-muted-foreground italic", className)}
         style={style}
       >
         —
-      </div>
+      </Div>
     );
   }
   const { items, title, description, layout = "list", columns = 1 } = data;
 
   if (!items || items.length === 0) {
     return (
-      <div
+      <Div
         className={cn("py-8 text-center text-muted-foreground", className)}
         style={style}
       >
-        {/* eslint-disable-next-line i18next/no-literal-string */}
-        <p>No results found</p>
-      </div>
+        <P>{t("app.api.v1.core.system.unifiedInterface.react.widgets.linkList.noResults")}</P>
+      </Div>
     );
   }
 
@@ -78,16 +83,16 @@ export function LinkListWidget({
   /* eslint-enable i18next/no-literal-string */
 
   return (
-    <div className={cn("space-y-4", className)} style={style}>
+    <Div className={cn("space-y-4", className)} style={style}>
       {title && (
-        <div className="space-y-1">
-          <h3 className="text-lg font-semibold">{title}</h3>
+        <Div className="space-y-1">
+          <H3 className="text-lg font-semibold">{title}</H3>
           {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <P className="text-sm text-muted-foreground">{description}</P>
           )}
-        </div>
+        </Div>
       )}
-      <div
+      <Div
         className={cn(
           "grid gap-4",
           layout === "grid" ? gridClass : "grid-cols-1",
@@ -101,8 +106,8 @@ export function LinkListWidget({
             context={context}
           />
         ))}
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }
 

@@ -15,6 +15,8 @@ import {
 import { useRouter } from "next/navigation";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div, Span } from "next-vibe-ui/ui";
+import { H3 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
@@ -132,8 +134,8 @@ function FolderTreeNode({
   };
 
   return (
-    <div>
-      <div
+    <Div>
+      <Div
         className={`flex items-center py-2 px-4 hover:bg-gray-50 border-b ${
           level > 0 ? `ml-${level * 4}` : ""
         }`}
@@ -154,77 +156,77 @@ function FolderTreeNode({
         )}
 
         {/* Folder Icon */}
-        <div className="mr-3">{getSpecialUseIcon(folder.specialUseType)}</div>
+        <Div className="mr-3">{getSpecialUseIcon(folder.specialUseType)}</Div>
 
         {/* Folder Info */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center space-x-2">
-            <span className="font-medium truncate">
+        <Div className="flex-1 min-w-0">
+          <Div className="flex items-center space-x-2">
+            <Span className="font-medium truncate">
               {folder.displayName || folder.name}
-            </span>
+            </Span>
             {folder.specialUseType && (
               <Badge variant="outline" className="text-xs">
                 {folder.specialUseType}
               </Badge>
             )}
-          </div>
-          <div className="text-sm text-gray-500 truncate">{folder.path}</div>
-        </div>
+          </Div>
+          <Div className="text-sm text-gray-500 truncate">{folder.path}</Div>
+        </Div>
 
         {/* Message Counts */}
-        <div className="flex items-center space-x-4 text-sm">
-          <div className="text-center">
-            <div className="font-medium">{folder.messageCount}</div>
-            <div className="text-xs text-gray-500">
+        <Div className="flex items-center space-x-4 text-sm">
+          <Div className="text-center">
+            <Div className="font-medium">{folder.messageCount}</Div>
+            <Div className="text-xs text-gray-500">
               {t("app.admin.emails.imap.common.total")}
-            </div>
-          </div>
+            </Div>
+          </Div>
           {folder.unseenCount > 0 && (
-            <div className="text-center">
+            <Div className="text-center">
               <Badge variant="default" className="bg-blue-100 text-blue-800">
                 {folder.unseenCount}
               </Badge>
-              <div className="text-xs text-gray-500">
+              <Div className="text-xs text-gray-500">
                 {t("app.admin.emails.imap.common.unread")}
-              </div>
-            </div>
+              </Div>
+            </Div>
           )}
           {folder.recentCount > 0 && (
-            <div className="text-center">
-              <div className="font-medium text-green-600">
+            <Div className="text-center">
+              <Div className="font-medium text-green-600">
                 {folder.recentCount}
-              </div>
-              <div className="text-xs text-gray-500">
+              </Div>
+              <Div className="text-xs text-gray-500">
                 {t("app.admin.emails.imap.common.recent")}
-              </div>
-            </div>
+              </Div>
+            </Div>
           )}
-        </div>
+        </Div>
 
         {/* Sync Status */}
-        <div className="ml-4 text-center">
-          <div
+        <Div className="ml-4 text-center">
+          <Div
             className={`text-sm font-medium ${getSyncStatusColor(folder.syncStatus)}`}
           >
             {folder.syncStatus}
-          </div>
-          <div className="text-xs text-gray-500">{folder.lastSyncAt}</div>
-        </div>
+          </Div>
+          <Div className="text-xs text-gray-500">{folder.lastSyncAt}</Div>
+        </Div>
 
         {/* Actions */}
-        <div className="ml-4 flex items-center space-x-2">
+        <Div className="ml-4 flex items-center space-x-2">
           <Button variant="outline" size="sm" onClick={() => onSync(folder.id)}>
             {t("app.admin.emails.imap.folder.actions.sync")}
           </Button>
           <Button variant="outline" size="sm" onClick={() => onView(folder.id)}>
             {t("app.admin.emails.imap.common.view")}
           </Button>
-        </div>
-      </div>
+        </Div>
+      </Div>
 
       {/* Children */}
       {folder.hasChildren && isExpanded && folder.children && (
-        <div>
+        <Div>
           {folder.children.map((child) => (
             <FolderTreeNode
               key={child.id}
@@ -235,9 +237,9 @@ function FolderTreeNode({
               t={t}
             />
           ))}
-        </div>
+        </Div>
       )}
-    </div>
+    </Div>
   );
 }
 
@@ -275,31 +277,31 @@ export function ImapFolderTree({
 
   if (isLoading) {
     return (
-      <div className="border rounded-lg">
-        <div className="bg-gray-50 px-4 py-3 border-b">
-          <h3 className="font-medium">
+      <Div className="border rounded-lg">
+        <Div className="bg-gray-50 px-4 py-3 border-b">
+          <H3 className="font-medium">
             {t("app.admin.emails.imap.admin.folders.title")}
-          </h3>
-        </div>
-        <div className="p-4 text-center text-gray-500">
+          </H3>
+        </Div>
+        <Div className="p-4 text-center text-gray-500">
           {t("app.admin.emails.imap.common.loading")}
-        </div>
-      </div>
+        </Div>
+      </Div>
     );
   }
 
   return (
-    <div className="border rounded-lg">
-      <div className="bg-gray-50 px-4 py-3 border-b">
-        <h3 className="font-medium">
+    <Div className="border rounded-lg">
+      <Div className="bg-gray-50 px-4 py-3 border-b">
+        <H3 className="font-medium">
           {t("app.admin.emails.imap.admin.folders.title")}
-        </h3>
-      </div>
-      <div className="max-h-96 overflow-y-auto">
+        </H3>
+      </Div>
+      <Div className="max-h-96 overflow-y-auto">
         {folderTree.length === 0 ? (
-          <div className="p-4 text-center text-gray-500">
+          <Div className="p-4 text-center text-gray-500">
             {t("app.admin.emails.imap.admin.folders.no_folders")}
-          </div>
+          </Div>
         ) : (
           folderTree.map((folder: FolderNode) => (
             <FolderTreeNode
@@ -312,7 +314,7 @@ export function ImapFolderTree({
             />
           ))
         )}
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }

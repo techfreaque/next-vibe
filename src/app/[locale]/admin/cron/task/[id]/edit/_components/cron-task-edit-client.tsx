@@ -7,6 +7,8 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui";
+import { H2, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -46,21 +48,21 @@ export function CronTaskEditClient({
   };
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Header with back button */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold">
+      <Div className="flex items-center justify-between">
+        <Div>
+          <H2 className="text-xl font-semibold">
             {t("app.admin.cron.taskDetails.edit")}
-          </h2>
-          <p className="text-sm text-muted-foreground">
+          </H2>
+          <P className="text-sm text-muted-foreground">
             {initialData.name} • {initialData.schedule}
-          </p>
-        </div>
+          </P>
+        </Div>
         <Button onClick={handleBack} variant="outline">
           {t("app.admin.cron.taskDetails.back")}
         </Button>
-      </div>
+      </Div>
 
       {/* Edit form */}
       <CronTaskEditForm
@@ -68,6 +70,6 @@ export function CronTaskEditClient({
         endpoint={endpoint}
         locale={locale}
       />
-    </div>
+    </Div>
   );
 }

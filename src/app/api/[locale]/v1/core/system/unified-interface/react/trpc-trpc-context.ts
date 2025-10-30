@@ -194,7 +194,7 @@ export async function createAuthenticatedTRPCContext(opts: {
   });
 
   if (!context.user) {
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- tRPC framework requires throwing TRPCError for authentication failures
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "app.error.unauthorized",
@@ -208,7 +208,7 @@ export async function createAuthenticatedTRPCContext(opts: {
     );
 
     if (!hasRequiredRole) {
-      // eslint-disable-next-line no-restricted-syntax
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- tRPC framework requires throwing TRPCError for authorization failures
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "error.forbidden",

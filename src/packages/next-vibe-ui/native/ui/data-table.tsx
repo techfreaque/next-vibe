@@ -14,9 +14,10 @@ import {
   RefreshControl,
   ScrollView,
 } from "react-native";
-import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
+import { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { StyledAnimatedView } from "../lib/styled";
 import { cn } from "../lib/utils";
 import {
   Table,
@@ -32,8 +33,8 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   onRowPress?: (row: Row<TData>) => void;
   estimatedItemSize?: number;
-  ListEmptyComponent?: FlashListProps<TData>["ListEmptyComponent"];
-  ListFooterComponent?: FlashListProps<TData>["ListFooterComponent"];
+  ListEmptyComponent?: React.ComponentType<unknown> | React.ReactElement | null;
+  ListFooterComponent?: React.ComponentType<unknown> | React.ReactElement | null;
   isRefreshing?: boolean;
   onRefresh?: () => void;
 }
@@ -68,13 +69,13 @@ export function DataTable<TData, TValue>({
   return (
     <>
       {isRefreshing && (
-        <Animated.View
+        <StyledAnimatedView
           entering={FadeInUp}
           exiting={FadeOutUp}
-          {...{ className: "h-14 top-16 absolute items-center justify-center w-screen" }}
+          className="h-14 top-16 absolute items-center justify-center w-screen"
         >
-          <ActivityIndicator size="small" {...{ className: "text-foreground" }} />
-        </Animated.View>
+          <ActivityIndicator size="small" />
+        </StyledAnimatedView>
       )}
       <ScrollView
         horizontal
@@ -106,57 +107,59 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            <FlashList
-              data={table.getRowModel().rows}
-              estimatedItemSize={estimatedItemSize}
-              ListEmptyComponent={ListEmptyComponent}
-              ListFooterComponent={ListFooterComponent}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{
-                paddingBottom: insets.bottom,
-              }}
-              refreshControl={
-                <RefreshControl
-                  refreshing={isRefreshing}
-                  onRefresh={onRefresh}
-                  style={{ opacity: 0 }}
-                />
-              }
-              renderItem={({ item: row, index }) => {
-                const rowClassName = cn(
-                  "active:opacity-70",
-                  index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50",
-                );
-                return (
-                  <TableRow
-                    {...(rowClassName ? { className: rowClassName } : {})}
-                    onPress={
-                      onRowPress
-                        ? (): void => {
-                            onRowPress(row);
-                          }
-                        : undefined
-                    }
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        style={{
-                          width: getColumnWidth(
-                            cell.column.getSize(),
-                            columns.length,
-                          ),
-                        }}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                );
-              }}
+            <FlashList<Row<TData>>
+              {...({
+                data: table.getRowModel().rows,
+                estimatedItemSize,
+                ListEmptyComponent,
+                ListFooterComponent,
+                showsVerticalScrollIndicator: false,
+                contentContainerStyle: {
+                  paddingBottom: insets.bottom,
+                },
+                refreshControl: (
+                  <RefreshControl
+                    refreshing={isRefreshing}
+                    onRefresh={onRefresh}
+                    style={{ opacity: 0 }}
+                  />
+                ),
+                renderItem: ({ item: row, index }: { item: Row<TData>; index: number }): JSX.Element => {
+                  const rowClassName = cn(
+                    "active:opacity-70",
+                    index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50",
+                  );
+                  const handlePress = onRowPress
+                    ? (): void => {
+                        onRowPress(row);
+                      }
+                    : undefined;
+                  return (
+                    <TableRow
+                      className={rowClassName}
+                      onPress={handlePress}
+                    >
+                      {row.getVisibleCells().map((cell): JSX.Element => (
+                        <TableCell
+                          key={cell.id}
+                          style={{
+                            width: getColumnWidth(
+                              cell.column.getSize(),
+                              columns.length,
+                            ),
+                          }}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any)}
             />
           </TableBody>
         </Table>

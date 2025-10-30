@@ -1,5 +1,4 @@
 import * as AccordionPrimitive from "@rn-primitives/accordion";
-import { styled } from "nativewind";
 import * as React from "react";
 import { Platform, Pressable, View } from "react-native";
 import Animated, {
@@ -18,33 +17,27 @@ import { cn } from "../lib/utils";
 import { ChevronDown } from "./icons/ChevronDown";
 import { TextClassContext } from "./text";
 
-// Local styled components to avoid type instantiation issues
-const StyledAccordionRoot = styled(AccordionPrimitive.Root, {
-  className: "style",
-});
-const StyledAccordionItem = styled(AccordionPrimitive.Item, {
-  className: "style",
-});
-const StyledAccordionHeader = styled(AccordionPrimitive.Header, {
-  className: "style",
-});
-const StyledAccordionTrigger = styled(AccordionPrimitive.Trigger, {
-  className: "style",
-});
-const StyledAccordionContent = styled(AccordionPrimitive.Content, {
-  className: "style",
-});
-const StyledAnimatedView = styled(Animated.View, {
-  className: "style",
-});
+// Local aliases - use direct primitives to avoid type instantiation issues with styled()
+const StyledAccordionRoot = AccordionPrimitive.Root;
+const StyledAccordionItem = AccordionPrimitive.Item;
+const StyledAccordionHeader = AccordionPrimitive.Header;
+const StyledAccordionTrigger = AccordionPrimitive.Trigger;
+const StyledAccordionContent = AccordionPrimitive.Content;
+const StyledAnimatedView = Animated.View;
 
 const Accordion = React.forwardRef<
   AccordionPrimitive.RootRef,
-  AccordionPrimitive.RootProps
->(({ children, ...props }, ref) => {
+  AccordionPrimitive.RootProps & { children?: React.ReactNode }
+>((props, ref) => {
+  const { children, asChild, ...rest } = props;
+  const shouldUseAsChild = asChild ?? (Platform.OS !== "web");
   return (
     <LayoutAnimationConfig skipEntering>
-      <StyledAccordionRoot ref={ref} {...props} asChild={Platform.OS !== "web"}>
+      <StyledAccordionRoot
+        ref={ref}
+        {...(rest as AccordionPrimitive.RootProps)}
+        asChild={shouldUseAsChild}
+      >
         <StyledAnimatedView layout={LinearTransition.duration(200)}>
           {children}
         </StyledAnimatedView>
@@ -102,7 +95,7 @@ const AccordionTrigger = React.forwardRef<
     <>
       {children}
       <StyledAnimatedView style={chevronStyle}>
-        <ChevronDown size={18} {...{ className: "text-foreground shrink-0" }} />
+        <ChevronDown size={18} className="text-foreground shrink-0" />
       </StyledAnimatedView>
     </>
   );
@@ -113,14 +106,14 @@ const AccordionTrigger = React.forwardRef<
         "native:text-lg font-medium web:group-hover:underline" // eslint-disable-line i18next/no-literal-string -- CSS class names
       }
     >
-      <StyledAccordionHeader {...{ className: "flex" }}>
+      <StyledAccordionHeader className="flex">
         <StyledAccordionTrigger ref={ref} {...props} asChild>
           {Platform.OS === "web" ? (
-            <View {...(triggerClassName ? { className: triggerClassName } : {})}>
+            <View className={triggerClassName}>
               <TriggerContent />
             </View>
           ) : (
-            <Pressable {...(triggerClassName ? { className: triggerClassName } : {})}>
+            <Pressable className={triggerClassName}>
               <TriggerContent />
             </Pressable>
           )}
@@ -163,13 +156,13 @@ interface InnerContentProps {
 
 function InnerContent({ children, className }: InnerContentProps): React.JSX.Element {
   if (Platform.OS === "web") {
-    return <View {...{ className: cn("pb-4", className) }}>{children}</View>;
+    return <View className={cn("pb-4", className)}>{children}</View>;
   }
   return (
     <StyledAnimatedView
       entering={FadeIn}
       exiting={FadeOutUp.duration(200)}
-      {...{ className: cn("pb-4", className) }}
+      className={cn("pb-4", className)}
     >
       {children}
     </StyledAnimatedView>

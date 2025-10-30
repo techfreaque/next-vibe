@@ -196,9 +196,9 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
             durationMs: exec.durationMs,
             error: exec.error
               ? {
-                  message: exec.error.message,
-                  messageParams: exec.error.messageParams,
-                  errorType: exec.error.errorType.errorKey,
+                  message: (exec.error as { message: string }).message,
+                  messageParams: (exec.error as { messageParams?: Record<string, string> }).messageParams,
+                  errorType: (exec.error as { errorType: { errorKey: string } }).errorType.errorKey,
                 }
               : null,
             environment: exec.environment,

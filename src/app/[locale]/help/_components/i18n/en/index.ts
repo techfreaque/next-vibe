@@ -15,6 +15,7 @@ export const translations = {
         messagePlaceholder: "Tell us how we can help you...",
         submit: "Send Message",
         sending: "Sending...",
+        error: "Error: Contact form not configured",
       },
       info: {
         title: "Contact Information",

@@ -3,6 +3,7 @@ import * as React from "react";
 import { Pressable } from "react-native";
 
 import { cn } from "../lib/utils";
+import type { WithClassName } from "../lib/types";
 import { TextClassContext } from "./text";
 
 const buttonVariants = cva(
@@ -60,7 +61,7 @@ const buttonTextVariants = cva(
   },
 );
 
-type ButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
+type ButtonProps = WithClassName<React.ComponentPropsWithoutRef<typeof Pressable>> &
   VariantProps<typeof buttonVariants>;
 
 const Button = React.forwardRef<
@@ -76,14 +77,14 @@ const Button = React.forwardRef<
       })}
     >
       <Pressable
-        className={cn(
-          props.disabled && "opacity-50 web:pointer-events-none",
-          buttonVariants({ variant, size, className }),
-        )}
         ref={ref}
         // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="button"
         {...props}
+        className={cn(
+          props.disabled && "opacity-50 web:pointer-events-none",
+          buttonVariants({ variant, size, className }),
+        )}
       />
     </TextClassContext.Provider>
   );

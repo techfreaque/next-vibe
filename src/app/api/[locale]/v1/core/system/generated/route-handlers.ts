@@ -4,664 +4,1112 @@
  *
  * Routes found: 143
  * Total paths (with aliases): 214
- * Generated at: 2025-10-30T17:40:45.850Z
+ * Generated at: 2025-10-30T22:11:59.865Z
  */
 
 /* eslint-disable prettier/prettier */
 /* eslint-disable i18next/no-literal-string */
-/* eslint-disable oxlint-plugin-restricted/restricted-syntax */
 
 import type { RouteModule } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/handler";
 
 /**
- * Dynamically import route handler by path
+ * Helper function to load and validate route modules
+ */
+async function loadRouteModule(
+  importFn: () => Promise<unknown>,
+  path: string
+): Promise<RouteModule | null> {
+  try {
+    const module = await importFn();
+    // Basic validation that it's a route module
+    if (module && typeof module === "object") {
+      return module as RouteModule;
+    }
+    return null;
+  } catch (error) {
+    console.error(`Failed to load route module for path: ${path}`, error);
+    return null;
+  }
+}
+
+/**
+ * Dynamically import route handler by path with runtime validation
  * @param path - The route path (e.g., "core/agent/chat/threads")
- * @returns The route module or null if not found
+ * @returns The validated route module or null if not found
+ * @throws {TypeError} If the imported module is not a valid RouteModule
  */
 export async function getRouteHandler(path: string): Promise<RouteModule | null> {
   switch (path) {
     case "core/agent/ai-stream":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/ai-stream/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/ai-stream/route"),
+        "core/agent/ai-stream"
+      );
     case "core/agent/brave-search":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/brave-search/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/brave-search/route"),
+        "core/agent/brave-search"
+      );
     case "core/agent/chat/folders":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/folders/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/folders/route"),
+        "core/agent/chat/folders"
+      );
     case "core/agent/chat/folders/:id":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/folders/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/folders/[id]/route"),
+        "core/agent/chat/folders/:id"
+      );
     case "core/agent/chat/folders/[id]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/folders/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/folders/[id]/route"),
+        "core/agent/chat/folders/[id]"
+      );
     case "core/agent/chat/folders/{id}":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/folders/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/folders/[id]/route"),
+        "core/agent/chat/folders/{id}"
+      );
     case "core/agent/chat/personas":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/personas/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/personas/route"),
+        "core/agent/chat/personas"
+      );
     case "core/agent/chat/personas/:id":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/personas/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/personas/[id]/route"),
+        "core/agent/chat/personas/:id"
+      );
     case "core/agent/chat/personas/[id]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/personas/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/personas/[id]/route"),
+        "core/agent/chat/personas/[id]"
+      );
     case "core/agent/chat/personas/{id}":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/personas/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/personas/[id]/route"),
+        "core/agent/chat/personas/{id}"
+      );
     case "core/agent/chat/threads":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/route"),
+        "core/agent/chat/threads"
+      );
     case "core/agent/chat/threads/:threadId":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/route"),
+        "core/agent/chat/threads/:threadId"
+      );
     case "core/agent/chat/threads/:threadId/messages":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/route"),
+        "core/agent/chat/threads/:threadId/messages"
+      );
     case "core/agent/chat/threads/:threadId/messages/[messageId]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route"),
+        "core/agent/chat/threads/:threadId/messages/[messageId]"
+      );
     case "core/agent/chat/threads/:threadId/messages/[messageId]/branch":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route"),
+        "core/agent/chat/threads/:threadId/messages/[messageId]/branch"
+      );
     case "core/agent/chat/threads/:threadId/messages/[messageId]/vote":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route"),
+        "core/agent/chat/threads/:threadId/messages/[messageId]/vote"
+      );
     case "core/agent/chat/threads/:threadId/messages/path":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/path/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/path/route"),
+        "core/agent/chat/threads/:threadId/messages/path"
+      );
     case "core/agent/chat/threads/:threadId/messages/search":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/search/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/search/route"),
+        "core/agent/chat/threads/:threadId/messages/search"
+      );
     case "core/agent/chat/threads/:thread_id":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/route"),
+        "core/agent/chat/threads/:thread_id"
+      );
     case "core/agent/chat/threads/:thread_id/messages":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/route"),
+        "core/agent/chat/threads/:thread_id/messages"
+      );
     case "core/agent/chat/threads/:thread_id/messages/[messageId]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route"),
+        "core/agent/chat/threads/:thread_id/messages/[messageId]"
+      );
     case "core/agent/chat/threads/:thread_id/messages/[messageId]/branch":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route"),
+        "core/agent/chat/threads/:thread_id/messages/[messageId]/branch"
+      );
     case "core/agent/chat/threads/:thread_id/messages/[messageId]/vote":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route"),
+        "core/agent/chat/threads/:thread_id/messages/[messageId]/vote"
+      );
     case "core/agent/chat/threads/:thread_id/messages/path":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/path/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/path/route"),
+        "core/agent/chat/threads/:thread_id/messages/path"
+      );
     case "core/agent/chat/threads/:thread_id/messages/search":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/search/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/search/route"),
+        "core/agent/chat/threads/:thread_id/messages/search"
+      );
     case "core/agent/chat/threads/[threadId]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/route"),
+        "core/agent/chat/threads/[threadId]"
+      );
     case "core/agent/chat/threads/[threadId]/messages":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/route"),
+        "core/agent/chat/threads/[threadId]/messages"
+      );
     case "core/agent/chat/threads/[threadId]/messages/:messageId":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route"),
+        "core/agent/chat/threads/[threadId]/messages/:messageId"
+      );
     case "core/agent/chat/threads/[threadId]/messages/:messageId/branch":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route"),
+        "core/agent/chat/threads/[threadId]/messages/:messageId/branch"
+      );
     case "core/agent/chat/threads/[threadId]/messages/:messageId/vote":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route"),
+        "core/agent/chat/threads/[threadId]/messages/:messageId/vote"
+      );
     case "core/agent/chat/threads/[threadId]/messages/:message_id":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route"),
+        "core/agent/chat/threads/[threadId]/messages/:message_id"
+      );
     case "core/agent/chat/threads/[threadId]/messages/:message_id/branch":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route"),
+        "core/agent/chat/threads/[threadId]/messages/:message_id/branch"
+      );
     case "core/agent/chat/threads/[threadId]/messages/:message_id/vote":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route"),
+        "core/agent/chat/threads/[threadId]/messages/:message_id/vote"
+      );
     case "core/agent/chat/threads/[threadId]/messages/[messageId]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route"),
+        "core/agent/chat/threads/[threadId]/messages/[messageId]"
+      );
     case "core/agent/chat/threads/[threadId]/messages/[messageId]/branch":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route"),
+        "core/agent/chat/threads/[threadId]/messages/[messageId]/branch"
+      );
     case "core/agent/chat/threads/[threadId]/messages/[messageId]/vote":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route"),
+        "core/agent/chat/threads/[threadId]/messages/[messageId]/vote"
+      );
     case "core/agent/chat/threads/[threadId]/messages/[message_id]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route"),
+        "core/agent/chat/threads/[threadId]/messages/[message_id]"
+      );
     case "core/agent/chat/threads/[threadId]/messages/[message_id]/branch":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route"),
+        "core/agent/chat/threads/[threadId]/messages/[message_id]/branch"
+      );
     case "core/agent/chat/threads/[threadId]/messages/[message_id]/vote":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route"),
+        "core/agent/chat/threads/[threadId]/messages/[message_id]/vote"
+      );
     case "core/agent/chat/threads/[threadId]/messages/path":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/path/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/path/route"),
+        "core/agent/chat/threads/[threadId]/messages/path"
+      );
     case "core/agent/chat/threads/[threadId]/messages/search":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/search/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/search/route"),
+        "core/agent/chat/threads/[threadId]/messages/search"
+      );
     case "core/agent/chat/threads/[threadId]/messages/{messageId}":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route"),
+        "core/agent/chat/threads/[threadId]/messages/{messageId}"
+      );
     case "core/agent/chat/threads/[threadId]/messages/{messageId}/branch":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route"),
+        "core/agent/chat/threads/[threadId]/messages/{messageId}/branch"
+      );
     case "core/agent/chat/threads/[threadId]/messages/{messageId}/vote":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route"),
+        "core/agent/chat/threads/[threadId]/messages/{messageId}/vote"
+      );
     case "core/agent/chat/threads/[thread_id]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/route"),
+        "core/agent/chat/threads/[thread_id]"
+      );
     case "core/agent/chat/threads/[thread_id]/messages":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/route"),
+        "core/agent/chat/threads/[thread_id]/messages"
+      );
     case "core/agent/chat/threads/[thread_id]/messages/[messageId]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route"),
+        "core/agent/chat/threads/[thread_id]/messages/[messageId]"
+      );
     case "core/agent/chat/threads/[thread_id]/messages/[messageId]/branch":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route"),
+        "core/agent/chat/threads/[thread_id]/messages/[messageId]/branch"
+      );
     case "core/agent/chat/threads/[thread_id]/messages/[messageId]/vote":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route"),
+        "core/agent/chat/threads/[thread_id]/messages/[messageId]/vote"
+      );
     case "core/agent/chat/threads/[thread_id]/messages/[message_id]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route"),
+        "core/agent/chat/threads/[thread_id]/messages/[message_id]"
+      );
     case "core/agent/chat/threads/[thread_id]/messages/[message_id]/branch":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route"),
+        "core/agent/chat/threads/[thread_id]/messages/[message_id]/branch"
+      );
     case "core/agent/chat/threads/[thread_id]/messages/[message_id]/vote":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route"),
+        "core/agent/chat/threads/[thread_id]/messages/[message_id]/vote"
+      );
     case "core/agent/chat/threads/[thread_id]/messages/path":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/path/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/path/route"),
+        "core/agent/chat/threads/[thread_id]/messages/path"
+      );
     case "core/agent/chat/threads/[thread_id]/messages/search":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/search/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/search/route"),
+        "core/agent/chat/threads/[thread_id]/messages/search"
+      );
     case "core/agent/chat/threads/search":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/search/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/search/route"),
+        "core/agent/chat/threads/search"
+      );
     case "core/agent/chat/threads/{threadId}":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/route"),
+        "core/agent/chat/threads/{threadId}"
+      );
     case "core/agent/chat/threads/{threadId}/messages":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/route"),
+        "core/agent/chat/threads/{threadId}/messages"
+      );
     case "core/agent/chat/threads/{threadId}/messages/[messageId]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/route"),
+        "core/agent/chat/threads/{threadId}/messages/[messageId]"
+      );
     case "core/agent/chat/threads/{threadId}/messages/[messageId]/branch":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/branch/route"),
+        "core/agent/chat/threads/{threadId}/messages/[messageId]/branch"
+      );
     case "core/agent/chat/threads/{threadId}/messages/[messageId]/vote":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/vote/route"),
+        "core/agent/chat/threads/{threadId}/messages/[messageId]/vote"
+      );
     case "core/agent/chat/threads/{threadId}/messages/path":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/path/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/path/route"),
+        "core/agent/chat/threads/{threadId}/messages/path"
+      );
     case "core/agent/chat/threads/{threadId}/messages/search":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/search/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/search/route"),
+        "core/agent/chat/threads/{threadId}/messages/search"
+      );
     case "core/agent/speech-to-text":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/speech-to-text/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/speech-to-text/route"),
+        "core/agent/speech-to-text"
+      );
     case "core/agent/text-to-speech":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/agent/text-to-speech/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/agent/text-to-speech/route"),
+        "core/agent/text-to-speech"
+      );
     case "core/contact":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/contact/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/contact/route"),
+        "core/contact"
+      );
     case "core/credits":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/credits/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/credits/route"),
+        "core/credits"
+      );
     case "core/credits/history":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/credits/history/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/credits/history/route"),
+        "core/credits/history"
+      );
     case "core/credits/purchase":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/credits/purchase/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/credits/purchase/route"),
+        "core/credits/purchase"
+      );
     case "core/emails/imap-client/accounts/:id":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/accounts/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/accounts/[id]/route"),
+        "core/emails/imap-client/accounts/:id"
+      );
     case "core/emails/imap-client/accounts/[id]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/accounts/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/accounts/[id]/route"),
+        "core/emails/imap-client/accounts/[id]"
+      );
     case "core/emails/imap-client/accounts/create":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/accounts/create/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/accounts/create/route"),
+        "core/emails/imap-client/accounts/create"
+      );
     case "core/emails/imap-client/accounts/list":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/route"),
+        "core/emails/imap-client/accounts/list"
+      );
     case "core/emails/imap-client/accounts/test":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/accounts/test/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/accounts/test/route"),
+        "core/emails/imap-client/accounts/test"
+      );
     case "core/emails/imap-client/accounts/{id}":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/accounts/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/accounts/[id]/route"),
+        "core/emails/imap-client/accounts/{id}"
+      );
     case "core/emails/imap-client/config":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/config/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/config/route"),
+        "core/emails/imap-client/config"
+      );
     case "core/emails/imap-client/folders/list":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/folders/list/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/folders/list/route"),
+        "core/emails/imap-client/folders/list"
+      );
     case "core/emails/imap-client/folders/sync":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/folders/sync/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/folders/sync/route"),
+        "core/emails/imap-client/folders/sync"
+      );
     case "core/emails/imap-client/health":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/health/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/health/route"),
+        "core/emails/imap-client/health"
+      );
     case "core/emails/imap-client/messages/:id":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/messages/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/messages/[id]/route"),
+        "core/emails/imap-client/messages/:id"
+      );
     case "core/emails/imap-client/messages/[id]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/messages/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/messages/[id]/route"),
+        "core/emails/imap-client/messages/[id]"
+      );
     case "core/emails/imap-client/messages/list":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/messages/list/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/messages/list/route"),
+        "core/emails/imap-client/messages/list"
+      );
     case "core/emails/imap-client/messages/sync":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/messages/sync/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/messages/sync/route"),
+        "core/emails/imap-client/messages/sync"
+      );
     case "core/emails/imap-client/messages/{id}":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/messages/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/messages/[id]/route"),
+        "core/emails/imap-client/messages/{id}"
+      );
     case "core/emails/imap-client/sync":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/imap-client/sync/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/imap-client/sync/route"),
+        "core/emails/imap-client/sync"
+      );
     case "core/emails/messages/:id":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/messages/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/messages/[id]/route"),
+        "core/emails/messages/:id"
+      );
     case "core/emails/messages/[id]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/messages/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/messages/[id]/route"),
+        "core/emails/messages/[id]"
+      );
     case "core/emails/messages/list":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/messages/list/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/messages/list/route"),
+        "core/emails/messages/list"
+      );
     case "core/emails/messages/stats":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/messages/stats/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/messages/stats/route"),
+        "core/emails/messages/stats"
+      );
     case "core/emails/messages/{id}":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/messages/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/messages/[id]/route"),
+        "core/emails/messages/{id}"
+      );
     case "core/emails/send":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/send/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/send/route"),
+        "core/emails/send"
+      );
     case "core/emails/smtp-client/create":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/smtp-client/create/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/smtp-client/create/route"),
+        "core/emails/smtp-client/create"
+      );
     case "core/emails/smtp-client/edit/:id":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/smtp-client/edit/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/smtp-client/edit/[id]/route"),
+        "core/emails/smtp-client/edit/:id"
+      );
     case "core/emails/smtp-client/edit/[id]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/smtp-client/edit/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/smtp-client/edit/[id]/route"),
+        "core/emails/smtp-client/edit/[id]"
+      );
     case "core/emails/smtp-client/edit/{id}":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/smtp-client/edit/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/smtp-client/edit/[id]/route"),
+        "core/emails/smtp-client/edit/{id}"
+      );
     case "core/emails/smtp-client/list":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/emails/smtp-client/list/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/emails/smtp-client/list/route"),
+        "core/emails/smtp-client/list"
+      );
     case "core/import":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/import/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/import/route"),
+        "core/import"
+      );
     case "core/leads/batch":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/batch/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/batch/route"),
+        "core/leads/batch"
+      );
     case "core/leads/campaigns/campaign-starter/campaign-starter-config":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/campaigns/campaign-starter/campaign-starter-config/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/campaigns/campaign-starter/campaign-starter-config/route"),
+        "core/leads/campaigns/campaign-starter/campaign-starter-config"
+      );
     case "core/leads/campaigns/emails/test-mail":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/campaigns/emails/test-mail/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/campaigns/emails/test-mail/route"),
+        "core/leads/campaigns/emails/test-mail"
+      );
     case "core/leads/create":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/create/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/create/route"),
+        "core/leads/create"
+      );
     case "core/leads/export":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/export/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/export/route"),
+        "core/leads/export"
+      );
     case "core/leads/import":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/route"),
+        "core/leads/import"
+      );
     case "core/leads/import/jobs/:jobId":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/route"),
+        "core/leads/import/jobs/:jobId"
+      );
     case "core/leads/import/jobs/:jobId/retry":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/retry/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/retry/route"),
+        "core/leads/import/jobs/:jobId/retry"
+      );
     case "core/leads/import/jobs/:jobId/stop":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/stop/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/stop/route"),
+        "core/leads/import/jobs/:jobId/stop"
+      );
     case "core/leads/import/jobs/:job_id":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/route"),
+        "core/leads/import/jobs/:job_id"
+      );
     case "core/leads/import/jobs/:job_id/retry":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/retry/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/retry/route"),
+        "core/leads/import/jobs/:job_id/retry"
+      );
     case "core/leads/import/jobs/:job_id/stop":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/stop/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/stop/route"),
+        "core/leads/import/jobs/:job_id/stop"
+      );
     case "core/leads/import/jobs/[jobId]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/route"),
+        "core/leads/import/jobs/[jobId]"
+      );
     case "core/leads/import/jobs/[jobId]/retry":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/retry/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/retry/route"),
+        "core/leads/import/jobs/[jobId]/retry"
+      );
     case "core/leads/import/jobs/[jobId]/stop":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/stop/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/stop/route"),
+        "core/leads/import/jobs/[jobId]/stop"
+      );
     case "core/leads/import/jobs/[job_id]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/route"),
+        "core/leads/import/jobs/[job_id]"
+      );
     case "core/leads/import/jobs/[job_id]/retry":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/retry/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/retry/route"),
+        "core/leads/import/jobs/[job_id]/retry"
+      );
     case "core/leads/import/jobs/[job_id]/stop":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/stop/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/stop/route"),
+        "core/leads/import/jobs/[job_id]/stop"
+      );
     case "core/leads/import/jobs/{jobId}":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/route"),
+        "core/leads/import/jobs/{jobId}"
+      );
     case "core/leads/import/jobs/{jobId}/retry":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/retry/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/retry/route"),
+        "core/leads/import/jobs/{jobId}/retry"
+      );
     case "core/leads/import/jobs/{jobId}/stop":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/stop/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/jobs/[jobId]/stop/route"),
+        "core/leads/import/jobs/{jobId}/stop"
+      );
     case "core/leads/import/status":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/import/status/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/import/status/route"),
+        "core/leads/import/status"
+      );
     case "core/leads/lead/:id":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/lead/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/lead/[id]/route"),
+        "core/leads/lead/:id"
+      );
     case "core/leads/lead/[id]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/lead/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/lead/[id]/route"),
+        "core/leads/lead/[id]"
+      );
     case "core/leads/lead/{id}":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/lead/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/lead/[id]/route"),
+        "core/leads/lead/{id}"
+      );
     case "core/leads/list":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/list/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/list/route"),
+        "core/leads/list"
+      );
     case "core/leads/search":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/search/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/search/route"),
+        "core/leads/search"
+      );
     case "core/leads/stats":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/stats/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/stats/route"),
+        "core/leads/stats"
+      );
     case "core/leads/tracking/engagement":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/tracking/engagement/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/tracking/engagement/route"),
+        "core/leads/tracking/engagement"
+      );
     case "core/leads/tracking/pixel":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/leads/tracking/pixel/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/leads/tracking/pixel/route"),
+        "core/leads/tracking/pixel"
+      );
     case "core/manifest":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/manifest/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/manifest/route"),
+        "core/manifest"
+      );
     case "core/newsletter/status":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/newsletter/status/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/newsletter/status/route"),
+        "core/newsletter/status"
+      );
     case "core/newsletter/subscribe":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/newsletter/subscribe/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/newsletter/subscribe/route"),
+        "core/newsletter/subscribe"
+      );
     case "core/newsletter/unsubscribe":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/newsletter/unsubscribe/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/newsletter/unsubscribe/route"),
+        "core/newsletter/unsubscribe"
+      );
     case "core/payment":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/payment/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/payment/route"),
+        "core/payment"
+      );
     case "core/payment/invoice":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/payment/invoice/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/payment/invoice/route"),
+        "core/payment/invoice"
+      );
     case "core/payment/portal":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/payment/portal/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/payment/portal/route"),
+        "core/payment/portal"
+      );
     case "core/payment/refund":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/payment/refund/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/payment/refund/route"),
+        "core/payment/refund"
+      );
     case "core/payment/webhook/stripe":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/payment/webhook/stripe/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/payment/webhook/stripe/route"),
+        "core/payment/webhook/stripe"
+      );
     case "core/stripe":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/stripe/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/stripe/route"),
+        "core/stripe"
+      );
     case "core/subscription":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/subscription/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/subscription/route"),
+        "core/subscription"
+      );
     case "core/subscription/checkout":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/subscription/checkout/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/subscription/checkout/route"),
+        "core/subscription/checkout"
+      );
     case "core/system/check/lint":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/check/lint/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/check/lint/route"),
+        "core/system/check/lint"
+      );
     case "core/system/check/oxlint":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/check/oxlint/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/check/oxlint/route"),
+        "core/system/check/oxlint"
+      );
     case "core/system/check/testing/test":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/check/testing/test/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/check/testing/test/route"),
+        "core/system/check/testing/test"
+      );
     case "core/system/check/typecheck":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/check/typecheck/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/check/typecheck/route"),
+        "core/system/check/typecheck"
+      );
     case "core/system/check/vibe-check":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/check/vibe-check/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/check/vibe-check/route"),
+        "core/system/check/vibe-check"
+      );
     case "core/system/db/migrate":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/migrate/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/migrate/route"),
+        "core/system/db/migrate"
+      );
     case "core/system/db/migrate-prod":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/migrate-prod/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/migrate-prod/route"),
+        "core/system/db/migrate-prod"
+      );
     case "core/system/db/migrate-repair":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/migrate-repair/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/migrate-repair/route"),
+        "core/system/db/migrate-repair"
+      );
     case "core/system/db/migrate-sync":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/migrate-sync/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/migrate-sync/route"),
+        "core/system/db/migrate-sync"
+      );
     case "core/system/db/migrate/task-management":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/migrate/task-management/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/migrate/task-management/route"),
+        "core/system/db/migrate/task-management"
+      );
     case "core/system/db/ping":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/ping/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/ping/route"),
+        "core/system/db/ping"
+      );
     case "core/system/db/reset":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/reset/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/reset/route"),
+        "core/system/db/reset"
+      );
     case "core/system/db/reset/task-management":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/reset/task-management/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/reset/task-management/route"),
+        "core/system/db/reset/task-management"
+      );
     case "core/system/db/schema-verify":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/schema-verify/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/schema-verify/route"),
+        "core/system/db/schema-verify"
+      );
     case "core/system/db/seed":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/seed/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/seed/route"),
+        "core/system/db/seed"
+      );
     case "core/system/db/sql":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/sql/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/sql/route"),
+        "core/system/db/sql"
+      );
     case "core/system/db/studio":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/studio/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/studio/route"),
+        "core/system/db/studio"
+      );
     case "core/system/db/utils":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/utils/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/utils/route"),
+        "core/system/db/utils"
+      );
     case "core/system/db/utils/docker-operations":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/db/utils/docker-operations/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/db/utils/docker-operations/route"),
+        "core/system/db/utils/docker-operations"
+      );
     case "core/system/generators/endpoint":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/generators/endpoint/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/generators/endpoint/route"),
+        "core/system/generators/endpoint"
+      );
     case "core/system/generators/endpoints":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/generators/endpoints/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/generators/endpoints/route"),
+        "core/system/generators/endpoints"
+      );
     case "core/system/generators/endpoints-index":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/generators/endpoints-index/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/generators/endpoints-index/route"),
+        "core/system/generators/endpoints-index"
+      );
     case "core/system/generators/generate-all":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/generators/generate-all/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/generators/generate-all/route"),
+        "core/system/generators/generate-all"
+      );
     case "core/system/generators/generate-trpc-router":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/generators/generate-trpc-router/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/generators/generate-trpc-router/route"),
+        "core/system/generators/generate-trpc-router"
+      );
     case "core/system/generators/generate-trpc-router/validation":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/generators/generate-trpc-router/validation/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/generators/generate-trpc-router/validation/route"),
+        "core/system/generators/generate-trpc-router/validation"
+      );
     case "core/system/generators/route-handlers":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/generators/route-handlers/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/generators/route-handlers/route"),
+        "core/system/generators/route-handlers"
+      );
     case "core/system/generators/seeds":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/generators/seeds/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/generators/seeds/route"),
+        "core/system/generators/seeds"
+      );
     case "core/system/generators/task-index":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/generators/task-index/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/generators/task-index/route"),
+        "core/system/generators/task-index"
+      );
     case "core/system/guard/destroy":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/guard/destroy/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/guard/destroy/route"),
+        "core/system/guard/destroy"
+      );
     case "core/system/guard/start":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/guard/start/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/guard/start/route"),
+        "core/system/guard/start"
+      );
     case "core/system/guard/status":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/guard/status/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/guard/status/route"),
+        "core/system/guard/status"
+      );
     case "core/system/guard/stop":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/guard/stop/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/guard/stop/route"),
+        "core/system/guard/stop"
+      );
     case "core/system/help":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/help/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/help/route"),
+        "core/system/help"
+      );
     case "core/system/help/list":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/help/list/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/help/list/route"),
+        "core/system/help/list"
+      );
     case "core/system/server/build":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/server/build/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/server/build/route"),
+        "core/system/server/build"
+      );
     case "core/system/server/dev":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/server/dev/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/server/dev/route"),
+        "core/system/server/dev"
+      );
     case "core/system/server/health":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/server/health/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/server/health/route"),
+        "core/system/server/health"
+      );
     case "core/system/server/start":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/server/start/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/server/start/route"),
+        "core/system/server/start"
+      );
     case "core/system/translations/reorganize":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/translations/reorganize/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/translations/reorganize/route"),
+        "core/system/translations/reorganize"
+      );
     case "core/system/translations/restore-backup":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/translations/restore-backup/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/translations/restore-backup/route"),
+        "core/system/translations/restore-backup"
+      );
     case "core/system/translations/stats":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/translations/stats/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/translations/stats/route"),
+        "core/system/translations/stats"
+      );
     case "core/system/unified-interface/ai/tools":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/ai/tools/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/ai/tools/route"),
+        "core/system/unified-interface/ai/tools"
+      );
     case "core/system/unified-interface/cli/setup/install":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/cli/setup/install/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/cli/setup/install/route"),
+        "core/system/unified-interface/cli/setup/install"
+      );
     case "core/system/unified-interface/cli/setup/status":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/cli/setup/status/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/cli/setup/status/route"),
+        "core/system/unified-interface/cli/setup/status"
+      );
     case "core/system/unified-interface/cli/setup/uninstall":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/cli/setup/uninstall/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/cli/setup/uninstall/route"),
+        "core/system/unified-interface/cli/setup/uninstall"
+      );
     case "core/system/unified-interface/cli/setup/update":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/cli/setup/update/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/cli/setup/update/route"),
+        "core/system/unified-interface/cli/setup/update"
+      );
     case "core/system/unified-interface/mcp/execute":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/mcp/execute/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/mcp/execute/route"),
+        "core/system/unified-interface/mcp/execute"
+      );
     case "core/system/unified-interface/mcp/tools":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/mcp/tools/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/mcp/tools/route"),
+        "core/system/unified-interface/mcp/tools"
+      );
     case "core/system/unified-interface/tasks/cron/history":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/history/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/history/route"),
+        "core/system/unified-interface/tasks/cron/history"
+      );
     case "core/system/unified-interface/tasks/cron/stats":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/stats/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/stats/route"),
+        "core/system/unified-interface/tasks/cron/stats"
+      );
     case "core/system/unified-interface/tasks/cron/status":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/status/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/status/route"),
+        "core/system/unified-interface/tasks/cron/status"
+      );
     case "core/system/unified-interface/tasks/cron/tasks":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/tasks/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/tasks/route"),
+        "core/system/unified-interface/tasks/cron/tasks"
+      );
     case "core/system/unified-interface/tasks/pulse":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/pulse/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/pulse/route"),
+        "core/system/unified-interface/tasks/pulse"
+      );
     case "core/system/unified-interface/tasks/pulse/execute":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/pulse/execute/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/pulse/execute/route"),
+        "core/system/unified-interface/tasks/pulse/execute"
+      );
     case "core/system/unified-interface/tasks/pulse/status":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/pulse/status/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/pulse/status/route"),
+        "core/system/unified-interface/tasks/pulse/status"
+      );
     case "core/system/unified-interface/tasks/side-tasks":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/side-tasks/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/side-tasks/route"),
+        "core/system/unified-interface/tasks/side-tasks"
+      );
     case "core/system/unified-interface/tasks/types":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/types/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/types/route"),
+        "core/system/unified-interface/tasks/types"
+      );
     case "core/system/unified-interface/tasks/unified-runner":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/unified-runner/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/unified-interface/tasks/unified-runner/route"),
+        "core/system/unified-interface/tasks/unified-runner"
+      );
     case "core/user/auth/check":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/user/auth/check/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/user/auth/check/route"),
+        "core/user/auth/check"
+      );
     case "core/user/private/logout":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/user/private/logout/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/user/private/logout/route"),
+        "core/user/private/logout"
+      );
     case "core/user/private/me":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/user/private/me/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/user/private/me/route"),
+        "core/user/private/me"
+      );
     case "core/user/private/me/avatar":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/user/private/me/avatar/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/user/private/me/avatar/route"),
+        "core/user/private/me/avatar"
+      );
     case "core/user/private/me/password":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/user/private/me/password/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/user/private/me/password/route"),
+        "core/user/private/me/password"
+      );
     case "core/user/public/login":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/user/public/login/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/user/public/login/route"),
+        "core/user/public/login"
+      );
     case "core/user/public/login/options":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/user/public/login/options/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/user/public/login/options/route"),
+        "core/user/public/login/options"
+      );
     case "core/user/public/reset-password/confirm":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/user/public/reset-password/confirm/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/user/public/reset-password/confirm/route"),
+        "core/user/public/reset-password/confirm"
+      );
     case "core/user/public/reset-password/request":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/user/public/reset-password/request/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/user/public/reset-password/request/route"),
+        "core/user/public/reset-password/request"
+      );
     case "core/user/public/reset-password/validate":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/user/public/reset-password/validate/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/user/public/reset-password/validate/route"),
+        "core/user/public/reset-password/validate"
+      );
     case "core/user/public/signup":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/user/public/signup/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/user/public/signup/route"),
+        "core/user/public/signup"
+      );
     case "core/user/search":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/user/search/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/user/search/route"),
+        "core/user/search"
+      );
     case "core/users/create":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/users/create/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/users/create/route"),
+        "core/users/create"
+      );
     case "core/users/list":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/users/list/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/users/list/route"),
+        "core/users/list"
+      );
     case "core/users/stats":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/users/stats/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/users/stats/route"),
+        "core/users/stats"
+      );
     case "core/users/user/:id":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/users/user/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/users/user/[id]/route"),
+        "core/users/user/:id"
+      );
     case "core/users/user/[id]":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/users/user/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/users/user/[id]/route"),
+        "core/users/user/[id]"
+      );
     case "core/users/user/{id}":
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generated route handler types require runtime flexibility for dynamic endpoint registration
-      return ((await import("@/app/api/[locale]/v1/core/users/user/[id]/route")) as unknown) as RouteModule;
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/users/user/[id]/route"),
+        "core/users/user/{id}"
+      );
     default:
       return null;
   }

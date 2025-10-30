@@ -4,6 +4,14 @@
  * Detects untranslated literal strings in JSX and code.
  */
 
+import type {
+  OxlintASTNode,
+  OxlintRuleContext,
+  JSXIdentifier,
+  JSXLiteral,
+  JSXAttribute,
+} from "../../../types";
+
 // Configuration options interface
 interface I18nOptions {
   words?: {
@@ -17,17 +25,9 @@ interface I18nOptions {
   };
 }
 
-// AST Node types
-interface ASTNode {
-  type: string;
-  value?: string | number | boolean | null | ASTNode;
-  name?: string | ASTNode;
-}
-
-// Rule context interface
-interface RuleContext {
-  options?: Array<I18nOptions>;
-  report: (descriptor: { node: ASTNode; message: string }) => void;
+// Extended rule context with i18n options
+interface I18nRuleContext extends OxlintRuleContext {
+  options?: I18nOptions[];
 }
 
 // Define the no-literal-string rule
@@ -65,7 +65,7 @@ const noLiteralStringRule = {
       },
     ],
   },
-  create(context: RuleContext): Record<string, (node: ASTNode) => void> {
+  create(context: I18nRuleContext): Record<string, (node: OxlintASTNode) => void> {
     // Merge user options with defaults
     const userOptions = context.options?.[0] || {};
     const options: I18nOptions = {
@@ -192,8 +192,8 @@ const noLiteralStringRule = {
 
     return {
       // JSX Text nodes
-      JSXText(node: ASTNode): void {
-        const value = node.value;
+      JSXText(node: OxlintASTNode): void {
+        const value = (node as { value?: unknown }).value;
         if (typeof value !== "string") {
           return;
         }
@@ -208,8 +208,8 @@ const noLiteralStringRule = {
       },
 
       // String literals in JSX expressions
-      "JSXExpressionContainer > Literal"(node: ASTNode): void {
-        const value = node.value;
+      "JSXExpressionContainer > Literal"(node: OxlintASTNode): void {
+        const value = (node as JSXLiteral).value;
         if (typeof value === "string" && !shouldExcludeString(value)) {
           context.report({
             node,
@@ -219,17 +219,16 @@ const noLiteralStringRule = {
       },
 
       // JSX Attribute values
-      JSXAttribute(node: ASTNode): void {
-        // Access as any to get the actual AST structure from oxlint
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const nameNode = (node as any).name;
+      JSXAttribute(node: OxlintASTNode): void {
+        const attrNode = node as JSXAttribute;
+        const nameNode = attrNode.name;
+
         if (!nameNode) {
           return;
         }
 
-        // Get the attribute name string - in JSX AST, name.name is the identifier
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const attrName: string = (nameNode as any).name || String(nameNode);
+        // Get the attribute name string - properly typed now
+        const attrName: string = (nameNode as JSXIdentifier).name || String(nameNode);
 
         // Skip ALL excluded attributes (className, href, etc.) - these contain non-translatable values
         if (isExcludedAttribute(attrName)) {
@@ -237,14 +236,13 @@ const noLiteralStringRule = {
         }
 
         // For non-excluded attributes, check if the value is a literal string that should be translated
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const valueNode = (node as any).value;
+        const valueNode = attrNode.value;
         if (!valueNode) {
           return;
         }
 
         if (valueNode.type === "Literal") {
-          const literalValue = valueNode.value;
+          const literalValue = (valueNode as JSXLiteral).value;
           if (
             typeof literalValue === "string" &&
             !shouldExcludeString(literalValue)

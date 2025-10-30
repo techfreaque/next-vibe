@@ -3,23 +3,9 @@
  * Handles GET, PATCH, and DELETE requests for individual threads
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { ApiHandlerProps } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/handler";
 
-import type {
-  ThreadDeleteRequestOutput,
-  ThreadDeleteResponseOutput,
-  ThreadDeleteUrlParamsTypeOutput,
-  ThreadGetRequestOutput,
-  ThreadGetResponseOutput,
-  ThreadGetUrlParamsTypeOutput,
-  ThreadPatchRequestOutput,
-  ThreadPatchResponseOutput,
-  ThreadPatchUrlParamsTypeOutput,
-} from "./definition";
 import definitions from "./definition";
 import { threadByIdRepository } from "./repository";
 
@@ -28,14 +14,10 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined,
     handler: async (
-      props: ApiHandlerProps<
-        ThreadGetRequestOutput,
-        ThreadGetUrlParamsTypeOutput,
-        typeof definitions.GET.allowedRoles
-      >,
-    ): Promise<ResponseType<ThreadGetResponseOutput>> => {
+      props,
+    ) => {
       return await threadByIdRepository.getThreadById(
-        { id: props.urlPathParams.threadId },
+        props.urlPathParams.threadId,
         props.user,
         props.locale,
         props.logger,
@@ -45,18 +27,11 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   [Methods.PATCH]: {
     email: undefined,
     handler: async (
-      props: ApiHandlerProps<
-        ThreadPatchRequestOutput,
-        ThreadPatchUrlParamsTypeOutput,
-        typeof definitions.PATCH.allowedRoles
-      >,
-    ): Promise<ResponseType<ThreadPatchResponseOutput>> => {
-      const dataWithId: ThreadPatchRequestOutput & { id: string } = {
-        ...props.data,
-        id: props.urlPathParams.threadId,
-      };
+      props,
+    ) => {
       return await threadByIdRepository.updateThread(
-        dataWithId,
+        props.data,
+        props.urlPathParams.threadId,
         props.user,
         props.locale,
         props.logger,
@@ -66,14 +41,10 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   [Methods.DELETE]: {
     email: undefined,
     handler: async (
-      props: ApiHandlerProps<
-        ThreadDeleteRequestOutput,
-        ThreadDeleteUrlParamsTypeOutput,
-        typeof definitions.DELETE.allowedRoles
-      >,
-    ): Promise<ResponseType<ThreadDeleteResponseOutput>> => {
+      props,
+    ) => {
       return await threadByIdRepository.deleteThread(
-        { id: props.urlPathParams.threadId },
+        props.urlPathParams.threadId,
         props.user,
         props.locale,
         props.logger,

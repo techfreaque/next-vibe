@@ -33,10 +33,13 @@ program
           options.ci || false,
           options.forceUpdate || false,
         );
-        console.log("Release process completed successfully.");
+        // eslint-disable-next-line i18next/no-literal-string
+        process.stdout.write("Release process completed successfully.\n");
         process.exit(0);
       } catch (error) {
-        console.error("Error during release process:", error);
+        // eslint-disable-next-line i18next/no-literal-string
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        process.stderr.write(`Error during release process: ${errorMsg}\n`);
         process.exit(1);
       }
     },
@@ -46,10 +49,13 @@ program
 program.action(async () => {
   try {
     await release();
-    console.log("Release process completed successfully.");
+    // eslint-disable-next-line i18next/no-literal-string
+    process.stdout.write("Release process completed successfully.\n");
     process.exit(0);
   } catch (error) {
-    console.error("Error during release process:", error);
+    // eslint-disable-next-line i18next/no-literal-string
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    process.stderr.write(`Error during release process: ${errorMsg}\n`);
     process.exit(1);
   }
 });

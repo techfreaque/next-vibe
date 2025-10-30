@@ -74,10 +74,12 @@ export function useEndpointDelete<
   // Create a submit function that calls the mutation
   const submit = useCallback(
     async (data?: TEndpoint["TRequestOutput"]): Promise<void> => {
-      await mutation.mutateAsync({
+      const mutationVariables = {
         requestData: data || ({} as TEndpoint["TRequestOutput"]),
         urlPathParams: urlPathParams,
-      });
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await mutation.mutateAsync(mutationVariables as any);
     },
     [mutation, urlPathParams],
   );

@@ -3,6 +3,8 @@
  * Page for monitoring and managing email synchronization operations
  */
 
+import { Div, P } from "next-vibe-ui/ui";
+import { H1 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -26,17 +28,17 @@ export default async function ImapSyncPage({
   const { t } = simpleT(locale);
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">
+    <Div className="container mx-auto py-6 space-y-6">
+      <Div className="mb-6">
+        <H1 className="text-3xl font-bold">
           {t("app.admin.emails.imap.admin.sync.title")}
-        </h1>
-        <p className="text-muted-foreground">
+        </H1>
+        <P className="text-muted-foreground">
           {t("app.admin.emails.imap.admin.sync.description")}
-        </p>
-      </div>
+        </P>
+      </Div>
 
       <ImapSyncOperations />
-    </div>
+    </Div>
   );
 }

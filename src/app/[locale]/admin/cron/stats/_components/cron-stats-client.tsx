@@ -27,6 +27,8 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
+import { Div, Span } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -154,23 +156,23 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <Div className="space-y-6">
         {/* Filters Skeleton */}
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-32" />
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <Skeleton key={i} className="h-10 w-full" />
               ))}
-            </div>
+            </Div>
           </CardContent>
         </Card>
 
         {/* Stats Cards Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
             <Card key={i}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -183,28 +185,28 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
               </CardContent>
             </Card>
           ))}
-        </div>
+        </Div>
 
         {/* Tabs Skeleton */}
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-32" />
-            <div className="flex space-x-2 mt-4">
+            <Div className="flex space-x-2 mt-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-8 w-20" />
               ))}
-            </div>
+            </Div>
           </CardHeader>
           <CardContent>
             <Skeleton className="h-96 w-full" />
           </CardContent>
         </Card>
-      </div>
+      </Div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Filters */}
       <CronStatsFiltersContainer
         locale={locale}
@@ -215,7 +217,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
       </CronStatsFiltersContainer>
 
       {/* Key Metrics Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Executions */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -225,15 +227,15 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.totalExecutions ?? 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.cron.stats.countWithLabel", {
                 count: formatNumber(stats?.executionsLast24h ?? 0),
                 label: t("app.admin.cron.stats.last24h"),
               })}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -248,13 +250,13 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
               {formatPercentage(stats?.successRate ?? 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.cron.stats.countWithLabel", {
                 count: formatNumber(stats?.successfulExecutions ?? 0),
                 label: t("app.admin.cron.stats.successful"),
               })}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -267,17 +269,17 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.activeTasks ?? 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.cron.stats.countWithLabel", {
                 count: formatPercentage(
                   (stats?.activeTasks ?? 0) / (stats?.totalTasks ?? 1),
                 ),
                 label: t("app.admin.cron.stats.ofTotal"),
               })}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -290,21 +292,21 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             <Cpu className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatPercentage(stats?.systemLoad ?? 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.cron.stats.countWithLabel", {
                 count: formatNumber(stats?.queueSize ?? 0),
                 label: t("app.admin.cron.stats.queued"),
               })}
-            </p>
+            </P>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Secondary Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Failed Executions */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -316,11 +318,11 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
               {formatNumber(stats?.failedExecutions ?? 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.failureRate ?? 0)}{" "}
               {t("app.admin.cron.stats.failureRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -333,16 +335,16 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.avgExecutionTime ?? 0)}
               ms
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.cron.stats.durationWithLabel", {
                 duration: formatNumber(stats?.medianExecutionTime ?? 0),
                 label: t("app.admin.cron.stats.median"),
               })}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -357,11 +359,11 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
               {formatNumber(stats?.healthyTasks ?? 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.degradedTasks ?? 0)}{" "}
               {t("app.admin.cron.stats.degraded")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -374,13 +376,13 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             <Server className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(stats?.pendingExecutions ?? 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.runningExecutions ?? 0)}{" "}
               {t("app.admin.cron.stats.running")}
-            </p>
+            </P>
           </CardContent>
         </Card>
       </div>
@@ -406,7 +408,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Execution Trends */}
             {stats?.historicalData && (
               <CronStatsChart
@@ -436,11 +438,11 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                 height={300}
               />
             )}
-          </div>
+          </Div>
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Performance Metrics */}
             <Card>
               <CardHeader>
@@ -450,44 +452,44 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                <Div className="space-y-3">
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t("app.admin.cron.stats.avgExecutionTime")}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.avgExecutionTime ?? 0)}
                       ms
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t("app.admin.cron.stats.medianExecutionTime")}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.medianExecutionTime ?? 0)}
                       ms
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t("app.admin.cron.stats.minExecutionTime")}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.minExecutionTime ?? 0)}
                       ms
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center justify-between">
+                    <Span className="text-sm font-medium">
                       {t("app.admin.cron.stats.maxExecutionTime")}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
+                    </Span>
+                    <Span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.maxExecutionTime ?? 0)}
                       ms
-                    </span>
-                  </div>
-                </div>
+                    </Span>
+                  </Div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -507,7 +509,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
           </div>
 
           {/* System Performance */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* System Load Chart */}
             {stats?.historicalData && (
               <CronStatsChart
@@ -536,11 +538,11 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                 height={300}
               />
             )}
-          </div>
+          </Div>
         </TabsContent>
 
         <TabsContent value="distribution" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Task Priority Distribution */}
             {stats?.tasksByPriority && (
               <CronStatsDistributionChart
@@ -573,7 +575,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
           </div>
 
           {/* Execution Distribution */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Executions by Hour */}
             {stats?.executionsByHour && (
               <CronStatsDistributionChart
@@ -603,7 +605,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                 height={300}
               />
             )}
-          </div>
+          </Div>
         </TabsContent>
 
         <TabsContent value="tasks" className="space-y-4">
@@ -616,7 +618,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <Div className="space-y-4">
                 {}
                 {stats?.topPerformingTasks?.map(
                   (
@@ -628,32 +630,32 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                     },
                     index: number,
                   ) => (
-                    <div
+                    <Div
                       key={task.taskName}
                       className="flex items-center justify-between p-3 border rounded-lg"
                     >
-                      <div className="flex items-center gap-3">
+                      <Div className="flex items-center gap-3">
                         <Badge variant="secondary">#{index + 1}</Badge>
-                        <div>
-                          <p className="font-medium">{task.taskName}</p>
-                          <p className="text-sm text-muted-foreground">
+                        <Div>
+                          <P className="font-medium">{task.taskName}</P>
+                          <P className="text-sm text-muted-foreground">
                             {formatNumber(task.executions)}{" "}
                             {t("app.admin.cron.stats.executions")}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium text-green-600">
+                          </P>
+                        </Div>
+                      </Div>
+                      <Div className="text-right">
+                        <P className="font-medium text-green-600">
                           {formatPercentage(task.successRate)}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
+                        </P>
+                        <P className="text-sm text-muted-foreground">
                           {formatNumber(task.avgDuration)}ms
-                        </p>
-                      </div>
-                    </div>
+                        </P>
+                      </Div>
+                    </Div>
                   ),
                 )}
-              </div>
+              </Div>
             </CardContent>
           </Card>
 
@@ -666,38 +668,38 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <Div className="space-y-4">
                 {}
                 {stats?.problemTasks?.map((task, index: number) => (
-                  <div
+                  <Div
                     key={task.taskName}
                     className="flex items-center justify-between p-3 border rounded-lg"
                   >
-                    <div className="flex items-center gap-3">
+                    <Div className="flex items-center gap-3">
                       <Badge variant="destructive">#{index + 1}</Badge>
-                      <div>
-                        <p className="font-medium">{task.taskName}</p>
-                        <p className="text-sm text-muted-foreground">
+                      <Div>
+                        <P className="font-medium">{task.taskName}</P>
+                        <P className="text-sm text-muted-foreground">
                           {formatNumber(task.failures)}{" "}
                           {t("app.admin.cron.stats.failures")} /{" "}
                           {formatNumber(task.executions)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium text-red-600">
+                        </P>
+                      </Div>
+                    </Div>
+                    <Div className="text-right">
+                      <P className="font-medium text-red-600">
                         {formatPercentage(task.failureRate)}
-                      </p>
+                      </P>
                       {task.lastFailure && (
-                        <p className="text-sm text-muted-foreground">
+                        <P className="text-sm text-muted-foreground">
                           {t("app.admin.cron.stats.lastFailure")}:{" "}
                           {new Date(task.lastFailure).toLocaleDateString()}
-                        </p>
+                        </P>
                       )}
-                    </div>
-                  </div>
+                    </Div>
+                  </Div>
                 ))}
-              </div>
+              </Div>
             </CardContent>
           </Card>
 
@@ -710,7 +712,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <Div className="space-y-4">
                 {}
                 {stats?.groupedStats?.byTaskName?.map(
                   (taskStat: {
@@ -721,44 +723,44 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                     successRate: number;
                     avgDuration: number;
                   }) => (
-                    <div
+                    <Div
                       key={taskStat.taskName}
                       className="flex items-center justify-between p-3 border rounded-lg"
                     >
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <p className="font-medium">{taskStat.taskName}</p>
-                          <p className="text-sm text-muted-foreground">
+                      <Div className="flex items-center gap-3">
+                        <Div>
+                          <P className="font-medium">{taskStat.taskName}</P>
+                          <P className="text-sm text-muted-foreground">
                             {formatNumber(taskStat.executions)}{" "}
                             {t("app.admin.cron.stats.executions")}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-green-600">
+                          </P>
+                        </Div>
+                      </Div>
+                      <Div className="text-right space-y-1">
+                        <Div className="flex items-center gap-2">
+                          <Span className="text-sm text-green-600">
                             {formatNumber(taskStat.successes)}{" "}
                             {t("app.admin.cron.stats.success")}
-                          </span>
-                          <span className="text-sm text-red-600">
+                          </Span>
+                          <Span className="text-sm text-red-600">
                             {formatNumber(taskStat.failures)}{" "}
                             {t("app.admin.cron.stats.failed")}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">
+                          </Span>
+                        </Div>
+                        <Div className="flex items-center gap-2">
+                          <Span className="text-sm font-medium">
                             {formatPercentage(taskStat.successRate)}
-                          </span>
-                          <span className="text-sm text-muted-foreground">
+                          </Span>
+                          <Span className="text-sm text-muted-foreground">
                             {formatNumber(taskStat.avgDuration)}ms{" "}
                             {t("app.admin.cron.stats.avg")}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                          </Span>
+                        </Div>
+                      </Div>
+                    </Div>
                   ),
                 )}
-              </div>
+              </Div>
             </CardContent>
           </Card>
 
@@ -773,7 +775,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <Div className="space-y-4">
                   {}
                   {stats.recentActivity.map(
                     (activity: {
@@ -782,30 +784,30 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                       taskName: string;
                       type: string;
                     }) => (
-                      <div
+                      <Div
                         key={`${activity.id}-${activity.timestamp}`}
                         className="flex items-center justify-between p-3 border rounded-lg"
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-blue-500" />
-                          <div>
-                            <p className="font-medium">{activity.taskName}</p>
-                            <p className="text-sm text-muted-foreground">
+                        <Div className="flex items-center gap-3">
+                          <Div className="w-2 h-2 rounded-full bg-blue-500" />
+                          <Div>
+                            <P className="font-medium">{activity.taskName}</P>
+                            <P className="text-sm text-muted-foreground">
                               {activity.type}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground">
+                            </P>
+                          </Div>
+                        </Div>
+                        <Div className="text-right">
+                          <P className="text-sm text-muted-foreground">
                             {new Date(activity.timestamp).toLocaleString(
                               locale,
                             )}
-                          </p>
-                        </div>
-                      </div>
+                          </P>
+                        </Div>
+                      </Div>
                     ),
                   )}
-                </div>
+                </Div>
               </CardContent>
             </Card>
           )}
@@ -824,7 +826,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <Div className="space-y-4">
                   {}
                   {stats.dailyStats
                     .slice(0, 10)
@@ -837,47 +839,47 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                         avgDuration: number;
                         uniqueTasks: number;
                       }) => (
-                        <div
+                        <Div
                           key={day.date}
                           className="flex items-center justify-between p-3 border rounded-lg"
                         >
-                          <div className="flex items-center gap-3">
-                            <div>
-                              <p className="font-medium">
+                          <Div className="flex items-center gap-3">
+                            <Div>
+                              <P className="font-medium">
                                 {new Date(day.date).toLocaleDateString(locale)}
-                              </p>
-                              <p className="text-sm text-muted-foreground">
+                              </P>
+                              <P className="text-sm text-muted-foreground">
                                 {formatNumber(day.executions)}{" "}
                                 {t("app.admin.cron.stats.executions")}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="text-right space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-green-600">
+                              </P>
+                            </Div>
+                          </Div>
+                          <Div className="text-right space-y-1">
+                            <Div className="flex items-center gap-2">
+                              <Span className="text-sm text-green-600">
                                 {formatNumber(day.successes)}{" "}
                                 {t("app.admin.cron.stats.successes")}
-                              </span>
-                              <span className="text-sm text-red-600">
+                              </Span>
+                              <Span className="text-sm text-red-600">
                                 {formatNumber(day.failures)}{" "}
                                 {t("app.admin.cron.stats.failures")}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">
+                              </Span>
+                            </Div>
+                            <Div className="flex items-center gap-2">
+                              <Span className="text-sm text-muted-foreground">
                                 {formatNumber(day.avgDuration)}ms{" "}
                                 {t("app.admin.cron.stats.avgDuration")}
-                              </span>
-                              <span className="text-sm text-muted-foreground">
+                              </Span>
+                              <Span className="text-sm text-muted-foreground">
                                 {formatNumber(day.uniqueTasks)}{" "}
                                 {t("app.admin.cron.stats.uniqueTasks")}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                              </Span>
+                            </Div>
+                          </Div>
+                        </Div>
                       ),
                     )}
-                </div>
+                </Div>
               </CardContent>
             </Card>
           )}
@@ -893,7 +895,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <Div className="space-y-4">
                   {}
                   {objectEntries(stats.taskStats)
                     .slice(0, 10)
@@ -910,14 +912,14 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                           isEnabled: boolean;
                         },
                       ]) => (
-                        <div
+                        <Div
                           key={taskName}
                           className="flex items-center justify-between p-3 border rounded-lg"
                         >
-                          <div className="flex items-center gap-3">
-                            <div>
-                              <p className="font-medium">{taskName}</p>
-                              <p className="text-sm text-muted-foreground">
+                          <Div className="flex items-center gap-3">
+                            <Div>
+                              <P className="font-medium">{taskName}</P>
+                              <P className="text-sm text-muted-foreground">
                                 {t("app.admin.cron.stats.priorityAndHealth", {
                                   priorityLabel: t(
                                     "app.admin.cron.stats.priorityLabel",
@@ -926,35 +928,35 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                                   healthLabel: t("app.admin.cron.stats.health"),
                                   health: taskStat.healthStatus,
                                 })}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="text-right space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-green-600">
+                              </P>
+                            </Div>
+                          </Div>
+                          <Div className="text-right space-y-1">
+                            <Div className="flex items-center gap-2">
+                              <Span className="text-sm text-green-600">
                                 {formatNumber(taskStat.successfulExecutions)} /{" "}
                                 {formatNumber(taskStat.totalExecutions)}
-                              </span>
-                              <span className="text-sm font-medium">
+                              </Span>
+                              <Span className="text-sm font-medium">
                                 {formatPercentage(taskStat.successRate)}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">
+                              </Span>
+                            </Div>
+                            <Div className="flex items-center gap-2">
+                              <Span className="text-sm text-muted-foreground">
                                 {formatNumber(taskStat.avgDuration)}ms{" "}
                                 {t("app.admin.cron.stats.avg")}
-                              </span>
-                              <span className="text-sm text-muted-foreground">
+                              </Span>
+                              <Span className="text-sm text-muted-foreground">
                                 {taskStat.isEnabled
                                   ? t("app.admin.cron.stats.enabled")
                                   : t("app.admin.cron.stats.disabled")}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                              </Span>
+                            </Div>
+                          </Div>
+                        </Div>
                       ),
                     )}
-                </div>
+                </Div>
               </CardContent>
             </Card>
           )}
@@ -971,7 +973,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <Div className="space-y-4">
                     {}
                     {stats.groupedStats.byPriority.map(
                       (priorityStat: {
@@ -981,19 +983,19 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                         successRate: number;
                         avgDuration: number;
                       }) => (
-                        <div
+                        <Div
                           key={priorityStat.priority}
                           className="flex items-center justify-between p-3 border rounded-lg"
                         >
-                          <div className="flex items-center gap-3">
-                            <div>
-                              <p className="font-medium">
+                          <Div className="flex items-center gap-3">
+                            <Div>
+                              <P className="font-medium">
                                 {priorityStat.priority}
-                              </p>
+                              </P>
                               <p className="text-sm text-muted-foreground">
                                 {formatNumber(priorityStat.taskCount)}{" "}
                                 {t("app.admin.cron.stats.tasks")}
-                              </p>
+                              </P>
                             </div>
                           </div>
                           <div className="text-right space-y-1">
@@ -1011,9 +1013,9 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                                 {formatNumber(priorityStat.avgDuration)}ms{" "}
                                 {t("app.admin.cron.stats.avg")}
                               </span>
-                            </div>
-                          </div>
-                        </div>
+                            </Div>
+                          </Div>
+                        </Div>
                       ),
                     )}
                   </div>
@@ -1033,7 +1035,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <Div className="space-y-4">
                     {}
                     {stats.groupedStats.byHealthStatus.map(
                       (healthStat: {
@@ -1041,15 +1043,15 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                         taskCount: number;
                         percentage: number;
                       }) => (
-                        <div
+                        <Div
                           key={healthStat.healthStatus}
                           className="flex items-center justify-between p-3 border rounded-lg"
                         >
-                          <div className="flex items-center gap-3">
-                            <div>
-                              <p className="font-medium">
+                          <Div className="flex items-center gap-3">
+                            <Div>
+                              <P className="font-medium">
                                 {healthStat.healthStatus}
-                              </p>
+                              </P>
                               <p className="text-sm text-muted-foreground">
                                 {t(
                                   "app.admin.cron.stats.countWithLabelAndPercentage",
@@ -1061,10 +1063,10 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                                     ),
                                   },
                                 )}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
+                              </P>
+                            </Div>
+                          </Div>
+                        </Div>
                       ),
                     )}
                   </div>
@@ -1084,7 +1086,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <Div className="space-y-4">
                     {}
                     {stats.groupedStats.byExecutionTime.map(
                       (timeStat: {
@@ -1093,15 +1095,15 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                         percentage: number;
                         avgDuration: number;
                       }) => (
-                        <div
+                        <Div
                           key={timeStat.timeRange}
                           className="flex items-center justify-between p-3 border rounded-lg"
                         >
-                          <div className="flex items-center gap-3">
-                            <div>
-                              <p className="font-medium">
+                          <Div className="flex items-center gap-3">
+                            <Div>
+                              <P className="font-medium">
                                 {timeStat.timeRange}
-                              </p>
+                              </P>
                               <p className="text-sm text-muted-foreground">
                                 {t(
                                   "app.admin.cron.stats.countWithLabelAndPercentage",
@@ -1113,7 +1115,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                                     ),
                                   },
                                 )}
-                              </p>
+                              </P>
                             </div>
                           </div>
                           <div className="text-right">
@@ -1131,6 +1133,6 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             )}
         </TabsContent>
       </Tabs>
-    </div>
+    </Div>
   );
 }

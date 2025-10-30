@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
+import { translations as permissionsTranslations } from "../../permissions/i18n/pl";
 
 export const translations: typeof enTranslations = {
+  permissions: permissionsTranslations,
   get: {
     title: "Pobierz folder",
     description: "Pobierz określony folder według ID",

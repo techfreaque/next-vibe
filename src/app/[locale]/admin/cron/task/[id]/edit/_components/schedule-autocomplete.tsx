@@ -21,6 +21,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "next-vibe-ui/ui/popover";
+import { Div, Span } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
@@ -115,7 +117,7 @@ export function ScheduleAutocomplete({
   };
 
   return (
-    <div className={cn("relative", className)}>
+    <Div className={cn("relative", className)}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -130,17 +132,17 @@ export function ScheduleAutocomplete({
             )}
             disabled={disabled}
           >
-            <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Div className="flex items-center gap-2 flex-1 min-w-0">
               {isCustomValue && (
                 <Badge variant="secondary" className="text-xs">
                   {t("app.admin.cron.taskDetails.customBadge")}
                 </Badge>
               )}
-              <span className="truncate">
+              <Span className="truncate">
                 {value ? displayValue : placeholder}
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
+              </Span>
+            </Div>
+            <Div className="flex items-center gap-1">
               {value && !disabled && (
                 <button
                   type="button"
@@ -155,7 +157,7 @@ export function ScheduleAutocomplete({
                 </button>
               )}
               <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
-            </div>
+            </Div>
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -164,7 +166,7 @@ export function ScheduleAutocomplete({
           align="start"
         >
           <Command>
-            <div className="flex items-center border-b px-3">
+            <Div className="flex items-center border-b px-3">
               <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
               <CommandInput
                 placeholder={searchPlaceholder}
@@ -172,13 +174,13 @@ export function ScheduleAutocomplete({
                 onValueChange={setSearchValue}
                 className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
               />
-            </div>
+            </Div>
             <CommandList className="max-h-[300px]">
               <CommandEmpty>
-                <div className="py-6 text-center text-sm">
-                  <p className="text-muted-foreground">
+                <Div className="py-6 text-center text-sm">
+                  <P className="text-muted-foreground">
                     {t("app.admin.cron.taskDetails.noSchedulesFound")}
-                  </p>
+                  </P>
                   {allowCustom && searchValue && (
                     <Button
                       variant="ghost"
@@ -191,7 +193,7 @@ export function ScheduleAutocomplete({
                       })}
                     </Button>
                   )}
-                </div>
+                </Div>
               </CommandEmpty>
 
               {filteredOptions.length > 0 && (
@@ -205,7 +207,7 @@ export function ScheduleAutocomplete({
                       onSelect={() => handleSelect(option.value)}
                       className="flex items-center justify-between"
                     >
-                      <span className="text-sm">{option.label}</span>
+                      <Span className="text-sm">{option.label}</Span>
                       {value === option.value && <Check className="h-4 w-4" />}
                     </CommandItem>
                   ))}
@@ -218,11 +220,11 @@ export function ScheduleAutocomplete({
                     onSelect={() => handleCustomValue(searchValue)}
                     className="flex items-center justify-between"
                   >
-                    <span>
+                    <Span>
                       {t("app.admin.cron.taskDetails.useCustomSchedule", {
                         searchValue,
                       })}
-                    </span>
+                    </Span>
                   </CommandItem>
                 </CommandGroup>
               )}
@@ -233,6 +235,6 @@ export function ScheduleAutocomplete({
 
       {/* Hidden input for form submission */}
       {name && <input type="hidden" name={name} value={value} />}
-    </div>
+    </Div>
   );
 }

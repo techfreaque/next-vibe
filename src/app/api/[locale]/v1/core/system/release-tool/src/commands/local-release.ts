@@ -34,6 +34,7 @@ export async function localRelease(
   const configResponse = await loadConfig(logger, configPath);
   if (!configResponse.success) {
     logger.error("Failed to load config", { error: configResponse.message });
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error(configResponse.message);
   }
   const config: ReleaseConfig = configResponse.data;
@@ -84,6 +85,7 @@ export async function localRelease(
         logger.info(`Linting ${packageJson.name}`);
         const lintResult = lint(cwd, logger);
         if (!lintResult.success) {
+          // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
           throw new Error(lintResult.message);
         }
       }
@@ -92,6 +94,7 @@ export async function localRelease(
         logger.info(`Type checking ${packageJson.name}`);
         const typecheckResult = typecheck(cwd, logger);
         if (!typecheckResult.success) {
+          // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
           throw new Error(typecheckResult.message);
         }
       }
@@ -100,6 +103,7 @@ export async function localRelease(
         logger.info(`Building ${packageJson.name}`);
         const buildResult = build(cwd, logger);
         if (!buildResult.success) {
+          // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
           throw new Error(buildResult.message);
         }
       }
@@ -108,6 +112,7 @@ export async function localRelease(
         logger.info(`Running tests for ${packageJson.name}`);
         const testResult = runTests(cwd, logger);
         if (!testResult.success) {
+          // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
           throw new Error(testResult.message);
         }
       }
@@ -116,6 +121,7 @@ export async function localRelease(
         logger.info(`Running Snyk vulnerability test for ${packageJson.name}`);
         const snykResult = snykTest(cwd, logger);
         if (!snykResult.success) {
+          // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
           throw new Error(snykResult.message);
         }
       }
@@ -141,6 +147,7 @@ export async function localRelease(
           logger,
         );
         if (!updateVersionResult.success) {
+          // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
           throw new Error(updateVersionResult.message);
         }
 

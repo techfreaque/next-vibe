@@ -5,8 +5,11 @@
 
 "use client";
 
+import { Div, Span } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
+
+import { simpleT } from "@/i18n/core/shared";
 
 import type {
   DataTableWidgetData,
@@ -39,8 +42,12 @@ function isDataTableWidgetData(
  */
 export const DataTableWidget = ({
   data,
+  metadata: _metadata,
+  context,
   className = "",
+  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element => {
+  const { t } = simpleT(context.locale);
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
@@ -55,7 +62,7 @@ export const DataTableWidget = ({
   }, [typedData]);
 
   if (!isValidData || !typedData) {
-    return <div className={className}>—</div>;
+    return <Div className={className} style={style}>—</Div>;
   }
 
   // Handle column sort
@@ -92,7 +99,7 @@ export const DataTableWidget = ({
   });
 
   return (
-    <div className={`overflow-x-auto ${className}`}>
+    <Div className={`overflow-x-auto ${className}`} style={style}>
       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead className="bg-gray-50 dark:bg-gray-800">
           <tr>
@@ -126,15 +133,15 @@ export const DataTableWidget = ({
                     : undefined
                 }
               >
-                <div className="flex items-center gap-2">
+                <Div className="flex items-center gap-2">
                   {column.label}
                   {column.sortable && sortBy === column.key && (
-                    <span className="text-blue-500">
+                    <Span className="text-blue-500">
                       {/* eslint-disable-next-line i18next/no-literal-string */}
                       {sortOrder === "asc" ? "↑" : "↓"}
-                    </span>
+                    </Span>
                   )}
-                </div>
+                </Div>
               </th>
             ))}
           </tr>
@@ -169,13 +176,16 @@ export const DataTableWidget = ({
 
       {typedData.totalRows !== undefined &&
         typedData.totalRows > typedData.rows.length && (
-          <div className="mt-4 flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-700">
-            {/* eslint-disable-next-line i18next/no-literal-string */}
-            <div className="text-sm text-gray-700 dark:text-gray-300">
-              Showing {typedData.rows.length} of {typedData.totalRows} results
-            </div>
-          </div>
+          <Div className="mt-4 flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-700">
+            <Div className="text-sm text-gray-700 dark:text-gray-300">
+              {t("app.api.v1.core.system.unifiedInterface.react.widgets.dataTable.showing")}{" "}
+              {typedData.rows.length}{" "}
+              {t("app.api.v1.core.system.unifiedInterface.react.widgets.dataTable.of")}{" "}
+              {typedData.totalRows}{" "}
+              {t("app.api.v1.core.system.unifiedInterface.react.widgets.dataTable.results")}
+            </Div>
+          </Div>
         )}
-    </div>
+    </Div>
   );
 };

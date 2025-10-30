@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createSuccessResponse,
@@ -19,7 +19,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { chatThreads } from "../../db";
+import { chatFolders, chatThreads } from "../../db";
+import {
+  canDeleteThread,
+  canReadThread,
+} from "../../permissions/permissions";
 import type { PersonaId } from "../../personas/config";
 import type {
   ThreadDeleteResponseOutput,
@@ -33,21 +37,22 @@ import type {
  */
 export interface ThreadByIdRepositoryInterface {
   getThreadById(
-    data: { id: string },
+    threadId: string,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadGetResponseOutput>>;
 
   updateThread(
-    data: ThreadPatchRequestOutput & { id: string },
+    data: ThreadPatchRequestOutput,
+    threadId: string,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadPatchResponseOutput>>;
 
   deleteThread(
-    data: { id: string },
+    threadId: string,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -62,32 +67,23 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
    * Get thread by ID
    */
   async getThreadById(
-    data: { id: string },
+    threadId: string,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadGetResponseOutput>> {
     try {
       logger.debug("Getting thread by ID", {
-        threadId: data.id,
+        threadId,
         userId: user.id,
+        isPublic: user.isPublic,
       });
 
-      // Type guard to ensure user has id
-      if (!user.id) {
-        return fail({
-          message:
-            "app.api.v1.core.agent.chat.threads.threadId.get.errors.unauthorized.title",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-        });
-      }
-
+      // Get thread without user filter to allow permission check
       const [thread] = await db
         .select()
         .from(chatThreads)
-        .where(
-          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)),
-        )
+        .where(eq(chatThreads.id, threadId))
         .limit(1);
 
       if (!thread) {
@@ -95,7 +91,26 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.threadId.get.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { threadId: data.id },
+          messageParams: { threadId },
+        });
+      }
+
+      // Get folder for permission check
+      let folder = null;
+      if (thread.folderId) {
+        [folder] = await db
+          .select()
+          .from(chatFolders)
+          .where(eq(chatFolders.id, thread.folderId))
+          .limit(1);
+      }
+
+      // Use permission system to check read access
+      if (!canReadThread(user, thread, folder)) {
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.get.errors.forbidden.title",
+          errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
@@ -142,34 +157,34 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
    * Update thread
    */
   async updateThread(
-    data: ThreadPatchRequestOutput & { id: string },
+    data: ThreadPatchRequestOutput,
+    threadId: string,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadPatchResponseOutput>> {
     try {
       logger.debug("Updating thread", {
-        threadId: data.id,
+        threadId,
         userId: user.id,
+        isPublic: user.isPublic,
         updates: data.updates,
       });
 
-      // Type guard to ensure user has id
-      if (!user.id) {
+      // Public users cannot update threads
+      if (user.isPublic) {
         return fail({
           message:
-            "app.api.v1.core.agent.chat.threads.threadId.patch.errors.unauthorized.title",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
+            "app.api.v1.core.agent.chat.threads.threadId.patch.errors.forbidden.title",
+          errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
-      // First verify the thread exists and belongs to the user
+      // Get thread without user filter to allow permission check
       const [existingThread] = await db
         .select()
         .from(chatThreads)
-        .where(
-          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)),
-        )
+        .where(eq(chatThreads.id, threadId))
         .limit(1);
 
       if (!existingThread) {
@@ -177,7 +192,16 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.threadId.patch.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { threadId: data.id },
+          messageParams: { threadId },
+        });
+      }
+
+      // Only owner can update their thread (no moderator update permissions)
+      if (user.id !== existingThread.userId) {
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.patch.errors.forbidden.title",
+          errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
@@ -220,13 +244,11 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         updateData.tags = data.updates.tags;
       }
 
-      // Update the thread
+      // Update the thread (user ownership already verified)
       const [updatedThread] = await db
         .update(chatThreads)
         .set(updateData)
-        .where(
-          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)),
-        )
+        .where(eq(chatThreads.id, threadId))
         .returning();
 
       logger.debug("Thread updated successfully", {
@@ -274,33 +296,32 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
    * Delete thread
    */
   async deleteThread(
-    data: { id: string },
+    threadId: string,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadDeleteResponseOutput>> {
     try {
       logger.debug("Deleting thread", {
-        threadId: data.id,
+        threadId,
         userId: user.id,
+        isPublic: user.isPublic,
       });
 
-      // Type guard to ensure user has id
-      if (!user.id) {
+      // Public users cannot delete threads
+      if (user.isPublic) {
         return fail({
           message:
-            "app.api.v1.core.agent.chat.threads.threadId.delete.errors.unauthorized.title",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
+            "app.api.v1.core.agent.chat.threads.threadId.delete.errors.forbidden.title",
+          errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
-      // First verify the thread exists and belongs to the user
+      // Get thread without user filter to allow permission check
       const [existingThread] = await db
         .select()
         .from(chatThreads)
-        .where(
-          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)),
-        )
+        .where(eq(chatThreads.id, threadId))
         .limit(1);
 
       if (!existingThread) {
@@ -308,22 +329,51 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.threadId.delete.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { threadId: data.id },
+          messageParams: { threadId },
+        });
+      }
+
+      // Get folder for permission check (needed for moderator checks)
+      let folder = null;
+      if (existingThread.folderId) {
+        [folder] = await db
+          .select()
+          .from(chatFolders)
+          .where(eq(chatFolders.id, existingThread.folderId))
+          .limit(1);
+      }
+
+      // Get all folders for recursive moderator check
+      const allFoldersArray = await db.select().from(chatFolders);
+      const allFolders = Object.fromEntries(
+        allFoldersArray.map((f) => [f.id, f]),
+      );
+
+      // Use permission system to check delete access
+      const canDelete = await canDeleteThread(
+        user,
+        existingThread,
+        logger,
+        folder,
+        allFolders,
+      );
+
+      if (!canDelete) {
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.delete.errors.forbidden.title",
+          errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
       // Delete the thread (cascade will handle messages)
-      await db
-        .delete(chatThreads)
-        .where(
-          and(eq(chatThreads.id, data.id), eq(chatThreads.userId, user.id)),
-        );
+      await db.delete(chatThreads).where(eq(chatThreads.id, threadId));
 
-      logger.debug("Thread deleted successfully", { threadId: data.id });
+      logger.debug("Thread deleted successfully", { threadId });
 
       return createSuccessResponse({
         success: true,
-        deletedId: data.id,
+        deletedId: threadId,
       });
     } catch (error) {
       logger.error("Error deleting thread", parseError(error));

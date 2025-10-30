@@ -13,6 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ParameterValue } from "../../shared/server-only/execution/executor";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
+import { MCP_CONFIG } from "../../shared/server-only/config";
 import { getMCPRegistry, toolMetadataToMCPTool } from "../registry";
 import type {
   IMCPProtocolHandler,
@@ -26,7 +27,6 @@ import type {
   MCPToolsListParams,
   MCPToolsListResult,
 } from "../types";
-import { getMCPConfig } from "./config";
 import { MCPErrorCode, MCPMethod } from "./types";
 
 /**
@@ -52,6 +52,8 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    * Handle incoming JSON-RPC request
    */
   async handleRequest(
+    // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Protocol message handling requires 'unknown' for flexible message types
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol message handling requires 'unknown' for flexible message types
     request: JsonRpcRequest<unknown>,
   ): Promise<JsonRpcResponse> {
     this.logger.debug("[MCP Protocol] Received request", {
@@ -65,12 +67,13 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
         return this.fail(
           request.id || null,
           MCPErrorCode.INVALID_REQUEST,
-          // eslint-disable-next-line i18next/no-literal-string
           "Invalid JSON-RPC version",
         );
       }
 
       // Route to appropriate handler
+      // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Request parsing requires 'unknown' for untrusted input
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Request parsing requires 'unknown' for untrusted input
       let result: unknown;
 
       switch (request.method) {
@@ -150,26 +153,27 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       protocolVersion: params.protocolVersion,
     });
 
-    const config = getMCPConfig();
-
     // Initialize registry
     const registry = getMCPRegistry(this.locale);
     await registry.initialize();
 
+    const capabilities = MCP_CONFIG.platformSpecific?.capabilities || {
+      tools: true,
+      prompts: false,
+      resources: false,
+    };
+
     return {
       protocolVersion: "2024-11-05",
       capabilities: {
-        tools: config.capabilities.tools ? { listChanged: false } : undefined,
-        prompts: config.capabilities.prompts
-          ? { listChanged: false }
-          : undefined,
-        resources: config.capabilities.resources
-          ? { subscribe: false }
-          : undefined,
+        tools: capabilities.tools ? { listChanged: false } : undefined,
+        prompts: capabilities.prompts ? { listChanged: false } : undefined,
+        resources: capabilities.resources ? { subscribe: false } : undefined,
       },
       serverInfo: {
-        name: config.name,
-        version: config.version,
+        // eslint-disable-next-line i18next/no-literal-string
+        name: "Vibe MCP Server",
+        version: "1.0.0",
       },
     };
   }
@@ -243,6 +247,8 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    */
   private createSuccessResponse(
     id: string | number | null,
+    // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types
     result: unknown,
   ): JsonRpcResponse {
     return {
@@ -286,6 +292,7 @@ export async function createMCPProtocolHandler(
   const cliUser = await getCliUser(logger, locale);
 
   if (!cliUser.id) {
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for invalid CLI user state
     throw new Error("CLI user ID is required");
   }
 

@@ -81,10 +81,10 @@ export function validateCliRequestData<
     const urlValidation = isUrlParamsNever
       ? { success: true as const, data: undefined as z.output<TUrlSchema> }
       : validateEndpointUrlParameters(
-          context.urlParameters,
-          endpoint.requestUrlPathParamsSchema,
-          logger,
-        );
+        context.urlParameters,
+        endpoint.requestUrlPathParamsSchema,
+        logger,
+      );
     if (!urlValidation.success) {
       return {
         success: false,
@@ -181,10 +181,54 @@ export async function validatePostRequestData<TSchema extends z.ZodTypeAny>(
   request: NextRequest,
   logger: EndpointLogger,
 ): Promise<ResponseType<z.output<TSchema>>> {
+  // Check if the schema is z.undefined(), z.never(), or empty z.object({}) (no request data expected)
+  // This happens when an endpoint has no request fields (e.g., DELETE with only URL params)
+  const isEmptyObject =
+    endpoint.requestSchema instanceof z.ZodObject &&
+    Object.keys(endpoint.requestSchema.shape).length === 0;
+
+  // Check if schema is z.never() by testing if it rejects empty object
+  const isNeverSchema = ((): boolean => {
+    try {
+      const testResult = endpoint.requestSchema.safeParse({});
+      return (
+        !testResult.success &&
+        testResult.error?.issues?.[0]?.code === "invalid_type" &&
+        testResult.error?.issues?.[0]?.expected === "never"
+      );
+    } catch {
+      return false;
+    }
+  })();
+
+  if (
+    endpoint.requestSchema instanceof z.ZodUndefined ||
+    endpoint.requestSchema instanceof z.ZodNever ||
+    isNeverSchema ||
+    isEmptyObject
+  ) {
+    // Return success with empty object as the data
+    return {
+      success: true,
+      data: {} as z.output<TSchema>,
+    };
+  }
+
   try {
-    const body = (await request.json()) as Record<
+    // Try to get the request body text first to check if it's empty
+    const bodyText = await request.text();
+
+    // If body is empty or whitespace only, treat as empty object
+    if (!bodyText || bodyText.trim() === "") {
+      // Validate empty object against schema
+      return validateEndpointRequestData({}, endpoint.requestSchema, logger);
+    }
+
+    // Parse the JSON body
+    const body = JSON.parse(bodyText) as Record<
       string,
-      string | number | boolean | null | object
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- JSON parsing requires unknown type for nested objects
+      string | number | boolean | null | Record<string, unknown>
     >;
 
     // Types flow naturally through validateEndpointRequestData
@@ -232,10 +276,10 @@ export async function validateNextRequestData<
     const urlValidation = isUrlParamsNever
       ? { success: true as const, data: undefined as z.output<TUrlSchema> }
       : validateEndpointUrlParameters(
-          context.urlParameters,
-          endpoint.requestUrlPathParamsSchema,
-          logger,
-        );
+        context.urlParameters,
+        endpoint.requestUrlPathParamsSchema,
+        logger,
+      );
     if (!urlValidation.success) {
       return {
         success: false,

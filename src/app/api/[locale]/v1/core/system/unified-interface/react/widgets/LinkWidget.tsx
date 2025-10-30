@@ -1,9 +1,12 @@
 "use client";
 
 import { ExternalLink } from "lucide-react";
-import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
+import { Span } from "next-vibe-ui/ui";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX, MouseEvent } from "react";
+
+import { simpleT } from "@/i18n/core/shared";
 
 import type {
   LinkWidgetData,
@@ -34,14 +37,16 @@ export function LinkWidget({
   className,
   style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
+  const { t } = simpleT(context.locale);
+
   if (!isLinkWidgetData(data)) {
     return (
-      <span
+      <Span
         className={cn("text-muted-foreground italic", className)}
         style={style}
       >
-        Invalid link data
-      </span>
+        {t("app.api.v1.core.system.unifiedInterface.react.widgets.link.invalidData")}
+      </Span>
     );
   }
 
@@ -58,11 +63,11 @@ export function LinkWidget({
 
   const linkContent = (
     <>
-      <span className="truncate">{title ?? url}</span>
+      <Span className="truncate">{title ?? url}</Span>
       {openInNewTab && (
         <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" />
       )}
-      {description && <span className="sr-only">{description}</span>}
+      {description && <Span className="sr-only">{description}</Span>}
     </>
   );
 

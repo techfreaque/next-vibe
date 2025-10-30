@@ -225,18 +225,18 @@ export class SchemaUIHandler {
     config: CLIFormConfig,
   ): Promise<Record<string, FormFieldValue>> {
     if (config.title) {
-      // eslint-disable-next-line no-console, i18next/no-literal-string
-      console.log(`\n📋 ${config.title}`);
+      // eslint-disable-next-line i18next/no-literal-string
+      process.stdout.write(`\n📋 ${config.title}\n`);
     }
 
     if (config.description) {
-      // eslint-disable-next-line no-console, i18next/no-literal-string
-      console.log(`   ${config.description}\n`);
+      // eslint-disable-next-line i18next/no-literal-string
+      process.stdout.write(`   ${config.description}\n\n`);
     }
 
     if (config.fields.length === 0) {
-      // eslint-disable-next-line no-console, i18next/no-literal-string
-      console.log("   No input required.\n");
+      // eslint-disable-next-line i18next/no-literal-string
+      process.stdout.write("   No input required.\n\n");
       return {};
     }
 

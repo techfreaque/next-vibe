@@ -4,6 +4,8 @@ import { cn } from "next-vibe/shared/utils";
 import { Markdown } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
+import { simpleT } from "@/i18n/core/shared";
+
 import type {
   MarkdownWidgetData,
   RenderableValue,
@@ -31,9 +33,12 @@ function isMarkdownWidgetData(
  */
 export function MarkdownWidget({
   data,
+  context,
   className,
   style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
+  const { t } = simpleT(context.locale);
+
   if (!isMarkdownWidgetData(data)) {
     return (
       <div
@@ -53,8 +58,7 @@ export function MarkdownWidget({
         className={cn("text-muted-foreground italic", className)}
         style={style}
       >
-        {/* eslint-disable-next-line i18next/no-literal-string */}
-        {"No content"}
+        {t("app.api.v1.core.system.unifiedInterface.react.widgets.markdown.noContent")}
       </div>
     );
   }

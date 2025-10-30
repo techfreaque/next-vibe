@@ -2,8 +2,8 @@
 
 import { ExternalLink } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
+import { Div, Span } from "next-vibe-ui/ui";
 import {
   Card,
   CardContent,
@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe-ui/ui/card";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX, MouseEvent } from "react";
 
 import type { RenderableValue, WidgetComponentProps } from "../types";
@@ -50,6 +51,7 @@ function isLinkCardData(data: RenderableValue): data is LinkCardData {
  */
 export function LinkCardWidget({
   data,
+  metadata: _metadata,
   context,
   className,
   style,
@@ -58,7 +60,7 @@ export function LinkCardWidget({
     return (
       <Card className={cn("overflow-hidden", className)} style={style}>
         <CardContent className="p-4">
-          <span className="text-muted-foreground italic">—</span>
+          <Span className="text-muted-foreground italic">—</Span>
         </CardContent>
       </Card>
     );
@@ -90,20 +92,20 @@ export function LinkCardWidget({
   const linkContent = (
     <>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">
+        <Div className="flex items-start justify-between gap-2">
+          <Div className="min-w-0 flex-1">
             <CardTitle className="group flex items-center gap-2 text-base font-semibold">
-              <span className="truncate transition-colors group-hover:text-primary">
+              <Span className="truncate transition-colors group-hover:text-primary">
                 {title}
-              </span>
+              </Span>
               <ExternalLink className="h-4 w-4 flex-shrink-0 opacity-50 transition-opacity group-hover:opacity-100" />
             </CardTitle>
-            <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-              {source && <span className="font-medium">{source}</span>}
-              {age && source && <span>•</span>}
-              {age && <span>{age}</span>}
-            </div>
-          </div>
+            <Div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+              {source && <Span className="font-medium">{source}</Span>}
+              {age && source && <Span>•</Span>}
+              {age && <Span>{age}</Span>}
+            </Div>
+          </Div>
           {thumbnail && (
             <Image
               src={thumbnail}
@@ -113,7 +115,7 @@ export function LinkCardWidget({
               className="w-16 h-16 object-cover rounded flex-shrink-0"
             />
           )}
-        </div>
+        </Div>
       </CardHeader>
       {displayDescription && (
         <CardContent className="pt-0">

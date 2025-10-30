@@ -184,6 +184,7 @@ program
 function handleError(
   logger: EndpointLogger,
   message: string,
+  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Package.json parsing requires 'unknown' for flexible config structure
   error: unknown,
 ): never {
   logger.error(message, parseError(error));

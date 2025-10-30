@@ -24,6 +24,8 @@ export type JsonRpcVersion = "2.0";
 /**
  * JSON-RPC Request (generic version)
  */
+// eslint-disable-next-line no-restricted-syntax -- Infrastructure: MCP tool parameters require 'unknown' for flexible schema definitions
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: MCP tool parameters require 'unknown' for flexible schema definitions
 export interface JsonRpcRequest<TParams = unknown> {
   jsonrpc: JsonRpcVersion;
   method: string;
@@ -34,6 +36,8 @@ export interface JsonRpcRequest<TParams = unknown> {
 /**
  * JSON-RPC Response (generic version)
  */
+// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Tool result type requires 'unknown' for flexible return values
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Tool result type requires 'unknown' for flexible return values
 export interface JsonRpcResponse<TResult = unknown> {
   jsonrpc: JsonRpcVersion;
   result?: TResult;
@@ -115,6 +119,13 @@ export interface MCPInitializeResult {
 /**
  * MCP Tool Definition
  */
+/**
+ * MCP Schema property value type
+ */
+interface MCPSchemaPropertyValue {
+  [key: string]: string | number | boolean | null | MCPSchemaPropertyValue;
+}
+
 export interface MCPTool {
   name: string;
   description: string;
@@ -122,7 +133,7 @@ export interface MCPTool {
     type: "object";
     properties?: Record<
       string,
-      Record<string, string | number | boolean | null | object>
+      Record<string, string | number | boolean | null | MCPSchemaPropertyValue>
     >;
     required?: string[];
     additionalProperties?: boolean;
@@ -236,6 +247,8 @@ export interface IMCPTransport {
  * MCP Protocol Handler Interface
  */
 export interface IMCPProtocolHandler {
+  // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Protocol extension requires 'unknown' for flexible message payloads
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol extension requires 'unknown' for flexible message payloads
   handleRequest(request: JsonRpcRequest<unknown>): Promise<JsonRpcResponse>;
   handleInitialize(params: MCPInitializeParams): Promise<MCPInitializeResult>;
   handleToolsList(params: MCPToolsListParams): Promise<MCPToolsListResult>;

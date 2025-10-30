@@ -151,6 +151,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
 
   /**
    * Create a new message in a thread
+   * PUBLIC users can respond in PUBLIC threads, but authenticated users are needed for other threads
    */
   async createMessage(
     data: MessageCreateRequestOutput & { threadId: string },
@@ -159,8 +160,18 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<ResponseType<MessageCreateResponseOutput>> {
     try {
-      // Public users cannot create messages
-      if (user.isPublic) {
+      // Extract user identifier - use leadId for PUBLIC users, userId for authenticated
+      const userIdentifier = user.isPublic ? user.leadId : user.id;
+
+      // SECURITY: Force role to USER for all user-created messages
+      // Only the AI stream system can create ASSISTANT/SYSTEM/TOOL/ERROR messages
+      if (data.message?.role && data.message.role !== ChatMessageRole.USER) {
+        logger.warn("Attempted to create message with non-USER role", {
+          attemptedRole: data.message.role,
+          userId: userIdentifier,
+          isPublic: user.isPublic,
+        });
+
         return fail({
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
@@ -168,21 +179,28 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         });
       }
 
-      // Type guard to ensure user has id
-      if (!user.id) {
+      // SECURITY: Force role to USER regardless of input
+      const safeRole = ChatMessageRole.USER;
+
+      // SECURITY: PUBLIC users cannot set model
+      if (user.isPublic && data.message?.model) {
+        logger.warn("PUBLIC user attempted to set model", {
+          model: data.message.model,
+          leadId: user.leadId,
+        });
+
         return fail({
           message:
-            "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.unauthorized.title" as const,
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
+            "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
+          errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
-      const userId = user.id;
-
       logger.debug("Creating message", {
         threadId: data.threadId,
-        userId,
-        role: data.message?.role,
+        userIdentifier,
+        isPublic: user.isPublic,
+        role: safeRole, // Always USER
       });
 
       // Get thread (without user filter to check permissions)
@@ -258,18 +276,18 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         depth = parentMessage.depth + 1;
       }
 
-      // Create message
+      // Create message with safe values
       const [message] = await db
         .insert(chatMessages)
         .values({
           threadId: data.threadId,
-          role: data.message?.role || ChatMessageRole.USER,
+          role: safeRole, // Always USER
           content: data.message?.content || "",
           parentId: data.message?.parentId || null,
           depth,
-          authorId: userId,
-          isAI: data.message?.role === ChatMessageRole.ASSISTANT,
-          model: data.message?.model || null,
+          authorId: userIdentifier,
+          isAI: false, // Always false for user messages
+          model: user.isPublic ? null : data.message?.model || null, // No model for PUBLIC users
         })
         .returning({
           id: chatMessages.id,

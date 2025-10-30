@@ -6,6 +6,8 @@
 import { BarChart3, Settings, TestTube, Users } from "lucide-react";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui";
+import { H2, H3, H4, P } from "next-vibe-ui/ui/typography";
 import { Progress } from "next-vibe-ui/ui/progress";
 import type { CSSProperties, JSX } from "react";
 
@@ -22,21 +24,21 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
   const abTestSummary = getABTestSummary();
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Header with refresh button */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+      <Div className="flex justify-between items-center">
+        <Div>
+          <H2 className="text-2xl font-bold text-gray-900 dark:text-white">
             {t("app.admin.leads.leads.admin.abTesting.title")}
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          </H2>
+          <P className="text-gray-600 dark:text-gray-400">
             {t("app.admin.leads.leads.admin.abTesting.subtitle")}
-          </p>
-        </div>
-      </div>
+          </P>
+        </Div>
+      </Div>
 
       {/* A/B Test Status Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <Div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -45,7 +47,7 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
             <TestTube className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {abTestSummary.enabled ? (
                 <Badge variant="default" className="bg-green-500">
                   {t("app.admin.leads.leads.admin.abTesting.status.active")}
@@ -55,8 +57,8 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                   {t("app.admin.leads.leads.admin.abTesting.status.inactive")}
                 </Badge>
               )}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {abTestSummary.enabled
                 ? t(
                     "app.admin.leads.leads.admin.abTesting.descriptions.enabled",
@@ -64,7 +66,7 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                 : t(
                     "app.admin.leads.leads.admin.abTesting.descriptions.disabled",
                   )}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -76,14 +78,14 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {abTestSummary.totalVariants}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t(
                 "app.admin.leads.leads.admin.abTesting.descriptions.emailJourneyVariants",
               )}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -95,7 +97,7 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
             <Settings className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {abTestSummary.isValid ? (
                 <Badge variant="default" className="bg-green-500">
                   {t("app.admin.leads.leads.admin.abTesting.status.valid")}
@@ -105,15 +107,15 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                   {t("app.admin.leads.leads.admin.abTesting.status.invalid")}
                 </Badge>
               )}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t(
                 "app.admin.leads.leads.admin.abTesting.descriptions.configurationStatus",
               )}
-            </p>
+            </P>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Variant Details */}
       <Card>
@@ -124,46 +126,46 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <Div className="space-y-6">
             {abTestSummary.variants.map((variant) => (
-              <div key={variant.id} className="border rounded-lg p-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
+              <Div key={variant.id} className="border rounded-lg p-4 space-y-4">
+                <Div className="flex items-center justify-between">
+                  <Div className="flex items-center gap-3">
+                    <Div
                       className="w-4 h-4 rounded-full"
                       style={{ backgroundColor: variant.metadata.color }}
                     />
-                    <div>
-                      <h3 className="font-semibold text-lg">
+                    <Div>
+                      <H3 className="font-semibold text-lg">
                         {variant.metadata.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      </H3>
+                      <P className="text-sm text-gray-600 dark:text-gray-400">
                         {variant.metadata.description}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold">
+                      </P>
+                    </Div>
+                  </Div>
+                  <Div className="text-right">
+                    <Div className="text-2xl font-bold">
                       {variant.weight.toFixed(1)}%
-                    </div>
-                    <div className="text-sm text-gray-500">
+                    </Div>
+                    <Div className="text-sm text-gray-500">
                       {t(
                         "app.admin.leads.leads.admin.abTesting.metrics.trafficSplit",
                       )}
-                    </div>
-                  </div>
-                </div>
+                    </Div>
+                  </Div>
+                </Div>
 
                 {/* Progress bar showing weight distribution */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>
+                <Div className="space-y-2">
+                  <Div className="flex justify-between text-sm">
+                    <P>
                       {t(
                         "app.admin.leads.leads.admin.abTesting.metrics.trafficAllocation",
                       )}
-                    </span>
-                    <span>{variant.weight.toFixed(1)}%</span>
-                  </div>
+                    </P>
+                    <P>{variant.weight.toFixed(1)}%</P>
+                  </Div>
                   <Progress
                     value={variant.weight}
                     className="h-2"
@@ -173,16 +175,16 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                       } as CSSProperties
                     }
                   />
-                </div>
+                </Div>
 
                 {/* Variant characteristics */}
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">
+                <Div className="space-y-2">
+                  <H4 className="font-medium text-sm">
                     {t(
                       "app.admin.leads.leads.admin.abTesting.variants.keyCharacteristics",
                     )}
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
+                  </H4>
+                  <Div className="flex flex-wrap gap-2">
                     {variant.metadata.characteristics.map((characteristic) => (
                       <Badge
                         key={characteristic}
@@ -192,11 +194,11 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                         {characteristic}
                       </Badge>
                     ))}
-                  </div>
-                </div>
-              </div>
+                  </Div>
+                </Div>
+              </Div>
             ))}
-          </div>
+          </Div>
         </CardContent>
       </Card>
 
@@ -209,19 +211,19 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-medium mb-2">
+          <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Div>
+              <H4 className="font-medium mb-2">
                 {t(
                   "app.admin.leads.leads.admin.abTesting.config.testConfiguration",
                 )}
-              </h4>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>
+              </H4>
+              <Div className="space-y-2 text-sm">
+                <Div className="flex justify-between">
+                  <P>
                     {t("app.admin.leads.leads.admin.abTesting.config.status")}:
-                  </span>
-                  <span
+                  </P>
+                  <P
                     className={
                       abTestSummary.enabled ? "text-green-600" : "text-gray-500"
                     }
@@ -233,25 +235,25 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                       : t(
                           "app.admin.leads.leads.admin.abTesting.config.disabled",
                         )}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>
+                  </P>
+                </Div>
+                <Div className="flex justify-between">
+                  <P>
                     {t(
                       "app.admin.leads.leads.admin.abTesting.metrics.totalVariants",
                     )}
                     :
-                  </span>
-                  <span>{abTestSummary.totalVariants}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>
+                  </P>
+                  <P>{abTestSummary.totalVariants}</P>
+                </Div>
+                <Div className="flex justify-between">
+                  <P>
                     {t(
                       "app.admin.leads.leads.admin.abTesting.config.configurationValid",
                     )}
                     :
-                  </span>
-                  <span
+                  </P>
+                  <P
                     className={
                       abTestSummary.isValid ? "text-green-600" : "text-red-600"
                     }
@@ -259,42 +261,42 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                     {abTestSummary.isValid
                       ? t("app.admin.leads.leads.admin.abTesting.config.yes")
                       : t("app.admin.leads.leads.admin.abTesting.config.no")}
-                  </span>
-                </div>
-              </div>
-            </div>
+                  </P>
+                </Div>
+              </Div>
+            </Div>
 
-            <div>
-              <h4 className="font-medium mb-2">
+            <Div>
+              <H4 className="font-medium mb-2">
                 {t(
                   "app.admin.leads.leads.admin.abTesting.config.trafficDistribution",
                 )}
-              </h4>
-              <div className="space-y-2 text-sm">
+              </H4>
+              <Div className="space-y-2 text-sm">
                 {abTestSummary.variants.map((variant) => (
-                  <div key={variant.id} className="flex justify-between">
-                    <span>{variant.metadata.name}:</span>
-                    <span>{variant.weight.toFixed(1)}%</span>
-                  </div>
+                  <Div key={variant.id} className="flex justify-between">
+                    <P>{variant.metadata.name}:</P>
+                    <P>{variant.weight.toFixed(1)}%</P>
+                  </Div>
                 ))}
-                <div className="border-t pt-2 font-medium">
-                  <div className="flex justify-between">
-                    <span>
+                <Div className="border-t pt-2 font-medium">
+                  <Div className="flex justify-between">
+                    <P>
                       {t("app.admin.leads.leads.admin.abTesting.config.total")}:
-                    </span>
-                    <span>
+                    </P>
+                    <P>
                       {abTestSummary.variants
                         .reduce((sum, v) => sum + v.weight, 0)
                         .toFixed(1)}
                       %
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                    </P>
+                  </Div>
+                </Div>
+              </Div>
+            </Div>
+          </Div>
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

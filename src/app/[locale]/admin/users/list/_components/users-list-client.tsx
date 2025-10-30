@@ -6,11 +6,13 @@
 "use client";
 
 import { Filter, List, RefreshCw, Table } from "lucide-react";
-import Link from "next/link";
+import NextLink from "next/link";
 import { cn } from "next-vibe/shared/utils";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { P } from "next-vibe-ui/ui/typography";
 import React, { useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -113,9 +115,9 @@ export function UsersListClient({
 
             {/* Add User */}
             <Button asChild size="sm">
-              <Link href={`/${locale}/admin/users/create`}>
+              <NextLink href={`/${locale}/admin/users/create`}>
                 {t("app.admin.users.actions.add")}
-              </Link>
+              </NextLink>
             </Button>
 
             {/* Refresh */}
@@ -134,16 +136,16 @@ export function UsersListClient({
       </CardHeader>
       <CardContent>
         {/* Filter Form */}
-        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div className="flex items-center space-x-2 mb-4">
+        <Div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <Div className="flex items-center space-x-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <Span className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {t("app.admin.users.list.filters.title")}:
-            </span>
-          </div>
+            </Span>
+          </Div>
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <Div className="space-y-4">
+            <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Search Field */}
               <EndpointFormField
                 name="searchAndPagination.search"
@@ -273,11 +275,11 @@ export function UsersListClient({
                   showAllRequired: false,
                 }}
               />
-            </div>
+            </Div>
 
             {/* Sort Order and Actions */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+            <Div className="flex items-center justify-between">
+              <Div className="flex items-center space-x-4">
                 <EndpointFormField
                   name="sorting.sortOrder"
                   config={{
@@ -301,7 +303,7 @@ export function UsersListClient({
                     showAllRequired: false,
                   }}
                 />
-              </div>
+              </Div>
 
               <Button
                 type="button"
@@ -311,72 +313,72 @@ export function UsersListClient({
               >
                 {t("app.admin.users.list.filters.clear")}
               </Button>
-            </div>
-          </div>
-        </div>
+            </Div>
+          </Div>
+        </Div>
 
         {/* Results Summary */}
-        <div className="mb-4 flex items-center justify-between">
-          <div className="text-sm text-gray-700 dark:text-gray-300">
+        <Div className="mb-4 flex items-center justify-between">
+          <Div className="text-sm text-gray-700 dark:text-gray-300">
             {t("app.admin.users.list.results.showing", {
               start:
                 totalUsers === 0 ? 0 : (currentPage - 1) * currentLimit + 1,
               end: Math.min(currentPage * currentLimit, totalUsers),
               total: totalUsers,
             })}
-          </div>
-        </div>
+          </Div>
+        </Div>
 
         {/* Content */}
         {queryLoading && users.length === 0 ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
+          <Div className="flex items-center justify-center h-64">
+            <Div className="text-center">
               <RefreshCw className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">
+              <P className="text-gray-500">
                 {t("app.admin.common.loading")}...
-              </p>
-            </div>
-          </div>
+              </P>
+            </Div>
+          </Div>
         ) : users.length === 0 ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <p className="text-gray-500 mb-4">
+          <Div className="flex items-center justify-center h-64">
+            <Div className="text-center">
+              <P className="text-gray-500 mb-4">
                 {t("app.admin.users.list.empty.message")}
-              </p>
+              </P>
               <Button asChild>
-                <Link href={`/${locale}/admin/users/create`}>
+                <NextLink href={`/${locale}/admin/users/create`}>
                   {t("app.admin.users.actions.add")}
-                </Link>
+                </NextLink>
               </Button>
-            </div>
-          </div>
+            </Div>
+          </Div>
         ) : viewMode === "table" ? (
           <UsersTable locale={locale} users={users} isLoading={queryLoading} />
         ) : (
-          <div className="space-y-3">
+          <Div className="space-y-3">
             {users.map((user: UserType) => (
-              <div
+              <Div
                 key={user.id}
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div>
-                      <Link
+                <Div className="flex items-center justify-between">
+                  <Div className="flex items-center space-x-4">
+                    <Div>
+                      <NextLink
                         href={`/${locale}/admin/users/${user.id}/edit`}
                         className="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                       >
                         {user.privateName || user.publicName}
-                      </Link>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      </NextLink>
+                      <P className="text-sm text-gray-500 dark:text-gray-400">
                         {user.email}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                      </P>
+                    </Div>
+                  </Div>
+                </Div>
+              </Div>
             ))}
-          </div>
+          </Div>
         )}
 
         {/* Pagination */}

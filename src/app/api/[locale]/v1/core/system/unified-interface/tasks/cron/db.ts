@@ -15,8 +15,6 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-
 import { CronTaskPriorityDB, CronTaskStatusDB } from "../enum";
 
 /**
@@ -86,7 +84,7 @@ export const cronTaskExecutions = pgTable("cron_task_executions", {
   // Configuration and results
   config: jsonb("config").notNull(),
   result: jsonb("result"),
-  error: jsonb("error").$type<ErrorResponseType>(),
+  error: jsonb("error"),
   errorStack: text("error_stack"),
 
   // Execution context

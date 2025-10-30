@@ -51,8 +51,6 @@ const DropdownMenuSubTrigger = React.forwardRef<
   const { open } = DropdownMenuPrimitive.useSubContext();
   const Icon =
     Platform.OS === "web" ? ChevronRight : open ? ChevronUp : ChevronDown;
-  const renderedChildren =
-    typeof children === "function" ? children({ pressed: false }) : children;
   return (
     <TextClassContext.Provider
       value={cn(
@@ -70,7 +68,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
         )}
         {...props}
       >
-        {renderedChildren}
+        {typeof children === "function" ? (children as (props: { pressed: boolean }) => React.ReactNode)({ pressed: open }) : children}
         <Icon size={18} className="ml-auto text-foreground" />
       </StyledDropdownMenuSubTrigger>
     </TextClassContext.Provider>
@@ -177,59 +175,47 @@ DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
 const DropdownMenuCheckboxItem = React.forwardRef<
   DropdownMenuPrimitive.CheckboxItemRef,
   DropdownMenuPrimitive.CheckboxItemProps & { className?: string }
->(({ className, children, checked, ...props }, ref) => {
-  const renderedChildren =
-    typeof children === "function" ? children({ pressed: false }) : children;
-  return (
-    <StyledDropdownMenuCheckboxItem
-      ref={ref}
-      className={cn(
-        "relative flex flex-row web:cursor-default items-center web:group rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
-        props.disabled && "web:pointer-events-none opacity-50",
-        className,
-      )}
-      checked={checked}
-      {...props}
-    >
-      <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-        <StyledDropdownMenuItemIndicator>
-          <Check size={14} strokeWidth={3} className="text-foreground" />
-        </StyledDropdownMenuItemIndicator>
-      </View>
-      {renderedChildren}
-    </StyledDropdownMenuCheckboxItem>
-  );
-});
+>(({ className, children, ...props }, ref) => (
+  <StyledDropdownMenuCheckboxItem
+    ref={ref}
+    className={cn(
+      "relative flex flex-row web:cursor-default items-center web:group rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
+      props.disabled && "web:pointer-events-none opacity-50",
+      className,
+    )}
+    {...props}
+  >
+    <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+      <StyledDropdownMenuItemIndicator>
+        <Check size={14} strokeWidth={3} className="text-foreground" />
+      </StyledDropdownMenuItemIndicator>
+    </View>
+    {typeof children === "function" ? (children as (props: { pressed: boolean }) => React.ReactNode)({ pressed: false }) : children}
+  </StyledDropdownMenuCheckboxItem>
+));
 DropdownMenuCheckboxItem.displayName =
   DropdownMenuPrimitive.CheckboxItem.displayName;
 
 const DropdownMenuRadioItem = React.forwardRef<
   DropdownMenuPrimitive.RadioItemRef,
   DropdownMenuPrimitive.RadioItemProps & { className?: string }
->(({ className, children, ...props }, ref) => {
-  const renderedChildren =
-    typeof children === "function"
-      ? children({ pressed: false })
-      : children;
-  return (
-    <StyledDropdownMenuRadioItem
-      ref={ref}
-      className={cn(
-        "relative flex flex-row web:cursor-default web:group items-center rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
-        props.disabled && "web:pointer-events-none opacity-50",
-        className,
-      )}
-      {...props}
-    >
-      <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-        <StyledDropdownMenuItemIndicator>
-          <View className="bg-foreground h-2 w-2 rounded-full" />
-        </StyledDropdownMenuItemIndicator>
-      </View>
-      {renderedChildren}
-    </StyledDropdownMenuRadioItem>
-  );
-});
+>(({ className, children, ...props }, ref) => (
+  <StyledDropdownMenuRadioItem
+    ref={ref}
+    className={cn(
+      "relative flex flex-row web:cursor-default web:group items-center rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
+      className,
+    )}
+    {...props}
+  >
+    <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+      <StyledDropdownMenuItemIndicator>
+        <View className="bg-foreground h-2 w-2 rounded-full" />
+      </StyledDropdownMenuItemIndicator>
+    </View>
+    {children}
+  </StyledDropdownMenuRadioItem>
+));
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 
 const DropdownMenuLabel = React.forwardRef<

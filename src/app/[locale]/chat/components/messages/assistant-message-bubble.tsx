@@ -10,11 +10,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { ToolCallRenderer } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/tool-call-renderer";
+
 import { chatProse } from "../../lib/design-tokens";
 import type { ChatMessage } from "../../types";
 import { AssistantMessageActions } from "./assistant-message-actions";
 import { MessageAuthorInfo } from "./message-author";
-import { ToolCallDisplay } from "./tool-call-display";
 
 interface AssistantMessageBubbleProps {
   message: ChatMessage;
@@ -68,9 +69,9 @@ export function AssistantMessageBubble({
         )}
 
         <Div className={cn(chatProse.all, "px-3 py-2.5 sm:px-4 sm:py-3")}>
-          {/* Tool calls display */}
+          {/* Tool calls display - using data-driven UI from unified-interface */}
           {message.toolCalls && message.toolCalls.length > 0 && (
-            <ToolCallDisplay
+            <ToolCallRenderer
               toolCalls={message.toolCalls}
               locale={locale}
               hasContent={message.content.trim().length > 0}

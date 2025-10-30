@@ -2,6 +2,8 @@ import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
 import { Methods } from "@/app/api/[locale]/v1/core/system/shared/enums";
+import { getLanguageFromLocale } from "@/i18n/core/language-utils";
+import { translateKey } from "@/i18n/core/translation-utils";
 
 import { loginRepository } from "../repository";
 import loginOptionsDefinitions from "./definition";
@@ -14,6 +16,7 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     handler: async ({ data, logger, locale }) => {
       const email = data.email;
+      const language = getLanguageFromLocale(locale);
       const optionsResult = await loginRepository.getLoginOptions(
         logger,
         locale,
@@ -32,22 +35,35 @@ export const { GET, tools } = endpointsHandler({
         data: {
           response: {
             success: true,
-            message: "Login options retrieved successfully",
+            message: translateKey(
+              "app.api.v1.core.user.public.login.options.messages.successMessage",
+              language,
+            ),
             forUser: email,
             loginMethods: {
               password: {
                 enabled: options.allowPasswordAuth,
-                description: "Log in with your email and password",
+                description: translateKey(
+                  "app.api.v1.core.user.public.login.options.messages.passwordAuthDescription",
+                  language,
+                ),
               },
               social: {
                 enabled: options.allowSocialAuth,
-                description: "Log in with your social media accounts",
+                description: translateKey(
+                  "app.api.v1.core.user.public.login.options.messages.socialAuthDescription",
+                  language,
+                ),
                 providers:
                   options.socialProviders?.map((provider) => ({
                     name: provider.name,
                     id: provider.providers[0] || "unknown",
                     enabled: provider.enabled,
-                    description: `Continue with ${provider.name}`,
+                    description: translateKey(
+                      "app.api.v1.core.user.public.login.options.messages.continueWithProvider",
+                      language,
+                      { provider: translateKey(provider.name, language) },
+                    ),
                   })) || [],
               },
             },
@@ -55,14 +71,29 @@ export const { GET, tools } = endpointsHandler({
               maxAttempts: options.maxAttempts,
               requireTwoFactor: options.requireTwoFactor,
               description: options.requireTwoFactor
-                ? "Enhanced security: 2FA required"
-                : "Standard security requirements",
+                ? translateKey(
+                    "app.api.v1.core.user.public.login.options.messages.twoFactorRequired",
+                    language,
+                  )
+                : translateKey(
+                    "app.api.v1.core.user.public.login.options.messages.standardSecurity",
+                    language,
+                  ),
             },
             recommendations: [
               options.allowPasswordAuth
-                ? "Try password login first"
-                : "Use social login",
-              "Social login is faster for new users",
+                ? translateKey(
+                    "app.api.v1.core.user.public.login.options.messages.tryPasswordFirst",
+                    language,
+                  )
+                : translateKey(
+                    "app.api.v1.core.user.public.login.options.messages.useSocialLogin",
+                    language,
+                  ),
+              translateKey(
+                "app.api.v1.core.user.public.login.options.messages.socialLoginFaster",
+                language,
+              ),
             ],
           },
         },

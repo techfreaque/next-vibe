@@ -18,7 +18,9 @@ import { Form, FormAlert } from "next-vibe-ui/ui";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div, Span } from "next-vibe-ui/ui";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { H4, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import type { CronHistoryResponseOutput } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/history/definition";
@@ -142,7 +144,7 @@ export function ExecutionHistory({
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <Div className="flex justify-between items-center">
           <CardTitle className="flex items-center">
             <Clock className="h-5 w-5 mr-2" />
             {t("app.admin.cron.executionHistory.titleWithCount", {
@@ -162,24 +164,24 @@ export function ExecutionHistory({
               )}
             />
           </Button>
-        </div>
+        </Div>
       </CardHeader>
       <CardContent>
         {/* Filter Form */}
-        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-          <div className="flex items-center space-x-2 mb-4">
+        <Div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+          <Div className="flex items-center space-x-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <Span className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {t("app.admin.cron.cronErrors.admin.interface.filter")}:
-            </span>
-          </div>
+            </Span>
+          </Div>
 
           <Form
             form={historyEndpoint.read.form}
             onSubmit={handleSubmit}
             className="space-y-4"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Task Name Search */}
               <EndpointFormField
                 name="taskName"
@@ -243,9 +245,9 @@ export function ExecutionHistory({
                   showAllRequired: false,
                 }}
               />
-            </div>
+            </Div>
 
-            <div className="flex items-center justify-end">
+            <Div className="flex items-center justify-end">
               <Button
                 type="button"
                 variant="outline"
@@ -254,116 +256,116 @@ export function ExecutionHistory({
               >
                 {t("app.admin.cron.cronErrors.admin.interface.clear")}
               </Button>
-            </div>
+            </Div>
 
             {/* Form Alert for any filter errors */}
             <FormAlert alert={historyEndpoint.alert} />
           </Form>
-        </div>
+        </Div>
 
         {/* Execution List */}
-        <div className="space-y-3">
+        <Div className="space-y-3">
           {history.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <Div className="text-center py-8 text-gray-500 dark:text-gray-400">
               {queryLoading ? (
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 dark:border-gray-100 mr-2" />
+                <Div className="flex items-center justify-center">
+                  <Div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 dark:border-gray-100 mr-2" />
                   {t(
                     "app.admin.cron.cronErrors.admin.interface.executionHistory.loadingHistory",
                   )}
-                </div>
+                </Div>
               ) : (
                 t(
                   "app.admin.cron.cronErrors.admin.interface.executionHistory.noHistory",
                 )
               )}
-            </div>
+            </Div>
           ) : (
             history.map((execution) => (
-              <div
+              <Div
                 key={execution.id}
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
+                <Div className="flex items-center justify-between">
+                  <Div className="flex items-center space-x-4">
                     {getStatusIcon(execution.status)}
-                    <div>
-                      <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                    <Div>
+                      <H4 className="font-medium text-gray-900 dark:text-gray-100">
                         {execution.taskName}
-                      </h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      </H4>
+                      <P className="text-sm text-gray-500 dark:text-gray-400">
                         {t(
                           "app.admin.cron.cronErrors.admin.interface.executionHistory.started",
                         )}
                         : {formatDate(execution.startedAt)}
-                      </p>
-                    </div>
-                  </div>
+                      </P>
+                    </Div>
+                  </Div>
 
-                  <div className="flex items-center space-x-4">
-                    <div className="text-right">
+                  <Div className="flex items-center space-x-4">
+                    <Div className="text-right">
                       <Badge className={getStatusColor(execution.status)}>
                         {execution.status}
                       </Badge>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      <P className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                         {t(
                           "app.admin.cron.cronErrors.admin.interface.executionHistory.duration",
                         )}
                         : {getDuration(execution)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                      </P>
+                    </Div>
+                  </Div>
+                </Div>
 
                 {execution.completedAt && (
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <Div className="mt-2">
+                    <P className="text-sm text-gray-500 dark:text-gray-400">
                       {t(
                         "app.admin.cron.cronErrors.admin.interface.executionHistory.completed",
                       )}
                       : {formatDate(execution.completedAt)}
-                    </p>
-                  </div>
+                    </P>
+                  </Div>
                 )}
 
                 {execution.error && (
-                  <div className="mt-3">
+                  <Div className="mt-3">
                     <details className="group">
                       <summary className="cursor-pointer text-sm font-medium text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
                         {t(
                           "app.admin.cron.cronErrors.admin.interface.executionHistory.errorDetails",
                         )}
                       </summary>
-                      <div className="text-xs bg-red-50 dark:bg-red-900/20 p-3 rounded border border-red-200 dark:border-red-800 mt-2 overflow-x-auto max-h-40 text-red-800 dark:text-red-300">
-                        <div className="mb-2 font-medium">
+                      <Div className="text-xs bg-red-50 dark:bg-red-900/20 p-3 rounded border border-red-200 dark:border-red-800 mt-2 overflow-x-auto max-h-40 text-red-800 dark:text-red-300">
+                        <Div className="mb-2 font-medium">
                           {execution.error.message}
-                        </div>
+                        </Div>
                         {execution.error.errorType && (
-                          <div className="text-xs opacity-75">
+                          <Div className="text-xs opacity-75">
                             {t("app.admin.cron.executionHistory.errorType")}:{" "}
                             {execution.error.errorType}
-                          </div>
+                          </Div>
                         )}
-                      </div>
+                      </Div>
                     </details>
-                  </div>
+                  </Div>
                 )}
-              </div>
+              </Div>
             ))
           )}
-        </div>
+        </Div>
 
         {/* Pagination */}
         {totalExecutions > currentLimit && (
-          <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+          <Div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <P className="text-sm text-gray-500 dark:text-gray-400">
               {t("app.admin.cron.executionHistory.pagination", {
                 from: currentOffset + 1,
                 to: Math.min(currentOffset + currentLimit, totalExecutions),
                 total: totalExecutions,
               })}
-            </p>
-            <div className="flex space-x-2">
+            </P>
+            <Div className="flex space-x-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -392,8 +394,8 @@ export function ExecutionHistory({
               >
                 {t("app.admin.cron.buttons.next")}
               </Button>
-            </div>
-          </div>
+            </Div>
+          </Div>
         )}
       </CardContent>
     </Card>

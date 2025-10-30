@@ -93,19 +93,53 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
    *
    * @param toolNames - Array of tool names to load
    * @param user - User context for permission filtering (optional)
+   * @param platform - Platform to filter by (optional, defaults to AI)
    * @param criteria - Additional filter criteria (optional)
    * @returns Array of DiscoveredEndpoint objects for the requested tools
    */
   async getEndpointsByToolNamesLazy(
     toolNames: string[],
     user?: AIToolExecutionContext["user"],
+    platform?: Platform,
     criteria?: ToolFilterCriteria,
   ): Promise<DiscoveredEndpoint[]> {
     // Use base class lazy loading method
     let endpoints = await super.getEndpointsByToolNamesLazy(
       toolNames,
       user,
-      Platform.AI,
+      platform || Platform.AI,
+    );
+
+    // Apply additional criteria if provided
+    if (criteria) {
+      endpoints = toolFilter.filterEndpointsByCriteria(endpoints, criteria);
+    }
+
+    return endpoints;
+  }
+
+  /**
+   * Lazy load specific endpoints by endpoint IDs
+   * This method dynamically imports only the requested endpoint definitions
+   * More precise than getEndpointsByToolNamesLazy as it loads exact endpoints
+   *
+   * @param endpointIds - Array of endpoint IDs to load (e.g., ["get_v1_core_agent_chat_folders"])
+   * @param user - User context for permission filtering (optional)
+   * @param platform - Platform to filter by (optional, defaults to AI)
+   * @param criteria - Additional filter criteria (optional)
+   * @returns Array of DiscoveredEndpoint objects for the requested endpoints
+   */
+  async getEndpointsByIdsLazy(
+    endpointIds: string[],
+    user?: AIToolExecutionContext["user"],
+    platform?: Platform,
+    criteria?: ToolFilterCriteria,
+  ): Promise<DiscoveredEndpoint[]> {
+    // Use base class lazy loading method
+    let endpoints = await super.getEndpointsByIdsLazy(
+      endpointIds,
+      user,
+      platform || Platform.AI,
     );
 
     // Apply additional criteria if provided

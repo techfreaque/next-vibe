@@ -18,6 +18,7 @@ import {
   createDataUrl,
   createTransparentPixelDataUrl,
 } from "next-vibe/shared/utils";
+import { Div, Span } from "next-vibe-ui/ui";
 import type React from "react";
 import type { JSX, ReactNode } from "react";
 
@@ -93,14 +94,14 @@ export function EmailHeader({
         borderBottom: "3px solid #3b82f6",
       }}
     >
-      <div
+      <Div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
-        <div
+        <Div
           style={{
             display: "flex",
             flexDirection: "column",
@@ -139,7 +140,7 @@ export function EmailHeader({
           >
             {t("app.api.v1.core.leads.campaigns.emails.common.logoPart2")}
           </Text>
-        </div>
+        </Div>
         <Text
           style={{
             fontSize: "14px",
@@ -150,7 +151,7 @@ export function EmailHeader({
         >
           {t("app.api.v1.core.leads.campaigns.emails.email.template.tagline")}
         </Text>
-      </div>
+      </Div>
     </Section>
   );
 }
@@ -307,7 +308,7 @@ export function CTAButton({
   };
 
   return (
-    <div style={{ textAlign: "center", margin: "32px 0" }}>
+    <Div style={{ textAlign: "center", margin: "32px 0" }}>
       <TrackedLink
         href={href}
         tracking={tracking}
@@ -324,7 +325,7 @@ export function CTAButton({
       >
         {text}
       </TrackedLink>
-    </div>
+    </Div>
   );
 }
 
@@ -411,7 +412,7 @@ export function StatsGrid({ stats }: StatsGridProps): React.JSX.Element {
         margin: "32px 0",
       }}
     >
-      <div
+      <Div
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${stats.length}, 1fr)`,
@@ -419,7 +420,7 @@ export function StatsGrid({ stats }: StatsGridProps): React.JSX.Element {
         }}
       >
         {stats.map((stat, index) => (
-          <div
+          <Div
             key={index}
             style={{
               textAlign: "center",
@@ -450,9 +451,9 @@ export function StatsGrid({ stats }: StatsGridProps): React.JSX.Element {
             >
               {stat.label}
             </Text>
-          </div>
+          </Div>
         ))}
-      </div>
+      </Div>
     </Section>
   );
 }

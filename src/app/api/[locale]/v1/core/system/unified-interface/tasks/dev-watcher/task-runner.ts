@@ -215,7 +215,7 @@ const startSmartFileWatcher = async (
   // Wait for abort signal
   return await new Promise<void>((resolve) => {
     let resolved = false;
-    const safeResolve = () => {
+    const safeResolve = (): void => {
       if (!resolved) {
         resolved = true;
         resolve();
@@ -293,7 +293,7 @@ const startPollingWatcher = async (
     // Wait for next cycle or abort signal
     await new Promise<void>((resolve) => {
       let resolved = false;
-      const safeResolve = () => {
+      const safeResolve = (): void => {
         if (!resolved) {
           resolved = true;
           resolve();
@@ -377,7 +377,7 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
       // Wait for next check or abort signal
       await new Promise<void>((resolve) => {
         let resolved = false;
-        const safeResolve = () => {
+        const safeResolve = (): void => {
           if (!resolved) {
             resolved = true;
             resolve();

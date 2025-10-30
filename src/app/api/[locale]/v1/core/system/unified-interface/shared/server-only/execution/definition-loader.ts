@@ -31,6 +31,7 @@ export interface DefinitionLoaderOptions {
 /**
  * Definition loading result
  */
+// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Dynamic module loading requires 'unknown' for runtime type discovery
 export interface DefinitionLoaderResult<TEndpoint = unknown> {
   /** Loaded endpoint definition */
   definition: TEndpoint | null;
@@ -43,6 +44,7 @@ export interface DefinitionLoaderResult<TEndpoint = unknown> {
 /**
  * Extract definition from route module
  */
+// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Definition extraction requires 'unknown' for flexible module structure
 function extractDefinitionFromModule<TEndpoint = unknown>(
   // eslint-disable-next-line no-restricted-syntax
   module: { [key: string]: unknown },
@@ -75,6 +77,7 @@ function extractDefinitionFromModule<TEndpoint = unknown>(
 /**
  * Load definition from definition file (fallback)
  */
+// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Export validation requires 'unknown' for runtime structure checking
 async function loadDefinitionFromFile<TEndpoint = unknown>(
   routePath: string,
   method: Methods | string,
@@ -111,6 +114,7 @@ async function loadDefinitionFromFile<TEndpoint = unknown>(
  * 1. Try to load from route module (route.ts -> tools.definitions)
  * 2. Fallback to definition file (definition.ts)
  */
+// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Definition type extraction requires 'unknown' for generic module support
 export async function loadEndpointDefinition<TEndpoint = unknown>(
   options: DefinitionLoaderOptions,
   logger: EndpointLogger,
@@ -141,6 +145,8 @@ export async function loadEndpointDefinition<TEndpoint = unknown>(
 
   if (moduleResult.module) {
     const definition = extractDefinitionFromModule<TEndpoint>(
+      // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Type parameter requires 'unknown' for generic definition loading
+      // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Cache key generation requires 'unknown' for flexible type support
       moduleResult.module as unknown as Record<string, unknown>,
       method,
       logger,

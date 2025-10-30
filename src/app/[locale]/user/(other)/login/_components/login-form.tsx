@@ -2,14 +2,12 @@
 
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
-import { Button, Card, CardContent, Form } from "next-vibe-ui/ui";
+import { Button, Card, CardContent, Div, Form, Link, Span } from "next-vibe-ui/ui";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import loginDefinitions from "@/app/api/[locale]/v1/core/user/public/login/definition";
 import { useLogin } from "@/app/api/[locale]/v1/core/user/public/login/hooks";
 import type { LoginOptions } from "@/app/api/[locale]/v1/core/user/public/login/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -55,30 +53,50 @@ export function LoginForm({
             <EndpointFormField
               name="credentials.email"
               control={form.control}
-              endpointFields={loginDefinitions.POST.fields}
               theme={{
                 style: "none",
                 showAllRequired: false,
+              }}
+              config={{
+                type: "email",
+                label: "app.api.v1.core.user.public.login.fields.email.label",
+                placeholder:
+                  "app.api.v1.core.user.public.login.fields.email.placeholder",
+                description:
+                  "app.api.v1.core.user.public.login.fields.email.description",
               }}
             />
 
             <EndpointFormField
               name="credentials.password"
               control={form.control}
-              endpointFields={loginDefinitions.POST.fields}
               theme={{
                 style: "none",
                 showAllRequired: false,
               }}
+              config={{
+                type: "password",
+                label: "app.api.v1.core.user.public.login.fields.password.label",
+                placeholder:
+                  "app.api.v1.core.user.public.login.fields.password.placeholder",
+                description:
+                  "app.api.v1.core.user.public.login.fields.password.description",
+              }}
             />
 
-            <div className="flex justify-between items-center">
+            <Div className="flex justify-between items-center">
               <EndpointFormField
                 name="options.rememberMe"
                 control={form.control}
-                endpointFields={loginDefinitions.POST.fields}
                 theme={{
                   style: "none",
+                }}
+                config={{
+                  type: "checkbox",
+                  label:
+                    "app.api.v1.core.user.public.login.fields.rememberMe.label",
+                  description:
+                    "app.api.v1.core.user.public.login.fields.rememberMe.description",
                 }}
               />
 
@@ -88,7 +106,7 @@ export function LoginForm({
               >
                 {t("app.user.other.login.auth.login.forgotPassword")}
               </Link>
-            </div>
+            </Div>
 
             <Button
               type="submit"
@@ -113,15 +131,15 @@ export function LoginForm({
             {loginOptions.allowSocialAuth &&
               loginOptions.socialProviders &&
               loginOptions.socialProviders.length > 0 && (
-                <div className="mt-4">
-                  <div className="relative flex items-center justify-center">
-                    <span className="absolute inset-x-0 h-px bg-gray-300 dark:bg-gray-700" />
-                    <span className="relative bg-white dark:bg-gray-900 px-4 text-sm text-gray-500 dark:text-gray-400">
+                <Div className="mt-4">
+                  <Div className="relative flex items-center justify-center">
+                    <Span className="absolute inset-x-0 h-px bg-gray-300 dark:bg-gray-700" />
+                    <Span className="relative bg-white dark:bg-gray-900 px-4 text-sm text-gray-500 dark:text-gray-400">
                       {t("app.user.other.login.auth.login.orContinueWith")}
-                    </span>
-                  </div>
+                    </Span>
+                  </Div>
 
-                  <div className="mt-4 grid grid-cols-2 gap-2">
+                  <Div className="mt-4 grid grid-cols-2 gap-2">
                     {loginOptions.socialProviders.map((provider) => (
                       <Button
                         key={provider.name}
@@ -133,11 +151,11 @@ export function LoginForm({
                         {t(provider.name)}
                       </Button>
                     ))}
-                  </div>
-                </div>
+                  </Div>
+                </Div>
               )}
 
-            <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+            <Div className="text-center text-sm text-gray-500 dark:text-gray-400">
               {t("app.user.other.login.login.dontHaveAccount")}{" "}
               <Link
                 href={`/${locale}/user/signup`}
@@ -145,7 +163,7 @@ export function LoginForm({
               >
                 {t("app.user.other.login.auth.login.createAccount")}
               </Link>
-            </div>
+            </Div>
           </Form>
         </CardContent>
       </Card>

@@ -3,6 +3,8 @@
  * Page for editing existing SMTP accounts
  */
 
+import { Div, P } from "next-vibe-ui/ui";
+import { H1 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -19,19 +21,19 @@ export default async function EditSmtpAccountPage({
   const { t } = simpleT(locale);
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+      <Div>
+        <H1 className="text-3xl font-bold tracking-tight">
           {t("app.admin.emails.smtp.pages.edit.edit")}
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        </H1>
+        <P className="text-gray-600 dark:text-gray-400">
           {t("app.admin.emails.smtp.pages.edit.editDescription")}
-        </p>
-      </div>
+        </P>
+      </Div>
 
       {/* Form Component */}
       <EditSmtpAccountForm locale={locale} accountId={id} />
-    </div>
+    </Div>
   );
 }

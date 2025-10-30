@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
+import { Div, Span } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import { useImapFoldersList } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/list/hooks";
@@ -133,20 +134,20 @@ export function ImapFoldersList({
 
   if (isLoading) {
     return (
-      <div className="p-4">{t("app.admin.emails.imap.common.loading")}</div>
+      <Div className="p-4">{t("app.admin.emails.imap.common.loading")}</Div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 text-red-600">
+      <Div className="p-4 text-red-600">
         {t("app.admin.emails.imap.common.error")}
-      </div>
+      </Div>
     );
   }
 
   return (
-    <div className="p-4">
+    <Div className="p-4">
       <Table>
         <TableHeader>
           <TableRow>
@@ -173,12 +174,12 @@ export function ImapFoldersList({
             folders.map((folder) => (
               <TableRow key={folder.id}>
                 <TableCell>
-                  <div>
-                    <div className="font-medium">
+                  <Div>
+                    <Div className="font-medium">
                       {folder.displayName || folder.name}
-                    </div>
-                    <div className="text-sm text-gray-500">{folder.path}</div>
-                  </div>
+                    </Div>
+                    <Div className="text-sm text-gray-500">{folder.path}</Div>
+                  </Div>
                 </TableCell>
                 <TableCell>
                   {folder.specialUseType
@@ -195,12 +196,12 @@ export function ImapFoldersList({
                       {folder.unseenCount}
                     </Badge>
                   ) : (
-                    <span className="text-gray-400">0</span>
+                    <Span className="text-gray-400">0</Span>
                   )}
                 </TableCell>
                 <TableCell>{getSyncStatusBadge(folder.syncStatus)}</TableCell>
                 <TableCell>
-                  <div className="flex items-center space-x-2">
+                  <Div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -223,7 +224,7 @@ export function ImapFoldersList({
                     >
                       {t("app.admin.emails.imap.common.view")}
                     </Button>
-                  </div>
+                  </Div>
                 </TableCell>
               </TableRow>
             ))
@@ -233,10 +234,10 @@ export function ImapFoldersList({
 
       {/* Footer with total count */}
       {totalFolders > 0 && (
-        <div className="mt-4 text-sm text-gray-600">
+        <Div className="mt-4 text-sm text-gray-600">
           {t("app.admin.emails.imap.folder.total", { count: totalFolders })}
-        </div>
+        </Div>
       )}
-    </div>
+    </Div>
   );
 }

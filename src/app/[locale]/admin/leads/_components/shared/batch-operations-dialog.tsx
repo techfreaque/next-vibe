@@ -6,6 +6,7 @@
 "use client";
 
 import { AlertTriangle, CheckCircle, Eye, Users } from "lucide-react";
+import { Div } from "next-vibe-ui/ui";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
@@ -26,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
+import { H4, P, Span } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import type {
@@ -89,9 +91,9 @@ export function BatchOperationsDialog({
   const { t } = simpleT(locale);
 
   const renderPreviewContent = (): React.JSX.Element => (
-    <div className="space-y-4">
+    <Div className="space-y-4">
       {description && (
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <P className="text-sm text-muted-foreground">{description}</P>
       )}
 
       <Alert>
@@ -104,11 +106,11 @@ export function BatchOperationsDialog({
       </Alert>
 
       {updates && (
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium">
+        <Div className="space-y-2">
+          <H4 className="text-sm font-medium">
             {t("app.admin.leads.leads.admin.batch.planned_changes")}
-          </h4>
-          <div className="flex flex-wrap gap-2">
+          </H4>
+          <Div className="flex flex-wrap gap-2">
             {updates.status && (
               <Badge variant="outline">
                 {t("app.admin.leads.leads.admin.batch.change_status", {
@@ -130,8 +132,8 @@ export function BatchOperationsDialog({
                 })}
               </Badge>
             )}
-          </div>
-        </div>
+          </Div>
+        </Div>
       )}
 
       <ScrollArea className="h-64 border rounded-md">
@@ -170,11 +172,11 @@ export function BatchOperationsDialog({
                       {t(lead.currentCampaignStage as TranslationKey)}
                     </Badge>
                   ) : (
-                    <span className="text-muted-foreground">
+                    <Span className="text-muted-foreground">
                       {t(
                         "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
                       )}
-                    </span>
+                    </Span>
                   )}
                 </TableCell>
               </TableRow>
@@ -182,11 +184,11 @@ export function BatchOperationsDialog({
           </TableBody>
         </Table>
       </ScrollArea>
-    </div>
+    </Div>
   );
 
   const renderResultContent = (): React.JSX.Element => (
-    <div className="space-y-4">
+    <Div className="space-y-4">
       {result?.success ? (
         <Alert>
           <CheckCircle className="h-4 w-4" />
@@ -212,24 +214,24 @@ export function BatchOperationsDialog({
       )}
 
       {result?.errors && result.errors.length > 0 && (
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-destructive">
+        <Div className="space-y-2">
+          <H4 className="text-sm font-medium text-destructive">
             {t("app.admin.leads.leads.admin.batch.errors_title", {
               count: result.errors.length,
             })}
-          </h4>
+          </H4>
           <ScrollArea className="h-32 border rounded-md p-2">
-            <div className="space-y-1">
+            <Div className="space-y-1">
               {result.errors.map((error, index) => (
-                <div key={index} className="text-sm text-destructive">
+                <Div key={index} className="text-sm text-destructive">
                   {error.error}
-                </div>
+                </Div>
               ))}
-            </div>
+            </Div>
           </ScrollArea>
-        </div>
+        </Div>
       )}
-    </div>
+    </Div>
   );
 
   return (

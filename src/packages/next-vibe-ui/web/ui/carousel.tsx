@@ -38,7 +38,7 @@ function useCarousel(): CarouselContextProps {
   const context = React.useContext(CarouselContext);
 
   if (!context) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
     throw new Error("useCarousel must be used within a <Carousel />");
   }
 

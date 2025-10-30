@@ -40,9 +40,10 @@ const badgeTextVariants = cva("text-xs font-semibold ", {
   },
 });
 
-type BadgeProps = SlottableViewProps & VariantProps<typeof badgeVariants> & {
-  className?: string;
-};
+type BadgeProps = SlottableViewProps &
+  VariantProps<typeof badgeVariants> & {
+    asChild?: boolean;
+  };
 
 function Badge({
   className,
@@ -57,7 +58,7 @@ function Badge({
     <TextClassContext.Provider value={badgeTextVariants({ variant })}>
       <Component
         {...props}
-        {...(combinedClassName ? { className: combinedClassName } : {})}
+        className={combinedClassName}
       />
     </TextClassContext.Provider>
   );

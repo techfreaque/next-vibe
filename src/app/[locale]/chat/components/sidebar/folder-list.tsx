@@ -29,6 +29,7 @@ import {
   FolderPlus,
   MessageSquarePlus,
   MoreVertical,
+  Shield,
   Trash2,
 } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
@@ -55,6 +56,7 @@ import {
 import { buildFolderUrl, getRootFolderId } from "../../lib/utils/navigation";
 import type { ChatFolder, ChatThread } from "../../types";
 import { MoveFolderDialog } from "./move-folder-dialog";
+import { PermissionsDialog } from "./permissions-dialog";
 import { RenameFolderDialog } from "./rename-folder-dialog";
 import { ThreadList } from "./thread-list";
 
@@ -341,6 +343,7 @@ function FolderItem({
   const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
   const [moveDialogOpen, setMoveDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [permissionsDialogOpen, setPermissionsDialogOpen] = React.useState(false);
 
   const threadsInFolder = useMemo(() => {
     return Object.values(chat.threads)
@@ -426,6 +429,15 @@ function FolderItem({
 
   const handleSaveMove = (targetFolderId: string | null): void => {
     onMoveFolderToParent(folder.id, targetFolderId);
+  };
+
+  const handleManagePermissions = (): void => {
+    setDropdownOpen(false);
+    setPermissionsDialogOpen(true);
+  };
+
+  const handleSavePermissions = (moderatorIds: string[]): void => {
+    onUpdateFolder(folder.id, { moderatorIds });
   };
 
   // Determine if move up/down should be disabled
@@ -560,6 +572,14 @@ function FolderItem({
               <FolderPlus className="h-4 w-4 mr-2" />
               {t("app.chat.folderList.newSubfolder")}
             </DropdownMenuItem>
+
+            {/* Permissions for PUBLIC folders or folder owners */}
+            {(folder.rootFolderId === "public" || !isDefault) && (
+              <DropdownMenuItem onSelect={handleManagePermissions}>
+                <Shield className="h-4 w-4 mr-2" />
+                {t("app.chat.folderList.managePermissions")}
+              </DropdownMenuItem>
+            )}
 
             {/* Only custom folders can be renamed, moved, and deleted */}
             {!isDefault && (
@@ -704,6 +724,16 @@ function FolderItem({
         folder={folder}
         folders={chat.folders}
         onMove={handleSaveMove}
+        locale={locale}
+      />
+
+      <PermissionsDialog
+        open={permissionsDialogOpen}
+        onOpenChange={setPermissionsDialogOpen}
+        resourceType="folder"
+        resourceName={folderDisplayName}
+        moderatorIds={(folder.moderatorIds as string[]) || []}
+        onSave={handleSavePermissions}
         locale={locale}
       />
 

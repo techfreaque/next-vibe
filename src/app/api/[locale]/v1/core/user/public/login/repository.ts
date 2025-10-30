@@ -16,7 +16,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { verifyPassword } from "next-vibe/shared/utils/password";
 
-import { leadAuthService } from "@/app/api/[locale]/v1/core/leads/auth-service";
+import { leadAuthRepository } from "@/app/api/[locale]/v1/core/leads/auth/repository";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
@@ -374,11 +374,11 @@ export class LoginRepositoryImpl implements LoginRepository {
       // Link the cookie leadId to the user if it exists
       // This ensures the userLeads table has the relationship for credit lookups
       if (cookieLeadId) {
-        await leadAuthService.linkLeadToUser(cookieLeadId, userId, logger);
+        await leadAuthRepository.linkLeadToUser(cookieLeadId, userId, locale, logger);
       }
 
       // Get primary leadId for user (now that we've linked the cookie leadId)
-      const leadIdResult = await leadAuthService.getAuthenticatedUserLeadId(
+      const leadIdResult = await leadAuthRepository.getAuthenticatedUserLeadId(
         userId,
         cookieLeadId,
         locale,

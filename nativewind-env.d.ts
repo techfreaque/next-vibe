@@ -66,15 +66,20 @@ declare module 'lucide-react-native' {
 declare module '@rn-primitives/types' {
   interface SlottableViewProps {
     className?: string;
+    asChild?: boolean;
+    children?: React.ReactNode;
   }
 
   interface SlottableTextProps {
     className?: string;
     asChild?: boolean;
+    children?: React.ReactNode;
   }
 
   interface SlottablePressableProps {
     className?: string;
+    asChild?: boolean;
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
   }
 }
 
@@ -109,7 +114,7 @@ declare module '@rn-primitives/alert-dialog' {
 declare module '@rn-primitives/dialog' {
   interface OverlayProps {
     className?: string;
-    children?: React.ReactNode;
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
   }
 
   interface ContentProps {
@@ -137,7 +142,7 @@ declare module '@rn-primitives/dialog' {
 declare module '@rn-primitives/context-menu' {
   interface SubTriggerProps {
     className?: string;
-    children?: React.ReactNode;
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
   }
 
   interface SubContentProps {
@@ -155,13 +160,21 @@ declare module '@rn-primitives/context-menu' {
 
   interface CheckboxItemProps {
     className?: string;
-    children?: React.ReactNode;
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
     disabled?: boolean;
+    checked: boolean;
+    onCheckedChange: (checked: boolean) => void;
+    closeOnPress?: boolean;
+    textValue?: string;
   }
 
   interface RadioItemProps {
     className?: string;
     children?: React.ReactNode;
+    value: string;
+    textValue?: string;
+    closeOnPress?: boolean;
+    disabled?: boolean;
   }
 
   interface LabelProps {
@@ -170,31 +183,6 @@ declare module '@rn-primitives/context-menu' {
 
   interface SeparatorProps {
     className?: string;
-  }
-}
-
-declare module '@rn-primitives/accordion' {
-  interface RootProps {
-    className?: string;
-    children?: React.ReactNode;
-  }
-
-  interface ItemProps {
-    className?: string;
-  }
-
-  interface HeaderProps {
-    className?: string;
-  }
-
-  interface TriggerProps {
-    className?: string;
-    children?: React.ReactNode;
-  }
-
-  interface ContentProps {
-    className?: string;
-    children?: React.ReactNode;
   }
 }
 
@@ -264,24 +252,12 @@ declare module '@rn-primitives/aspect-ratio' {
   }
 }
 
-declare module '@rn-primitives/avatar' {
-  interface RootProps {
-    className?: string;
-    alt?: string;
-  }
-
-  interface ImageProps {
-    className?: string;
-  }
-
-  interface FallbackProps {
-    className?: string;
-  }
-}
-
 declare module '@rn-primitives/checkbox' {
   interface RootProps {
     className?: string;
+    checked: boolean;
+    onCheckedChange: (checked: boolean) => void;
+    disabled?: boolean;
   }
 
   interface IndicatorProps {
@@ -306,7 +282,7 @@ declare module '@rn-primitives/collapsible' {
 declare module '@rn-primitives/dropdown-menu' {
   interface SubTriggerProps {
     className?: string;
-    children?: React.ReactNode;
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
   }
 
   interface SubContentProps {
@@ -324,13 +300,21 @@ declare module '@rn-primitives/dropdown-menu' {
 
   interface CheckboxItemProps {
     className?: string;
-    children?: React.ReactNode;
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
     disabled?: boolean;
+    checked: boolean;
+    onCheckedChange: (checked: boolean) => void;
+    closeOnPress?: boolean;
+    textValue?: string;
   }
 
   interface RadioItemProps {
     className?: string;
     children?: React.ReactNode;
+    disabled?: boolean;
+    value: string;
+    textValue?: string;
+    closeOnPress?: boolean;
   }
 
   interface LabelProps {
@@ -357,6 +341,8 @@ declare module '@rn-primitives/hover-card' {
 
   interface ContentProps {
     className?: string;
+    align?: 'start' | 'center' | 'end';
+    sideOffset?: number;
   }
 }
 
@@ -368,54 +354,70 @@ declare module '@rn-primitives/label' {
   interface TextProps {
     className?: string;
     children?: React.ReactNode;
-    nativeID?: string;
   }
 }
 
 declare module '@rn-primitives/menubar' {
   interface RootProps {
     className?: string;
+    value?: string | undefined;
+    onValueChange?: (value: string | undefined) => void;
+    children?: React.ReactNode;
   }
 
   interface MenuProps {
     className?: string;
+    children?: React.ReactNode;
   }
 
   interface TriggerProps {
     className?: string;
+    children?: React.ReactNode;
   }
 
   interface SubTriggerProps {
     className?: string;
-    children?: React.ReactNode;
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
   }
 
   interface SubContentProps {
     className?: string;
+    children?: React.ReactNode;
   }
 
   interface ContentProps {
     className?: string;
+    children?: React.ReactNode;
   }
 
   interface ItemProps {
     className?: string;
     disabled?: boolean;
+    children?: React.ReactNode;
   }
 
   interface CheckboxItemProps {
     className?: string;
-    children?: React.ReactNode;
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
     disabled?: boolean;
+    checked: boolean;
+    onCheckedChange: (checked: boolean) => void;
+    closeOnPress?: boolean;
+    textValue?: string;
   }
 
   interface RadioItemProps {
     className?: string;
-    children?: React.ReactNode;
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+    value: string;
+    textValue?: string;
+    closeOnPress?: boolean;
+    disabled?: boolean;
   }
 
   interface LabelProps {
     className?: string;
+    children?: React.ReactNode;
   }
 
   interface SeparatorProps {
@@ -427,19 +429,27 @@ declare module '@rn-primitives/navigation-menu' {
   interface RootProps {
     className?: string;
     children?: React.ReactNode;
+    value?: string | undefined;
+    onValueChange?: (value: string | undefined) => void;
+    delayDuration?: number;
+    skipDelayDuration?: number;
+    dir?: 'ltr' | 'rtl';
+    orientation?: 'horizontal' | 'vertical';
   }
 
   interface ListProps {
     className?: string;
+    children?: React.ReactNode;
   }
 
   interface ItemProps {
     className?: string;
+    children?: React.ReactNode;
   }
 
   interface TriggerProps {
     className?: string;
-    children?: React.ReactNode;
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
   }
 
   interface ContentProps {
@@ -449,6 +459,7 @@ declare module '@rn-primitives/navigation-menu' {
 
   interface LinkProps {
     className?: string;
+    children?: React.ReactNode;
   }
 
   interface IndicatorProps {
@@ -457,6 +468,7 @@ declare module '@rn-primitives/navigation-menu' {
 
   interface ViewportProps {
     className?: string;
+    children?: React.ReactNode;
   }
 }
 
@@ -472,6 +484,8 @@ declare module '@rn-primitives/popover' {
   interface ContentProps {
     className?: string;
     children?: React.ReactNode;
+    align?: 'start' | 'center' | 'end';
+    sideOffset?: number;
   }
 
   interface CloseProps {
@@ -482,6 +496,7 @@ declare module '@rn-primitives/popover' {
 declare module '@rn-primitives/progress' {
   interface RootProps {
     className?: string;
+    value?: number | null | undefined;
   }
 
   interface IndicatorProps {
@@ -496,7 +511,6 @@ declare module '@rn-primitives/radio-group' {
 
   interface ItemProps {
     className?: string;
-    disabled?: boolean;
   }
 
   interface IndicatorProps {
@@ -507,8 +521,6 @@ declare module '@rn-primitives/radio-group' {
 declare module '@rn-primitives/select' {
   interface TriggerProps {
     className?: string;
-    children?: React.ReactNode;
-    disabled?: boolean;
   }
 
   interface ValueProps {
@@ -521,10 +533,13 @@ declare module '@rn-primitives/select' {
 
   interface ItemProps {
     className?: string;
-    disabled?: boolean;
   }
 
   interface ItemTextProps {
+    className?: string;
+  }
+
+  interface ItemIndicatorProps {
     className?: string;
   }
 
@@ -545,6 +560,18 @@ declare module '@rn-primitives/select' {
   }
 
   interface ScrollDownButtonProps {
+    className?: string;
+  }
+
+  interface OverlayProps {
+    className?: string;
+  }
+
+  interface ViewportProps {
+    className?: string;
+  }
+
+  interface PortalProps {
     className?: string;
   }
 }
@@ -578,6 +605,10 @@ declare module '@rn-primitives/slider' {
 declare module '@rn-primitives/switch' {
   interface RootProps {
     className?: string;
+    checked: boolean;
+    onCheckedChange: (checked: boolean) => void;
+    disabled?: boolean;
+    onKeyDown?: (ev: KeyboardEvent<Element>) => void;
   }
 
   interface ThumbProps {
@@ -597,16 +628,21 @@ declare module '@rn-primitives/tabs' {
   interface TriggerProps {
     className?: string;
     disabled?: boolean;
+    value: string;
   }
 
   interface ContentProps {
     className?: string;
+    value: string;
   }
 }
 
 declare module '@rn-primitives/toggle' {
   interface RootProps {
     className?: string;
+    pressed: boolean;
+    onPressedChange: (pressed: boolean) => void;
+    disabled?: boolean;
   }
 }
 
@@ -620,20 +656,60 @@ declare module '@rn-primitives/toggle-group' {
     className?: string;
     children?: React.ReactNode;
     disabled?: boolean;
+    value: string;
   }
 }
 
 declare module '@rn-primitives/tooltip' {
+  import type { ViewStyle } from 'react-native';
+
   interface RootProps {
     className?: string;
+    onOpenChange?: (open: boolean) => void;
+    delayDuration?: number;
+    skipDelayDuration?: number;
+    disableHoverableContent?: boolean;
   }
 
   interface TriggerProps {
     className?: string;
+    children?: React.ReactNode;
+    asChild?: boolean;
   }
 
   interface ContentProps {
     className?: string;
+    children?: React.ReactNode;
+    sideOffset?: number;
+    side?: 'top' | 'right' | 'bottom' | 'left';
+    align?: 'start' | 'center' | 'end';
+    alignOffset?: number;
+    avoidCollisions?: boolean;
+    forceMount?: true | undefined;
+    style?: ViewStyle;
+    disablePositioningStyle?: boolean;
+    loop?: boolean;
+    onCloseAutoFocus?: (event: Event) => void;
+    onEscapeKeyDown?: (event: Event) => void;
+    onPointerDownOutside?: (event: Event) => void;
+    onFocusOutside?: (event: Event) => void;
+    onInteractOutside?: (event: Event) => void;
+    asChild?: boolean;
+  }
+
+  interface PortalProps {
+    children: React.ReactNode;
+    hostName?: string;
+    container?: HTMLElement | null | undefined;
+  }
+
+  interface OverlayProps {
+    className?: string;
+    children?: React.ReactNode;
+    forceMount?: true | undefined;
+    closeOnPress?: boolean;
+    style?: ViewStyle;
+    asChild?: boolean;
   }
 }
 
@@ -647,5 +723,4 @@ declare global {
 }
 
 // Ensure this file is treated as a module
-declare const __module: unique symbol;
-export type { __module };
+export {};

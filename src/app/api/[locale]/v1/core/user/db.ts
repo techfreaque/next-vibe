@@ -30,6 +30,13 @@ export const users = pgTable("users", {
   // Stripe integration
   stripeCustomerId: text("stripe_customer_id").unique(),
 
+  // Avatar
+  avatarUrl: text("avatar_url"),
+
+  // Two-Factor Authentication
+  twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
+  twoFactorSecret: text("two_factor_secret"),
+
   // Audit fields
   createdBy: uuid("created_by"),
   updatedBy: uuid("updated_by"),

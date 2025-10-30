@@ -4,6 +4,7 @@ import type { LucideIcon } from "lucide-react-native";
 import * as React from "react";
 
 import { cn } from "../lib/utils";
+import type { WithClassName } from "../lib/types";
 import { TextClassContext } from "./text";
 
 const toggleVariants = cva(
@@ -52,29 +53,35 @@ const toggleTextVariants = cva(
 
 const Toggle = React.forwardRef<
   TogglePrimitive.RootRef,
-  TogglePrimitive.RootProps & VariantProps<typeof toggleVariants>
->(({ className, variant, size, ...props }, ref) => (
-  <TextClassContext.Provider
-    value={cn(
-      toggleTextVariants({ variant, size }),
-      props.pressed
-        ? "text-accent-foreground"
-        : "web:group-hover:text-muted-foreground",
-      className,
-    )}
-  >
-    <TogglePrimitive.Root
-      ref={ref}
-      className={cn(
-        toggleVariants({ variant, size }),
-        props.disabled && "web:pointer-events-none opacity-50",
-        props.pressed && "bg-accent",
+  WithClassName<TogglePrimitive.RootProps> & VariantProps<typeof toggleVariants>
+>(({ className, variant, size, pressed, onPressedChange, ...props }, ref) => {
+  const isPressed = pressed ?? false;
+  const handlePressedChange = onPressedChange ?? (() => {});
+  return (
+    <TextClassContext.Provider
+      value={cn(
+        toggleTextVariants({ variant, size }),
+        isPressed
+          ? "text-accent-foreground"
+          : "web:group-hover:text-muted-foreground",
         className,
       )}
-      {...props}
-    />
-  </TextClassContext.Provider>
-));
+    >
+      <TogglePrimitive.Root
+        ref={ref}
+        pressed={isPressed}
+        onPressedChange={handlePressedChange}
+        {...props}
+        className={cn(
+          toggleVariants({ variant, size }),
+          props.disabled && "web:pointer-events-none opacity-50",
+          isPressed && "bg-accent",
+          className,
+        )}
+      />
+    </TextClassContext.Provider>
+  );
+});
 
 Toggle.displayName = TogglePrimitive.Root.displayName;
 
@@ -82,11 +89,11 @@ function ToggleIcon({
   className,
   icon: Icon,
   ...props
-}: React.ComponentPropsWithoutRef<LucideIcon> & {
+}: WithClassName<React.ComponentPropsWithoutRef<LucideIcon>> & {
   icon: LucideIcon;
 }): React.JSX.Element {
   const textClass = React.useContext(TextClassContext);
-  return <Icon className={cn(textClass, className)} {...props} />;
+  return <Icon {...props} className={cn(textClass, className)} />;
 }
 
 export { Toggle, ToggleIcon, toggleTextVariants, toggleVariants };

@@ -11,20 +11,29 @@ const ToggleGroupContext = React.createContext<VariantProps<
   typeof toggleVariants
 > | null>(null);
 
+type ToggleGroupProps = ToggleGroupPrimitive.RootProps &
+  VariantProps<typeof toggleVariants> & {
+    className?: string;
+  };
+
 const ToggleGroup = React.forwardRef<
   ToggleGroupPrimitive.RootRef,
-  ToggleGroupPrimitive.RootProps & VariantProps<typeof toggleVariants>
->(({ className, variant, size, children, ...props }, ref) => (
-  <ToggleGroupPrimitive.Root
-    ref={ref}
-    className={cn("flex flex-row items-center justify-center gap-1", className)}
-    {...props}
-  >
+  ToggleGroupProps
+>((allProps, ref) => {
+  const { className, variant, size, children, ...props } = allProps;
+  return (
     <ToggleGroupContext.Provider value={{ variant, size }}>
-      {children}
+      {/* @ts-expect-error - TypeScript can't verify discriminated union props are passed correctly via spread */}
+      <ToggleGroupPrimitive.Root
+        ref={ref}
+        {...props}
+        className={cn("flex flex-row items-center justify-center gap-1", className)}
+      >
+        {children}
+      </ToggleGroupPrimitive.Root>
     </ToggleGroupContext.Provider>
-  </ToggleGroupPrimitive.Root>
-));
+  );
+});
 
 ToggleGroup.displayName = ToggleGroupPrimitive.Root.displayName;
 
@@ -85,7 +94,7 @@ function ToggleGroupIcon({
   icon: LucideIcon;
 }): React.JSX.Element {
   const textClass = React.useContext(TextClassContext);
-  return <Icon className={cn(textClass, className)} {...props} />;
+  return <Icon {...props} className={cn(textClass, className)} />;
 }
 
 export { ToggleGroup, ToggleGroupIcon, ToggleGroupItem };

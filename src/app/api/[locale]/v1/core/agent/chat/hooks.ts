@@ -390,7 +390,6 @@ export function useChat(
                 metadata: folder.metadata,
                 createdAt: new Date(folder.createdAt),
                 updatedAt: new Date(folder.updatedAt),
-                moderatorIds: [],
               });
             });
             logger.debug("Chat: Folders loaded successfully", {
@@ -552,7 +551,7 @@ export function useChat(
           existingMsg.content !== streamMsg.content ||
           existingMsg.tokens !== (streamMsg.totalTokens || null) ||
           JSON.stringify(existingMsg.toolCalls) !==
-            JSON.stringify(streamMsg.toolCalls || null);
+          JSON.stringify(streamMsg.toolCalls || null);
 
         if (needsUpdate) {
           chatStore.updateMessage(streamMsg.messageId, {
@@ -663,17 +662,23 @@ export function useChat(
                 depth: message.depth,
                 authorId: null,
                 authorName: null,
-                isAI: message.role === "assistant",
+                isAI: message.role === "assistant" || message.role === "tool",
                 errorType: null,
                 errorMessage: null,
                 edited: false,
                 tokens: null,
                 toolCalls: message.toolCalls
                   ? message.toolCalls.map((tc) => ({
-                      toolName: tc.toolName,
-                      displayName: tc.displayName,
-                      args: tc.args,
-                    }))
+                    toolName: tc.toolName,
+                    displayName: tc.displayName,
+                    icon: tc.icon,
+                    args: tc.args,
+                    result: tc.result,
+                    error: tc.error,
+                    executionTime: tc.executionTime,
+                    widgetMetadata: tc.widgetMetadata,
+                    creditsUsed: tc.creditsUsed,
+                  }))
                   : null,
                 upvotes: null,
                 downvotes: null,
@@ -1258,9 +1263,9 @@ export function useChat(
             .json()
             // eslint-disable-next-line no-restricted-syntax
             .catch(() => ({}))) as Record<
-            string,
-            string | number | boolean | null
-          >;
+              string,
+              string | number | boolean | null
+            >;
           logger.error("Chat: Failed to create folder", {
             status: response.status,
             error: parseError(errorData).message,

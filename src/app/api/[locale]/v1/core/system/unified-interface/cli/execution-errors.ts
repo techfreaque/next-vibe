@@ -412,7 +412,7 @@ export namespace ErrorHandler {
     try {
       return await fn();
     } catch (error) {
-      // eslint-disable-next-line no-restricted-syntax
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure code requires throwing for system-level errors and initialization failures
       throw createError(error as UnknownError, context);
     }
   }

@@ -5,9 +5,10 @@
 
 "use client";
 
-import { Form, FormAlert } from "next-vibe-ui/ui";
+import { Form, FormAlert, Div } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { H3 } from "next-vibe-ui/ui/typography";
 import type { FormEvent, JSX } from "react";
 
 import { useImapAccountCreateEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/create/hooks";
@@ -48,9 +49,9 @@ export function ImapAccountCreateForm({
       onSubmit={handleSubmit}
       className="space-y-6"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <Div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Basic Information */}
-        <div className="space-y-4">
+        <Div className="space-y-4">
           <EndpointFormField
             name="basicInfo.name"
             config={{
@@ -106,10 +107,10 @@ export function ImapAccountCreateForm({
               showAllRequired: false,
             }}
           />
-        </div>
+        </Div>
 
         {/* Authentication */}
-        <div className="space-y-4">
+        <Div className="space-y-4">
           <EndpointFormField
             name="authentication.username"
             config={{
@@ -174,16 +175,16 @@ export function ImapAccountCreateForm({
               showAllRequired: false,
             }}
           />
-        </div>
-      </div>
+        </Div>
+      </Div>
 
       {/* Advanced Settings */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">
+      <Div className="space-y-4">
+        <H3 className="text-lg font-medium">
           {t("app.admin.emails.imap.account.sections.advanced")}
-        </h3>
+        </H3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <EndpointFormField
             name="advancedSettings.connectionTimeout"
             config={{
@@ -226,7 +227,7 @@ export function ImapAccountCreateForm({
               showAllRequired: false,
             }}
           />
-        </div>
+        </Div>
 
         <EndpointFormField
           name="syncConfiguration.enabled"
@@ -253,11 +254,11 @@ export function ImapAccountCreateForm({
             showAllRequired: false,
           }}
         />
-      </div>
+      </Div>
       <FormAlert alert={endpoint.alert} />
 
       {/* Form Actions */}
-      <div className="flex items-center justify-end space-x-4">
+      <Div className="flex items-center justify-end space-x-4">
         <Button type="button" variant="outline" onClick={onCancel}>
           {t("app.admin.emails.imap.common.cancel")}
         </Button>
@@ -266,7 +267,7 @@ export function ImapAccountCreateForm({
             ? t("app.admin.emails.imap.common.saving")
             : t("app.admin.emails.imap.account.create")}
         </Button>
-      </div>
+      </Div>
     </Form>
   );
 }

@@ -133,4 +133,15 @@ export const translations: typeof enTranslations = {
       facebook: "Facebook",
     },
   },
+  messages: {
+    successMessage: "Opcje logowania pobrane pomyślnie",
+    passwordAuthDescription: "Zaloguj się za pomocą adresu e-mail i hasła",
+    socialAuthDescription: "Zaloguj się za pomocą kont społecznościowych",
+    continueWithProvider: "Kontynuuj z {{provider}}",
+    twoFactorRequired: "Zwiększone bezpieczeństwo: wymagane 2FA",
+    standardSecurity: "Standardowe wymagania bezpieczeństwa",
+    tryPasswordFirst: "Wypróbuj najpierw logowanie hasłem",
+    useSocialLogin: "Użyj logowania społecznościowego",
+    socialLoginFaster: "Logowanie społecznościowe jest szybsze dla nowych użytkowników",
+  },
 };

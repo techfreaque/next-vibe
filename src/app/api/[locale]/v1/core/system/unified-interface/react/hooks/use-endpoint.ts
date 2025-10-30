@@ -7,7 +7,6 @@ import { useMemo } from "react";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {
   EndpointReturn,
@@ -158,16 +157,22 @@ export function useEndpoint<
     return defaultValues;
   }, [autoPrefillData, defaultValues]);
 
-  const createOperation = useEndpointCreate(primaryEndpoint, logger, {
-    formOptions: {
-      persistForm: false, // No local storage
-      defaultValues,
-      persistenceKey: undefined,
+  const createOperation = useEndpointCreate(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    primaryEndpoint as any,
+    logger,
+    {
+      formOptions: {
+        persistForm: false, // No local storage
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        defaultValues: defaultValues as any,
+        persistenceKey: undefined,
+      },
+      mutationOptions: {},
+      urlPathParams: queryOptions?.urlPathParams,
+      autoPrefillData,
     },
-    mutationOptions: {},
-    urlPathParams: queryOptions?.urlPathParams,
-    autoPrefillData,
-  });
+  );
 
   const deleteOperation = useEndpointDelete(deleteEndpoint, logger, {
     mutationOptions: {},
@@ -270,9 +275,12 @@ export function useEndpoint<
   return {
     alert,
     read: read ?? undefined,
-    create: create ?? undefined,
-    delete: deleteOperation ?? undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    create: (create as any) ?? undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete: (deleteOperation as any) ?? undefined,
     isLoading,
     error,
-  };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any;
 }

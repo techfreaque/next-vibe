@@ -21,7 +21,7 @@ import type {
 import type { z } from "zod";
 
 import { useTranslation } from "@/i18n/core/client";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
@@ -58,7 +58,10 @@ import {
   FormLabel,
   FormMessage,
 } from "./form";
-import { getFieldConfig } from "./infer-field-config";
+import {
+  type EndpointFieldStructure,
+  getFieldConfig,
+} from "./infer-field-config";
 
 // Default theme for required fields
 const DEFAULT_THEME: RequiredFieldTheme = {
@@ -561,25 +564,33 @@ function renderFieldInput<
       );
     }
 
-    case "phone":
+    case "phone": {
       if (config.type !== "phone") {
+        // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for invalid config
         throw new Error("Invalid config type for phone field");
+      }
+      // Extract placeholder to avoid complex union type error
+      let phonePlaceholder: TranslationKey;
+      if (config.placeholder !== undefined) {
+        phonePlaceholder = config.placeholder as TranslationKey;
+      } else {
+        phonePlaceholder =
+          "packages.nextVibeUi.web.common.enterPhoneNumber" as TranslationKey;
       }
       return (
         <PhoneField
           value={String(field.value ?? "")}
           onChange={(value) => field.onChange(value)}
           onBlur={field.onBlur}
-          placeholder={
-            config.placeholder ?? "packages.nextVibeUi.web.common.enterPhoneNumber"
-          }
-          defaultCountry={config.defaultCountry ?? "DE"}
-          preferredCountries={config.preferredCountries ?? ["DE", "PL", "GLOBAL"]}
+          placeholder={phonePlaceholder}
+          defaultCountry={config.defaultCountry ?? "GLOBAL"}
+          preferredCountries={config.preferredCountries ?? ["GLOBAL"]}
           disabled={disabled ?? config.disabled}
           className={inputClassName}
           name={field.name}
         />
       );
+    }
 
     case "multiselect": {
       const multiselectValue: string[] = Array.isArray(field.value)
@@ -658,7 +669,7 @@ export interface EndpointFormFieldProps<
     "requiredFields"
   > {
   schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
-  endpointFields?: unknown; // Endpoint fields for auto-inference (from definition.POST.fields)
+  endpointFields?: EndpointFieldStructure; // Endpoint fields for auto-inference (from definition.POST.fields)
 }
 
 /**
@@ -687,6 +698,7 @@ export function EndpointFormField<
     (endpointFields ? getFieldConfig(endpointFields, name) : null);
 
   if (!config) {
+    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for missing config
     throw new Error(
       `EndpointFormField: No config provided for field "${name}". ` +
         `Either provide a config prop or pass endpointFields for auto-inference.`,
@@ -767,7 +779,7 @@ export interface EndpointFormFieldsProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
   requiredFields?: string[];
   schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
-  endpointFields?: unknown; // Endpoint fields for auto-inference
+  endpointFields?: EndpointFieldStructure; // Endpoint fields for auto-inference
   theme?: RequiredFieldTheme;
   className?: string;
   fieldClassName?: string;

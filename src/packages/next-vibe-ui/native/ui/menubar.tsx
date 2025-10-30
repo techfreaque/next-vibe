@@ -21,10 +21,15 @@ const MenubarRadioGroup = MenubarPrimitive.RadioGroup;
 
 const Menubar = React.forwardRef<
   MenubarPrimitive.RootRef,
-  MenubarPrimitive.RootProps
->(({ className, ...props }, ref) => (
+  Omit<MenubarPrimitive.RootProps, 'value' | 'onValueChange'> & {
+    value?: string | undefined;
+    onValueChange?: (value: string | undefined) => void;
+  }
+>(({ className, value, onValueChange, ...props }, ref) => (
   <MenubarPrimitive.Root
     ref={ref}
+    value={value}
+    onValueChange={onValueChange || (() => {})}
     className={cn(
       "flex flex-row h-10 native:h-12 items-center space-x-1 rounded-md border border-border bg-background p-1",
       className,
@@ -57,8 +62,9 @@ MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName;
 
 const MenubarSubTrigger = React.forwardRef<
   MenubarPrimitive.SubTriggerRef,
-  MenubarPrimitive.SubTriggerProps & {
+  Omit<MenubarPrimitive.SubTriggerProps, 'children'> & {
     inset?: boolean;
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
   }
 >(({ className, inset, children, ...props }, ref) => {
   const { open } = MenubarPrimitive.useSubContext();
@@ -159,7 +165,9 @@ MenubarItem.displayName = MenubarPrimitive.Item.displayName;
 
 const MenubarCheckboxItem = React.forwardRef<
   MenubarPrimitive.CheckboxItemRef,
-  MenubarPrimitive.CheckboxItemProps
+  Omit<MenubarPrimitive.CheckboxItemProps, 'children'> & {
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+  }
 >(({ className, children, checked, ...props }, ref) => (
   <MenubarPrimitive.CheckboxItem
     ref={ref}
@@ -183,7 +191,10 @@ MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName;
 
 const MenubarRadioItem = React.forwardRef<
   MenubarPrimitive.RadioItemRef,
-  MenubarPrimitive.RadioItemProps
+  Omit<MenubarPrimitive.RadioItemProps, 'children'> & {
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+    disabled?: boolean;
+  }
 >(({ className, children, ...props }, ref) => (
   <MenubarPrimitive.RadioItem
     ref={ref}

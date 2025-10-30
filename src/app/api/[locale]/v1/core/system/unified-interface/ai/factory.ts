@@ -23,70 +23,96 @@ import type {
 } from "./types";
 
 /**
+ * Type-safe helper to check if schema has a property
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function hasProperty<T extends string>(obj: any, prop: T): obj is Record<T, any> {
+  return obj && typeof obj === "object" && prop in obj;
+}
+
+/**
  * Strip transforms and refinements from a Zod schema to make it JSON Schema compatible
  * This is needed for AI tools because the AI SDK needs to serialize schemas to JSON Schema
  * Transforms and refinements are runtime-only features that can't be represented in JSON Schema
+ *
+ * This implementation uses runtime property checking instead of type guards
+ * to avoid issues with Zod v4 internal type changes
  */
 function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const schemaDef = (schema as any)._def;
+
+  if (!schemaDef || typeof schemaDef.typeName !== "string") {
+    return schema;
+  }
+
   // Handle ZodEffects (transforms, refinements, preprocessors)
-  // Check using _def.typeName instead of instanceof since ZodEffects might not be exported
-  if ("_def" in schema && schema._def.typeName === "ZodEffects") {
-    // Recursively strip from the inner schema
-    return stripTransformsAndRefinements((schema as any)._def.schema);
+  if (schemaDef.typeName === "ZodEffects" && hasProperty(schemaDef, "schema")) {
+    return stripTransformsAndRefinements(schemaDef.schema as z.ZodTypeAny);
   }
 
-  // Handle ZodOptional
-  if (schema instanceof z.ZodOptional) {
-    return stripTransformsAndRefinements(schema.unwrap()).optional();
+  // Handle ZodOptional - has unwrap() method
+  if (schemaDef.typeName === "ZodOptional" && hasProperty(schema, "unwrap")) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const unwrapped = stripTransformsAndRefinements((schema as any).unwrap());
+    return unwrapped.optional();
   }
 
-  // Handle ZodNullable
-  if (schema instanceof z.ZodNullable) {
-    return stripTransformsAndRefinements(schema.unwrap()).nullable();
+  // Handle ZodNullable - has unwrap() method
+  if (schemaDef.typeName === "ZodNullable" && hasProperty(schema, "unwrap")) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const unwrapped = stripTransformsAndRefinements((schema as any).unwrap());
+    return unwrapped.nullable();
   }
 
-  // Handle ZodDefault
-  if (schema instanceof z.ZodDefault) {
-    const innerSchema = stripTransformsAndRefinements(schema.removeDefault());
-    // Get the default value - it can be either a function or a direct value
-    const defaultValue =
-      typeof schema._def.defaultValue === "function"
-        ? schema._def.defaultValue()
-        : schema._def.defaultValue;
-    return innerSchema.default(defaultValue);
+  // Handle ZodDefault - has removeDefault() method
+  if (schemaDef.typeName === "ZodDefault" && hasProperty(schema, "removeDefault")) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const innerSchema = stripTransformsAndRefinements((schema as any).removeDefault());
+    // Get the default value from _def
+    const defaultValue = schemaDef.defaultValue;
+    const resolvedDefault = typeof defaultValue === "function" ? defaultValue() : defaultValue;
+    return innerSchema.default(resolvedDefault);
   }
 
   // Handle ZodObject - recursively strip from all properties
-  if (schema instanceof z.ZodObject) {
-    const shape = schema.shape;
+  if (schemaDef.typeName === "ZodObject" && hasProperty(schema, "shape")) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const shape = (schema as any).shape as Record<string, z.ZodTypeAny>;
     const strippedShape: Record<string, z.ZodTypeAny> = {};
 
     for (const [key, value] of Object.entries(shape)) {
-      strippedShape[key] = stripTransformsAndRefinements(value as z.ZodTypeAny);
+      strippedShape[key] = stripTransformsAndRefinements(value);
     }
 
     return z.object(strippedShape);
   }
 
-  // Handle ZodArray
-  if (schema instanceof z.ZodArray) {
-    return z.array(stripTransformsAndRefinements(schema.element));
+  // Handle ZodArray - has element property
+  if (schemaDef.typeName === "ZodArray" && hasProperty(schema, "element")) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const element = (schema as any).element as z.ZodTypeAny;
+    const stripped = stripTransformsAndRefinements(element);
+    return z.array(stripped);
   }
 
-  // Handle ZodUnion
-  if (schema instanceof z.ZodUnion) {
-    const options = schema.options.map((option: z.ZodTypeAny) =>
+  // Handle ZodUnion - has options property
+  if (schemaDef.typeName === "ZodUnion" && hasProperty(schema, "options")) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const options = (schema as any).options as z.ZodTypeAny[];
+    const strippedOptions = options.map((option) =>
       stripTransformsAndRefinements(option),
-    );
-    return z.union(options as [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]]);
+    ) as [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]];
+    return z.union(strippedOptions);
   }
 
-  // Handle ZodIntersection
-  if (schema instanceof z.ZodIntersection) {
-    return z.intersection(
-      stripTransformsAndRefinements(schema._def.left),
-      stripTransformsAndRefinements(schema._def.right),
-    );
+  // Handle ZodIntersection - access left and right through _def
+  if (schemaDef.typeName === "ZodIntersection" && hasProperty(schemaDef, "left") && hasProperty(schemaDef, "right")) {
+    const left = schemaDef.left as z.ZodTypeAny;
+    const right = schemaDef.right as z.ZodTypeAny;
+    const strippedLeft = stripTransformsAndRefinements(left);
+    const strippedRight = stripTransformsAndRefinements(right);
+    return z.intersection(strippedLeft, strippedRight);
   }
 
   // For all other types (primitives, etc.), return as-is
@@ -161,9 +187,8 @@ export class ToolFactory {
 
         const executionContext: AIToolExecutionContext = {
           toolName: endpoint.toolName,
-          data: transformedParams as unknown as {
-            [key: string]: ToolParameterValue;
-          },
+          // Transform validated params to tool parameter format
+          data: transformedParams as Record<string, ToolParameterValue>,
           user: context.user,
           locale: context.locale,
           logger: context.logger,

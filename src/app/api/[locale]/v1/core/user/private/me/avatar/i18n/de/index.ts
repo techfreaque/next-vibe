@@ -6,9 +6,13 @@ export const translations: typeof enTranslations = {
     user_not_found: "Benutzer nicht gefunden",
     failed_to_upload_avatar: "Avatar konnte nicht hochgeladen werden",
     failed_to_delete_avatar: "Avatar konnte nicht gelöscht werden",
+    invalid_file_type: "Ungültiger Dateityp",
+    file_too_large: "Datei zu groß",
   },
   debug: {
+    uploadingUserAvatar: "Benutzer-Avatar wird hochgeladen",
     errorUploadingUserAvatar: "Fehler beim Hochladen des Benutzer-Avatars",
+    deletingUserAvatar: "Benutzer-Avatar wird gelöscht",
     errorDeletingUserAvatar: "Fehler beim Löschen des Benutzer-Avatars",
   },
   success: {
@@ -18,6 +22,9 @@ export const translations: typeof enTranslations = {
       visible: "Ihr Avatar ist jetzt in Ihrem Profil sichtbar",
       update:
         "Sie können ihn jederzeit in Ihren Profileinstellungen aktualisieren",
+      default: "Ihr Profil zeigt jetzt den Standard-Avatar",
+      uploadNew:
+        "Sie können jederzeit einen neuen Avatar in Ihren Profileinstellungen hochladen",
     },
   },
   upload: {

@@ -6,6 +6,8 @@
 "use client";
 
 import Image from "next/image";
+import { Div, Span } from "next-vibe-ui/ui";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { RenderableValue, WidgetComponentProps } from "../types";
@@ -41,10 +43,13 @@ function isDataCardsWidgetData(
  */
 export const DataCardsWidget = ({
   data,
+  metadata: _metadata,
+  context: _context,
   className = "",
+  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element => {
   if (!isDataCardsWidgetData(data)) {
-    return <div className={className}>—</div>;
+    return <Div className={className} style={style}>—</Div>;
   }
 
   const typedData = data;
@@ -59,7 +64,7 @@ export const DataCardsWidget = ({
   /* eslint-enable i18next/no-literal-string */
 
   return (
-    <div className={`grid gap-4 ${gridCols} ${className}`}>
+    <Div className={`grid gap-4 ${gridCols} ${className}`} style={style}>
       {typedData.items.map((item, index) => {
         const titleValue = typedData.titleKey ? item[typedData.titleKey] : "";
         const title =
@@ -82,12 +87,12 @@ export const DataCardsWidget = ({
             : String(imgValue ?? "");
 
         return (
-          <div
+          <Div
             key={index}
             className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
           >
             {image && (
-              <div className="aspect-video w-full overflow-hidden bg-gray-100 dark:bg-gray-700">
+              <Div className="aspect-video w-full overflow-hidden bg-gray-100 dark:bg-gray-700">
                 <Image
                   src={image}
                   alt={title}
@@ -95,20 +100,20 @@ export const DataCardsWidget = ({
                   height={225}
                   className="h-full w-full object-cover"
                 />
-              </div>
+              </Div>
             )}
-            <div className="p-4">
+            <Div className="p-4">
               {title && (
-                <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <H3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
                   {title}
-                </h3>
+                </H3>
               )}
               {description && (
-                <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">
+                <P className="mb-3 text-sm text-gray-600 dark:text-gray-400">
                   {description}
-                </p>
+                </P>
               )}
-              <div className="space-y-2">
+              <Div className="space-y-2">
                 {Object.entries(item).map(([key, value]) => {
                   // Skip keys used for title, description, image
                   if (
@@ -120,23 +125,23 @@ export const DataCardsWidget = ({
                   }
 
                   return (
-                    <div key={key} className="flex justify-between text-sm">
-                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                    <Div key={key} className="flex justify-between text-sm">
+                      <Span className="font-medium text-gray-700 dark:text-gray-300">
                         {key}:
-                      </span>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      </Span>
+                      <Span className="text-gray-600 dark:text-gray-400">
                         {typeof value === "object" && value !== null
                           ? JSON.stringify(value)
                           : String(value ?? "")}
-                      </span>
-                    </div>
+                      </Span>
+                    </Div>
                   );
                 })}
-              </div>
-            </div>
-          </div>
+              </Div>
+            </Div>
+          </Div>
         );
       })}
-    </div>
+    </Div>
   );
 };

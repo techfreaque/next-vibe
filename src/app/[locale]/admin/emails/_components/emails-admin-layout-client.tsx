@@ -11,6 +11,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { Div, Span } from "next-vibe-ui/ui";
+import { H1, P } from "next-vibe-ui/ui/typography";
 import type { ComponentType, JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -77,22 +79,22 @@ export function EmailsAdminLayoutClient({
   );
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col space-y-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+      <Div className="flex flex-col space-y-4">
+        <Div>
+          <H1 className="text-3xl font-bold text-gray-900 dark:text-white">
             {t("app.admin.emails.components.admin.title")}
-          </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          </H1>
+          <P className="mt-2 text-gray-600 dark:text-gray-400">
             {t("app.admin.emails.components.admin.description")}
-          </p>
-        </div>
+          </P>
+        </Div>
 
         {/* Main Navigation */}
         <Card>
           <CardContent className="p-4">
-            <div className="flex flex-wrap gap-2">
+            <Div className="flex flex-wrap gap-2">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = currentSection?.key === item.key;
@@ -112,27 +114,27 @@ export function EmailsAdminLayoutClient({
                   >
                     <Link href={item.href} className="flex items-center gap-2">
                       <Icon className="h-4 w-4" />
-                      <span>{item.label}</span>
+                      <Span>{item.label}</Span>
                     </Link>
                   </Button>
                 );
               })}
-            </div>
+            </Div>
 
             {/* Current Section Description */}
             {currentSection && (
-              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+              <Div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                <P className="text-sm text-gray-600 dark:text-gray-400">
                   {currentSection.description}
-                </p>
-              </div>
+                </P>
+              </Div>
             )}
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Page Content */}
-      <div className="min-h-[600px]">{children}</div>
-    </div>
+      <Div className="min-h-[600px]">{children}</Div>
+    </Div>
   );
 }

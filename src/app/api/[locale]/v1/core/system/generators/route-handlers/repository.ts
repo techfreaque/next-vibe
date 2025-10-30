@@ -57,8 +57,7 @@ interface RouteHandlersGeneratorRepository {
  * Route Handlers Generator Repository Implementation
  */
 class RouteHandlersGeneratorRepositoryImpl
-  implements RouteHandlersGeneratorRepository
-{
+  implements RouteHandlersGeneratorRepository {
   async generateRouteHandlers(
     data: RouteHandlersRequestType,
     _user: JwtPayloadType,
@@ -146,13 +145,16 @@ class RouteHandlersGeneratorRepositoryImpl
     // Sort paths for consistent output
     allPaths.sort();
 
-    // Generate getRouteHandler function cases
+    // Generate getRouteHandler function cases with type-safe loading
     const cases: string[] = [];
     for (const path of allPaths) {
       const importPath = pathMap[path];
       // eslint-disable-next-line i18next/no-literal-string
       cases.push(`    case "${path}":
-      return ((await import("${importPath}")) as unknown) as RouteModule;`);
+      return await loadRouteModule(
+        () => import("${importPath}"),
+        "${path}"
+      );`);
     }
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -172,9 +174,30 @@ class RouteHandlersGeneratorRepositoryImpl
 import type { RouteModule } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/handler";
 
 /**
- * Dynamically import route handler by path
+ * Helper function to load and validate route modules
+ */
+async function loadRouteModule(
+  importFn: () => Promise<unknown>,
+  path: string
+): Promise<RouteModule | null> {
+  try {
+    const module = await importFn();
+    // Basic validation that it's a route module
+    if (module && typeof module === "object") {
+      return module as RouteModule;
+    }
+    return null;
+  } catch (error) {
+    console.error(\`Failed to load route module for path: \${path}\`, error);
+    return null;
+  }
+}
+
+/**
+ * Dynamically import route handler by path with runtime validation
  * @param path - The route path (e.g., "core/agent/chat/threads")
- * @returns The route module or null if not found
+ * @returns The validated route module or null if not found
+ * @throws {TypeError} If the imported module is not a valid RouteModule
  */
 export async function getRouteHandler(path: string): Promise<RouteModule | null> {
   switch (path) {

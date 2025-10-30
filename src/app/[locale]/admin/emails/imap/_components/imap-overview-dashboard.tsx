@@ -13,6 +13,7 @@ import {
   Wifi,
   WifiOff,
 } from "lucide-react";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -24,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -161,7 +163,7 @@ export function ImapOverviewDashboard(): JSX.Element {
   // Show loading state if no data
   if (isLoading || !healthData) {
     return (
-      <div className="space-y-6">
+      <Div className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>
@@ -169,12 +171,12 @@ export function ImapOverviewDashboard(): JSX.Element {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8">
-              <p>{t("app.admin.emails.imap.common.loading")}</p>
-            </div>
+            <Div className="text-center py-8">
+              <P>{t("app.admin.emails.imap.common.loading")}</P>
+            </Div>
           </CardContent>
         </Card>
-      </div>
+      </Div>
     );
   }
 
@@ -186,9 +188,9 @@ export function ImapOverviewDashboard(): JSX.Element {
   );
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Key Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -196,15 +198,15 @@ export function ImapOverviewDashboard(): JSX.Element {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {healthData?.accountsTotal ?? 0}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {healthData?.accountsHealthy ?? 0}{" "}
               {t(
                 "app.admin.emails.imap.dashboard.activeAccounts",
               ).toLowerCase()}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -215,12 +217,12 @@ export function ImapOverviewDashboard(): JSX.Element {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {healthData?.syncStats?.totalSyncs?.toLocaleString() ?? "0"}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.emails.imap.dashboard.synchronizedMessages")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -231,14 +233,14 @@ export function ImapOverviewDashboard(): JSX.Element {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {healthData?.syncStats?.lastSyncTime ||
                 t("app.admin.emails.imap.dashboard.never")}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.emails.imap.dashboard.syncStatus")}:{" "}
               {healthData?.serverStatus ?? "unknown"}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -249,77 +251,77 @@ export function ImapOverviewDashboard(): JSX.Element {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {healthData?.uptime ?? "N/A"}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {t("app.admin.emails.imap.admin.health.serverStatus")}:{" "}
               {healthData?.serverStatus ?? "unknown"}
-            </p>
+            </P>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Server Health Status */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <Div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
               {getStatusIcon(healthData?.serverStatus ?? "unknown")}
-              <span>
+              <Span>
                 {t("app.admin.emails.imap.admin.health.serverStatus")}
-              </span>
+              </Span>
             </CardTitle>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">
+            <Div className="flex items-center space-x-4">
+              <Span className="text-sm text-gray-500">
                 {t("app.admin.emails.imap.admin.health.lastUpdate", {
                   lastUpdate: lastUpdate.toLocaleTimeString(),
                 })}
-              </span>
+              </Span>
               <Button variant="outline" size="sm" onClick={handleRefresh}>
                 {t("app.admin.emails.imap.common.refresh")}
               </Button>
-            </div>
-          </div>
+            </Div>
+          </Div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div
+          <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Div className="text-center">
+              <Div
                 className={`text-2xl font-bold ${getStatusColor(healthData?.serverStatus ?? "unknown")}`}
               >
                 {(healthData?.serverStatus ?? "unknown").toUpperCase()}
-              </div>
-              <div className="text-sm text-gray-600">
+              </Div>
+              <Div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.admin.health.serverStatus")}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">
+              </Div>
+            </Div>
+            <Div className="text-center">
+              <Div className="text-2xl font-bold">
                 {healthData?.uptime ?? "N/A"}
-              </div>
-              <div className="text-sm text-gray-600">
+              </Div>
+              <Div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.admin.health.uptime")}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">
+              </Div>
+            </Div>
+            <Div className="text-center">
+              <Div className="text-2xl font-bold">
                 {healthData?.syncedAccounts ?? 0}/
                 {healthData?.totalAccounts ?? 0}
-              </div>
-              <div className="text-sm text-gray-600">
+              </Div>
+              <Div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.admin.health.accounts")}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">
+              </Div>
+            </Div>
+            <Div className="text-center">
+              <Div className="text-2xl font-bold">
                 {healthData?.activeConnections ?? 0}
-              </div>
-              <div className="text-sm text-gray-600">
+              </Div>
+              <Div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.admin.health.activeConnections")}
-              </div>
-            </div>
-          </div>
+              </Div>
+            </Div>
+          </Div>
         </CardContent>
       </Card>
 
@@ -329,84 +331,84 @@ export function ImapOverviewDashboard(): JSX.Element {
           <CardTitle>{t("app.admin.emails.imap.admin.health.title")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold">
+          <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Div className="text-center">
+              <Div className="text-2xl font-bold">
                 {healthData.avgResponseTime}
-                <span className="text-sm ml-1">ms</span>
-              </div>
-              <div className="text-sm text-gray-600">
+                <Span className="text-sm ml-1">ms</Span>
+              </Div>
+              <Div className="text-sm text-gray-600">
                 {t(
                   "app.api.v1.core.emails.imapClient.health.health.get.response.data.performanceMetrics.avgResponseTime",
                 )}
-              </div>
-            </div>
-          </div>
+              </Div>
+            </Div>
+          </Div>
         </CardContent>
       </Card>
 
       {/* Account Status Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
+            <Div className="flex items-center justify-between">
+              <Div>
+                <P className="text-sm font-medium text-gray-600">
                   {t("app.admin.emails.imap.admin.health.accounts")}
-                </p>
-                <p className="text-2xl font-bold">{accounts.length}</p>
-              </div>
+                </P>
+                <P className="text-2xl font-bold">{accounts.length}</P>
+              </Div>
               <CheckCircle className="h-8 w-8 text-blue-600" />
-            </div>
+            </Div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
+            <Div className="flex items-center justify-between">
+              <Div>
+                <P className="text-sm font-medium text-gray-600">
                   {t("app.admin.emails.imap.admin.health.connectedAccounts")}
-                </p>
-                <p className="text-2xl font-bold text-green-600">
+                </P>
+                <P className="text-2xl font-bold text-green-600">
                   {connectedAccounts.length}
-                </p>
-              </div>
+                </P>
+              </Div>
               <Wifi className="h-8 w-8 text-green-600" />
-            </div>
+            </Div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
+            <Div className="flex items-center justify-between">
+              <Div>
+                <P className="text-sm font-medium text-gray-600">
                   {t("app.admin.emails.imap.admin.health.disconnectedAccounts")}
-                </p>
-                <p className="text-2xl font-bold text-red-600">
+                </P>
+                <P className="text-2xl font-bold text-red-600">
                   {disconnectedAccounts.length}
-                </p>
-              </div>
+                </P>
+              </Div>
               <WifiOff className="h-8 w-8 text-red-600" />
-            </div>
+            </Div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
+            <Div className="flex items-center justify-between">
+              <Div>
+                <P className="text-sm font-medium text-gray-600">
                   {t("app.admin.emails.imap.admin.health.errors")}
-                </p>
-                <p className="text-2xl font-bold text-red-600">{totalErrors}</p>
-              </div>
+                </P>
+                <P className="text-2xl font-bold text-red-600">{totalErrors}</P>
+              </Div>
               <AlertCircle className="h-8 w-8 text-red-600" />
-            </div>
+            </Div>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Account Status Details */}
       <Card>
@@ -443,15 +445,15 @@ export function ImapOverviewDashboard(): JSX.Element {
               {accounts.map((account) => (
                 <TableRow key={account.id}>
                   <TableCell>
-                    <div>
-                      <div className="font-medium">{account.name}</div>
-                      <div className="text-sm text-gray-500">
+                    <Div>
+                      <Div className="font-medium">{account.name}</Div>
+                      <Div className="text-sm text-gray-500">
                         {account.email}
-                      </div>
-                    </div>
+                      </Div>
+                    </Div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center space-x-2">
+                    <Div className="flex items-center space-x-2">
                       {getStatusIcon(
                         account.isConnected ? "connected" : "disconnected",
                       )}
@@ -459,7 +461,7 @@ export function ImapOverviewDashboard(): JSX.Element {
                         account.isConnected ? "connected" : "disconnected",
                         t,
                       )}
-                    </div>
+                    </Div>
                   </TableCell>
                   <TableCell>{getStatusBadge(account.syncStatus, t)}</TableCell>
                   <TableCell>
@@ -471,18 +473,18 @@ export function ImapOverviewDashboard(): JSX.Element {
                     {account.syncError ? (
                       <Badge variant="destructive">1</Badge>
                     ) : (
-                      <span className="text-gray-400">0</span>
+                      <Span className="text-gray-400">0</Span>
                     )}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center space-x-2">
+                    <Div className="flex items-center space-x-2">
                       <Button variant="outline" size="sm">
                         {t("app.admin.emails.imap.account.test")}
                       </Button>
                       <Button variant="outline" size="sm">
                         {t("app.admin.emails.imap.common.sync")}
                       </Button>
-                    </div>
+                    </Div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -490,6 +492,6 @@ export function ImapOverviewDashboard(): JSX.Element {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

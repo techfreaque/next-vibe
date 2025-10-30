@@ -50,7 +50,7 @@ function useChart<
   const context = React.useContext(ChartContext);
 
   if (!context) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
     throw new Error("useChart must be used within a <ChartContainer />");
   }
 

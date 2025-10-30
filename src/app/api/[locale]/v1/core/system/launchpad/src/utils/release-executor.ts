@@ -482,6 +482,7 @@ export class ReleaseExecutor {
         `❌ ${t("app.api.v1.core.system.launchpad.releaseExecutor.weeklyUpdate.failed")}:`,
         parseError(error),
       );
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw error;
     }
   }

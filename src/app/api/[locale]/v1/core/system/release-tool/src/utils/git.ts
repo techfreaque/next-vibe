@@ -94,7 +94,7 @@ export function createGitTag(
     // For commit errors (not status check errors)
 
     logger.error("Failed to commit changes.", parseError(error));
-    // eslint-disable-next-line i18next/no-literal-string
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error("Failed to commit changes", { cause: error });
   }
 
@@ -126,7 +126,7 @@ export function createGitTag(
     }
   } catch (error) {
     logger.error("Failed during tag operations.", parseError(error));
-    // eslint-disable-next-line i18next/no-literal-string
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error("Failed during tag operations", { cause: error });
   }
 }

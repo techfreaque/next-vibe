@@ -20,10 +20,12 @@ import type { PackageJson, ReleasePackage } from "../types/index.js";
 /**
  * Type guard to validate if parsed JSON matches PackageJson structure
  */
+// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Package.json field access requires 'unknown' for dynamic property access
 function isPackageJson(value: unknown): value is PackageJson {
   if (typeof value !== "object" || value === null) {
     return false;
   }
+  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Package metadata extraction requires 'unknown' for flexible JSON structure
   const obj = value as Record<string, unknown>;
   return typeof obj.name === "string" && typeof obj.version === "string";
 }
@@ -46,6 +48,7 @@ export function getPackageJson(
   }
 
   try {
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Package validation requires 'unknown' for runtime structure checking
     const parsedJson: unknown = JSON.parse(
       readFileSync(packageJsonPath, "utf8"),
     );

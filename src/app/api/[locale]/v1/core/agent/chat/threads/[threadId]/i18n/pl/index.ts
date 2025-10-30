@@ -1,8 +1,10 @@
 import { translations as messagesTranslations } from "../../messages/i18n/pl";
+import { translations as permissionsTranslations } from "../../permissions/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   messages: messagesTranslations,
+  permissions: permissionsTranslations,
   get: {
     title: "Pobierz wątek czatu",
     description: "Pobierz określony wątek czatu według ID",

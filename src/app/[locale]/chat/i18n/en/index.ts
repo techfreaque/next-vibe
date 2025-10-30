@@ -651,6 +651,7 @@ export const translations = {
     moveToFolder: "Move to Folder",
     newSubfolder: "New Subfolder",
     deleteFolder: "Delete Folder",
+    managePermissions: "Manage Permissions",
     today: "Today",
     lastWeek: "Last 7 Days",
     lastMonth: "Last 30 Days",
@@ -666,6 +667,29 @@ export const translations = {
       description: 'Are you sure you want to delete "{{folderName}}"?',
       descriptionWithThreads:
         'Are you sure you want to delete "{{folderName}}"? This folder contains {{count}} thread(s) which will also be deleted.',
+    },
+  },
+  permissions: {
+    folder: {
+      title: "Folder Permissions",
+      description: "Manage who can moderate this folder",
+    },
+    thread: {
+      title: "Thread Permissions",
+      description: "Manage who can moderate this thread",
+    },
+    addModerator: {
+      label: "Add Moderator",
+      placeholder: "Enter user ID...",
+    },
+    moderatorList: {
+      label: "Current Moderators",
+      empty: "No moderators added yet",
+    },
+    errors: {
+      emptyId: "User ID cannot be empty",
+      invalidUuid: "Invalid user ID format",
+      duplicate: "This user is already a moderator",
     },
   },
   threadList: {

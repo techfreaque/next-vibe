@@ -3,7 +3,9 @@ export const translations = {
   description: "Update your account password securely",
   tag: "password-change",
   debug: {
+    updatingPassword: "Updating password",
     errorUpdatingPassword: "Error updating password",
+    settingPassword: "Setting password",
     errorSettingPassword: "Error setting password",
   },
   groups: {
@@ -64,6 +66,8 @@ export const translations = {
     incorrect_password: "Incorrect password",
     update_failed: "Failed to update password",
     token_creation_failed: "Failed to create password token",
+    two_factor_code_required: "Two-factor authentication code required",
+    invalid_two_factor_code: "Invalid two-factor authentication code",
     invalid_request: {
       title: "Invalid Request",
       description: "The password change request is invalid",
@@ -106,6 +110,12 @@ export const translations = {
     },
   },
   success: {
+    updated: "Password updated successfully",
+    securityTip: "For enhanced security, enable two-factor authentication",
+    nextSteps: {
+      logoutOther: "All other sessions have been logged out for security",
+      enable2fa: "Consider enabling two-factor authentication for better security",
+    },
     title: "Password Updated",
     description: "Your password has been successfully updated",
   },

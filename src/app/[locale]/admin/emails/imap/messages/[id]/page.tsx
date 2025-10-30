@@ -4,6 +4,7 @@
  */
 
 import { notFound } from "next/navigation";
+import { Div, H1 } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import { imapMessagesRepository } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/repository";
@@ -57,14 +58,14 @@ export default async function ImapMessageDetailPage({
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+    <Div className="container mx-auto py-6 space-y-6">
+      <Div className="flex items-center justify-between">
+        <H1 className="text-2xl font-bold text-gray-900 dark:text-white">
           {t("app.admin.emails.imap.messages.detail.title")}
-        </h1>
-      </div>
+        </H1>
+      </Div>
 
       <ImapMessageDetail messageId={id} />
-    </div>
+    </Div>
   );
 }

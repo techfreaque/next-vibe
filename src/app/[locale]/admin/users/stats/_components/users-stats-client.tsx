@@ -16,11 +16,13 @@ import {
   UserCheck,
   Users,
 } from "lucide-react";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Progress } from "next-vibe-ui/ui/progress";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -54,23 +56,23 @@ export function UsersStatsClient({
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <Div className="space-y-6">
         {/* Filters Skeleton */}
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-24" />
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {Array.from({ length: 3 }).map((_, i) => (
                 <Skeleton key={i} className="h-10 w-full" />
               ))}
-            </div>
+            </Div>
           </CardContent>
         </Card>
 
         {/* Overview Cards Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i}>
               <CardHeader className="pb-2">
@@ -82,28 +84,28 @@ export function UsersStatsClient({
               </CardContent>
             </Card>
           ))}
-        </div>
+        </Div>
 
         {/* Tabs Skeleton */}
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-32" />
-            <div className="flex space-x-2 mt-4">
+            <Div className="flex space-x-2 mt-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-8 w-20" />
               ))}
-            </div>
+            </Div>
           </CardHeader>
           <CardContent>
             <Skeleton className="h-96 w-full" />
           </CardContent>
         </Card>
-      </div>
+      </Div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Filters */}
       <UsersStatsFiltersContainer
         locale={locale}
@@ -115,7 +117,7 @@ export function UsersStatsClient({
       </UsersStatsFiltersContainer>
 
       {/* Key Metrics Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Users */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -125,13 +127,13 @@ export function UsersStatsClient({
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(data?.totalUsers || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatNumber(data?.newUsers || 0)}{" "}
               {t("app.admin.users.stats.newUsers")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -144,15 +146,15 @@ export function UsersStatsClient({
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(data?.activeUsers || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(
                 (data?.activeUsers || 0) / (data?.totalUsers || 1),
               )}{" "}
               {t("app.admin.users.stats.ofTotal")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -165,13 +167,13 @@ export function UsersStatsClient({
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(data?.emailVerifiedUsers || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(data?.verificationRate || 0)}{" "}
               {t("app.admin.users.stats.verificationRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -184,13 +186,13 @@ export function UsersStatsClient({
             <Crown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(data?.usersWithStripeId || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(data?.stripeIntegrationRate || 0)}{" "}
               {t("app.admin.users.stats.stripeIntegrationRate")}
-            </p>
+            </P>
           </CardContent>
         </Card>
 
@@ -203,10 +205,10 @@ export function UsersStatsClient({
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <Div className="text-2xl font-bold">
               {formatNumber(data?.usersWithLeadId || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            </Div>
+            <P className="text-xs text-muted-foreground">
               {formatPercentage(data?.leadAssociationRate || 0)}{" "}
               {t("app.admin.users.stats.leadAssociationRate")}
             </p>
@@ -284,7 +286,7 @@ export function UsersStatsClient({
 
         <TabsContent value="overview" className="space-y-4">
           {/* Additional Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Email Statistics */}
             <Card>
               <CardHeader>
@@ -382,8 +384,8 @@ export function UsersStatsClient({
                     <span>
                       {formatNumber(data?.usersCreatedLastMonth || 0)}
                     </span>
-                  </div>
-                </div>
+                  </Div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -412,15 +414,15 @@ export function UsersStatsClient({
                   <div className="flex justify-between text-sm">
                     <span>{t("app.admin.users.stats.retentionRate")}</span>
                     <span>{formatPercentage(data?.retentionRate || 0)}</span>
-                  </div>
-                </div>
+                  </Div>
+                </Div>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
 
         <TabsContent value="distribution" className="space-y-4">
-          <div className="grid grid-cols-1 gap-6">
+          <Div className="grid grid-cols-1 gap-6">
             {/* Role Distribution */}
             <Card>
               <CardHeader>
@@ -430,16 +432,16 @@ export function UsersStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">
+                <Div className="space-y-3">
+                  <Div className="space-y-2">
+                    <Div className="flex items-center justify-between">
+                      <Span className="text-sm font-medium">
                         {t("app.admin.users.role.public")}
                       </span>
-                      <span className="text-sm text-muted-foreground">
+                      <Span className="text-sm text-muted-foreground">
                         {formatNumber(data?.publicUsers || 0)}
-                      </span>
-                    </div>
+                      </Span>
+                    </Div>
                     <Progress
                       value={
                         ((data?.publicUsers || 0) / (data?.totalUsers || 1)) *
@@ -449,15 +451,15 @@ export function UsersStatsClient({
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">
+                  <Div className="space-y-2">
+                    <Div className="flex items-center justify-between">
+                      <Span className="text-sm font-medium">
                         {t("app.admin.users.role.customer")}
                       </span>
-                      <span className="text-sm text-muted-foreground">
+                      <Span className="text-sm text-muted-foreground">
                         {formatNumber(data?.customerUsers || 0)}
-                      </span>
-                    </div>
+                      </Span>
+                    </Div>
                     <Progress
                       value={
                         ((data?.customerUsers || 0) / (data?.totalUsers || 1)) *
@@ -467,15 +469,15 @@ export function UsersStatsClient({
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">
+                  <Div className="space-y-2">
+                    <Div className="flex items-center justify-between">
+                      <Span className="text-sm font-medium">
                         {t("app.admin.users.role.partner_admin")}
                       </span>
-                      <span className="text-sm text-muted-foreground">
+                      <Span className="text-sm text-muted-foreground">
                         {formatNumber(data?.partnerAdminUsers || 0)}
-                      </span>
-                    </div>
+                      </Span>
+                    </Div>
                     <Progress
                       value={
                         ((data?.partnerAdminUsers || 0) /
@@ -486,15 +488,15 @@ export function UsersStatsClient({
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">
+                  <Div className="space-y-2">
+                    <Div className="flex items-center justify-between">
+                      <Span className="text-sm font-medium">
                         {t("app.admin.users.role.partner_employee")}
                       </span>
-                      <span className="text-sm text-muted-foreground">
+                      <Span className="text-sm text-muted-foreground">
                         {formatNumber(data?.partnerEmployeeUsers || 0)}
-                      </span>
-                    </div>
+                      </Span>
+                    </Div>
                     <Progress
                       value={
                         ((data?.partnerEmployeeUsers || 0) /
@@ -505,15 +507,15 @@ export function UsersStatsClient({
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">
+                  <Div className="space-y-2">
+                    <Div className="flex items-center justify-between">
+                      <Span className="text-sm font-medium">
                         {t("app.admin.users.role.admin")}
                       </span>
-                      <span className="text-sm text-muted-foreground">
+                      <Span className="text-sm text-muted-foreground">
                         {formatNumber(data?.adminUsers || 0)}
-                      </span>
-                    </div>
+                      </Span>
+                    </Div>
                     <Progress
                       value={
                         ((data?.adminUsers || 0) / (data?.totalUsers || 1)) *
@@ -521,8 +523,8 @@ export function UsersStatsClient({
                       }
                       className="h-2"
                     />
-                  </div>
-                </div>
+                  </Div>
+                </Div>
               </CardContent>
             </Card>
           </div>

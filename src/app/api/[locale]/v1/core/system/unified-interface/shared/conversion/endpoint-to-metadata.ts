@@ -24,11 +24,18 @@ import type {
 export type JsonSchema = ReturnType<typeof zodToJsonSchema>;
 
 /**
+ * JSON Schema property value type
+ */
+interface JsonSchemaPropertyValue {
+  [key: string]: string | number | boolean | null | JsonSchemaPropertyValue;
+}
+
+/**
  * JSON Schema Object with properties
  */
 export interface JsonSchemaObject {
   type: "object";
-  properties?: Record<string, Record<string, string | number | boolean | null | object>>;
+  properties?: Record<string, Record<string, string | number | boolean | null | JsonSchemaPropertyValue>>;
   required?: string[];
   additionalProperties?: boolean;
 }

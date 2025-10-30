@@ -1,6 +1,8 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type {
@@ -30,18 +32,19 @@ function isCodeOutputWidgetData(
  */
 export function CodeOutputWidget({
   data,
+  metadata: _metadata,
   context,
   className,
   style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
   if (!isCodeOutputWidgetData(data)) {
     return (
-      <div
+      <Div
         className={cn("italic p-4 text-muted-foreground", className)}
         style={style}
       >
         —
-      </div>
+      </Div>
     );
   }
 
@@ -55,19 +58,19 @@ export function CodeOutputWidget({
 
   if (!code) {
     return (
-      <div
+      <Div
         className={cn("italic p-4 text-muted-foreground", className)}
         style={style}
       >
         —
-      </div>
+      </Div>
     );
   }
 
   const lines = code.split("\n");
 
   return (
-    <div
+    <Div
       className={cn(
         "overflow-hidden rounded-lg border border-border",
         theme === "dark" ? "bg-slate-900" : "bg-slate-50",
@@ -75,11 +78,11 @@ export function CodeOutputWidget({
       )}
       style={style}
     >
-      <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-2">
-        <span className="font-mono text-xs uppercase text-muted-foreground">
+      <Div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-2">
+        <Span className="font-mono text-xs uppercase text-muted-foreground">
           {language}
-        </span>
-      </div>
+        </Span>
+      </Div>
       <pre
         className={cn(
           "overflow-x-auto p-4 font-mono text-sm",
@@ -92,7 +95,7 @@ export function CodeOutputWidget({
             const isHighlighted = highlightLines.includes(lineNumber);
 
             return (
-              <div
+              <Div
                 key={index}
                 className={cn(
                   "flex",
@@ -100,17 +103,17 @@ export function CodeOutputWidget({
                 )}
               >
                 {showLineNumbers && (
-                  <span className="inline-block w-12 select-none pr-4 text-right text-muted-foreground">
+                  <Span className="inline-block w-12 select-none pr-4 text-right text-muted-foreground">
                     {lineNumber}
-                  </span>
+                  </Span>
                 )}
-                <span className="flex-1">{line || " "}</span>
-              </div>
+                <Span className="flex-1">{line || " "}</Span>
+              </Div>
             );
           })}
         </code>
       </pre>
-    </div>
+    </Div>
   );
 }
 

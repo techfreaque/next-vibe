@@ -135,6 +135,25 @@ const { POST } = createEndpoint({
         },
       ),
 
+      // === TWO-FACTOR AUTHENTICATION (OPTIONAL) ===
+      twoFactorCode: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label:
+            "app.api.v1.core.user.private.me.password.twoFactorCode.label" as const,
+          description:
+            "app.api.v1.core.user.private.me.password.twoFactorCode.description" as const,
+          placeholder:
+            "app.api.v1.core.user.private.me.password.twoFactorCode.placeholder" as const,
+          required: false,
+          layout: { columns: 12 },
+          helpText:
+            "app.api.v1.core.user.private.me.password.twoFactorCode.description" as const,
+        },
+        z.string().length(6).optional(),
+      ),
+
       // === RESPONSE FIELD ===
       response: objectField(
         {

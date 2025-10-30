@@ -19,6 +19,8 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
+import { Div } from "next-vibe-ui/ui";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import React, { useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -138,17 +140,17 @@ function InlineEditForm({
   }, [endpoint.create.response?.success, onSuccess]);
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 p-4 border-t">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium">
+    <Div className="bg-gray-50 dark:bg-gray-800 p-4 border-t">
+      <Div className="flex justify-between items-center mb-4">
+        <H3 className="text-lg font-medium">
           {t("app.admin.cron.taskDetails.edit")}: {task.name}
-        </h3>
+        </H3>
         <Button variant="ghost" size="sm" onClick={onCancel}>
           <X className="h-4 w-4" />
         </Button>
-      </div>
+      </Div>
       <CronTaskEditForm task={task} endpoint={endpoint} locale={locale} />
-    </div>
+    </Div>
   );
 }
 
@@ -233,26 +235,26 @@ export function CronTasksTable({
 
   if (loading) {
     return (
-      <div className="space-y-4">
+      <Div className="space-y-4">
         {Array.from({ length: 5 }, (_, i) => (
           <Skeleton key={i} className="h-16 w-full" />
         ))}
-      </div>
+      </Div>
     );
   }
 
   if (tasks.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-500 dark:text-gray-400">
+      <Div className="text-center py-8">
+        <P className="text-gray-500 dark:text-gray-400">
           {t("app.admin.cron.cronErrors.admin.interface.noResults")}
-        </p>
-      </div>
+        </P>
+      </Div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <Div className="space-y-4">
       <Table>
         <TableHeader>
           <TableRow>
@@ -270,47 +272,47 @@ export function CronTasksTable({
             <React.Fragment key={task.id}>
               <TableRow>
                 <TableCell>
-                  <div className="flex items-center space-x-2">
-                    <div
+                  <Div className="flex items-center space-x-2">
+                    <Div
                       className={cn(
                         "h-2 w-2 rounded-full",
                         task.enabled ? "bg-green-500" : "bg-gray-400",
                       )}
                     />
-                    <div>
-                      <div className="font-medium">{task.name}</div>
+                    <Div>
+                      <Div className="font-medium">{task.name}</Div>
                       {task.description && (
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                        <Div className="text-sm text-gray-500 dark:text-gray-400">
                           {task.description}
-                        </div>
+                        </Div>
                       )}
-                    </div>
-                  </div>
+                    </Div>
+                  </Div>
                 </TableCell>
                 <TableCell>
-                  <div className="text-sm">
+                  <Div className="text-sm">
                     {formatCronSchedule(
                       task.schedule,
                       userTimezone,
                       locale,
                       logger,
                     )}
-                  </div>
+                  </Div>
                 </TableCell>
                 <TableCell>{getStatusBadge(task)}</TableCell>
                 <TableCell>
-                  <div className="text-sm">
+                  <Div className="text-sm">
                     {task.lastRun
                       ? new Date(task.lastRun).toLocaleString(locale)
                       : t("app.admin.cron.table.statusBadge.never")}
-                  </div>
+                  </Div>
                 </TableCell>
                 <TableCell>
-                  <div className="text-sm">
+                  <Div className="text-sm">
                     {task.nextRun
                       ? new Date(task.nextRun).toLocaleString(locale)
                       : t("app.admin.cron.table.statusBadge.notScheduled")}
-                  </div>
+                  </Div>
                 </TableCell>
                 <TableCell>
                   <TaskToggleSwitch
@@ -320,7 +322,7 @@ export function CronTasksTable({
                   />
                 </TableCell>
                 <TableCell>
-                  <div className="flex space-x-1">
+                  <Div className="flex space-x-1">
                     {editingTaskId === task.id ? (
                       <Button
                         variant="ghost"
@@ -343,7 +345,7 @@ export function CronTasksTable({
                       onTaskUpdated={onTaskUpdated}
                       locale={locale}
                     />
-                  </div>
+                  </Div>
                 </TableCell>
               </TableRow>
 
@@ -367,6 +369,6 @@ export function CronTasksTable({
           ))}
         </TableBody>
       </Table>
-    </div>
+    </Div>
   );
 }

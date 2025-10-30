@@ -45,7 +45,8 @@ function extractThinkingSections(content: string): {
   }
 
   // Remove all complete <think>...</think> tags from content
-  processedContent = content.replace(completeThinkRegex, "");
+  // Replace with double newline to preserve spacing between text segments
+  processedContent = content.replace(completeThinkRegex, "\n\n");
 
   // Check for incomplete <think> tag (streaming case)
   const incompleteThinkMatch = processedContent.match(/<think>([\s\S]*)$/i);

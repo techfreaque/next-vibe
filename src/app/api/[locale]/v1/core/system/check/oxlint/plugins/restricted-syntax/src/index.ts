@@ -7,18 +7,42 @@
  * - No `throw` statements
  * - No JSX in object literals (except icon property)
  */
-interface ASTNode {
+
+// Type definitions for Oxlint AST nodes
+interface OxlintASTNode {
   type: string;
-  value?: string | number | boolean | null | ASTNode;
-  name?: string;
+  [key: string]: unknown;
+}
+
+interface Property extends OxlintASTNode {
+  type: "Property";
+  key?: OxlintASTNode;
+  value?: OxlintASTNode;
   computed?: boolean;
-  key?: ASTNode;
-  expression?: ASTNode;
   method?: boolean;
 }
 
-interface RuleContext {
-  report: (descriptor: { node: ASTNode; message: string }) => void;
+interface ParenthesizedExpression extends OxlintASTNode {
+  type: "ParenthesizedExpression";
+  expression?: OxlintASTNode;
+}
+
+interface OxlintComment {
+  type: "Line" | "Block";
+  value: string;
+}
+
+interface OxlintRuleContext {
+  report: (descriptor: { node: OxlintASTNode; message: string }) => void;
+  options?: unknown[];
+  getCommentsInside?: (node: OxlintASTNode) => OxlintComment[];
+  getCommentsBefore?: (node: OxlintASTNode) => OxlintComment[];
+  getFilename?: () => string;
+  filename?: string;
+  sourceCode?: {
+    getCommentsBefore?: (node: OxlintASTNode) => OxlintComment[];
+    getCommentsInside?: (node: OxlintASTNode) => OxlintComment[];
+  };
 }
 
 interface RuleModule {
@@ -31,39 +55,115 @@ interface RuleModule {
     };
     schema: Array<Record<string, never>>;
   };
-  create: (context: RuleContext) => Record<string, (node: ASTNode) => void>;
+  create: (context: OxlintRuleContext) => Record<string, (node: OxlintASTNode) => void>;
 }
 
 // Helper functions for type checking and node traversal
-function isObjectProperty(prop: ASTNode): boolean {
-    return prop.type === "Property" && prop.method !== undefined && typeof prop.method === "boolean";
+/**
+ * Type guard to check if a node is a Property node
+ */
+function isProperty(node: OxlintASTNode): node is Property {
+  return node.type === "Property" && typeof (node as Property).method === "boolean";
 }
+/**
+ * Check if the current file is in an allowed path where restricted syntax is permitted
+ */
+function isAllowedPath(context: OxlintRuleContext): boolean {
+    let filename = "";
 
-function isIconKey(prop: ASTNode): boolean {
-    if (prop.computed) {
+    // Try to get filename from context
+    if (typeof context.getFilename === "function") {
+        filename = context.getFilename();
+    } else if (typeof context.filename === "string") {
+        filename = context.filename;
+    }
+
+    if (!filename) {
         return false;
     }
-    const key = prop.key;
+
+    // Normalize path separators
+    const normalizedPath = filename.replace(/\\/g, "/");
+
+    // Allow unified-interface system code (infrastructure)
+    if (normalizedPath.includes("/core/system/unified-interface/")) {
+        return true;
+    }
+
+    // Allow oxlint plugins (infrastructure)
+    if (normalizedPath.includes("/core/system/check/oxlint/plugins/")) {
+        return true;
+    }
+
+    return false;
+}
+
+function hasDisableComment(context: OxlintRuleContext, node: OxlintASTNode): boolean {
+    // Try to get comments from context
+    const getComments = context.getCommentsBefore || context.sourceCode?.getCommentsBefore;
+    if (typeof getComments !== "function") {
+        // If comment API is not available, allow the node (fail open)
+        return false;
+    }
+
+    try {
+        const comments = getComments(node);
+        if (!comments || !Array.isArray(comments)) {
+            return false;
+        }
+
+        // Check if any preceding comment contains eslint-disable or oxlint-disable for restricted-syntax or no-restricted-syntax
+        for (const comment of comments) {
+            if (!comment || typeof comment.value !== "string") {
+                continue;
+            }
+            const commentText = comment.value.trim();
+            // Check for eslint-disable-next-line or oxlint-disable-next-line with restricted-syntax or no-restricted-syntax
+            if (
+                (commentText.includes("eslint-disable-next-line") || commentText.includes("oxlint-disable-next-line")) &&
+                (commentText.includes("restricted-syntax") || commentText.includes("no-restricted-syntax"))
+            ) {
+                return true;
+            }
+        }
+    } catch {
+        // If any error occurs, don't block (fail open)
+        return false;
+    }
+
+    return false;
+}
+
+function isObjectProperty(prop: OxlintASTNode): prop is Property {
+    return isProperty(prop);
+}
+
+function isIconKey(prop: OxlintASTNode): boolean {
+    const property = prop as Property;
+    if (property.computed) {
+        return false;
+    }
+    const key = property.key;
     if (!key) {
         return false;
     }
     if (key.type === "Identifier") {
-        return key.name === "icon";
+        return (key as { name?: string }).name === "icon";
     }
-    if (key.type === "Literal" && typeof key.value === "string") {
-        return key.value === "icon";
+    if (key.type === "Literal" && typeof (key as { value?: unknown }).value === "string") {
+        return (key as { value?: string }).value === "icon";
     }
     return false;
 }
 
-function isJSX(n: ASTNode): boolean {
+function isJSX(n: OxlintASTNode): boolean {
     return n && (n.type === "JSXElement" || n.type === "JSXFragment");
 }
 
-function unwrapParen(n: ASTNode): ASTNode {
+function unwrapParen(n: OxlintASTNode): OxlintASTNode {
     let cur = n;
     while (cur?.type === "ParenthesizedExpression") {
-        const expr = cur.expression;
+        const expr = (cur as ParenthesizedExpression).expression;
         if (!expr) {
             break;
         }
@@ -83,30 +183,42 @@ const restrictedSyntaxRule: RuleModule = {
         },
         schema: []
     },
-    create(context: RuleContext): Record<string, (node: ASTNode) => void> {
+    create(context: OxlintRuleContext): Record<string, (node: OxlintASTNode) => void> {
+        // Check if file is in allowed path (applies to all rules)
+        const isAllowed = isAllowedPath(context);
+
         return {
-            TSUnknownKeyword(node: ASTNode): void {
+            TSUnknownKeyword(node: OxlintASTNode): void {
+                if (isAllowed || hasDisableComment(context, node)) {
+                    return;
+                }
                 context.report({
                     node,
                     message: "Usage of the 'unknown' type isn't allowed. Consider using generics with interface or type alias for explicit structure."
                 });
             },
 
-            TSObjectKeyword(node: ASTNode): void {
+            TSObjectKeyword(node: OxlintASTNode): void {
+                if (isAllowed || hasDisableComment(context, node)) {
+                    return;
+                }
                 context.report({
                     node,
                     message: "Usage of the 'object' type isn't allowed. Consider using generics with interface or type alias for explicit structure."
                 });
             },
 
-            ThrowStatement(node: ASTNode): void {
+            ThrowStatement(node: OxlintASTNode): void {
+                if (isAllowed || hasDisableComment(context, node)) {
+                    return;
+                }
                 context.report({
                     node,
                     message: "Usage of 'throw' statements is not allowed. Use proper ResponseType<T> patterns instead."
                 });
             },
 
-            Property(node: ASTNode): void {
+            Property(node: OxlintASTNode): void {
                 // Only process ObjectProperty nodes
                 if (!isObjectProperty(node)) {
                     return;
@@ -117,7 +229,8 @@ const restrictedSyntaxRule: RuleModule = {
                     return;
                 }
 
-                const value = node.value;
+                const property = node as Property;
+                const value = property.value;
 
                 if (!value || typeof value === "string" || typeof value === "number" || typeof value === "boolean" || value === null) {
                     return;

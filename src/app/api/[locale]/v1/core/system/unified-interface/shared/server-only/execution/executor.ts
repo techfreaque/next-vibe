@@ -12,8 +12,8 @@ import {
   type RouteExecutionContext,
   type RouteExecutionResult,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/route-executor";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -24,6 +24,7 @@ import type { DiscoveredEndpoint } from "../types/registry";
  * Extract error message from unknown error
  * Inlined to avoid Turbopack bundling issues
  */
+// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Handler execution requires 'unknown' for flexible handler signatures
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;

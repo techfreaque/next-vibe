@@ -128,7 +128,7 @@ function updatePackageDependencies(
   const packageJsonResponse = getPackageJson(cwd, logger);
 
   if (!packageJsonResponse.success) {
-    // eslint-disable-next-line i18next/no-literal-string
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error(`Failed to read package.json for ${packageName}`);
   }
 
@@ -169,6 +169,7 @@ function updatePackageDependencies(
     logger.info(`Successfully installed dependencies for ${packageName}`);
   } catch (error) {
     logger.error("Error updating global dependencies", parseError(error));
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
     throw error;
   }
 }

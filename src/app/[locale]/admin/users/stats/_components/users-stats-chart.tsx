@@ -7,8 +7,10 @@
 
 import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schema";
 import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
+import { H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 import {
@@ -67,12 +69,12 @@ function ChartLegend({
   const { t } = simpleT(locale);
 
   return (
-    <div className="border-t">
-      <div className="flex items-center justify-between p-4 border-b">
-        <h4 className="text-sm font-medium">
+    <Div className="border-t">
+      <Div className="flex items-center justify-between p-4 border-b">
+        <H4 className="text-sm font-medium">
           {t("app.admin.users.stats.legend.title")}
-        </h4>
-        <div className="flex gap-2">
+        </H4>
+        <Div className="flex gap-2">
           <button
             onClick={onShowAll}
             className="text-xs text-muted-foreground hover:text-foreground"
@@ -85,9 +87,9 @@ function ChartLegend({
           >
             {t("app.admin.users.stats.legend.hideAll")}
           </button>
-        </div>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-4">
+        </Div>
+      </Div>
+      <Div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-4">
         {series.map((item) => (
           <button
             key={item.name}
@@ -96,15 +98,15 @@ function ChartLegend({
               item.visible ? "opacity-100" : "opacity-50"
             }`}
           >
-            <div
+            <Div
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: item.color }}
             />
-            <span className="truncate">{t(item.name, item.nameParams)}</span>
+            <Span className="truncate">{t(item.name, item.nameParams)}</Span>
           </button>
         ))}
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }
 
@@ -184,12 +186,12 @@ export function UsersStatsChart({
           <CardTitle>{t("app.admin.users.stats.chart.title")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div
+          <Div
             className="flex items-center justify-center text-muted-foreground"
             style={{ height: `${height}px` }}
           >
             {t("app.admin.users.stats.chart.noData")}
-          </div>
+          </Div>
         </CardContent>
       </Card>
     );
@@ -248,8 +250,8 @@ export function UsersStatsChart({
   }): JSX.Element | null => {
     if (active && payload?.length) {
       return (
-        <div className="bg-background border border-border rounded-lg shadow-lg p-3 dark:bg-popover dark:border-border">
-          <p className="font-medium text-foreground mb-2">{label}</p>
+        <Div className="bg-background border border-border rounded-lg shadow-lg p-3 dark:bg-popover dark:border-border">
+          <P className="font-medium text-foreground mb-2">{label}</P>
           {payload.map((entry, index: number) => {
             // Find the series data to get translation parameters
             const seriesData = data?.series?.find(
@@ -260,12 +262,12 @@ export function UsersStatsChart({
               : entry.name;
 
             return (
-              <p key={index} className="text-sm" style={{ color: entry.color }}>
+              <P key={index} className="text-sm" style={{ color: entry.color }}>
                 {`${translatedName}: ${new Intl.NumberFormat(language).format(entry.value)}`}
-              </p>
+              </P>
             );
           })}
-        </div>
+        </Div>
       );
     }
     return null;
@@ -385,7 +387,7 @@ export function UsersStatsChart({
           {data.title || t("app.admin.users.stats.chart.title")}
         </CardTitle>
         {data.subtitle && (
-          <p className="text-sm text-muted-foreground">{data.subtitle}</p>
+          <P className="text-sm text-muted-foreground">{data.subtitle}</P>
         )}
       </CardHeader>
       <CardContent>

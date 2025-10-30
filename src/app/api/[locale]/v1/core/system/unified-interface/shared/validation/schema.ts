@@ -45,6 +45,7 @@ export function validateLocale(
  * Types flow naturally from the schema without explicit constraints
  */
 export function validateRequestData<TSchema extends z.ZodTypeAny>(
+  // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Validation function must accept 'unknown' to safely validate untrusted input
   data: unknown,
   schema: TSchema,
   logger: EndpointLogger,
@@ -69,6 +70,7 @@ export function validateRequestData<TSchema extends z.ZodTypeAny>(
  * Types flow naturally from the schema without explicit constraints
  */
 export function validateUrlParameters<TSchema extends z.ZodTypeAny>(
+  // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Validation function must accept 'unknown' to safely validate untrusted URL parameters
   urlParameters: unknown,
   schema: TSchema,
   logger: EndpointLogger,

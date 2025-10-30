@@ -85,40 +85,110 @@ export function GroupedAssistantMessage({
     ...assistantMessages.flatMap((msg) => msg.toolCalls || []),
   ];
 
-  // Extract reasoning content from <think> tags and regular content from ASSISTANT messages
-  let reasoningContent = "";
-  let regularContent = "";
-
-  // Combine all content from assistant messages
+  // Parse content into ordered segments: reasoning, text, tool calls
+  // We need to preserve the order: <think>...</think> text toolcall <think>...</think> text
   const allContent = assistantMessages
     .map((m) => m.content)
     .filter((c) => c.trim().length > 0)
     .join("\n\n");
 
-  // Parse <think> tags from content
+  // Split content into segments while preserving order
+  type ContentSegment =
+    | { type: "reasoning"; content: string; isStreaming?: boolean }
+    | { type: "text"; content: string }
+    | { type: "toolCalls" };
+
+  const segments: ContentSegment[] = [];
+  let lastIndex = 0;
+
+  // Find all <think> tags and split content around them
   const thinkTagRegex = /<think>([\s\S]*?)<\/think>/gi;
-  const thinkMatches = allContent.match(thinkTagRegex);
+  let match: RegExpExecArray | null;
+  let hasOpenThinkTag = false;
 
-  if (thinkMatches) {
-    // Extract reasoning content from <think> tags
-    reasoningContent = thinkMatches
-      .map((match) => {
-        const content = match.replace(/<\/?think>/gi, "").trim();
-        return content;
-      })
-      .join("\n\n");
-
-    // Remove <think> tags from regular content
-    regularContent = allContent.replace(thinkTagRegex, "").trim();
-  } else {
-    regularContent = allContent;
+  // Check if there's an unclosed <think> tag (streaming reasoning)
+  const openThinkMatch = allContent.match(/<think>(?![\s\S]*<\/think>)/);
+  if (openThinkMatch) {
+    hasOpenThinkTag = true;
   }
 
-  // Check if there's content after tool calls and reasoning
-  const hasContent = regularContent.length > 0 || allToolCalls.length > 0;
+  while ((match = thinkTagRegex.exec(allContent)) !== null) {
+    // Add text before this <think> tag
+    if (match.index > lastIndex) {
+      const textBefore = allContent.substring(lastIndex, match.index).trim();
+      if (textBefore) {
+        segments.push({ type: "text", content: textBefore });
+      }
+    }
 
-  // Show streaming placeholder when no regular content yet (even if tool calls or reasoning exist)
-  const isStreaming = regularContent.length === 0;
+    // Add reasoning content
+    const reasoningContent = match[1].trim();
+    if (reasoningContent) {
+      segments.push({ type: "reasoning", content: reasoningContent });
+    }
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Handle unclosed <think> tag (streaming reasoning)
+  if (hasOpenThinkTag && openThinkMatch) {
+    const streamingReasoningStart = allContent.indexOf("<think>", lastIndex);
+    if (streamingReasoningStart !== -1) {
+      // Add text before streaming reasoning
+      if (streamingReasoningStart > lastIndex) {
+        const textBefore = allContent
+          .substring(lastIndex, streamingReasoningStart)
+          .trim();
+        if (textBefore) {
+          segments.push({ type: "text", content: textBefore });
+        }
+      }
+
+      // Add streaming reasoning
+      const streamingContent = allContent
+        .substring(streamingReasoningStart + 7)
+        .trim(); // +7 for "<think>"
+      if (streamingContent) {
+        segments.push({
+          type: "reasoning",
+          content: streamingContent,
+          isStreaming: true,
+        });
+      }
+
+      lastIndex = allContent.length;
+    }
+  }
+
+  // Add remaining text after last <think> tag
+  if (lastIndex < allContent.length) {
+    const textAfter = allContent.substring(lastIndex).trim();
+    if (textAfter) {
+      segments.push({ type: "text", content: textAfter });
+    }
+  }
+
+  // Insert tool calls at the right position:
+  // - After all reasoning blocks (both complete and streaming)
+  // - Before any text content that comes after reasoning
+  if (allToolCalls.length > 0) {
+    const lastReasoningIndex = segments.findLastIndex(
+      (s) => s.type === "reasoning",
+    );
+    if (lastReasoningIndex !== -1) {
+      // Insert tool calls after last reasoning
+      segments.splice(lastReasoningIndex + 1, 0, { type: "toolCalls" });
+    } else {
+      // No reasoning, insert at the beginning
+      segments.unshift({ type: "toolCalls" });
+    }
+  }
+
+  // Check if there's any content
+  const hasContent = segments.length > 0;
+
+  // Show streaming placeholder when no content yet
+  const isStreaming = segments.length === 0;
 
   return (
     <Div className="flex items-start gap-3">
@@ -140,42 +210,55 @@ export function GroupedAssistantMessage({
         )}
 
         <Div className={cn(chatProse.all, "px-3 py-2.5 sm:px-4 sm:py-3")}>
-          {/* Reasoning display - shows thinking content from <think> tags */}
-          {reasoningContent.length > 0 && (
-            <ReasoningDisplay
-              reasoningMessages={[
-                {
-                  ...primary,
-                  content: reasoningContent,
-                },
-              ]}
-              locale={locale}
-              hasContent={hasContent}
-            />
-          )}
+          {/* Render content in order: reasoning, tool calls, text */}
+          {segments.map((segment, index) => {
+            if (segment.type === "reasoning") {
+              // Check if there's any text content after this reasoning block
+              const hasContentAfterReasoning = segments
+                .slice(index + 1)
+                .some((s) => s.type === "text" && s.content.trim().length > 0);
 
-          {/* Tool calls display - shows all tool calls from sequence */}
-          {allToolCalls.length > 0 && (
-            <ToolCallRenderer
-              toolCalls={allToolCalls}
-              locale={locale}
-              hasContent={hasContent}
-            />
-          )}
+              return (
+                <ReasoningDisplay
+                  key={`reasoning-${index}`}
+                  reasoningMessages={[
+                    {
+                      ...primary,
+                      content: segment.content,
+                    },
+                  ]}
+                  locale={locale}
+                  hasContent={hasContentAfterReasoning}
+                  isStreaming={segment.isStreaming}
+                />
+              );
+            } else if (segment.type === "toolCalls") {
+              return (
+                <ToolCallRenderer
+                  key={`toolcalls-${index}`}
+                  toolCalls={allToolCalls}
+                  locale={locale}
+                  hasContent={hasContent}
+                />
+              );
+            } else {
+              // Text segment
+              return (
+                <Div key={`text-${index}`} className="mb-3 last:mb-0">
+                  <Markdown content={segment.content} />
+                </Div>
+              );
+            }
+          })}
 
-          {/* Regular content (without <think> tags) */}
-          {regularContent.length > 0 ? (
-            <Div>
-              <Markdown content={regularContent} />
-            </Div>
-          ) : isStreaming ? (
-            // Show streaming placeholder when no content yet
+          {/* Show streaming placeholder when no content yet */}
+          {isStreaming && (
             <Div className="flex items-center gap-2 text-muted-foreground">
               <Div className="animate-pulse h-2 w-2 bg-blue-400 rounded-full" />
               <Div className="animate-pulse h-2 w-2 bg-blue-400 rounded-full animation-delay-150" />
               <Div className="animate-pulse h-2 w-2 bg-blue-400 rounded-full animation-delay-300" />
             </Div>
-          ) : null}
+          )}
         </Div>
 
         {/* Actions - Fixed height container to maintain consistent spacing */}
@@ -183,7 +266,7 @@ export function GroupedAssistantMessage({
         <Div className="h-10 sm:h-8 flex items-center">
           <AssistantMessageActions
             messageId={primary.id}
-            content={regularContent}
+            content={allContent}
             ttsAutoplay={ttsAutoplay}
             locale={locale}
             onAnswerAsModel={onAnswerAsModel}

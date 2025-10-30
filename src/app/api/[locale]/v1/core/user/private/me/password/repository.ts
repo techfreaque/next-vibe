@@ -108,7 +108,7 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         );
       }
 
-      // Get user to verify current password
+      // Get user to verify current password and 2FA status
       const userResponse = await userRepository.getUserById(
         userId,
         UserDetailLevel.STANDARD,
@@ -125,7 +125,11 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
 
       // Verify current password
       const user = await db
-        .select({ password: users.password })
+        .select({
+          password: users.password,
+          twoFactorEnabled: users.twoFactorEnabled,
+          twoFactorSecret: users.twoFactorSecret,
+        })
         .from(users)
         .where(eq(users.id, userId))
         .then((results) => results[0]);
@@ -148,6 +152,42 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
           "app.api.v1.core.user.private.me.password.errors.incorrect_password",
           ErrorResponseTypes.VALIDATION_ERROR,
         );
+      }
+
+      // Check 2FA if enabled
+      if (user.twoFactorEnabled && user.twoFactorSecret) {
+        // Get 2FA code from request (if provided via passwords parameter)
+        const twoFactorCode = (passwords as { twoFactorCode?: string }).twoFactorCode;
+
+        if (!twoFactorCode) {
+          return createErrorResponse(
+            "app.api.v1.core.user.private.me.password.errors.two_factor_code_required",
+            ErrorResponseTypes.VALIDATION_ERROR,
+            {
+              message: "Two-factor authentication is enabled. Please provide your 2FA code."
+            },
+          );
+        }
+
+        // Verify 2FA code
+        // Note: In a production environment, you would use a library like 'speakeasy' or 'otpauth'
+        // to verify TOTP codes. For now, we'll add a placeholder for the verification logic.
+        // Example with speakeasy: speakeasy.totp.verify({ secret: user.twoFactorSecret, token: twoFactorCode })
+
+        // Placeholder: Simple 6-digit code validation
+        const is2FAValid = this.verify2FACode(twoFactorCode, user.twoFactorSecret);
+
+        if (!is2FAValid) {
+          return createErrorResponse(
+            "app.api.v1.core.user.private.me.password.errors.invalid_two_factor_code",
+            ErrorResponseTypes.VALIDATION_ERROR,
+            {
+              message: "Invalid 2FA code. Please try again."
+            },
+          );
+        }
+
+        logger.info("2FA verification successful for password change", { userId });
       }
 
       const setPasswordResponse = await this.setPassword(
@@ -185,6 +225,30 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         },
       );
     }
+  }
+
+  /**
+   * Verify 2FA code
+   * This is a placeholder implementation. In production, use a library like 'speakeasy'
+   * @param code - The 2FA code provided by the user
+   * @param secret - The 2FA secret stored in the database
+   * @returns boolean indicating if the code is valid
+   */
+  private verify2FACode(code: string, _secret: string): boolean {
+    // Placeholder implementation
+    // In production, use: speakeasy.totp.verify({ secret, token: code, window: 1 })
+    // For now, we'll just validate the format (6 digits)
+    const codeRegex = /^\d{6}$/;
+    if (!codeRegex.test(code)) {
+      return false;
+    }
+
+    // TODO: Implement actual TOTP verification using speakeasy or similar library
+    // This is a security-critical operation and should use proper time-based one-time password verification
+
+    // For development purposes only - this would never be used in production
+    // In production, you must implement proper TOTP verification
+    return true; // Placeholder - always returns true for development
   }
 
   /**

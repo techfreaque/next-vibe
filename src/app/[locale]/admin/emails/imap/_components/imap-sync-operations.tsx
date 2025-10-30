@@ -14,6 +14,7 @@ import {
   RefreshCw,
   Square,
 } from "lucide-react";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -26,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
@@ -199,68 +201,68 @@ export function ImapSyncOperations(): JSX.Element {
   };
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Sync Control Panel */}
       <Card>
         <CardHeader>
           <CardTitle> {t("app.admin.emails.imap.sync.controlPanel")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <Div className="space-y-6">
             {/* Current Status */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
+            <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Div className="text-center">
+                <Div className="text-2xl font-bold text-blue-600">
                   {syncStatus.isRunning
                     ? t("app.admin.emails.imap.sync.status.syncing")
                     : t("app.admin.emails.imap.sync.idle")}
-                </div>
-                <div className="text-sm text-gray-600">
+                </Div>
+                <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.sync.currentStatus")}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{syncStatus.lastSync}</div>
-                <div className="text-sm text-gray-600">
+                </Div>
+              </Div>
+              <Div className="text-center">
+                <Div className="text-2xl font-bold">{syncStatus.lastSync}</Div>
+                <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.sync.lastSync")}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{syncStatus.nextSync}</div>
-                <div className="text-sm text-gray-600">
+                </Div>
+              </Div>
+              <Div className="text-center">
+                <Div className="text-2xl font-bold">{syncStatus.nextSync}</Div>
+                <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.sync.nextSync")}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">
+                </Div>
+              </Div>
+              <Div className="text-center">
+                <Div className="text-2xl font-bold">
                   {syncStatus.currentOperation}
-                </div>
-                <div className="text-sm text-gray-600">
+                </Div>
+                <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.sync.currentOperation")}
-                </div>
-              </div>
-            </div>
+                </Div>
+              </Div>
+            </Div>
 
             {/* Progress Bar */}
             {syncStatus.isRunning && (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>{t("app.admin.emails.imap.sync.progress")}</span>
-                  <span>{syncStatus.progress}%</span>
-                </div>
+              <Div className="space-y-2">
+                <Div className="flex justify-between text-sm">
+                  <Span>{t("app.admin.emails.imap.sync.progress")}</Span>
+                  <Span>{syncStatus.progress}%</Span>
+                </Div>
                 <Progress value={syncStatus.progress} className="w-full" />
-              </div>
+              </Div>
             )}
 
             {/* Control Buttons */}
-            <div className="flex items-center space-x-4">
+            <Div className="flex items-center space-x-4">
               <Button
                 onClick={handleStartSync}
                 disabled={isSyncing}
                 className="flex items-center space-x-2"
               >
                 <Play className="h-4 w-4" />
-                <span>{t("app.admin.emails.imap.sync.start")}</span>
+                <Span>{t("app.admin.emails.imap.sync.start")}</Span>
               </Button>
               <Button
                 variant="outline"
@@ -269,7 +271,7 @@ export function ImapSyncOperations(): JSX.Element {
                 className="flex items-center space-x-2"
               >
                 <Pause className="h-4 w-4" />
-                <span>{t("app.admin.emails.imap.sync.pause")}</span>
+                <Span>{t("app.admin.emails.imap.sync.pause")}</Span>
               </Button>
               <Button
                 variant="outline"
@@ -278,76 +280,76 @@ export function ImapSyncOperations(): JSX.Element {
                 className="flex items-center space-x-2"
               >
                 <Square className="h-4 w-4" />
-                <span>{t("app.admin.emails.imap.sync.stop")}</span>
+                <Span>{t("app.admin.emails.imap.sync.stop")}</Span>
               </Button>
               <Button variant="outline">
                 {t("app.admin.emails.imap.sync.manual")}
               </Button>
-            </div>
-          </div>
+            </Div>
+          </Div>
         </CardContent>
       </Card>
 
       {/* Sync Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
+            <Div className="flex items-center justify-between">
+              <Div>
+                <P className="text-sm font-medium text-gray-600">
                   {t("app.admin.emails.imap.sync.statistics.totalSyncsToday")}
-                </p>
-                <p className="text-2xl font-bold">24</p>
-              </div>
+                </P>
+                <P className="text-2xl font-bold">24</P>
+              </Div>
               <RefreshCw className="h-8 w-8 text-blue-600" />
-            </div>
+            </Div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
+            <Div className="flex items-center justify-between">
+              <Div>
+                <P className="text-sm font-medium text-gray-600">
                   {t("app.admin.emails.imap.sync.statistics.successfulSyncs")}
-                </p>
-                <p className="text-2xl font-bold text-green-600">22</p>
-              </div>
+                </P>
+                <P className="text-2xl font-bold text-green-600">22</P>
+              </Div>
               <CheckCircle className="h-8 w-8 text-green-600" />
-            </div>
+            </Div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
+            <Div className="flex items-center justify-between">
+              <Div>
+                <P className="text-sm font-medium text-gray-600">
                   {t("app.admin.emails.imap.sync.statistics.failedSyncs")}
-                </p>
-                <p className="text-2xl font-bold text-red-600">2</p>
-              </div>
+                </P>
+                <P className="text-2xl font-bold text-red-600">2</P>
+              </Div>
               <AlertCircle className="h-8 w-8 text-red-600" />
-            </div>
+            </Div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
+            <Div className="flex items-center justify-between">
+              <Div>
+                <P className="text-sm font-medium text-gray-600">
                   {t("app.admin.emails.imap.sync.statistics.avgDuration")}
-                </p>
-                <p className="text-2xl font-bold">
+                </P>
+                <P className="text-2xl font-bold">
                   {t("app.admin.emails.imap.common.never")}
-                </p>
-              </div>
+                </P>
+              </Div>
               <Clock className="h-8 w-8 text-gray-600" />
-            </div>
+            </Div>
           </CardContent>
         </Card>
-      </div>
+      </Div>
 
       {/* Sync History */}
       <Card>
@@ -401,7 +403,7 @@ export function ImapSyncOperations(): JSX.Element {
                     {sync.errors > 0 ? (
                       <Badge variant="destructive">{sync.errors}</Badge>
                     ) : (
-                      <span className="text-gray-400">0</span>
+                      <Span className="text-gray-400">0</Span>
                     )}
                   </TableCell>
                 </TableRow>
@@ -410,6 +412,6 @@ export function ImapSyncOperations(): JSX.Element {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

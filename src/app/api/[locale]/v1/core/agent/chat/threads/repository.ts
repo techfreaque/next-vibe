@@ -112,11 +112,21 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       }
 
       // Build where clause - use leadId for anonymous users, userId for authenticated users
-      const conditions = [eq(chatThreads.userId, userIdentifier)];
+      // For PUBLIC folder, show all public threads from all users
+      // For other folders, only show user's own threads
+      const conditions = [];
 
-      // Filter by root folder
-      if (rootFolderId) {
-        conditions.push(eq(chatThreads.rootFolderId, rootFolderId));
+      if (rootFolderId === "public") {
+        // PUBLIC folder: Show all threads in public folder (from all users)
+        conditions.push(eq(chatThreads.rootFolderId, "public"));
+      } else {
+        // Other folders: Show only user's own threads
+        conditions.push(eq(chatThreads.userId, userIdentifier));
+
+        // Filter by root folder if specified
+        if (rootFolderId) {
+          conditions.push(eq(chatThreads.rootFolderId, rootFolderId));
+        }
       }
 
       // Filter by subfolder (optional)

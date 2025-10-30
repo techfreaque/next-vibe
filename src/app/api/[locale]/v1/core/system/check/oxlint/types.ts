@@ -5,6 +5,104 @@
 
 export type Severity = "off" | "warn" | "error" | "allow" | "deny";
 
+/**
+ * Oxlint AST Node Types
+ * These types define the structure of AST nodes for Oxlint plugin development
+ */
+
+// Base AST Node interface
+export interface OxlintASTNode {
+  type: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
+// JSX-specific AST nodes
+export interface JSXIdentifier extends OxlintASTNode {
+  type: "JSXIdentifier" | "Identifier";
+  name: string;
+}
+
+export interface JSXLiteral extends OxlintASTNode {
+  type: "Literal";
+  value: string | number | boolean | null;
+}
+
+export interface JSXAttribute extends OxlintASTNode {
+  type: "JSXAttribute";
+  name: JSXIdentifier;
+  value?: JSXLiteral | OxlintASTNode;
+}
+
+export interface JSXText extends OxlintASTNode {
+  type: "JSXText";
+  value: string;
+}
+
+// Property node for object literals
+export interface Property extends OxlintASTNode {
+  type: "Property";
+  key?: OxlintASTNode;
+  value?: OxlintASTNode;
+  computed?: boolean;
+  method?: boolean;
+}
+
+// TypeScript-specific nodes
+export interface TSUnknownKeyword extends OxlintASTNode {
+  type: "TSUnknownKeyword";
+}
+
+export interface TSObjectKeyword extends OxlintASTNode {
+  type: "TSObjectKeyword";
+}
+
+// Statement nodes
+export interface ThrowStatement extends OxlintASTNode {
+  type: "ThrowStatement";
+  argument?: OxlintASTNode;
+}
+
+// Expression nodes
+export interface ParenthesizedExpression extends OxlintASTNode {
+  type: "ParenthesizedExpression";
+  expression?: OxlintASTNode;
+}
+
+// Comment interface
+export interface OxlintComment {
+  type: "Line" | "Block";
+  value: string;
+}
+
+// Rule Context for plugins
+export interface OxlintRuleContext {
+  report: (descriptor: { node: OxlintASTNode; message: string }) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  options?: any[];
+  getCommentsInside?: (node: OxlintASTNode) => OxlintComment[];
+  getCommentsBefore?: (node: OxlintASTNode) => OxlintComment[];
+  getFilename?: () => string;
+  filename?: string;
+  sourceCode?: {
+    getCommentsBefore?: (node: OxlintASTNode) => OxlintComment[];
+    getCommentsInside?: (node: OxlintASTNode) => OxlintComment[];
+  };
+}
+
+// Type guard helpers for AST nodes
+export function isJSXIdentifier(node: OxlintASTNode): node is JSXIdentifier {
+  return node.type === "JSXIdentifier" || node.type === "Identifier";
+}
+
+export function isJSXLiteral(node: OxlintASTNode): node is JSXLiteral {
+  return node.type === "Literal";
+}
+
+export function isProperty(node: OxlintASTNode): node is Property {
+  return node.type === "Property" && typeof (node as Property).method === "boolean";
+}
+
 export interface OxlintLabel {
   span: {
     offset: number;

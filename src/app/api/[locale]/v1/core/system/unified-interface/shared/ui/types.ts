@@ -7,6 +7,8 @@
  * across all platforms (CLI, Web, Mobile).
  */
 
+import type React from "react";
+
 import type { ResponseFieldMetadata } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/types";
 import type {
   FieldDataType,
@@ -44,7 +46,7 @@ export type WidgetActionType =
 /**
  * Widget action payload
  */
-// eslint-disable-next-line no-restricted-syntax
+// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Generic widget system requires 'unknown' default for flexible action payloads across all widget types
 export interface WidgetAction<TPayload = unknown> {
   type: WidgetActionType;
   payload: TPayload;
@@ -110,7 +112,7 @@ export interface WidgetComponentProps<TData = RenderableValue> {
  * Widget renderer function type
  * Used for functional widget implementations
  */
-// eslint-disable-next-line no-restricted-syntax
+// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Generic widget renderer requires 'unknown' default to support any data type across all widgets
 export type WidgetRenderer<TData = unknown> = (
   props: WidgetComponentProps<TData>,
 ) => React.ReactElement | string | null;
@@ -119,7 +121,7 @@ export type WidgetRenderer<TData = unknown> = (
  * Widget registry entry
  * Maps widget types to their implementations
  */
-// eslint-disable-next-line no-restricted-syntax
+// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Widget registry requires 'unknown' default to support dynamic widget registration with any data type
 export interface WidgetRegistryEntry<TData = unknown> {
   /** Widget type identifier */
   type: WidgetType;
@@ -294,6 +296,7 @@ export interface ContainerWidgetData {
  */
 export interface WidgetErrorBoundaryProps {
   children: React.ReactNode;
+  locale: CountryLanguage;
   fallback?: React.ReactElement;
   onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }

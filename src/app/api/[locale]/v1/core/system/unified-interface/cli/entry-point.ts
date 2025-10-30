@@ -446,7 +446,9 @@ export class CliEntryPoint {
 
       try {
         const definitionImport = (await import(definitionPath)) as
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: CLI argument parsing requires 'unknown' for flexible input handling
           | Record<string, unknown>
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Option extraction requires 'unknown' for dynamic CLI options
           | { default: Record<string, unknown> };
         const definitionModule =
           "default" in definitionImport
@@ -454,8 +456,10 @@ export class CliEntryPoint {
             : definitionImport;
 
         // Check default export
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Command handler requires 'unknown' for flexible command signatures
         let definitions: Record<string, unknown> | undefined;
         if (typeof definitionModule === "object" && definitionModule !== null) {
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Parameter validation requires 'unknown' for untrusted CLI input
           definitions = definitionModule as Record<string, unknown>;
         }
 
@@ -502,7 +506,7 @@ export class CliEntryPoint {
    * Show discovered routes with their aliases
    */
   showDiscoveredRoutes(): void {
-    console.log(`\n📊 Total routes discovered: ${this.routes.length}\n`);
+    this.logger.info(`\n📊 Total routes discovered: ${this.routes.length}\n`);
 
     // Group routes by their base path for better organization
     const routeGroups = new Map<string, CliRouteMetadata[]>();
@@ -522,14 +526,14 @@ export class CliEntryPoint {
 
     // Display routes grouped by base path
     for (const [basePath, routes] of routeGroups) {
-      console.log(`📁 ${basePath || "root"}:`);
+      this.logger.info(`📁 ${basePath || "root"}:`);
       for (const route of routes) {
-        console.log(`  ✅ ${route.alias} → ${route.path}`);
+        this.logger.info(`  ✅ ${route.alias} → ${route.path}`);
         if (route.description) {
-          console.log(`     ${route.description}`);
+          this.logger.info(`     ${route.description}`);
         }
       }
-      console.log(String());
+      this.logger.info("");
     }
   }
 
@@ -556,7 +560,7 @@ export class CliEntryPoint {
         ? helpHandler.formatAsJson(helpContent)
         : helpHandler.formatAsText(helpContent);
 
-    console.log(formattedHelp);
+    this.logger.info(formattedHelp);
     return {
       success: true,
       data: {
@@ -605,11 +609,13 @@ export class CliEntryPoint {
    */
   private async getCreateApiEndpoint(
     route: CliRouteMetadata,
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Result formatting requires 'unknown' for flexible output types
   ): Promise<unknown | null> {
     try {
       // Import the route module dynamically
       const routeModule = (await import(route.routePath)) as {
         tools?: {
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Error handling requires 'unknown' for any error type
           definitions?: Record<string, unknown>;
         };
       };
@@ -627,6 +633,7 @@ export class CliEntryPoint {
       );
       try {
         const definitionModule = (await import(definitionPath)) as {
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Data serialization requires 'unknown' for flexible data structures
           default?: Record<string, unknown>;
         };
         const definitions = definitionModule.default;

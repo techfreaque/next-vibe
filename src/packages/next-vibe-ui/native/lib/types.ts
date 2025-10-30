@@ -44,3 +44,34 @@ export type TextInputPropsWithClassName = ComponentPropsWithoutRef<typeof TextIn
  * Utility type to add className support to any component props
  */
 export type WithClassName<T> = T & { className?: string };
+
+/**
+ * Extended slottable types with className support for NativeWind
+ * These extend the @rn-primitives slottable types to include className
+ */
+import type {
+  SlottableTextProps as RNPSlottableTextProps,
+  SlottableViewProps as RNPSlottableViewProps,
+  SlottablePressableProps as RNPSlottablePressableProps,
+} from '@rn-primitives/types';
+
+export type SlottableTextPropsWithClassName = RNPSlottableTextProps & {
+  className?: string;
+};
+
+export type SlottableViewPropsWithClassName = RNPSlottableViewProps & {
+  className?: string;
+};
+
+export type SlottablePressablePropsWithClassName = RNPSlottablePressableProps & {
+  className?: string;
+};
+
+/**
+ * Type helper to extract component props with className support
+ * This is used to work around the fact that @rn-primitives uses type aliases
+ * which cannot be augmented via module declaration merging
+ */
+export type WithClassNameProps<T> = T extends { className?: string }
+  ? T
+  : T & { className?: string };

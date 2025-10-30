@@ -667,6 +667,7 @@ export const translations: typeof enTranslations = {
     moveToFolder: "In Ordner verschieben",
     newSubfolder: "Neuer Unterordner",
     deleteFolder: "Ordner löschen",
+    managePermissions: "Berechtigungen verwalten",
     deleteDialog: {
       title: "Ordner löschen",
       description: 'Möchten Sie "{{folderName}}" wirklich löschen?',
@@ -683,6 +684,29 @@ export const translations: typeof enTranslations = {
     changeIcon: "Symbol ändern",
     delete: "Löschen",
     newFolder: "Neuer Ordner",
+  },
+  permissions: {
+    folder: {
+      title: "Ordnerberechtigungen",
+      description: "Verwalten Sie, wer diesen Ordner moderieren kann",
+    },
+    thread: {
+      title: "Thread-Berechtigungen",
+      description: "Verwalten Sie, wer diesen Thread moderieren kann",
+    },
+    addModerator: {
+      label: "Moderator hinzufügen",
+      placeholder: "Benutzer-ID eingeben...",
+    },
+    moderatorList: {
+      label: "Aktuelle Moderatoren",
+      empty: "Noch keine Moderatoren hinzugefügt",
+    },
+    errors: {
+      emptyId: "Benutzer-ID darf nicht leer sein",
+      invalidUuid: "Ungültiges Benutzer-ID-Format",
+      duplicate: "Dieser Benutzer ist bereits ein Moderator",
+    },
   },
   threadedView: {
     expandReplies: "Antworten erweitern",

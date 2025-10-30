@@ -32,22 +32,40 @@ export function logTranslationError(
 
   const prefix = context ? `[${context}] ` : "";
 
+  // Using process.stderr for error logging in development
+  // In production, these would be caught by error monitoring
   switch (errorType) {
     case "missing":
-      // eslint-disable-next-line no-console
-      console.error(`${prefix}Translation key not found: ${key}`);
+      if (typeof process !== "undefined" && process.stderr) {
+        process.stderr.write(`${prefix}Translation key not found: ${key}\n`);
+      } else {
+        // eslint-disable-next-line no-console
+        console.error(`${prefix}Translation key not found: ${key}`);
+      }
       break;
     case "invalid_type":
-      // eslint-disable-next-line no-console
-      console.error(
-        `${prefix}Translation key "${key}" has invalid type (expected string)`,
-      );
+      if (typeof process !== "undefined" && process.stderr) {
+        process.stderr.write(
+          `${prefix}Translation key "${key}" has invalid type (expected string)\n`,
+        );
+      } else {
+        // eslint-disable-next-line no-console
+        console.error(
+          `${prefix}Translation key "${key}" has invalid type (expected string)`,
+        );
+      }
       break;
     case "fallback_missing":
-      // eslint-disable-next-line no-console
-      console.error(
-        `${prefix}Translation key not found in fallback language: ${key}`,
-      );
+      if (typeof process !== "undefined" && process.stderr) {
+        process.stderr.write(
+          `${prefix}Translation key not found in fallback language: ${key}\n`,
+        );
+      } else {
+        // eslint-disable-next-line no-console
+        console.error(
+          `${prefix}Translation key not found in fallback language: ${key}`,
+        );
+      }
       break;
   }
 }

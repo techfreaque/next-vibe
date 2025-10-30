@@ -52,20 +52,20 @@ type ActionRequestData = SideTasksRequestOutput;
  */
 export interface ISideTasksRepository {
   // Task management
-  getAllTasks(logger: EndpointLogger): Promise<ResponseType<SideTaskRecord[]>>;
+  getAllTasks(logger: EndpointLogger): ReturnType<SideTasksRepository["getAllTasks"]>;
   getTaskById(
     id: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SideTaskRecord | null>>;
-  getTaskByName(name: string): Promise<ResponseType<SideTaskRecord | null>>;
+  ): ReturnType<SideTasksRepository["getTaskById"]>;
+  getTaskByName(name: string): ReturnType<SideTasksRepository["getTaskByName"]>;
   createTask(
     task: NewSideTaskRecord,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SideTaskRecord>>;
+  ): ReturnType<SideTasksRepository["createTask"]>;
   updateTask(
     id: string,
     updates: Partial<SideTaskRecord>,
-  ): Promise<ResponseType<SideTaskRecord>>;
+  ): ReturnType<SideTasksRepository["updateTask"]>;
   deleteTask(id: string): Promise<ResponseType<void>>;
 
   // Execution management
@@ -75,16 +75,16 @@ export interface ISideTasksRepository {
   updateExecution(
     id: string,
     updates: Partial<SideTaskExecutionRecord>,
-  ): Promise<ResponseType<SideTaskExecutionRecord>>;
+  ): ReturnType<SideTasksRepository["updateExecution"]>;
   getExecutionsByTaskId(
     taskId: string,
     logger: EndpointLogger,
     limit?: number,
-  ): Promise<ResponseType<SideTaskExecutionRecord[]>>;
+  ): ReturnType<SideTasksRepository["getExecutionsByTaskId"]>;
   getRecentExecutions(
     logger: EndpointLogger,
     limit?: number,
-  ): Promise<ResponseType<SideTaskExecutionRecord[]>>;
+  ): ReturnType<SideTasksRepository["getRecentExecutions"]>;
 
   // Health check management
   createHealthCheck(
@@ -92,15 +92,15 @@ export interface ISideTasksRepository {
   ): Promise<ResponseType<SideTaskHealthCheckRecord>>;
   getLatestHealthCheck(
     taskId: string,
-  ): Promise<ResponseType<SideTaskHealthCheckRecord | null>>;
+  ): ReturnType<SideTasksRepository["getLatestHealthCheck"]>;
   getHealthCheckHistory(
     taskId: string,
     logger: EndpointLogger,
     limit?: number,
-  ): Promise<ResponseType<SideTaskHealthCheckRecord[]>>;
+  ): ReturnType<SideTasksRepository["getHealthCheckHistory"]>;
 
   // Statistics
-  getTaskStatistics(logger: EndpointLogger): Promise<
+  getTaskStatistics(logger?: EndpointLogger): Promise<
     ResponseType<{
       totalTasks: number;
       runningTasks: number;
@@ -126,7 +126,7 @@ export interface ISideTasksRepository {
 export class SideTasksRepository implements ISideTasksRepository {
   async getAllTasks(
     logger: EndpointLogger,
-  ): Promise<ResponseType<SideTaskRecord[]>> {
+  ) {
     try {
       const tasks = await db
         .select()
@@ -135,7 +135,7 @@ export class SideTasksRepository implements ISideTasksRepository {
       logger.debug("Successfully fetched all side tasks", {
         count: tasks.length,
       });
-      return createSuccessResponse<SideTaskRecord[]>(tasks);
+      return createSuccessResponse(tasks);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch all side tasks", {
@@ -153,7 +153,7 @@ export class SideTasksRepository implements ISideTasksRepository {
   async getTaskById(
     id: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SideTaskRecord | null>> {
+  ) {
     try {
       const task = await db
         .select()
@@ -164,7 +164,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         id,
         found: !!task[0],
       });
-      return createSuccessResponse<SideTaskRecord | null>(task[0] || null);
+      return createSuccessResponse(task[0] || null);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch side task by ID", {
@@ -182,14 +182,14 @@ export class SideTasksRepository implements ISideTasksRepository {
 
   async getTaskByName(
     name: string,
-  ): Promise<ResponseType<SideTaskRecord | null>> {
+  ) {
     try {
       const task = await db
         .select()
         .from(sideTasks)
         .where(eq(sideTasks.name, name))
         .limit(1);
-      return createSuccessResponse<SideTaskRecord | null>(task[0] || null);
+      return createSuccessResponse(task[0] || null);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -204,7 +204,7 @@ export class SideTasksRepository implements ISideTasksRepository {
   async createTask(
     task: NewSideTaskRecord,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SideTaskRecord>> {
+  ) {
     try {
       logger.debug("Creating new side task", { name: task.name });
       const [newTask] = await db.insert(sideTasks).values(task).returning();
@@ -212,7 +212,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         id: newTask.id,
         name: newTask.name,
       });
-      return createSuccessResponse<SideTaskRecord>(newTask);
+      return createSuccessResponse(newTask);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to create side task", {
@@ -231,7 +231,7 @@ export class SideTasksRepository implements ISideTasksRepository {
   async updateTask(
     id: string,
     updates: Partial<SideTaskRecord>,
-  ): Promise<ResponseType<SideTaskRecord>> {
+  ) {
     try {
       const [updatedTask] = await db
         .update(sideTasks)
@@ -247,7 +247,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         });
       }
 
-      return createSuccessResponse<SideTaskRecord>(updatedTask);
+      return createSuccessResponse(updatedTask);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -282,7 +282,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .insert(sideTaskExecutions)
         .values(execution)
         .returning();
-      return createSuccessResponse(newExecution);
+      return createSuccessResponse(newExecution as SideTaskExecutionRecord);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -297,7 +297,7 @@ export class SideTasksRepository implements ISideTasksRepository {
   async updateExecution(
     id: string,
     updates: Partial<SideTaskExecutionRecord>,
-  ): Promise<ResponseType<SideTaskExecutionRecord>> {
+  ) {
     try {
       const [updatedExecution] = await db
         .update(sideTaskExecutions)
@@ -313,7 +313,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         });
       }
 
-      return createSuccessResponse<SideTaskExecutionRecord>(updatedExecution);
+      return createSuccessResponse(updatedExecution);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -329,7 +329,7 @@ export class SideTasksRepository implements ISideTasksRepository {
     taskId: string,
     logger: EndpointLogger,
     limit = 50,
-  ): Promise<ResponseType<SideTaskExecutionRecord[]>> {
+  ) {
     try {
       const executions = await db
         .select()
@@ -338,7 +338,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .orderBy(desc(sideTaskExecutions.startedAt))
         .limit(limit);
 
-      return createSuccessResponse<SideTaskExecutionRecord[]>(executions);
+      return createSuccessResponse(executions);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -353,7 +353,7 @@ export class SideTasksRepository implements ISideTasksRepository {
   async getRecentExecutions(
     logger: EndpointLogger,
     limit = 100,
-  ): Promise<ResponseType<SideTaskExecutionRecord[]>> {
+  ) {
     try {
       const executions = await db
         .select()
@@ -361,7 +361,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .orderBy(desc(sideTaskExecutions.startedAt))
         .limit(limit);
 
-      return createSuccessResponse<SideTaskExecutionRecord[]>(executions);
+      return createSuccessResponse(executions);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -381,7 +381,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .insert(sideTaskHealthChecks)
         .values(healthCheck)
         .returning();
-      return createSuccessResponse(newHealthCheck);
+      return createSuccessResponse(newHealthCheck as SideTaskHealthCheckRecord);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -395,7 +395,7 @@ export class SideTasksRepository implements ISideTasksRepository {
 
   async getLatestHealthCheck(
     taskId: string,
-  ): Promise<ResponseType<SideTaskHealthCheckRecord | null>> {
+  ) {
     try {
       const healthCheck = await db
         .select()
@@ -404,9 +404,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .orderBy(desc(sideTaskHealthChecks.createdAt))
         .limit(1);
 
-      return createSuccessResponse<SideTaskHealthCheckRecord | null>(
-        healthCheck[0] || null,
-      );
+      return createSuccessResponse(healthCheck[0] || null);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -422,7 +420,7 @@ export class SideTasksRepository implements ISideTasksRepository {
     taskId: string,
     logger: EndpointLogger,
     limit = 50,
-  ): Promise<ResponseType<SideTaskHealthCheckRecord[]>> {
+  ) {
     try {
       const healthChecks = await db
         .select()
@@ -431,7 +429,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .orderBy(desc(sideTaskHealthChecks.createdAt))
         .limit(limit);
 
-      return createSuccessResponse<SideTaskHealthCheckRecord[]>(healthChecks);
+      return createSuccessResponse(healthChecks);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({

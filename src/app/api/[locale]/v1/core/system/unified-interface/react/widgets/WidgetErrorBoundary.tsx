@@ -4,6 +4,8 @@ import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import React, { Component, type ErrorInfo, type ReactNode } from "react";
 
+import { simpleT } from "@/i18n/core/shared";
+
 import type { WidgetErrorBoundaryProps } from "../types";
 
 /**
@@ -51,11 +53,13 @@ export class WidgetErrorBoundary extends Component<
       this.props.onError(error, errorInfo);
     }
 
-    // Log error to console in development
+    // Log error for debugging
+    // eslint-disable-next-line i18next/no-literal-string
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    // eslint-disable-next-line i18next/no-literal-string
+    const errorInfoStr = JSON.stringify(errorInfo);
     // eslint-disable-next-line no-console, i18next/no-literal-string
-    console.error("Widget Error:", error);
-    // eslint-disable-next-line no-console, i18next/no-literal-string
-    console.error("Error Info:", errorInfo);
+    console.error(`Widget Error: ${errorMsg}`, errorInfoStr);
   }
 
   render(): ReactNode {
@@ -65,21 +69,23 @@ export class WidgetErrorBoundary extends Component<
         return this.props.fallback;
       }
 
+      const { t } = simpleT(this.props.locale);
+
       // Default error UI
       return (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          {/* eslint-disable-next-line i18next/no-literal-string */}
-          <AlertTitle>Widget Error</AlertTitle>
+          <AlertTitle>
+            {t("app.api.v1.core.system.unifiedInterface.react.widgets.errorBoundary.title")}
+          </AlertTitle>
           <AlertDescription>
-            {/* eslint-disable i18next/no-literal-string */}
             {this.state.error?.message ||
-              "An error occurred while rendering this widget"}
-            {/* eslint-enable i18next/no-literal-string */}
+              t("app.api.v1.core.system.unifiedInterface.react.widgets.errorBoundary.defaultMessage")}
             {this.state.errorInfo && (
               <details className="mt-2 text-xs">
-                {/* eslint-disable-next-line i18next/no-literal-string */}
-                <summary className="cursor-pointer">Error Details</summary>
+                <summary className="cursor-pointer">
+                  {t("app.api.v1.core.system.unifiedInterface.react.widgets.errorBoundary.errorDetails")}
+                </summary>
                 <pre className="mt-2 overflow-auto p-2 bg-muted rounded">
                   {this.state.errorInfo.componentStack}
                 </pre>

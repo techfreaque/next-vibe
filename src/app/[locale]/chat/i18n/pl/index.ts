@@ -648,6 +648,7 @@ export const translations: typeof enTranslations = {
     moveToFolder: "Przenieś do folderu",
     newSubfolder: "Nowy podfolder",
     deleteFolder: "Usuń folder",
+    managePermissions: "Zarządzaj uprawnieniami",
     deleteDialog: {
       title: "Usuń folder",
       description: 'Czy na pewno chcesz usunąć "{{folderName}}"?',
@@ -664,6 +665,29 @@ export const translations: typeof enTranslations = {
     changeIcon: "Zmień ikonę",
     delete: "Usuń",
     newFolder: "Nowy folder",
+  },
+  permissions: {
+    folder: {
+      title: "Uprawnienia folderu",
+      description: "Zarządzaj tym, kto może moderować ten folder",
+    },
+    thread: {
+      title: "Uprawnienia wątku",
+      description: "Zarządzaj tym, kto może moderować ten wątek",
+    },
+    addModerator: {
+      label: "Dodaj moderatora",
+      placeholder: "Wprowadź ID użytkownika...",
+    },
+    moderatorList: {
+      label: "Obecni moderatorzy",
+      empty: "Nie dodano jeszcze moderatorów",
+    },
+    errors: {
+      emptyId: "ID użytkownika nie może być puste",
+      invalidUuid: "Nieprawidłowy format ID użytkownika",
+      duplicate: "Ten użytkownik jest już moderatorem",
+    },
   },
   threadedView: {
     expandReplies: "Rozwiń odpowiedzi",

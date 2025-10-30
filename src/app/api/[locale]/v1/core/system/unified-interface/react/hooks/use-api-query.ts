@@ -255,7 +255,8 @@ export function useApiQuery<
 
   // Create default state based on enabled option and existing store data
   const defaultState: QueryStoreType<TEndpoint["TResponseOutput"]> =
-    useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    useMemo((): any => {
       if (options.enabled === false) {
         return {
           response: undefined,
@@ -424,10 +425,10 @@ export function useApiQuery<
           const executeWithCleanup = async (): Promise<void> => {
             try {
               await executeQuery(
-                endpoint,
+                endpoint as never,
                 logger,
-                requestData,
-                urlPathParams,
+                requestData as never,
+                urlPathParams as never,
                 t,
                 locale,
                 {
@@ -512,10 +513,10 @@ export function useApiQuery<
       let executionCompleted = false;
       try {
         await executeQuery(
-          endpoint,
+          endpoint as never,
           logger,
-          requestData,
-          urlPathParams,
+          requestData as never,
+          urlPathParams as never,
           t,
           locale,
           {
@@ -578,10 +579,10 @@ export function useApiQuery<
   > => {
     try {
       const response = await executeQuery(
-        endpoint,
+        endpoint as never,
         logger,
-        requestData,
-        urlPathParams,
+        requestData as never,
+        urlPathParams as never,
         t,
         locale,
         {

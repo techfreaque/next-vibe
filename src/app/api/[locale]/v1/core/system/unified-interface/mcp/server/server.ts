@@ -8,9 +8,11 @@ import "server-only";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { env } from "@/config/env";
+
+import { MCP_CONFIG } from "../../shared/server-only/config";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { createEndpointLogger } from "../../shared/logger/endpoint";
-import { getMCPConfig, isMCPServerEnabled } from "./config";
 import { createMCPProtocolHandler } from "./protocol-handler";
 import { StdioTransport } from "./stdio-transport";
 
@@ -32,10 +34,11 @@ export class MCPServer {
   private running = false;
 
   constructor(options: MCPServerOptions = {}) {
-    const config = getMCPConfig();
-    this.locale = options.locale || config.locale;
+    this.locale = options.locale || env.VIBE_LOCALE;
+    const isDebug = options.debug ??
+      (process.env.DEBUG === "true" || process.env.VIBE_LOG_LEVEL === "debug");
     this.logger = createEndpointLogger(
-      options.debug ?? config.debug,
+      isDebug,
       Date.now(),
       this.locale,
     );
@@ -50,22 +53,29 @@ export class MCPServer {
       return;
     }
 
-    if (!isMCPServerEnabled()) {
+    const isMCPServerEnabled = process.env.VIBE_MCP_DISABLED !== "true";
+    if (!isMCPServerEnabled) {
       this.logger.error("[MCP Server] MCP server is disabled");
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for disabled server
       throw new Error("MCP server is disabled");
     }
 
     try {
       this.logger.info("[MCP Server] Starting...");
 
-      const config = getMCPConfig();
+      const capabilities = MCP_CONFIG.platformSpecific?.capabilities || {
+        tools: true,
+        prompts: false,
+        resources: false,
+      };
+
       this.logger.info("[MCP Server] Configuration", {
-        name: config.name,
-        version: config.version,
+        // eslint-disable-next-line i18next/no-literal-string
+        name: "Vibe MCP Server",
+        version: "1.0.0",
         locale: this.locale,
-        debug: config.debug,
-        capabilities: config.capabilities,
+        debug: this.logger.isDebugEnabled,
+        capabilities,
       });
 
       // Create protocol handler
@@ -98,7 +108,7 @@ export class MCPServer {
       this.logger.error("[MCP Server] Failed to start", {
         error: error instanceof Error ? error.message : String(error),
       });
-      // eslint-disable-next-line no-restricted-syntax
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Re-throw MCP server startup errors for caller to handle
       throw error;
     }
   }

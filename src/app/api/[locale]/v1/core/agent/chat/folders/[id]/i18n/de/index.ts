@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
+import { translations as permissionsTranslations } from "../../permissions/i18n/de";
 
 export const translations: typeof enTranslations = {
+  permissions: permissionsTranslations,
   get: {
     title: "Ordner abrufen",
     description: "Einen bestimmten Ordner nach ID abrufen",

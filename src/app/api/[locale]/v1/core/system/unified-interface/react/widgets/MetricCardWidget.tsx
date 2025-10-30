@@ -2,6 +2,7 @@
 
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import type { JSX } from "react";
 
@@ -32,18 +33,19 @@ function isMetricCardWidgetData(
  */
 export function MetricCardWidget({
   data,
+  metadata: _metadata,
   context,
   className,
   style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
   if (!isMetricCardWidgetData(data)) {
     return (
-      <div
+      <Div
         className={cn("text-muted-foreground italic", className)}
         style={style}
       >
         —
-      </div>
+      </Div>
     );
   }
 
@@ -77,32 +79,32 @@ export function MetricCardWidget({
           {label}
         </CardTitle>
         {icon && (
-          <span className="text-2xl" role="img" aria-label={label}>
+          <Span className="text-2xl" role="img" aria-label={label}>
             {icon}
-          </span>
+          </Span>
         )}
       </CardHeader>
       <CardContent>
-        <div className="flex items-baseline gap-2">
-          <div
+        <Div className="flex items-baseline gap-2">
+          <Div
             className="text-2xl font-bold"
             style={color ? { color } : undefined}
           >
             {displayValue}
-            {unit && <span className="ml-1 text-sm font-normal">{unit}</span>}
-          </div>
+            {unit && <Span className="ml-1 text-sm font-normal">{unit}</Span>}
+          </Div>
           {trend && TrendIcon && (
-            <div
+            <Div
               className={cn(
                 "flex items-center gap-1 text-xs",
                 trendColorClassName,
               )}
             >
               <TrendIcon className="h-3 w-3" />
-              <span>{Math.abs(trend.value)}%</span>
-            </div>
+              <Span>{Math.abs(trend.value)}%</Span>
+            </Div>
           )}
-        </div>
+        </Div>
       </CardContent>
     </Card>
   );

@@ -16,6 +16,11 @@ import type { Methods } from "../../types/enums";
 import type { RouteModule } from "../../types/handler";
 
 /**
+ * Default request data type for route module constraints
+ */
+type DefaultRequestData = Record<string, string | number | boolean | null>;
+
+/**
  * Route loading options
  */
 export interface RouteLoaderOptions {
@@ -40,14 +45,12 @@ export interface RouteLoaderResult<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
+    DefaultRequestData
   > = CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
+    DefaultRequestData
   >,
 > {
   /** Loaded route module */
@@ -91,14 +94,12 @@ export async function loadRouteModule<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
+    DefaultRequestData
   > = CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
+    DefaultRequestData
   >,
 >(
   options: RouteLoaderOptions,
@@ -134,7 +135,8 @@ export async function loadRouteModule<
       );
       const handler = await getRouteHandler(normalizedPath);
       if (handler) {
-        routeModule = handler as RouteModule<TEndpoint>;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        routeModule = handler as any as RouteModule<TEndpoint>;
         source = "registry";
         logger.debug(`[Route Loader] Route module loaded from registry`);
       }
@@ -149,7 +151,8 @@ export async function loadRouteModule<
   if (!routeModule && fallbackToDynamic) {
     try {
       logger.debug(`[Route Loader] Attempting dynamic import`, { routePath });
-      const imported = (await import(routePath)) as RouteModule<TEndpoint>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const imported = (await import(routePath)) as any as RouteModule<TEndpoint>;
       routeModule = imported;
       source = "dynamic";
       logger.debug(`[Route Loader] Route module loaded via dynamic import`);
@@ -194,22 +197,30 @@ export async function loadRouteModule<
 }
 
 /**
+ * Type for platform handler structure
+ */
+type PlatformHandlers =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  | ((...args: any[]) => any)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  | Record<string, (...args: any[]) => any>;
+
+/**
  * Extract handler from route module by platform and method
  */
 export function extractHandlerFromModule<
-  THandler = unknown,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  THandler = (...args: any[]) => any,
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
+    DefaultRequestData
   > = CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
+    DefaultRequestData
   >,
 >(
   module: RouteModule<TEndpoint>,
@@ -220,12 +231,14 @@ export function extractHandlerFromModule<
   logger.debug(`[Route Loader] Extracting ${platform} handler`, {
     method,
     hasTools: !!module.tools,
-    hasPlatform: !!(module.tools as Record<string, unknown>)?.[platform],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    hasPlatform: !!(module.tools as Record<string, any>)?.[platform],
   });
 
-  const platformHandlers = (module.tools as Record<string, unknown>)?.[
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const platformHandlers = (module.tools as Record<string, any>)?.[
     platform
-  ];
+  ] as PlatformHandlers | undefined;
 
   if (!platformHandlers) {
     logger.warn(`[Route Loader] No ${platform} handlers found`);
@@ -238,7 +251,8 @@ export function extractHandlerFromModule<
     platformHandlers !== null &&
     method in platformHandlers
   ) {
-    const handler = (platformHandlers as Record<string, unknown>)[method];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handler = (platformHandlers as Record<string, any>)[method];
     logger.debug(`[Route Loader] Found ${platform} handler for method`, {
       method,
       handlerType: typeof handler,
@@ -264,19 +278,18 @@ export function extractHandlerFromModule<
  * Load route module and extract handler in one call
  */
 export async function loadRouteHandler<
-  THandler = unknown,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  THandler = (...args: any[]) => any,
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
+    DefaultRequestData
   > = CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
+    DefaultRequestData
   >,
 >(
   options: RouteLoaderOptions,

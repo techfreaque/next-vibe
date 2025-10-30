@@ -11,6 +11,8 @@ import { cn } from "next-vibe/shared/utils/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { Div, Span } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -57,7 +59,7 @@ export function CronNavigation({
     <>
       <Card>
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+          <Div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = item.key === currentPage;
@@ -73,23 +75,23 @@ export function CronNavigation({
                         : "hover:bg-muted/50",
                     )}
                   >
-                    <div className="flex items-center space-x-2 w-full">
+                    <Div className="flex items-center space-x-2 w-full">
                       <Icon className="h-5 w-5" />
-                      <span className="font-medium">{item.label}</span>
+                      <Span className="font-medium">{item.label}</Span>
                       {isActive && (
                         <Badge variant="secondary" className="ml-auto">
                           {t("app.admin.common.active")}
                         </Badge>
                       )}
-                    </div>
-                    <p className="text-sm text-left opacity-80">
+                    </Div>
+                    <P className="text-sm text-left opacity-80">
                       {item.description}
-                    </p>
+                    </P>
                   </Button>
                 </Link>
               );
             })}
-          </div>
+          </Div>
         </CardContent>
       </Card>
       {children}

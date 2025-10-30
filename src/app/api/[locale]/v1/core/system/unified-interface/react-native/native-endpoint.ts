@@ -284,6 +284,7 @@ export async function nativeEndpoint<
         });
       }
 
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure code requires throwing for system-level errors and initialization failures
       throw parseError;
     }
 

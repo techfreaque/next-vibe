@@ -131,4 +131,15 @@ export const translations = {
       facebook: "Facebook",
     },
   },
+  messages: {
+    successMessage: "Login options retrieved successfully",
+    passwordAuthDescription: "Log in with your email and password",
+    socialAuthDescription: "Log in with your social media accounts",
+    continueWithProvider: "Continue with {{provider}}",
+    twoFactorRequired: "Enhanced security: 2FA required",
+    standardSecurity: "Standard security requirements",
+    tryPasswordFirst: "Try password login first",
+    useSocialLogin: "Use social login",
+    socialLoginFaster: "Social login is faster for new users",
+  },
 };

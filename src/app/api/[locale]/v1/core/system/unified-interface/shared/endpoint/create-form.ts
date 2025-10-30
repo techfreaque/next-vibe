@@ -271,7 +271,18 @@ export type MethodSpecificEndpoint<
   TMethod extends Methods,
   TExampleKey extends string,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-> = CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>;
+> = CreateApiEndpoint<
+  TExampleKey,
+  TMethod,
+  TUserRoleValue,
+  TFields,
+  InferInputFromFieldForMethod<TFields, TMethod, FieldUsage.RequestData>,
+  InferOutputFromFieldForMethod<TFields, TMethod, FieldUsage.RequestData>,
+  InferInputFromFieldForMethod<TFields, TMethod, FieldUsage.Response>,
+  InferOutputFromFieldForMethod<TFields, TMethod, FieldUsage.Response>,
+  InferInputFromFieldForMethod<TFields, TMethod, FieldUsage.RequestUrlParams>,
+  InferOutputFromFieldForMethod<TFields, TMethod, FieldUsage.RequestUrlParams>
+>;
 
 /**
  * Return type for createFormEndpoint - provides both GET and POST endpoints
@@ -859,8 +870,18 @@ export function createFormEndpoint<
 
   // Return the form endpoints with proper typing
   return {
-    GET: getEndpoint,
-    POST: postEndpoint,
+    GET: getEndpoint as unknown as MethodSpecificEndpoint<
+      TFields,
+      Methods.GET,
+      TExampleKey,
+      TUserRoleValue
+    >,
+    POST: postEndpoint as unknown as MethodSpecificEndpoint<
+      TFields,
+      Methods.POST,
+      TExampleKey,
+      TUserRoleValue
+    >,
   };
 }
 

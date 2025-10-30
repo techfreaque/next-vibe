@@ -34,7 +34,7 @@ export function getPlatformAuthHandler(
 
     default: {
       const _exhaustiveCheck: never = platform;
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth factory exhaustiveness check requires throwing for unsupported platforms
       throw new Error(`Unsupported platform: ${String(_exhaustiveCheck)}`);
     }
   }

@@ -18,19 +18,42 @@ const platform = {
   isBrowser,
 };
 
-// Simple console logger for environment validation to avoid circular dependencies
+// Simple logger for environment validation to avoid circular dependencies
+// React Native environment - keeping simple logging for development
 export const envValidationLogger: EndpointLogger = {
-  info: (message: string, meta?: ExplicitAnyType) =>
-    console.log(`[ENV] ${message}`, meta || ""),
-  error: (message: string, meta?: ExplicitAnyType) =>
-    console.error(`[ENV] ${message}`, meta || ""),
-  debug: (message: string, meta?: ExplicitAnyType) =>
-    console.log(`[ENV] ${message}`, meta || ""),
-  warn: (message: string, meta?: ExplicitAnyType) =>
-    console.warn(`[ENV] ${message}`, meta || ""),
-  vibe: (message: string, meta?: ExplicitAnyType) =>
-    console.log(`[ENV] ${message}`, meta || ""),
-  isDebugEnabled: false,
+  info: (message: string, meta?: ExplicitAnyType) => {
+    if (__DEV__) {
+      const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
+      // In React Native, we use LogBox-friendly logging
+      // eslint-disable-next-line no-console
+      console.log(`[ENV] ${message}${metaStr}`);
+    }
+  },
+  error: (message: string, meta?: ExplicitAnyType) => {
+    const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
+    // eslint-disable-next-line no-console
+    console.error(`[ENV] ${message}${metaStr}`);
+  },
+  debug: (message: string, meta?: ExplicitAnyType) => {
+    if (__DEV__) {
+      const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
+      // eslint-disable-next-line no-console
+      console.log(`[ENV] ${message}${metaStr}`);
+    }
+  },
+  warn: (message: string, meta?: ExplicitAnyType) => {
+    const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
+    // eslint-disable-next-line no-console
+    console.warn(`[ENV] ${message}${metaStr}`);
+  },
+  vibe: (message: string, meta?: ExplicitAnyType) => {
+    if (__DEV__) {
+      const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
+      // eslint-disable-next-line no-console
+      console.log(`[ENV] ${message}${metaStr}`);
+    }
+  },
+  isDebugEnabled: __DEV__,
 };
 
 // Export validated environment for use throughout the application

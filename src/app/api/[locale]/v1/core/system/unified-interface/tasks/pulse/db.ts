@@ -15,8 +15,6 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-
 import { PulseExecutionStatusDB, PulseHealthStatusDB } from "../enum";
 
 /**
@@ -68,7 +66,7 @@ export const pulseExecutions = pgTable("pulse_executions", {
 
   // Results and errors
   result: jsonb("result"),
-  errors: jsonb("errors").$type<ErrorResponseType[]>(),
+  errors: jsonb("errors"),
 
   // Metadata
   environment: text("environment").default("production"),

@@ -157,6 +157,7 @@ import {
   Zap,
 } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+import { Span } from "next-vibe-ui/ui";
 import React from "react";
 
 /**
@@ -177,7 +178,7 @@ export type IconComponent =
  */
 /* eslint-disable i18next/no-literal-string -- Technical UI element, not user-facing text */
 const OneAIcon: IconComponent = ({ className = "" }) => (
-  <span
+  <Span
     className={cn(
       "text-lg font-bold leading-none flex items-center justify-center",
       "bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600",
@@ -187,7 +188,7 @@ const OneAIcon: IconComponent = ({ className = "" }) => (
   >
     {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
     1A
-  </span>
+  </Span>
 );
 /* eslint-enable i18next/no-literal-string */
 
@@ -424,9 +425,9 @@ export function getIconComponent(iconValue: IconValue): IconComponent {
     }
     // Emoji/unicode string - wrap in component
     return ({ className = "" }) => (
-      <span className={cn("text-base leading-none", className)}>
+      <Span className={cn("text-base leading-none", className)}>
         {iconValue}
-      </span>
+      </Span>
     );
   }
 

@@ -487,12 +487,17 @@ const { POST } = createEndpoint({
                 },
               ],
             },
-            z.enum([
-              DEFAULT_FOLDER_IDS.PRIVATE,
-              DEFAULT_FOLDER_IDS.SHARED,
-              DEFAULT_FOLDER_IDS.PUBLIC,
-              DEFAULT_FOLDER_IDS.INCOGNITO,
-            ]),
+            z
+              .enum([
+                DEFAULT_FOLDER_IDS.PRIVATE,
+                DEFAULT_FOLDER_IDS.SHARED,
+                DEFAULT_FOLDER_IDS.PUBLIC,
+                DEFAULT_FOLDER_IDS.INCOGNITO,
+              ])
+              .refine((val) => val !== DEFAULT_FOLDER_IDS.INCOGNITO, {
+                message:
+                  "app.api.v1.core.agent.chat.threads.post.errors.forbidden.incognitoNotAllowed",
+              }),
           ),
           subFolderId: requestDataField(
             {

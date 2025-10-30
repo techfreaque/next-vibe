@@ -478,9 +478,9 @@ export class CliResourceManager {
           logger.info(
             "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.performanceBreakdown",
           );
-          console.log(DebugFormatter.formatPerformanceBreakdown(breakdown));
+          logger.info(DebugFormatter.formatPerformanceBreakdown(breakdown));
         } else {
-          console.log(DebugFormatter.formatExecutionSummary(breakdown, locale));
+          logger.info(DebugFormatter.formatExecutionSummary(breakdown, locale));
         }
       }
 

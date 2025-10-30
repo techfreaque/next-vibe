@@ -17,7 +17,7 @@ import { envClient } from "@/config/env-client";
 export function getCookie(name: string): string | null {
   try {
     if (envClient.platform.isServer || typeof document === "undefined") {
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Client-side cookie helper throws for server-side usage
       throw new Error("getCookie cannot be called on the server");
     }
 
@@ -46,7 +46,7 @@ export function getCookie(name: string): string | null {
 export function setCookie(name: string, value: string): void {
   try {
     if (envClient.platform.isServer || typeof document === "undefined") {
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Client-side cookie helper throws for server-side usage
       throw new Error("setCookie cannot be called on the server");
     }
 
@@ -105,7 +105,7 @@ export function setCookie(name: string, value: string): void {
 export function deleteCookie(name: string): void {
   try {
     if (envClient.platform.isServer || typeof document === "undefined") {
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Client-side cookie helper throws for server-side usage
       throw new Error("deleteCookie cannot be called on the server");
     }
 
@@ -157,7 +157,7 @@ export function deleteCookie(name: string): void {
 export function getAllCookies(): Record<string, string> {
   try {
     if (envClient.platform.isServer || typeof document === "undefined") {
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Client-side cookie helper throws for server-side usage
       throw new Error("getAllCookies cannot be called on the server");
     }
 

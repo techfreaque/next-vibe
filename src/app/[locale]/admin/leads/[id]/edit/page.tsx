@@ -11,6 +11,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-
 import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { Div, H1, P } from "next-vibe-ui/ui/typography";
 
 import { LeadEditForm } from "./_components/lead-edit-form";
 
@@ -40,19 +41,19 @@ export default async function LeadEditPage({
   }
 
   return (
-    <div className="space-y-8">
+    <Div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+      <Div>
+        <H1 className="text-3xl font-bold tracking-tight">
           {t("app.admin.leads.leads.edit.success.title")}
-        </h1>
-        <p className="text-muted-foreground mt-2">
+        </H1>
+        <P className="text-muted-foreground mt-2">
           {t("app.admin.leads.leads.edit.success.description")}
-        </p>
-      </div>
+        </P>
+      </Div>
 
       {/* Edit Form */}
       <LeadEditForm locale={locale} leadId={id} lead={leadResponse.data} />
-    </div>
+    </Div>
   );
 }

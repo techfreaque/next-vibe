@@ -4,9 +4,13 @@ export const translations = {
     user_not_found: "User not found",
     failed_to_upload_avatar: "Failed to upload avatar",
     failed_to_delete_avatar: "Failed to delete avatar",
+    invalid_file_type: "Invalid file type",
+    file_too_large: "File too large",
   },
   debug: {
+    uploadingUserAvatar: "Uploading user avatar",
     errorUploadingUserAvatar: "Error uploading user avatar",
+    deletingUserAvatar: "Deleting user avatar",
     errorDeletingUserAvatar: "Error deleting user avatar",
   },
   success: {
@@ -15,6 +19,8 @@ export const translations = {
     nextSteps: {
       visible: "Your avatar is now visible on your profile",
       update: "You can update it anytime from your profile settings",
+      default: "Your profile now shows the default avatar",
+      uploadNew: "You can upload a new avatar anytime from your profile settings",
     },
   },
   upload: {

@@ -1,9 +1,10 @@
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { Div, Link, Span } from "next-vibe-ui/ui";
+import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import { Separator } from "next-vibe-ui/ui/separator";
 import type { JSX } from "react";
 
@@ -272,9 +273,9 @@ export default async function JobPostingPage({
   }
 
   return (
-    <div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
-      <div className="container max-w-6xl mx-auto py-8 px-4">
-        <div className="mb-8">
+    <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
+      <Div className="container max-w-6xl mx-auto py-8 px-4">
+        <Div className="mb-8">
           <Button
             variant="ghost"
             size="sm"
@@ -283,40 +284,40 @@ export default async function JobPostingPage({
           >
             <Link href={`/${locale}/careers`}>
               <ArrowLeft className="h-4 w-4" />
-              <span>
+              <Span>
                 {t("app.story._components.home.careers.openPositions")}
-              </span>
+              </Span>
             </Link>
           </Button>
-        </div>
+        </Div>
 
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+        <Div className="max-w-5xl mx-auto">
+          <H1 className="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
             {job.title}
-          </h1>
-          <p className="text-xl text-gray-700 dark:text-gray-300 mb-8">
+          </H1>
+          <P className="text-xl text-gray-700 dark:text-gray-300 mb-8">
             {job.shortDescription}
-          </p>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            <div className="lg:col-span-3">
-              <div className="space-y-8">
+          </P>
+          <Div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <Div className="lg:col-span-3">
+              <Div className="space-y-8">
                 <section>
-                  <h2 className="text-2xl font-bold mb-4">
+                  <H2 className="text-2xl font-bold mb-4">
                     {t(
                       "app.story._components.home.careers.jobDetail.jobOverview",
                     )}
-                  </h2>
-                  <p className="text-gray-700 dark:text-gray-300">
+                  </H2>
+                  <P className="text-gray-700 dark:text-gray-300">
                     {job.longDescription}
-                  </p>
+                  </P>
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold mb-4">
+                  <H2 className="text-2xl font-bold mb-4">
                     {t(
                       "app.story._components.home.careers.jobDetail.responsibilities",
                     )}
-                  </h2>
+                  </H2>
                   <ul className="list-disc pl-6 space-y-2">
                     {Object.values(job.responsibilities).map(
                       (responsibility: string, index: number) => (
@@ -332,11 +333,11 @@ export default async function JobPostingPage({
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold mb-4">
+                  <H2 className="text-2xl font-bold mb-4">
                     {t(
                       "app.story._components.home.careers.jobDetail.requirements",
                     )}
-                  </h2>
+                  </H2>
                   <ul className="list-disc pl-6 space-y-2">
                     {Object.values(job.requirements).map(
                       (requirement: string, index: number) => (
@@ -352,17 +353,17 @@ export default async function JobPostingPage({
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold mb-4">
+                  <H2 className="text-2xl font-bold mb-4">
                     {t(
                       "app.story._components.home.careers.jobDetail.qualifications",
                     )}
-                  </h2>
+                  </H2>
 
-                  <h3 className="text-xl font-semibold mb-2">
+                  <H3 className="text-xl font-semibold mb-2">
                     {t(
                       "app.story._components.home.careers.jobDetail.qualificationsRequired",
                     )}
-                  </h3>
+                  </H3>
                   <ul className="list-disc pl-6 space-y-2 mb-4">
                     {Object.values(job.qualifications.required).map(
                       (qualification: string, index: number) => (
@@ -376,11 +377,11 @@ export default async function JobPostingPage({
                     )}
                   </ul>
 
-                  <h3 className="text-xl font-semibold mb-2">
+                  <H3 className="text-xl font-semibold mb-2">
                     {t(
                       "app.story._components.home.careers.jobDetail.qualificationsPreferred",
                     )}
-                  </h3>
+                  </H3>
                   <ul className="list-disc pl-6 space-y-2">
                     {Object.values(job.qualifications.preferred).map(
                       (qualification: string, index: number) => (
@@ -396,132 +397,132 @@ export default async function JobPostingPage({
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold mb-4">
+                  <H2 className="text-2xl font-bold mb-4">
                     {t("app.story._components.home.careers.benefits.title")}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  </H2>
+                  <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Card>
                       <CardContent className="p-4">
-                        <h3 className="font-semibold mb-2">
+                        <H3 className="font-semibold mb-2">
                           {t(
                             "app.story._components.home.careers.benefits.growthTitle",
                           )}
-                        </h3>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                        </H3>
+                        <P className="text-sm text-gray-700 dark:text-gray-300">
                           {t(
                             "app.story._components.home.careers.benefits.growthDesc",
                           )}
-                        </p>
+                        </P>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
-                        <h3 className="font-semibold mb-2">
+                        <H3 className="font-semibold mb-2">
                           {t(
                             "app.story._components.home.careers.benefits.meaningfulTitle",
                           )}
-                        </h3>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                        </H3>
+                        <P className="text-sm text-gray-700 dark:text-gray-300">
                           {t(
                             "app.story._components.home.careers.benefits.meaningfulDesc",
                           )}
-                        </p>
+                        </P>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
-                        <h3 className="font-semibold mb-2">
+                        <H3 className="font-semibold mb-2">
                           {t(
                             "app.story._components.home.careers.benefits.balanceTitle",
                           )}
-                        </h3>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                        </H3>
+                        <P className="text-sm text-gray-700 dark:text-gray-300">
                           {t(
                             "app.story._components.home.careers.benefits.balanceDesc",
                           )}
-                        </p>
+                        </P>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
-                        <h3 className="font-semibold mb-2">
+                        <H3 className="font-semibold mb-2">
                           {t(
                             "app.story._components.home.careers.benefits.compensationTitle",
                           )}
-                        </h3>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                        </H3>
+                        <P className="text-sm text-gray-700 dark:text-gray-300">
                           {t(
                             "app.story._components.home.careers.benefits.compensationDesc",
                           )}
-                        </p>
+                        </P>
                       </CardContent>
                     </Card>
-                  </div>
+                  </Div>
                 </section>
-              </div>
-            </div>
+              </Div>
+            </Div>
 
-            <div className="lg:col-span-2">
-              <div className="sticky top-24 space-y-6">
+            <Div className="lg:col-span-2">
+              <Div className="sticky top-24 space-y-6">
                 <Card>
                   <CardContent className="p-6">
-                    <h3 className="text-xl font-bold mb-4">
+                    <H3 className="text-xl font-bold mb-4">
                       {t(
                         "app.story._components.home.careers.jobDetail.applyNow",
                       )}
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div className="text-gray-500 dark:text-gray-400">
+                    </H3>
+                    <Div className="space-y-4">
+                      <Div className="grid grid-cols-2 gap-2 text-sm">
+                        <Div className="text-gray-500 dark:text-gray-400">
                           {t(
                             "app.story._components.home.careers.jobDetail.location",
                           )}
                           :
-                        </div>
-                        <div className="font-medium">{job.location}</div>
+                        </Div>
+                        <Div className="font-medium">{job.location}</Div>
 
-                        <div className="text-gray-500 dark:text-gray-400">
+                        <Div className="text-gray-500 dark:text-gray-400">
                           {t(
                             "app.story._components.home.careers.jobDetail.department",
                           )}
                           :
-                        </div>
-                        <div className="font-medium">{job.department}</div>
+                        </Div>
+                        <Div className="font-medium">{job.department}</Div>
 
-                        <div className="text-gray-500 dark:text-gray-400">
+                        <Div className="text-gray-500 dark:text-gray-400">
                           {t(
                             "app.story._components.home.careers.jobDetail.employmentType",
                           )}
                           :
-                        </div>
-                        <div className="font-medium">{job.type}</div>
+                        </Div>
+                        <Div className="font-medium">{job.type}</Div>
 
-                        <div className="text-gray-500 dark:text-gray-400">
+                        <Div className="text-gray-500 dark:text-gray-400">
                           {t(
                             "app.story._components.home.careers.jobDetail.experienceLevel",
                           )}
                           :
-                        </div>
-                        <div className="font-medium">{job.experienceLevel}</div>
+                        </Div>
+                        <Div className="font-medium">{job.experienceLevel}</Div>
 
-                        <div className="text-gray-500 dark:text-gray-400">
+                        <Div className="text-gray-500 dark:text-gray-400">
                           {t(
                             "app.story._components.home.careers.jobDetail.postedDate",
                           )}
                           :
-                        </div>
-                        <div className="font-medium">{job.postedDate}</div>
+                        </Div>
+                        <Div className="font-medium">{job.postedDate}</Div>
 
-                        <div className="text-gray-500 dark:text-gray-400">
+                        <Div className="text-gray-500 dark:text-gray-400">
                           {t(
                             "app.story._components.home.careers.jobDetail.applicationDeadline",
                           )}
                           :
-                        </div>
-                        <div className="font-medium">
+                        </Div>
+                        <Div className="font-medium">
                           {job.applicationDeadline}
-                        </div>
-                      </div>
+                        </Div>
+                      </Div>
 
                       <Separator />
 
@@ -532,18 +533,18 @@ export default async function JobPostingPage({
                           {t("app.story._components.home.careers.applyNow")}
                         </Link>
                       </Button>
-                    </div>
+                    </Div>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardContent className="p-6">
-                    <h3 className="text-lg font-bold mb-4">
+                    <H3 className="text-lg font-bold mb-4">
                       {t(
                         "app.story._components.home.careers.jobDetail.relatedPositions",
                       )}
-                    </h3>
-                    <div className="space-y-3">
+                    </H3>
+                    <Div className="space-y-3">
                       {Object.entries(jobs)
                         .filter(([key]) => key !== jobId)
                         .slice(0, 2)
@@ -556,21 +557,21 @@ export default async function JobPostingPage({
                               href={`/${locale}/careers/${key}`}
                               className="block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                             >
-                              <h4 className="font-medium">{typedJob.title}</h4>
-                              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 line-clamp-2">
+                              <H3 className="font-medium">{typedJob.title}</H3>
+                              <P className="text-sm text-gray-700 dark:text-gray-300 mt-1 line-clamp-2">
                                 {typedJob.shortDescription}
-                              </p>
+                              </P>
                             </Link>
                           );
                         })}
-                    </div>
+                    </Div>
                   </CardContent>
                 </Card>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+              </Div>
+            </Div>
+          </Div>
+        </Div>
+      </Div>
+    </Div>
   );
 }

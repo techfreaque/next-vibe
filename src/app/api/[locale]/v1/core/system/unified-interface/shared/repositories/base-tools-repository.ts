@@ -14,6 +14,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
  * Type for tool metadata - any JSON-serializable object
  * Using unknown instead of strict Record to support various tool formats (MCP, AI, etc.)
  */
+// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Tool result handling requires 'unknown' for flexible return types
 type ToolMetadata = unknown;
 
 /**
@@ -34,6 +35,7 @@ export interface BaseToolsRepository<TRequest, TResponse> {
  */
 export abstract class BaseToolsRepositoryImpl<
   TRequest,
+  // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Parameter extraction requires 'unknown' for dynamic tool arguments
   TResponse extends Record<string, unknown>,
 >implements BaseToolsRepository<TRequest, TResponse>
 {

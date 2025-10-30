@@ -284,7 +284,7 @@ const { POST } = createEndpoint({
           .nullable()
           .optional()
           .describe(
-            "Array of tool IDs to enable. null = no tools, undefined/[] = all available tools for user (filtered by permissions), ['search', 'core_user_create'] = specific tools",
+            "Array of endpoint IDs to enable. null = no tools, undefined/[] = all available tools for user (filtered by permissions), ['get_v1_core_agent_chat_folders', 'post_v1_core_user_create'] = specific endpoints",
           ),
       ),
 

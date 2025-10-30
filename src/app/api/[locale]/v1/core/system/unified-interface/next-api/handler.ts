@@ -177,7 +177,7 @@ export function createNextHandler<
 
       // Create success response with email handling
       return await createHTTPSuccessResponse<TResponseOutput>({
-        data: result.data as unknown as TResponseOutput,
+        data: result.data as TResponseOutput,
         schema: endpoint.responseSchema as z.ZodType<TResponseOutput>,
         status: 200,
         onSuccess: async (data) => {

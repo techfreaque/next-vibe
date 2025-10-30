@@ -5,9 +5,10 @@
 
 "use client";
 
-import { Form, FormAlert } from "next-vibe-ui/ui";
+import { Form, FormAlert, Div } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { H3 } from "next-vibe-ui/ui/typography";
 import type { FormEvent, JSX } from "react";
 
 import { useImapAccountByIdEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/[id]/hooks";
@@ -57,20 +58,20 @@ export function ImapAccountEditForm({
   const alert = endpoint.alert;
 
   if (endpoint.read?.isLoading) {
-    return <div>{t("app.admin.emails.imap.common.loading")}</div>;
+    return <Div>{t("app.admin.emails.imap.common.loading")}</Div>;
   }
 
   if (!form) {
-    return <div>{t("app.admin.emails.imap.common.loading")}</div>;
+    return <Div>{t("app.admin.emails.imap.common.loading")}</Div>;
   }
 
   return (
     <Form form={form} onSubmit={handleSubmit} className="space-y-6">
       <FormAlert alert={alert} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <Div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Basic Information */}
-        <div className="space-y-4">
+        <Div className="space-y-4">
           <EndpointFormField
             name="name"
             config={{
@@ -126,10 +127,10 @@ export function ImapAccountEditForm({
               showAllRequired: false,
             }}
           />
-        </div>
+        </Div>
 
         {/* Authentication */}
-        <div className="space-y-4">
+        <Div className="space-y-4">
           <EndpointFormField
             name="username"
             config={{
@@ -199,16 +200,16 @@ export function ImapAccountEditForm({
               showAllRequired: false,
             }}
           />
-        </div>
-      </div>
+        </Div>
+      </Div>
 
       {/* Advanced Settings */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">
+      <Div className="space-y-4">
+        <H3 className="text-lg font-medium">
           {t("app.admin.emails.imap.account.sections.advanced")}
-        </h3>
+        </H3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <EndpointFormField
             name="connectionTimeout"
             config={{
@@ -251,7 +252,7 @@ export function ImapAccountEditForm({
               showAllRequired: false,
             }}
           />
-        </div>
+        </Div>
 
         <EndpointFormField
           name="enabled"
@@ -278,10 +279,10 @@ export function ImapAccountEditForm({
             showAllRequired: false,
           }}
         />
-      </div>
+      </Div>
 
       {/* Form Actions */}
-      <div className="flex items-center justify-end space-x-4">
+      <Div className="flex items-center justify-end space-x-4">
         <Button type="button" variant="outline" onClick={onCancel}>
           {t("app.admin.emails.imap.common.cancel")}
         </Button>
@@ -290,7 +291,7 @@ export function ImapAccountEditForm({
             ? t("app.admin.emails.imap.common.saving")
             : t("app.admin.emails.imap.account.update")}
         </Button>
-      </div>
+      </Div>
     </Form>
   );
 }

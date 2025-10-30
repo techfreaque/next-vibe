@@ -7,6 +7,7 @@
 
 import { Eye, Mail, MailOpen, Paperclip, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
@@ -184,20 +185,20 @@ export function ImapMessagesList({
 
   if (isLoading) {
     return (
-      <div className="p-4">{t("app.admin.emails.imap.common.loading")}</div>
+      <Div className="p-4">{t("app.admin.emails.imap.common.loading")}</Div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <Div className="space-y-4">
       {/* Bulk Actions */}
       {selectedMessages.length > 0 && (
-        <div className="flex items-center space-x-2 p-3 bg-blue-50 rounded-lg">
-          <span className="text-sm font-medium">
+        <Div className="flex items-center space-x-2 p-3 bg-blue-50 rounded-lg">
+          <Span className="text-sm font-medium">
             {t("app.admin.emails.imap.message.selected", {
               count: selectedMessages.length,
             })}
-          </span>
+          </Span>
           <Button size="sm" variant="outline" onClick={handleMarkAsRead}>
             {t("app.admin.emails.imap.admin.messages.actions.markAsRead")}
           </Button>
@@ -207,11 +208,11 @@ export function ImapMessagesList({
           <Button size="sm" variant="outline" onClick={handleToggleFlag}>
             {t("app.admin.emails.imap.admin.messages.actions.toggleFlag")}
           </Button>
-        </div>
+        </Div>
       )}
 
       {/* Messages Table */}
-      <div className="border rounded-lg">
+      <Div className="border rounded-lg">
         <Table>
           <TableHeader>
             <TableRow>
@@ -261,7 +262,7 @@ export function ImapMessagesList({
                     />
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center space-x-1">
+                    <Div className="flex items-center space-x-1">
                       {message.isRead ? (
                         <MailOpen className="h-4 w-4 text-gray-400" />
                       ) : (
@@ -273,36 +274,36 @@ export function ImapMessagesList({
                       {message.hasAttachments && (
                         <Paperclip className="h-4 w-4 text-gray-600" />
                       )}
-                    </div>
+                    </Div>
                   </TableCell>
                   <TableCell>
-                    <div
+                    <Div
                       className={`truncate max-w-xs ${!message.isRead ? "font-semibold" : ""}`}
                     >
                       {message.subject}
-                    </div>
+                    </Div>
                   </TableCell>
                   <TableCell>
-                    <div className="truncate max-w-xs">
-                      <div className={!message.isRead ? "font-semibold" : ""}>
+                    <Div className="truncate max-w-xs">
+                      <Div className={!message.isRead ? "font-semibold" : ""}>
                         {message.senderName || message.senderEmail}
-                      </div>
+                      </Div>
                       {message.senderName && (
-                        <div className="text-sm text-gray-500">
+                        <Div className="text-sm text-gray-500">
                           {message.senderEmail}
-                        </div>
+                        </Div>
                       )}
-                    </div>
+                    </Div>
                   </TableCell>
                   <TableCell>
-                    <div className="text-sm">
+                    <Div className="text-sm">
                       {message.sentAt ? formatDate(message.sentAt) : "-"}
-                    </div>
+                    </Div>
                   </TableCell>
                   <TableCell>
-                    <div className="text-sm">
+                    <Div className="text-sm">
                       {/* TODO: Add messageSize to API definition */}-
-                    </div>
+                    </Div>
                   </TableCell>
                   <TableCell>
                     {/* TODO: Add syncStatus to API definition */}
@@ -322,19 +323,19 @@ export function ImapMessagesList({
             )}
           </TableBody>
         </Table>
-      </div>
+      </Div>
 
       {/* Pagination */}
       {messages.length > 0 && (
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">
+        <Div className="flex items-center justify-between">
+          <Div className="text-sm text-gray-600">
             {t("app.admin.emails.imap.admin.messages.pagination.showing", {
               start: (page - 1) * limit + 1,
               end: Math.min(page * limit, totalMessages),
               total: totalMessages,
             })}
-          </div>
-          <div className="flex items-center space-x-2">
+          </Div>
+          <Div className="flex items-center space-x-2">
             <Button
               variant="outline"
               size="sm"
@@ -350,9 +351,9 @@ export function ImapMessagesList({
             >
               {t("app.admin.emails.imap.common.next")}
             </Button>
-          </div>
-        </div>
+          </Div>
+        </Div>
       )}
-    </div>
+    </Div>
   );
 }

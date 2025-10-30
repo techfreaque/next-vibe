@@ -88,7 +88,7 @@ const useFormField: () => {
   const fieldState = getFieldState(fieldContext.name, formState);
 
   if (!fieldContext) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
     throw new Error("useFormField should be used within <FormField>");
   }
 

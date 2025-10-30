@@ -165,6 +165,35 @@ export abstract class BaseRegistry {
   }
 
   /**
+   * Lazy load specific endpoints by endpoint IDs
+   * This method dynamically imports only the requested endpoint definitions
+   * More precise than getEndpointsByToolNamesLazy as it loads exact endpoints
+   *
+   * @param endpointIds - Array of endpoint IDs to load (e.g., ["get_v1_core_agent_chat_folders"])
+   * @param user - User context for permission filtering (optional)
+   * @param platform - Platform to filter by (optional)
+   * @returns Array of DiscoveredEndpoint objects for the requested endpoints
+   */
+  async getEndpointsByIdsLazy(
+    endpointIds: string[],
+    user?: JwtPayloadType,
+    platform?: Platform,
+  ): Promise<DiscoveredEndpoint[]> {
+    // Import the lazy loader
+    const { getEndpointsByIds } = await import("../discovery/adapter");
+
+    // Load only the requested endpoints
+    const endpoints = await getEndpointsByIds(endpointIds);
+
+    // Apply permission filtering if user is provided
+    if (user) {
+      return toolFilter.filterEndpointsByPermissions(endpoints, user, platform);
+    }
+
+    return endpoints;
+  }
+
+  /**
    * Refresh the registry
    */
   async refresh(): Promise<void> {

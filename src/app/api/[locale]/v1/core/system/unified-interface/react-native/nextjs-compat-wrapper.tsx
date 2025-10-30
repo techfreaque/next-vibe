@@ -70,7 +70,7 @@ export interface ExpoRouterParams extends Record<string, string | string[]> {
  * Using a single flexible signature to avoid intersection type issues
  */
 type AnyNextPageComponent<TParams extends RouteParams = ExpoRouterParams> = (
-  props: { params: Promise<TParams> } | { params: TParams } | Record<string, unknown>
+  props: { params: Promise<TParams> } | { params: TParams } | Record<string, string | number | boolean>
 ) => Promise<JSX.Element> | JSX.Element | never;
 
 /**
@@ -190,7 +190,7 @@ type AnyNextLayoutComponent<TParams extends RouteParams = ExpoRouterParams> = (
   props:
     | { params: Promise<TParams>; children: React.ReactNode }
     | { params: TParams; children: React.ReactNode }
-    | Record<string, unknown>
+    | Record<string, string | number | boolean>
 ) => Promise<JSX.Element> | JSX.Element;
 
 /**

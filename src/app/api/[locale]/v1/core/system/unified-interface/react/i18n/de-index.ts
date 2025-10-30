@@ -19,6 +19,30 @@ export const translations: typeof enTranslations = {
       mutation_success: "Mutation erfolgreich",
     },
   },
+  widgets: {
+    container: {
+      noContent: "Kein Inhalt",
+    },
+    dataTable: {
+      showing: "Zeige",
+      of: "von",
+      results: "Ergebnisse",
+    },
+    linkList: {
+      noResults: "Keine Ergebnisse gefunden",
+    },
+    link: {
+      invalidData: "Ungültige Link-Daten",
+    },
+    markdown: {
+      noContent: "Kein Inhalt",
+    },
+    errorBoundary: {
+      title: "Widget-Fehler",
+      errorDetails: "Fehlerdetails",
+      defaultMessage: "Beim Rendern dieses Widgets ist ein Fehler aufgetreten",
+    },
+  },
   post: {
     title: "Titel",
     description: "Endpunkt-Beschreibung",

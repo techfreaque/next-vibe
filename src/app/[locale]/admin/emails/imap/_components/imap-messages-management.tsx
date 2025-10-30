@@ -7,10 +7,11 @@
 "use client";
 
 import { Filter, RefreshCw } from "lucide-react";
-import { FormAlert } from "next-vibe-ui/ui";
+import { Div, FormAlert, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { useImapAccountsListEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/hooks";
@@ -69,26 +70,26 @@ export function ImapMessagesManagement(): JSX.Element {
     });
   };
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">
+    <Div>
+      <Div className="mb-6">
+        <H1 className="text-3xl font-bold">
           {t("app.admin.emails.imap.admin.messages.title", {
             count: totalMessages,
           })}
-        </h1>
-        <p className="text-muted-foreground">
+        </H1>
+        <P className="text-muted-foreground">
           {t("app.admin.emails.imap.admin.messages.description")}
-        </p>
-      </div>
-      <div className="space-y-6">
+        </P>
+      </Div>
+      <Div className="space-y-6">
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <Div className="flex items-center justify-between">
               <CardTitle className="flex items-center space-x-2">
                 <Filter className="h-5 w-5" />
-                <span>{t("app.admin.emails.imap.admin.messages.filters")}</span>
+                <Span>{t("app.admin.emails.imap.admin.messages.filters")}</Span>
               </CardTitle>
-              <div className="flex items-center space-x-2">
+              <Div className="flex items-center space-x-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -107,15 +108,15 @@ export function ImapMessagesManagement(): JSX.Element {
                   <RefreshCw className="h-4 w-4 mr-2" />
                   {t("app.admin.emails.imap.common.refresh")}
                 </Button>
-              </div>
-            </div>
+              </Div>
+            </Div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
+            <Div className="space-y-6">
               <FormAlert alert={messagesEndpoint.alert} />
 
               {/* Filters Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Account Filter */}
                 <EndpointFormField
                   name="accountId"
@@ -234,10 +235,10 @@ export function ImapMessagesManagement(): JSX.Element {
                     showAllRequired: false,
                   }}
                 />
-              </div>
+              </Div>
 
               {/* Date Range Filters */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <EndpointFormField
                   name="dateFrom"
                   config={{
@@ -265,11 +266,11 @@ export function ImapMessagesManagement(): JSX.Element {
                     showAllRequired: false,
                   }}
                 />
-              </div>
+              </Div>
 
               {/* Search Bar */}
-              <div className="flex items-center space-x-4">
-                <div className="flex-1">
+              <Div className="flex items-center space-x-4">
+                <Div className="flex-1">
                   <EndpointFormField
                     name="search"
                     config={{
@@ -284,9 +285,9 @@ export function ImapMessagesManagement(): JSX.Element {
                       showAllRequired: false,
                     }}
                   />
-                </div>
-              </div>
-            </div>
+                </Div>
+              </Div>
+            </Div>
           </CardContent>
         </Card>
 
@@ -294,15 +295,15 @@ export function ImapMessagesManagement(): JSX.Element {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>
+              <Span>
                 {t("app.admin.emails.imap.admin.messages.title", {
                   count: totalMessages,
                 })}
-              </span>
-              <div className="text-sm text-muted-foreground">
+              </Span>
+              <Div className="text-sm text-muted-foreground">
                 {t("app.admin.emails.imap.common.page")} {currentPage}{" "}
                 {t("app.admin.emails.imap.common.of")} {totalPages}
-              </div>
+              </Div>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -316,9 +317,9 @@ export function ImapMessagesManagement(): JSX.Element {
 
             {/* Pagination */}
             {totalMessages > 0 && (
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-muted-foreground">
+              <Div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <Div className="flex items-center justify-between">
+                  <Div className="text-sm text-muted-foreground">
                     {t("app.admin.emails.imap.common.showing")}{" "}
                     {(currentPage - 1) * currentLimit + 1}{" "}
                     {t("app.admin.emails.imap.common.to")}{" "}
@@ -328,8 +329,8 @@ export function ImapMessagesManagement(): JSX.Element {
                     {t(
                       "app.admin.emails.imap.admin.messages.title",
                     ).toLowerCase()}
-                  </div>
-                  <div className="flex items-center space-x-2">
+                  </Div>
+                  <Div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -343,9 +344,9 @@ export function ImapMessagesManagement(): JSX.Element {
                     >
                       {t("app.admin.emails.imap.common.previous")}
                     </Button>
-                    <span className="text-sm">
+                    <Span className="text-sm">
                       {currentPage} / {totalPages}
-                    </span>
+                    </Span>
                     <Button
                       variant="outline"
                       size="sm"
@@ -359,9 +360,9 @@ export function ImapMessagesManagement(): JSX.Element {
                     >
                       {t("app.admin.emails.imap.common.next")}
                     </Button>
-                  </div>
-                </div>
-              </div>
+                  </Div>
+                </Div>
+              </Div>
             )}
           </CardContent>
         </Card>
@@ -374,49 +375,49 @@ export function ImapMessagesManagement(): JSX.Element {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold">
+            <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Div className="text-center">
+                <Div className="text-2xl font-bold">
                   {totalMessages.toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-600">
+                </Div>
+                <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.dashboard.totalMessages")}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
+                </Div>
+              </Div>
+              <Div className="text-center">
+                <Div className="text-2xl font-bold text-blue-600">
                   {messages
                     .filter((msg) => !msg.isRead)
                     .length.toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-600">
+                </Div>
+                <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.messages.unread")}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-600">
+                </Div>
+              </Div>
+              <Div className="text-center">
+                <Div className="text-2xl font-bold text-yellow-600">
                   {messages
                     .filter((msg) => msg.isFlagged)
                     .length.toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-600">
+                </Div>
+                <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.messages.flagged")}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
+                </Div>
+              </Div>
+              <Div className="text-center">
+                <Div className="text-2xl font-bold text-green-600">
                   {messages
                     .filter((msg) => msg.hasAttachments)
                     .length.toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-600">
+                </Div>
+                <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.messages.withAttachments")}
-                </div>
-              </div>
-            </div>
+                </Div>
+              </Div>
+            </Div>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }

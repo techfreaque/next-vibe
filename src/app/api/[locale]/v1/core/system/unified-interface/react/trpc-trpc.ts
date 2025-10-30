@@ -53,7 +53,7 @@ export const publicProcedure = t.procedure;
 const isAuthenticated = middleware(async ({ ctx, next }) => {
   if (!ctx.user || ctx.user.isPublic) {
     // Debug: Authentication required but user not authenticated
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- tRPC framework requires throwing TRPCError for middleware error handling
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "app.error.unauthorized",
@@ -88,7 +88,7 @@ export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
       logger.error("tRPC: Role check failed - user not authenticated", {
         requiredRoles: [...roles],
       });
-      // eslint-disable-next-line no-restricted-syntax
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- tRPC framework requires throwing TRPCError for authentication failures
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: "app.error.unauthorized",
@@ -103,7 +103,7 @@ export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
         requiredRoles: [...roles],
         userRoles: [...ctx.userRoles],
       });
-      // eslint-disable-next-line no-restricted-syntax
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- tRPC framework requires throwing TRPCError for authorization failures
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "error.forbidden",
@@ -179,12 +179,12 @@ export function handleNextVibeResponse<T>(response: {
   if (!response.success) {
     const errorType = response.errorType || ErrorResponseTypes.INTERNAL_ERROR;
     const message = response.message || errorType.errorKey;
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- tRPC framework requires throwing TRPCError for error responses
     throw convertToTRPCError(errorType, message);
   }
 
   if (response.data === undefined) {
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- tRPC framework requires throwing TRPCError for missing response data
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
       message: ErrorResponseTypes.NO_RESPONSE_DATA.errorKey,

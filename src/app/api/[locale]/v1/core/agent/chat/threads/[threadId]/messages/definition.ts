@@ -22,7 +22,7 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { ChatMessageRole, ChatMessageRoleOptions } from "../../../enum";
+import { ChatMessageRole } from "../../../enum";
 
 /**
  * Get Messages List Endpoint (GET)
@@ -293,11 +293,14 @@ const { GET } = createEndpoint({
 /**
  * Create Message Endpoint (POST)
  * Creates a new message in a thread
+ *
+ * Note: PUBLIC role is allowed for anonymous users to respond in threads
+ * The repository layer validates thread access and permissions
  */
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "agent", "chat", "threads", "[threadId]", "messages"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title:
     "app.api.v1.core.agent.chat.threads.threadId.messages.post.title" as const,
@@ -405,9 +408,14 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.messages.post.role.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.post.role.description" as const,
-              options: ChatMessageRoleOptions,
+              options: [
+                {
+                  value: ChatMessageRole.USER,
+                  label: "app.api.v1.core.agent.chat.enums.role.user" as const,
+                },
+              ],
             },
-            z.enum(ChatMessageRole),
+            z.literal(ChatMessageRole.USER),
           ),
           content: requestDataField(
             {

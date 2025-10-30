@@ -66,6 +66,7 @@ export async function ciRelease(
 
   if (!configResponse.success) {
     logger.error("Failed to load config", { error: configResponse.message });
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error(configResponse.message);
   }
 
@@ -106,6 +107,7 @@ export async function ciRelease(
           logger.info(CLI_MESSAGES.runningSnykMonitor(packageJson.name));
           const snykResult = snykMonitor(cwd, logger);
           if (!snykResult.success) {
+            // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
             throw new Error(snykResult.message);
           }
         }
@@ -148,6 +150,7 @@ function runQualityChecks(
     logger.info(CLI_MESSAGES.linting(packageName));
     const lintResult = lint(cwd, logger);
     if (!lintResult.success) {
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(lintResult.message);
     }
   }
@@ -156,6 +159,7 @@ function runQualityChecks(
     logger.info(CLI_MESSAGES.typeChecking(packageName));
     const typecheckResult = typecheck(cwd, logger);
     if (!typecheckResult.success) {
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(typecheckResult.message);
     }
   }
@@ -164,6 +168,7 @@ function runQualityChecks(
     logger.info(CLI_MESSAGES.building(packageName));
     const buildResult = build(cwd, logger);
     if (!buildResult.success) {
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(buildResult.message);
     }
   }
@@ -172,6 +177,7 @@ function runQualityChecks(
     logger.info(CLI_MESSAGES.runningTests(packageName));
     const testResult = runTests(cwd, logger);
     if (!testResult.success) {
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(testResult.message);
     }
   }
@@ -180,6 +186,7 @@ function runQualityChecks(
     logger.info(CLI_MESSAGES.runningSnykTest(packageName));
     const snykResult = snykTest(cwd, logger);
     if (!snykResult.success) {
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(snykResult.message);
     }
   }
@@ -196,6 +203,7 @@ function runCiReleaseCommand(
   if (!releaseConfig.ciReleaseCommand) {
     const errorMsg = CLI_MESSAGES.ciReleaseRequired(packageName);
     logger.error(errorMsg);
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error(errorMsg);
   }
 
@@ -221,12 +229,14 @@ function runCiReleaseCommand(
       if (typeof value !== "string") {
         const errorMsg = CLI_MESSAGES.envVarNotString(packageName);
         logger.error(errorMsg);
+        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
         throw new Error(errorMsg);
       }
       const envValue = getEnvVar(value);
       if (!envValue) {
         const errorMsg = CLI_MESSAGES.envVarNotSet(value, packageName);
         logger.error(errorMsg);
+        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
         throw new Error(errorMsg);
       }
       ciEnv[key] = envValue;
@@ -243,6 +253,7 @@ function runCiReleaseCommand(
     const msg = error instanceof Error ? error.message : String(error);
     const errorMsg = CLI_MESSAGES.ciCommandFailed(packageName, msg);
     logger.error(errorMsg);
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error(errorMsg, { cause: error });
   }
 }

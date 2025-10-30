@@ -6,6 +6,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { Div } from "next-vibe-ui/ui";
+import { H1 } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import type { ReactNode } from "react";
 
@@ -55,23 +57,23 @@ export function AdminLeadsLayoutClient({
   const currentPage = getCurrentPage();
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Header with Navigation */}
-      <div className="flex flex-col space-y-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+      <Div className="flex flex-col space-y-4">
+        <Div>
+          <H1 className="text-3xl font-bold text-gray-900 dark:text-white">
             {t("app.admin.leads.leads.admin.title")}
-          </h1>
-        </div>
+          </H1>
+        </Div>
 
         <LeadsNavigation locale={locale} currentPage={currentPage} />
-      </div>
+      </Div>
 
       {/* Import Status Alert */}
       <ImportStatusAlert />
 
       {/* Page Content */}
       {children}
-    </div>
+    </Div>
   );
 }

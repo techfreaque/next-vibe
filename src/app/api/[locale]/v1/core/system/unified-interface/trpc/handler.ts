@@ -77,7 +77,7 @@ export function createTRPCHandler<
         createEndpointLogger(false, Date.now(), ctx.locale),
       );
       if (!authResult.success) {
-        // eslint-disable-next-line no-restricted-syntax
+        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- TRPC/Framework error propagation requires throwing to integrate with framework error handling
         throw convertToTRPCError(
           ErrorResponseTypes.UNAUTHORIZED,
           ctx.t(
@@ -103,7 +103,7 @@ export function createTRPCHandler<
       );
 
       if (!validationResult.success) {
-        // eslint-disable-next-line no-restricted-syntax
+        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- TRPC/Framework error propagation requires throwing to integrate with framework error handling
         throw convertToTRPCError(
           ErrorResponseTypes.INVALID_REQUEST_ERROR,
           ctx.t(
@@ -133,7 +133,7 @@ export function createTRPCHandler<
         logger.error(
           "tRPC endpoint returned streaming response - not supported",
         );
-        // eslint-disable-next-line no-restricted-syntax
+        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- TRPC/Framework error propagation requires throwing to integrate with framework error handling
         throw convertToTRPCError(
           ErrorResponseTypes.INTERNAL_ERROR,
           ctx.t(
@@ -148,12 +148,12 @@ export function createTRPCHandler<
     } catch (error) {
       // If it's already a tRPC error, re-throw it
       if (error && typeof error === "object" && "code" in error) {
-        // eslint-disable-next-line no-restricted-syntax
+        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Error re-throwing is necessary to propagate errors through call stack
         throw error;
       }
 
       // Error details are handled by parseError and included in the response
-      // eslint-disable-next-line no-restricted-syntax
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- TRPC/Framework error propagation requires throwing to integrate with framework error handling
       throw convertToTRPCError(
         ErrorResponseTypes.INTERNAL_ERROR,
         ctx.t(

@@ -1,13 +1,12 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { Form } from "next-vibe-ui/ui";
-import { Button } from "next-vibe-ui/ui/button";
+import { Button, Div, Form } from "next-vibe-ui/ui";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+import { H2 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import contactDefinitions from "@/app/api/[locale]/v1/core/contact/definition";
 import { useContactWithEngagement } from "@/app/api/[locale]/v1/core/contact/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/types";
@@ -29,37 +28,43 @@ export default function ContactForm({
 }: ContactFormProps): JSX.Element {
   const logger = createEndpointLogger(false, Date.now(), locale);
   const contactResult = useContactWithEngagement(logger, user);
+  const { t } = simpleT(locale);
+
+  // Type assertion: contactResult.create is always defined because definition has POST
+  if (!contactResult.create) {
+    logger.error("Contact form endpoint not properly configured");
+    return <div>{t("app.help.components.pages.help.form.error")}</div>;
+  }
+
   const form = contactResult.create.form;
   const isSubmitting = contactResult.create.isSubmitting || false;
   const submitForm = contactResult.create.onSubmit;
   const isSubmitSuccessful = contactResult.create.response?.success === true;
-  const { t } = simpleT(locale);
 
   // Show success message if form was submitted successfully
   if (isSubmitSuccessful) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
-        <h2 className="text-2xl font-bold mb-6">
+      <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
+        <H2 className="text-2xl font-bold mb-6">
           {t("app.help.components.pages.help.form.title")}
-        </h2>
+        </H2>
         <FormAlert alert={contactResult.alert} className="mb-6" />
-      </div>
+      </Div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
-      <h2 className="text-2xl font-bold mb-6">
+    <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
+      <H2 className="text-2xl font-bold mb-6">
         {t("app.help.components.pages.help.form.title")}
-      </h2>
+      </H2>
       {/* Show form alert if any */}
       <FormAlert alert={contactResult.alert} className="mb-6" />
       <Form form={form} onSubmit={submitForm} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <EndpointFormField
             name="name"
             control={form.control}
-            endpointFields={contactDefinitions.POST.fields}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -69,18 +74,16 @@ export default function ContactForm({
           <EndpointFormField
             name="email"
             control={form.control}
-            endpointFields={contactDefinitions.POST.fields}
             theme={{
               style: "none",
               showAllRequired: false,
             }}
           />
-        </div>
+        </Div>
 
         <EndpointFormField
           name="company"
           control={form.control}
-          endpointFields={contactDefinitions.POST.fields}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -90,7 +93,6 @@ export default function ContactForm({
         <EndpointFormField
           name="subject"
           control={form.control}
-          endpointFields={contactDefinitions.POST.fields}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -100,7 +102,6 @@ export default function ContactForm({
         <EndpointFormField
           name="message"
           control={form.control}
-          endpointFields={contactDefinitions.POST.fields}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -122,6 +123,6 @@ export default function ContactForm({
           )}
         </Button>
       </Form>
-    </div>
+    </Div>
   );
 }

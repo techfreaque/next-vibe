@@ -8,7 +8,6 @@ import "server-only";
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-import { validateData } from "next-vibe/shared/utils/validation";
 import { z } from "zod";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
@@ -16,7 +15,7 @@ import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/sha
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "../shared/logger/endpoint";
 import {
   type ValidatedRequestData,
   validateEndpointRequestData,
@@ -39,6 +38,7 @@ export interface NextValidationContext {
   /** Next.js request object */
   request: NextRequest;
   /** Raw URL parameters from Next.js route (INPUT type) */
+  // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Validation helper requires 'unknown' for untrusted input validation
   urlParameters: Record<string, unknown>;
   /** Locale for error messages */
   locale: CountryLanguage;
@@ -91,7 +91,7 @@ export async function validateNextRequestData<
         endpoint.requestUrlPathParamsSchema,
         logger,
       )
-      : { success: true as const, data: undefined };
+      : { success: true as const, data: undefined as TUrlVariablesOutput };
 
     if (!urlValidation.success) {
       return {
@@ -106,18 +106,18 @@ export async function validateNextRequestData<
 
     // Validate request data based on method
     // Extract raw data and validate it using schemas
-    let requestValidation: ResponseType<z.output<typeof endpoint.requestSchema>>;
+    let requestValidation: ResponseType<TRequestOutput>;
 
     if (context.method === Methods.GET) {
       // For GET requests, extract query parameters
-      requestValidation = validateGetRequestData(
+      requestValidation = validateGetRequestData<TRequestOutput>(
         endpoint,
         context.request,
         logger,
       );
     } else {
       // For POST/PUT/PATCH/DELETE requests, validate body
-      requestValidation = await validatePostRequestData(
+      requestValidation = await validatePostRequestData<TRequestOutput>(
         endpoint,
         context.request,
         logger,
@@ -141,7 +141,7 @@ export async function validateNextRequestData<
       success: true,
       data: {
         requestData: requestValidation.data,
-        urlPathParams: urlValidation.data,
+        urlPathParams: urlValidation.data as TUrlVariablesOutput,
         locale: validatedLocale,
       },
     };
@@ -165,13 +165,13 @@ export async function validateNextRequestData<
  * Validate GET request data from query parameters
  * Extracts raw query parameters and validates using schema
  */
-function validateGetRequestData<_TRequestInput, TRequestOutput, TSchema extends z.ZodTypeAny>(
+function validateGetRequestData<TRequestOutput>(
   endpoint: {
-    requestSchema: TSchema;
+    requestSchema: z.ZodTypeAny;
   },
   request: NextRequest,
   logger: EndpointLogger,
-): ResponseType<z.output<TSchema>> {
+): ResponseType<TRequestOutput> {
   // Check if the schema is z.undefined(), z.never(), or empty z.object({}) (no request data expected)
   // This happens when an endpoint has no request fields
   const isEmptyObject =
@@ -288,11 +288,11 @@ function validateGetRequestData<_TRequestInput, TRequestOutput, TSchema extends 
   }
 
   // Validate using schema - schema takes raw input and produces validated output
-  return validateData(
+  return validateEndpointRequestData(
     queryData,
     endpoint.requestSchema,
     logger,
-  );
+  ) as ResponseType<TRequestOutput>;
 }
 
 /**
@@ -336,13 +336,13 @@ function parseFormDataToObject(formData: FormData): Record<string, unknown> {
  * Extracts raw request body and validates using schema
  * Handles both JSON and FormData (multipart/form-data)
  */
-async function validatePostRequestData<_TRequestInput, TRequestOutput, TSchema extends z.ZodTypeAny>(
+async function validatePostRequestData<TRequestOutput>(
   endpoint: {
-    requestSchema: TSchema;
+    requestSchema: z.ZodTypeAny;
   },
   request: NextRequest,
   logger: EndpointLogger,
-): Promise<ResponseType<z.output<TSchema>>> {
+): Promise<ResponseType<TRequestOutput>> {
   // Check if the schema is z.undefined(), z.never(), or empty z.object({}) (no request data expected)
   // This happens when an endpoint has no request fields
   const isEmptyObject =
@@ -380,11 +380,13 @@ async function validatePostRequestData<_TRequestInput, TRequestOutput, TSchema e
   try {
     const contentType = request.headers.get("content-type") || "";
 
+    // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Cache key generation requires 'unknown' for flexible parameter support
     let body: unknown;
 
     if (contentType.includes("multipart/form-data")) {
       // Parse FormData
       const formData = await request.formData();
+      // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Parameter serialization requires 'unknown' for dynamic value handling
       body = parseFormDataToObject(formData as unknown as FormData);
     } else {
       // Parse JSON
@@ -396,7 +398,7 @@ async function validatePostRequestData<_TRequestInput, TRequestOutput, TSchema e
       body,
       endpoint.requestSchema,
       logger,
-    );
+    ) as ResponseType<TRequestOutput>;
   } catch (error) {
     return {
       success: false,

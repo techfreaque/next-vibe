@@ -552,6 +552,7 @@ export class RouteDelegationHandler {
   formatResult(
     result: RouteExecutionResult,
     outputFormat = "pretty",
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Route handler execution requires 'unknown' for flexible handler types
     endpointDefinition: unknown | null,
     locale: CountryLanguage,
     verbose = false,
@@ -768,6 +769,7 @@ export class RouteDelegationHandler {
    */
   private formatWithEnhancedRenderer(
     data: CliResponseData,
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response transformation requires 'unknown' for flexible response types
     endpointDefinition: unknown,
     locale: CountryLanguage,
     logger: EndpointLogger,

@@ -13,6 +13,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "next-vibe-ui/ui";
+import { H4 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -189,9 +190,9 @@ export function IconSelector({
             <Div className="space-y-4">
               {Object.entries(iconCategories).map(([category, icons]) => (
                 <Div key={category}>
-                  <h4 className="text-xs font-semibold text-muted-foreground mb-2 px-1">
+                  <H4 className="text-xs font-semibold text-muted-foreground mb-2 px-1">
                     {category}
-                  </h4>
+                  </H4>
                   <Div className="grid grid-cols-8 gap-1">
                     {icons.map((iconKey) => {
                       const Icon = ICON_REGISTRY[iconKey];

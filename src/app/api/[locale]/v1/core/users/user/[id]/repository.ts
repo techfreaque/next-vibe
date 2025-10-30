@@ -80,6 +80,25 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
 
       logger.debug("User found successfully", { userId: foundUser.id });
 
+      // Fetch user roles from database
+      const { userRolesRepository } = await import(
+        "@/app/api/[locale]/v1/core/user/user-roles/repository"
+      );
+      const userRolesResponse = await userRolesRepository.findByUserId(
+        foundUser.id,
+        logger,
+      );
+
+      // Default to empty array if roles fetch fails
+      const userRoles = userRolesResponse.success ? userRolesResponse.data : [];
+
+      if (!userRolesResponse.success) {
+        logger.warn("Failed to fetch user roles", {
+          userId: foundUser.id,
+          error: userRolesResponse.message,
+        });
+      }
+
       return createSuccessResponse({
         userProfile: {
           basicInfo: {
@@ -93,7 +112,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
           isActive: foundUser.isActive,
           emailVerified: foundUser.emailVerified,
           stripeCustomerId: foundUser.stripeCustomerId,
-          userRoles: [], // TODO: Fetch user roles from database
+          userRoles: userRoles,
         },
         timestamps: {
           createdAt: foundUser.createdAt.toISOString(),
@@ -106,7 +125,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         emailVerified: foundUser.emailVerified,
         isActive: foundUser.isActive,
         stripeCustomerId: foundUser.stripeCustomerId,
-        userRoles: [], // TODO: Fetch user roles from database
+        userRoles: userRoles,
         createdAt: foundUser.createdAt.toISOString(),
         updatedAt: foundUser.updatedAt.toISOString(),
       });
@@ -185,6 +204,25 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
 
       logger.debug("User updated successfully", { userId });
 
+      // Fetch user roles from database
+      const { userRolesRepository } = await import(
+        "@/app/api/[locale]/v1/core/user/user-roles/repository"
+      );
+      const userRolesResponse = await userRolesRepository.findByUserId(
+        updatedUser.id,
+        logger,
+      );
+
+      // Default to empty array if roles fetch fails
+      const userRoles = userRolesResponse.success ? userRolesResponse.data : [];
+
+      if (!userRolesResponse.success) {
+        logger.warn("Failed to fetch user roles", {
+          userId: updatedUser.id,
+          error: userRolesResponse.message,
+        });
+      }
+
       return createSuccessResponse({
         id: updatedUser.id,
         leadId: null,
@@ -194,7 +232,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         emailVerified: updatedUser.emailVerified,
         isActive: updatedUser.isActive,
         stripeCustomerId: updatedUser.stripeCustomerId,
-        userRoles: [], // TODO: Fetch user roles from database
+        userRoles: userRoles,
         createdAt: updatedUser.createdAt.toISOString(),
         updatedAt: updatedUser.updatedAt.toISOString(),
       });

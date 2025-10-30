@@ -5,7 +5,9 @@ export const translations: typeof enTranslations = {
   description: "Ändern Sie Ihr Kontokennwort sicher",
   tag: "passwort-ändern",
   debug: {
+    updatingPassword: "Passwort wird aktualisiert",
     errorUpdatingPassword: "Fehler beim Aktualisieren des Passworts",
+    settingPassword: "Passwort wird gesetzt",
     errorSettingPassword: "Fehler beim Setzen des Passworts",
   },
   groups: {
@@ -66,6 +68,8 @@ export const translations: typeof enTranslations = {
     incorrect_password: "Falsches Passwort",
     update_failed: "Passwort konnte nicht aktualisiert werden",
     token_creation_failed: "Passwort-Token konnte nicht erstellt werden",
+    two_factor_code_required: "Zwei-Faktor-Authentifizierungscode erforderlich",
+    invalid_two_factor_code: "Ungültiger Zwei-Faktor-Authentifizierungscode",
     invalid_request: {
       title: "Ungültige Anfrage",
       description: "Die Passwort-Änderungsanfrage ist ungültig",
@@ -112,6 +116,12 @@ export const translations: typeof enTranslations = {
     },
   },
   success: {
+    updated: "Passwort erfolgreich aktualisiert",
+    securityTip: "Aktivieren Sie für erhöhte Sicherheit die Zwei-Faktor-Authentifizierung",
+    nextSteps: {
+      logoutOther: "Alle anderen Sitzungen wurden aus Sicherheitsgründen abgemeldet",
+      enable2fa: "Erwägen Sie die Aktivierung der Zwei-Faktor-Authentifizierung für bessere Sicherheit",
+    },
     title: "Passwort Aktualisiert",
     description: "Ihr Passwort wurde erfolgreich aktualisiert",
   },

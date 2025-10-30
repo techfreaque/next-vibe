@@ -281,14 +281,14 @@ export function useApiForm<
 
         // Call the API with the validated form data
         const result = await executeMutation(
-          endpoint,
+          endpoint as never,
           logger,
-          validatedData,
-          (options?.urlParamVariables as TEndpoint["TUrlVariablesOutput"]) ||
-          ({} as TEndpoint["TUrlVariablesOutput"]),
+          validatedData as never,
+          ((options?.urlParamVariables as TEndpoint["TUrlVariablesOutput"]) ||
+          ({} as TEndpoint["TUrlVariablesOutput"])) as never,
           t,
           locale,
-          mutationOptions,
+          mutationOptions as never,
         );
 
         if (result === undefined) {
@@ -378,24 +378,18 @@ export function useApiForm<
           ? formState.formError
           : undefined;
 
+  // Simplify submitError to avoid complex union types
+  const submitError: ErrorResponseType | undefined =
+    mutationState.error ||
+    formState.formError ||
+    undefined;
+
   return {
     form: formMethods,
     response,
     // Backward compatibility properties
     isSubmitSuccessful: mutationState.isSuccess,
-    submitError:
-      mutationState.error || formState.formError
-        ? fail({
-          message:
-            mutationState.error?.message ||
-            formState.formError?.message ||
-            "app.api.v1.core.system.unifiedInterface.react.hooks.mutationForm.post.errors.unknown.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams:
-            mutationState.error?.messageParams ||
-            formState.formError?.messageParams,
-        })
-        : undefined,
+    submitError,
 
     isSubmitting: mutationState.isPending,
     submitForm,

@@ -17,10 +17,15 @@ import { ChevronDown } from "./icons/ChevronDown";
 
 const NavigationMenu = React.forwardRef<
   NavigationMenuPrimitive.RootRef,
-  NavigationMenuPrimitive.RootProps
->(({ className, children, ...props }, ref) => (
+  Omit<NavigationMenuPrimitive.RootProps, 'value' | 'onValueChange'> & {
+    value?: string | undefined;
+    onValueChange?: (value: string | undefined) => void;
+  }
+>(({ className, children, value, onValueChange, ...props }, ref) => (
   <NavigationMenuPrimitive.Root
     ref={ref}
+    value={value}
+    onValueChange={onValueChange || (() => {})}
     className={cn(
       "relative z-10 flex flex-row max-w-max items-center justify-center",
       className,
@@ -56,7 +61,9 @@ const navigationMenuTriggerStyle = cva(
 
 const NavigationMenuTrigger = React.forwardRef<
   NavigationMenuPrimitive.TriggerRef,
-  NavigationMenuPrimitive.TriggerProps
+  Omit<NavigationMenuPrimitive.TriggerProps, 'children'> & {
+    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+  }
 >(({ className, children, ...props }, ref) => {
   const { value } = NavigationMenuPrimitive.useRootContext();
   const { value: itemValue } = NavigationMenuPrimitive.useItemContext();

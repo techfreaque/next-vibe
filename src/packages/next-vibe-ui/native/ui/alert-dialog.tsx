@@ -4,6 +4,7 @@ import { Platform, StyleSheet, View, type ViewProps } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import { cn } from "../lib/utils";
+import type { WithClassName } from "../lib/types";
 import { buttonTextVariants, buttonVariants } from "./button";
 import { TextClassContext } from "./text";
 
@@ -117,7 +118,7 @@ AlertDialogFooter.displayName = "AlertDialogFooter";
 
 const AlertDialogTitle = React.forwardRef<
   AlertDialogPrimitive.TitleRef,
-  AlertDialogPrimitive.TitleProps
+  WithClassName<AlertDialogPrimitive.TitleProps>
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Title
     ref={ref}
@@ -132,7 +133,7 @@ AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName;
 
 const AlertDialogDescription = React.forwardRef<
   AlertDialogPrimitive.DescriptionRef,
-  AlertDialogPrimitive.DescriptionProps
+  WithClassName<AlertDialogPrimitive.DescriptionProps>
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Description
     ref={ref}

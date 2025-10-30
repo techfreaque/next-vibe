@@ -845,8 +845,8 @@ export type ThreadPatchResponseOutput = typeof PATCH.types.ResponseOutput;
 export type ThreadPatchUrlParamsTypeOutput =
   typeof PATCH.types.UrlVariablesOutput;
 
-export type ThreadDeleteRequestInput = typeof DELETE.types.RequestInput;
-export type ThreadDeleteRequestOutput = typeof DELETE.types.RequestOutput;
+export type ThreadDeleteRequestInput = typeof DELETE.types.UrlVariablesInput;
+export type ThreadDeleteRequestOutput = typeof DELETE.types.UrlVariablesOutput;
 export type ThreadDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type ThreadDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 export type ThreadDeleteUrlParamsTypeOutput =

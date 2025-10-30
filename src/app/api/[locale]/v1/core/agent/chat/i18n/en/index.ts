@@ -15,6 +15,7 @@ export const translations = {
     personas: "Personas",
     credits: "Credits",
     balance: "Balance",
+    permissions: "Permissions",
   },
   config: {
     folders: {
@@ -29,6 +30,7 @@ export const translations = {
       user: "User",
       assistant: "Assistant",
       system: "System",
+      tool: "Tool",
       error: "Error",
     },
     threadStatus: {

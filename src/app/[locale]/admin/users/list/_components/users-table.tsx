@@ -5,8 +5,9 @@
 
 "use client";
 
-import Link from "next/link";
+import NextLink from "next/link";
 import { Badge } from "next-vibe-ui/ui/badge";
+import { Div } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Table,
@@ -16,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import { useCallback } from "react";
 
@@ -80,7 +82,7 @@ export function UsersTable({
 
   if (isLoading && users.length === 0) {
     return (
-      <div className="rounded-md border">
+      <Div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -97,52 +99,52 @@ export function UsersTable({
             {Array.from({ length: 5 }).map((_, index) => (
               <TableRow key={index}>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <Div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                 </TableCell>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <Div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                 </TableCell>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <Div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                 </TableCell>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <Div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                 </TableCell>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <Div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </div>
+      </Div>
     );
   }
 
   if (users.length === 0) {
     return (
-      <div className="rounded-md border">
-        <div className="p-8 text-center">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+      <Div className="rounded-md border">
+        <Div className="p-8 text-center">
+          <H3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
             {t("app.admin.users.list.empty.title")}
-          </h3>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          </H3>
+          <P className="mt-2 text-sm text-gray-500 dark:text-gray-400">
             {t("app.admin.users.list.empty.description")}
-          </p>
-          <div className="mt-6">
+          </P>
+          <Div className="mt-6">
             <Button asChild>
-              <Link href={`/${locale}/admin/users/create`}>
+              <NextLink href={`/${locale}/admin/users/create`}>
                 {t("app.admin.users.actions.add")}
-              </Link>
+              </NextLink>
             </Button>
-          </div>
-        </div>
-      </div>
+          </Div>
+        </Div>
+      </Div>
     );
   }
 
   return (
-    <div className="rounded-md border">
+    <Div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
@@ -169,12 +171,12 @@ export function UsersTable({
             return (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">
-                  <Link
+                  <NextLink
                     href={`/${locale}/admin/users/${user.id}/edit`}
                     className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
                     {user.privateName || user.publicName}
-                  </Link>
+                  </NextLink>
                 </TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
@@ -183,24 +185,24 @@ export function UsersTable({
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <Div className="text-sm text-gray-500 dark:text-gray-400">
                     {formatDate(user.createdAt)}
-                  </div>
+                  </Div>
                 </TableCell>
                 <TableCell className="text-right">
-                  <div className="flex items-center justify-end space-x-2">
+                  <Div className="flex items-center justify-end space-x-2">
                     <Button asChild variant="outline" size="sm">
-                      <Link href={`/${locale}/admin/users/${user.id}/edit`}>
+                      <NextLink href={`/${locale}/admin/users/${user.id}/edit`}>
                         {t("app.admin.users.actions.edit")}
-                      </Link>
+                      </NextLink>
                     </Button>
-                  </div>
+                  </Div>
                 </TableCell>
               </TableRow>
             );
           })}
         </TableBody>
       </Table>
-    </div>
+    </Div>
   );
 }

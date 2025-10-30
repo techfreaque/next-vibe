@@ -45,6 +45,14 @@ const ContextMenuSubTrigger = React.forwardRef<
   const { open } = ContextMenuPrimitive.useSubContext();
   const Icon =
     Platform.OS === "web" ? ChevronRight : open ? ChevronUp : ChevronDown;
+
+  const renderChildren = () => {
+    if (typeof children === "function") {
+      return (children as (props: { pressed: boolean }) => React.ReactNode)({ pressed: open });
+    }
+    return children;
+  };
+
   return (
     <TextClassContext.Provider
       value={cn(
@@ -62,7 +70,7 @@ const ContextMenuSubTrigger = React.forwardRef<
         )}
         {...props}
       >
-        {typeof children === "function" ? children({ pressed: open }) : children}
+        {renderChildren()}
         <Icon size={18} className="ml-auto text-foreground" />
       </StyledContextMenuSubTrigger>
     </TextClassContext.Provider>
@@ -164,36 +172,46 @@ ContextMenuItem.displayName = ContextMenuPrimitive.Item.displayName;
 const ContextMenuCheckboxItem = React.forwardRef<
   ContextMenuPrimitive.CheckboxItemRef,
   ContextMenuPrimitive.CheckboxItemProps & { className?: string }
->(({ className, children, ...props }, ref) => (
-  <StyledContextMenuCheckboxItem
-    ref={ref}
-    className={cn(
-      "relative flex flex-row web:cursor-default items-center web:group rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
-      props.disabled && "web:pointer-events-none opacity-50",
-      className,
-    )}
-    {...props}
-  >
-    <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <StyledContextMenuItemIndicator>
-        <Check size={14} strokeWidth={3} className="text-foreground" />
-      </StyledContextMenuItemIndicator>
-    </View>
-    {typeof children === "function" ? children({ pressed: false }) : children}
-  </StyledContextMenuCheckboxItem>
-));
+>(({ className, children, disabled, ...props }, ref) => {
+  const renderChildren = () => {
+    if (typeof children === "function") {
+      return (children as (props: { pressed: boolean }) => React.ReactNode)({ pressed: false });
+    }
+    return children;
+  };
+
+  return (
+    <StyledContextMenuCheckboxItem
+      ref={ref}
+      className={cn(
+        "relative flex flex-row web:cursor-default items-center web:group rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
+        disabled && "web:pointer-events-none opacity-50",
+        className,
+      )}
+      disabled={disabled}
+      {...props}
+    >
+      <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+        <StyledContextMenuItemIndicator>
+          <Check size={14} strokeWidth={3} className="text-foreground" />
+        </StyledContextMenuItemIndicator>
+      </View>
+      {renderChildren()}
+    </StyledContextMenuCheckboxItem>
+  );
+});
 ContextMenuCheckboxItem.displayName =
   ContextMenuPrimitive.CheckboxItem.displayName;
 
 const ContextMenuRadioItem = React.forwardRef<
   ContextMenuPrimitive.RadioItemRef,
-  ContextMenuPrimitive.RadioItemProps & { className?: string }
->(({ className, children, ...props }, ref) => (
+  ContextMenuPrimitive.RadioItemProps & { className?: string; disabled?: boolean }
+>(({ className, children, disabled, ...props }, ref) => (
   <StyledContextMenuRadioItem
     ref={ref}
     className={cn(
       "relative flex flex-row web:cursor-default web:group items-center rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
-      props.disabled && "web:pointer-events-none opacity-50",
+      disabled && "web:pointer-events-none opacity-50",
       className,
     )}
     {...props}

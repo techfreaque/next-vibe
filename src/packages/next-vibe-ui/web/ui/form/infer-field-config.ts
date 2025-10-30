@@ -17,7 +17,7 @@ import type { FieldConfig } from "./endpoint-form-field-types";
 /**
  * Type for endpoint field structure
  */
-interface EndpointFieldStructure {
+export interface EndpointFieldStructure {
   type?: string;
   children?: Record<string, EndpointFieldStructure>;
   ui?: {

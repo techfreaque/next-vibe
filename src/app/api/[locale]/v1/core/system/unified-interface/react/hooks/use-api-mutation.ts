@@ -195,13 +195,13 @@ export function useApiMutation<
           : ({} as TEndpoint["TUrlVariablesOutput"]);
 
       void executeMutation(
-        endpoint,
+        endpoint as never,
         logger,
-        requestData,
-        urlPathParams,
+        requestData as never,
+        urlPathParams as never,
         t,
         locale,
-        options,
+        options as never,
       );
     },
     [executeMutation, endpoint, logger, t, locale, options],
@@ -230,13 +230,13 @@ export function useApiMutation<
             : ({} as TEndpoint["TUrlVariablesOutput"]);
 
         const response = await executeMutation(
-          endpoint,
+          endpoint as never,
           logger,
-          requestData,
-          urlPathParams,
+          requestData as never,
+          urlPathParams as never,
           t,
           locale,
-          options,
+          options as never,
         );
 
         // Ensure we return a proper ResponseType

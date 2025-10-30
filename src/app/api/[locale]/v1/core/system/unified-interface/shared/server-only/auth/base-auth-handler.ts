@@ -191,7 +191,7 @@ export abstract class BaseAuthHandler {
    */
   protected createPublicUser(leadId: string): JwtPayloadType {
     if (!leadId) {
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
       throw new Error("leadId from DB required for public user");
     }
     return {
@@ -208,11 +208,11 @@ export abstract class BaseAuthHandler {
     leadId: string,
   ): JwtPrivatePayloadType {
     if (!leadId) {
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
       throw new Error("leadId from DB required for private user");
     }
     if (!userId) {
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
       throw new Error("userId required for private user");
     }
     return {
@@ -237,7 +237,7 @@ export abstract class BaseAuthHandler {
     logger.error("User missing leadId from DB", { userId });
     const dbLeadId = await this.getLeadIdFromDb(userId, locale, logger);
     if (!dbLeadId) {
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for failed lead ID retrieval
       throw new Error(`Failed to get or create lead ID for user ${userId}`);
     }
     return dbLeadId;

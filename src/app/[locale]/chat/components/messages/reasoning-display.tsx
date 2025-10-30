@@ -8,10 +8,10 @@ import {
   Div,
   Span,
 } from "next-vibe-ui/ui";
-import { ChevronDown, ChevronRight, Lightbulb } from "next-vibe-ui/ui/icons";
+import { ChevronDown, ChevronRight, Lightbulb, Loader2 } from "next-vibe-ui/ui/icons";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -22,16 +22,32 @@ interface ReasoningDisplayProps {
   reasoningMessages: ChatMessage[];
   locale: CountryLanguage;
   hasContent?: boolean; // Whether there's content after reasoning
+  isStreaming?: boolean; // Whether reasoning is currently streaming
 }
 
 export function ReasoningDisplay({
   reasoningMessages,
   locale,
   hasContent = false,
+  isStreaming = false,
 }: ReasoningDisplayProps): JSX.Element | null {
   const { t } = simpleT(locale);
-  // Open by default if no content after, collapsed if there is content
-  const [isOpen, setIsOpen] = useState(!hasContent);
+  // Open by default if no content after OR if streaming, collapsed if there is content
+  const [isOpen, setIsOpen] = useState(!hasContent || isStreaming);
+
+  // Auto-collapse when text content appears after thinking tags
+  useEffect(() => {
+    // If there's content after reasoning and we're not streaming, auto-collapse with a slight delay
+    // to avoid jarring transitions during streaming
+    if (hasContent && !isStreaming && isOpen) {
+      // Small delay to ensure smooth transition after streaming completes
+      const timeoutId = setTimeout(() => {
+        setIsOpen(false);
+      }, 100);
+
+      return (): void => clearTimeout(timeoutId);
+    }
+  }, [hasContent, isStreaming, isOpen]);
 
   if (!reasoningMessages || reasoningMessages.length === 0) {
     return null;
@@ -62,34 +78,24 @@ export function ReasoningDisplay({
                 <ChevronRight className="h-4 w-4 shrink-0" />
               )}
               <Lightbulb className="h-4 w-4 shrink-0" />
-              <Span>
-                {reasoningMessages.length === 1
-                  ? t("app.chat.reasoning.title")
-                  : t("app.chat.reasoning.multiple", {
-                      count: reasoningMessages.length,
-                    })}
+              <Span className="flex-1 text-left">
+                {t("app.chat.reasoning.title")}
               </Span>
+              {isStreaming && (
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+              )}
             </button>
           </CollapsibleTrigger>
 
           {/* Content - Collapsible */}
           <CollapsibleContent>
-            <Div className="px-3 pb-2 space-y-2">
-              {reasoningMessages.map((message, index) => (
+            <Div className="px-3 pb-2">
+              {reasoningMessages.map((message) => (
                 <Div
                   key={message.id}
                   className="px-3 py-2 rounded-md bg-background/50 border border-border/50 text-sm"
                 >
-                  {/* Reasoning step number */}
-                  <Div className="flex items-start gap-2 mb-2">
-                    <Div className="shrink-0 mt-0.5">
-                      <Span className="text-purple-400 font-medium text-xs">
-                        {t("app.chat.reasoning.step", { number: index + 1 })}
-                      </Span>
-                    </Div>
-                  </Div>
-
-                  {/* Reasoning content */}
+                  {/* Reasoning content - no step number, just thinking content */}
                   <Div className="text-foreground/90 prose prose-sm dark:prose-invert max-w-none">
                     <Markdown content={message.content} />
                   </Div>

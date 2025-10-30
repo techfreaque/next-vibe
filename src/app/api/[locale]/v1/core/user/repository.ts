@@ -20,7 +20,7 @@ import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { leadAuthService } from "../leads/auth-service";
+import { leadAuthRepository } from "../leads/auth/repository";
 import { authRepository } from "./auth/repository";
 import type { NewUser, User } from "./db";
 import { insertUserSchema, users } from "./db";
@@ -301,7 +301,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         );
       }
 
-      const leadResult = await leadAuthService.getAuthenticatedUserLeadId(
+      const leadResult = await leadAuthRepository.getAuthenticatedUserLeadId(
         userId,
         undefined,
         locale,

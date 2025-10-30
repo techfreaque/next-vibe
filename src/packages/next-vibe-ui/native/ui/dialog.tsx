@@ -3,6 +3,7 @@ import * as React from "react";
 import { Platform, StyleSheet, View, type ViewProps } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
+import type { WithClassName } from "../lib/types";
 import { cn } from "../lib/utils";
 import { X } from "./icons/X";
 
@@ -40,8 +41,13 @@ const DialogOverlayNative = React.forwardRef<
   DialogPrimitive.OverlayRef,
   DialogPrimitive.OverlayProps
 >(({ className, children, ...props }, ref) => {
-  const content =
-    typeof children === "function" ? children({ pressed: false }) : children;
+  const renderChildren = () => {
+    if (typeof children === "function") {
+      return (children as (props: { pressed: boolean }) => React.ReactNode)({ pressed: false });
+    }
+    return children;
+  };
+
   return (
     <DialogPrimitive.Overlay
       style={StyleSheet.absoluteFill}
@@ -56,7 +62,7 @@ const DialogOverlayNative = React.forwardRef<
         entering={FadeIn.duration(150)}
         exiting={FadeOut.duration(150)}
       >
-        {content}
+        {renderChildren()}
       </Animated.View>
     </DialogPrimitive.Overlay>
   );
@@ -136,7 +142,7 @@ DialogFooter.displayName = "DialogFooter";
 
 const DialogTitle = React.forwardRef<
   DialogPrimitive.TitleRef,
-  DialogPrimitive.TitleProps
+  WithClassName<DialogPrimitive.TitleProps>
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
@@ -151,7 +157,7 @@ DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
 const DialogDescription = React.forwardRef<
   DialogPrimitive.DescriptionRef,
-  DialogPrimitive.DescriptionProps
+  WithClassName<DialogPrimitive.DescriptionProps>
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}

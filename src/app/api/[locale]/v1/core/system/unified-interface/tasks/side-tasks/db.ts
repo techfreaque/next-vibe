@@ -15,8 +15,6 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-
 import { TaskPriorityDB, TaskStatusDB } from "../enum";
 
 /**
@@ -89,7 +87,7 @@ export const sideTaskExecutions = pgTable("side_task_executions", {
 
   // Results and errors
   result: jsonb("result"),
-  error: jsonb("error").$type<ErrorResponseType>(),
+  error: jsonb("error"),
   errorStack: text("error_stack"),
 
   // Context

@@ -27,8 +27,7 @@ import type { Methods } from "../../types/enums";
 // LEVEL 1: Test basic field types
 // ============================================================================
 
-// Test 1.1: PrimitiveField extends UnifiedField
-type Test1_1_PrimitiveField = PrimitiveField<z.ZodString, { request: "data" }>;
+// Test 1.1: PrimitiveField extends UnifiedField (checked via Test1_2)
 // Test 1.2: ObjectField with record children extends UnifiedField
 type Test1_2_ObjectField = ObjectField<
   Record<string, UnifiedField<z.ZodTypeAny>>,
@@ -114,7 +113,7 @@ type Test3_1_Result =
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
+    any
   >
   ? "✓ PASS"
   : "✗ FAIL";

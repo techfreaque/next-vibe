@@ -4,6 +4,8 @@
  */
 
 import { redirect } from "next/navigation";
+import { Div } from "next-vibe-ui/ui";
+import { H1, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -60,19 +62,19 @@ export default async function UserEditPage({
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <Div className="container mx-auto py-6 space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+      <Div>
+        <H1 className="text-3xl font-bold tracking-tight">
           {t("app.admin.users.actions.editUser")}
-        </h1>
-        <p className="text-muted-foreground mt-2">
+        </H1>
+        <P className="text-muted-foreground mt-2">
           {t("app.admin.users.overview.description")}
-        </p>
-      </div>
+        </P>
+      </Div>
 
       {/* Edit Form */}
       <UserEditForm locale={locale} userId={id} user={userResponse.data} />
-    </div>
+    </Div>
   );
 }

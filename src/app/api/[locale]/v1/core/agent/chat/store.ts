@@ -27,6 +27,7 @@ export interface ChatThread {
   archived: boolean;
   tags: string[];
   preview: string | null;
+  moderatorIds?: string[] | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -73,6 +74,7 @@ export interface ChatFolder {
   expanded: boolean;
   sortOrder: number;
   metadata: Record<string, string | number | boolean | null>;
+  moderatorIds?: string[] | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -157,6 +159,27 @@ const getDefaultSettings = (): ChatSettings => ({
   enabledToolIds: [],
 });
 
+/**
+ * Migrate old tool ID format to new format
+ * Old format: "core_credits", "core_agent_chat_personas"
+ * New format: "get_v1_core_credits", "get_v1_core_agent_chat_personas"
+ */
+const migrateToolIds = (toolIds: string[]): string[] => {
+  return toolIds
+    .map((id) => {
+      // If ID already has method prefix (contains _v1_), it's already in new format
+      if (id.includes("_v1_")) {
+        return id;
+      }
+
+      // Old format detected - migrate to new format
+      // Default to GET method for most tools
+      // Special cases can be added here if needed
+      return `get_v1_${id}`;
+    })
+    .filter((id, index, self) => self.indexOf(id) === index); // Remove duplicates
+};
+
 // Helper to load settings from localStorage (client-only, called after mount)
 const loadSettings = (): ChatSettings => {
   const defaults = getDefaultSettings();
@@ -169,6 +192,26 @@ const loadSettings = (): ChatSettings => {
     const stored = localStorage.getItem("chat-settings");
     if (stored) {
       const parsed = JSON.parse(stored) as Partial<ChatSettings>;
+
+      // Migrate old tool IDs to new format
+      if (parsed.enabledToolIds && Array.isArray(parsed.enabledToolIds)) {
+        const migratedToolIds = migrateToolIds(parsed.enabledToolIds);
+
+        // If migration happened, save the migrated version back to localStorage
+        if (
+          JSON.stringify(migratedToolIds) !==
+          JSON.stringify(parsed.enabledToolIds)
+        ) {
+          const migratedSettings = {
+            ...defaults,
+            ...parsed,
+            enabledToolIds: migratedToolIds,
+          };
+          saveSettings(migratedSettings);
+          return migratedSettings;
+        }
+      }
+
       // Merge with defaults to handle missing fields from old versions
       return { ...defaults, ...parsed };
     }

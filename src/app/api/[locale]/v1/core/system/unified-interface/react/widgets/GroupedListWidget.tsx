@@ -5,6 +5,7 @@
 
 "use client";
 
+import { Div, Span } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -36,7 +37,10 @@ function isGroupedListWidgetData(
  */
 export const GroupedListWidget = ({
   data,
+  metadata: _metadata,
+  context: _context,
   className = "",
+  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element => {
   // Initialize hooks before any early returns
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
@@ -52,7 +56,7 @@ export const GroupedListWidget = ({
   }, [typedData]);
 
   if (!isValidData || !typedData) {
-    return <div className={className}>—</div>;
+    return <Div className={className} style={style}>—</Div>;
   }
 
   const toggleGroup = (groupKey: string): void => {
@@ -68,7 +72,7 @@ export const GroupedListWidget = ({
   };
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <Div className={`space-y-4 ${className}`} style={style}>
       {typedData.groups.map((group) => {
         const isExpanded = expandedGroups.has(group.key);
         const itemCount = group.items.length;
@@ -78,7 +82,7 @@ export const GroupedListWidget = ({
             : group.items;
 
         return (
-          <div
+          <Div
             key={String(group.key)}
             className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
           >
@@ -88,14 +92,14 @@ export const GroupedListWidget = ({
               className="flex w-full items-center justify-between bg-gray-50 px-4 py-3 text-left hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
               type="button"
             >
-              <div className="flex items-center gap-3">
-                <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <Div className="flex items-center gap-3">
+                <Span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   {String(group.label)}
-                </span>
-                <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                </Span>
+                <Span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                   {itemCount}
-                </span>
-              </div>
+                </Span>
+              </Div>
               <svg
                 className={`h-5 w-5 text-gray-500 transition-transform ${
                   isExpanded ? "rotate-180" : ""
@@ -115,47 +119,47 @@ export const GroupedListWidget = ({
 
             {/* Group Summary */}
             {data.showGroupSummary && group.summary && (
-              <div className="border-b border-gray-200 bg-gray-50 px-4 py-2 dark:border-gray-700 dark:bg-gray-750">
-                <div className="flex flex-wrap gap-4">
+              <Div className="border-b border-gray-200 bg-gray-50 px-4 py-2 dark:border-gray-700 dark:bg-gray-750">
+                <Div className="flex flex-wrap gap-4">
                   {Object.entries(group.summary).map(([key, value]) => (
-                    <div key={key} className="text-sm">
-                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                    <Div key={key} className="text-sm">
+                      <Span className="font-medium text-gray-700 dark:text-gray-300">
                         {key}:
-                      </span>{" "}
-                      <span className="text-gray-600 dark:text-gray-400">
+                      </Span>{" "}
+                      <Span className="text-gray-600 dark:text-gray-400">
                         {typeof value === "object" && value !== null
                           ? JSON.stringify(value)
                           : String(value ?? "")}
-                      </span>
-                    </div>
+                      </Span>
+                    </Div>
                   ))}
-                </div>
-              </div>
+                </Div>
+              </Div>
             )}
 
             {/* Group Items */}
             {isExpanded && (
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+              <Div className="divide-y divide-gray-200 dark:divide-gray-700">
                 {displayItems.map((item, itemIndex) => (
-                  <div
+                  <Div
                     key={itemIndex}
                     className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-750"
                   >
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 md:grid-cols-3 lg:grid-cols-4">
+                    <Div className="grid grid-cols-2 gap-x-4 gap-y-2 md:grid-cols-3 lg:grid-cols-4">
                       {Object.entries(item).map(([key, value]) => (
-                        <div key={key} className="text-sm">
-                          <div className="font-medium text-gray-700 dark:text-gray-300">
+                        <Div key={key} className="text-sm">
+                          <Div className="font-medium text-gray-700 dark:text-gray-300">
                             {key}
-                          </div>
-                          <div className="text-gray-600 dark:text-gray-400">
+                          </Div>
+                          <Div className="text-gray-600 dark:text-gray-400">
                             {typeof value === "object" && value !== null
                               ? JSON.stringify(value)
                               : String(value ?? "")}
-                          </div>
-                        </div>
+                          </Div>
+                        </Div>
                       ))}
-                    </div>
-                  </div>
+                    </Div>
+                  </Div>
                 ))}
 
                 {/* Show More Button */}
@@ -172,11 +176,11 @@ export const GroupedListWidget = ({
                       {`Show ${itemCount - (typedData.maxItemsPerGroup ?? 0)} more`}
                     </button>
                   )}
-              </div>
+              </Div>
             )}
-          </div>
+          </Div>
         );
       })}
-    </div>
+    </Div>
   );
 };

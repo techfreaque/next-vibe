@@ -2,6 +2,7 @@
 
 import { Check, Edit2, X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Input } from "next-vibe-ui/ui/input";
 import type { JSX, KeyboardEvent } from "react";
@@ -67,15 +68,15 @@ export function EditableTextWidget({
 
   if (!context.isInteractive) {
     return (
-      <span className={cn("text-foreground", className)} style={style}>
+      <Span className={cn("text-foreground", className)} style={style}>
         {value || "—"}
-      </span>
+      </Span>
     );
   }
 
   if (isEditing) {
     return (
-      <div className={cn("flex items-center gap-2", className)} style={style}>
+      <Div className={cn("flex items-center gap-2", className)} style={style}>
         <Input
           value={editValue}
           onChange={(e): void => setEditValue(e.target.value)}
@@ -101,16 +102,16 @@ export function EditableTextWidget({
         >
           <X className="h-4 w-4" />
         </Button>
-      </div>
+      </Div>
     );
   }
 
   return (
-    <div
+    <Div
       className={cn("group flex items-center gap-2", className)}
       style={style}
     >
-      <span className="text-foreground">{value || "—"}</span>
+      <Span className="text-foreground">{value || "—"}</Span>
       <Button
         size="sm"
         variant="ghost"
@@ -119,7 +120,7 @@ export function EditableTextWidget({
       >
         <Edit2 className="h-3 w-3" />
       </Button>
-    </div>
+    </Div>
   );
 }
 

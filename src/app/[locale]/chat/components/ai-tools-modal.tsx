@@ -138,40 +138,40 @@ export function AIToolsModal({
   }, [filteredTools]);
 
   // Toggle a single tool
-  const handleToggleTool = (toolName: string): void => {
-    const isEnabled = enabledToolIds.includes(toolName);
+  const handleToggleTool = (endpointId: string): void => {
+    const isEnabled = enabledToolIds.includes(endpointId);
 
     if (isEnabled) {
       // Remove from enabled list
-      onToolsChange(enabledToolIds.filter((id) => id !== toolName));
+      onToolsChange(enabledToolIds.filter((id) => id !== endpointId));
     } else {
       // Add to enabled list
-      onToolsChange([...enabledToolIds, toolName]);
+      onToolsChange([...enabledToolIds, endpointId]);
     }
 
     logger.debug("AIToolsModal", "Tool toggled", {
-      toolName,
+      endpointId,
       enabled: !isEnabled,
     });
   };
 
   // Toggle all tools in current view
   const handleToggleAll = (): void => {
-    const allToolNames = filteredTools.map((tool) => tool.name);
-    const allEnabled = allToolNames.every((name) =>
-      enabledToolIds.includes(name),
+    const allEndpointIds = filteredTools.map((tool) => tool.endpointId);
+    const allEnabled = allEndpointIds.every((id) =>
+      enabledToolIds.includes(id),
     );
 
     if (allEnabled) {
       // Disable all visible tools
       const remainingEnabled = enabledToolIds.filter(
-        (id) => !allToolNames.includes(id),
+        (id) => !allEndpointIds.includes(id),
       );
       onToolsChange(remainingEnabled);
       logger.debug("AIToolsModal", "All visible tools disabled");
     } else {
       // Enable all visible tools (merge with existing)
-      const uniqueEnabled = [...new Set([...enabledToolIds, ...allToolNames])];
+      const uniqueEnabled = [...new Set([...enabledToolIds, ...allEndpointIds])];
       onToolsChange(uniqueEnabled);
       logger.debug("AIToolsModal", "All visible tools enabled");
     }
@@ -182,7 +182,7 @@ export function AIToolsModal({
     if (filteredTools.length === 0) {
       return false;
     }
-    return filteredTools.every((tool) => enabledToolIds.includes(tool.name));
+    return filteredTools.every((tool) => enabledToolIds.includes(tool.endpointId));
   }, [filteredTools, enabledToolIds]);
 
   // Toggle category expansion
@@ -200,19 +200,19 @@ export function AIToolsModal({
   const toggleCategoryTools = (
     categoryTools: AIToolMetadataSerialized[],
   ): void => {
-    const categoryToolIds = categoryTools.map((t) => t.name);
-    const allEnabled = categoryToolIds.every((id) =>
+    const categoryEndpointIds = categoryTools.map((t) => t.endpointId);
+    const allEnabled = categoryEndpointIds.every((id) =>
       enabledToolIds.includes(id),
     );
 
     if (allEnabled) {
       // Disable all tools in category
       onToolsChange(
-        enabledToolIds.filter((id) => !categoryToolIds.includes(id)),
+        enabledToolIds.filter((id) => !categoryEndpointIds.includes(id)),
       );
     } else {
       // Enable all tools in category
-      const newIds = new Set([...enabledToolIds, ...categoryToolIds]);
+      const newIds = new Set([...enabledToolIds, ...categoryEndpointIds]);
       onToolsChange([...newIds]);
     }
   };
@@ -229,7 +229,7 @@ export function AIToolsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90dvh] flex flex-col">
+      <DialogContent className="sm:max-w-[700px] max-h-[90dvh] flex flex-col overflow-x-hidden overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t("app.chat.aiTools.modal.title")}</DialogTitle>
           <DialogDescription>
@@ -237,7 +237,7 @@ export function AIToolsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <Div className="space-y-4 flex-1 overflow-hidden flex flex-col">
+        <Div className="space-y-4 flex-1 flex flex-col">
           {/* Search and Controls */}
           <Div className="space-y-2 shrink-0">
             {/* Search Input */}
@@ -312,8 +312,8 @@ export function AIToolsModal({
               <Div className="space-y-4">
                 {Object.entries(toolsByCategory).map(([category, tools]) => {
                   const isExpanded = expandedCategories.has(category);
-                  const categoryToolIds = tools.map((t) => t.name);
-                  const allCategoryEnabled = categoryToolIds.every((id) =>
+                  const categoryEndpointIds = tools.map((t) => t.endpointId);
+                  const allCategoryEnabled = categoryEndpointIds.every((id) =>
                     enabledToolIds.includes(id),
                   );
 
@@ -334,7 +334,7 @@ export function AIToolsModal({
                         </Span>
                         <Badge variant="secondary" className="text-xs">
                           {
-                            categoryToolIds.filter((id) =>
+                            categoryEndpointIds.filter((id) =>
                               enabledToolIds.includes(id),
                             ).length
                           }{" "}
@@ -353,13 +353,13 @@ export function AIToolsModal({
                         <Div className="px-4 pb-3 space-y-2 border-t">
                           {tools.map((tool) => {
                             const isEnabled = enabledToolIds.includes(
-                              tool.name,
+                              tool.endpointId,
                             );
 
                             return (
                               <Div
-                                key={tool.name}
-                                onClick={() => handleToggleTool(tool.name)}
+                                key={tool.endpointId}
+                                onClick={() => handleToggleTool(tool.endpointId)}
                                 className={cn(
                                   "w-full text-left px-3 py-2 rounded-md border transition-all cursor-pointer",
                                   "hover:border-primary/50 hover:bg-accent/50",
@@ -370,7 +370,7 @@ export function AIToolsModal({
                                 <Checkbox
                                   checked={isEnabled}
                                   onCheckedChange={() =>
-                                    handleToggleTool(tool.name)
+                                    handleToggleTool(tool.endpointId)
                                   }
                                   className="mt-0.5 shrink-0"
                                   onClick={(e) => e.stopPropagation()}

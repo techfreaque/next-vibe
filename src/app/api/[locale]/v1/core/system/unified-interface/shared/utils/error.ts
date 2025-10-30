@@ -1,8 +1,10 @@
+import type { ErrorDetails, ErrorLogger } from "./error.types";
+
 /**
  * Extract error message from unknown error
  * Handles all error types safely
  */
-export function getErrorMessage(error: unknown): string {
+export function getErrorMessage(error: Error | string): string {
   if (error instanceof Error) {
     return error.message;
   }
@@ -25,11 +27,11 @@ export function isError(error: Error | string): error is Error {
 export function createStandardError(
   message: string,
   code?: string,
-  details?: Record<string, string | number | boolean | null>,
-): Error & { code?: string; details?: Record<string, string | number | boolean | null> } {
+  details?: ErrorDetails,
+): Error & { code?: string; details?: ErrorDetails } {
   const error = new Error(message) as Error & {
     code?: string;
-    details?: Record<string, string | number | boolean | null>;
+    details?: ErrorDetails;
   };
   if (code) {
     error.code = code;
@@ -57,7 +59,7 @@ export function formatErrorForLogging(error: Error | string): {
   message: string;
   stack?: string;
   code?: string;
-  details?: Record<string, string | number | boolean | null>;
+  details?: ErrorDetails;
 } {
   const message = getErrorMessage(error);
   const stack = extractStackTrace(error);
@@ -75,7 +77,7 @@ export function formatErrorForLogging(error: Error | string): {
         "details" in error &&
           typeof error.details === "object" &&
           error.details !== null
-          ? (error.details as Record<string, string | number | boolean | null>)
+          ? (error.details as ErrorDetails)
           : undefined,
     };
   }
@@ -91,7 +93,7 @@ export function createErrorResult(
   error: Error | string,
   startTime: number,
   toolName: string,
-  logger: { error: (message: string, context?: Record<string, string | number | boolean | null>) => void },
+  logger: ErrorLogger,
 ): {
   success: false;
   error: string;

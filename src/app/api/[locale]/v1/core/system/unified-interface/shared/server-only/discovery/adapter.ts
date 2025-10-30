@@ -16,6 +16,18 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 
 import type { DiscoveredEndpoint } from "../types/registry";
 
+// Simple logger for adapter operations
+const logger = {
+  warn(message: string, ...args: unknown[]): void {
+    const argsStr = args.length > 0 ? ` ${JSON.stringify(args)}` : "";
+    process.stderr.write(`[Lazy Loader] ${message}${argsStr}\n`);
+  },
+  error(message: string, error?: unknown): void {
+    const errorStr = error ? ` ${error instanceof Error ? error.message : String(error)}` : "";
+    process.stderr.write(`[Lazy Loader] ${message}${errorStr}\n`);
+  },
+};
+
 /**
  * Type for the nested endpoint structure from generated/endpoints.ts
  * This is a recursive structure where each level can contain either:
@@ -151,8 +163,7 @@ export async function getEndpointsByToolNames(
       const definition = await getEndpoint(path);
 
       if (!definition) {
-        // eslint-disable-next-line no-console
-        console.warn(`[Lazy Loader] Endpoint not found for tool: ${toolName}`);
+        logger.warn(`Endpoint not found for tool: ${toolName}`);
         continue;
       }
 
@@ -163,10 +174,7 @@ export async function getEndpointsByToolNames(
       );
 
       if (methods.length === 0) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `[Lazy Loader] No HTTP methods found for tool: ${toolName}`,
-        );
+        logger.warn(`No HTTP methods found for tool: ${toolName}`);
         continue;
       }
 
@@ -194,17 +202,94 @@ export async function getEndpointsByToolNames(
           toolName,
           routePath,
           definitionPath,
-          definition: methodDef,
+          definition: methodDef as CreateApiEndpoint<
+            string,
+            Methods,
+            readonly (typeof UserRoleValue)[],
+            UnifiedField<z.ZodTypeAny>
+          >,
           enabled: true,
           discoveredAt: Date.now(),
         });
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(
-        `[Lazy Loader] Failed to load endpoint for tool: ${toolName}`,
-        error,
-      );
+      logger.error(`Failed to load endpoint for tool: ${toolName}`, error);
+    }
+  }
+
+  return discovered;
+}
+
+/**
+ * Lazy load specific endpoints by endpoint IDs
+ * This is more precise than getEndpointsByToolNames as it loads exact endpoints
+ * instead of loading all 143 endpoints upfront
+ *
+ * @param endpointIds - Array of endpoint IDs (e.g., ["get_v1_core_agent_chat_folders", "post_v1_core_agent_chat_threads"])
+ * @returns Array of DiscoveredEndpoint objects for the requested endpoints
+ */
+export async function getEndpointsByIds(
+  endpointIds: string[],
+): Promise<DiscoveredEndpoint[]> {
+  const { getEndpoint } = await import(
+    "@/app/api/[locale]/v1/core/system/generated/endpoint"
+  );
+
+  const discovered: DiscoveredEndpoint[] = [];
+
+  for (const endpointId of endpointIds) {
+    // Parse endpoint ID format: ${method}_v1_${toolName}
+    // Example: "get_v1_core_agent_chat_folders" -> method="get", toolName="core_agent_chat_folders"
+    const parts = endpointId.split("_v1_");
+    if (parts.length !== 2) {
+      logger.warn(`Invalid endpoint ID format: ${endpointId}`);
+      continue;
+    }
+
+    const [methodLower, toolName] = parts;
+    const method = methodLower.toUpperCase() as Methods;
+
+    // Convert tool name to path (e.g., "core_agent_chat_folders" -> "core/agent/chat/folders")
+    const path = toolName.replace(/_/g, "/");
+
+    try {
+      // Dynamically import only this specific endpoint definition
+      const definition = await getEndpoint(path);
+
+      if (!definition) {
+        logger.warn(`Endpoint not found for ID: ${endpointId}`);
+        continue;
+      }
+
+      // Get the specific method definition
+      const methodDef = definition[method];
+
+      if (!methodDef) {
+        logger.warn(`Method ${method} not found for endpoint: ${endpointId}`);
+        continue;
+      }
+
+      // Generate file paths using module paths (@ alias)
+      const definitionPath = `@/app/api/[locale]/v1/${path}/definition`;
+      const routePath = `@/app/api/[locale]/v1/${path}/route`;
+
+      // Create discovered endpoint
+      discovered.push({
+        id: endpointId,
+        toolName,
+        routePath,
+        definitionPath,
+        definition: methodDef as CreateApiEndpoint<
+          string,
+          Methods,
+          readonly (typeof UserRoleValue)[],
+          UnifiedField<z.ZodTypeAny>
+        >,
+        enabled: true,
+        discoveredAt: Date.now(),
+      });
+    } catch (error) {
+      logger.error(`Failed to load endpoint for ID: ${endpointId}`, error);
     }
   }
 

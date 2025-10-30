@@ -16,7 +16,7 @@ const Progress = React.forwardRef<
   ProgressPrimitive.RootProps & {
     indicatorClassName?: string;
   }
->(({ className, value, indicatorClassName, ...props }, ref) => {
+>(({ className, indicatorClassName, ...props }, ref) => {
   return (
     <ProgressPrimitive.Root
       ref={ref}
@@ -26,7 +26,7 @@ const Progress = React.forwardRef<
       )}
       {...props}
     >
-      <Indicator value={value} className={indicatorClassName} />
+      <Indicator value={props.value} className={indicatorClassName} />
     </ProgressPrimitive.Root>
   );
 });

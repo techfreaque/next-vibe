@@ -138,10 +138,12 @@ export class ResponseMetadataExtractor {
     responseData?: ExtractOutput<TEndpoint["responseSchema"]>,
   ): ResponseContainerMetadata | null;
   extractResponseMetadata(
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Metadata extraction requires 'unknown' for flexible response structures
     definition: unknown,
     responseData?: ResponseData,
   ): ResponseContainerMetadata | null;
   extractResponseMetadata(
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Field value extraction requires 'unknown' for dynamic data types
     definition: unknown,
     responseData?: ResponseData,
   ): ResponseContainerMetadata | null {
@@ -845,7 +847,8 @@ export class ResponseMetadataExtractor {
 
     // Extract UI configuration with proper typing
     const hasUi = "ui" in definition && typeof definition.ui === "object";
-    const ui = hasUi ? definition.ui : null;
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- UI config can be various widget types
+    const ui = hasUi ? (definition.ui as Record<string, unknown>) : null;
 
     const schema =
       "schema" in definition && definition.schema instanceof z.ZodType
@@ -929,12 +932,14 @@ export class ResponseMetadataExtractor {
   /**
    * Type guard to check if value is a Zod schema
    */
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Widget data transformation requires 'unknown' for flexible widget types
   private isZodSchema(value: unknown): value is z.ZodTypeAny {
     return (
       typeof value === "object" &&
       value !== null &&
       "_def" in value &&
-      typeof (value as { _def?: object })._def === "object"
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard requires unknown for flexible schema checking
+      typeof (value as { _def?: Record<string, unknown> })._def === "object"
     );
   }
 
@@ -1011,7 +1016,8 @@ export class ResponseMetadataExtractor {
    * Determine field type from widget and schema
    */
   private determineFieldType(
-    widget: WidgetConfig | object | null,
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Widget configuration requires unknown for flexible metadata
+    widget: WidgetConfig | Record<string, unknown> | null,
     schema?: z.ZodTypeAny,
   ): FieldDataType {
     // Check widget fieldType first (explicit type override)

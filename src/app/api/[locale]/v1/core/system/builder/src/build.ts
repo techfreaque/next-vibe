@@ -342,8 +342,8 @@ export function cleanDistFolders(buildConfig: BuildConfig): void {
 }
 
 function logger(message: string): void {
-  // eslint-disable-next-line i18next/no-literal-string, no-console
-  console.log(`[builder] ${message}`);
+  // eslint-disable-next-line i18next/no-literal-string
+  process.stdout.write(`[builder] ${message}\n`);
 }
 
 const env = { ...process.env };

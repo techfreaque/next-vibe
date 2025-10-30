@@ -104,7 +104,7 @@ export function bumpVersion(
 ): string {
   const versionParts = currentVersion.split(".").map(Number);
   if (versionParts.length !== 3) {
-    // eslint-disable-next-line i18next/no-literal-string
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Validation failures must throw to halt execution with invalid state
     throw new Error("Invalid version format");
   }
 
@@ -175,6 +175,7 @@ export function updateVariableStringValue(
         : // eslint-disable-next-line i18next/no-literal-string
           "const variableName = 'value'";
 
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(
         // eslint-disable-next-line i18next/no-literal-string
         `Could not find a matching declaration for '${fileInfo.varName}' in '${fileInfo.filePath}' or the format is not supported. Only ${formatDescription} format is supported.`,

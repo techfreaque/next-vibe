@@ -209,6 +209,7 @@ export interface ApiStore {
       string,
       Methods,
       TUserRoleValue,
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Generic endpoint constraint requires 'unknown' for flexible endpoint typing in query execution
       unknown
     >,
   >(
@@ -236,6 +237,7 @@ export interface ApiStore {
       string,
       Methods,
       TUserRoleValue,
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Generic endpoint constraint requires 'unknown' for flexible endpoint typing in mutation execution
       unknown
     >,
   >(
@@ -366,6 +368,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       string,
       Methods,
       TUserRoleValue,
+      // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Generic endpoint type parameter requires 'unknown' for flexible endpoint support
       unknown
     >,
   >(
@@ -686,6 +689,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     const fetchPromise = (async (): Promise<TEndpoint["TResponseOutput"]> => {
       // Validate request data using the endpoint's schema
       // Skip validation for z.never() schemas (GET endpoints with no request data)
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
       const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
       const isNeverSchema = requestSchema instanceof z.ZodNever;
 
@@ -757,7 +761,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         if (endpoint.method !== Methods.GET) {
           if (containsFile(requestData)) {
             // Convert to FormData
-            // eslint-disable-next-line no-restricted-syntax
+            // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: FormData conversion requires 'unknown' for flexible data structure support
             postBody = objectToFormData(requestData as Record<string, unknown>);
           } else {
             // Use JSON
@@ -1002,6 +1006,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       string,
       Methods,
       TUserRoleValue,
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Generic endpoint type parameter requires 'unknown' for flexible endpoint support
       unknown
     >,
   >(
@@ -1105,7 +1110,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       if (endpoint.method !== Methods.GET) {
         if (containsFile(requestData)) {
           // Convert to FormData
-          // eslint-disable-next-line no-restricted-syntax
+          // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: FormData conversion requires 'unknown' for flexible data structure support
           postBody = objectToFormData(requestData as Record<string, unknown>);
         } else {
           // Use JSON
@@ -1509,6 +1514,7 @@ export const apiClient = {
     } = {},
   ): Promise<ResponseType<TResponseOutput>> => {
     // Check if the endpoint expects undefined for request data
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
     const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
     const isUndefinedSchema =
       requestSchema.safeParse(undefined).success &&
@@ -1530,13 +1536,13 @@ export const apiClient = {
     const response = await useApiStore
       .getState()
       .executeQuery(
-        endpoint,
+        endpoint as never,
         logger,
-        requestData,
-        pathParams,
+        requestData as never,
+        pathParams as never,
         t,
         locale,
-        options,
+        options as never,
       );
 
     if (!response.success) {
@@ -1563,6 +1569,7 @@ export const apiClient = {
       string,
       Methods,
       TUserRoleValue,
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Generic endpoint type parameter requires 'unknown' for flexible endpoint support
       unknown
     >,
   >(
@@ -1639,6 +1646,7 @@ export const apiClient = {
       string,
       Methods,
       TUserRoleValue,
+      // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Generic endpoint type parameter requires 'unknown' for flexible endpoint support
       unknown
     >,
   >(

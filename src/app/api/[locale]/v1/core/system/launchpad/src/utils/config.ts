@@ -15,6 +15,7 @@ let configRootDir: string | null = null;
 // Get the root directory from the config file location
 export function getRootDirectory(t: TFunction): string {
   if (!configRootDir) {
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error(
       t("app.api.v1.core.system.launchpad.errors.configNotLoaded"),
     );
@@ -63,6 +64,7 @@ function findConfigUp(configFileName: string): string | null {
  * Type guard to validate that an imported module has the expected LaunchpadConfig structure
  */
 function isLaunchpadConfigModule(
+  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Type guard requires 'unknown' for runtime module validation
   module: unknown,
 ): module is { default: LaunchpadConfig } {
   if (typeof module !== "object" || module === null) {
@@ -96,6 +98,7 @@ export async function loadConfig(
     // If explicit path is provided, use it directly
     resolvedConfigPath = resolve(process.cwd(), configPath);
     if (!existsSync(resolvedConfigPath)) {
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(
         t(
           "app.api.v1.core.system.launchpad.errors.configFileNotFound" as const,
@@ -109,6 +112,7 @@ export async function loadConfig(
     // Otherwise search up from cwd
     const foundConfigPath = findConfigUp(configPath);
     if (!foundConfigPath) {
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(
         t(
           "app.api.v1.core.system.launchpad.errors.configFileNotFoundInParents" as const,
@@ -126,11 +130,13 @@ export async function loadConfig(
 
   try {
     // const compiledConfigPath = await getCompiledConfigPath(resolvedConfigPath);
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Dynamic config import requires 'unknown' for runtime type validation
     const importedModule: unknown = await import(
       `file://${resolvedConfigPath}`
     );
 
     if (!isLaunchpadConfigModule(importedModule)) {
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(
         t(
           "app.api.v1.core.system.launchpad.errors.invalidConfigFormat" as const,
@@ -148,6 +154,7 @@ export async function loadConfig(
     const contextMessage = t(
       "app.api.v1.core.system.launchpad.errors.errorLoadingConfig" as const,
     );
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error(`${contextMessage} ${errorMessage}`, { cause: error });
   }
 }

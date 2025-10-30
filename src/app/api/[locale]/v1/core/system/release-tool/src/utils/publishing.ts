@@ -113,7 +113,7 @@ export async function zipFolders({
       }
 
       if (!existsSync(inputPath)) {
-        // eslint-disable-next-line i18next/no-literal-string
+        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Validation failures must throw to halt execution with invalid state
         throw new Error(`Input folder ${inputPath} does not exist, cannot zip`);
       }
 

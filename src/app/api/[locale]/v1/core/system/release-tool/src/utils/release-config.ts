@@ -21,6 +21,7 @@ export const DEFAULT_CONFIG_PATH = "release.config.ts";
  * Type guard to validate if an imported module has the expected ReleaseConfig structure
  */
 function isReleaseConfigModule(
+  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Release config parsing requires 'unknown' for flexible configuration
   module: unknown,
 ): module is { default: ReleaseConfig } {
   if (typeof module !== "object" || module === null) {

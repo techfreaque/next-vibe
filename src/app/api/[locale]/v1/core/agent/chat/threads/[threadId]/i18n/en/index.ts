@@ -1,7 +1,9 @@
 import { translations as messagesTranslations } from "../../messages/i18n/en";
+import { translations as permissionsTranslations } from "../../permissions/i18n/en";
 
 export const translations = {
   messages: messagesTranslations,
+  permissions: permissionsTranslations,
   get: {
     title: "Get Chat Thread",
     description: "Retrieve a specific chat thread by ID",

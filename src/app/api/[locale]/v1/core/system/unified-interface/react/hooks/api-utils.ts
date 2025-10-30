@@ -14,6 +14,7 @@ import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repos
 /**
  * Check if an object contains File instances (recursively)
  */
+// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: API response handling requires 'unknown' for flexible response types
 export function containsFile(obj: unknown): boolean {
   if (obj instanceof File) {
     return true;
@@ -34,6 +35,7 @@ export function containsFile(obj: unknown): boolean {
  * Convert an object to FormData (recursively handles nested objects and arrays)
  */
 export function objectToFormData(
+  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Error extraction requires 'unknown' to handle any error type
   obj: Record<string, unknown>,
   formData: FormData = new FormData(),
   parentKey = "",
@@ -52,6 +54,7 @@ export function objectToFormData(
           formData.append(arrayKey, item);
         } else if (item && typeof item === "object") {
           objectToFormData(
+            // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Data transformation requires 'unknown' for flexible input types
             item as Record<string, unknown>,
             formData,
             arrayKey,
@@ -64,6 +67,7 @@ export function objectToFormData(
     } else if (value && typeof value === "object") {
       // Handle nested objects
       objectToFormData(
+        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Type guard requires 'unknown' for runtime type checking
         value as Record<string, unknown>,
         formData,
         formKey,

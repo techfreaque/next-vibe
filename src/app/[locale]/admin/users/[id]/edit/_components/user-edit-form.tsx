@@ -8,6 +8,7 @@
 import { ArrowLeft, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Form, FormAlert } from "next-vibe-ui/ui";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
@@ -53,31 +54,31 @@ export function UserEditForm({
   };
 
   if (isLoading) {
-    return <div>{t("app.admin.common.loading")}</div>;
+    return <Div>{t("app.admin.common.loading")}</Div>;
   }
 
   return (
-    <div className="space-y-6">
+    <Div className="space-y-6">
       {/* Action Buttons */}
-      <div className="flex items-center justify-between">
+      <Div className="flex items-center justify-between">
         <Button
           variant="outline"
           onClick={handleBack}
           className="flex items-center space-x-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>{t("app.admin.common.actions.back")}</span>
+          <Span>{t("app.admin.common.actions.back")}</Span>
         </Button>
-      </div>
+      </Div>
 
       {/* Main Form Card */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <span>{t("app.admin.users.actions.editUser")}</span>
-            <span className="text-lg font-normal text-gray-500">
+            <Span>{t("app.admin.users.actions.editUser")}</Span>
+            <Span className="text-lg font-normal text-gray-500">
               - {user.email}
-            </span>
+            </Span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -186,7 +187,7 @@ export function UserEditForm({
             <FormAlert alert={endpoint.alert} />
 
             {/* Submit Button */}
-            <div className="flex justify-end space-x-4">
+            <Div className="flex justify-end space-x-4">
               <Button
                 type="button"
                 variant="outline"
@@ -201,10 +202,10 @@ export function UserEditForm({
                   ? t("app.admin.users.form.buttons.saving")
                   : t("app.admin.users.form.buttons.update")}
               </Button>
-            </div>
+            </Div>
           </Form>
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

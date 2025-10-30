@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
     personas: "Persony",
     credits: "Kredyty",
     balance: "Saldo",
+    permissions: "Uprawnienia",
   },
   config: {
     folders: {
@@ -30,6 +31,7 @@ export const translations: typeof enTranslations = {
       user: "Użytkownik",
       assistant: "Asystent",
       system: "System",
+      tool: "Narzędzie",
       error: "Błąd",
     },
     threadStatus: {

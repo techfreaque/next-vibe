@@ -15,10 +15,12 @@ import {
   Users,
   X,
 } from "lucide-react";
-import Link from "next/link";
+import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div, Span } from "next-vibe-ui/ui";
+import { H1 } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -91,9 +93,9 @@ export function AdminLayoutClient({
   ] as const satisfies readonly NavigationItem[];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <Div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Mobile sidebar */}
-      <div
+      <Div
         className={cn(
           "fixed inset-0 z-50 lg:hidden",
           sidebarOpen ? "block" : "hidden",
@@ -105,14 +107,14 @@ export function AdminLayoutClient({
           onClick={() => setSidebarOpen(false)}
           aria-label="Close sidebar"
         />
-        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white dark:bg-gray-800 shadow-xl">
-          <div className="flex h-16 items-center justify-between px-4">
-            <div className="flex items-center">
+        <Div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white dark:bg-gray-800 shadow-xl">
+          <Div className="flex h-16 items-center justify-between px-4">
+            <Div className="flex items-center">
               <Shield className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
+              <Span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
                 {t("app.admin.components.navigation.admin")}
-              </span>
-            </div>
+              </Span>
+            </Div>
             <Button
               variant="ghost"
               size="sm"
@@ -123,7 +125,7 @@ export function AdminLayoutClient({
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map((item) => (
-              <Link
+              <NextLink
                 key={item.name}
                 href={item.href}
                 className={cn(
@@ -143,24 +145,24 @@ export function AdminLayoutClient({
                   )}
                 />
                 {item.name}
-              </Link>
+              </NextLink>
             ))}
           </nav>
-        </div>
-      </div>
+        </Div>
+      </Div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-          <div className="flex h-16 items-center px-4">
+      <Div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
+        <Div className="flex flex-col flex-grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+          <Div className="flex h-16 items-center px-4">
             <Shield className="h-8 w-8 text-blue-600" />
-            <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
+            <Span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
               {t("app.admin.components.navigation.adminPanel")}
-            </span>
-          </div>
+            </Span>
+          </Div>
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map((item) => (
-              <Link
+              <NextLink
                 key={item.name}
                 href={item.href}
                 className={cn(
@@ -179,35 +181,35 @@ export function AdminLayoutClient({
                   )}
                 />
                 {item.name}
-              </Link>
+              </NextLink>
             ))}
           </nav>
 
           {/* User info */}
-          <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex items-center">
-              <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
-                <span className="text-sm font-medium text-white">
+          <Div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 p-4">
+            <Div className="flex items-center">
+              <Div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
+                <Span className="text-sm font-medium text-white">
                   {user.privateName.charAt(0)}
-                </span>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                </Span>
+              </Div>
+              <Div className="ml-3">
+                <Span className="text-sm font-medium text-gray-700 dark:text-gray-200">
                   {user.privateName}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                </Span>
+                <Span className="text-xs text-gray-500 dark:text-gray-400">
                   {t("app.admin.components.navigation.administrator")}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                </Span>
+              </Div>
+            </Div>
+          </Div>
+        </Div>
+      </Div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <Div className="lg:pl-64">
         {/* Top bar */}
-        <div className="sticky top-0 z-40 flex h-16 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <Div className="sticky top-0 z-40 flex h-16 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
           <Button
             variant="ghost"
             size="sm"
@@ -217,33 +219,32 @@ export function AdminLayoutClient({
             <Menu className="h-6 w-6" />
           </Button>
 
-          <div className="flex flex-1 justify-between px-4 lg:px-6">
-            <div className="flex items-center">
-              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <Div className="flex flex-1 justify-between px-4 lg:px-6">
+            <Div className="flex items-center">
+              <H1 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {t("app.admin.components.navigation.adminDashboard")}
-              </h1>
-            </div>
+              </H1>
+            </Div>
 
-            <div className="flex items-center space-x-4">
+            <Div className="flex items-center space-x-4">
               {/* Theme toggle */}
               <ThemeToggle locale={locale} />
 
               {/* Locale selector */}
               <CountrySelector isNavBar locale={locale} />
 
-              <Link
-                href={`/${locale}/`}
-                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              >
-                {t("app.admin.components.navigation.backToApp")}
-              </Link>
-            </div>
-          </div>
-        </div>
+              <Span className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <a href={`/${locale}/`}>
+                  {t("app.admin.components.navigation.backToApp")}
+                </a>
+              </Span>
+            </Div>
+          </Div>
+        </Div>
 
         {/* Page content */}
         <main className="flex-1">{children}</main>
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }

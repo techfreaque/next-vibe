@@ -8,6 +8,7 @@ import "server-only";
 
 import type { z } from "zod";
 
+import type { TranslationKey } from "@/i18n/core/static-types";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import type { UserRoleValue } from "../../../../../user/user-roles/enum";
@@ -115,15 +116,13 @@ export function convertEndpointsToMetadata(
               routePath,
               definitionPath,
               method,
-              title: typeof methodDef.title === "string" ? methodDef.title : "",
-              description:
-                typeof methodDef.description === "string"
+              title: (typeof methodDef.title === "string" ? methodDef.title : undefined) as TranslationKey | undefined,
+              description: (typeof methodDef.description === "string"
                   ? methodDef.description
-                  : "",
-              category:
-                typeof methodDef.category === "string"
+                  : undefined) as TranslationKey | undefined,
+              category: (typeof methodDef.category === "string"
                   ? methodDef.category
-                  : "",
+                  : undefined) as TranslationKey | undefined,
               tags: Array.isArray(methodDef.tags) ? methodDef.tags : [],
               allowedRoles: Array.isArray(methodDef.allowedRoles)
                 ? (methodDef.allowedRoles as readonly (typeof UserRoleValue)[])

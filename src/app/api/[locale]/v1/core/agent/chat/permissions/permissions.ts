@@ -49,6 +49,54 @@ export function isThreadModerator(userId: string, thread: ChatThread): boolean {
 }
 
 /**
+ * Check if user is a moderator of a folder OR any of its parent folders (recursive)
+ * Moderator permissions are inherited from parent folders
+ */
+export function isFolderModeratorRecursive(
+  userId: string,
+  folder: ChatFolder,
+  allFolders: Record<string, ChatFolder>,
+): boolean {
+  // Check if user is a direct moderator of this folder
+  if (isFolderModerator(userId, folder)) {
+    return true;
+  }
+
+  // Check parent folders recursively
+  if (folder.parentId) {
+    const parentFolder = allFolders[folder.parentId];
+    if (parentFolder) {
+      return isFolderModeratorRecursive(userId, parentFolder, allFolders);
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Check if user is a moderator of a thread OR its parent folder (recursive)
+ * Thread moderator permissions are inherited from folder moderators
+ */
+export function isThreadModeratorRecursive(
+  userId: string,
+  thread: ChatThread,
+  folder: ChatFolder | null,
+  allFolders: Record<string, ChatFolder>,
+): boolean {
+  // Check if user is a direct moderator of this thread
+  if (isThreadModerator(userId, thread)) {
+    return true;
+  }
+
+  // Check if user is a moderator of the parent folder (recursive)
+  if (folder) {
+    return isFolderModeratorRecursive(userId, folder, allFolders);
+  }
+
+  return false;
+}
+
+/**
  * Check if user is the owner of a resource
  */
 export function isOwner(userId: string, resourceUserId: string): boolean {
@@ -101,15 +149,19 @@ export function canReadFolder(
 }
 
 /**
- * Check if user can create a folder
- * - PRIVATE/SHARED: Any authenticated user
- * - PUBLIC: Admin only
+ * Check if user can create a folder (forum-style permissions)
+ * - PRIVATE/SHARED: Any authenticated user can create
+ * - PUBLIC: ADMIN only can create ROOT folders (parentId === null)
+ * - PUBLIC: Any authenticated user can create SUBfolders (parentId !== null)
  * - INCOGNITO: Not allowed on server
+ *
+ * @param parentId - If null, creating a root folder; otherwise creating a subfolder
  */
 export async function canCreateFolder(
   user: JwtPayloadType,
   rootFolderId: string,
   logger: EndpointLogger,
+  parentId?: string | null,
 ): Promise<boolean> {
   // Public users cannot create folders on server
   if (user.isPublic) {
@@ -126,9 +178,14 @@ export async function canCreateFolder(
     return false;
   }
 
-  // PUBLIC folders: admin only
+  // PUBLIC folders: ADMIN only for root folders, anyone for subfolders
   if (rootFolderId === "public") {
-    return await isAdmin(userId, logger);
+    // If creating a root folder/thread in public (parentId is null)
+    if (!parentId) {
+      return await isAdmin(userId, logger);
+    }
+    // If creating a subfolder, allowed for any authenticated user
+    return true;
   }
 
   // PRIVATE/SHARED folders: any authenticated user
@@ -178,12 +235,16 @@ export function canWriteFolder(
 
 /**
  * Check if user can delete a folder
- * - Owner only for all folder types
+ * - ADMIN: Can delete any folder (full delete rights)
+ * - Owner: Can delete their own folders
+ * - Moderator (PUBLIC only): Can delete folders they moderate (changes visibility)
  */
-export function canDeleteFolder(
+export async function canDeleteFolder(
   user: JwtPayloadType,
   folder: ChatFolder,
-): boolean {
+  logger: EndpointLogger,
+  allFolders?: Record<string, ChatFolder>,
+): Promise<boolean> {
   if (user.isPublic) {
     return false;
   }
@@ -193,17 +254,34 @@ export function canDeleteFolder(
     return false;
   }
 
-  return isOwner(userId, folder.userId);
+  // Admin can delete anything
+  if (await isAdmin(userId, logger)) {
+    return true;
+  }
+
+  // Owner can delete their own folders
+  if (isOwner(userId, folder.userId)) {
+    return true;
+  }
+
+  // Moderators in PUBLIC folders can "delete" (change visibility)
+  if (folder.rootFolderId === "public" && allFolders) {
+    return isFolderModeratorRecursive(userId, folder, allFolders);
+  }
+
+  return false;
 }
 
 /**
  * Check if user can manage folder permissions (add/remove moderators)
- * - Owner only
+ * - ADMIN: Can manage permissions for any folder
+ * - Owner: Can manage permissions for their own folders
  */
-export function canManageFolder(
+export async function canManageFolder(
   user: JwtPayloadType,
   folder: ChatFolder,
-): boolean {
+  logger: EndpointLogger,
+): Promise<boolean> {
   if (user.isPublic) {
     return false;
   }
@@ -213,6 +291,12 @@ export function canManageFolder(
     return false;
   }
 
+  // Admin can manage any folder
+  if (await isAdmin(userId, logger)) {
+    return true;
+  }
+
+  // Owner can manage their own folders
   return isOwner(userId, folder.userId);
 }
 
@@ -261,16 +345,16 @@ export function canReadThread(
  * Check if user can write to a thread (create messages)
  * - PRIVATE: Owner only
  * - SHARED: Owner or link holders (not implemented yet)
- * - PUBLIC: Owner, moderators, or all authenticated users
+ * - PUBLIC: PUBLIC users (anonymous), owner, moderators, or all authenticated users
  */
 export function canWriteThread(
   user: JwtPayloadType,
   thread: ChatThread,
   folder: ChatFolder | null,
 ): boolean {
-  // Public users cannot write
+  // PUBLIC users can write to PUBLIC threads only
   if (user.isPublic) {
-    return false;
+    return thread.rootFolderId === "public";
   }
 
   const userId = user.id;
@@ -299,14 +383,18 @@ export function canWriteThread(
 
 /**
  * Check if user can delete a thread
+ * - ADMIN: Can delete any thread (full delete rights)
  * - PRIVATE: Owner only
  * - SHARED: Owner only
- * - PUBLIC: Owner or moderators
+ * - PUBLIC: Owner, moderators (recursive from folder), or admins
  */
-export function canDeleteThread(
+export async function canDeleteThread(
   user: JwtPayloadType,
   thread: ChatThread,
-): boolean {
+  logger: EndpointLogger,
+  folder?: ChatFolder | null,
+  allFolders?: Record<string, ChatFolder>,
+): Promise<boolean> {
   if (user.isPublic) {
     return false;
   }
@@ -316,17 +404,50 @@ export function canDeleteThread(
     return false;
   }
 
+  // Admin can delete anything
+  if (await isAdmin(userId, logger)) {
+    return true;
+  }
+
   // Owner can always delete
   if (isOwner(userId, thread.userId)) {
     return true;
   }
 
-  // PUBLIC threads: moderators can delete
-  if (thread.rootFolderId === "public") {
-    return isThreadModerator(userId, thread);
+  // PUBLIC threads: moderators can delete (check recursive)
+  if (thread.rootFolderId === "public" && allFolders) {
+    return isThreadModeratorRecursive(userId, thread, folder || null, allFolders);
   }
 
   return false;
+}
+
+/**
+ * Check if user can manage thread permissions (add/remove moderators)
+ * - ADMIN: Can manage permissions for any thread
+ * - Owner: Can manage permissions for their own threads
+ */
+export async function canManageThread(
+  user: JwtPayloadType,
+  thread: ChatThread,
+  logger: EndpointLogger,
+): Promise<boolean> {
+  if (user.isPublic) {
+    return false;
+  }
+
+  const userId = user.id;
+  if (!userId) {
+    return false;
+  }
+
+  // Admin can manage any thread
+  if (await isAdmin(userId, logger)) {
+    return true;
+  }
+
+  // Owner can manage their own threads
+  return isOwner(userId, thread.userId);
 }
 
 // ============================================================================

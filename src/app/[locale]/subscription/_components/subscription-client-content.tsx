@@ -21,12 +21,15 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  Div,
+  Span,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "next-vibe-ui/ui";
 import { Container } from "next-vibe-ui/ui/container";
+import { H1, H3, H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
@@ -128,12 +131,12 @@ export function SubscriptionClientContent({
         transition={{ duration: 0.5 }}
         className="text-center space-y-4"
       >
-        <h1 className="text-4xl font-bold tracking-tight">
+        <H1 className="text-4xl font-bold tracking-tight">
           {t("app.subscription.subscription.title")}
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        </H1>
+        <P className="text-xl text-muted-foreground max-w-2xl mx-auto">
           {t("app.subscription.subscription.description")}
-        </p>
+        </P>
       </motion.div>
 
       {/* Credit Balance Overview Card */}
@@ -144,89 +147,89 @@ export function SubscriptionClientContent({
       >
         <Card className="relative overflow-hidden">
           <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
+            <Div className="flex items-start justify-between">
+              <Div className="space-y-1">
                 <CardTitle className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-primary/10">
+                  <Div className="p-2 rounded-lg bg-primary/10">
                     <Coins className="h-6 w-6 text-primary" />
-                  </div>
+                  </Div>
                   {t("app.subscription.subscription.balance.title")}
                 </CardTitle>
                 <CardDescription>
                   {t("app.subscription.subscription.balance.description")}
                 </CardDescription>
-              </div>
+              </Div>
               <Badge className="text-lg font-bold px-4 py-2">
                 {initialCredits?.total ?? 0}{" "}
                 {t("app.subscription.subscription.balance.total")}
               </Badge>
-            </div>
+            </Div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* Expiring Credits */}
-              <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-                <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300 mb-2">
+              <Div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <Div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300 mb-2">
                   <Calendar className="h-4 w-4" />
                   {t("app.subscription.subscription.balance.expiring.title")}
-                </div>
-                <div className="text-2xl font-bold text-amber-900 dark:text-amber-100">
+                </Div>
+                <Div className="text-2xl font-bold text-amber-900 dark:text-amber-100">
                   {initialCredits?.expiring ?? 0}
-                </div>
-                <div className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                </Div>
+                <Div className="text-xs text-amber-600 dark:text-amber-400 mt-1">
                   {t(
                     "app.subscription.subscription.balance.expiring.description",
                   )}
-                </div>
-              </div>
+                </Div>
+              </Div>
 
               {/* Permanent Credits */}
-              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-300 mb-2">
+              <Div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                <Div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-300 mb-2">
                   <Sparkles className="h-4 w-4" />
                   {t("app.subscription.subscription.balance.permanent.title")}
-                </div>
-                <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+                </Div>
+                <Div className="text-2xl font-bold text-green-900 dark:text-green-100">
                   {initialCredits?.permanent ?? 0}
-                </div>
-                <div className="text-xs text-green-600 dark:text-green-400 mt-1">
+                </Div>
+                <Div className="text-xs text-green-600 dark:text-green-400 mt-1">
                   {t(
                     "app.subscription.subscription.balance.permanent.description",
                   )}
-                </div>
-              </div>
+                </Div>
+              </Div>
 
               {/* Free Credits */}
-              <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300 mb-2">
+              <Div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                <Div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300 mb-2">
                   <Zap className="h-4 w-4" />
                   {t("app.subscription.subscription.balance.free.title")}
-                </div>
-                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                </Div>
+                <Div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
                   {initialCredits?.free ?? 0}
-                </div>
-                <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                </Div>
+                <Div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                   {t("app.subscription.subscription.balance.free.description")}
-                </div>
-              </div>
+                </Div>
+              </Div>
 
               {/* Expiration Notice */}
               {initialCredits?.expiresAt && initialCredits.expiring > 0 && (
-                <div className="p-4 rounded-lg bg-muted/50 border">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                <Div className="p-4 rounded-lg bg-muted/50 border">
+                  <Div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                     <AlertCircle className="h-4 w-4" />
                     {t("app.subscription.subscription.balance.nextExpiration")}
-                  </div>
-                  <div className="text-lg font-semibold">
+                  </Div>
+                  <Div className="text-lg font-semibold">
                     {formatDate(initialCredits.expiresAt, locale)}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
+                  </Div>
+                  <Div className="text-xs text-muted-foreground mt-1">
                     {initialCredits.expiring}{" "}
                     {t("app.subscription.subscription.balance.total")}
-                  </div>
-                </div>
+                  </Div>
+                </Div>
               )}
-            </div>
+            </Div>
           </CardContent>
         </Card>
       </motion.div>
@@ -272,55 +275,55 @@ export function SubscriptionClientContent({
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                <Div className="space-y-3">
+                  <Div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20">
                     <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-amber-900 dark:text-amber-100">
+                    <Div>
+                      <P className="font-medium text-amber-900 dark:text-amber-100">
                         {t(
                           "app.subscription.subscription.overview.howItWorks.expiring.title",
                         )}
-                      </p>
-                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                      </P>
+                      <P className="text-sm text-amber-700 dark:text-amber-300">
                         {t(
                           "app.subscription.subscription.overview.howItWorks.expiring.description",
                         )}
-                      </p>
-                    </div>
-                  </div>
+                      </P>
+                    </Div>
+                  </Div>
 
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
+                  <Div className="flex items-start gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
                     <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-green-900 dark:text-green-100">
+                    <Div>
+                      <P className="font-medium text-green-900 dark:text-green-100">
                         {t(
                           "app.subscription.subscription.overview.howItWorks.permanent.title",
                         )}
-                      </p>
-                      <p className="text-sm text-green-700 dark:text-green-300">
+                      </P>
+                      <P className="text-sm text-green-700 dark:text-green-300">
                         {t(
                           "app.subscription.subscription.overview.howItWorks.permanent.description",
                         )}
-                      </p>
-                    </div>
-                  </div>
+                      </P>
+                    </Div>
+                  </Div>
 
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                  <Div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20">
                     <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-blue-900 dark:text-blue-100">
+                    <Div>
+                      <P className="font-medium text-blue-900 dark:text-blue-100">
                         {t(
                           "app.subscription.subscription.overview.howItWorks.free.title",
                         )}
-                      </p>
-                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                      </P>
+                      <P className="text-sm text-blue-700 dark:text-blue-300">
                         {t(
                           "app.subscription.subscription.overview.howItWorks.free.description",
                         )}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                      </P>
+                    </Div>
+                  </Div>
+                </Div>
               </CardContent>
             </Card>
 
@@ -338,123 +341,123 @@ export function SubscriptionClientContent({
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">
+                <Div className="space-y-4">
+                  <Div>
+                    <H4 className="font-semibold mb-2">
                       {t(
                         "app.subscription.subscription.overview.costs.models.title",
                       )}
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="flex justify-between p-2 rounded bg-muted/50">
-                        <span>
+                    </H4>
+                    <Div className="grid grid-cols-2 gap-2 text-sm">
+                      <Div className="flex justify-between p-2 rounded bg-muted/50">
+                        <Span>
                           {t(
                             "app.subscription.subscription.overview.costs.models.gpt4",
                           )}
-                        </span>
-                        <span className="font-mono">
+                        </Span>
+                        <Span className="font-mono">
                           {t(
                             "app.subscription.subscription.overview.costs.models.cost",
                             {
                               count: 5,
                             },
                           )}
-                        </span>
-                      </div>
-                      <div className="flex justify-between p-2 rounded bg-muted/50">
-                        <span>
+                        </Span>
+                      </Div>
+                      <Div className="flex justify-between p-2 rounded bg-muted/50">
+                        <Span>
                           {t(
                             "app.subscription.subscription.overview.costs.models.claude",
                           )}
-                        </span>
-                        <span className="font-mono">
+                        </Span>
+                        <Span className="font-mono">
                           {t(
                             "app.subscription.subscription.overview.costs.models.cost",
                             {
                               count: 4,
                             },
                           )}
-                        </span>
-                      </div>
-                      <div className="flex justify-between p-2 rounded bg-muted/50">
-                        <span>
+                        </Span>
+                      </Div>
+                      <Div className="flex justify-between p-2 rounded bg-muted/50">
+                        <Span>
                           {t(
                             "app.subscription.subscription.overview.costs.models.gpt35",
                           )}
-                        </span>
-                        <span className="font-mono">
+                        </Span>
+                        <Span className="font-mono">
                           {t(
                             "app.subscription.subscription.overview.costs.models.cost",
                             {
                               count: 2,
                             },
                           )}
-                        </span>
-                      </div>
-                      <div className="flex justify-between p-2 rounded bg-muted/50">
-                        <span>
+                        </Span>
+                      </Div>
+                      <Div className="flex justify-between p-2 rounded bg-muted/50">
+                        <Span>
                           {t(
                             "app.subscription.subscription.overview.costs.models.llama",
                           )}
-                        </span>
-                        <span className="font-mono">
+                        </Span>
+                        <Span className="font-mono">
                           {t(
                             "app.subscription.subscription.overview.costs.models.cost",
                             {
                               count: 2,
                             },
                           )}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                        </Span>
+                      </Div>
+                    </Div>
+                  </Div>
 
-                  <div>
-                    <h4 className="font-semibold mb-2">
+                  <Div>
+                    <H4 className="font-semibold mb-2">
                       {t(
                         "app.subscription.subscription.overview.costs.features.title",
                       )}
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="flex justify-between p-2 rounded bg-muted/50">
-                        <span>
+                    </H4>
+                    <Div className="grid grid-cols-2 gap-2 text-sm">
+                      <Div className="flex justify-between p-2 rounded bg-muted/50">
+                        <Span>
                           {t(
                             "app.subscription.subscription.overview.costs.features.search",
                           )}
-                        </span>
-                        <span className="font-mono">
+                        </Span>
+                        <Span className="font-mono">
                           {t(
                             "app.subscription.subscription.overview.costs.features.searchCost",
                           )}
-                        </span>
-                      </div>
-                      <div className="flex justify-between p-2 rounded bg-muted/50">
-                        <span>
+                        </Span>
+                      </Div>
+                      <Div className="flex justify-between p-2 rounded bg-muted/50">
+                        <Span>
                           {t(
                             "app.subscription.subscription.overview.costs.features.tts",
                           )}
-                        </span>
-                        <span className="font-mono">
+                        </Span>
+                        <Span className="font-mono">
                           {t(
                             "app.subscription.subscription.overview.costs.features.audioCost",
                           )}
-                        </span>
-                      </div>
-                      <div className="flex justify-between p-2 rounded bg-muted/50">
-                        <span>
+                        </Span>
+                      </Div>
+                      <Div className="flex justify-between p-2 rounded bg-muted/50">
+                        <Span>
                           {t(
                             "app.subscription.subscription.overview.costs.features.stt",
                           )}
-                        </span>
-                        <span className="font-mono">
+                        </Span>
+                        <Span className="font-mono">
                           {t(
                             "app.subscription.subscription.overview.costs.features.audioCost",
                           )}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                        </Span>
+                      </Div>
+                    </Div>
+                  </Div>
+                </Div>
               </CardContent>
             </Card>
           </motion.div>
@@ -470,11 +473,11 @@ export function SubscriptionClientContent({
           >
             {/* Subscription Option */}
             <Card className="relative overflow-hidden border-2 border-primary">
-              <div className="absolute top-4 right-4">
+              <Div className="absolute top-4 right-4">
                 <Badge className="bg-primary">
                   {t("app.subscription.subscription.buy.subscription.badge")}
                 </Badge>
-              </div>
+              </Div>
               <CardHeader>
                 <CardTitle className="text-2xl">
                   {t("app.subscription.subscription.buy.subscription.title")}
@@ -486,41 +489,41 @@ export function SubscriptionClientContent({
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <div className="text-4xl font-bold">{formatPrice(10, locale)}</div>
-                  <div className="text-sm text-muted-foreground">
+                <Div className="space-y-2">
+                  <Div className="text-4xl font-bold">{formatPrice(10, locale)}</Div>
+                  <Div className="text-sm text-muted-foreground">
                     {t(
                       "app.subscription.subscription.buy.subscription.perMonth",
                     )}
-                  </div>
-                </div>
+                  </Div>
+                </Div>
 
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center gap-2">
+                <Div className="space-y-3 text-sm">
+                  <Div className="flex items-center gap-2">
                     <Zap className="h-4 w-4 text-primary" />
-                    <span>
+                    <Span>
                       {t(
                         "app.subscription.subscription.buy.subscription.features.credits",
                       )}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-amber-600" />
-                    <span>
+                    <Span>
                       {t(
                         "app.subscription.subscription.buy.subscription.features.expiry",
                       )}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-green-600" />
-                    <span>
+                    <Span>
                       {t(
                         "app.subscription.subscription.buy.subscription.features.bestFor",
                       )}
-                    </span>
-                  </div>
-                </div>
+                    </Span>
+                  </Div>
+                </Div>
 
                 <Button className="w-full" size="lg">
                   {t("app.subscription.subscription.buy.subscription.button")}
@@ -539,46 +542,46 @@ export function SubscriptionClientContent({
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <div className="text-4xl font-bold">{formatPrice(5, locale)}</div>
-                  <div className="text-sm text-muted-foreground">
+                <Div className="space-y-2">
+                  <Div className="text-4xl font-bold">{formatPrice(5, locale)}</Div>
+                  <Div className="text-sm text-muted-foreground">
                     {t("app.subscription.subscription.buy.pack.perPack")}
-                  </div>
-                </div>
+                  </Div>
+                </Div>
 
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center gap-2">
+                <Div className="space-y-3 text-sm">
+                  <Div className="flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-green-600" />
-                    <span>
+                    <Span>
                       {t(
                         "app.subscription.subscription.buy.pack.features.credits",
                       )}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 text-green-600" />
-                    <span>
+                    <Span>
                       {t(
                         "app.subscription.subscription.buy.pack.features.expiry",
                       )}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-blue-600" />
-                    <span>
+                    <Span>
                       {t(
                         "app.subscription.subscription.buy.pack.features.bestFor",
                       )}
-                    </span>
-                  </div>
-                </div>
+                    </Span>
+                  </Div>
+                </Div>
 
                 {/* Quantity Selector */}
-                <div className="space-y-3">
+                <Div className="space-y-3">
                   <label className="text-sm font-medium">
                     {t("app.subscription.subscription.buy.pack.quantity")}
                   </label>
-                  <div className="flex items-center gap-3">
+                  <Div className="flex items-center gap-3">
                     <Button
                       variant="outline"
                       size="sm"
@@ -589,16 +592,16 @@ export function SubscriptionClientContent({
                     >
                       -
                     </Button>
-                    <div className="flex-1 text-center">
-                      <div className="text-lg font-semibold">
+                    <Div className="flex-1 text-center">
+                      <Div className="text-lg font-semibold">
                         {packQuantity}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
+                      </Div>
+                      <Div className="text-xs text-muted-foreground">
                         {t("app.subscription.subscription.buy.pack.total", {
                           count: packQuantity * 500,
                         })}
-                      </div>
-                    </div>
+                      </Div>
+                    </Div>
                     <Button
                       variant="outline"
                       size="sm"
@@ -609,13 +612,13 @@ export function SubscriptionClientContent({
                     >
                       +
                     </Button>
-                  </div>
-                  <div className="text-center text-sm text-muted-foreground">
+                  </Div>
+                  <Div className="text-center text-sm text-muted-foreground">
                     {t("app.subscription.subscription.buy.pack.totalPrice", {
                       price: formatPrice(5 * packQuantity, locale),
                     })}
-                  </div>
-                </div>
+                  </Div>
+                </Div>
 
                 <Button className="w-full" size="lg" variant="outline">
                   {t("app.subscription.subscription.buy.pack.button", {
@@ -650,23 +653,23 @@ export function SubscriptionClientContent({
               </CardHeader>
               <CardContent>
                 {!initialHistory || initialHistory.transactions.length === 0 ? (
-                  <div className="text-center py-12 space-y-4">
+                  <Div className="text-center py-12 space-y-4">
                     <History className="h-12 w-12 text-muted-foreground mx-auto" />
-                    <div>
-                      <p className="text-lg font-medium">
+                    <Div>
+                      <P className="text-lg font-medium">
                         {t("app.subscription.subscription.history.empty.title")}
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-2">
+                      </P>
+                      <P className="text-sm text-muted-foreground mt-2">
                         {t(
                           "app.subscription.subscription.history.empty.description",
                         )}
-                      </p>
-                    </div>
-                  </div>
+                      </P>
+                    </Div>
+                  </Div>
                 ) : (
-                  <div className="space-y-3">
+                  <Div className="space-y-3">
                     {initialHistory.transactions.map((transaction) => (
-                      <div
+                      <Div
                         key={transaction.id}
                         className={cn(
                           "p-4 rounded-lg border flex items-center justify-between",
@@ -675,23 +678,23 @@ export function SubscriptionClientContent({
                             : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800",
                         )}
                       >
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium capitalize">
+                        <Div className="space-y-1">
+                          <Div className="flex items-center gap-2">
+                            <Span className="font-medium capitalize">
                               {t(getTransactionTypeKey(transaction.type))}
-                            </span>
+                            </Span>
                             {transaction.modelId && (
                               <Badge variant="outline" className="text-xs">
                                 {transaction.modelId}
                               </Badge>
                             )}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
+                          </Div>
+                          <Div className="text-sm text-muted-foreground">
                             {formatDate(transaction.createdAt, locale)}
-                          </div>
-                        </div>
-                        <div className="text-right space-y-1">
-                          <div
+                          </Div>
+                        </Div>
+                        <Div className="text-right space-y-1">
+                          <Div
                             className={cn(
                               "text-lg font-bold",
                               transaction.amount > 0
@@ -701,27 +704,27 @@ export function SubscriptionClientContent({
                           >
                             {transaction.amount > 0 ? "+" : ""}
                             {transaction.amount}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
+                          </Div>
+                          <Div className="text-xs text-muted-foreground">
                             {t(
                               "app.subscription.subscription.history.balance",
                               {
                                 count: transaction.balanceAfter,
                               },
                             )}
-                          </div>
-                        </div>
-                      </div>
+                          </Div>
+                        </Div>
+                      </Div>
                     ))}
 
                     {initialHistory.totalCount > 10 && (
-                      <div className="text-center pt-4">
+                      <Div className="text-center pt-4">
                         <Button variant="outline">
                           {t("app.subscription.subscription.history.loadMore")}
                         </Button>
-                      </div>
+                      </Div>
                     )}
-                  </div>
+                  </Div>
                 )}
               </CardContent>
             </Card>

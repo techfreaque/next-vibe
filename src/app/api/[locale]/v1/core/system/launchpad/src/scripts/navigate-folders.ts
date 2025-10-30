@@ -1,6 +1,5 @@
 /// <reference types="node" />
 /* eslint-disable i18next/no-literal-string */
-/* eslint-disable no-console */
 import { exec } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -17,6 +16,17 @@ import type {
 import { cloneRepo } from "../utils/repo-utils.js";
 
 const execAsync = promisify(exec);
+
+// Simple logger for launchpad CLI output
+const logger = {
+  log(message: string): void {
+    process.stdout.write(`${message}\n`);
+  },
+  error(message: string, error?: Error | string): void {
+    const errorStr = error ? ` ${error instanceof Error ? error.message : String(error)}` : "";
+    process.stderr.write(`${message}${errorStr}\n`);
+  },
+};
 
 /**
  * Type guard to check if an item is a LaunchpadPackage
@@ -55,12 +65,12 @@ function isLaunchpadFolder(
  */
 async function openInVSCode(folderPath: string): Promise<void> {
   try {
-    console.log(`Opening ${folderPath} in VS Code...`);
+    logger.log(`Opening ${folderPath} in VS Code...`);
     await execAsync(`code "${folderPath}"`);
-    console.log("VS Code opened successfully ✅");
+    logger.log("VS Code opened successfully ✅");
   } catch (error) {
-    console.error("Failed to open VS Code:", error);
-    console.error("Failed to open VS Code. Is it installed and in your PATH?");
+    logger.error("Failed to open VS Code:", error instanceof Error ? error : String(error));
+    logger.error("Failed to open VS Code. Is it installed and in your PATH?");
   }
 }
 
@@ -99,18 +109,18 @@ function renderHeader(title: string): void {
   const padding = Math.floor((width - title.length) / 2);
   const line = "━".repeat(width);
 
-  console.log("\n");
-  console.log(chalk.blue(line));
-  console.log(chalk.blue("┃") + " ".repeat(width) + chalk.blue("┃"));
-  console.log(
+  logger.log("\n");
+  logger.log(chalk.blue(line));
+  logger.log(chalk.blue("┃") + " ".repeat(width) + chalk.blue("┃"));
+  logger.log(
     chalk.blue("┃") +
       " ".repeat(padding) +
       chalk.bold.white(title) +
       " ".repeat(padding + (title.length % 2 === 0 ? 0 : 1)) +
       chalk.blue("┃"),
   );
-  console.log(chalk.blue("┃") + " ".repeat(width) + chalk.blue("┃"));
-  console.log(chalk.blue(line));
+  logger.log(chalk.blue("┃") + " ".repeat(width) + chalk.blue("┃"));
+  logger.log(chalk.blue(line));
 }
 
 /**
@@ -155,12 +165,12 @@ export async function navigateFolders(
 
       // Display current path with styling
       const pathString = formatPath(currentPath);
-      console.log(
+      logger.log(
         `\n${chalk.dim(
           "Current location: ",
         )}${chalk.green.bold(`📂 ${pathString}`)}`,
       );
-      console.log(`${chalk.dim("─".repeat(70))}\n`);
+      logger.log(`${chalk.dim("─".repeat(70))}\n`);
 
       // Prepare choices
       const choices: Array<
@@ -296,23 +306,23 @@ export async function navigateFolders(
           if (fs.existsSync(physicalPath)) {
             await openInVSCode(physicalPath);
           } else {
-            console.log("\n");
-            console.log(
+            logger.log("\n");
+            logger.log(
               chalk.yellow(`⚠️  Directory does not exist: ${physicalPath}`),
             );
-            const result = (await inquirer.prompt([
+            const result = await inquirer.prompt<{ createDir: boolean }>([
               {
                 type: "confirm",
                 name: "createDir",
                 message: "Would you like to create this directory?",
                 default: false,
               },
-            ])) as { createDir: boolean };
+            ]);
 
             if (result.createDir) {
               // Simply create the directory as we have no repo info here
               fs.mkdirSync(physicalPath, { recursive: true });
-              console.log(chalk.green(`✅ Created directory: ${physicalPath}`));
+              logger.log(chalk.green(`✅ Created directory: ${physicalPath}`));
               await openInVSCode(physicalPath);
             }
           }
@@ -327,18 +337,18 @@ export async function navigateFolders(
             if (fs.existsSync(packagePath)) {
               await openInVSCode(packagePath);
             } else {
-              console.log("\n");
-              console.log(
+              logger.log("\n");
+              logger.log(
                 `⚠️  Package directory does not exist: ${packagePath}`,
               );
-              const cloneResult = (await inquirer.prompt([
+              const cloneResult = await inquirer.prompt<{ shouldCloneRepo: boolean }>([
                 {
                   type: "confirm",
                   name: "shouldCloneRepo",
                   message: "Would you like to clone this repository?",
                   default: true,
                 },
-              ])) as { shouldCloneRepo: boolean };
+              ]);
 
               if (cloneResult.shouldCloneRepo) {
                 try {
@@ -349,11 +359,11 @@ export async function navigateFolders(
                     selectedItem.branch,
                     rootDir,
                   );
-                  console.log(chalk.green(`✅ Repository cloned successfully`));
+                  logger.log(chalk.green(`✅ Repository cloned successfully`));
                   await openInVSCode(packagePath);
                 } catch {
-                  console.log(chalk.red(`❌ Failed to clone repository`));
-                  console.log(
+                  logger.log(chalk.red(`❌ Failed to clone repository`));
+                  logger.log(
                     chalk.yellow(
                       "You can try cloning manually or check the repository URL and permissions.",
                     ),
@@ -373,7 +383,7 @@ export async function navigateFolders(
     // Clear screen when exiting
     clearScreen();
   } catch (error) {
-    console.error("Error navigating folders:", error);
+    logger.error("Error navigating folders:", error instanceof Error ? error : String(error));
     // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
     throw error;
   }

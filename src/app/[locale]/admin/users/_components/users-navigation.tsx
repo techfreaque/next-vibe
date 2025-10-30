@@ -6,8 +6,9 @@
 "use client";
 
 import { BarChart3, List, UserPlus } from "lucide-react";
-import Link from "next/link";
+import NextLink from "next/link";
 import { cn } from "next-vibe/shared/utils";
+import { Div, Span } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -51,7 +52,7 @@ export function UsersNavigation({
   ] as const;
 
   return (
-    <div className="border-b border-gray-200 dark:border-gray-700">
+    <Div className="border-b border-gray-200 dark:border-gray-700">
       <nav
         className="flex space-x-8"
         aria-label={t("app.admin.users.tabs.overview")}
@@ -61,7 +62,7 @@ export function UsersNavigation({
           const isActive = item.key === currentPage;
 
           return (
-            <Link
+            <NextLink
               key={item.key}
               href={item.href}
               className={cn(
@@ -80,11 +81,11 @@ export function UsersNavigation({
                     : "text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300",
                 )}
               />
-              <span>{item.label}</span>
-            </Link>
+              <Span>{item.label}</Span>
+            </NextLink>
           );
         })}
       </nav>
-    </div>
+    </Div>
   );
 }

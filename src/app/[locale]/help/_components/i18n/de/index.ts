@@ -17,6 +17,7 @@ export const translations: typeof enTranslations = {
         messagePlaceholder: "Sagen Sie uns, wie wir Ihnen helfen können...",
         submit: "Nachricht senden",
         sending: "Wird gesendet...",
+        error: "Fehler: Kontaktformular nicht konfiguriert",
       },
       info: {
         title: "Kontaktinformationen",
