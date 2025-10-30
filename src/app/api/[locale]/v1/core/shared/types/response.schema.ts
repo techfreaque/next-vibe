@@ -80,7 +80,7 @@ export function throwErrorResponse(
   messageParams?: TParams,
 ): never {
   const errorResponse = createErrorResponse(message, errorType, messageParams);
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Core utility function that intentionally throws for error propagation
   throw new ErrorResponseError(errorResponse);
 }
 
@@ -161,6 +161,7 @@ export function createStreamingResponse(response: Response): StreamingResponse {
 /**
  * Type guard to check if a response is a streaming response
  */
+// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic type parameter for type guard utility
 export function isStreamingResponse<T = unknown>(
   value: ResponseType<T> | StreamingResponse,
 ): value is StreamingResponse {
@@ -168,6 +169,7 @@ export function isStreamingResponse<T = unknown>(
     typeof value === "object" &&
     value !== null &&
     "__isStreamingResponse" in value &&
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Type assertion needed for runtime type checking
     (value as unknown as Record<string, boolean>).__isStreamingResponse === true
   );
 }

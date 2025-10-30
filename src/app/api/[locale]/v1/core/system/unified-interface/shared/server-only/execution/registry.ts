@@ -11,7 +11,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getErrorMessage } from "../../utils/error";
 import type { Platform } from "../config";
 import { getDiscoveredEndpoints } from "../discovery/adapter";
 import { toolFilter } from "../permissions/filter";
@@ -87,7 +86,7 @@ export abstract class BaseRegistry {
       await this.onInitialized();
     } catch (error) {
       this.logger.error(`[${this.config.platformName}] Initialization failed`, {
-        error: getErrorMessage(error),
+        error: error instanceof Error ? error.message : String(error),
       });
       this.initialized = false;
       this.endpoints = [];
@@ -134,6 +133,35 @@ export abstract class BaseRegistry {
   getEndpointByToolName(toolName: string): DiscoveredEndpoint | null {
     this.ensureInitialized();
     return this.endpoints.find((e) => e.toolName === toolName) || null;
+  }
+
+  /**
+   * Lazy load specific endpoints by tool names
+   * This method dynamically imports only the requested endpoint definitions
+   * instead of loading all endpoints during initialization
+   *
+   * @param toolNames - Array of tool names to load
+   * @param user - User context for permission filtering (optional)
+   * @param platform - Platform to filter by (optional)
+   * @returns Array of DiscoveredEndpoint objects for the requested tools
+   */
+  async getEndpointsByToolNamesLazy(
+    toolNames: string[],
+    user?: JwtPayloadType,
+    platform?: Platform,
+  ): Promise<DiscoveredEndpoint[]> {
+    // Import the lazy loader
+    const { getEndpointsByToolNames } = await import("../discovery/adapter");
+
+    // Load only the requested endpoints
+    const endpoints = await getEndpointsByToolNames(toolNames);
+
+    // Apply permission filtering if user is provided
+    if (user) {
+      return toolFilter.filterEndpointsByPermissions(endpoints, user, platform);
+    }
+
+    return endpoints;
   }
 
   /**

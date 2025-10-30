@@ -100,7 +100,7 @@ export function useIncognitoChat(
   // Thread operations
   const createThread = useCallback(
     (title: string): ChatThread => {
-      logger.debug("useIncognitoChat", "Creating thread", { title });
+      logger.debug("Incognito: Creating thread", { title });
 
       const thread = createIncognitoThread(
         title || t(CHAT_CONSTANTS.DEFAULT_THREAD_TITLE),
@@ -120,7 +120,7 @@ export function useIncognitoChat(
 
   const updateThreadCallback = useCallback(
     (threadId: string, updates: Partial<ChatThread>): void => {
-      logger.debug("useIncognitoChat", "Updating thread", {
+      logger.debug("Incognito: Updating thread", {
         threadId,
         updatedFields: Object.keys(updates).join(", "),
       });
@@ -140,7 +140,7 @@ export function useIncognitoChat(
 
   const deleteThreadCallback = useCallback(
     (threadId: string): void => {
-      logger.debug("useIncognitoChat", "Deleting thread", { threadId });
+      logger.debug("Incognito: Deleting thread", { threadId });
 
       deleteThread(threadId);
 
@@ -160,7 +160,7 @@ export function useIncognitoChat(
 
   const setActiveThreadCallback = useCallback(
     (threadId: string | null): void => {
-      logger.debug("useIncognitoChat", "Setting active thread", { threadId });
+      logger.debug("Incognito: Setting active thread", { threadId });
 
       setActiveThreadStorage(threadId);
 
@@ -182,7 +182,7 @@ export function useIncognitoChat(
       model: ModelId | null = null,
       persona: string | null = null,
     ): ChatMessage => {
-      logger.debug("useIncognitoChat", "Adding message", {
+      logger.debug("Incognito: Adding message", {
         threadId,
         role,
         content,
@@ -209,7 +209,7 @@ export function useIncognitoChat(
 
   const updateMessageCallback = useCallback(
     (messageId: string, updates: Partial<ChatMessage>): void => {
-      logger.debug("useIncognitoChat", "Updating message", {
+      logger.debug("Incognito: Updating message", {
         messageId,
         updatedFields: Object.keys(updates).join(", "),
       });
@@ -229,7 +229,7 @@ export function useIncognitoChat(
 
   const deleteMessageCallback = useCallback(
     (messageId: string): void => {
-      logger.debug("useIncognitoChat", "Deleting message", { messageId });
+      logger.debug("Incognito: Deleting message", { messageId });
 
       deleteMessage(messageId);
 
@@ -248,7 +248,7 @@ export function useIncognitoChat(
   // Folder operations
   const setCurrentFolderCallback = useCallback(
     (rootFolderId: DefaultFolderId, subFolderId: string | null): void => {
-      logger.debug("useIncognitoChat", "Setting current folder", {
+      logger.debug("Incognito: Setting current folder", {
         rootFolderId,
         subFolderId,
       });
@@ -267,7 +267,7 @@ export function useIncognitoChat(
   // AI operations (client-side only)
   const sendMessage = useCallback(
     (content: string, model: ModelId): Promise<void> => {
-      logger.debug("useIncognitoChat", "Sending message (client-side)", {
+      logger.debug("Incognito: Sending message (client-side)", {
         content,
         model,
       });

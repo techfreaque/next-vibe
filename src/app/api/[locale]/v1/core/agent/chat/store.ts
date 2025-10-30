@@ -72,6 +72,7 @@ export interface ChatFolder {
   parentId: string | null;
   expanded: boolean;
   sortOrder: number;
+  metadata: Record<string, string | number | boolean | null>;
   createdAt: Date;
   updatedAt: Date;
 }

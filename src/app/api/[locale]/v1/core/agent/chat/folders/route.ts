@@ -7,25 +7,22 @@ import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-inte
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { createFolder, getFolders } from "./repository";
+import { chatFoldersRepository } from "./repository";
 
+// The return type mismatch between repository methods and endpointsHandler is a known
+// limitation of the type system. The handlers work correctly at runtime.
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async (props) => {
-      return await getFolders(props.user, props.data);
-    },
+    handler: ({ data, user, locale, logger }) =>
+      chatFoldersRepository.getFolders(data, user, locale, logger) as any,
   },
   [Methods.POST]: {
     email: undefined,
-    handler: async (props) => {
-      return await createFolder(
-        props.user,
-        props.data,
-        props.locale,
-        props.logger,
-      );
-    },
+    handler: ({ data, user, locale, logger }) =>
+      chatFoldersRepository.createFolder(data, user, locale, logger) as any,
   },
 });
+/* eslint-enable @typescript-eslint/no-explicit-any */

@@ -6,7 +6,7 @@
 import "server-only";
 
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { stepCountIs, streamText } from "ai";
+import { streamText } from "ai";
 import { and, eq } from "drizzle-orm";
 import {
   createStreamingResponse,
@@ -20,7 +20,10 @@ import { parseError } from "next-vibe/shared/utils";
 import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
 import { creditValidator } from "@/app/api/[locale]/v1/core/credits/validator";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { CoreTool } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/types";
+import type {
+  CoreTool,
+  DiscoveredEndpoint,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/ai/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -75,7 +78,7 @@ export interface IAiStreamRepository {
  * Type guard for tool result values
  * Validates that value is JSON-serializable and matches ToolCallResult type
  */
-
+// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Type guard requires unknown parameter
 function isValidToolResult(value: unknown): value is ToolCallResult {
   if (value === null) {
     return true;
@@ -283,8 +286,8 @@ async function fetchMessageHistory(
     const roleLowercase = msg.role.toLowerCase();
     const validRole: "user" | "assistant" | "system" =
       roleLowercase === "user" ||
-      roleLowercase === "assistant" ||
-      roleLowercase === "system"
+        roleLowercase === "assistant" ||
+        roleLowercase === "system"
         ? roleLowercase
         : "user";
     return {
@@ -334,8 +337,8 @@ async function getParentMessage(
   const roleLowercase = message.role.toLowerCase();
   const validRole: "user" | "assistant" | "system" =
     roleLowercase === "user" ||
-    roleLowercase === "assistant" ||
-    roleLowercase === "system"
+      roleLowercase === "assistant" ||
+      roleLowercase === "system"
       ? roleLowercase
       : "user";
 
@@ -564,8 +567,8 @@ class AiStreamRepository implements IAiStreamRepository {
             const roleLowercase = msg.role.toLowerCase();
             const validRole: "user" | "assistant" | "system" =
               roleLowercase === "user" ||
-              roleLowercase === "assistant" ||
-              roleLowercase === "system"
+                roleLowercase === "assistant" ||
+                roleLowercase === "system"
                 ? roleLowercase
                 : "user";
             return { role: validRole, content: msg.content };
@@ -639,31 +642,33 @@ class AiStreamRepository implements IAiStreamRepository {
     let tools: Record<string, CoreTool> | undefined = undefined;
     let enhancedSystemPrompt = params.systemPrompt;
 
-    if (params.requestedTools === null) {
+    // If tools are explicitly disabled (null) or not requested (undefined/empty), don't load any
+    if (
+      params.requestedTools === null ||
+      params.requestedTools === undefined ||
+      params.requestedTools.length === 0
+    ) {
+      params.logger.debug("No tools requested, skipping tool loading");
       return { tools, systemPrompt: enhancedSystemPrompt };
     }
 
-
     try {
-      const {getToolRegistry} = await import(
-        "@/app/api/[locale]/v1/core/system/unified-interface/ai/registry",
+      const { getToolRegistry } = await import(
+        "@/app/api/[locale]/v1/core/system/unified-interface/ai/registry"
       );
       const registry = getToolRegistry();
 
-      // Get endpoints filtered by user permissions at framework level
-      // This ensures users only get tools they have permission to use
-      const allEndpoints = registry.getEndpoints(params.user, Platform.AI);
-      const enabledEndpoints =
-        params.requestedTools && params.requestedTools.length > 0
-          ? allEndpoints.filter((endpoint) =>
-              params.requestedTools!.includes(endpoint.toolName),
-            )
-          : allEndpoints;
+      // Lazy load ONLY the requested tools instead of loading all 143 endpoints
+      // This uses the generated/endpoint.ts dynamic import system
+      const enabledEndpoints = await registry.getEndpointsByToolNamesLazy(
+        params.requestedTools,
+        params.user,
+      );
 
-      params.logger.debug("Loading tools", {
-        requestedCount: params.requestedTools?.length ?? "all",
-        enabledCount: enabledEndpoints.length,
-        enabledNames: enabledEndpoints.map((endpoint) => endpoint.toolName),
+      params.logger.debug("Lazy loaded tools", {
+        requestedCount: params.requestedTools.length,
+        loadedCount: enabledEndpoints.length,
+        loadedNames: enabledEndpoints.map((endpoint) => endpoint.toolName),
       });
 
       if (enabledEndpoints.length > 0) {
@@ -704,10 +709,10 @@ class AiStreamRepository implements IAiStreamRepository {
 
           enhancedSystemPrompt = enhancedSystemPrompt
             ? [
-                enhancedSystemPrompt,
-                combinedInstructions,
-                TOOL_USAGE_GUIDELINES,
-              ].join("\n\n")
+              enhancedSystemPrompt,
+              combinedInstructions,
+              TOOL_USAGE_GUIDELINES,
+            ].join("\n\n")
             : [combinedInstructions, TOOL_USAGE_GUIDELINES].join("\n\n");
         }
       }
@@ -1002,36 +1007,15 @@ class AiStreamRepository implements IAiStreamRepository {
       messages.unshift({ role: "system", content: systemPrompt });
     }
 
-    // Step 8: Create AI message placeholder
+    // Step 8: Generate AI message ID
+    // Note: AI message placeholder is created inside the stream (after line 1260)
+    // to avoid duplicate inserts. The placeholder is created when we start streaming content.
     let aiMessageId = crypto.randomUUID();
-    const parentForAiMessage =
-      data.operation === "answer-as-ai" || data.operation === "retry"
-        ? effectiveParentMessageId
-        : userMessageId;
-    const aiMessageDepth =
-      data.operation === "answer-as-ai" || data.operation === "retry"
-        ? messageDepth
-        : messageDepth + 1;
-
-    if (!isIncognito && userId) {
-      await this.createAiMessagePlaceholder({
-        messageId: aiMessageId,
-        threadId: threadResult.threadId,
-        parentId: parentForAiMessage ?? null,
-        depth: aiMessageDepth,
-        userId,
-        model: data.model,
-        persona: data.persona,
-        sequenceId: aiMessageId, // First message in sequence uses its own ID
-        sequenceIndex: 0, // First message in sequence
-        logger,
-      });
-    } else {
-      logger.debug("Generated incognito AI message ID", {
-        messageId: aiMessageId,
-        operation: data.operation,
-      });
-    }
+    logger.debug("Generated AI message ID", {
+      messageId: aiMessageId,
+      operation: data.operation,
+      isIncognito,
+    });
 
     // Step 9: Start AI streaming (for all operations including answer-as-ai)
     try {
@@ -1193,8 +1177,8 @@ class AiStreamRepository implements IAiStreamRepository {
               modelConfig?.openRouterModel || data.model;
 
             // Use Vercel AI SDK's built-in multi-step tool calling
-            // stopWhen: allows up to 5 steps (tool call + text generation cycles)
-            // The model will continue until it generates text without tool calls or reaches the step limit
+            // maxSteps: allows up to 50 steps (tool call + text generation cycles)
+            // This allows for long-running tool sequences that could take minutes
             const streamResult = streamText({
               model: provider(openRouterModelId),
               messages,
@@ -1203,25 +1187,26 @@ class AiStreamRepository implements IAiStreamRepository {
               system: systemPrompt || undefined,
               ...(tools
                 ? {
-                    tools,
-                    stopWhen: stepCountIs(5), // Allow up to 5 steps for multi-step tool calling
-                    onStepFinish: ({
-                      text,
-                      toolCalls,
-                      toolResults,
+                  tools,
+                  maxSteps: 50, // Allow up to 50 steps for multi-step tool calling that could take minutes
+                  onStepFinish: ({
+                    text,
+                    toolCalls,
+                    toolResults,
+                    finishReason,
+                    usage,
+                  }): void => {
+                    logger.info("[AI Stream] Step finished", {
+                      hasText: !!text,
+                      textLength: text?.length || 0,
+                      toolCallsCount: toolCalls.length,
+                      toolResultsCount: toolResults.length,
                       finishReason,
-                      usage,
-                    }): void => {
-                      logger.info("[AI Stream] Step finished", {
-                        hasText: !!text,
-                        textLength: text?.length || 0,
-                        toolCallsCount: toolCalls.length,
-                        toolResultsCount: toolResults.length,
-                        finishReason,
-                        totalTokens: usage.totalTokens,
-                      });
-                    },
-                  }
+                      totalTokens: usage.totalTokens,
+                      textPreview: text?.substring(0, 100),
+                    });
+                  },
+                }
                 : {}),
             });
 
@@ -1235,16 +1220,27 @@ class AiStreamRepository implements IAiStreamRepository {
             // Track if we need to create a new assistant message after tool calls
             let needsNewAssistantMessage = false;
 
-            // Get endpoint metadata for display info
-            // Filter by user permissions to ensure we only show tools the user can access
-            const { getToolRegistry } = await import(
-              "@/app/api/[locale]/v1/core/system/unified-interface/ai/registry"
-            );
-            const registry = getToolRegistry();
-            const allEndpoints = registry.getEndpoints(user, Platform.AI);
-            const endpointMap = new Map(
-              allEndpoints.map((endpoint) => [endpoint.toolName, endpoint]),
-            );
+            // Lazy load endpoint metadata only when tool calls are encountered
+            // This avoids loading all 143 endpoints when no tools are used
+            let endpointMap: Map<string, DiscoveredEndpoint> | null = null;
+            const getEndpointMap = async (): Promise<
+              Map<string, DiscoveredEndpoint>
+            > => {
+              if (!endpointMap) {
+                const { getToolRegistry } = await import(
+                  "@/app/api/[locale]/v1/core/system/unified-interface/ai/registry"
+                );
+                const registry = getToolRegistry();
+                const allEndpoints = registry.getEndpoints(user, Platform.AI);
+                endpointMap = new Map(
+                  allEndpoints.map((endpoint) => [endpoint.toolName, endpoint]),
+                );
+                logger.debug("Lazy loaded endpoint metadata for tool calls", {
+                  endpointCount: allEndpoints.length,
+                });
+              }
+              return endpointMap;
+            };
 
             // Stream the response
             logger.info("[AI Stream] Starting to process fullStream");
@@ -1291,7 +1287,33 @@ class AiStreamRepository implements IAiStreamRepository {
             }
 
             for await (const part of streamResult.fullStream) {
+              // Log event type prominently
               if (part.type === "text-delta") {
+                logger.info("[AI Stream] *** TEXT-DELTA EVENT ***", {
+                  type: part.type,
+                  text: "text" in part ? String(part.text) : undefined,
+                  textLength: "text" in part ? String(part.text).length : 0,
+                });
+              } else {
+                logger.info("[AI Stream] Event received", {
+                  type: part.type,
+                  hasText: "text" in part,
+                  textPreview: "text" in part ? String(part.text).substring(0, 50) : undefined,
+                  hasToolName: "toolName" in part,
+                  toolName: "toolName" in part ? String(part.toolName) : undefined,
+                });
+              }
+
+              if (part.type === "start-step") {
+                logger.info("[AI Stream] Step started", {
+                  stepNumber: ("stepNumber" in part ? String(part.stepNumber) : "unknown") as string,
+                });
+              } else if (part.type === "finish-step") {
+                logger.info("[AI Stream] Step finished", {
+                  finishReason: ("finishReason" in part ? String(part.finishReason) : "unknown") as string,
+                  usage: ("usage" in part ? part.usage : undefined) as Record<string, unknown> | undefined,
+                });
+              } else if (part.type === "text-delta") {
                 const textDelta = part.text;
 
                 if (
@@ -1392,8 +1414,10 @@ class AiStreamRepository implements IAiStreamRepository {
                   // Accumulate the content
                   fullContent += textDelta;
 
-                  logger.debug("[AI Stream] Text delta", {
+                  logger.info("[AI Stream] *** EMITTING CONTENT_DELTA ***", {
+                    messageId: aiMessageId,
                     deltaLength: textDelta.length,
+                    delta: textDelta,
                     totalContentLength: fullContent.length,
                   });
 
@@ -1402,9 +1426,13 @@ class AiStreamRepository implements IAiStreamRepository {
                     messageId: aiMessageId,
                     delta: textDelta,
                   });
-                  controller.enqueue(
-                    encoder.encode(formatSSEEvent(deltaEvent)),
-                  );
+                  const eventString = formatSSEEvent(deltaEvent);
+                  controller.enqueue(encoder.encode(eventString));
+
+                  logger.info("[AI Stream] *** CONTENT_DELTA EMITTED ***", {
+                    messageId: aiMessageId,
+                    eventStringPreview: eventString.substring(0, 100),
+                  });
                 }
               } else if (part.type === "reasoning-start") {
                 // Reasoning starts - just track it, don't create separate message
@@ -1434,8 +1462,9 @@ class AiStreamRepository implements IAiStreamRepository {
                   totalLength: fullReasoningContent.length,
                 });
               } else if (part.type === "tool-call") {
-                // Get endpoint metadata for display info
-                const endpoint = endpointMap.get(part.toolName);
+                // Lazy load endpoint metadata only when tool calls are encountered
+                const map = await getEndpointMap();
+                const endpoint = map.get(part.toolName);
 
                 // Try to get widget metadata from endpoint definition
                 let widgetMetadata: ToolCallWidgetMetadata | undefined;
@@ -1638,9 +1667,9 @@ class AiStreamRepository implements IAiStreamRepository {
 
                         typeof output.error === "string"
                           ?
-                            (output.error as string)
+                          (output.error as string)
                           :
-                            JSON.stringify(output.error);
+                          JSON.stringify(output.error);
                     }
                   }
 
@@ -1698,6 +1727,12 @@ class AiStreamRepository implements IAiStreamRepository {
                     encoder.encode(formatSSEEvent(toolResultEvent)),
                   );
                 }
+              } else {
+                // Log unhandled event types
+                logger.debug("[AI Stream] Unhandled event type", {
+                  type: part.type,
+                  partKeys: Object.keys(part),
+                });
               }
             }
 
@@ -1740,8 +1775,8 @@ class AiStreamRepository implements IAiStreamRepository {
                 finishReason: (finishReason ?? "unknown") as string,
                 ...(collectedToolCalls.length > 0
                   ? {
-                      toolCalls: collectedToolCalls,
-                    }
+                    toolCalls: collectedToolCalls,
+                  }
                   : {}),
               };
 

@@ -21,7 +21,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { cronTasks } from "../../db";
+import { cronTasks } from "../../cron/db";
 import {
   CronTaskPriority,
   CronTaskPriorityDB,
@@ -108,12 +108,12 @@ function determineTaskStatus(
   }
 
   // If task has never run
-  if (!task.lastRun) {
+  if (!task.lastExecutedAt) {
     return CronTaskStatus.PENDING;
   }
 
   // If task has errors in recent execution
-  if (task.lastError) {
+  if (task.lastExecutionError) {
     return CronTaskStatus.ERROR;
   }
 
@@ -122,11 +122,11 @@ function determineTaskStatus(
     return CronTaskStatus.FAILED;
   }
 
-  // Check if task is currently running (nextRun is in the past but no recent completion)
+  // Check if task is currently running (nextExecutionAt is in the past but no recent completion)
   const now = new Date();
-  if (task.nextRun && task.nextRun < now) {
-    // If nextRun is overdue, task might be running or stuck
-    const timeSinceNextRun = now.getTime() - task.nextRun.getTime();
+  if (task.nextExecutionAt && task.nextExecutionAt < now) {
+    // If nextExecutionAt is overdue, task might be running or stuck
+    const timeSinceNextRun = now.getTime() - task.nextExecutionAt.getTime();
     const timeout = task.timeout || 300000; // Default 5 minutes
 
     if (timeSinceNextRun < timeout) {
@@ -166,9 +166,9 @@ function formatTaskResponse(
     priority: prioritySchema.parse(task.priority),
     status: statusSchema.parse(determineTaskStatus(task)),
     category: categorySchema.parse(task.category),
-    lastRun: task.lastRun?.toISOString(),
+    lastRun: task.lastExecutedAt?.toISOString(),
     nextRun:
-      task.nextRun?.toISOString() ||
+      task.nextExecutionAt?.toISOString() ||
       (task.enabled
         ? calculateNextExecutionTime(task.schedule || undefined)?.toISOString()
         : undefined),
@@ -337,12 +337,11 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         category: data.category ?? TaskCategory.SYSTEM,
         timeout: data.timeout ?? 300000,
         retries: data.retries ?? 3,
-        version: "1",
-        defaultConfig: {
-          retryDelay: data.retryDelay ?? 5000,
-        },
-        nextRun: nextRun || undefined,
-        runCount: 0,
+        retryDelay: data.retryDelay ?? 5000,
+        version: "1.0.0",
+        defaultConfig: {},
+        nextExecutionAt: nextRun || undefined,
+        executionCount: 0,
         successCount: 0,
         errorCount: 0,
       };
@@ -370,17 +369,6 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       });
 
       // Format the response
-      const defaultConfig =
-        typeof createdTask.defaultConfig === "object" &&
-        createdTask.defaultConfig !== null
-          ? createdTask.defaultConfig
-          : {};
-      const retryDelay =
-        "retryDelay" in defaultConfig &&
-        typeof defaultConfig.retryDelay === "number"
-          ? defaultConfig.retryDelay
-          : 5000;
-
       const response: CronTaskCreateResponseOutput = {
         task: {
           id: createdTask.id,
@@ -393,8 +381,8 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
           category: z.enum(TaskCategoryDB).parse(createdTask.category),
           timeout: createdTask.timeout || 300000,
           retries: createdTask.retries || 3,
-          retryDelay,
-          version: parseInt(createdTask.version, 10) || 1,
+          retryDelay: createdTask.retryDelay || 5000,
+          version: parseInt(createdTask.version.split(".")[0], 10) || 1,
           createdAt: createdTask.createdAt.toISOString(),
           updatedAt: createdTask.updatedAt.toISOString(),
         },

@@ -214,6 +214,14 @@ const startSmartFileWatcher = async (
 
   // Wait for abort signal
   return await new Promise<void>((resolve) => {
+    let resolved = false;
+    const safeResolve = () => {
+      if (!resolved) {
+        resolved = true;
+        resolve();
+      }
+    };
+
     signal.addEventListener("abort", () => {
       logger.debug("🛑 Stopping file watchers...");
 
@@ -224,7 +232,7 @@ const startSmartFileWatcher = async (
 
       // Close all watchers
       watchers.forEach((watcher) => {
-        try {
+        try{
           watcher.close();
         } catch (error) {
           logger.debug("Error closing watcher:", { error: String(error) });
@@ -232,7 +240,7 @@ const startSmartFileWatcher = async (
       });
 
       logger.debug("✅ File watchers stopped");
-      resolve();
+      safeResolve();
     });
   });
 };
@@ -284,11 +292,19 @@ const startPollingWatcher = async (
 
     // Wait for next cycle or abort signal
     await new Promise<void>((resolve) => {
-      const timeout = setTimeout(() => resolve(), WATCH_INTERVAL);
+      let resolved = false;
+      const safeResolve = () => {
+        if (!resolved) {
+          resolved = true;
+          resolve();
+        }
+      };
+
+      const timeout = setTimeout(safeResolve, WATCH_INTERVAL);
 
       signal.addEventListener("abort", () => {
         clearTimeout(timeout);
-        resolve();
+        safeResolve();
       });
     });
   }
@@ -360,11 +376,19 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
 
       // Wait for next check or abort signal
       await new Promise<void>((resolve) => {
-        const timeout = setTimeout(() => resolve(), HEALTH_CHECK_INTERVAL);
+        let resolved = false;
+        const safeResolve = () => {
+          if (!resolved) {
+            resolved = true;
+            resolve();
+          }
+        };
+
+        const timeout = setTimeout(safeResolve, HEALTH_CHECK_INTERVAL);
 
         signal.addEventListener("abort", () => {
           clearTimeout(timeout);
-          resolve();
+          safeResolve();
         });
       });
     }

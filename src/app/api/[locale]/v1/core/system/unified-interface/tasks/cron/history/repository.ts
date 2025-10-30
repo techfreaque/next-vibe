@@ -13,13 +13,12 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import { z } from "zod";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { cronTaskExecutions, cronTasks } from "../../db";
+import { cronTaskExecutions, cronTasks } from "../../cron/db";
 import { CronTaskPriority, CronTaskStatus } from "../../enum";
 import type {
   CronHistoryRequestOutput,
@@ -105,7 +104,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
           completedAt: cronTaskExecutions.completedAt,
           durationMs: cronTaskExecutions.durationMs,
           error: cronTaskExecutions.error,
-          environment: cronTaskExecutions.executionEnvironment,
+          environment: cronTaskExecutions.environment,
           createdAt: cronTaskExecutions.createdAt,
         })
         .from(cronTaskExecutions)
@@ -179,21 +178,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
         ),
       );
 
-      // Zod schemas for runtime validation and type narrowing
-      const statusSchema = z.enum(
-        Object.values(CronTaskStatus) as [string, ...string[]],
-      );
-      const prioritySchema = z.enum(
-        Object.values(CronTaskPriority) as [string, ...string[]],
-      );
-      const errorSchema = z
-        .object({
-          message: z.string(),
-          messageParams: z.record(z.string(), z.unknown()).optional(),
-          errorType: z.string(),
-        })
-        .nullable();
-
+      // Database already returns correct enum types, no parsing needed
       const response: CronHistoryResponseOutput = {
         executions: executions.map((exec) => {
           const execution: CronHistoryResponseOutput["executions"][number] = {
@@ -204,14 +189,18 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
               t(
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.history.get.unknownTask",
               ),
-            status: statusSchema.parse(exec.status),
-            priority: prioritySchema.parse(
-              exec.priority ?? CronTaskPriority.MEDIUM,
-            ),
+            status: exec.status,
+            priority: exec.priority ?? CronTaskPriority.MEDIUM,
             startedAt: exec.startedAt.toISOString(),
             completedAt: exec.completedAt?.toISOString() ?? null,
             durationMs: exec.durationMs,
-            error: errorSchema.parse(exec.error),
+            error: exec.error
+              ? {
+                  message: exec.error.message,
+                  messageParams: exec.error.messageParams,
+                  errorType: exec.error.errorType.errorKey,
+                }
+              : null,
             environment: exec.environment,
             createdAt: exec.createdAt.toISOString(),
           };

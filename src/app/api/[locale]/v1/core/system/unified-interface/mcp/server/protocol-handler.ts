@@ -11,6 +11,7 @@ import { getCliUser } from "@/app/api/[locale]/v1/core/system/unified-interface/
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { ParameterValue } from "../../shared/server-only/execution/executor";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { getMCPRegistry, toolMetadataToMCPTool } from "../registry";
 import type {
@@ -258,7 +259,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     id: string | number | null,
     code: MCPErrorCode,
     message: string,
-    data?: Record<string, unknown>,
+    data?: Record<string, ParameterValue>,
   ): JsonRpcResponse {
     const error: JsonRpcError = {
       code,

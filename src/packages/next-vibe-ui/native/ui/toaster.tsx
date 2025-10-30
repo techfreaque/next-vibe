@@ -30,7 +30,7 @@ export function Toaster(): React.JSX.Element {
                   <ToastDescription>{description}</ToastDescription>
                 )}
               </View>
-              {action}
+              {action ? <>{action}</> : null}
               <ToastClose />
             </Toast>
           </View>

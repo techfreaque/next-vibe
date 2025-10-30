@@ -27,14 +27,19 @@ import {
 /**
  * Next.js validation context
  * Handles raw INPUT data from Next.js requests
+ *
+ * Note: urlParameters is Record<string, unknown> to handle cases where
+ * we extract parameters from Next.js params (which includes locale) and need
+ * to pass the remaining parameters. TypeScript doesn't automatically narrow
+ * Omit<T & {locale}, "locale"> to T, so we use a more flexible type here.
  */
-export interface NextValidationContext<TUrlParametersInput> {
+export interface NextValidationContext {
   /** HTTP method being used */
   method: Methods;
   /** Next.js request object */
   request: NextRequest;
   /** Raw URL parameters from Next.js route (INPUT type) */
-  urlParameters: TUrlParametersInput;
+  urlParameters: Record<string, unknown>;
   /** Locale for error messages */
   locale: CountryLanguage;
 }
@@ -47,6 +52,7 @@ export async function validateNextRequestData<
   TRequestInput,
   TRequestOutput,
   TResponseInput,
+  TResponseOutput,
   TUrlVariablesInput,
   TUrlVariablesOutput,
   TExampleKey extends string,
@@ -62,10 +68,11 @@ export async function validateNextRequestData<
     TRequestInput,
     TRequestOutput,
     TResponseInput,
+    TResponseOutput,
     TUrlVariablesInput,
     TUrlVariablesOutput
   >,
-  context: NextValidationContext<TUrlVariablesInput>,
+  context: NextValidationContext,
   logger: EndpointLogger,
 ): Promise<
   ResponseType<ValidatedRequestData<TRequestOutput, TUrlVariablesOutput>>
@@ -80,10 +87,10 @@ export async function validateNextRequestData<
     const hasUrlParams = Object.keys(context.urlParameters || {}).length > 0;
     const urlValidation = hasUrlParams
       ? validateEndpointUrlParameters(
-          context.urlParameters,
-          endpoint.requestUrlPathParamsSchema,
-          logger,
-        )
+        context.urlParameters,
+        endpoint.requestUrlPathParamsSchema,
+        logger,
+      )
       : { success: true as const, data: undefined };
 
     if (!urlValidation.success) {
@@ -99,21 +106,22 @@ export async function validateNextRequestData<
 
     // Validate request data based on method
     // Extract raw data and validate it using schemas
-    let requestValidation: ResponseType<TRequestOutput>;
+    let requestValidation: ResponseType<z.output<typeof endpoint.requestSchema>>;
 
     if (context.method === Methods.GET) {
       // For GET requests, extract query parameters
-      requestValidation = validateGetRequestData<TRequestInput, TRequestOutput>(
+      requestValidation = validateGetRequestData(
         endpoint,
         context.request,
         logger,
       );
     } else {
       // For POST/PUT/PATCH/DELETE requests, validate body
-      requestValidation = await validatePostRequestData<
-        TRequestInput,
-        TRequestOutput
-      >(endpoint, context.request, logger);
+      requestValidation = await validatePostRequestData(
+        endpoint,
+        context.request,
+        logger,
+      );
     }
 
     if (!requestValidation.success) {
@@ -133,7 +141,7 @@ export async function validateNextRequestData<
       success: true,
       data: {
         requestData: requestValidation.data,
-        urlPathParams: urlValidation.data as TUrlVariablesOutput,
+        urlPathParams: urlValidation.data,
         locale: validatedLocale,
       },
     };
@@ -157,13 +165,13 @@ export async function validateNextRequestData<
  * Validate GET request data from query parameters
  * Extracts raw query parameters and validates using schema
  */
-function validateGetRequestData<TRequestInput, TRequestOutput>(
+function validateGetRequestData<_TRequestInput, TRequestOutput, TSchema extends z.ZodTypeAny>(
   endpoint: {
-    requestSchema: z.ZodTypeAny;
+    requestSchema: TSchema;
   },
   request: NextRequest,
   logger: EndpointLogger,
-): ResponseType<TRequestOutput> {
+): ResponseType<z.output<TSchema>> {
   // Check if the schema is z.undefined(), z.never(), or empty z.object({}) (no request data expected)
   // This happens when an endpoint has no request fields
   const isEmptyObject =
@@ -281,7 +289,7 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
 
   // Validate using schema - schema takes raw input and produces validated output
   return validateData(
-    queryData as TRequestInput,
+    queryData,
     endpoint.requestSchema,
     logger,
   );
@@ -328,13 +336,13 @@ function parseFormDataToObject(formData: FormData): Record<string, unknown> {
  * Extracts raw request body and validates using schema
  * Handles both JSON and FormData (multipart/form-data)
  */
-async function validatePostRequestData<TRequestInput, TRequestOutput>(
+async function validatePostRequestData<_TRequestInput, TRequestOutput, TSchema extends z.ZodTypeAny>(
   endpoint: {
-    requestSchema: z.ZodTypeAny;
+    requestSchema: TSchema;
   },
   request: NextRequest,
   logger: EndpointLogger,
-): Promise<ResponseType<TRequestOutput>> {
+): Promise<ResponseType<z.output<TSchema>>> {
   // Check if the schema is z.undefined(), z.never(), or empty z.object({}) (no request data expected)
   // This happens when an endpoint has no request fields
   const isEmptyObject =
@@ -372,19 +380,19 @@ async function validatePostRequestData<TRequestInput, TRequestOutput>(
   try {
     const contentType = request.headers.get("content-type") || "";
 
-    let body: TRequestInput;
+    let body: unknown;
 
     if (contentType.includes("multipart/form-data")) {
       // Parse FormData
       const formData = await request.formData();
-      body = parseFormDataToObject(formData) as TRequestInput;
+      body = parseFormDataToObject(formData as unknown as FormData);
     } else {
       // Parse JSON
-      body = (await request.json()) as TRequestInput;
+      body = await request.json();
     }
 
     // Validate using schema - schema takes raw input and produces validated output
-    return validateEndpointRequestData<TRequestOutput>(
+    return validateEndpointRequestData(
       body,
       endpoint.requestSchema,
       logger,

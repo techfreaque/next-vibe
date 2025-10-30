@@ -24,16 +24,16 @@ import type { DiscoveredEndpoint } from "../types/registry";
  */
 type EndpointNode =
   | {
-      [K in Methods]?: CreateApiEndpoint<
-        string,
-        K,
-        readonly UserRoleValue[],
-        UnifiedField<z.ZodTypeAny>
-      >;
-    }
+    [K in Methods]?: CreateApiEndpoint<
+      string,
+      K,
+      readonly (typeof UserRoleValue)[],
+      UnifiedField<z.ZodTypeAny>
+    >;
+  }
   | {
-      [key: string]: EndpointNode;
-    };
+    [key: string]: EndpointNode;
+  };
 
 /**
  * Convert generated endpoints to DiscoveredEndpoint format
@@ -60,11 +60,11 @@ export function getDiscoveredEndpoints(): DiscoveredEndpoint[] {
         const methodKey = method as Methods;
         const definition = obj[methodKey] as
           | CreateApiEndpoint<
-              string,
-              Methods,
-              readonly UserRoleValue[],
-              UnifiedField<z.ZodTypeAny>
-            >
+            string,
+            Methods,
+            readonly (typeof UserRoleValue)[],
+            UnifiedField<z.ZodTypeAny>
+          >
           | undefined;
 
         if (!definition) {
@@ -123,4 +123,90 @@ export function getDiscoveredEndpoints(): DiscoveredEndpoint[] {
  */
 export function getStaticEndpoints(): DiscoveredEndpoint[] {
   return getDiscoveredEndpoints();
+}
+
+/**
+ * Lazy load specific endpoints by tool names
+ * This function dynamically imports only the requested endpoint definitions
+ * instead of loading all 143 endpoints upfront
+ *
+ * @param toolNames - Array of tool names (e.g., ["core_agent_chat_folders", "core_agent_chat_threads"])
+ * @returns Array of DiscoveredEndpoint objects for the requested tools
+ */
+export async function getEndpointsByToolNames(
+  toolNames: string[],
+): Promise<DiscoveredEndpoint[]> {
+  const { getEndpoint } = await import(
+    "@/app/api/[locale]/v1/core/system/generated/endpoint"
+  );
+
+  const discovered: DiscoveredEndpoint[] = [];
+
+  for (const toolName of toolNames) {
+    // Convert tool name to path (e.g., "core_agent_chat_folders" -> "core/agent/chat/folders")
+    const path = toolName.replace(/_/g, "/");
+
+    try {
+      // Dynamically import only this specific endpoint definition
+      const definition = await getEndpoint(path);
+
+      if (!definition) {
+        // eslint-disable-next-line no-console
+        console.warn(`[Lazy Loader] Endpoint not found for tool: ${toolName}`);
+        continue;
+      }
+
+      // Determine the method from the definition
+      // The definition object has method keys (GET, POST, etc.)
+      const methods = Object.keys(definition).filter((key) =>
+        Object.values(Methods).includes(key as Methods),
+      );
+
+      if (methods.length === 0) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[Lazy Loader] No HTTP methods found for tool: ${toolName}`,
+        );
+        continue;
+      }
+
+      // Create DiscoveredEndpoint for each method
+      for (const method of methods) {
+        const methodKey = method as Methods;
+        const methodDef = definition[methodKey];
+
+        if (!methodDef) {
+          continue;
+        }
+
+        // Generate endpoint ID
+        const methodLower = method.toLowerCase();
+        // eslint-disable-next-line i18next/no-literal-string
+        const id = `${methodLower}_v1_${toolName}`;
+
+        // Generate file paths using module paths (@ alias)
+        const definitionPath = `@/app/api/[locale]/v1/${path}/definition`;
+        const routePath = `@/app/api/[locale]/v1/${path}/route`;
+
+        // Create discovered endpoint
+        discovered.push({
+          id,
+          toolName,
+          routePath,
+          definitionPath,
+          definition: methodDef,
+          enabled: true,
+          discoveredAt: Date.now(),
+        });
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `[Lazy Loader] Failed to load endpoint for tool: ${toolName}`,
+        error,
+      );
+    }
+  }
+
+  return discovered;
 }

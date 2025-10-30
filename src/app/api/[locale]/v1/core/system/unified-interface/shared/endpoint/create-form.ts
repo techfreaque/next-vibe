@@ -55,17 +55,17 @@ export interface FormExamples<
         FieldUsage.RequestData
       >
     > extends never
-      ? undefined
-      : ExamplesList<
-          ExtractInput<
-            InferSchemaFromFieldForMethod<
-              TFields,
-              Methods.GET,
-              FieldUsage.RequestData
-            >
-          >,
-          TExampleKey
-        >;
+    ? undefined
+    : ExamplesList<
+      ExtractInput<
+        InferSchemaFromFieldForMethod<
+          TFields,
+          Methods.GET,
+          FieldUsage.RequestData
+        >
+      >,
+      TExampleKey
+    >;
     responses: ExamplesList<
       ExtractOutput<
         InferSchemaFromFieldForMethod<TFields, Methods.GET, FieldUsage.Response>
@@ -79,17 +79,17 @@ export interface FormExamples<
         FieldUsage.RequestUrlParams
       >
     > extends never
-      ? undefined
-      : ExamplesList<
-          ExtractInput<
-            InferSchemaFromFieldForMethod<
-              TFields,
-              Methods.GET,
-              FieldUsage.RequestUrlParams
-            >
-          >,
-          TExampleKey
-        >;
+    ? undefined
+    : ExamplesList<
+      ExtractInput<
+        InferSchemaFromFieldForMethod<
+          TFields,
+          Methods.GET,
+          FieldUsage.RequestUrlParams
+        >
+      >,
+      TExampleKey
+    >;
   };
   readonly POST?: {
     requests?: ExtractInput<
@@ -99,17 +99,17 @@ export interface FormExamples<
         FieldUsage.RequestData
       >
     > extends never
-      ? undefined
-      : ExamplesList<
-          ExtractInput<
-            InferSchemaFromFieldForMethod<
-              TFields,
-              Methods.POST,
-              FieldUsage.RequestData
-            >
-          >,
-          TExampleKey
-        >;
+    ? undefined
+    : ExamplesList<
+      ExtractInput<
+        InferSchemaFromFieldForMethod<
+          TFields,
+          Methods.POST,
+          FieldUsage.RequestData
+        >
+      >,
+      TExampleKey
+    >;
     responses: ExamplesList<
       ExtractOutput<
         InferSchemaFromFieldForMethod<
@@ -127,17 +127,17 @@ export interface FormExamples<
         FieldUsage.RequestUrlParams
       >
     > extends never
-      ? undefined
-      : ExamplesList<
-          ExtractInput<
-            InferSchemaFromFieldForMethod<
-              TFields,
-              Methods.POST,
-              FieldUsage.RequestUrlParams
-            >
-          >,
-          TExampleKey
-        >;
+    ? undefined
+    : ExamplesList<
+      ExtractInput<
+        InferSchemaFromFieldForMethod<
+          TFields,
+          Methods.POST,
+          FieldUsage.RequestUrlParams
+        >
+      >,
+      TExampleKey
+    >;
   };
 }
 
@@ -146,7 +146,7 @@ export interface FormExamples<
  */
 export interface CreateFormEndpointConfig<
   TExampleKey extends string,
-  TUserRoleValue extends readonly UserRoleValue[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields extends UnifiedField<z.ZodTypeAny>,
 > {
   // Shared configuration
@@ -196,37 +196,37 @@ type SupportsMethodAndUsage<
 > =
   // Check if it's method-specific format first
   TMethod extends keyof TUsage
-    ? TUsage[TMethod] extends infer TMethodUsage
-      ? TTargetUsage extends FieldUsage.RequestData
-        ? TMethodUsage extends { request: "data" | "data&urlPathParams" }
-          ? true
-          : false
-        : TTargetUsage extends FieldUsage.RequestUrlParams
-          ? TMethodUsage extends {
-              request: "urlPathParams" | "data&urlPathParams";
-            }
-            ? true
-            : false
-          : TTargetUsage extends FieldUsage.Response
-            ? TMethodUsage extends { response: true }
-              ? true
-              : false
-            : false
-      : false
-    : // Fall back to original logic for backward compatibility
-      TTargetUsage extends FieldUsage.RequestData
-      ? TUsage extends { request: "data" | "data&urlPathParams" }
-        ? true
-        : false
-      : TTargetUsage extends FieldUsage.RequestUrlParams
-        ? TUsage extends { request: "urlPathParams" | "data&urlPathParams" }
-          ? true
-          : false
-        : TTargetUsage extends FieldUsage.Response
-          ? TUsage extends { response: true }
-            ? true
-            : false
-          : false;
+  ? TUsage[TMethod] extends infer TMethodUsage
+  ? TTargetUsage extends FieldUsage.RequestData
+  ? TMethodUsage extends { request: "data" | "data&urlPathParams" }
+  ? true
+  : false
+  : TTargetUsage extends FieldUsage.RequestUrlParams
+  ? TMethodUsage extends {
+    request: "urlPathParams" | "data&urlPathParams";
+  }
+  ? true
+  : false
+  : TTargetUsage extends FieldUsage.Response
+  ? TMethodUsage extends { response: true }
+  ? true
+  : false
+  : false
+  : false
+  : // Fall back to original logic for backward compatibility
+  TTargetUsage extends FieldUsage.RequestData
+  ? TUsage extends { request: "data" | "data&urlPathParams" }
+  ? true
+  : false
+  : TTargetUsage extends FieldUsage.RequestUrlParams
+  ? TUsage extends { request: "urlPathParams" | "data&urlPathParams" }
+  ? true
+  : false
+  : TTargetUsage extends FieldUsage.Response
+  ? TUsage extends { response: true }
+  ? true
+  : false
+  : false;
 
 /**
  * Filter schema for a specific method and usage type
@@ -237,30 +237,30 @@ export type FilterSchemaForMethod<
   TMethod extends Methods,
 > =
   TFields extends PrimitiveField<infer TSchema, FieldUsageConfig>
-    ? SupportsMethodAndUsage<
-        TFields["usage"],
-        TMethod,
-        TTargetUsage
-      > extends true
-      ? TSchema
-      : z.ZodNever
-    : TFields extends ObjectField<infer TChildren, FieldUsageConfig>
-      ? SupportsMethodAndUsage<
-          TFields["usage"],
-          TMethod,
-          TTargetUsage
-        > extends true
-        ? z.ZodObject<{
-            [K in keyof TChildren as FilterSchemaForMethod<
-              TChildren[K],
-              TTargetUsage,
-              TMethod
-            > extends z.ZodNever
-              ? never
-              : K]: FilterSchemaForMethod<TChildren[K], TTargetUsage, TMethod>;
-          }>
-        : z.ZodNever
-      : z.ZodNever;
+  ? SupportsMethodAndUsage<
+    TFields["usage"],
+    TMethod,
+    TTargetUsage
+  > extends true
+  ? TSchema
+  : z.ZodNever
+  : TFields extends ObjectField<infer TChildren, FieldUsageConfig>
+  ? SupportsMethodAndUsage<
+    TFields["usage"],
+    TMethod,
+    TTargetUsage
+  > extends true
+  ? z.ZodObject<{
+    [K in keyof TChildren as FilterSchemaForMethod<
+      TChildren[K],
+      TTargetUsage,
+      TMethod
+    > extends z.ZodNever
+    ? never
+    : K]: FilterSchemaForMethod<TChildren[K], TTargetUsage, TMethod>;
+  }>
+  : z.ZodNever
+  : z.ZodNever;
 
 /**
  * Method-specific endpoint type that extends CreateApiEndpoint
@@ -270,7 +270,7 @@ export type MethodSpecificEndpoint<
   TFields extends UnifiedField<z.ZodTypeAny>,
   TMethod extends Methods,
   TExampleKey extends string,
-  TUserRoleValue extends readonly UserRoleValue[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > = CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>;
 
 /**
@@ -280,7 +280,7 @@ export type MethodSpecificEndpoint<
 export interface CreateFormEndpointReturn<
   TFields extends UnifiedField<z.ZodTypeAny>,
   TExampleKey extends string,
-  TUserRoleValue extends readonly UserRoleValue[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > {
   readonly GET: MethodSpecificEndpoint<
     TFields,
@@ -646,7 +646,7 @@ export function generateRequestUrlSchemaForMethod<F>(
 export function createFormEndpoint<
   const TFields extends UnifiedField<z.ZodTypeAny>,
   TExampleKey extends string,
-  TUserRoleValue extends readonly UserRoleValue[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 >(
   config: CreateFormEndpointConfig<TExampleKey, TUserRoleValue, TFields>,
 ): CreateFormEndpointReturn<TFields, TExampleKey, TUserRoleValue> {
@@ -663,6 +663,11 @@ export function createFormEndpoint<
     config.fields,
     Methods.GET,
   );
+
+  // Helper function for authentication check
+  const requiresAuthentication = (): boolean => {
+    return !config.allowedRoles.includes("PUBLIC");
+  };
 
   // Create GET endpoint with method-specific type inference
   const getEndpoint = {
@@ -686,6 +691,7 @@ export function createFormEndpoint<
     requestSchema: getRequestSchema,
     responseSchema: getResponseSchema,
     requestUrlPathParamsSchema: getUrlSchema,
+    requiresAuthentication,
     types: {
       RequestInput: null as InferInputFromFieldForMethod<
         TFields,
@@ -718,6 +724,36 @@ export function createFormEndpoint<
         FieldUsage.RequestUrlParams
       >,
     },
+    TRequestInput: null as InferInputFromFieldForMethod<
+      TFields,
+      Methods.GET,
+      FieldUsage.RequestData
+    >,
+    TRequestOutput: null as InferOutputFromFieldForMethod<
+      TFields,
+      Methods.GET,
+      FieldUsage.RequestData
+    >,
+    TResponseInput: null as InferInputFromFieldForMethod<
+      TFields,
+      Methods.GET,
+      FieldUsage.Response
+    >,
+    TResponseOutput: null as InferOutputFromFieldForMethod<
+      TFields,
+      Methods.GET,
+      FieldUsage.Response
+    >,
+    TUrlVariablesInput: null as InferInputFromFieldForMethod<
+      TFields,
+      Methods.GET,
+      FieldUsage.RequestUrlParams
+    >,
+    TUrlVariablesOutput: null as InferOutputFromFieldForMethod<
+      TFields,
+      Methods.GET,
+      FieldUsage.RequestUrlParams
+    >,
   };
 
   // Generate schemas for POST method using original fields
@@ -756,6 +792,7 @@ export function createFormEndpoint<
     requestSchema: postRequestSchema,
     responseSchema: postResponseSchema,
     requestUrlPathParamsSchema: postRequestUrlSchema,
+    requiresAuthentication,
     types: {
       RequestInput: null as InferInputFromFieldForMethod<
         TFields,
@@ -788,24 +825,42 @@ export function createFormEndpoint<
         FieldUsage.RequestUrlParams
       >,
     },
-  };
-
-  // Return the form endpoints
-  // Type assertion needed: method-specific types are structurally compatible but TypeScript can't verify
-  return {
-    GET: getEndpoint as MethodSpecificEndpoint<
-      TFields,
-      Methods.GET,
-      TExampleKey,
-      TUserRoleValue
-    >,
-
-    POST: postEndpoint as MethodSpecificEndpoint<
+    TRequestInput: null as InferInputFromFieldForMethod<
       TFields,
       Methods.POST,
-      TExampleKey,
-      TUserRoleValue
+      FieldUsage.RequestData
     >,
+    TRequestOutput: null as InferOutputFromFieldForMethod<
+      TFields,
+      Methods.POST,
+      FieldUsage.RequestData
+    >,
+    TResponseInput: null as InferInputFromFieldForMethod<
+      TFields,
+      Methods.POST,
+      FieldUsage.Response
+    >,
+    TResponseOutput: null as InferOutputFromFieldForMethod<
+      TFields,
+      Methods.POST,
+      FieldUsage.Response
+    >,
+    TUrlVariablesInput: null as InferInputFromFieldForMethod<
+      TFields,
+      Methods.POST,
+      FieldUsage.RequestUrlParams
+    >,
+    TUrlVariablesOutput: null as InferOutputFromFieldForMethod<
+      TFields,
+      Methods.POST,
+      FieldUsage.RequestUrlParams
+    >,
+  };
+
+  // Return the form endpoints with proper typing
+  return {
+    GET: getEndpoint,
+    POST: postEndpoint,
   };
 }
 

@@ -3,7 +3,8 @@
 // https://github.com/shadcn-ui/ui
 
 import * as React from "react";
-import type { JSX } from "react";
+import type { JSX, ReactNode } from "react";
+import type { ViewProps } from "react-native";
 import type {
   ControllerProps,
   FieldError,
@@ -24,7 +25,7 @@ import {
   BottomSheetOpenTrigger,
   BottomSheetView,
 } from "./bottom-sheet";
-import { Button, buttonTextVariants } from "./button";
+import { Button } from "./button";
 import { Calendar } from "./calendar";
 import { Checkbox } from "./checkbox";
 import { Calendar as CalendarIcon } from "./icons/Calendar";
@@ -102,10 +103,14 @@ const useFormField = (): UseFormFieldReturn => {
   const { nativeID } = itemContext;
 
   return {
+    id: nativeID,
     nativeID,
     name: fieldContext.name,
+    formItemId: `${nativeID}-form-item`,
     formItemNativeID: `${nativeID}-form-item`,
+    formDescriptionId: `${nativeID}-form-item-description`,
     formDescriptionNativeID: `${nativeID}-form-item-description`,
+    formMessageId: `${nativeID}-form-item-message`,
     formMessageNativeID: `${nativeID}-form-item-message`,
     handleSubmit,
     ...fieldState,
@@ -120,9 +125,13 @@ const FormItemContext = React.createContext<FormItemContextValue>(
   {} as FormItemContextValue,
 );
 
+interface FormItemViewProps extends ViewProps {
+  className?: string;
+}
+
 const FormItem = React.forwardRef<
   React.ElementRef<typeof View>,
-  React.ComponentPropsWithoutRef<typeof View>
+  FormItemViewProps
 >(({ className, ...props }, ref) => {
   const nativeID = React.useId();
 
@@ -134,12 +143,16 @@ const FormItem = React.forwardRef<
 });
 FormItem.displayName = "FormItem";
 
+interface FormLabelProps {
+  children?: ReactNode;
+  nativeID?: string;
+  onPress?: () => void;
+}
+
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof Label>,
-  Omit<React.ComponentPropsWithoutRef<typeof Label>, "children"> & {
-    children: string;
-  }
->(({ className, nativeID: _nativeID, ...props }, ref) => {
+  FormLabelProps
+>(({ nativeID: _nativeID, ...props }, ref) => {
   const { error, formItemNativeID } = useFormField();
 
   return (
@@ -148,7 +161,6 @@ const FormLabel = React.forwardRef<
       className={cn(
         "pb-1 native:pb-2 px-px",
         error && "text-destructive",
-        className,
       )}
       nativeID={formItemNativeID}
       {...props}
@@ -157,27 +169,35 @@ const FormLabel = React.forwardRef<
 });
 FormLabel.displayName = "FormLabel";
 
+interface FormDescriptionProps {
+  children?: ReactNode;
+}
+
 const FormDescription = React.forwardRef<
   React.ElementRef<typeof Text>,
-  React.ComponentPropsWithoutRef<typeof Text>
->(({ className, ...props }, ref) => {
+  FormDescriptionProps
+>(({ ...props }, ref) => {
   const { formDescriptionNativeID } = useFormField();
 
   return (
     <Text
       ref={ref}
       nativeID={formDescriptionNativeID}
-      className={cn("text-sm text-muted-foreground pt-1", className)}
+      className="text-sm text-muted-foreground pt-1"
       {...props}
     />
   );
 });
 FormDescription.displayName = "FormDescription";
 
+interface FormMessageProps {
+  children?: ReactNode;
+}
+
 const FormMessage = React.forwardRef<
   React.ElementRef<typeof Animated.Text>,
-  React.ComponentPropsWithoutRef<typeof Animated.Text>
->(({ className, children, ...props }, ref) => {
+  FormMessageProps
+>(({ children }, ref) => {
   const { error, formMessageNativeID } = useFormField();
   const body = error ? String(error?.message) : children;
 
@@ -191,8 +211,7 @@ const FormMessage = React.forwardRef<
       exiting={FadeOut.duration(275)}
       ref={ref}
       nativeID={formMessageNativeID}
-      className={cn("text-sm font-medium text-destructive", className)}
-      {...props}
+      className="text-sm font-medium text-destructive"
     >
       {body}
     </Animated.Text>
@@ -367,7 +386,6 @@ const FormCheckbox = React.forwardRef<
         />
         {!!label && (
           <FormLabel
-            className="pb-0"
             nativeID={formItemNativeID}
             onPress={handleOnLabelPress}
           >
@@ -383,9 +401,15 @@ const FormCheckbox = React.forwardRef<
 
 FormCheckbox.displayName = "FormCheckbox";
 
-// TODO: Implement Calendar and BottomSheet components
-const FormDatePicker = React.forwardRef<React.ElementRef<typeof Button>, any>(
-  ({ label, description, value, onChange, ...props }, ref) => {
+interface FormDatePickerProps {
+  label?: string;
+  description?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+}
+
+const FormDatePicker = React.forwardRef<React.ElementRef<typeof Button>, FormDatePickerProps>(
+  ({ label, description, value, onChange }, ref) => {
     const {
       error,
       formItemNativeID,
@@ -410,54 +434,34 @@ const FormDatePicker = React.forwardRef<React.ElementRef<typeof Button>, any>(
               }
               aria-invalid={!!error}
             >
-              {({ pressed }): JSX.Element => (
-                <>
-                  <CalendarIcon
-                    className={buttonTextVariants({
-                      variant: "outline",
-                      className: cn(
-                        !value && "opacity-80",
-                        pressed && "opacity-60",
-                      ),
-                    })}
-                    size={18}
-                  />
-                  <Text
-                    className={buttonTextVariants({
-                      variant: "outline",
-                      className: cn(
-                        "font-normal",
-                        !value && "opacity-70",
-                        pressed && "opacity-50",
-                      ),
-                    })}
-                  >
-                    {value ? value : "Pick a date"}
-                  </Text>
-                  {!!value && (
-                    <Button
-                      className="absolute right-0 active:opacity-70 native:pr-3"
-                      variant="ghost"
-                      onPress={(): void => {
-                        onChange?.("");
-                      }}
-                    >
-                      <X size={18} className="text-muted-foreground text-xs" />
-                    </Button>
-                  )}
-                </>
+              <CalendarIcon
+                size={18}
+              />
+              <Text>
+                {value ?? "Pick a date"}
+              </Text>
+              {!!value && (
+                <Button
+                  className="absolute right-0 active:opacity-70 native:pr-3"
+                  variant="ghost"
+                  onPress={(): void => {
+                    onChange?.("");
+                  }}
+                >
+                  <X size={18} />
+                </Button>
               )}
             </Button>
           </BottomSheetOpenTrigger>
           <BottomSheetContent>
-            <BottomSheetView hadHeader={false} className="pt-2">
+            <BottomSheetView className="pt-2">
               <Calendar
                 selected={value ? new Date(value) : undefined}
                 onSelect={(date): void => {
                   onChange?.(date ? date.toISOString().split("T")[0] : "");
                 }}
               />
-              <View className={"pb-2 pt-4"}>
+              <View className="pb-2 pt-4">
                 <BottomSheetCloseTrigger asChild>
                   <Button>
                     <Text>Close</Text>
@@ -492,7 +496,7 @@ const FormRadioGroup = React.forwardRef<
       <View>
         {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
         {!!description && (
-          <FormDescription className="pt-0">{description}</FormDescription>
+          <FormDescription>{description}</FormDescription>
         )}
       </View>
       <RadioGroup
@@ -516,20 +520,27 @@ const FormRadioGroup = React.forwardRef<
 
 FormRadioGroup.displayName = "FormRadioGroup";
 
-// TODO: Implement Combobox component - using Select as fallback
-const FormCombobox = React.forwardRef<any, any>(
-  ({ label, description, value, onChange, options = [], ...props }, ref) => {
-    const { error, formItemNativeID, formDescriptionNativeID } = useFormField();
+interface FormComboboxProps {
+  label?: string;
+  description?: string;
+  value?: Option;
+  onChange?: (value: Option) => void;
+  options?: Option[];
+}
+
+const FormCombobox = React.forwardRef<React.ElementRef<typeof View>, FormComboboxProps>(
+  ({ label, description, value, onChange, options = [] }, ref) => {
+    const { formItemNativeID, formDescriptionNativeID: _formDescriptionNativeID } = useFormField();
 
     return (
       <FormItem>
         {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
-        <Select value={value} onValueChange={onChange} {...props}>
+        <Select value={value} onValueChange={onChange}>
           <SelectTrigger ref={ref}>
             <SelectValue placeholder="Select an option" />
           </SelectTrigger>
           <SelectContent>
-            {options.map((option: Option | undefined): JSX.Element | null => {
+            {options.map((option): JSX.Element | null => {
               if (!option) {
                 return null;
               }
@@ -653,7 +664,6 @@ const FormSwitch = React.forwardRef<
         />
         {!!label && (
           <FormLabel
-            className="pb-0"
             nativeID={formItemNativeID}
             onPress={handleOnLabelPress}
           >

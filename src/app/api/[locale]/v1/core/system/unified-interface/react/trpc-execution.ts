@@ -25,7 +25,7 @@ type ApiHandlerFunction<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly UserRoleValue[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > = (params: {
   data: TRequestOutput;
   urlPathParams: TUrlVariablesOutput;
@@ -51,7 +51,7 @@ export async function safeExecuteTRPC<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly UserRoleValue[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 >(
   handler: ApiHandlerFunction<
     TRequestOutput,

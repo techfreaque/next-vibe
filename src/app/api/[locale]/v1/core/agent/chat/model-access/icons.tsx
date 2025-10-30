@@ -173,6 +173,7 @@ export type IconComponent =
 
 /**
  * Special 1A icon component (defined outside registry due to JSX)
+ * Note: "1A" is a technical UI identifier, not user-facing text
  */
 /* eslint-disable i18next/no-literal-string -- Technical UI element, not user-facing text */
 const OneAIcon: IconComponent = ({ className = "" }) => (
@@ -184,6 +185,7 @@ const OneAIcon: IconComponent = ({ className = "" }) => (
       className,
     )}
   >
+    {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
     1A
   </span>
 );

@@ -2,14 +2,14 @@
  * Text-to-Speech Enums
  */
 
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
 /**
  * TTS Provider enum
  */
 export const {
   enum: TtsProvider,
-  options: ttsProviderOptions,
+  options: TtsProviderOptions,
   Value: TtsProviderValue,
 } = createEnumOptions({
   OPENAI: "app.api.v1.core.agent.textToSpeech.providers.openai",
@@ -25,7 +25,7 @@ export const {
  */
 export const {
   enum: TtsVoice,
-  options: ttsVoiceOptions,
+  options: TtsVoiceOptions,
   Value: TtsVoiceValue,
 } = createEnumOptions({
   MALE: "app.api.v1.core.agent.textToSpeech.voices.MALE",
@@ -37,7 +37,7 @@ export const {
  */
 export const {
   enum: TtsLanguage,
-  options: ttsLanguageOptions,
+  options: TtsLanguageOptions,
   Value: TtsLanguageValue,
 } = createEnumOptions({
   EN: "app.api.v1.core.agent.textToSpeech.languages.en",

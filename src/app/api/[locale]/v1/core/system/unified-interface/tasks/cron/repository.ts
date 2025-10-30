@@ -16,14 +16,16 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import {
-  type CronTask,
-  type CronTaskExecution,
   cronTaskExecutions,
   cronTasks,
-  type CronTaskSchedule,
   cronTaskSchedules,
-  type NewCronTask,
-  type NewCronTaskExecution,
+} from "./db";
+import type {
+  CronTask,
+  CronTaskExecution,
+  CronTaskSchedule,
+  NewCronTask,
+  NewCronTaskExecution,
 } from "./db";
 
 /**

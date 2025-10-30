@@ -18,6 +18,7 @@ export interface OxlintLabel {
 export interface OxlintConfig {
   $schema?: string;
   plugins?: string[];
+  jsPlugins?: string[];
   categories?: {
     correctness?: Severity;
     suspicious?: Severity;
@@ -94,20 +95,13 @@ type LintConfigElement = Record<string, LintConfigValue>;
 
 /**
  * ESLint Configuration
- * For i18n checking and custom AST rules that oxlint doesn't support
+ * For import sorting, React hooks, and custom AST rules that oxlint doesn't support
+ * i18n is now handled by oxlint JS plugin
  */
 export interface EslintConfig {
   ignores: string[];
   files: string[];
-  i18n: {
-    enabled: boolean;
-    config: {
-      files: string[];
-      ignores: string[];
-      rules: LintConfigElement
-    };
-  };
-  customRules: LintConfigElement;
+  eslintOnlyRules: LintConfigElement;
   ruleOverrides: LintConfigElement;
   parserOptions: {
     project: string;

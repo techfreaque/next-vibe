@@ -12,6 +12,7 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 import { simpleT } from "@/i18n/core/shared";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {
   DiscoveredEndpoint,
@@ -51,7 +52,7 @@ export interface BaseToolMetadata {
   endpointPath: string;
   method: string;
   routePath: string;
-  allowedRoles: readonly string[];
+  allowedRoles: readonly (typeof UserRoleValue)[];
   requestSchema?: z.ZodSchema;
 }
 

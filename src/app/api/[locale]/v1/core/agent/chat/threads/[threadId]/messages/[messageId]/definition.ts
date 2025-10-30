@@ -236,7 +236,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.response.message.createdAt.content" as const,
             },
-            z.date(),
+            z.string().datetime(),
           ),
           updatedAt: responseField(
             {
@@ -244,7 +244,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.response.message.updatedAt.content" as const,
             },
-            z.date(),
+            z.string().datetime(),
           ),
         },
       ),
@@ -279,8 +279,8 @@ const { GET } = createEndpoint({
           isAI: false,
           model: null,
           tokens: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
       },
     },
@@ -470,7 +470,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.response.message.updatedAt.content" as const,
             },
-            z.date(),
+            z.string().datetime(),
           ),
         },
       ),
@@ -503,7 +503,7 @@ const { PATCH } = createEndpoint({
           id: "660e8400-e29b-41d4-a716-446655440000",
           content: "Updated message content",
           role: ChatMessageRole.USER,
-          updatedAt: new Date(),
+          updatedAt: new Date().toISOString(),
         },
       },
     },

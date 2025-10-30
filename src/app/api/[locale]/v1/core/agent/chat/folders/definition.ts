@@ -60,6 +60,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.folders.get.rootFolderId.description" as const,
           layout: { columns: 12 },
+          validation: { required: false },
           options: [
             {
               value: DEFAULT_FOLDER_IDS.PRIVATE,
@@ -83,19 +84,21 @@ const { GET } = createEndpoint({
             },
           ],
         },
-        z.enum([
-          DEFAULT_FOLDER_IDS.PRIVATE,
-          DEFAULT_FOLDER_IDS.SHARED,
-          DEFAULT_FOLDER_IDS.PUBLIC,
-          DEFAULT_FOLDER_IDS.INCOGNITO,
-        ]),
+        z
+          .enum([
+            DEFAULT_FOLDER_IDS.PRIVATE,
+            DEFAULT_FOLDER_IDS.SHARED,
+            DEFAULT_FOLDER_IDS.PUBLIC,
+            DEFAULT_FOLDER_IDS.INCOGNITO,
+          ])
+          .optional(),
       ),
 
       // === RESPONSE ===
       folders: responseArrayField(
         {
           type: WidgetType.DATA_CARDS,
-          layout: "list",
+          layout: { type: LayoutType.STACKED },
         },
         objectField(
           {
@@ -197,7 +200,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.folders.get.response.folders.folder.createdAt.content" as const,
               },
-              z.date(),
+              z.string().datetime(),
             ),
             updatedAt: responseField(
               {
@@ -205,7 +208,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.folders.get.response.folders.folder.updatedAt.content" as const,
               },
-              z.date(),
+              z.string().datetime(),
             ),
           },
         ),
@@ -524,7 +527,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.post.response.folder.createdAt.content" as const,
                 },
-                z.date(),
+                z.string().datetime(),
               ),
               updatedAt: responseField(
                 {
@@ -532,7 +535,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.post.response.folder.updatedAt.content" as const,
                 },
-                z.date(),
+                z.string().datetime(),
               ),
             },
           ),
@@ -621,8 +624,8 @@ const { POST } = createEndpoint({
             expanded: true,
             sortOrder: 0,
             metadata: {},
-            createdAt: new Date("2024-01-01T00:00:00Z"),
-            updatedAt: new Date("2024-01-01T00:00:00Z"),
+            createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
+            updatedAt: new Date("2024-01-01T00:00:00Z").toISOString(),
           },
         },
       },

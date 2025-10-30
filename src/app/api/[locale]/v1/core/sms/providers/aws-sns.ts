@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { createHash, createHmac } from "node:crypto";
 
 import {

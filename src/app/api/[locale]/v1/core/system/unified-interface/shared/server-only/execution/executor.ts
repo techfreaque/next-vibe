@@ -17,9 +17,22 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { getErrorMessage } from "../../utils/error";
 import { getDiscoveredEndpoints } from "../discovery/adapter";
 import type { DiscoveredEndpoint } from "../types/registry";
+
+/**
+ * Extract error message from unknown error
+ * Inlined to avoid Turbopack bundling issues
+ */
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === "string") {
+    return error;
+  }
+  return String(error);
+}
 
 /**
  * Recursive parameter value type

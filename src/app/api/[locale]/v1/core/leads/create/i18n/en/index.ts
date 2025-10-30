@@ -143,9 +143,12 @@ export const translations = {
         "Thank you for your interest in our services. We've received your information and our team is ready to help you achieve your business goals.",
       nextSteps: {
         title: "What happens next?",
+        step1Number: "1.",
         step1: "Our team will review your business profile and goals",
+        step2Number: "2.",
         step2:
           "You'll receive a personalized consultation proposal within 24 hours",
+        step3Number: "3.",
         step3:
           "We'll schedule a call to discuss your specific needs and objectives",
       },

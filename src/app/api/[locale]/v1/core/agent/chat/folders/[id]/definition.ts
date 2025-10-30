@@ -152,7 +152,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.get.response.folder.createdAt.content" as const,
                 },
-                z.date(),
+                z.string().datetime(),
               ),
               updatedAt: responseField(
                 {
@@ -160,7 +160,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.get.response.folder.updatedAt.content" as const,
                 },
-                z.date(),
+                z.string().datetime(),
               ),
             },
           ),
@@ -244,8 +244,8 @@ const { GET } = createEndpoint({
             expanded: true,
             sortOrder: 0,
             metadata: {},
-            createdAt: new Date("2024-01-01T00:00:00Z"),
-            updatedAt: new Date("2024-01-01T00:00:00Z"),
+            createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
+            updatedAt: new Date("2024-01-01T00:00:00Z").toISOString(),
           },
         },
       },
@@ -490,7 +490,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.patch.response.folder.createdAt.content" as const,
                 },
-                z.date(),
+                z.string().datetime(),
               ),
               updatedAt: responseField(
                 {
@@ -498,7 +498,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.patch.response.folder.updatedAt.content" as const,
                 },
-                z.date(),
+                z.string().datetime(),
               ),
             },
           ),
@@ -592,8 +592,8 @@ const { PATCH } = createEndpoint({
             expanded: true,
             sortOrder: 0,
             metadata: {},
-            createdAt: new Date("2024-01-01T00:00:00Z"),
-            updatedAt: new Date(),
+            createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
+            updatedAt: new Date().toISOString(),
           },
         },
       },

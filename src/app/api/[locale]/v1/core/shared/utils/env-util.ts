@@ -22,7 +22,7 @@ export function validateEnv<TSchema extends z.ZodType>(
     logger,
   );
   if (!validationResult.success) {
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Environment validation must throw on startup to prevent invalid configuration
     throw new Error(
       // eslint-disable-next-line i18next/no-literal-string
       `Environment validation error: ${validationResult.message} ${JSON.stringify(

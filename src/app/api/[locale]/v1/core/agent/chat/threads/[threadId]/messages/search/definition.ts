@@ -246,7 +246,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.response.results.message.createdAt.content" as const,
               },
-              z.date(),
+              z.string().datetime(),
             ),
           },
         ),
@@ -287,7 +287,7 @@ const { GET } = createEndpoint({
             role: ChatMessageRole.USER,
             rank: 0.95,
             headline: "Let's discuss <b>machine learning</b> algorithms...",
-            createdAt: new Date("2024-01-15T10:00:00Z"),
+            createdAt: new Date("2024-01-15T10:00:00Z").toISOString(),
           },
         ],
         totalCount: 1,

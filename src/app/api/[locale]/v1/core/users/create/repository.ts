@@ -143,7 +143,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
               userId: responseData.responseId,
             });
           } else {
-            logger.warn("Welcome SMS failed to send", {
+            logger.error("Welcome SMS failed to send", {
               userId: responseData.responseId,
               error: result.message,
             });
@@ -151,7 +151,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
           return;
         })
         .catch((error) => {
-          logger.warn("Welcome SMS sending encountered an error", {
+          logger.error("Welcome SMS sending encountered an error", {
             userId: responseData.responseId,
             error: error instanceof Error ? error.message : String(error),
           });

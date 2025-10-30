@@ -122,8 +122,8 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
             string,
             string | number | boolean
           >,
-          createdAt: thread.createdAt,
-          updatedAt: thread.updatedAt,
+          createdAt: thread.createdAt.toISOString(),
+          updatedAt: thread.updatedAt.toISOString(),
         },
       };
       return createSuccessResponse(response);
@@ -254,8 +254,8 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
             string,
             string | number | boolean
           >,
-          createdAt: updatedThread.createdAt,
-          updatedAt: updatedThread.updatedAt,
+          createdAt: updatedThread.createdAt.toISOString(),
+          updatedAt: updatedThread.updatedAt.toISOString(),
         },
       };
       return createSuccessResponse(response);

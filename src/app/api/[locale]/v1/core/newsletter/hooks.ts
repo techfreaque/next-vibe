@@ -5,22 +5,21 @@
  * Type-safe hooks for newsletter subscription management
  */
 
-import { type ChangeEvent, useCallback, useMemo } from "react";
+import { useCallback, useMemo, type ChangeEvent } from "react";
 
+import { useTranslation } from "@/i18n/core/client";
+import type { TranslationKey } from "@/i18n/core/static-types";
+
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import {
   createCustomStateKey,
   useCustomState,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
-import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useUser } from "@/app/api/[locale]/v1/core/user/private/me/hooks";
-import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
-import statusEndpoints, {
-  type StatusGetResponseOutput,
-} from "./status/definition";
+import statusEndpoints from "./status/definition";
 import subscribeEndpoints from "./subscribe/definition";
 import unsubscribeEndpoints from "./unsubscribe/definition";
 
@@ -57,9 +56,7 @@ export function useNewsletterStatus(params: {
     {
       queryOptions: {
         enabled: params.enabled !== false,
-      },
-      formOptions: {
-        defaultValues: { email: params.email },
+        requestData: { email: params.email },
       },
     },
     logger,
@@ -196,36 +193,25 @@ export function useNewsletterManager(): NewsletterManagerResult {
   // Check if any operation is in progress
   const isAnyOperationInProgress = useMemo(() => {
     return (
-      (subscriptionEndpoint.create?.isPending ?? false) ||
-      (unsubscribeEndpoint.create?.isPending ?? false)
+      (subscriptionEndpoint.create?.isSubmitting ?? false) ||
+      (unsubscribeEndpoint.create?.isSubmitting ?? false)
     );
-  }, [subscriptionEndpoint.create?.isPending, unsubscribeEndpoint.create?.isPending]);
+  }, [subscriptionEndpoint.create?.isSubmitting, unsubscribeEndpoint.create?.isSubmitting]);
 
   // Check status when we have a valid email
   const statusEndpoint = useNewsletterStatus({
     email: email || "",
     enabled:
       isCurrentEmailValid &&
-      !(subscriptionEndpoint.create?.isPending ?? false) &&
-      !(unsubscribeEndpoint.create?.isPending ?? false),
+      !(subscriptionEndpoint.create?.isSubmitting ?? false) &&
+      !(unsubscribeEndpoint.create?.isSubmitting ?? false),
   });
 
-  // Type guard for newsletter status response
-  const isNewsletterStatusResponse = (
-    data: StatusGetResponseOutput | undefined,
-  ): data is StatusGetResponseOutput => {
-    return (
-      data !== null &&
-      data !== undefined &&
-      typeof data === "object" &&
-      "subscribed" in data &&
-      typeof data.subscribed === "boolean"
-    );
-  };
-
-  const isSubscribed = isNewsletterStatusResponse(statusEndpoint.read?.data)
-    ? statusEndpoint.read.data.subscribed
-    : false;
+  const isSubscribed =
+    statusEndpoint.read?.response?.success &&
+    statusEndpoint.read.response.data.subscribed
+      ? statusEndpoint.read.response.data.subscribed
+      : false;
 
   // Override subscription status based on recent mutations for immediate UI feedback
   const effectiveIsSubscribed =
@@ -301,9 +287,11 @@ export function useNewsletterManager(): NewsletterManagerResult {
         unsubscribeEndpoint.create?.reset();
         setShowConfirmUnsubscribe(false);
 
-        subscriptionEndpoint.create.mutate({
+        // Set form value and submit
+        subscriptionEndpoint.create.form.reset({
           email: emailToUse,
         });
+        subscriptionEndpoint.create.submitForm(undefined);
       }
     },
     [
@@ -335,9 +323,11 @@ export function useNewsletterManager(): NewsletterManagerResult {
         // Reset subscription endpoint
         subscriptionEndpoint.create?.reset();
 
-        unsubscribeEndpoint.create.mutate({
+        // Set form value and submit
+        unsubscribeEndpoint.create.form.reset({
           email: emailToUse,
         });
+        unsubscribeEndpoint.create.submitForm(undefined);
         setShowConfirmUnsubscribe(false);
       }
     },
@@ -361,13 +351,13 @@ export function useNewsletterManager(): NewsletterManagerResult {
         // Clear success/error messages when user starts typing
         if (
           subscriptionEndpoint.create?.isSuccess ||
-          subscriptionEndpoint.create?.isError
+          subscriptionEndpoint.create?.error
         ) {
           subscriptionEndpoint.create?.reset();
         }
         if (
           unsubscribeEndpoint.create?.isSuccess ||
-          unsubscribeEndpoint.create?.isError
+          unsubscribeEndpoint.create?.error
         ) {
           unsubscribeEndpoint.create?.reset();
         }
@@ -387,8 +377,8 @@ export function useNewsletterManager(): NewsletterManagerResult {
     setEmail,
     isLoggedIn,
     isSubscribed: effectiveIsSubscribed,
-    isSubmitting: subscriptionEndpoint.create?.isPending ?? false,
-    isUnsubscribing: unsubscribeEndpoint.create?.isPending ?? false,
+    isSubmitting: subscriptionEndpoint.create?.isSubmitting ?? false,
+    isUnsubscribing: unsubscribeEndpoint.create?.isSubmitting ?? false,
     isAnyOperationInProgress,
     subscribe,
     unsubscribe,

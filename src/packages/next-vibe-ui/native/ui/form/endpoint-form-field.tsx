@@ -11,6 +11,7 @@ interface EndpointFormFieldProps {
 }
 
 export function EndpointFormField(_props: EndpointFormFieldProps): JSX.Element {
+  // eslint-disable-next-line no-console
   console.warn("🔶 Using stub: EndpointFormField");
   return (
     <View style={{ padding: 8, backgroundColor: "#FEF3C7", marginVertical: 4 }}>

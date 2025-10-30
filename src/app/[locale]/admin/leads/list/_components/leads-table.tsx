@@ -293,12 +293,9 @@ export function LeadsTable({
                   </TableCell>
                   <TableCell>
                     {lead.phone ? (
-                      <a
-                        href={`tel:${lead.phone}`}
-                        className="text-blue-600 hover:underline text-sm"
-                      >
+                      <span className="text-blue-600 text-sm">
                         {lead.phone}
-                      </a>
+                      </span>
                     ) : (
                       <span className="text-gray-400">
                         {t(
@@ -309,15 +306,17 @@ export function LeadsTable({
                   </TableCell>
                   <TableCell>
                     {lead.website ? (
-                      <a
-                        href={lead.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline text-sm flex items-center gap-1"
+                      <button
+                        onClick={() => {
+                          if (lead.website) {
+                            window.open(lead.website, "_blank", "noopener,noreferrer");
+                          }
+                        }}
+                        className="text-blue-600 hover:underline text-sm flex items-center gap-1 cursor-pointer bg-transparent border-none p-0"
                       >
                         <ExternalLink className="h-3 w-3" />
                         {t("app.admin.leads.leads.admin.table.website")}
-                      </a>
+                      </button>
                     ) : (
                       <span className="text-gray-400">
                         {t(

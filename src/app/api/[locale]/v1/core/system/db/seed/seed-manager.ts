@@ -113,7 +113,7 @@ export async function runSeeds(
         } catch (error) {
           logger.error(`❌ Error seeding ${moduleId}:`, parseError(error));
           // Re-throw to propagate seeding errors to the main process
-          // eslint-disable-next-line no-restricted-syntax
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Seed infrastructure needs to propagate errors
           throw error;
         }
       } else {
@@ -140,7 +140,7 @@ export async function seedDatabase(
   } catch (error) {
     logger.error("❌ Error seeding database:", parseError(error));
     // Don't call process.exit here - let the caller handle the error
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Seed infrastructure needs to propagate errors
     throw error;
   }
   // Don't close database here - it needs to stay open for the application

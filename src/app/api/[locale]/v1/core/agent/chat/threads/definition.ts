@@ -281,7 +281,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.v1.core.agent.chat.threads.get.response.threads.thread.createdAt.content" as const,
                   },
-                  z.date(),
+                  z.string().datetime(),
                 ),
                 updatedAt: responseField(
                   {
@@ -289,7 +289,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.v1.core.agent.chat.threads.get.response.threads.thread.updatedAt.content" as const,
                   },
-                  z.date(),
+                  z.string().datetime(),
                 ),
               },
             ),
@@ -616,7 +616,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.threads.post.response.thread.createdAt.content" as const,
                 },
-                z.date(),
+                z.string().datetime(),
               ),
               updatedAt: responseField(
                 {
@@ -624,7 +624,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.threads.post.response.thread.updatedAt.content" as const,
                 },
-                z.date(),
+                z.string().datetime(),
               ),
             },
           ),
@@ -709,8 +709,8 @@ const { POST } = createEndpoint({
             rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
             subFolderId: null,
             status: ThreadStatus.ACTIVE,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           },
         },
       },

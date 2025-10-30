@@ -225,7 +225,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.createdAt.content" as const,
               },
-              z.date(),
+              z.string().datetime(),
             ),
             updatedAt: responseField(
               {
@@ -233,7 +233,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.updatedAt.content" as const,
               },
-              z.date(),
+              z.string().datetime(),
             ),
           },
         ),
@@ -267,8 +267,8 @@ const { GET } = createEndpoint({
             isAI: false,
             model: null,
             tokens: null,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           },
           {
             id: "770e8400-e29b-41d4-a716-446655440000",
@@ -281,8 +281,8 @@ const { GET } = createEndpoint({
             isAI: true,
             model: "gpt-4o",
             tokens: 150,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           },
         ],
       },
@@ -460,7 +460,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.v1.core.agent.chat.threads.threadId.messages.post.response.message.createdAt.content" as const,
         },
-        z.date(),
+        z.string().datetime(),
       ),
     },
   ),
@@ -487,7 +487,7 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         id: "660e8400-e29b-41d4-a716-446655440000",
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       },
     },
   },

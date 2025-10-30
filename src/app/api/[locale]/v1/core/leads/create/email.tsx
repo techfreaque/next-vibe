@@ -118,8 +118,11 @@ function WelcomeEmailContent({
             marginBottom: "8px",
           }}
         >
-          {/* eslint-disable-next-line i18next/no-literal-string */}
-          <Text style={{ fontWeight: "700" }}>1.</Text>
+          <Text style={{ fontWeight: "700" }}>
+            {t(
+              "app.api.v1.core.leads.create.email.welcome.nextSteps.step1Number",
+            )}
+          </Text>
           {"  "}
           {t("app.api.v1.core.leads.create.email.welcome.nextSteps.step1")}
         </Text>
@@ -131,8 +134,11 @@ function WelcomeEmailContent({
             marginBottom: "8px",
           }}
         >
-          {/* eslint-disable-next-line i18next/no-literal-string */}
-          <Text style={{ fontWeight: "700" }}>2.</Text>
+          <Text style={{ fontWeight: "700" }}>
+            {t(
+              "app.api.v1.core.leads.create.email.welcome.nextSteps.step2Number",
+            )}
+          </Text>
           {"  "}
           {t("app.api.v1.core.leads.create.email.welcome.nextSteps.step2")}
         </Text>
@@ -144,8 +150,11 @@ function WelcomeEmailContent({
             marginBottom: "0",
           }}
         >
-          {/* eslint-disable-next-line i18next/no-literal-string */}
-          <Text style={{ fontWeight: "700" }}>3.</Text>
+          <Text style={{ fontWeight: "700" }}>
+            {t(
+              "app.api.v1.core.leads.create.email.welcome.nextSteps.step3Number",
+            )}
+          </Text>
           {"  "}
           {t("app.api.v1.core.leads.create.email.welcome.nextSteps.step3")}
         </Text>

@@ -25,7 +25,7 @@ export default function ErrorPage({
     envClient.NODE_ENV !== Environment.PRODUCTION ||
     envClient.NEXT_PUBLIC_DEBUG_PRODUCTION
   ) {
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax
     throw error;
   }
 

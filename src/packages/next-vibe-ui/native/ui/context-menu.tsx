@@ -62,7 +62,7 @@ const ContextMenuSubTrigger = React.forwardRef<
         )}
         {...props}
       >
-        {children}
+        {typeof children === "function" ? children({ pressed: open }) : children}
         <Icon size={18} className="ml-auto text-foreground" />
       </StyledContextMenuSubTrigger>
     </TextClassContext.Provider>
@@ -145,6 +145,7 @@ const ContextMenuItem = React.forwardRef<
     className?: string;
   }
 >(({ className, inset, ...props }, ref) => (
+  // eslint-disable-next-line i18next/no-literal-string
   <TextClassContext.Provider value="select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground">
     <StyledContextMenuItem
       ref={ref}
@@ -178,7 +179,7 @@ const ContextMenuCheckboxItem = React.forwardRef<
         <Check size={14} strokeWidth={3} className="text-foreground" />
       </StyledContextMenuItemIndicator>
     </View>
-    {children}
+    {typeof children === "function" ? children({ pressed: false }) : children}
   </StyledContextMenuCheckboxItem>
 ));
 ContextMenuCheckboxItem.displayName =

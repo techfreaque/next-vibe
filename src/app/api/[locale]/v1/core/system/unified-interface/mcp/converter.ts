@@ -27,32 +27,82 @@ export function toolMetadataToMCPTool(
     ? zodSchemaToJsonSchema(metadata.requestSchema)
     : { type: "object", properties: {}, required: [] };
 
-  // Extract properties safely from JSON Schema
-  const hasProperties = baseSchema && typeof baseSchema === "object" && "properties" in baseSchema;
-  const hasRequired = baseSchema && typeof baseSchema === "object" && "required" in baseSchema;
-  const hasAdditionalProperties = baseSchema && typeof baseSchema === "object" && "additionalProperties" in baseSchema;
-
-  const properties = hasProperties ? baseSchema.properties : undefined;
-  const required = hasRequired ? baseSchema.required : undefined;
-  const additionalProperties = hasAdditionalProperties ? baseSchema.additionalProperties : undefined;
-
-  // Safely handle properties as Record<string, unknown>
-  const typedProperties: Record<string, Record<string, string | number | boolean | object | null>> | undefined =
-    properties && typeof properties === "object" ? properties : undefined;
-  const typedRequired: string[] | undefined =
-    Array.isArray(required) ? required : undefined;
-  const typedAdditionalProperties: boolean | undefined =
-    typeof additionalProperties === "boolean" ? additionalProperties : undefined;
+  // Build MCP input schema from JSON schema
+  const inputSchema = buildMCPInputSchema(baseSchema);
 
   return {
     name: metadata.name,
     description: safeTranslate(metadata.description, locale, metadata.name),
-    inputSchema: {
-      type: "object",
-      properties: typedProperties,
-      required: typedRequired,
-      additionalProperties: typedAdditionalProperties,
-    },
+    inputSchema,
+  };
+}
+
+/**
+ * Type guard for MCP property
+ */
+function isMCPProperty(
+  value: unknown
+): value is Record<string, string | number | boolean | null | object> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  // Check all values are valid primitive types or objects
+  for (const v of Object.values(value)) {
+    const type = typeof v;
+    if (
+      type !== "string" &&
+      type !== "number" &&
+      type !== "boolean" &&
+      type !== "object" &&
+      v !== null
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Build MCP input schema from JSON schema
+ * Safely extracts and types properties for MCP format
+ */
+function buildMCPInputSchema(
+  schema: ReturnType<typeof zodSchemaToJsonSchema>
+): MCPTool["inputSchema"] {
+  const defaultSchema: MCPTool["inputSchema"] = {
+    type: "object",
+    properties: undefined,
+    required: undefined,
+    additionalProperties: undefined,
+  };
+
+  if (!schema || typeof schema !== "object") {
+    return defaultSchema;
+  }
+
+  // Extract properties
+  const properties = "properties" in schema ? schema.properties : undefined;
+  const required = "required" in schema ? schema.required : undefined;
+  const additionalProperties = "additionalProperties" in schema ? schema.additionalProperties : undefined;
+
+  // Validate and build properties
+  let typedProperties: MCPTool["inputSchema"]["properties"];
+  if (properties && typeof properties === "object" && !Array.isArray(properties)) {
+    typedProperties = {};
+    for (const [key, value] of Object.entries(properties)) {
+      if (isMCPProperty(value)) {
+        typedProperties[key] = value;
+      }
+    }
+  }
+
+  return {
+    type: "object",
+    properties: typedProperties,
+    required: Array.isArray(required) ? required : undefined,
+    additionalProperties: typeof additionalProperties === "boolean" ? additionalProperties : undefined,
   };
 }
 

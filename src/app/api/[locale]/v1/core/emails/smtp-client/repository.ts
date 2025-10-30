@@ -284,8 +284,16 @@ class SmtpRepositoryImpl implements SmtpRepository {
         );
       }
 
-      const transport = await this.getTransport(account, logger);
-      await transport.verify();
+      const transportResult = await this.getTransport(account, logger);
+      if (!transportResult.success) {
+        return createErrorResponse(
+          transportResult.message,
+          transportResult.errorType || ErrorResponseTypes.EMAIL_ERROR,
+          transportResult.messageParams,
+        );
+      }
+
+      await transportResult.data.verify();
 
       await this.updateAccountHealth(data.accountId, true, logger);
 
@@ -477,13 +485,15 @@ class SmtpRepositoryImpl implements SmtpRepository {
   private async getTransport(
     account: SmtpAccount,
     logger: EndpointLogger,
-  ): Promise<Transporter<SMTPTransport.SentMessageInfo>> {
+  ): Promise<
+    ResponseType<Transporter<SMTPTransport.SentMessageInfo>>
+  > {
     const cacheKey = account.id;
 
     if (this.transportCache.has(cacheKey)) {
       const cachedTransport = this.transportCache.get(cacheKey);
       if (cachedTransport) {
-        return cachedTransport;
+        return createSuccessResponse(cachedTransport);
       }
     }
 
@@ -510,7 +520,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
       await transport.verify();
 
       this.transportCache.set(cacheKey, transport);
-      return transport;
+      return createSuccessResponse(transport);
     } catch (error) {
       logger.error("Error creating SMTP transport", {
         accountId: account.id,
@@ -526,11 +536,14 @@ class SmtpRepositoryImpl implements SmtpRepository {
         parseError(error).message,
       );
 
-      // Return error via exception - transport creation must succeed or fail
-      // Callers will handle the error and use fallback accounts if needed
-      // eslint-disable-next-line no-restricted-syntax
-      throw new Error(
-        `${SMTP_ERROR_MESSAGES.TRANSPORT_CREATION_FAILED}: ${parseError(error).message}`, { cause: error },
+      return createErrorResponse(
+        "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+        ErrorResponseTypes.EMAIL_ERROR,
+        {
+          accountId: account.id,
+          accountName: account.name,
+          error: parseError(error).message,
+        },
       );
     }
   }
@@ -684,7 +697,16 @@ class SmtpRepositoryImpl implements SmtpRepository {
       }
 
       // Get transport
-      const transport = await this.getTransport(account, logger);
+      const transportResult = await this.getTransport(account, logger);
+      if (!transportResult.success) {
+        return createErrorResponse(
+          transportResult.message,
+          transportResult.errorType || ErrorResponseTypes.EMAIL_ERROR,
+          transportResult.messageParams,
+        );
+      }
+
+      const transport = transportResult.data;
 
       // Prepare email headers
       const headers: Record<string, string> = {};

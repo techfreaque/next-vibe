@@ -7,9 +7,10 @@
 /* eslint-disable react-compiler/react-compiler */
 "use client";
 
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import { AUTH_STATUS_COOKIE_PREFIX } from "next-vibe/shared/constants";
 import { parseError } from "next-vibe/shared/utils";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -21,6 +22,10 @@ import { useAIStreamStore } from "../ai-stream/hooks/store";
 import type { DefaultFolderId } from "./config";
 import { createCreditUpdateCallback } from "./credit-updater";
 import { ChatMessageRole } from "./enum";
+import {
+  GET as foldersGetEndpoint,
+  type FolderListResponseOutput,
+} from "./folders/definition";
 import type { IconValue } from "./model-access/icons";
 import type { ModelId } from "./model-access/models";
 import type { PersonaListResponseOutput } from "./personas/definition";
@@ -209,7 +214,7 @@ export function useChat(
         .find((row) => row.startsWith(AUTH_STATUS_COOKIE_PREFIX));
       const isAuthenticated = authStatusCookie !== undefined;
 
-      logger.debug("useChat", "Checking authentication before loading data", {
+      logger.debug("Chat: Checking authentication before loading data", {
         isAuthenticated,
       });
 
@@ -218,7 +223,7 @@ export function useChat(
         const { loadIncognitoState } = await import("./incognito/storage");
         const incognitoState = loadIncognitoState();
 
-        logger.debug("useChat", "Loading incognito data from localStorage", {
+        logger.debug("Chat: Loading incognito data from localStorage", {
           threadCount: Object.keys(incognitoState.threads).length,
           messageCount: Object.keys(incognitoState.messages).length,
           folderCount: Object.keys(incognitoState.folders).length,
@@ -251,7 +256,7 @@ export function useChat(
           });
         });
 
-        logger.info("useChat", "Incognito data loaded successfully", {
+        logger.info("Chat: Incognito data loaded successfully", {
           threadCount: Object.keys(incognitoState.threads).length,
           messageCount: Object.keys(incognitoState.messages).length,
           folderCount: Object.keys(incognitoState.folders).length,
@@ -274,6 +279,8 @@ export function useChat(
       }
 
       // Load ALL threads (no rootFolderId filter)
+      // IMPORTANT: Disable local cache to ensure threads are always fresh from server
+      // Only incognito threads should use localStorage
       try {
         const threadsResponse = await apiClient.fetch(
           threadsGetEndpoint,
@@ -285,9 +292,12 @@ export function useChat(
           {},
           t,
           locale,
+          {
+            disableLocalCache: true, // Always fetch fresh from server
+          },
         );
 
-        logger.debug("useChat", "Loaded threads", {
+        logger.debug("Chat: Loaded threads", {
           success: threadsResponse.success,
           hasData: threadsResponse.success && !!threadsResponse.data,
         });
@@ -333,17 +343,64 @@ export function useChat(
                 updatedAt: new Date(thread.updatedAt),
               });
             });
-            logger.debug("useChat", "Threads loaded successfully", {
+            logger.debug("Chat: Threads loaded successfully", {
               count: responseData.response.threads.length,
             });
           }
         }
       } catch (error) {
-        logger.error("useChat", "Failed to load threads", parseError(error));
+        logger.error("Chat: Failed to load threads", parseError(error));
       }
 
-      // Folders are not loaded from server - they are managed client-side only
-      // This keeps the architecture simple and avoids unnecessary API calls
+      // Load folders from server
+      try {
+        const foldersResponse = await apiClient.fetch(
+          foldersGetEndpoint,
+          logger,
+          {},
+          {},
+          t,
+          locale,
+          {
+            // Disable cache to ensure fresh data
+            disableLocalCache: true,
+          },
+        );
+
+        logger.debug("Chat: Loaded folders", {
+          success: foldersResponse.success,
+          hasData: foldersResponse.success && !!foldersResponse.data,
+        });
+
+        if (foldersResponse.success && foldersResponse.data) {
+          const responseData = foldersResponse.data as FolderListResponseOutput;
+
+          if (responseData.folders) {
+            responseData.folders.forEach((folder) => {
+              chatStore.addFolder({
+                id: folder.id,
+                userId: folder.userId,
+                rootFolderId: folder.rootFolderId,
+                name: folder.name,
+                icon: folder.icon,
+                color: folder.color,
+                parentId: folder.parentId,
+                expanded: folder.expanded,
+                sortOrder: folder.sortOrder,
+                metadata: folder.metadata,
+                createdAt: new Date(folder.createdAt),
+                updatedAt: new Date(folder.updatedAt),
+                moderatorIds: [],
+              });
+            });
+            logger.debug("Chat: Folders loaded successfully", {
+              count: responseData.folders.length,
+            });
+          }
+        }
+      } catch (error) {
+        logger.error("Chat: Failed to load folders", parseError(error));
+      }
     };
 
     void loadData();
@@ -574,7 +631,7 @@ export function useChat(
     // Load messages from server
     const loadMessages = async (): Promise<void> => {
       try {
-        logger.debug("useChat", "Loading messages for thread", {
+        logger.debug("Chat: Loading messages for thread", {
           threadId: activeThreadId,
         });
 
@@ -587,7 +644,7 @@ export function useChat(
             success: boolean;
             data?: { messages?: ChatMessage[] };
           };
-          logger.debug("useChat", "Loaded messages", {
+          logger.debug("Chat: Loaded messages", {
             threadId: activeThreadId,
             count: data.data?.messages?.length || 0,
           });
@@ -628,7 +685,7 @@ export function useChat(
             });
           }
         } else {
-          logger.error("useChat", "Failed to load messages", {
+          logger.error("Chat: Failed to load messages", {
             threadId: activeThreadId,
             status: response.status,
           });
@@ -636,7 +693,7 @@ export function useChat(
           loadedThreadsRef.current.delete(activeThreadId);
         }
       } catch (error) {
-        logger.error("useChat", "Error loading messages", {
+        logger.error("Chat: Error loading messages", {
           threadId: activeThreadId,
           error: parseError(error).message,
         });
@@ -655,7 +712,7 @@ export function useChat(
       content: string,
       onThreadCreated?: (threadId: string, rootFolderId: string) => void,
     ): Promise<void> => {
-      logger.debug("useChat", "Sending message", { content });
+      logger.debug("Chat: Sending message", { content });
 
       chatStore.setLoading(true);
 
@@ -683,7 +740,7 @@ export function useChat(
             // Get the last message (most recent)
             const lastMessage = threadMessages[threadMessages.length - 1];
             parentMessageId = lastMessage.id;
-            logger.debug("useChat", "Using last message as parent", {
+            logger.debug("Chat: Using last message as parent", {
               parentMessageId,
               lastMessageContent: lastMessage.content.substring(0, 50),
               isIncognito: chatStore.currentRootFolderId === "incognito",
@@ -708,7 +765,7 @@ export function useChat(
           },
           {
             onThreadCreated: (data) => {
-              logger.debug("useChat", "Thread created during send", {
+              logger.debug("Chat: Thread created during send", {
                 threadId: data.threadId,
                 rootFolderId: data.rootFolderId,
               });
@@ -716,7 +773,7 @@ export function useChat(
               // Set the active thread in the chat store
               // This ensures subsequent messages use the correct threadId
               chatStore.setActiveThread(data.threadId);
-              logger.debug("useChat", "Set active thread after creation", {
+              logger.debug("Chat: Set active thread after creation", {
                 threadId: data.threadId,
               });
 
@@ -732,7 +789,7 @@ export function useChat(
         setInput("");
       } catch (error) {
         const errorMessage = parseError(error);
-        logger.error("useChat", "Failed to send message", {
+        logger.error("Chat: Failed to send message", {
           error: errorMessage.message,
           stack: errorMessage.stack,
         });
@@ -756,13 +813,13 @@ export function useChat(
 
   const retryMessage = useCallback(
     async (messageId: string): Promise<void> => {
-      logger.debug("useChat", "Retrying message (creating branch)", {
+      logger.debug("Chat: Retrying message (creating branch)", {
         messageId,
       });
 
       const message = chatStore.messages[messageId];
       if (!message) {
-        logger.error("useChat", "Message not found", { messageId });
+        logger.error("Chat: Message not found", { messageId });
         return;
       }
 
@@ -792,7 +849,7 @@ export function useChat(
           },
         );
       } catch (error) {
-        logger.error("useChat", "Failed to retry message", parseError(error));
+        logger.error("Chat: Failed to retry message", parseError(error));
       } finally {
         chatStore.setLoading(false);
       }
@@ -811,11 +868,11 @@ export function useChat(
 
   const branchMessage = useCallback(
     async (messageId: string, newContent: string): Promise<void> => {
-      logger.debug("useChat", "Branching message", { messageId, newContent });
+      logger.debug("Chat: Branching message", { messageId, newContent });
 
       const message = chatStore.messages[messageId];
       if (!message) {
-        logger.error("useChat", "Message not found", { messageId });
+        logger.error("Chat: Message not found", { messageId });
         return;
       }
 
@@ -843,7 +900,7 @@ export function useChat(
           },
         );
       } catch (error) {
-        logger.error("useChat", "Failed to branch message", parseError(error));
+        logger.error("Chat: Failed to branch message", parseError(error));
       } finally {
         chatStore.setLoading(false);
       }
@@ -862,11 +919,11 @@ export function useChat(
 
   const answerAsAI = useCallback(
     async (messageId: string, content: string): Promise<void> => {
-      logger.debug("useChat", "Answering as AI", { messageId, content });
+      logger.debug("Chat: Answering as AI", { messageId, content });
 
       const message = chatStore.messages[messageId];
       if (!message) {
-        logger.error("useChat", "Message not found", { messageId });
+        logger.error("Chat: Message not found", { messageId });
         return;
       }
 
@@ -893,7 +950,7 @@ export function useChat(
           },
         );
       } catch (error) {
-        logger.error("useChat", "Failed to answer as AI", parseError(error));
+        logger.error("Chat: Failed to answer as AI", parseError(error));
       } finally {
         chatStore.setLoading(false);
       }
@@ -911,13 +968,13 @@ export function useChat(
   );
 
   const stopGeneration = useCallback((): void => {
-    logger.debug("useChat", "Stopping generation");
+    logger.debug("Chat: Stopping generation");
     aiStream.stopStream();
   }, [logger, aiStream]);
 
   // Thread operations
   const createNewThread = useCallback((): string => {
-    logger.debug("useChat", "Creating new thread");
+    logger.debug("Chat: Creating new thread");
     const threadId = crypto.randomUUID();
     chatStore.setActiveThread(threadId);
     return threadId;
@@ -925,7 +982,7 @@ export function useChat(
 
   const setActiveThreadCallback = useCallback(
     (threadId: string | null): void => {
-      logger.debug("useChat", "Setting active thread", { threadId });
+      logger.debug("Chat: Setting active thread", { threadId });
       chatStore.setActiveThread(threadId);
     },
     [logger, chatStore],
@@ -933,18 +990,18 @@ export function useChat(
 
   const deleteMessage = useCallback(
     async (messageId: string): Promise<void> => {
-      logger.debug("useChat", "Deleting message", { messageId });
+      logger.debug("Chat: Deleting message", { messageId });
 
       const message = chatStore.messages[messageId];
       if (!message) {
-        logger.error("useChat", "Message not found", { messageId });
+        logger.error("Chat: Message not found", { messageId });
         return;
       }
 
       // Get the thread to check if it's incognito
       const thread = chatStore.threads[message.threadId];
       if (!thread) {
-        logger.error("useChat", "Thread not found for message", {
+        logger.error("Chat: Thread not found for message", {
           messageId,
           threadId: message.threadId,
         });
@@ -1006,7 +1063,7 @@ export function useChat(
         );
 
         if (!response.ok) {
-          logger.error("useChat", "Failed to delete message", {
+          logger.error("Chat: Failed to delete message", {
             status: response.status,
           });
           return;
@@ -1015,7 +1072,7 @@ export function useChat(
         // Remove from store
         chatStore.deleteMessage(messageId);
       } catch (error) {
-        logger.error("useChat", "Failed to delete message", parseError(error));
+        logger.error("Chat: Failed to delete message", parseError(error));
       }
     },
     [logger, chatStore, locale],
@@ -1023,18 +1080,18 @@ export function useChat(
 
   const voteMessage = useCallback(
     async (messageId: string, vote: 1 | -1 | 0): Promise<void> => {
-      logger.debug("useChat", "Voting on message", { messageId, vote });
+      logger.debug("Chat: Voting on message", { messageId, vote });
 
       const message = chatStore.messages[messageId];
       if (!message) {
-        logger.error("useChat", "Message not found", { messageId });
+        logger.error("Chat: Message not found", { messageId });
         return;
       }
 
       // Get the thread to check if it's incognito
       const thread = chatStore.threads[message.threadId];
       if (!thread) {
-        logger.error("useChat", "Thread not found for message", {
+        logger.error("Chat: Thread not found for message", {
           messageId,
           threadId: message.threadId,
         });
@@ -1049,7 +1106,7 @@ export function useChat(
 
       // Incognito mode doesn't support voting
       if (!isAuthenticated || thread.rootFolderId === "incognito") {
-        logger.debug("useChat", "Voting not supported in incognito mode", {
+        logger.debug("Chat: Voting not supported in incognito mode", {
           messageId,
           isAuthenticated,
           rootFolderId: thread.rootFolderId,
@@ -1074,7 +1131,7 @@ export function useChat(
         );
 
         if (!response.ok) {
-          logger.error("useChat", "Failed to vote on message", {
+          logger.error("Chat: Failed to vote on message", {
             status: response.status,
           });
           return;
@@ -1089,7 +1146,7 @@ export function useChat(
         }
         chatStore.updateMessage(messageId, updates);
       } catch (error) {
-        logger.error("useChat", "Failed to vote on message", parseError(error));
+        logger.error("Chat: Failed to vote on message", parseError(error));
       }
     },
     [logger, chatStore, locale],
@@ -1097,7 +1154,7 @@ export function useChat(
 
   const deleteThread = useCallback(
     async (threadId: string): Promise<void> => {
-      logger.debug("useChat", "Deleting thread", { threadId });
+      logger.debug("Chat: Deleting thread", { threadId });
 
       try {
         const response = await fetch(
@@ -1108,7 +1165,7 @@ export function useChat(
         );
 
         if (!response.ok) {
-          logger.error("useChat", "Failed to delete thread", {
+          logger.error("Chat: Failed to delete thread", {
             status: response.status,
           });
           return;
@@ -1122,7 +1179,7 @@ export function useChat(
           chatStore.setActiveThread(null);
         }
       } catch (error) {
-        logger.error("useChat", "Failed to delete thread", parseError(error));
+        logger.error("Chat: Failed to delete thread", parseError(error));
       }
     },
     [logger, chatStore, locale],
@@ -1130,7 +1187,7 @@ export function useChat(
 
   const updateThread = useCallback(
     async (threadId: string, updates: ThreadUpdate): Promise<void> => {
-      logger.debug("useChat", "Updating thread", {
+      logger.debug("Chat: Updating thread", {
         threadId,
         updatedFields: Object.keys(updates).join(", "),
       });
@@ -1148,7 +1205,7 @@ export function useChat(
         );
 
         if (!response.ok) {
-          logger.error("useChat", "Failed to update thread", {
+          logger.error("Chat: Failed to update thread", {
             status: response.status,
           });
           return;
@@ -1157,7 +1214,7 @@ export function useChat(
         // Update local store
         chatStore.updateThread(threadId, updates);
       } catch (error) {
-        logger.error("useChat", "Failed to update thread", parseError(error));
+        logger.error("Chat: Failed to update thread", parseError(error));
       }
     },
     [logger, chatStore, locale],
@@ -1170,7 +1227,7 @@ export function useChat(
       parentId: string | null,
       icon?: string,
     ): Promise<string> => {
-      logger.debug("useChat", "Creating folder", {
+      logger.debug("Chat: Creating folder", {
         name,
         rootFolderId,
         parentId,
@@ -1200,8 +1257,11 @@ export function useChat(
           const errorData = (await response
             .json()
             // eslint-disable-next-line no-restricted-syntax
-            .catch(() => ({}))) as Record<string, unknown>;
-          logger.error("useChat", "Failed to create folder", {
+            .catch(() => ({}))) as Record<
+            string,
+            string | number | boolean | null
+          >;
+          logger.error("Chat: Failed to create folder", {
             status: response.status,
             error: parseError(errorData).message,
           });
@@ -1219,7 +1279,7 @@ export function useChat(
 
         return folder.id;
       } catch (error) {
-        logger.error("useChat", "Failed to create folder", parseError(error));
+        logger.error("Chat: Failed to create folder", parseError(error));
         return "";
       }
     },
@@ -1228,7 +1288,7 @@ export function useChat(
 
   const updateFolder = useCallback(
     async (folderId: string, updates: FolderUpdate): Promise<void> => {
-      logger.debug("useChat", "Updating folder", {
+      logger.debug("Chat: Updating folder", {
         folderId,
         updatedFields: Object.keys(updates).join(", "),
       });
@@ -1246,7 +1306,7 @@ export function useChat(
         );
 
         if (!response.ok) {
-          logger.error("useChat", "Failed to update folder", {
+          logger.error("Chat: Failed to update folder", {
             status: response.status,
           });
           return;
@@ -1255,7 +1315,7 @@ export function useChat(
         // Update local store
         chatStore.updateFolder(folderId, updates);
       } catch (error) {
-        logger.error("useChat", "Failed to update folder", parseError(error));
+        logger.error("Chat: Failed to update folder", parseError(error));
       }
     },
     [logger, chatStore, locale],
@@ -1263,7 +1323,7 @@ export function useChat(
 
   const deleteFolder = useCallback(
     async (folderId: string): Promise<void> => {
-      logger.debug("useChat", "Deleting folder", { folderId });
+      logger.debug("Chat: Deleting folder", { folderId });
 
       try {
         const response = await fetch(
@@ -1274,7 +1334,7 @@ export function useChat(
         );
 
         if (!response.ok) {
-          logger.error("useChat", "Deleting folder", {
+          logger.error("Chat: Deleting folder", {
             status: response.status,
           });
           return;
@@ -1283,7 +1343,7 @@ export function useChat(
         // Remove from store
         chatStore.deleteFolder(folderId);
       } catch (error) {
-        logger.error("useChat", "Failed to delete folder", parseError(error));
+        logger.error("Chat: Failed to delete folder", parseError(error));
       }
     },
     [logger, chatStore, locale],
@@ -1291,7 +1351,7 @@ export function useChat(
 
   const setCurrentFolder = useCallback(
     (rootFolderId: DefaultFolderId, subFolderId: string | null): void => {
-      logger.debug("useChat", "Setting current folder", {
+      logger.debug("Chat: Setting current folder", {
         rootFolderId,
         subFolderId,
       });

@@ -175,12 +175,12 @@ const { GET } = createEndpoint({
 
       results: responseArrayField(
         {
-          type: WidgetType.LINK_LIST,
+          type: WidgetType.GROUPED_LIST,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         objectField(
           {
-            type: WidgetType.LINK_CARD,
+            type: WidgetType.CONTAINER,
             title:
               "app.api.v1.core.agent.chat.tools.braveSearch.get.response.results.item.title" as const,
             description:
@@ -199,7 +199,7 @@ const { GET } = createEndpoint({
             ),
             url: responseField(
               {
-                type: WidgetType.LINK,
+                type: WidgetType.TEXT,
                 content:
                   "app.api.v1.core.agent.chat.tools.braveSearch.get.response.results.item.url" as const,
               },
@@ -207,7 +207,7 @@ const { GET } = createEndpoint({
             ),
             snippet: responseField(
               {
-                type: WidgetType.MARKDOWN,
+                type: WidgetType.TEXT,
                 content:
                   "app.api.v1.core.agent.chat.tools.braveSearch.get.response.results.item.snippet" as const,
               },

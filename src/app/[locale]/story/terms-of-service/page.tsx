@@ -336,12 +336,14 @@ export default async function TermsOfServicePage({
               {t(
                 "app.story._components.home.termsOfService.sections.contact.content",
               )}{" "}
-              <a
-                href={`mailto:${supportEmail}`}
-                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+              <button
+                onClick={() => {
+                  window.location.href = `mailto:${supportEmail}`;
+                }}
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors bg-transparent border-none p-0 cursor-pointer"
               >
                 {supportEmail}
-              </a>
+              </button>
               .
             </p>
           </div>

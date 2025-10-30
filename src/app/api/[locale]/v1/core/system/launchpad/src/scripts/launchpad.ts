@@ -126,6 +126,7 @@ program
         ) {
           versionBump = typedValue;
         } else {
+          // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
           throw new Error(
             `Invalid version bump type: ${typedValue}. Must be one of: patch, minor, major, init`,
           );

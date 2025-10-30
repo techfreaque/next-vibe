@@ -69,15 +69,16 @@ async function handleEmails<
  * @returns Next.js route handler function
  */
 export function createNextHandler<
-  TRequestInput,
   TRequestOutput,
-  TResponseInput,
   TResponseOutput,
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
+  TRequestInput = TRequestOutput,
+  TResponseInput = TResponseOutput,
+  TUrlVariablesInput = TUrlVariablesOutput,
 >(
   options: ApiHandlerOptions<
     TRequestOutput,
@@ -86,9 +87,12 @@ export function createNextHandler<
     TExampleKey,
     TMethod,
     TUserRoleValue,
-    TFields
+    TFields,
+    TRequestInput,
+    TResponseInput,
+    TUrlVariablesInput
   >,
-): NextHandlerReturnType<TResponseOutput, TUrlVariablesOutput> {
+): NextHandlerReturnType<TResponseOutput, TUrlVariablesInput> {
   const { endpoint, handler, email } = options;
 
   return async (
@@ -96,12 +100,18 @@ export function createNextHandler<
     {
       params,
     }: {
-      params: Promise<TUrlVariablesOutput & { locale: CountryLanguage }>;
+      params: Promise<TUrlVariablesInput & { locale: CountryLanguage }>;
     },
   ) => {
     // Get locale and translation function
-    const { locale, ...resolvedParams } = await params;
-    const urlParameters = resolvedParams as TUrlVariablesOutput;
+    const awaitedParams = await params;
+    const { locale, ...urlParametersOmitted } = awaitedParams;
+
+    // Extract URL parameters (removing locale)
+    // TypeScript can't infer that Omit<T & {locale}, "locale"> = T
+    // So we need to explicitly reconstruct the object
+    const urlParameters = urlParametersOmitted;
+
     const logger = createEndpointLogger(false, Date.now(), locale);
     const { t } = simpleT(locale);
     try {
@@ -125,7 +135,8 @@ export function createNextHandler<
         TRequestInput,
         TRequestOutput,
         TResponseInput,
-        Record<string, string>,
+        TResponseOutput,
+        TUrlVariablesInput,
         TUrlVariablesOutput,
         TExampleKey,
         TMethod,
@@ -135,7 +146,7 @@ export function createNextHandler<
         endpoint,
         {
           method: endpoint.method,
-          urlParameters: urlParameters as Record<string, string>,
+          urlParameters: urlParameters,
           request,
           locale,
         },
@@ -144,10 +155,9 @@ export function createNextHandler<
 
       if (!validationResult.success) {
         logger.error(
-          `Validation error: ${validationResult.message} (${
-            validationResult.messageParams
-              ? JSON.stringify(validationResult.messageParams)
-              : "No params"
+          `Validation error: ${validationResult.message} (${validationResult.messageParams
+            ? JSON.stringify(validationResult.messageParams)
+            : "No params"
           })`,
         );
         return createHTTPErrorResponse({

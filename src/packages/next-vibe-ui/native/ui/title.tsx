@@ -33,6 +33,7 @@ export function Title({
 }: TitleProps): React.JSX.Element {
   return (
     <RNText
+      // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
       role="heading"
       aria-level={level}
       className={cn(

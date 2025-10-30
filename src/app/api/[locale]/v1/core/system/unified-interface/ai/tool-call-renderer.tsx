@@ -17,8 +17,16 @@ import type {
   ToolCall,
   ToolCallResult,
 } from "@/app/api/[locale]/v1/core/agent/chat/db";
+import type { ResponseFieldMetadata } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/types";
+import {
+  FieldDataType,
+  WidgetType,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+
+import { LinkListWidget } from "../react/widgets/LinkListWidget";
+import type { WidgetRenderContext } from "../shared/ui/types";
 
 interface ToolCallRendererProps {
   toolCalls: ToolCall[];
@@ -45,6 +53,135 @@ function getArgsSummary(args: ToolCallResult): string | null {
 }
 
 /**
+ * Render tool result using data-driven widgets
+ */
+function renderToolResult(
+  toolCall: ToolCall,
+  locale: CountryLanguage,
+  context: WidgetRenderContext,
+): JSX.Element {
+  const { t } = simpleT(locale);
+
+  // If no result, show nothing
+  if (!toolCall.result) {
+    return <></>;
+  }
+
+  // Check if we have widget metadata for data-driven rendering
+  const hasMetadata =
+    toolCall.widgetMetadata?.responseFields &&
+    toolCall.widgetMetadata.responseFields.length > 0;
+
+  if (!hasMetadata) {
+    // Fallback to JSON dump if no metadata
+    return (
+      <>
+        <Div className="text-xs font-medium text-muted-foreground mb-1">
+          {t("app.chat.toolCall.result")}:
+        </Div>
+        <Pre className="text-xs overflow-x-auto text-foreground/80 max-h-60">
+          {JSON.stringify(toolCall.result, null, 2)}
+        </Pre>
+      </>
+    );
+  }
+
+  // Render each field using its widget type
+  return (
+    <Div className="space-y-3">
+      {toolCall.widgetMetadata!.responseFields.map((field) => {
+        const fieldValue =
+          toolCall.result?.[field.name as keyof typeof toolCall.result];
+
+        // Skip if no value
+        if (fieldValue === undefined || fieldValue === null) {
+          return null;
+        }
+
+        // Create proper metadata structure
+        const metadata: ResponseFieldMetadata = {
+          name: field.name,
+          type: FieldDataType.ARRAY,
+          widgetType: field.widgetType,
+          value: fieldValue,
+          label: field.label,
+          description: field.description,
+        };
+
+        // Handle different widget types
+        switch (field.widgetType) {
+          case WidgetType.LINK_LIST:
+            // Search results - render as link list
+            if (Array.isArray(fieldValue)) {
+              return (
+                <LinkListWidget
+                  key={field.name}
+                  data={{
+                    items: fieldValue as Array<{
+                      url: string;
+                      title: string;
+                      snippet?: string;
+                      age?: string;
+                      source?: string;
+                    }>,
+                    layout: "list",
+                  }}
+                  metadata={metadata}
+                  context={context}
+                />
+              );
+            }
+            break;
+
+          case WidgetType.GROUPED_LIST:
+            // Grouped list - render as link list for search results
+            if (Array.isArray(fieldValue)) {
+              return (
+                <LinkListWidget
+                  key={field.name}
+                  data={{
+                    items: fieldValue as Array<{
+                      url: string;
+                      title: string;
+                      snippet?: string;
+                      age?: string;
+                      source?: string;
+                    }>,
+                    layout: "list",
+                  }}
+                  metadata={metadata}
+                  context={context}
+                />
+              );
+            }
+            break;
+
+          default:
+            // Fallback to JSON for other types
+            return (
+              <Div key={field.name} className="space-y-1">
+                {field.label && (
+                  <Span className="text-sm font-medium">{field.label}</Span>
+                )}
+                {field.description && (
+                  <Span className="text-xs text-muted-foreground">
+                    {field.description}
+                  </Span>
+                )}
+                <Pre className="text-sm overflow-x-auto">
+                  {JSON.stringify(fieldValue, null, 2)}
+                </Pre>
+              </Div>
+            );
+        }
+
+        return null;
+      })}
+    </Div>
+  );
+}
+
+/**
  * Tool Call Renderer Component
  * Renders tool calls using unified-interface widget system with dynamic definition loading from registry
  *
@@ -65,6 +202,14 @@ export function ToolCallRenderer({
   if (!toolCalls || toolCalls.length === 0) {
     return null;
   }
+
+  // Create widget render context
+  const context: WidgetRenderContext = {
+    locale,
+    isInteractive: true,
+    permissions: [],
+    platform: "web",
+  };
 
   // Get header title
   const getHeaderTitle = (): string => {
@@ -169,48 +314,10 @@ export function ToolCallRenderer({
                     </Div>
                   )}
 
-                  {/* Result - Render using widget system if metadata available */}
+                  {/* Result - Render using data-driven widget system */}
                   {toolCall.result && (
                     <Div className="px-3 py-2">
-                      {toolCall.widgetMetadata?.responseFields &&
-                      toolCall.widgetMetadata.responseFields.length > 0 ? (
-                        <Div className="space-y-2">
-                          {toolCall.widgetMetadata.responseFields.map(
-                            (field) => (
-                              <Div key={field.name} className="space-y-1">
-                                {field.label && (
-                                  <Span className="text-sm font-medium">
-                                    {field.label}
-                                  </Span>
-                                )}
-                                {field.description && (
-                                  <Span className="text-xs text-muted-foreground">
-                                    {field.description}
-                                  </Span>
-                                )}
-                                <Pre className="text-sm">
-                                  {JSON.stringify(
-                                    toolCall.result?.[
-                                      field.name as keyof typeof toolCall.result
-                                    ],
-                                    null,
-                                    2,
-                                  )}
-                                </Pre>
-                              </Div>
-                            ),
-                          )}
-                        </Div>
-                      ) : (
-                        <>
-                          <Div className="text-xs font-medium text-muted-foreground mb-1">
-                            {t("app.chat.toolCall.result")}:
-                          </Div>
-                          <Pre className="text-xs overflow-x-auto text-foreground/80 max-h-60">
-                            {JSON.stringify(toolCall.result, null, 2)}
-                          </Pre>
-                        </>
-                      )}
+                      {renderToolResult(toolCall, locale, context)}
                     </Div>
                   )}
                 </Div>

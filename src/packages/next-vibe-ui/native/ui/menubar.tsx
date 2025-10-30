@@ -234,7 +234,7 @@ const MenubarSeparator = React.forwardRef<
 ));
 MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName;
 
-const MenubarShortcut = ({ className, ...props }: TextProps) => {
+const MenubarShortcut = ({ className, ...props }: TextProps): React.JSX.Element => {
   return (
     <Text
       className={cn(

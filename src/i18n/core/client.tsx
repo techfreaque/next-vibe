@@ -234,7 +234,7 @@ export function useTranslation(): TranslationContextType {
   const context = useContext(TranslationContext);
 
   if (!context) {
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Critical initialization error: Context must exist for i18n to function
     throw new Error("useTranslation must be used within a TranslationProvider");
   }
 

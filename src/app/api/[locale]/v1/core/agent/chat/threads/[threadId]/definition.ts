@@ -186,7 +186,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.get.response.thread.createdAt.content" as const,
             },
-            z.date(),
+            z.string().datetime(),
           ),
           updatedAt: responseField(
             {
@@ -194,7 +194,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.get.response.thread.updatedAt.content" as const,
             },
-            z.date(),
+            z.string().datetime(),
           ),
         },
       ),
@@ -285,8 +285,8 @@ const { GET } = createEndpoint({
           tags: [],
           preview: "Hello, how can I help you?",
           metadata: {},
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
       },
     },
@@ -579,7 +579,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.response.thread.createdAt.content" as const,
             },
-            z.date(),
+            z.string().datetime(),
           ),
           updatedAt: responseField(
             {
@@ -587,7 +587,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.response.thread.updatedAt.content" as const,
             },
-            z.date(),
+            z.string().datetime(),
           ),
         },
       ),
@@ -685,8 +685,8 @@ const { PATCH } = createEndpoint({
           tags: [],
           preview: "Hello, how can I help you?",
           metadata: {},
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
       },
     },

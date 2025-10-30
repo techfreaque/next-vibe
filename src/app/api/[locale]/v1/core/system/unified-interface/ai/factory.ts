@@ -23,6 +23,77 @@ import type {
 } from "./types";
 
 /**
+ * Strip transforms and refinements from a Zod schema to make it JSON Schema compatible
+ * This is needed for AI tools because the AI SDK needs to serialize schemas to JSON Schema
+ * Transforms and refinements are runtime-only features that can't be represented in JSON Schema
+ */
+function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
+  // Handle ZodEffects (transforms, refinements, preprocessors)
+  // Check using _def.typeName instead of instanceof since ZodEffects might not be exported
+  if ("_def" in schema && schema._def.typeName === "ZodEffects") {
+    // Recursively strip from the inner schema
+    return stripTransformsAndRefinements((schema as any)._def.schema);
+  }
+
+  // Handle ZodOptional
+  if (schema instanceof z.ZodOptional) {
+    return stripTransformsAndRefinements(schema.unwrap()).optional();
+  }
+
+  // Handle ZodNullable
+  if (schema instanceof z.ZodNullable) {
+    return stripTransformsAndRefinements(schema.unwrap()).nullable();
+  }
+
+  // Handle ZodDefault
+  if (schema instanceof z.ZodDefault) {
+    const innerSchema = stripTransformsAndRefinements(schema.removeDefault());
+    // Get the default value - it can be either a function or a direct value
+    const defaultValue =
+      typeof schema._def.defaultValue === "function"
+        ? schema._def.defaultValue()
+        : schema._def.defaultValue;
+    return innerSchema.default(defaultValue);
+  }
+
+  // Handle ZodObject - recursively strip from all properties
+  if (schema instanceof z.ZodObject) {
+    const shape = schema.shape;
+    const strippedShape: Record<string, z.ZodTypeAny> = {};
+
+    for (const [key, value] of Object.entries(shape)) {
+      strippedShape[key] = stripTransformsAndRefinements(value as z.ZodTypeAny);
+    }
+
+    return z.object(strippedShape);
+  }
+
+  // Handle ZodArray
+  if (schema instanceof z.ZodArray) {
+    return z.array(stripTransformsAndRefinements(schema.element));
+  }
+
+  // Handle ZodUnion
+  if (schema instanceof z.ZodUnion) {
+    const options = schema.options.map((option: z.ZodTypeAny) =>
+      stripTransformsAndRefinements(option),
+    );
+    return z.union(options as [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]]);
+  }
+
+  // Handle ZodIntersection
+  if (schema instanceof z.ZodIntersection) {
+    return z.intersection(
+      stripTransformsAndRefinements(schema._def.left),
+      stripTransformsAndRefinements(schema._def.right),
+    );
+  }
+
+  // For all other types (primitives, etc.), return as-is
+  return schema;
+}
+
+/**
  * Tool factory options
  */
 export interface ToolFactoryOptions {
@@ -62,7 +133,14 @@ export class ToolFactory {
       endpoint.toolName;
 
     // Generate PROPER Zod schema from fields (not from requestSchema!)
-    const parameters = this.generateInputSchema(endpoint);
+    // Keep the original schema with transforms for validation
+    const rawParameters = this.generateInputSchema(endpoint);
+
+    // Strip transforms and refinements for JSON Schema serialization (AI SDK requirement)
+    // The AI SDK's tool() function internally calls zodToJsonSchema() which can't handle transforms
+    const parameters = stripTransformsAndRefinements(
+      rawParameters,
+    ) as z.ZodObject<Record<string, z.ZodTypeAny>>;
 
     // Log schema type for debugging
     context.logger.debug("[Tool Factory] Generated schema", {
@@ -77,11 +155,15 @@ export class ToolFactory {
       description,
       inputSchema: parameters,
       execute: async (params: z.infer<typeof parameters>) => {
-        // params is already properly typed from Zod schema inference
-        // Type flows naturally from the Zod schema validation
+        // Apply the original schema (with transforms) to the params
+        // This ensures transforms like .toLowerCase().trim() are applied
+        const transformedParams = rawParameters.parse(params);
+
         const executionContext: AIToolExecutionContext = {
           toolName: endpoint.toolName,
-          data: params as unknown as { [key: string]: ToolParameterValue },
+          data: transformedParams as unknown as {
+            [key: string]: ToolParameterValue;
+          },
           user: context.user,
           locale: context.locale,
           logger: context.logger,
@@ -181,19 +263,27 @@ export class ToolFactory {
     const tools = new Map<string, CoreTool>();
 
     for (const endpoint of endpoints) {
-      const createdTool = this.createToolFromEndpoint(
-        endpoint,
-        executor,
-        context,
-        options,
-      );
-      tools.set(endpoint.toolName, createdTool);
+      try {
+        const createdTool = this.createToolFromEndpoint(
+          endpoint,
+          executor,
+          context,
+          options,
+        );
+        tools.set(endpoint.toolName, createdTool);
 
-      context.logger.debug("[Tool Factory] Created tool from endpoint", {
-        toolName: endpoint.toolName,
-        endpointId: endpoint.id,
-        method: endpoint.definition.method,
-      });
+        context.logger.debug("[Tool Factory] Created tool from endpoint", {
+          toolName: endpoint.toolName,
+          endpointId: endpoint.id,
+          method: endpoint.definition.method,
+        });
+      } catch (error) {
+        // Skip tools that have schemas with custom types that can't be serialized to JSON Schema
+        context.logger.warn("[Tool Factory] Skipping tool with invalid schema", {
+          toolName: endpoint.toolName,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
     }
 
     return tools;

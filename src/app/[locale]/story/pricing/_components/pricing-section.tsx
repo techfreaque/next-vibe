@@ -21,7 +21,7 @@ import type { JSX } from "react";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { useSubscriptionCheckout } from "@/app/api/[locale]/v1/core/subscription/checkout/hooks";
+import { useSimplifiedCheckout } from "@/app/api/[locale]/v1/core/subscription/checkout/hooks";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
 import type {
   BillingIntervalValue,
@@ -32,6 +32,7 @@ import {
   SubscriptionPlan,
   SubscriptionStatus,
 } from "@/app/api/[locale]/v1/core/subscription/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -79,8 +80,11 @@ export default function PricingSection({
   const [isChangingPlan, setIsChangingPlan] = useState<string | null>(null);
   const [clickedPlan, setClickedPlan] = useState<string | null>(null);
 
+  // Create logger for subscription operations
+  const logger = createEndpointLogger(false, Date.now(), locale);
+
   // Use subscription hooks for mutations
-  const { createCheckout } = useSubscriptionCheckout();
+  const { createCheckout } = useSimplifiedCheckout(logger);
 
   const currentPlanId = currentSubscription?.plan;
   const isActive = currentSubscription?.status === SubscriptionStatus.ACTIVE;

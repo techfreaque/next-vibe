@@ -6,6 +6,7 @@ import type { JSX } from "react";
 import { Text, View } from "react-native";
 
 export function FormAlert(_props: Record<string, unknown>): JSX.Element {
+  // eslint-disable-next-line no-console
   console.warn("🔶 Using stub: FormAlert");
   return (
     <View style={{ padding: 8, backgroundColor: "#FEF3C7", marginVertical: 4 }}>

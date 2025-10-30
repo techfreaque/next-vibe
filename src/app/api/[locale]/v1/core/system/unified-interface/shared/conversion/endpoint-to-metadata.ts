@@ -11,6 +11,7 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 import { simpleT } from "@/i18n/core/shared";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {
   DiscoveredEndpoint,
@@ -21,6 +22,16 @@ import type {
  * JSON Schema type from zod-to-json-schema
  */
 export type JsonSchema = ReturnType<typeof zodToJsonSchema>;
+
+/**
+ * JSON Schema Object with properties
+ */
+export interface JsonSchemaObject {
+  type: "object";
+  properties?: Record<string, Record<string, string | number | boolean | null | object>>;
+  required?: string[];
+  additionalProperties?: boolean;
+}
 
 /**
  * Convert Zod schema to JSON Schema
@@ -51,7 +62,7 @@ export interface BaseEndpointMetadata {
   endpointPath: string;
   method: string;
   routePath: string;
-  allowedRoles: readonly string[];
+  allowedRoles: readonly (typeof UserRoleValue)[];
   requiresAuth: boolean;
   requestSchema?: z.ZodSchema;
   responseSchema?: z.ZodSchema;
@@ -180,9 +191,9 @@ export function endpointToMetadata(
     routePath: endpoint.routePath,
     definitionPath: endpoint.definitionPath,
     method: definition.method,
-    title: String(title || ""),
-    description: String(description || ""),
-    category: String(category || ""),
+    title: title,
+    description: description,
+    category: category,
     tags: Array.isArray(tags) ? tags : [],
     allowedRoles: definition.allowedRoles,
     requiresAuth: !definition.allowedRoles.includes("PUBLIC"),
@@ -206,7 +217,7 @@ export function hasResponseSchema(endpoint: DiscoveredEndpoint): boolean {
  */
 export function extractAllowedRoles(
   endpoint: DiscoveredEndpoint,
-): readonly string[] {
+): readonly (typeof UserRoleValue)[] {
   return endpoint.definition.allowedRoles || [];
 }
 
@@ -298,19 +309,20 @@ export function isEnabledForPlatform(
 ): boolean {
   const roles = extractAllowedRoles(endpoint);
 
-  let optOutRole: "CLI_OFF" | "AI_OFF" | "WEB_OFF" | "MCP_OFF";
+  let optOutRole: "CLI_OFF" | "AI_TOOL_OFF" | "WEB_OFF";
   switch (platform) {
     case "CLI":
       optOutRole = "CLI_OFF";
       break;
     case "AI":
-      optOutRole = "AI_OFF";
+      optOutRole = "AI_TOOL_OFF";
       break;
     case "WEB":
       optOutRole = "WEB_OFF";
       break;
     case "MCP":
-      optOutRole = "MCP_OFF";
+      // MCP uses CLI_OFF for now since there's no MCP_OFF role yet
+      optOutRole = "CLI_OFF";
       break;
   }
 

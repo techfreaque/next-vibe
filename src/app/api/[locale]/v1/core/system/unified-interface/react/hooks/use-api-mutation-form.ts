@@ -51,8 +51,9 @@ export function useApiForm<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
-    unknown
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
   >,
 >(
   endpoint: TEndpoint,
@@ -81,22 +82,22 @@ export function useApiForm<
         state: ApiStore,
       ):
         | {
-            isPending: boolean;
-            isError: boolean;
-            error: ErrorResponseType | null;
-            isSuccess: boolean;
-            data: TEndpoint["TResponseOutput"] | undefined;
-          }
+          isPending: boolean;
+          isError: boolean;
+          error: ErrorResponseType | null;
+          isSuccess: boolean;
+          data: TEndpoint["TResponseOutput"] | undefined;
+        }
         | undefined =>
         state.mutations[mutationId] as
-          | {
-              isPending: boolean;
-              isError: boolean;
-              error: ErrorResponseType | null;
-              isSuccess: boolean;
-              data: TEndpoint["TResponseOutput"] | undefined;
-            }
-          | undefined,
+        | {
+          isPending: boolean;
+          isError: boolean;
+          error: ErrorResponseType | null;
+          isSuccess: boolean;
+          data: TEndpoint["TResponseOutput"] | undefined;
+        }
+        | undefined,
     [mutationId],
   );
 
@@ -106,10 +107,10 @@ export function useApiForm<
         state: ApiStore,
       ):
         | {
-            formError: ErrorResponseType | null;
-            isSubmitting: boolean;
-            queryParams?: FormQueryParams;
-          }
+          formError: ErrorResponseType | null;
+          isSubmitting: boolean;
+          queryParams?: FormQueryParams;
+        }
         | undefined =>
         state.forms[formId],
     [formId],
@@ -250,10 +251,10 @@ export function useApiForm<
     options: TEndpoint["TUrlVariablesOutput"] extends undefined
       ? undefined
       : SubmitFormFunctionOptions<
-          TEndpoint["TRequestOutput"],
-          TEndpoint["TResponseOutput"],
-          TEndpoint["TUrlVariablesOutput"]
-        >,
+        TEndpoint["TRequestOutput"],
+        TEndpoint["TResponseOutput"],
+        TEndpoint["TUrlVariablesOutput"]
+      >,
   ): void => {
     logger.debug("submitForm called", {
       endpoint: endpoint.path.join("/"),
@@ -284,7 +285,7 @@ export function useApiForm<
           logger,
           validatedData,
           (options?.urlParamVariables as TEndpoint["TUrlVariablesOutput"]) ||
-            ({} as TEndpoint["TUrlVariablesOutput"]),
+          ({} as TEndpoint["TUrlVariablesOutput"]),
           t,
           locale,
           mutationOptions,
@@ -325,10 +326,10 @@ export function useApiForm<
         const errorResponse = isErrorResponseType(error)
           ? error
           : fail({
-              message:
-                "app.api.v1.core.system.unifiedInterface.react.hooks.mutationForm.post.errors.mutation_failed.title",
-              errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            });
+            message:
+              "app.api.v1.core.system.unifiedInterface.react.hooks.mutationForm.post.errors.mutation_failed.title",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
 
         setError(errorResponse);
         const formData = formMethods.getValues();
@@ -369,8 +370,8 @@ export function useApiForm<
   const response: ResponseType<TEndpoint["TResponseOutput"]> | undefined =
     mutationState.isSuccess
       ? createSuccessResponse(
-          mutationState.data as TEndpoint["TResponseOutput"],
-        )
+        mutationState.data as TEndpoint["TResponseOutput"],
+      )
       : mutationState.isError && mutationState.error
         ? mutationState.error
         : formState.formError
@@ -385,15 +386,15 @@ export function useApiForm<
     submitError:
       mutationState.error || formState.formError
         ? fail({
-            message:
-              mutationState.error?.message ||
-              formState.formError?.message ||
-              "app.api.v1.core.system.unifiedInterface.react.hooks.mutationForm.post.errors.unknown.title",
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams:
-              mutationState.error?.messageParams ||
-              formState.formError?.messageParams,
-          })
+          message:
+            mutationState.error?.message ||
+            formState.formError?.message ||
+            "app.api.v1.core.system.unifiedInterface.react.hooks.mutationForm.post.errors.unknown.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams:
+            mutationState.error?.messageParams ||
+            formState.formError?.messageParams,
+        })
         : undefined,
 
     isSubmitting: mutationState.isPending,

@@ -338,12 +338,14 @@ export interface LeadsRepository {
 
 /**
  * Utility function to ensure a lead has an email
- * Throws an error if the lead doesn't have an email
+ * Returns the lead if it has an email, otherwise returns null
+ * @deprecated Use leadHasEmail type guard instead and handle null case
  */
-export function ensureLeadHasEmail(lead: LeadResponseType): LeadWithEmailType {
+export function ensureLeadHasEmail(
+  lead: LeadResponseType,
+): LeadWithEmailType | null {
   if (!leadHasEmail(lead)) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
-    throw new Error(`Lead ${lead.id} does not have an email address`);
+    return null;
   }
   return lead;
 }

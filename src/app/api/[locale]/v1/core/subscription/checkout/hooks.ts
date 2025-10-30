@@ -60,15 +60,29 @@ export function useSimplifiedCheckout(logger: EndpointLogger): {
     }
 
     try {
-      const result = await endpoint.create.mutateAsync({
+      // Set form values
+      endpoint.create.form.reset({
         planId,
         billingInterval,
         metadata,
       });
 
+      // Submit form
+      await endpoint.create.submitForm(undefined);
+
+      // Get response
+      const result = endpoint.create.response;
+
+      if (!result) {
+        return createErrorResponse(
+          "app.api.v1.core.subscription.checkout.error",
+          ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        );
+      }
+
       if (!result.success) {
         return createErrorResponse(
-          result.message,
+          result.message ?? "app.api.v1.core.subscription.checkout.error",
           ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           result.messageParams,
         );
@@ -93,7 +107,7 @@ export function useSimplifiedCheckout(logger: EndpointLogger): {
 
   return {
     createCheckout,
-    isPending: endpoint.create?.isPending ?? false,
+    isPending: endpoint.create?.isSubmitting ?? false,
     error: endpoint.create?.error ?? null,
   };
 }

@@ -267,6 +267,7 @@ export class FunctionalGeneratorsRepositoryImpl
       );
     } catch (error) {
       logger.error("❌ Error generating endpoints:", parseError(error));
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
       throw error;
     }
   }
@@ -288,6 +289,7 @@ export class FunctionalGeneratorsRepositoryImpl
       );
     } catch (error) {
       logger.error("❌ Error generating seeds:", parseError(error));
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
       throw error;
     }
   }
@@ -309,6 +311,7 @@ export class FunctionalGeneratorsRepositoryImpl
       logger.debug("✅ Cron tasks generated successfully");
     } catch (error) {
       logger.error("❌ Error generating cron tasks:", parseError(error));
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
       throw error;
     }
   }
@@ -330,6 +333,7 @@ export class FunctionalGeneratorsRepositoryImpl
       logger.debug("✅ tRPC router generated successfully");
     } catch (error) {
       logger.error("❌ Error generating tRPC router:", parseError(error));
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
       throw error;
     }
   }
@@ -405,6 +409,7 @@ export const runFunctionalGenerators = async (
     }
   } catch (error) {
     logger.error("❌ Error running functional generators:", parseError(error));
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
     throw error;
   }
 };

@@ -65,54 +65,73 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
 
           // Run oxlint if not skipped (fast Rust linter)
           if (!data.skipOxlint) {
+            logger.info("Starting Oxlint check...");
             promises.push(
-              oxlintRepository.execute(
-                {
-                  path: path || "./",
-                  verbose: logger.isDebugEnabled,
-                  fix: data.fix || false,
-                  timeout: data.timeout,
-                  cacheDir: "./.tmp",
-                },
-                locale,
-                logger,
-              ),
+              oxlintRepository
+                .execute(
+                  {
+                    path: path || "./",
+                    verbose: logger.isDebugEnabled,
+                    fix: data.fix || false,
+                    timeout: data.timeout,
+                    cacheDir: "./.tmp",
+                  },
+                  locale,
+                  logger,
+                )
+                .then((result) => {
+                  logger.info("✓ Oxlint check completed");
+                  return result;
+                }),
             );
           }
 
           // Run ESLint if not skipped (i18n + custom AST rules)
           if (!data.skipLint) {
+            logger.info("Starting ESLint check...");
             promises.push(
-              lintRepository.execute(
-                {
-                  path: path || "./",
-                  verbose: logger.isDebugEnabled,
-                  fix: data.fix || false,
-                  timeout: data.timeout,
-                  cacheDir: "./.tmp",
-                },
-                locale,
-                logger,
-              ),
+              lintRepository
+                .execute(
+                  {
+                    path: path || "./",
+                    verbose: logger.isDebugEnabled,
+                    fix: data.fix || false,
+                    timeout: data.timeout,
+                    cacheDir: "./.tmp",
+                  },
+                  locale,
+                  logger,
+                )
+                .then((result) => {
+                  logger.info("✓ ESLint check completed");
+                  return result;
+                }),
             );
           }
 
           // Run typecheck if not skipped
           if (!data.skipTypecheck) {
+            logger.info("Starting TypeScript check...");
             promises.push(
-              typecheckRepository.execute(
-                {
-                  path, // This can be undefined for full project check
-                  disableFilter: false,
-                },
-                logger,
-              ),
+              typecheckRepository
+                .execute(
+                  {
+                    path, // This can be undefined for full project check
+                    disableFilter: false,
+                  },
+                  logger,
+                )
+                .then((result) => {
+                  logger.info("✓ TypeScript check completed");
+                  return result;
+                }),
             );
           }
 
           return await Promise.allSettled(promises);
         }),
       );
+      logger.info("All checks completed");
 
       // Combine all issues from all checks
       const allIssues: Array<{

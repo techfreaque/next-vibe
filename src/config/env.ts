@@ -44,7 +44,7 @@ export const envSchema = envClientSchema.extend({
       return false;
     }
 
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Environment validation needs to throw for invalid configuration at startup
     throw new Error("The env EMAIL_SECURE must be a boolean");
   }),
   EMAIL_USER: z.string(),
@@ -58,7 +58,7 @@ export const envSchema = envClientSchema.extend({
       return false;
     }
 
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Environment validation needs to throw for invalid configuration at startup
     throw new Error("The env ENABLE_ANALYTICS must be a boolean");
   }),
 
@@ -144,7 +144,7 @@ export const envSchema = envClientSchema.extend({
       if (val === "false") {
         return false;
       }
-      // eslint-disable-next-line no-restricted-syntax
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Environment validation needs to throw for invalid configuration at startup
       throw new Error("The env IMAP_SEED_SECURE must be a boolean");
     })
     .optional(),
@@ -169,7 +169,7 @@ export const envSchema = envClientSchema.extend({
       return false;
     }
 
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Environment validation needs to throw for invalid configuration at startup
     throw new Error("The env LEADS_EMAIL_SECURE must be a boolean");
   }),
   LEADS_EMAIL_USER: z.string(),

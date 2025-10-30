@@ -31,7 +31,7 @@ import type { InferJwtPayloadTypeFromRoles } from "./trpc-types";
  */
 export interface TRPCContext<
   TUrlParams,
-  TUserRoleValue extends readonly UserRoleValue[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > {
   user: InferJwtPayloadTypeFromRoles<TUserRoleValue> | null;
 
@@ -60,7 +60,7 @@ export interface TRPCContext<
  */
 export async function createTRPCContext<
   TUrlParams,
-  TUserRoleValue extends readonly UserRoleValue[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 >(opts: {
   req: NextRequest;
   urlPathParams?: TUrlParams;
@@ -104,7 +104,7 @@ export async function createTRPCContext<
   // Authenticate user using the existing auth system
   // Use getAuthMinimalUser which properly handles PUBLIC role with leadId creation
   let user: JwtPayloadType;
-  let userRoles: UserRoleValue[] = [];
+  let userRoles: (typeof UserRoleValue)[] = [];
 
   try {
     // Try to get authenticated user first
@@ -179,10 +179,10 @@ export async function createTRPCContext<
 export async function createAuthenticatedTRPCContext(opts: {
   req: NextRequest;
   urlPathParams?: Record<string, string>;
-  requiredRoles?: readonly UserRoleValue[];
+  requiredRoles?: readonly (typeof UserRoleValue)[];
   locale: CountryLanguage;
 }): Promise<
-  TRPCContext<Record<string, string>, readonly UserRoleValue[]> & {
+  TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]> & {
     user: JwtPayloadType;
   }
 > {

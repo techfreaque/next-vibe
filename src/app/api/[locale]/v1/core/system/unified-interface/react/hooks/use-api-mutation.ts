@@ -33,11 +33,11 @@ export type MutationVariables<TRequest, TUrlVariables> = [TRequest] extends [
   never,
 ]
   ? [TUrlVariables] extends [never]
-    ? Record<string, never> // Both are never - empty object
-    : { requestData: TRequest; urlPathParams: TUrlVariables }
+  ? Record<string, never> // Both are never - empty object
+  : { requestData: TRequest; urlPathParams: TUrlVariables }
   : [TUrlVariables] extends [never]
-    ? { requestData: TRequest; urlPathParams?: never } // TRequest exists, TUrlVariables is never - urlPathParams is optional
-    : { requestData: TRequest; urlPathParams: TUrlVariables };
+  ? { requestData: TRequest; urlPathParams?: never } // TRequest exists, TUrlVariables is never - urlPathParams is optional
+  : { requestData: TRequest; urlPathParams: TUrlVariables };
 
 /**
  * Mutation context type for tracking additional mutation state
@@ -111,7 +111,13 @@ export type EnhancedMutationResult<TResponse, TRequest, TUrlVariables> = Omit<
  * @returns Mutation result
  */
 export function useApiMutation<
-  TEndpoint extends CreateApiEndpoint<string, Methods, readonly string[], unknown>,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
+  >,
 >(
   endpoint: TEndpoint,
   logger: EndpointLogger,
@@ -318,8 +324,8 @@ export function useApiMutation<
         "data" in mutationState.data
         ? (mutationState.data as ResponseType<TEndpoint["TResponseOutput"]>)
         : createSuccessResponse(
-            mutationState.data as TEndpoint["TResponseOutput"],
-          )
+          mutationState.data as TEndpoint["TResponseOutput"],
+        )
       : undefined;
 
     // Use local error state if it exists, otherwise fall back to store error
@@ -347,9 +353,9 @@ export function useApiMutation<
       failureReason: null,
       context: undefined as
         | MutationContext<
-            TEndpoint["TRequestOutput"],
-            TEndpoint["TUrlVariablesOutput"]
-          >
+          TEndpoint["TRequestOutput"],
+          TEndpoint["TUrlVariablesOutput"]
+        >
         | undefined,
     };
   }, [mutationState, mutate, mutateAsync, reset, localError, setErrorType]);

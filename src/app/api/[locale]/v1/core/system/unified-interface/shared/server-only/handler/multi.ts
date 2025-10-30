@@ -28,7 +28,7 @@ export function endpointsHandler<const T>(
       CreateApiEndpoint<
         string,
         Methods,
-        readonly UserRoleValue[],
+        readonly (typeof UserRoleValue)[],
         Record<string, string | number | boolean | null>
       >
     >,
@@ -48,7 +48,7 @@ export function endpointsHandler<const T>(
     const endpoint = definitions[method] as CreateApiEndpoint<
       string,
       Methods,
-      readonly UserRoleValue[],
+      readonly (typeof UserRoleValue)[],
       Record<string, string | number | boolean | null>
     >;
     const methodConfig = methodConfigs[method];
@@ -64,13 +64,13 @@ export function endpointsHandler<const T>(
       handler: methodConfig.handler,
       email: methodConfig.email
         ? {
-            afterHandlerEmails: methodConfig.email,
-          }
+          afterHandlerEmails: methodConfig.email,
+        }
         : undefined,
       sms: methodConfig.sms
         ? {
-            afterHandlerSms: methodConfig.sms,
-          }
+          afterHandlerSms: methodConfig.sms,
+        }
         : undefined,
     });
 

@@ -374,7 +374,7 @@ export async function navigateFolders(
     clearScreen();
   } catch (error) {
     console.error("Error navigating folders:", error);
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
     throw error;
   }
 }

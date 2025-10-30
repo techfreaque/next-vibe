@@ -1,6 +1,7 @@
 "use client";
 
 import { Brain, Check, ChevronDown, Copy, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useState } from "react";
@@ -308,15 +309,15 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
           ),
 
           a: ({ href, children }) => (
-            <a
-              href={href}
+            <Link
+              href={href || "#"}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 inline-flex items-center gap-1 underline underline-offset-2 decoration-2 hover:decoration-blue-600 dark:hover:decoration-blue-400 transition-all duration-200 font-medium"
             >
               {children}
               <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 opacity-70" />
-            </a>
+            </Link>
           ),
 
           img: ({ src, alt }) => (
@@ -436,6 +437,15 @@ function CodeBlock({
   );
 }
 
+// Helper functions for image modal
+function handleImageInModalClick(e: React.MouseEvent): void {
+  e.stopPropagation();
+}
+
+function handleImageInModalKeyDown(e: React.KeyboardEvent): void {
+  e.stopPropagation();
+}
+
 // Image component with modal
 function MarkdownImage({
   src,
@@ -450,15 +460,35 @@ function MarkdownImage({
     return <></>;
   }
 
+  const handleImageClick = (): void => {
+    setIsOpen(true);
+  };
+
+  const handleModalClose = (): void => {
+    setIsOpen(false);
+  };
+
+  const handleModalKeyDown = (e: React.KeyboardEvent): void => {
+    if (e.key === "Escape") {
+      setIsOpen(false);
+    }
+  };
+
   return (
     <>
       <div className="my-6 group">
-        <img
-          src={src}
-          alt={alt}
-          className="max-w-full h-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
-          onClick={() => setIsOpen(true)}
-        />
+        <button
+          type="button"
+          onClick={handleImageClick}
+          className="block w-full text-left"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src}
+            alt={alt}
+            className="max-w-full h-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
+          />
+        </button>
         {alt && (
           <p className="text-sm text-slate-500 dark:text-slate-400 italic mt-2 text-center">
             {alt}
@@ -466,13 +496,16 @@ function MarkdownImage({
         )}
       </div>
       {isOpen && (
-        <div
+        <button
+          type="button"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in duration-200"
-          onClick={() => setIsOpen(false)}
+          onClick={handleModalClose}
+          onKeyDown={handleModalKeyDown}
         >
           <button
+            type="button"
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-            onClick={() => setIsOpen(false)}
+            onClick={handleModalClose}
           >
             <svg
               className="w-6 h-6"
@@ -488,13 +521,15 @@ function MarkdownImage({
               />
             </svg>
           </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}
             alt={alt}
             className="max-w-full max-h-full rounded-xl shadow-2xl animate-in zoom-in-95 duration-200"
-            onClick={(e) => e.stopPropagation()}
+            onClick={handleImageInModalClick}
+            onKeyDown={handleImageInModalKeyDown}
           />
-        </div>
+        </button>
       )}
     </>
   );

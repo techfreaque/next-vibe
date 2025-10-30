@@ -202,7 +202,7 @@ class BraveSearchService {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        // eslint-disable-next-line no-restricted-syntax
+        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Internal helper throws, caught by caller
         throw new BraveSearchError(
           // eslint-disable-next-line i18next/no-literal-string
           `Brave Search API error: ${response.statusText}`,
@@ -214,7 +214,7 @@ class BraveSearchService {
       return this.parseResults(data, config.includeNews);
     } catch (error) {
       clearTimeout(timeoutId);
-      // eslint-disable-next-line no-restricted-syntax
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Re-throw to propagate error to caller
       throw error;
     }
   }
@@ -272,12 +272,12 @@ class BraveSearchService {
    */
   private validateQuery(query: string): void {
     if (!query || query.trim().length === 0) {
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Validation helper throws, caught by caller
       throw new BraveSearchError("Search query cannot be empty");
     }
 
     if (query.length > 400) {
-      // eslint-disable-next-line no-restricted-syntax
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Validation helper throws, caught by caller
       throw new BraveSearchError(
         // eslint-disable-next-line i18next/no-literal-string
         "Search query is too long (max 400 characters)",

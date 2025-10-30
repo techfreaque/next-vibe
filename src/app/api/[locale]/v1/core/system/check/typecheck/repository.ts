@@ -69,16 +69,16 @@ function createTempTsConfig(
     const tsConfigContent = readFileSync("tsconfig.json", "utf8");
     const parsedJsonResult = parseJsonWithComments(tsConfigContent);
     if (!parsedJsonResult.success) {
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Build infrastructure needs to throw for configuration errors
       throw new Error("Failed to parse tsconfig.json");
     }
     mainTsConfig = TsConfigSchema.parse(parsedJsonResult.data);
   } catch (error) {
-    /* eslint-disable no-restricted-syntax, i18next/no-literal-string */
+    /* eslint-disable oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Build infrastructure needs to throw for configuration errors */
     throw new Error(
       `Failed to read or parse tsconfig.json: ${error instanceof Error ? error.message : String(error)}`, { cause: error },
     );
-    /* eslint-enable no-restricted-syntax, i18next/no-literal-string */
+    /* eslint-enable oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string */
   }
   const generalFilesToInclude = (mainTsConfig.include || []).filter(
     (includePattern) =>

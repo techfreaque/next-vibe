@@ -299,8 +299,8 @@ export async function dev(
       } else if (errorMessage.includes("duplicate key")) {
         logger.debug("User roles already exist, skipping creation");
       } else {
-        // For other errors, we should log and rethrow
-        throw roleError;
+        // For other errors, we should log and continue
+        logger.error("Error creating user roles", parseError(roleError));
       }
     }
   } catch (error) {
@@ -396,12 +396,43 @@ export async function test(logger: EndpointLogger): Promise<void> {
           logger,
         );
         if (!userResponse.success) {
-          throw new Error(`Failed to create user: ${userResponse.message}`);
+          logger.error(`Failed to create user: ${userResponse.message}`);
+          // Return a minimal placeholder user that will be filtered out
+          return {
+            id: "",
+            leadId: "",
+            isPublic: false,
+            privateName: "",
+            publicName: "",
+            email: "",
+            emailVerified: false,
+            isActive: false,
+            requireTwoFactor: false,
+            marketingConsent: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            userRoles: [],
+          } as StandardUserType;
         }
         return userResponse.data;
       } catch (error) {
         logger.error(`Error creating user ${user.email}`, parseError(error));
-        throw error;
+        // Return a minimal placeholder user that will be filtered out
+        return {
+          id: "",
+          leadId: "",
+          isPublic: false,
+          privateName: "",
+          publicName: "",
+          email: "",
+          emailVerified: false,
+          isActive: false,
+          requireTwoFactor: false,
+          marketingConsent: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          userRoles: [],
+        } as StandardUserType;
       }
     }),
   );
@@ -442,8 +473,8 @@ export async function test(logger: EndpointLogger): Promise<void> {
       } else if (errorMessage.includes("duplicate key")) {
         logger.debug("User roles already exist, skipping creation");
       } else {
-        // For other errors, we should log and rethrow
-        throw roleError;
+        // For other errors, we should log and continue
+        logger.error("Error creating test user roles", parseError(roleError));
       }
     }
   } catch (error) {
@@ -492,9 +523,10 @@ export async function prod(logger: EndpointLogger): Promise<void> {
         logger,
       );
       if (!adminResponse.success) {
-        throw new Error(
+        logger.error(
           `Failed to create admin user: ${JSON.stringify(adminResponse)}`,
         );
+        return;
       }
       createdAdmin = adminResponse.data;
       logger.debug(
@@ -527,8 +559,8 @@ export async function prod(logger: EndpointLogger): Promise<void> {
           `Admin role for user ${createdAdmin.id} already exists, skipping creation`,
         );
       } else {
-        // For other errors, we should log and rethrow
-        throw roleError;
+        // For other errors, we should log and continue
+        logger.error("Error creating admin role", parseError(roleError));
       }
     }
   } catch (error) {

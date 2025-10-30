@@ -1,15 +1,11 @@
-import react from "@vitejs/plugin-react";
 import path from "node:path";
+
+import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [
-    tsconfigPaths({
-      ignoreConfigErrors: true,
-    }),
-    react(),
-  ],
+  plugins: [tsconfigPaths({ ignoreConfigErrors: true }), ...react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

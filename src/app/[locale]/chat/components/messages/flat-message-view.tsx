@@ -559,7 +559,12 @@ function FlatMessage({
                       content,
                       onBranchMessage,
                     )
-                : undefined
+                : async (): Promise<void> => {
+                    logger.warn(
+                      "FlatMessageView",
+                      "Branch operation not available - onBranchMessage handler not provided",
+                    );
+                  }
             }
             onCancel={messageActions.cancelAction}
             onModelChange={onModelChange}
@@ -575,8 +580,26 @@ function FlatMessage({
             descriptionKey="app.chat.flatView.retryModal.description"
             selectedModel={selectedModel}
             selectedPersona={selectedPersona}
-            onModelChange={onModelChange || undefined}
-            onPersonaChange={onPersonaChange || undefined}
+            onModelChange={
+              onModelChange ||
+              ((model: ModelId): void => {
+                logger.debug(
+                  "FlatMessageView",
+                  "Model selection changed (no handler)",
+                  { model },
+                );
+              })
+            }
+            onPersonaChange={
+              onPersonaChange ||
+              ((persona: string): void => {
+                logger.debug(
+                  "FlatMessageView",
+                  "Persona selection changed (no handler)",
+                  { persona },
+                );
+              })
+            }
             onConfirm={(): Promise<void> =>
               messageActions.handleConfirmRetry(message.id, onRetryMessage)
             }
@@ -647,8 +670,26 @@ function FlatMessage({
             descriptionKey="app.chat.flatView.answerModal.description"
             selectedModel={selectedModel}
             selectedPersona={selectedPersona}
-            onModelChange={onModelChange || undefined}
-            onPersonaChange={onPersonaChange || undefined}
+            onModelChange={
+              onModelChange ||
+              ((model: ModelId): void => {
+                logger.debug(
+                  "FlatMessageView",
+                  "Model selection changed (no handler)",
+                  { model },
+                );
+              })
+            }
+            onPersonaChange={
+              onPersonaChange ||
+              ((persona: string): void => {
+                logger.debug(
+                  "FlatMessageView",
+                  "Persona selection changed (no handler)",
+                  { persona },
+                );
+              })
+            }
             showInput={true}
             inputValue={messageActions.answerContent}
             onInputChange={messageActions.setAnswerContent}

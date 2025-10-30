@@ -3,8 +3,9 @@
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useAIStreamStore } from "@/app/api/[locale]/v1/core/agent/ai-stream/hooks/store";
 import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
 import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -86,6 +87,61 @@ export function ChatMessages({
   // Use custom hook for message action state management
   const messageActions = useMessageActions(logger);
 
+  // Get streaming messages from AI stream store
+  const streamingMessages = useAIStreamStore((state) => state.streamingMessages);
+
+  // Merge streaming messages with persisted messages for instant UI updates
+  const mergedMessages = useMemo(() => {
+    const messageMap = new Map<string, ChatMessage>();
+
+    // Add all persisted messages first
+    for (const msg of messages) {
+      messageMap.set(msg.id, msg);
+    }
+
+    // Override with streaming messages (they have the latest content)
+    for (const streamMsg of Object.values(streamingMessages)) {
+      const existingMsg = messageMap.get(streamMsg.messageId);
+      if (existingMsg) {
+        // Update existing message with streaming content
+        messageMap.set(streamMsg.messageId, {
+          ...existingMsg,
+          content: streamMsg.content,
+          toolCalls: streamMsg.toolCalls,
+        });
+      } else {
+        // Add new streaming message with all required fields
+        messageMap.set(streamMsg.messageId, {
+          id: streamMsg.messageId,
+          threadId: streamMsg.threadId,
+          role: streamMsg.role,
+          content: streamMsg.content,
+          parentId: streamMsg.parentId,
+          depth: streamMsg.depth,
+          model: streamMsg.model ?? null,
+          persona: streamMsg.persona ?? null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          toolCalls: streamMsg.toolCalls,
+          sequenceId: streamMsg.sequenceId ?? null,
+          sequenceIndex: streamMsg.sequenceIndex ?? 0,
+          // Required fields with defaults
+          authorId: null,
+          authorName: null,
+          isAI: streamMsg.role === "assistant",
+          errorType: null,
+          errorMessage: null,
+          edited: false,
+          tokens: null,
+          upvotes: null,
+          downvotes: null,
+        });
+      }
+    }
+
+    return [...messageMap.values()];
+  }, [messages, streamingMessages]);
+
   // Check if user is at bottom of scroll
   const isAtBottom = useCallback((): boolean => {
     const container = messagesContainerRef.current;
@@ -159,7 +215,7 @@ export function ChatMessages({
           paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,
         }}
       >
-        {Object.keys(messages).length === 0 && !isLoading && onSendMessage ? (
+        {mergedMessages.length === 0 && !isLoading && onSendMessage ? (
           <Div
             className="flex items-center justify-center"
             style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}
@@ -174,7 +230,7 @@ export function ChatMessages({
           // Flat view (4chan style) - ALL messages in chronological order
           ((): JSX.Element => {
             // Get ALL messages from thread, sorted by timestamp
-            const allMessages = Object.values(messages).toSorted(
+            const allMessages = mergedMessages.toSorted(
               (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
             );
             return (
@@ -214,14 +270,13 @@ export function ChatMessages({
         ) : viewMode === "threaded" ? (
           // Threaded view (Reddit style) - Show ALL messages, not just current path
           ((): JSX.Element[] => {
-            const allMessages = Object.values(messages);
-            const rootMessages = getRootMessages(allMessages, null);
+            const rootMessages = getRootMessages(mergedMessages, null);
             return rootMessages.map((rootMessage) => (
               <ThreadedMessage
                 key={rootMessage.id}
                 message={rootMessage}
-                replies={getDirectReplies(allMessages, rootMessage.id)}
-                allMessages={allMessages}
+                replies={getDirectReplies(mergedMessages, rootMessage.id)}
+                allMessages={mergedMessages}
                 depth={0}
                 selectedModel={selectedModel}
                 selectedPersona={selectedPersona}
@@ -242,9 +297,8 @@ export function ChatMessages({
         ) : (
           // Linear view (ChatGPT style) - Build path through message tree
           ((): JSX.Element => {
-            const allMessages = Object.values(messages);
             const { path, branchInfo } = buildMessagePath(
-              allMessages,
+              mergedMessages,
               branchIndices,
             );
 
@@ -281,7 +335,8 @@ export function ChatMessages({
           })()
         )}
 
-        {isLoading && <LoadingIndicator />}
+        {/* Only show loading indicator if no messages exist yet */}
+        {isLoading && mergedMessages.length === 0 && <LoadingIndicator />}
 
         <Div ref={messagesEndRef} />
       </Div>

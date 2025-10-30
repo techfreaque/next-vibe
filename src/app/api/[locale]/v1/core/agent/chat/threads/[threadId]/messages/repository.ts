@@ -133,6 +133,8 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         sequenceId: msg.sequenceId ?? null,
         sequenceIndex: msg.sequenceIndex ?? 0,
         toolCalls: msg.metadata?.toolCalls || null,
+        createdAt: msg.createdAt.toISOString(),
+        updatedAt: msg.updatedAt.toISOString(),
       }));
 
       return createSuccessResponse({ messages: mappedMessages });
@@ -295,7 +297,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
 
       return createSuccessResponse({
         id: message.id,
-        createdAt: message.createdAt,
+        createdAt: message.createdAt.toISOString(),
       });
     } catch (error) {
       logger.error("Error creating message", parseError(error));

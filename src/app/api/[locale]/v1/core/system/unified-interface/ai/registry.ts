@@ -87,6 +87,36 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
   }
 
   /**
+   * Lazy load specific endpoints by tool names
+   * This method dynamically imports only the requested endpoint definitions
+   * instead of loading all endpoints during initialization
+   *
+   * @param toolNames - Array of tool names to load
+   * @param user - User context for permission filtering (optional)
+   * @param criteria - Additional filter criteria (optional)
+   * @returns Array of DiscoveredEndpoint objects for the requested tools
+   */
+  async getEndpointsByToolNamesLazy(
+    toolNames: string[],
+    user?: AIToolExecutionContext["user"],
+    criteria?: ToolFilterCriteria,
+  ): Promise<DiscoveredEndpoint[]> {
+    // Use base class lazy loading method
+    let endpoints = await super.getEndpointsByToolNamesLazy(
+      toolNames,
+      user,
+      Platform.AI,
+    );
+
+    // Apply additional criteria if provided
+    if (criteria) {
+      endpoints = toolFilter.filterEndpointsByCriteria(endpoints, criteria);
+    }
+
+    return endpoints;
+  }
+
+  /**
    * Execute a tool
    */
   async executeTool(

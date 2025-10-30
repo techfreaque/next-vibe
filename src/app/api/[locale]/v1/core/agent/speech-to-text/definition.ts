@@ -20,7 +20,7 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { sttLanguageOptions, sttProviderOptions } from "./enum";
+import { SttLanguageOptions, SttProviderOptions } from "./enum";
 
 /**
  * Speech-to-Text Endpoint (POST)
@@ -105,7 +105,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.speechToText.post.provider.description",
           layout: { columns: 6 },
-          options: sttProviderOptions,
+          options: SttProviderOptions,
         },
         z.string().default("openai"),
       ),
@@ -117,7 +117,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.speechToText.post.language.description",
           layout: { columns: 6 },
-          options: sttLanguageOptions,
+          options: SttLanguageOptions,
         },
         z.string().default("en"),
       ),

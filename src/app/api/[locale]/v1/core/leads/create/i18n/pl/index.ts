@@ -145,9 +145,12 @@ export const translations: typeof enTranslations = {
         "Dziękujemy za zainteresowanie naszymi usługami. Otrzymaliśmy Twoje informacje i nasz zespół jest gotowy pomóc Ci osiągnąć cele biznesowe.",
       nextSteps: {
         title: "Co dalej?",
+        step1Number: "1.",
         step1: "Nasz zespół przejrzy profil i cele Twojej firmy",
+        step2Number: "2.",
         step2:
           "Otrzymasz spersonalizowaną propozycję konsultacji w ciągu 24 godzin",
+        step3Number: "3.",
         step3: "Umówimy rozmowę, aby omówić Twoje konkretne potrzeby i cele",
       },
       cta: {

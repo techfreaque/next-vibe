@@ -19,7 +19,7 @@ import type { TRPCContext } from "./trpc-trpc-context";
  */
 const t = initTRPC
   .context<
-    TRPCContext<Record<string, string>, readonly UserRoleValue[]>
+    TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]>
   >()
   .create({
     errorFormatter({ shape, error }) {
@@ -79,7 +79,7 @@ export const authenticatedProcedure = publicProcedure.use(isAuthenticated);
  * Creates middleware that checks for specific user roles
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export function requireRoles<TRoles extends readonly UserRoleValue[]>(
+export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
   roles: TRoles,
   logger: EndpointLogger,
 ) {

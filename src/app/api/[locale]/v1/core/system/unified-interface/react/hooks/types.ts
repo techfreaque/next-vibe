@@ -31,19 +31,20 @@ export type InferApiFormReturn<T> =
   T extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
-    unknown
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
   >
-    ? T extends {
-        types: {
-          RequestOutput: infer TRequestOutput;
-          ResponseOutput: infer TResponseOutput;
-          UrlVariablesOutput: infer TUrlVariablesOutput;
-        };
-      }
-      ? ApiFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
-      : never
-    : never;
+  ? T extends {
+    types: {
+      RequestOutput: infer TRequestOutput;
+      ResponseOutput: infer TResponseOutput;
+      UrlVariablesOutput: infer TUrlVariablesOutput;
+    };
+  }
+  ? ApiFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
+  : never
+  : never;
 
 /**
  * Extract types from an CreateApiEndpoint for ApiQueryReturn
@@ -53,13 +54,14 @@ export type InferApiQueryReturn<T> =
   T extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
-    unknown
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
   >
-    ? T extends { types: { ResponseOutput: infer TResponseOutput } }
-      ? ApiQueryReturn<TResponseOutput>
-      : never
-    : never;
+  ? T extends { types: { ResponseOutput: infer TResponseOutput } }
+  ? ApiQueryReturn<TResponseOutput>
+  : never
+  : never;
 
 /**
  * Extract types from an CreateApiEndpoint for ApiQueryFormReturn
@@ -69,19 +71,20 @@ export type InferApiQueryFormReturn<T> =
   T extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
-    unknown
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
   >
-    ? T extends {
-        types: {
-          RequestOutput: infer TRequestOutput;
-          ResponseOutput: infer TResponseOutput;
-          UrlVariablesOutput: infer TUrlVariablesOutput;
-        };
-      }
-      ? ApiQueryFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
-      : never
-    : never;
+  ? T extends {
+    types: {
+      RequestOutput: infer TRequestOutput;
+      ResponseOutput: infer TResponseOutput;
+      UrlVariablesOutput: infer TUrlVariablesOutput;
+    };
+  }
+  ? ApiQueryFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
+  : never
+  : never;
 
 /**
  * Extract types from an CreateApiEndpoint for EnhancedMutationResult
@@ -91,23 +94,24 @@ export type InferEnhancedMutationResult<T> =
   T extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
-    unknown
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
   >
-    ? T extends {
-        types: {
-          RequestOutput: infer TRequestOutput;
-          ResponseOutput: infer TResponseOutput;
-          UrlVariablesOutput: infer TUrlVariablesOutput;
-        };
-      }
-      ? EnhancedMutationResult<
-          TResponseOutput,
-          TRequestOutput,
-          TUrlVariablesOutput
-        >
-      : never
-    : never;
+  ? T extends {
+    types: {
+      RequestOutput: infer TRequestOutput;
+      ResponseOutput: infer TResponseOutput;
+      UrlVariablesOutput: infer TUrlVariablesOutput;
+    };
+  }
+  ? EnhancedMutationResult<
+    TResponseOutput,
+    TRequestOutput,
+    TUrlVariablesOutput
+  >
+  : never
+  : never;
 
 /**
  * Enhanced query result with additional loading state info

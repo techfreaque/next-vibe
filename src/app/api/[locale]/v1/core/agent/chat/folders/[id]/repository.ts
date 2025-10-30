@@ -66,8 +66,8 @@ export async function getFolder(
               string,
               string | number | boolean | null
             >) || {},
-          createdAt: new Date(folder.createdAt),
-          updatedAt: new Date(folder.updatedAt),
+          createdAt: folder.createdAt.toISOString(),
+          updatedAt: folder.updatedAt.toISOString(),
         },
       },
     });
@@ -157,8 +157,8 @@ export async function updateFolder(
               string,
               string | number | boolean | null
             >) || {},
-          createdAt: new Date(updatedFolder.createdAt),
-          updatedAt: new Date(updatedFolder.updatedAt),
+          createdAt: updatedFolder.createdAt.toISOString(),
+          updatedAt: updatedFolder.updatedAt.toISOString(),
         },
       },
     });

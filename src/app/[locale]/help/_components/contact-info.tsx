@@ -34,12 +34,14 @@ export default function ContactInfo({
                 {t("app.help.components.pages.help.info.email")}
               </h3>
             </div>
-            <a
-              href={`mailto:${supportEmail}`}
-              className="text-blue-600 dark:text-blue-400 hover:underline ml-8"
+            <button
+              onClick={() => {
+                window.location.href = `mailto:${supportEmail}`;
+              }}
+              className="text-blue-600 dark:text-blue-400 hover:underline ml-8 bg-transparent border-none p-0 cursor-pointer"
             >
               {supportEmail}
-            </a>
+            </button>
           </div>
 
           <div>

@@ -432,9 +432,9 @@ export function useAIStream(
               case StreamEventType.CONTENT_DELTA: {
                 const eventData = event.data as ContentDeltaEventData;
                 // Get fresh state from store to avoid stale closure
-                const currentMessage =
+                let currentMessage =
                   useAIStreamStore.getState().streamingMessages[
-                    eventData.messageId
+                  eventData.messageId
                   ];
 
                 logger.info("[DEBUG] CONTENT_DELTA event received", {
@@ -445,6 +445,31 @@ export function useAIStream(
                   currentContent: currentMessage?.content,
                   currentContentType: typeof currentMessage?.content,
                 });
+
+                // If message doesn't exist yet, create it (race condition fix)
+                if (!currentMessage) {
+                  logger.warn("[DEBUG] CONTENT_DELTA received before MESSAGE_CREATED, creating placeholder", {
+                    messageId: eventData.messageId,
+                  });
+
+                  // Create a placeholder message
+                  store.addMessage({
+                    messageId: eventData.messageId,
+                    threadId: data.threadId || "",
+                    role: ChatMessageRole.ASSISTANT,
+                    content: "",
+                    parentId: null,
+                    depth: 0,
+                    model: null,
+                    persona: null,
+                    isStreaming: true,
+                    sequenceId: null,
+                    sequenceIndex: 0,
+                  });
+
+                  // Get the message we just created
+                  currentMessage = useAIStreamStore.getState().streamingMessages[eventData.messageId];
+                }
 
                 if (currentMessage && eventData.delta) {
                   const newContent =
@@ -459,7 +484,7 @@ export function useAIStream(
                       const { useChatStore } = await import("../../chat/store");
                       const chatThread =
                         useChatStore.getState().threads[
-                          currentMessage.threadId
+                        currentMessage.threadId
                         ];
                       const isIncognito =
                         chatThread?.rootFolderId === "incognito";
@@ -520,7 +545,7 @@ export function useAIStream(
                 // Get fresh state from store to avoid stale closure
                 const currentMessage =
                   useAIStreamStore.getState().streamingMessages[
-                    eventData.messageId
+                  eventData.messageId
                   ];
 
                 logger.info("[DEBUG] REASONING_DELTA event received", {
@@ -556,7 +581,7 @@ export function useAIStream(
                         // Save to localStorage for incognito mode
                         const chatThread =
                           useChatStore.getState().threads[
-                            currentMessage.threadId
+                          currentMessage.threadId
                           ];
                         const isIncognito =
                           chatThread?.rootFolderId === "incognito";
@@ -614,7 +639,7 @@ export function useAIStream(
                 // Mark reasoning message as complete
                 const currentMessage =
                   useAIStreamStore.getState().streamingMessages[
-                    eventData.messageId
+                  eventData.messageId
                   ];
                 if (currentMessage) {
                   // Update streaming store
@@ -663,7 +688,7 @@ export function useAIStream(
                 // Use getState() to get the latest state (in case of batched updates)
                 const currentMessage =
                   useAIStreamStore.getState().streamingMessages[
-                    eventData.messageId
+                  eventData.messageId
                   ];
                 if (currentMessage) {
                   logger.info("[DEBUG] Adding tool call to streaming message", {
@@ -680,7 +705,7 @@ export function useAIStream(
                   // Verify it was added
                   const updatedMessage =
                     useAIStreamStore.getState().streamingMessages[
-                      eventData.messageId
+                    eventData.messageId
                     ];
                   logger.info("[DEBUG] Tool call added, new state", {
                     messageId: eventData.messageId,
@@ -710,7 +735,7 @@ export function useAIStream(
                 // Update the tool call with the result
                 const currentMessage =
                   useAIStreamStore.getState().streamingMessages[
-                    eventData.messageId
+                  eventData.messageId
                   ];
                 if (currentMessage?.toolCalls) {
                   const toolCallIndex = currentMessage.toolCalls.findIndex(

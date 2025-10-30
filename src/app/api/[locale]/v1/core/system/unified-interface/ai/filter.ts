@@ -127,7 +127,7 @@ export class ToolFilter implements IToolFilter {
 
     // Filter out opt-out roles from allowed roles for permission check
     const effectiveAllowedRoles = endpoint.definition.allowedRoles.filter(
-      (role: (typeof UserRoleValue)[number]) => !this.isOptOutRole(role),
+      (role: typeof UserRoleValue) => !this.isOptOutRole(role),
     );
 
     // Public user - only public endpoints
@@ -178,7 +178,7 @@ export class ToolFilter implements IToolFilter {
   /**
    * Check if role is an opt-out role
    */
-  private isOptOutRole(role: (typeof UserRoleValue)[number]): boolean {
+  private isOptOutRole(role: typeof UserRoleValue): boolean {
     return (
       role === UserRole.CLI_OFF ||
       role === UserRole.AI_TOOL_OFF ||
@@ -189,8 +189,8 @@ export class ToolFilter implements IToolFilter {
   /**
    * Get role priority (higher = more privileged)
    */
-  private getRolePriority(role: (typeof UserRoleValue)[number]): number {
-    const priorities: Record<(typeof UserRoleValue)[number], number> = {
+  private getRolePriority(role: typeof UserRoleValue): number {
+    const priorities: Record<typeof UserRoleValue, number> = {
       [UserRole.PUBLIC]: 0,
       [UserRole.CUSTOMER]: 5,
       [UserRole.PARTNER_EMPLOYEE]: 20,
@@ -209,8 +209,8 @@ export class ToolFilter implements IToolFilter {
    * Check if role A can access role B's resources
    */
   canAccessRole(
-    userRole: (typeof UserRoleValue)[number],
-    requiredRole: (typeof UserRoleValue)[number],
+    userRole: typeof UserRoleValue,
+    requiredRole: typeof UserRoleValue,
   ): boolean {
     // Opt-out roles can't be used for access checks
     if (this.isOptOutRole(requiredRole)) {
@@ -263,7 +263,7 @@ export class ToolFilter implements IToolFilter {
 
       for (const role of endpoint.definition.allowedRoles) {
         // Only count actual user roles, not opt-out roles
-        const roleValue = role as (typeof UserRoleValue)[number];
+        const roleValue = role as typeof UserRoleValue;
         if (!this.isOptOutRole(roleValue)) {
           counts[roleValue] = (counts[roleValue] || 0) + 1;
         }

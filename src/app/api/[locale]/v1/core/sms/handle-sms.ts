@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { performance } from "node:perf_hooks";
 
 import type { UndefinedType } from "next-vibe/shared/types/common.schema";

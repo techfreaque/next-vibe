@@ -1,4 +1,4 @@
-import { Button, Section, Text } from "@react-email/components";
+import { Button, Link, Section, Text } from "@react-email/components";
 import type React from "react";
 import type { JSX } from "react";
 
@@ -383,13 +383,12 @@ function renderAdminSubscriptionNotificationEmailContent(
               )}
               :
             </Text>{" "}
-            {/* eslint-disable-next-line eslint-plugin-next/no-html-link-for-pages */}
-            <a
+            <Link
               href={`mailto:${user.email}`}
               style={{ color: "#3b82f6", textDecoration: "none" }}
             >
               {user.email}
-            </a>
+            </Link>
           </Text>
 
           <Text

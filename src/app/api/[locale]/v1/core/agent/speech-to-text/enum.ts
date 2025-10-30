@@ -2,14 +2,14 @@
  * Speech-to-Text Enums
  */
 
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
 /**
  * STT Provider enum
  */
 export const {
   enum: SttProvider,
-  options: sttProviderOptions,
+  options: SttProviderOptions,
   Value: SttProviderValue,
 } = createEnumOptions({
   OPENAI: "app.api.v1.core.agent.speechToText.providers.openai",
@@ -27,7 +27,7 @@ export const {
  */
 export const {
   enum: SttLanguage,
-  options: sttLanguageOptions,
+  options: SttLanguageOptions,
   Value: SttLanguageValue,
 } = createEnumOptions({
   EN: "app.api.v1.core.agent.speechToText.languages.en",

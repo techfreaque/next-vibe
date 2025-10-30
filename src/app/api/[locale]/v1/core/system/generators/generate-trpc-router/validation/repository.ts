@@ -126,7 +126,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
 
         case "VALIDATE_ROUTE_FILE": {
           if (!filePath) {
-            // eslint-disable-next-line i18next/no-literal-string, no-restricted-syntax
+            // eslint-disable-next-line i18next/no-literal-string, oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
             throw new Error("File path is required for route file validation");
           }
           const fileValidation = this.validateRouteFile(
@@ -191,7 +191,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
         }
 
         default: {
-          // eslint-disable-next-line i18next/no-literal-string, no-restricted-syntax
+          // eslint-disable-next-line i18next/no-literal-string, oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
           throw new Error(`Unknown TRPC validation operation: ${operation}`);
         }
       }

@@ -40,7 +40,7 @@ export const envClientSchema = z.object({
       return false;
     }
 
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Environment validation needs to throw for invalid configuration at startup
     throw new Error(
       `The env NEXT_PUBLIC_DEBUG_PRODUCTION must be a boolean, received: ${val}`,
     );

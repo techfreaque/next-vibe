@@ -40,7 +40,7 @@ export function useEndpointCreate<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     UnifiedField<z.ZodTypeAny>
   >,
 >(

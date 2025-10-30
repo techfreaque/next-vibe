@@ -6,8 +6,8 @@
  * It supports both oxlint (fast Rust linter) and ESLint (for features oxlint doesn't support).
  *
  * Division of Responsibilities:
- * - Oxlint: Handles JS/TS/TSX files for fast linting (core rules, TypeScript, React, etc.)
- * - ESLint: Handles i18n checking and custom AST rules that oxlint doesn't support
+ * - Oxlint: Handles JS/TS/TSX files for fast linting (core rules, TypeScript, React, i18n, restricted-syntax)
+ * - ESLint: Handles import sorting, React hooks, and TypeScript-specific rules that oxlint doesn't support yet
  * - Prettier: Handles code formatting
  */
 
@@ -18,6 +18,10 @@ import type {
   PrettierConfig,
 } from "./src/app/api/[locale]/v1/core/system/check/oxlint/types";
 
+// Get project root directory (process is available at runtime via Node.js)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const projectRoot = (globalThis as any).process?.cwd() ?? "";
+
 // ============================================================
 // Configuration Switches
 // ============================================================
@@ -25,14 +29,13 @@ import type {
 const enableI18n = true;
 const enableReactRules = true;
 const enableAccessibilityRules = true;
-const enableImportRules = false; // Disabled in oxlint due to bugs with export * re-exports, ESLint handles import checking
+const enableImportRules = false;
 const enablePromiseRules = true;
 const enableNodeRules = true;
-const enablePedanticRules = false; // Set to false to reduce noise
+const enablePedanticRules = false;
 
 // ============================================================
-// Oxlint Configuration (Fast Rust Linter)
-// Handles: JS/TS/TSX files for core linting
+// Oxlint Configuration
 // ============================================================
 
 export const oxlintConfig: OxlintConfig = {
@@ -50,11 +53,20 @@ export const oxlintConfig: OxlintConfig = {
     "nextjs",
   ],
 
+  jsPlugins: [
+    `${projectRoot}/src/app/api/[locale]/v1/core/system/check/oxlint/plugins/restricted-syntax/src/index.ts`,
+    ...(enableI18n
+      ? [
+          `${projectRoot}/src/app/api/[locale]/v1/core/system/check/oxlint/plugins/i18n/src/index.ts`,
+        ]
+      : []),
+  ],
+
   categories: {
     correctness: "error",
     suspicious: "error",
     pedantic: enablePedanticRules ? "error" : "off",
-    style: "off", // Disabled for prettier compatibility
+    style: "off",
   },
 
   rules: {
@@ -65,7 +77,7 @@ export const oxlintConfig: OxlintConfig = {
     "no-console": "error",
     "curly": "error",
     "eqeqeq": "error",
-    "no-undef": "off", // TypeScript handles this
+    "no-undef": "off",
     "camelcase": "error",
     "no-template-curly-in-string": "error",
     "no-unsafe-optional-chaining": "error",
@@ -86,6 +98,8 @@ export const oxlintConfig: OxlintConfig = {
     "typescript/no-inferrable-types": "error",
     "typescript/consistent-type-imports": "error",
     "typescript/no-empty-function": "error",
+    "typescript/prefer-includes": "error",
+    "typescript/prefer-string-starts-ends-with": "error",
     "typescript/ban-ts-comment": "error",
     "typescript/consistent-type-definitions": "error",
     "typescript/no-empty-object-type": "error",
@@ -120,9 +134,9 @@ export const oxlintConfig: OxlintConfig = {
       "react/self-closing-comp": "error",
       "react/react-in-jsx-scope": "off", // Next.js auto-imports React
 
-      // React Hooks
-      "react/rules-of-hooks": "error",
-      "react/exhaustive-deps": "error",
+      // React Hooks (handled by ESLint as oxlint doesn't support these yet)
+      // "react/rules-of-hooks": "error", // Moved to ESLint-only
+      // "react/exhaustive-deps": "error", // Moved to ESLint-only
     }),
 
     // ========================================
@@ -213,7 +227,7 @@ export const oxlintConfig: OxlintConfig = {
     // ========================================
     // OXC Unique Rules
     // ========================================
-    "oxc/no-optional-chaining": "off", // We use optional chaining
+    "oxc/no-optional-chaining": "off",
     "oxc/missing-throw": "error",
     "oxc/number-arg-out-of-range": "error",
     "oxc/only-used-in-recursion": "error",
@@ -227,6 +241,140 @@ export const oxlintConfig: OxlintConfig = {
     "oxc/bad-object-literal-comparison": "error",
     "oxc/bad-replace-all-arg": "error",
     "oxc/uninvoked-array-callback": "error",
+
+    // ========================================
+    // Custom JS Plugin Rules
+    // ========================================
+    "oxlint-plugin-restricted/restricted-syntax": "error",
+    "oxlint-plugin-i18n/no-literal-string": [
+      "error",
+      {
+        words: {
+          exclude: [
+            // single-character punctuation (including parentheses)
+            `^[\\[\\]\\{\\}\\—\\<\\>\\•\\+\\%\\#\\@\\.\\:\\-\\_\\*\\;\\,\\/\\(\\)]+$`,
+            // numbers
+            `^\\d+$`,
+            // dotted keys
+            `^[^\\s]+\\.[^\\s]+$`,
+            // image/file extensions
+            `\\.(?:jpe?g|png|svg|webp|gif)$`,
+            // URLs and paths
+            `^(?:https?://|/)[^\\s]*$`,
+            // @mentions or #tags
+            `^[#@]\\w+$`,
+            // all-lowercase words
+            `^[a-z]+$`,
+            // camelCase
+            `^[a-z]+(?:[A-Z][a-zA-Z0-9]*)*$`,
+            // hyphen-separated
+            `^[^\\s]+(?:-[^\\s]+)+$`,
+            // slash paths
+            `^[^\\s]+\\/(?:[^\\s]*)$`,
+            // ALL-CAPS
+            `^[A-Z]+(?:_[A-Z]+)*$`,
+            // use client/server/custom directives
+            `^use (?:client|server|custom)$`,
+            // SVG path data
+            `^[MmLlHhVvCcSsQqTtAaZz0-9\\s,.-]+$`,
+            // Technical symbols and emoji used as UI elements (not translatable text)
+            `^[▶◀▲▼►◄▴▾►◄✅✕✔✓🔧]+$`,
+            // CSS-like values with units or technical notation
+            `^[\\d\\s]+(?:px|em|rem|%|vh|vw|deg|rad)?(?:\\s+[\\d]+)*$`,
+            // url() notation
+            `^url\\([^)]+\\)$`,
+            // translate/rotate/scale transforms
+            `^(?:translate|rotate|scale|matrix|skew)\\([^)]+\\)$`,
+            // Keyboard key indicators (technical, not translatable)
+            `^(?:Esc|Enter|Tab|Shift|Ctrl|Alt|Cmd|Space|Backspace|Delete|ArrowUp|ArrowDown|ArrowLeft|ArrowRight|F\\d+)$`,
+            // Single character technical indicators
+            `^[A-Z0-9]{1,2}$`,
+          ],
+        },
+        "jsx-attributes": {
+          exclude: [
+            "className",
+            "*ClassName",
+            "id",
+            "data-testid",
+            "to",
+            "href",
+            "style",
+            "target",
+            "rel",
+            "type",
+            "src",
+            // SVG attributes (technical, not translatable)
+            "viewBox",
+            "d",
+            "fill",
+            "stroke",
+            "transform",
+            "gradientTransform",
+            "gradientUnits",
+            "cx",
+            "cy",
+            "r",
+            "fx",
+            "fy",
+            "offset",
+            "stopColor",
+            "stopOpacity",
+            "width",
+            "height",
+            "x",
+            "y",
+            "x1",
+            "x2",
+            "y1",
+            "y2",
+            "strokeWidth",
+            "strokeLinecap",
+            "strokeLinejoin",
+            "fillRule",
+            "clipRule",
+            "opacity",
+            "xmlns",
+            "xmlnsXlink",
+            // Accessibility attributes that contain technical or context-dependent text
+            "aria-label",
+            "aria-labelledby",
+            "aria-describedby",
+            "title",
+            "placeholder",
+          ],
+        },
+        "object-properties": {
+          exclude: [
+            "id",
+            "key",
+            "type",
+            "className",
+            "*ClassName",
+            "imageUrl",
+            "style",
+            "path",
+            "href",
+            "to",
+            "data",
+            "alg",
+            "backgroundColor",
+            "borderRadius",
+            "color",
+            "fontSize",
+            "lineHeight",
+            "padding",
+            "textDecoration",
+            "marginTop",
+            "marginBottom",
+            "margin",
+            "value",
+            "email",
+            "displayName",
+          ],
+        },
+      },
+    ],
 
     // ========================================
     // Next.js Rules
@@ -311,12 +459,27 @@ export const oxlintConfig: OxlintConfig = {
     ".nyc_output",
     "build",
     "*.min.js",
+    "next-env.d.ts",
+    "nativewind-env.d.ts",
+    // Test and development files
+    "**/*test-files/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    // App-native demo/test pages (intentionally hardcoded strings)
+    "src/app-native/**",
+    // System builder test files
+    "src/app/api/[locale]/v1/core/system/builder/test-files/**",
+    // React Native UI stubs (not yet implemented)
+    "src/packages/next-vibe-ui/native/**",
+    // System unified-interface (system code, not user-facing)
+    "src/app/api/[locale]/v1/core/system/unified-interface/**",
   ],
 };
 
 // ============================================================
-// ESLint Configuration (i18n and custom AST rules)
-// Handles: TypeScript files for i18n checking and custom syntax rules
+// ESLint Configuration
 // ============================================================
 
 export const eslintConfig: EslintConfig = {
@@ -342,230 +505,29 @@ export const eslintConfig: EslintConfig = {
     "**/*.d.ts",
   ],
   files: ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
-  i18n: {
-    enabled: enableI18n,
-    config: {
-      files: ["**/*.{ts,tsx}"],
-      ignores: [
-        ".tmp",
-        "src/i18n/**",
-        "**/i18n/**",
-        "**/*.db.ts",
-        "**/db.ts",
-        "**/*.seed.ts",
-        "**/seed.ts",
-        "**/*.seeds.ts",
-        "**/seeds.ts",
-        "**/*.test.ts",
-        "**/*.cron.ts",
-        "**/cron.ts",
-        "**/env.ts",
-        "**/env-client.ts",
-        "next.config.ts",
-        "drizzle.config.ts",
-        "**/*schema.ts",
-        "to_migrate",
-      ],
-      rules: {
-        "i18next/no-literal-string": [
-          "error",
-          {
-            framework: "react",
-            mode: "all",
-            validateTemplate: true,
-            "should-validate-template": true,
-            callees: {
-              exclude: [
-                "createEndpoint",
-                "createFormEndpoint",
-                "router.push",
-                "middlewareInfoLogger",
-                "middlewareErrorLogger",
-                "middlewareDebugLogger",
-                "cookiesStore.delete",
-                "new URL",
-                "cookiesStore.set",
-                "pgEnum",
-                "cva",
-                "cn",
-                "logTranslationError",
-                "logger.info",
-                "setNestedPath",
-                "logger.warn",
-                "logger.error",
-                "logger.debug",
-                "logger.vibe",
-                "sql",
-              ],
-            },
-            "object-properties": {
-              exclude: [
-                "id",
-                "key",
-                "type",
-                "className",
-                "*ClassName",
-                "imageUrl",
-                "style",
-                "path",
-                "href",
-                "to",
-                "data",
-                "alg",
-                "backgroundColor",
-                "borderRadius",
-                "color",
-                "fontSize",
-                "lineHeight",
-                "padding",
-                "textDecoration",
-                "marginTop",
-                "marginBottom",
-                "margin",
-                "value",
-                "email",
-                "displayName",
-              ],
-            },
-            "jsx-attributes": {
-              exclude: [
-                "className",
-                "*ClassName",
-                "id",
-                "data-testid",
-                "to",
-                "href",
-                "style",
-                "target",
-                "rel",
-                "type",
-                "src",
-              ],
-            },
-            "jsx-components": { exclude: ["Trans"] },
-            words: {
-              exclude: [
-                // single-character punctuation
-                `^[\\[\\]\\{\\}\\—\\<\\>\\•\\+\\%\\#\\@\\.\\:\\-\\_\\*\\;\\,\\/]$`,
-                // numbers
-                `^\\d+$`,
-                // dotted keys
-                `^[^\\s]+\\.[^\\s]+$`,
-                // image/file extensions
-                `\\.(?:jpe?g|png|svg|webp|gif)$`,
-                // URLs and paths
-                `^(?:https?://|/)[^\\s]*$`,
-                // @mentions or #tags
-                `^[#@]\\w+$`,
-                // all-lowercase words
-                `^[a-z]+$`,
-                // camelCase
-                `^[a-z]+(?:[A-Z][a-zA-Z0-9]*)*$`,
-                // hyphen-separated
-                `^[^\\s]+(?:-[^\\s]+)+$`,
-                // slash paths
-                `^[^\\s]+\\/(?:[^\\s]*)$`,
-                // ALL-CAPS
-                `^[A-Z]+(?:_[A-Z]+)*$`,
-                // use client/server/custom directives
-                `^use (?:client|server|custom)$`,
-              ],
-            },
-            validComponents: ["Trans"],
-            ignoreAttribute: [
-              "aria-labelledby",
-              "aria-describedby",
-            ],
-          },
-        ],
-      },
-    },
+  eslintOnlyRules: {
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "unused-imports/no-unused-imports": "off",
+    "import/first": "error",
+    "import/no-duplicates": "error",
+    "import/newline-after-import": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
+    "react-compiler/react-compiler": "error",
+    "@c-ehrlich/use-server/no-top-level-use-server": "error",
   },
-  customRules: {
-    "no-restricted-syntax": [
-      "error",
-      {
-        selector: "TSUnknownKeyword",
-        message:
-          "Usage of the 'unknown' type isn't allowed. Consider using generics with interface or type alias for explicit structure.",
-      },
-      {
-        selector: "TSObjectKeyword",
-        message:
-          "Usage of the 'object' type isn't allowed. Consider using generics with interface or type alias for explicit structure.",
-      },
-      {
-        selector: "ThrowStatement",
-        message:
-          "Usage of 'throw' statements is not allowed. Use proper ResponseType<T> patterns instead.",
-      },
-      {
-        selector: "Property[value.type='JSXElement']:not([key.name='icon'])",
-        message:
-          "JSX elements inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
-      },
-      {
-        selector: "Property[value.type='JSXFragment']:not([key.name='icon'])",
-        message:
-          "JSX fragments inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
-      },
-      {
-        selector:
-          "Property[value.type='ParenthesizedExpression']:not([key.name='icon']) > ParenthesizedExpression > JSXElement",
-        message:
-          "JSX elements inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
-      },
-      {
-        selector:
-          "Property[value.type='ParenthesizedExpression']:not([key.name='icon']) > ParenthesizedExpression > JSXFragment",
-        message:
-          "JSX fragments inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
-      },
-    ],
-  },
+
   ruleOverrides: {
-    typescript: {
-      "@typescript-eslint/return-await": ["error", "always"],
-      "@typescript-eslint/explicit-member-accessibility": [
-        "error",
-        { accessibility: "no-public" },
-      ],
-      "@typescript-eslint/prefer-optional-chain": "error",
-      "@typescript-eslint/no-unnecessary-condition": "off",
-      "@typescript-eslint/prefer-nullish-coalescing": "off",
-      "@typescript-eslint/strict-boolean-expressions": "off",
-    },
+    typescript: {},
     promise: {
       "promise/no-return-wrap": "error",
       "promise/no-nesting": "warn",
     },
     import: {
-      // ESLint handles these with proper TypeScript module resolution
-      "import/namespace": "error",
-      "import/no-unresolved": "error",
-      "import/no-unassigned-import": [
-        "error",
-        {
-          allow: ["server-only", "**/*.css", "**/*.scss"],
-        },
-      ],
-      "import/extensions": [
-        "error",
-        "ignorePackages",
-        {
-          ts: "never",
-          tsx: "never",
-          js: "never",
-          jsx: "never",
-          json: "always",
-        },
-      ],
-    },
-    react: {
-      "react-compiler/react-compiler": "error",
-    },
-    custom: {
-      "@c-ehrlich/use-server/no-top-level-use-server": "error",
+      "import/first": "error",
+      "import/no-duplicates": "error",
+      "import/newline-after-import": "error",
     },
   },
   parserOptions: {
@@ -594,6 +556,127 @@ export const prettierConfig: PrettierConfig = {
 };
 
 // ============================================================
+// I18n Plugin Configuration
+// ============================================================
+
+export const i18nPluginConfig = {
+  words: {
+    exclude: [
+      `^[\\[\\]\\{\\}\\—\\<\\>\\•\\+\\%\\#\\@\\.\\:\\-\\_\\*\\;\\,\\/\\(\\)]+$`,
+      `^\\s+$`,
+      `^\\d+$`,
+      `^[^\\s]+\\.[^\\s]+$`,
+      `\\.(?:jpe?g|png|svg|webp|gif|csv|json|xml|pdf)$`,
+      `^(?:https?://|/)[^\\s]*$`,
+      `^[#@]\\w+$`,
+      `^[a-z]+$`,
+      `^[a-z]+(?:[A-Z][a-zA-Z0-9]*)*$`,
+      `^[^\\s]+(?:-[^\\s]+)+$`,
+      `^[^\\s]+\\/(?:[^\\s]*)$`,
+      `^[A-Z]+(?:_[A-Z]+)*$`,
+      `^use (?:client|server|custom)$`,
+      `^&[a-z]+;$`,
+      // SVG path data
+      `^[MmLlHhVvCcSsQqTtAaZz0-9\\s,.-]+$`,
+      // Technical symbols and emoji used as UI elements (not translatable text)
+      `^[▶◀▲▼►◄▴▾►◄✅✕✔✓🔧]+$`,
+      // CSS-like values with units or technical notation
+      `^[\\d\\s]+(?:px|em|rem|%|vh|vw|deg|rad)?(?:\\s+[\\d]+)*$`,
+      // url() notation
+      `^url\\([^)]+\\)$`,
+      // translate/rotate/scale transforms
+      `^(?:translate|rotate|scale|matrix|skew)\\([^)]+\\)$`,
+      // Keyboard key indicators (technical, not translatable)
+      `^(?:Esc|Enter|Tab|Shift|Ctrl|Alt|Cmd|Space|Backspace|Delete|ArrowUp|ArrowDown|ArrowLeft|ArrowRight|F\\d+)$`,
+      // Single character technical indicators
+      `^[A-Z0-9]{1,2}$`,
+    ],
+  },
+  "jsx-attributes": {
+    exclude: [
+      "className",
+      "*ClassName",
+      "id",
+      "data-testid",
+      "to",
+      "href",
+      "style",
+      "target",
+      "rel",
+      "type",
+      "src",
+      // SVG attributes (technical, not translatable)
+      "viewBox",
+      "d",
+      "fill",
+      "stroke",
+      "transform",
+      "gradientTransform",
+      "gradientUnits",
+      "cx",
+      "cy",
+      "r",
+      "fx",
+      "fy",
+      "offset",
+      "stopColor",
+      "stopOpacity",
+      "width",
+      "height",
+      "x",
+      "y",
+      "x1",
+      "x2",
+      "y1",
+      "y2",
+      "strokeWidth",
+      "strokeLinecap",
+      "strokeLinejoin",
+      "fillRule",
+      "clipRule",
+      "opacity",
+      "xmlns",
+      "xmlnsXlink",
+      // Accessibility attributes that contain technical or context-dependent text
+      "aria-label",
+      "aria-labelledby",
+      "aria-describedby",
+      "title",
+      "placeholder",
+    ],
+  },
+  "object-properties": {
+    exclude: [
+      "id",
+      "key",
+      "type",
+      "className",
+      "*ClassName",
+      "imageUrl",
+      "style",
+      "path",
+      "href",
+      "to",
+      "data",
+      "alg",
+      "backgroundColor",
+      "borderRadius",
+      "color",
+      "fontSize",
+      "lineHeight",
+      "padding",
+      "textDecoration",
+      "marginTop",
+      "marginBottom",
+      "margin",
+      "value",
+      "email",
+      "displayName",
+    ],
+  },
+};
+
+// ============================================================
 // Combined Export
 // ============================================================
 
@@ -603,5 +686,4 @@ export const config: OxlintPrettierEslintConfig = {
   prettier: prettierConfig,
 };
 
-// Export as default for easier imports
 export default config;

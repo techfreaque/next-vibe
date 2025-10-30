@@ -3,9 +3,9 @@
  * Handles content state, loading state, and action handlers
  */
 
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import { TIMING } from "../../lib/config/constants";

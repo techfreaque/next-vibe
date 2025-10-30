@@ -145,8 +145,8 @@ class MessageRepository implements MessageRepositoryInterface {
           isAI: message.isAI,
           model: message.model,
           tokens: message.tokens,
-          createdAt: message.createdAt,
-          updatedAt: message.updatedAt,
+          createdAt: message.createdAt.toISOString(),
+          updatedAt: message.updatedAt.toISOString(),
         },
       });
     } catch (error) {
@@ -234,14 +234,14 @@ class MessageRepository implements MessageRepositoryInterface {
       // Update message
       const updateData = data.role
         ? {
-            content: data.content,
-            role: data.role,
-            updatedAt: new Date(),
-          }
+          content: data.content,
+          role: data.role,
+          updatedAt: new Date(),
+        }
         : {
-            content: data.content,
-            updatedAt: new Date(),
-          };
+          content: data.content,
+          updatedAt: new Date(),
+        };
 
       const [updatedMessage] = await db
         .update(chatMessages)
@@ -254,7 +254,7 @@ class MessageRepository implements MessageRepositoryInterface {
           id: updatedMessage.id,
           content: updatedMessage.content,
           role: updatedMessage.role,
-          updatedAt: updatedMessage.updatedAt,
+          updatedAt: updatedMessage.updatedAt.toISOString(),
         },
       });
     } catch (error) {

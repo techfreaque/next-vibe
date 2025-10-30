@@ -121,6 +121,7 @@ export const BreadcrumbPage = React.forwardRef<RNText, BreadcrumbPageProps>(
     return (
       <RNText
         ref={ref}
+        // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="link"
         aria-disabled={true}
         aria-current="page"

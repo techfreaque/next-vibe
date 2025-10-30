@@ -275,7 +275,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.createdAt.content" as const,
             },
-            z.date(),
+            z.string().datetime(),
           ),
           updatedAt: responseField(
             {
@@ -283,7 +283,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.updatedAt.content" as const,
             },
-            z.date(),
+            z.string().datetime(),
           ),
         },
       ),
@@ -323,8 +323,8 @@ const { POST } = createEndpoint({
           isAI: false,
           model: null,
           tokens: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
       },
     },

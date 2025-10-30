@@ -87,15 +87,15 @@ export function Brands({ locale }: BrandsProps): JSX.Element {
         transition={{ duration: 0.5, staggerChildren: 0.1 }}
       >
         {brands.map((brand, index) => (
-          <a
+          <button
             key={index}
-            href={t(brand.link)}
-            target="_blank"
-            rel="noopener noreferrer"
+            onClick={() => {
+              window.open(t(brand.link), "_blank", "noopener,noreferrer");
+            }}
             className={cn(
               brand.className ? t(brand.className) : "",
 
-              "flex items-center justify-center",
+              "flex items-center justify-center bg-transparent border-none p-0 cursor-pointer",
             )}
           >
             <motion.div
@@ -113,7 +113,7 @@ export function Brands({ locale }: BrandsProps): JSX.Element {
                 />
               </div>
             </motion.div>
-          </a>
+          </button>
         ))}
       </motion.div>
     </div>

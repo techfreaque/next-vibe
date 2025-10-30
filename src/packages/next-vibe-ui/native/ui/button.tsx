@@ -81,6 +81,7 @@ const Button = React.forwardRef<
           buttonVariants({ variant, size, className }),
         )}
         ref={ref}
+        // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="button"
         {...props}
       />

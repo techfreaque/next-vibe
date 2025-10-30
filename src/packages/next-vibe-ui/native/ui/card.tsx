@@ -33,6 +33,7 @@ CardHeader.displayName = "CardHeader";
 const CardTitle = React.forwardRef<TextRef, TextProps>(
   ({ className, ...props }, ref) => (
     <Text
+      // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
       role="heading"
       aria-level={3}
       ref={ref}

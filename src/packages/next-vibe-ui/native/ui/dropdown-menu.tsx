@@ -52,7 +52,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   const Icon =
     Platform.OS === "web" ? ChevronRight : open ? ChevronUp : ChevronDown;
   const renderedChildren =
-    typeof children === "function" ? children({ open } as any) : children;
+    typeof children === "function" ? children({ pressed: false }) : children;
   return (
     <TextClassContext.Provider
       value={cn(
@@ -179,7 +179,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   DropdownMenuPrimitive.CheckboxItemProps & { className?: string }
 >(({ className, children, checked, ...props }, ref) => {
   const renderedChildren =
-    typeof children === "function" ? children({ checked } as any) : children;
+    typeof children === "function" ? children({ pressed: false }) : children;
   return (
     <StyledDropdownMenuCheckboxItem
       ref={ref}
@@ -209,7 +209,7 @@ const DropdownMenuRadioItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   const renderedChildren =
     typeof children === "function"
-      ? children({ checked: props.value === props.value } as any)
+      ? children({ pressed: false })
       : children;
   return (
     <StyledDropdownMenuRadioItem

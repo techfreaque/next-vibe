@@ -74,11 +74,19 @@ const pulseTaskRunner: TaskRunner = {
 
       // Wait for next pulse or abort signal
       await new Promise<void>((resolve) => {
-        const timeout = setTimeout(() => resolve(), PULSE_INTERVAL);
+        let resolved = false;
+        const safeResolve = () => {
+          if (!resolved) {
+            resolved = true;
+            resolve();
+          }
+        };
+
+        const timeout = setTimeout(safeResolve, PULSE_INTERVAL);
 
         signal.addEventListener("abort", () => {
           clearTimeout(timeout);
-          resolve();
+          safeResolve();
         });
       });
     }

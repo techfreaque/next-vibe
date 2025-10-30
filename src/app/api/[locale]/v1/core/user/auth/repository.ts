@@ -1197,15 +1197,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * @returns The user ID if available, null otherwise
    */
   extractUserId(payload: JwtPrivatePayloadType): string | null {
-    const isPrivatePayload = (
-      payload: JwtPrivatePayloadType,
-    ): payload is JwtPrivatePayloadType => {
-      return (
-        !payload.isPublic && "id" in payload && typeof payload.id === "string"
-      );
-    };
-
-    if (isPrivatePayload(payload)) {
+    if (!payload.isPublic && "id" in payload && typeof payload.id === "string") {
       return payload.id;
     }
     return null;

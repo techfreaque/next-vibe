@@ -1,11 +1,12 @@
-import type { NextConfig } from "next";
 import path from "node:path";
+
+import type { NextConfig } from "next";
 import type { Configuration } from "webpack";
 
 import { useTurbopack } from "./src/config/constants";
 
 // Configuration flags
-const useTypedRoutes = false; // Set to true to enable typed routes
+const useTypedRoutes = true; // Set to true to enable typed routes
 const useNextQueryPortalPackage = false;
 
 // once react native is supported, we can use withExpo
@@ -110,7 +111,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["socket.io", "socket.io-client"],
 
   // Ensure WebSocket routes are properly handled
-  // eslint-disable-next-line @typescript-eslint/require-await
+   
   async rewrites() {
     return [
       {

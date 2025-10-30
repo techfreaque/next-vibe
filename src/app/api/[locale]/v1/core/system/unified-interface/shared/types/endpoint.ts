@@ -50,8 +50,10 @@ export type FieldUIConfig = {
 
 /**
  * Type alias for CreateApiEndpoint - accepts any generic parameters
+ * This uses the any type to accept any possible CreateApiEndpoint instance
  */
-export type CreateApiEndpointAny = CreateApiEndpoint;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CreateApiEndpointAny = CreateApiEndpoint<any, any, any, any>;
 
 /**
  * Export for backward compatibility
@@ -62,7 +64,7 @@ export type EndpointDefinition = CreateApiEndpointAny;
 /**
  * API section type for nested endpoint structure
  * Used in generated endpoints.ts file
- * Accepts CreateApiEndpoint with any type parameters
+ * Accepts CreateApiEndpoint with any type parameters or CreateEndpointReturnInMethod
  */
 export interface ApiSection {
   readonly GET?: CreateApiEndpointAny;
@@ -70,7 +72,8 @@ export interface ApiSection {
   readonly PUT?: CreateApiEndpointAny;
   readonly PATCH?: CreateApiEndpointAny;
   readonly DELETE?: CreateApiEndpointAny;
-  readonly [key: string]: CreateApiEndpointAny | ApiSection | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readonly [key: string]: CreateApiEndpointAny | ApiSection | undefined | any;
 }
 
 // ============================================================================

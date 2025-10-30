@@ -25,7 +25,7 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
  * GET endpoint definition - Get cron status
  * Retrieves current status of cron system and tasks
  */
-const cronStatusGetEndpoint = createEndpoint({
+const { GET: cronStatusGetEndpoint } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "system", "tasks", "cron", "status"],
   title: "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.title",
@@ -333,18 +333,13 @@ const cronStatusGetEndpoint = createEndpoint({
   },
 });
 
-export { cronStatusGetEndpoint as GET };
-export { cronStatusGetEndpoint };
+export const GET = cronStatusGetEndpoint;
 
-const endpoints = { GET: cronStatusGetEndpoint };
+const endpoints = { GET };
 export default endpoints;
 
 // Export types for repository using proper Output types from endpoint
-export type CronStatusRequestInput =
-  typeof cronStatusGetEndpoint.GET.types.RequestInput;
-export type CronStatusRequestOutput =
-  typeof cronStatusGetEndpoint.GET.types.RequestOutput;
-export type CronStatusResponseInput =
-  typeof cronStatusGetEndpoint.GET.types.ResponseInput;
-export type CronStatusResponseOutput =
-  typeof cronStatusGetEndpoint.GET.types.ResponseOutput;
+export type CronStatusRequestInput = typeof GET.types.RequestInput;
+export type CronStatusRequestOutput = typeof GET.types.RequestOutput;
+export type CronStatusResponseInput = typeof GET.types.ResponseInput;
+export type CronStatusResponseOutput = typeof GET.types.ResponseOutput;

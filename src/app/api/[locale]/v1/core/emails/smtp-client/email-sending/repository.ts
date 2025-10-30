@@ -48,29 +48,26 @@ function isCountry(value: string): value is Countries {
 
 /**
  * Utility function to map locale to country and language for SMTP selection
- * Note: Throws are caught by parent try-catch and converted to ResponseType
+ * Returns null on validation failure
  */
 function mapLocaleToSelectionCriteria(locale: CountryLanguage): {
   country: Countries;
   language: Languages;
-} {
+} | null {
   const parts: string[] = locale.split("-");
   if (parts.length !== 2) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
-    throw new Error(`Invalid locale format: ${locale}`);
+    return null;
   }
 
   const languagePart = parts[0];
   const countryPart = parts[1];
 
   if (!isLanguage(languagePart)) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
-    throw new Error(`Invalid language in locale: ${languagePart}`);
+    return null;
   }
 
   if (!isCountry(countryPart)) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
-    throw new Error(`Invalid country in locale: ${countryPart}`);
+    return null;
   }
 
   return { country: countryPart, language: languagePart };
@@ -118,9 +115,20 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
       const rawHtml: string = await render(data.params.jsx);
 
       // 2) Map locale to country and language for selection criteria
-      const { country, language } = mapLocaleToSelectionCriteria(
-        data.params.locale,
-      );
+      const localeMapping = mapLocaleToSelectionCriteria(data.params.locale);
+      if (!localeMapping) {
+        logger.error("Invalid locale format", { locale: data.params.locale });
+        return createErrorResponse(
+          "app.api.v1.core.emails.smtpClient.emailSending.email.errors.sending_failed",
+          ErrorResponseTypes.VALIDATION_ERROR,
+          {
+            recipient: data.params.toEmail,
+            error: `Invalid locale format: ${data.params.locale}`,
+          },
+        );
+      }
+
+      const { country, language } = localeMapping;
 
       // 3) Build comprehensive selection criteria
       const selectionCriteria: SmtpSelectionCriteria = data.params

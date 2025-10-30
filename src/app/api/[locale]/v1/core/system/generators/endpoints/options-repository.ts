@@ -282,7 +282,9 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
    */
   private listOptions(
     category?: string,
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for runtime object handling
   ): Record<string, string | number | boolean | null | object> {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for runtime object handling
     const options: Record<string, string | number | boolean | null | object> =
       {};
 

@@ -155,8 +155,8 @@ export const pathRepository = {
           isAI: msg.isAI,
           model: msg.model,
           tokens: msg.tokens,
-          createdAt: msg.createdAt,
-          updatedAt: msg.updatedAt,
+          createdAt: msg.createdAt.toISOString(),
+          updatedAt: msg.updatedAt.toISOString(),
         })),
       });
     } catch (error) {

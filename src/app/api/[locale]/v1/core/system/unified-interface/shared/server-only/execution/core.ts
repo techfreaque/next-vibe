@@ -41,7 +41,7 @@ export interface HandlerContext<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly UserRoleValue[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 > {
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>;
@@ -79,7 +79,7 @@ export async function executeHandler<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly UserRoleValue[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 >(
   context: HandlerContext<
@@ -147,7 +147,7 @@ export async function executeHandler<
 export async function authenticateUser<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly UserRoleValue[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 >(
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
@@ -193,13 +193,13 @@ export async function authenticateUser<
       errorType: ErrorResponseTypes.UNAUTHORIZED,
       cause: parsedError
         ? fail({
-            message:
-              "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: {
-              error: parsedError.message,
-            },
-          })
+          message:
+            "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
+            error: parsedError.message,
+          },
+        })
         : undefined,
     });
   }
@@ -211,7 +211,7 @@ export async function authenticateUser<
 export async function authenticateTypedUser<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly UserRoleValue[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 >(
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
@@ -252,13 +252,13 @@ export async function authenticateTypedUser<
       errorType: ErrorResponseTypes.UNAUTHORIZED,
       cause: parsedError
         ? fail({
-            message:
-              "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: {
-              error: parsedError.message,
-            },
-          })
+          message:
+            "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
+            error: parsedError.message,
+          },
+        })
         : undefined,
     });
   }

@@ -84,7 +84,7 @@ export async function handleUncensoredAI(
 
   if (!response.ok) {
     const errorText = await response.text();
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Internal helper throws, caught by caller
     throw new Error(
       t(
         "app.api.v1.core.agent.chat.aiStream.providers.uncensoredHandler.errors.apiError",

@@ -204,8 +204,26 @@ export function ThreadedMessage({
                 descriptionKey="app.chat.threadedView.retryModal.description"
                 selectedModel={selectedModel}
                 selectedPersona={selectedPersona}
-                onModelChange={onModelChange || ((): void => {})}
-                onPersonaChange={onPersonaChange || ((): void => {})}
+                onModelChange={
+                  onModelChange ||
+                  ((model: ModelId): void => {
+                    logger.debug(
+                      "ThreadedMessage",
+                      "Model selection changed (no handler)",
+                      { model },
+                    );
+                  })
+                }
+                onPersonaChange={
+                  onPersonaChange ||
+                  ((persona: string): void => {
+                    logger.debug(
+                      "ThreadedMessage",
+                      "Persona selection changed (no handler)",
+                      { persona },
+                    );
+                  })
+                }
                 onConfirm={(): Promise<void> =>
                   messageActions.handleConfirmRetry(message.id, onRetryMessage)
                 }
@@ -556,8 +574,26 @@ export function ThreadedMessage({
               descriptionKey="app.chat.threadedView.answerModal.description"
               selectedModel={selectedModel}
               selectedPersona={selectedPersona}
-              onModelChange={onModelChange || ((): void => {})}
-              onPersonaChange={onPersonaChange || ((): void => {})}
+              onModelChange={
+                onModelChange ||
+                ((model: ModelId): void => {
+                  logger.debug(
+                    "ThreadedMessage",
+                    "Model selection changed (no handler)",
+                    { model },
+                  );
+                })
+              }
+              onPersonaChange={
+                onPersonaChange ||
+                ((persona: string): void => {
+                  logger.debug(
+                    "ThreadedMessage",
+                    "Persona selection changed (no handler)",
+                    { persona },
+                  );
+                })
+              }
               showInput={true}
               inputValue={messageActions.answerContent}
               onInputChange={messageActions.setAnswerContent}

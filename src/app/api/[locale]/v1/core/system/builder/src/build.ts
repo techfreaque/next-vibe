@@ -18,10 +18,18 @@ const { t } = simpleT("en-GLOBAL");
 const program = new Command();
 
 /**
+ * Represents an unknown module import structure
+ */
+interface UnknownModule {
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build infrastructure needs flexible module import typing
+  [key: string]: unknown;
+}
+
+/**
  * Type guard to validate if an imported module has the expected BuildConfig structure
  */
 function isBuildConfigModule(
-  module: Record<string, string | number | boolean | null | object>,
+  module: UnknownModule,
 ): module is { default: BuildConfig } {
   if (typeof module !== "object" || module === null) {
     return false;
@@ -80,6 +88,7 @@ export async function compileToJsFilesWithVite(
 export async function pweBuild(fileConfig: FileToCompile): Promise<void> {
   const inputFilePath = resolve(process.cwd(), fileConfig.options.input);
   if (!existsSync(inputFilePath)) {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build infrastructure needs to throw for configuration errors
     throw new Error(
       t("app.api.v1.core.system.builder.errors.inputFileNotFound", {
         filePath: inputFilePath,
@@ -201,6 +210,7 @@ async function setPackageBuildConfig({
     fileConfig.options.output,
   ).split(".")[0];
   if (!outPutFilesNameWithoutExtension) {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build infrastructure needs to throw for configuration errors
     throw new Error(
       t("app.api.v1.core.system.builder.errors.invalidOutputFileName"),
     );
@@ -236,6 +246,7 @@ export async function getConfigContent(
   const importedModule = await import(configSourcePath);
 
   if (!isBuildConfigModule(importedModule)) {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build infrastructure needs to throw for configuration errors
     throw new Error(
       t("app.api.v1.core.system.builder.errors.invalidBuildConfig"),
     );
@@ -291,6 +302,7 @@ export async function getCompiledConfigPath(
     } catch {
       /* empty */
     }
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build infrastructure needs to throw for build errors
     throw error;
   }
 }

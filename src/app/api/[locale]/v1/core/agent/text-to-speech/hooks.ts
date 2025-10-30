@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
+
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -61,7 +62,7 @@ export function useTTSAudio({
 
   // Stop audio playback
   const stopAudio = useCallback((): void => {
-    logger.debug("TTS", "Stopping audio");
+    logger.debug("TTS: Stopping audio");
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -73,12 +74,12 @@ export function useTTSAudio({
   const playAudio = useCallback(async (): Promise<void> => {
     // Prevent concurrent processing
     if (isProcessingRef.current) {
-      logger.debug("TTS", "Already processing, skipping");
+      logger.debug("TTS: Already processing, skipping");
       return;
     }
 
     if (!text.trim()) {
-      logger.debug("TTS", "No text to convert");
+      logger.debug("TTS: No text to convert");
       return;
     }
 
@@ -87,15 +88,15 @@ export function useTTSAudio({
     setError(null);
 
     try {
-      logger.debug("TTS", "Starting TTS conversion", {
+      logger.debug("TTS: Starting TTS conversion", {
         textLength: text.length,
       });
 
       // If we already have audio URL, just play it
       if (audioUrl && audioRef.current) {
-        logger.debug("TTS", "Using cached audio");
+        logger.debug("TTS: Using cached audio");
         audioRef.current.play().catch((err: Error | null) => {
-          logger.error("TTS", "Failed to play cached audio", {
+          logger.error("TTS: Failed to play cached audio", {
             error: err instanceof Error ? err.message : String(err),
           });
           setError(t("app.chat.hooks.tts.failed-to-play"));
@@ -107,11 +108,11 @@ export function useTTSAudio({
       }
 
       // Call TTS API
-      logger.debug("TTS", "Calling TTS API");
+      logger.debug("TTS: Calling TTS API");
 
       if (!endpoint.create) {
         const errorMsg = t("app.chat.hooks.tts.endpoint-not-available");
-        logger.error("TTS", errorMsg);
+        logger.error("TTS: Endpoint not available", errorMsg);
         setError(errorMsg);
         onError?.(errorMsg);
         setIsLoading(false);
@@ -129,7 +130,9 @@ export function useTTSAudio({
       await endpoint.create.submitForm(undefined, {
         onSuccess: ({ responseData }) => {
           const audioDataUrl = responseData.response.audioUrl;
-          logger.debug("TTS", "Got audio URL", { urlLength: audioDataUrl.length });
+          logger.debug("TTS: Got audio URL", {
+            urlLength: audioDataUrl.length,
+          });
 
           // Create audio element
           const audio = new Audio(audioDataUrl);
@@ -137,34 +140,37 @@ export function useTTSAudio({
           setAudioUrl(audioDataUrl);
 
           // Set up event listeners
-          audio.onended = (): void => {
-            logger.debug("TTS", "Audio playback ended");
+          audio.addEventListener("ended", (): void => {
+            logger.debug("TTS: Audio playback ended");
             setIsPlaying(false);
-          };
+          });
 
-          audio.onerror = (err): void => {
+          audio.addEventListener("error", (err): void => {
             const audioError =
               err instanceof Error
                 ? err
                 : new Error(t("app.chat.hooks.tts.failed-to-play"));
-            logger.error("TTS", "Audio playback error", parseError(audioError));
+            logger.error("TTS: Audio playback error", parseError(audioError));
             setError(t("app.chat.hooks.tts.failed-to-play"));
             setIsPlaying(false);
-          };
+          });
 
           // Play audio
-          logger.debug("TTS", "Starting audio playback");
+          logger.debug("TTS: Starting audio playback");
           audio.play().catch((err: Error | null) => {
-            logger.error("TTS", "Failed to play audio", {
+            logger.error("TTS: Failed to play audio", {
               error: err instanceof Error ? err.message : String(err),
             });
             setError(t("app.chat.hooks.tts.failed-to-play"));
           });
           setIsPlaying(true);
-          logger.debug("TTS", "Audio playback started successfully");
+          logger.debug("TTS: Audio playback started successfully");
         },
         onError: ({ error }) => {
-          logger.error("TTS", "TTS API returned error", error);
+          logger.error("TTS: API returned error", {
+            errorType: error.errorType,
+            errorMessage: error.message,
+          });
           const errorMsg =
             error.message || t("app.chat.hooks.tts.failed-to-generate");
           setError(errorMsg);
@@ -176,11 +182,11 @@ export function useTTSAudio({
         err instanceof Error
           ? err.message
           : t("app.chat.hooks.tts.failed-to-generate");
-      logger.error("TTS", "Exception during TTS", parseError(err));
+      logger.error("TTS: Exception during processing", parseError(err));
       setError(errorMsg);
       onError?.(errorMsg);
     } finally {
-      logger.debug("TTS", "Finished TTS attempt");
+      logger.debug("TTS: Finished TTS attempt");
       setIsLoading(false);
       // eslint-disable-next-line require-atomic-updates
       isProcessingRef.current = false;

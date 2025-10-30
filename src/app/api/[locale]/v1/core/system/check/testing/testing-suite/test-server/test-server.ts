@@ -70,7 +70,7 @@ export async function startServer(logger: EndpointLogger): Promise<void> {
     });
   } catch (error) {
     logger.error("Failed to start server:", parseError(error));
-    // eslint-disable-next-line no-restricted-syntax -- Test infrastructure can throw errors
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Test infrastructure can throw errors
     throw error;
   }
 }

@@ -19,6 +19,7 @@ import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  throwErrorResponse,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/ui/storage";
@@ -259,8 +260,10 @@ class AuthRepositoryNativeImpl implements AuthRepository {
   requireUserId(payload: JwtPrivatePayloadType): string {
     const userId = this.extractUserId(payload);
     if (!userId) {
-      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
-      throw new Error("User ID is required but not present in JWT payload");
+      throwErrorResponse(
+        "app.api.v1.core.user.auth.errors.jwt_payload_missing_id",
+        ErrorResponseTypes.UNAUTHORIZED,
+      );
     }
     return userId;
   }

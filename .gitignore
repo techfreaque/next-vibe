@@ -7,6 +7,16 @@ dist
 
 # Generated files
 postgres_data
+lint.config.js
+lint.config.js.map
+lint.config.d.ts
+lint.config.d.ts.map
+
+# TypeScript compilation artifacts (when accidentally generated)
+src/app/api/[locale]/v1/core/system/check/oxlint/types.js
+src/app/api/[locale]/v1/core/system/check/oxlint/types.js.map
+src/app/api/[locale]/v1/core/system/check/oxlint/types.d.ts
+src/app/api/[locale]/v1/core/system/check/oxlint/types.d.ts.map
 
 # system temporary files
 .tmp

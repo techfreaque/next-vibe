@@ -40,7 +40,9 @@ const badgeTextVariants = cva("text-xs font-semibold ", {
   },
 });
 
-type BadgeProps = SlottableViewProps & VariantProps<typeof badgeVariants>;
+type BadgeProps = SlottableViewProps & VariantProps<typeof badgeVariants> & {
+  className?: string;
+};
 
 function Badge({
   className,
@@ -49,11 +51,13 @@ function Badge({
   ...props
 }: BadgeProps): React.JSX.Element {
   const Component = asChild ? Slot.View : View;
+  const combinedClassName = cn(badgeVariants({ variant }), className);
+
   return (
     <TextClassContext.Provider value={badgeTextVariants({ variant })}>
       <Component
-        className={cn(badgeVariants({ variant }), className)}
         {...props}
+        {...(combinedClassName ? { className: combinedClassName } : {})}
       />
     </TextClassContext.Provider>
   );

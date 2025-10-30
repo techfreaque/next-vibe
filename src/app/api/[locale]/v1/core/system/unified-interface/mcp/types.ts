@@ -9,6 +9,7 @@ import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interfac
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type {
   BaseExecutionContext,
@@ -43,7 +44,7 @@ export interface JsonRpcResponse<TResult = unknown> {
 export interface JsonRpcError {
   code: number;
   message: string;
-  data?: Record<string, string | number | boolean | null | object>;
+  data?: Record<string, ParameterValue>;
 }
 
 /**
@@ -145,7 +146,7 @@ export interface MCPToolsListResult {
  */
 export interface MCPToolCallParams {
   name: string;
-  arguments?: Record<string, string | number | boolean | null | object>;
+  arguments?: Record<string, ParameterValue>;
 }
 
 export interface MCPToolCallResult {
@@ -195,9 +196,9 @@ export interface MCPExecutionContext<TData = { [key: string]: ParameterValue }>
 export interface MCPToolMetadata {
   id: string; // Unique identifier (same as DiscoveredEndpointMetadata.id)
   name: string;
-  description: string;
-  category?: string;
-  tags: readonly string[];
+  description: TranslationKey | undefined;
+  category?: TranslationKey;
+  tags: readonly (TranslationKey | undefined)[];
   path: string; // API path (same as DiscoveredEndpointMetadata.path)
   routePath: string;
   definitionPath: string;

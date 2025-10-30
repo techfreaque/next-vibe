@@ -23,7 +23,7 @@ class ApiError extends Error {
   }
 }
 
-// eslint-disable-next-line no-restricted-syntax
+// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic error input type for error parsing utility
 type ErrorCheckInput = unknown;
 
 /**
@@ -46,7 +46,7 @@ export function isErrorResponseType(
  * Possible error input types for error checking and parsing
  */
 
-// eslint-disable-next-line no-restricted-syntax
+// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic error input type for error parsing utility
 type ParseableError = unknown;
 
 /**

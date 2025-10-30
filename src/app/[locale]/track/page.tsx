@@ -53,7 +53,15 @@ export default function TrackPage(): React.ReactElement {
         // Validate URL if provided
         if (url) {
           try {
-            new URL(url);
+            const parsedUrl = new URL(url);
+            if (!parsedUrl.protocol || !parsedUrl.hostname) {
+              logger.error("Invalid tracking URL format", {
+                url,
+                error: "Missing protocol or hostname",
+              });
+              router.push(`/${locale}`);
+              return;
+            }
           } catch (error) {
             logger.error("Invalid tracking URL", parseError(error), { url });
             router.push(`/${locale}`);

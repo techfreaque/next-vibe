@@ -1,27 +1,30 @@
 /**
- * ESLint Configuration (Wrapper)
+ * ESLint Configuration
  *
- * This file wraps the unified lint.config.ts configuration for ESLint compatibility.
- * ESLint handles only what oxlint doesn't support:
- * - i18n checking (eslint-plugin-i18next)
- * - Custom AST rules (no-restricted-syntax)
- * - Additional TypeScript type-aware rules
+ * Minimal ESLint setup for rules not yet supported by oxlint:
+ * - Import sorting (simple-import-sort)
+ * - React Hooks rules (react-hooks)
+ * - React compiler checks (react-compiler)
+ * - Use server directive validation (@c-ehrlich/use-server)
+ * - Import validation with TypeScript resolution (import plugin)
  *
- * Main linting is handled by oxlint for performance.
+ * All other rules are handled by oxlint (including i18n and restricted-syntax via JS plugins).
+ * Configuration source: lint.config.ts
  */
 
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import tsParser from "@typescript-eslint/parser";
 import ts from "@typescript-eslint/eslint-plugin";
-import i18next from "eslint-plugin-i18next";
 import reactCompiler from "eslint-plugin-react-compiler";
+import reactHooks from "eslint-plugin-react-hooks";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
+import unusedImports from "eslint-plugin-unused-imports";
 import promisePlugin from "eslint-plugin-promise";
 import importPlugin from "eslint-plugin-import";
 import useServerPlugin from "@c-ehrlich/eslint-plugin-use-server";
 import globals from "globals";
 
-// Import unified configuration
 import { eslintConfig as sharedConfig } from "./lint.config.ts";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -36,49 +39,14 @@ function cleanGlobals(globalsObj) {
 
 const config = [
   // ============================================================
-  // Ignores (shared with oxlint)
+  // Ignores
   // ============================================================
   {
     ignores: sharedConfig.ignores,
   },
 
   // ============================================================
-  // i18n Configuration (only if enabled)
-  // ============================================================
-  ...(sharedConfig.i18n.enabled
-    ? [
-        {
-          files: sharedConfig.i18n.config.files,
-          ignores: sharedConfig.i18n.config.ignores,
-          plugins: { i18next },
-          languageOptions: {
-            parser: tsParser,
-            ecmaVersion: 2022,
-            sourceType: "module",
-            parserOptions: {
-              ecmaFeatures: {
-                jsx: true,
-              },
-            },
-            globals: {
-              ...cleanGlobals(globals.browser),
-              ...cleanGlobals(globals.node),
-              ...cleanGlobals(globals.es2021),
-              JSX: "readonly",
-            },
-          },
-          settings: {
-            react: {
-              version: "detect",
-            },
-          },
-          rules: sharedConfig.i18n.config.rules,
-        },
-      ]
-    : []),
-
-  // ============================================================
-  // TypeScript Configuration (custom rules not in oxlint)
+  // ESLint Rules
   // ============================================================
   {
     files: sharedConfig.files,
@@ -113,36 +81,22 @@ const config = [
     plugins: {
       "@typescript-eslint": ts,
       "react-compiler": reactCompiler,
+      "react-hooks": reactHooks,
+      "simple-import-sort": simpleImportSort,
+      "unused-imports": unusedImports,
       promise: promisePlugin,
       import: importPlugin,
       "@c-ehrlich/use-server": useServerPlugin,
     },
     rules: {
+      ...sharedConfig.eslintOnlyRules,
       ...sharedConfig.ruleOverrides.typescript,
       ...sharedConfig.ruleOverrides.promise,
       ...sharedConfig.ruleOverrides.import,
-      ...sharedConfig.ruleOverrides.react,
-      ...sharedConfig.ruleOverrides.custom,
     },
-  },
-
-  // ============================================================
-  // Custom AST Rules (no-restricted-syntax)
-  // ============================================================
-  {
-    files: sharedConfig.files,
-    ignores: ["**/seeds.ts"],
-    languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        ecmaVersion: 2021,
-        sourceType: "module",
-        project: [resolve(__dirname, sharedConfig.parserOptions.project)],
-        tsconfigRootDir: __dirname,
-        ecmaFeatures: { jsx: true },
-      },
+    linterOptions: {
+      reportUnusedDisableDirectives: false,
     },
-    rules: sharedConfig.customRules,
   },
 ];
 

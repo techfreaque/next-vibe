@@ -90,8 +90,8 @@ type Test2_1_NestedObjectField = ObjectField<
 >;
 type Test2_1_Result =
   Test2_1_NestedObjectField extends UnifiedField<z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test2_1: Test2_1_Result = "✓ PASS";
 
 // ============================================================================
@@ -102,7 +102,7 @@ const test2_1: Test2_1_Result = "✓ PASS";
 type Test3_1_Endpoint = ApiEndpoint<
   "test",
   Methods.POST,
-  readonly UserRoleValue[],
+  readonly (typeof UserRoleValue)[],
   ObjectField<
     { name: PrimitiveField<z.ZodString, { request: "data" }> },
     { request: "data" }
@@ -113,29 +113,29 @@ type Test3_1_Result =
   Test3_1_Endpoint extends ApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     UnifiedField<z.ZodTypeAny>
   >
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test3_1: Test3_1_Result = "✓ PASS";
 
 // Test 3.2: Can we create an ApiEndpoint with nested ObjectField?
 type Test3_2_Endpoint = ApiEndpoint<
   "test",
   Methods.POST,
-  readonly UserRoleValue[],
+  readonly (typeof UserRoleValue)[],
   Test2_1_NestedObjectField
 >;
 type Test3_2_Result =
   Test3_2_Endpoint extends ApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test3_2: Test3_2_Result = "✓ PASS";
 
 // ============================================================================
@@ -146,7 +146,7 @@ const test3_2: Test3_2_Result = "✓ PASS";
 type Test4_1_CreateEndpoint = CreateApiEndpoint<
   "test",
   Methods.POST,
-  readonly UserRoleValue[],
+  readonly (typeof UserRoleValue)[],
   ObjectField<
     { name: PrimitiveField<z.ZodString, { request: "data" }> },
     { request: "data" }
@@ -156,29 +156,29 @@ type Test4_1_Result =
   Test4_1_CreateEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test4_1: Test4_1_Result = "✓ PASS";
 
 // Test 4.2: CreateApiEndpoint with nested ObjectField
 type Test4_2_CreateEndpoint = CreateApiEndpoint<
   "test",
   Methods.POST,
-  readonly UserRoleValue[],
+  readonly (typeof UserRoleValue)[],
   Test2_1_NestedObjectField
 >;
 type Test4_2_Result =
   Test4_2_CreateEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test4_2: Test4_2_Result = "✓ PASS";
 
 // ============================================================================
@@ -214,7 +214,7 @@ const test5_1: Test5_1_Result = "✓ PASS";
 type Test5_2_LoginEndpoint = CreateApiEndpoint<
   "default",
   Methods.POST,
-  readonly UserRoleValue[],
+  readonly (typeof UserRoleValue)[],
   Test5_1_LoginFields
 >;
 
@@ -222,11 +222,11 @@ type Test5_2_Result =
   Test5_2_LoginEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test5_2: Test5_2_Result = "✓ PASS";
 
 // ============================================================================
@@ -237,8 +237,8 @@ const test5_2: Test5_2_Result = "✓ PASS";
 type Test6_1_DirectCheck<T extends UnifiedField<z.ZodTypeAny>> = T;
 type Test6_1_Result =
   Test6_1_DirectCheck<Test5_1_LoginFields> extends UnifiedField<z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test6_1: Test6_1_Result = "✓ PASS";
 
 // Test 6.2: Constraint in function parameter position
@@ -259,7 +259,7 @@ type Test6_3_NestedGeneric<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     TFields
   >,
 > = TEndpoint;
@@ -271,11 +271,11 @@ type Test6_3_Result =
   > extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test6_3: Test6_3_Result = "✓ PASS";
 
 // ============================================================================
@@ -287,7 +287,7 @@ type Test7_1_UseApiForm = <
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >,
 >(
@@ -307,7 +307,7 @@ type Test7_2_AcceptsAnyEndpoint = (
   endpoint: CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >,
 ) => void;
@@ -315,8 +315,8 @@ type Test7_2_AcceptsAnyEndpoint = (
 // Can we pass the login endpoint to it?
 type Test7_2_Result =
   Test5_2_LoginEndpoint extends Parameters<Test7_2_AcceptsAnyEndpoint>[0]
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test7_2: Test7_2_Result = "✓ PASS";
 
 // ============================================================================
@@ -328,7 +328,7 @@ type Test8_1_UseApiFormCurrent = <
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >,
 >(
@@ -366,17 +366,17 @@ type Test9_1_Result =
     },
     any
   >
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test9_1: Test9_1_Result = "✓ PASS";
 
 // Test 9.2: Test that we can access nested field types
 type Test9_2_CredentialsField =
   Test9_1_FieldsFromEndpoint extends ObjectField<infer C, any>
-    ? C extends { credentials: infer Cred }
-      ? Cred
-      : never
-    : never;
+  ? C extends { credentials: infer Cred }
+  ? Cred
+  : never
+  : never;
 type Test9_2_Result =
   Test9_2_CredentialsField extends ObjectField<any, any> ? "✓ PASS" : "✗ FAIL";
 const test9_2: Test9_2_Result = "✓ PASS";
@@ -398,8 +398,8 @@ type Test10_1_ArrayOfObjects = ArrayField<
 >;
 type Test10_1_Result =
   Test10_1_ArrayOfObjects extends UnifiedField<z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test10_1: Test10_1_Result = "✓ PASS";
 
 // Test 10.2: Deeply nested ObjectFields (3 levels)
@@ -421,8 +421,8 @@ type Test10_2_DeeplyNested = ObjectField<
 >;
 type Test10_2_Result =
   Test10_2_DeeplyNested extends UnifiedField<z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test10_2: Test10_2_Result = "✓ PASS";
 
 // Test 10.3: Mixed usage configurations
@@ -448,8 +448,8 @@ type Test10_4_NestedArrays = ArrayField<
 >;
 type Test10_4_Result =
   Test10_4_NestedArrays extends UnifiedField<z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test10_4: Test10_4_Result = "✓ PASS";
 
 // ============================================================================
@@ -463,7 +463,7 @@ interface Test11_1_LoginEndpoints {
   GET: CreateApiEndpoint<
     "status",
     Methods.GET,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     ObjectField<Record<string, never>, { response: true }>
   >;
 }
@@ -478,7 +478,7 @@ const test11_1: Test11_1_Result = "✓ PASS";
 type Test11_2_UseEndpoint = <
   T extends Record<
     string,
-    CreateApiEndpoint<string, Methods, readonly UserRoleValue[], any>
+    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
   >,
 >(
   endpoints: T,
@@ -512,7 +512,7 @@ type Test12_1_CustomField = ObjectField<
 type Test12_1_CustomEndpoint = CreateApiEndpoint<
   "custom",
   Methods.POST,
-  readonly UserRoleValue[],
+  readonly (typeof UserRoleValue)[],
   Test12_1_CustomField
 >;
 
@@ -520,11 +520,11 @@ type Test12_1_Result =
   Test12_1_CustomEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test12_1: Test12_1_Result = "✓ PASS";
 
 // Test 12.2: Verify type inference works with custom fields
@@ -552,15 +552,15 @@ type Test13_1_OptionalFields = ObjectField<
 >;
 type Test13_1_Result =
   Test13_1_OptionalFields extends UnifiedField<z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test13_1: Test13_1_Result = "✓ PASS";
 
 // Test 13.2: Endpoint with optional fields
 type Test13_2_OptionalEndpoint = CreateApiEndpoint<
   "optional",
   Methods.POST,
-  readonly UserRoleValue[],
+  readonly (typeof UserRoleValue)[],
   Test13_1_OptionalFields
 >;
 type Test13_2_Request = Test13_2_OptionalEndpoint["TRequestOutput"];
@@ -580,7 +580,7 @@ const test13_2: Test13_2_Result = "✓ PASS";
 type Test14_1_GetEndpoint = CreateApiEndpoint<
   "get",
   Methods.GET,
-  readonly UserRoleValue[],
+  readonly (typeof UserRoleValue)[],
   ObjectField<
     {
       data: PrimitiveField<z.ZodString, { response: true }>;
@@ -592,11 +592,11 @@ type Test14_1_Result =
   Test14_1_GetEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test14_1: Test14_1_Result = "✓ PASS";
 
 // Test 14.2: DELETE endpoint
@@ -615,11 +615,11 @@ type Test14_2_Result =
   Test14_2_DeleteEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test14_2: Test14_2_Result = "✓ PASS";
 
 // ============================================================================
@@ -653,8 +653,8 @@ type Test15_1_PaginationFields = ObjectField<
 >;
 type Test15_1_Result =
   Test15_1_PaginationFields extends UnifiedField<z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test15_1: Test15_1_Result = "✓ PASS";
 
 // Test 15.2: File upload with metadata
@@ -681,8 +681,8 @@ type Test15_2_FileUploadFields = ObjectField<
 >;
 type Test15_2_Result =
   Test15_2_FileUploadFields extends UnifiedField<z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test15_2: Test15_2_Result = "✓ PASS";
 
 // ============================================================================
@@ -694,7 +694,7 @@ type Test16_1_UseApiFormSignature = <
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >,
 >(
@@ -719,7 +719,7 @@ interface Test16_2_TestRecord {
   logout: CreateApiEndpoint<
     "logout",
     Methods.POST,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     ObjectField<Record<string, never>, { response: true }>
   >;
 }
@@ -766,10 +766,10 @@ const test18_1: Test18_1_IsReadonly = "✓ PASS";
 type Test18_2_FieldsType = Test5_2_LoginEndpoint["fields"];
 type Test18_2_HasChildren =
   Test18_2_FieldsType extends ObjectField<infer TChildren, any>
-    ? TChildren extends { credentials: any }
-      ? "✓ PASS"
-      : "✗ FAIL"
-    : "✗ FAIL";
+  ? TChildren extends { credentials: any }
+  ? "✓ PASS"
+  : "✗ FAIL"
+  : "✗ FAIL";
 const test18_2: Test18_2_HasChildren = "✓ PASS";
 
 // ============================================================================
@@ -821,7 +821,7 @@ interface Test20_1_MultiEndpoint {
   default: CreateApiEndpoint<
     "default",
     Methods.POST,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     ObjectField<
       {
         email: PrimitiveField<z.ZodString, { request: "data" }>;
@@ -832,7 +832,7 @@ interface Test20_1_MultiEndpoint {
   verify: CreateApiEndpoint<
     "verify",
     Methods.POST,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     ObjectField<
       {
         code: PrimitiveField<z.ZodString, { request: "data" }>;
@@ -843,7 +843,7 @@ interface Test20_1_MultiEndpoint {
   resend: CreateApiEndpoint<
     "resend",
     Methods.POST,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     ObjectField<Record<string, never>, { response: true }>
   >;
 }
@@ -853,11 +853,11 @@ type Test20_1_DefaultValid =
   Test20_1_MultiEndpoint["default"] extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     any
   >
-    ? "✓ PASS"
-    : "✗ FAIL";
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test20_1: Test20_1_DefaultValid = "✓ PASS";
 
 // Test 20.2: Verify the record has all expected keys

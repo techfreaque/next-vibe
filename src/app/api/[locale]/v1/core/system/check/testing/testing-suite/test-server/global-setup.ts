@@ -31,7 +31,7 @@ export default async function setup(
     logger.error("Error during test setup:", parseError(error));
     // Make sure to disconnect Prisma on error
     await closeDatabase(logger).catch(void logger.error);
-    // eslint-disable-next-line no-restricted-syntax -- Test infrastructure can throw errors
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Test infrastructure can throw errors
     throw error;
   }
 }

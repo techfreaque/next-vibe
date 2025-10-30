@@ -16,7 +16,6 @@ import { endpointToMetadata } from "../shared/conversion/endpoint-to-metadata";
 import type { ParameterValue } from "../shared/server-only/execution/executor";
 import { BaseRegistry } from "../shared/server-only/execution/registry";
 import { toolFilter } from "../shared/server-only/permissions/filter";
-import { getErrorMessage } from "../shared/utils/error";
 /**
  * Singleton instance using shared factory
  */
@@ -181,7 +180,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
     } catch (error) {
       this.logger.error("[MCP Registry] Tool execution failed", {
         toolName: context.toolName,
-        error: getErrorMessage(error),
+        error: error instanceof Error ? error.message : String(error),
       });
 
       return this.fail({

@@ -22,7 +22,7 @@ interface SimpleEndpointDefinition {
   description?: string;
   category?: string;
   tags?: readonly string[];
-  allowedRoles?: readonly UserRoleValue[];
+  allowedRoles?: readonly (typeof UserRoleValue)[];
   requestSchema?: z.ZodTypeAny;
   responseSchema?: z.ZodTypeAny;
   credits?: number;
@@ -41,8 +41,8 @@ interface SimpleEndpointDefinition {
  */
 interface NestedEndpoints {
   [key: string]:
-    | NestedEndpoints
-    | Partial<Record<Methods, SimpleEndpointDefinition>>;
+  | NestedEndpoints
+  | Partial<Record<Methods, SimpleEndpointDefinition>>;
 }
 
 /**
@@ -126,7 +126,7 @@ export function convertEndpointsToMetadata(
                   : "",
               tags: Array.isArray(methodDef.tags) ? methodDef.tags : [],
               allowedRoles: Array.isArray(methodDef.allowedRoles)
-                ? (methodDef.allowedRoles as readonly UserRoleValue[])
+                ? (methodDef.allowedRoles as readonly (typeof UserRoleValue)[])
                 : [],
               requiresAuth: !methodDef.allowedRoles?.includes("PUBLIC"),
               requestSchema: methodDef.requestSchema,

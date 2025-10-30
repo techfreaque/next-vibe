@@ -75,7 +75,7 @@ export class CliEntryPoint {
     private logger: EndpointLogger,
     private t: TFunction,
     private locale: CountryLanguage,
-  ) {}
+  ) { }
 
   /**
    * Initialize the CLI system by discovering routes
@@ -168,10 +168,10 @@ export class CliEntryPoint {
     const cliUser = options.user
       ? options.user
       : await getCliUserForCommand(
-          command,
-          this.logger,
-          options.locale || "en-GLOBAL",
-        );
+        command,
+        this.logger,
+        options.locale || "en-GLOBAL",
+      );
 
     // Create execution context
     const context: RouteExecutionContext = {

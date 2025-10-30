@@ -1,14 +1,4 @@
 /**
- * Shared Error Handling Utilities
- * Generic error handling functions used across all platforms (AI, CLI, MCP, React)
- */
-
-/**
- * Error details type
- */
-export type ErrorDetails = Record<string, string | number | boolean | null>;
-
-/**
  * Extract error message from unknown error
  * Handles all error types safely
  */
@@ -35,11 +25,11 @@ export function isError(error: Error | string): error is Error {
 export function createStandardError(
   message: string,
   code?: string,
-  details?: ErrorDetails,
-): Error & { code?: string; details?: ErrorDetails } {
+  details?: Record<string, string | number | boolean | null>,
+): Error & { code?: string; details?: Record<string, string | number | boolean | null> } {
   const error = new Error(message) as Error & {
     code?: string;
-    details?: ErrorDetails;
+    details?: Record<string, string | number | boolean | null>;
   };
   if (code) {
     error.code = code;
@@ -67,7 +57,7 @@ export function formatErrorForLogging(error: Error | string): {
   message: string;
   stack?: string;
   code?: string;
-  details?: ErrorDetails;
+  details?: Record<string, string | number | boolean | null>;
 } {
   const message = getErrorMessage(error);
   const stack = extractStackTrace(error);
@@ -83,21 +73,14 @@ export function formatErrorForLogging(error: Error | string): {
       code: error.code,
       details:
         "details" in error &&
-        typeof error.details === "object" &&
-        error.details !== null
-          ? (error.details as ErrorDetails)
+          typeof error.details === "object" &&
+          error.details !== null
+          ? (error.details as Record<string, string | number | boolean | null>)
           : undefined,
     };
   }
 
   return { message, stack };
-}
-
-/**
- * Logger interface for error handling
- */
-export interface ErrorLogger {
-  error: (message: string, context?: ErrorDetails) => void;
 }
 
 /**
@@ -108,7 +91,7 @@ export function createErrorResult(
   error: Error | string,
   startTime: number,
   toolName: string,
-  logger: ErrorLogger,
+  logger: { error: (message: string, context?: Record<string, string | number | boolean | null>) => void },
 ): {
   success: false;
   error: string;

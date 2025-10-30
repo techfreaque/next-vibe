@@ -19,15 +19,17 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types"
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
-  type NewSideTaskExecutionRecord,
-  type NewSideTaskHealthCheckRecord,
-  type NewSideTaskRecord,
-  type SideTaskExecutionRecord,
   sideTaskExecutions,
-  type SideTaskHealthCheckRecord,
   sideTaskHealthChecks,
-  type SideTaskRecord,
   sideTasks,
+} from "./db";
+import type {
+  NewSideTaskExecutionRecord,
+  NewSideTaskHealthCheckRecord,
+  NewSideTaskRecord,
+  SideTaskExecutionRecord,
+  SideTaskHealthCheckRecord,
+  SideTaskRecord,
 } from "./db";
 import type {
   SideTasksRequestOutput,

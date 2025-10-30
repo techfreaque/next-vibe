@@ -149,8 +149,8 @@ export const branchRepository = {
           isAI: newMessage.isAI,
           model: newMessage.model,
           tokens: newMessage.tokens,
-          createdAt: newMessage.createdAt,
-          updatedAt: newMessage.updatedAt,
+          createdAt: newMessage.createdAt.toISOString(),
+          updatedAt: newMessage.updatedAt.toISOString(),
         },
       });
     } catch (error) {

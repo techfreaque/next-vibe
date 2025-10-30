@@ -75,13 +75,10 @@ const AccordionItem = React.forwardRef<
 });
 AccordionItem.displayName = AccordionPrimitive.Item.displayName;
 
-const Trigger = Platform.OS === "web" ? View : Pressable;
-
 const AccordionTrigger = React.forwardRef<
   AccordionPrimitive.TriggerRef,
   AccordionPrimitive.TriggerProps & {
     className?: string;
-    children: React.ReactNode;
   }
 >(({ className, children, ...props }, ref) => {
   const { isExpanded } = AccordionPrimitive.useItemContext();
@@ -96,25 +93,37 @@ const AccordionTrigger = React.forwardRef<
     opacity: interpolate(progress.value, [0, 1], [1, 0.8], Extrapolation.CLAMP),
   }));
 
+  const triggerClassName = cn(
+    "flex flex-row web:flex-1 items-center justify-between py-4 web:transition-all group web:focus-visible:outline-none web:focus-visible:ring-1 web:focus-visible:ring-muted-foreground",
+    className,
+  );
+
+  const TriggerContent = (): React.JSX.Element => (
+    <>
+      {children}
+      <StyledAnimatedView style={chevronStyle}>
+        <ChevronDown size={18} {...{ className: "text-foreground shrink-0" }} />
+      </StyledAnimatedView>
+    </>
+  );
+
   return (
     <TextClassContext.Provider
       value={
         "native:text-lg font-medium web:group-hover:underline" // eslint-disable-line i18next/no-literal-string -- CSS class names
       }
     >
-      <StyledAccordionHeader className="flex">
+      <StyledAccordionHeader {...{ className: "flex" }}>
         <StyledAccordionTrigger ref={ref} {...props} asChild>
-          <Trigger
-            className={cn(
-              "flex flex-row web:flex-1 items-center justify-between py-4 web:transition-all group web:focus-visible:outline-none web:focus-visible:ring-1 web:focus-visible:ring-muted-foreground",
-              className,
-            )}
-          >
-            {children}
-            <StyledAnimatedView style={chevronStyle}>
-              <ChevronDown size={18} className={"text-foreground shrink-0"} />
-            </StyledAnimatedView>
-          </Trigger>
+          {Platform.OS === "web" ? (
+            <View {...(triggerClassName ? { className: triggerClassName } : {})}>
+              <TriggerContent />
+            </View>
+          ) : (
+            <Pressable {...(triggerClassName ? { className: triggerClassName } : {})}>
+              <TriggerContent />
+            </Pressable>
+          )}
         </StyledAccordionTrigger>
       </StyledAccordionHeader>
     </TextClassContext.Provider>
@@ -147,21 +156,20 @@ const AccordionContent = React.forwardRef<
   );
 });
 
-function InnerContent({
-  children,
-  className,
-}: {
+interface InnerContentProps {
   children: React.ReactNode;
   className?: string;
-}): React.JSX.Element {
+}
+
+function InnerContent({ children, className }: InnerContentProps): React.JSX.Element {
   if (Platform.OS === "web") {
-    return <View className={cn("pb-4", className)}>{children}</View>;
+    return <View {...{ className: cn("pb-4", className) }}>{children}</View>;
   }
   return (
     <StyledAnimatedView
       entering={FadeIn}
       exiting={FadeOutUp.duration(200)}
-      className={cn("pb-4", className)}
+      {...{ className: cn("pb-4", className) }}
     >
       {children}
     </StyledAnimatedView>

@@ -184,8 +184,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         status: thread.status,
         preview: thread.preview,
         pinned: thread.pinned,
-        createdAt: thread.createdAt,
-        updatedAt: thread.updatedAt,
+        createdAt: thread.createdAt.toISOString(),
+        updatedAt: thread.updatedAt.toISOString(),
       }));
 
       const pageCount = Math.ceil(total / limit);
@@ -293,8 +293,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         rootFolderId: dbThread.rootFolderId, // Already typed as DefaultFolderId from DB schema
         subFolderId: dbThread.folderId,
         status: dbThread.status,
-        createdAt: dbThread.createdAt,
-        updatedAt: dbThread.updatedAt,
+        createdAt: dbThread.createdAt.toISOString(),
+        updatedAt: dbThread.updatedAt.toISOString(),
       };
 
       logger.debug("Thread created successfully", { threadId: thread.id });

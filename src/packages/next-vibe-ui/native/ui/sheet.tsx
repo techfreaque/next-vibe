@@ -23,7 +23,7 @@ function useSheet(): SheetContextValue {
   const context = useContext(SheetContext);
   if (!context) {
     // eslint-disable-next-line no-restricted-syntax -- Error handling for context
-    throw new Error("Sheet components must be used within Sheet"); // eslint-disable-line i18next/no-literal-string -- Error message
+    throw new Error("Sheet components must be used within Sheet");
   }
   return context;
 }

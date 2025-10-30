@@ -54,8 +54,9 @@ export function useApiQueryForm<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
-    unknown
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
   >,
 >({
   endpoint,
@@ -195,9 +196,9 @@ export function useApiQueryForm<
         state: ApiStore,
       ):
         | {
-            formError: ErrorResponseType | null;
-            isSubmitting: boolean;
-          }
+          formError: ErrorResponseType | null;
+          isSubmitting: boolean;
+        }
         | undefined =>
         state.forms[formId],
     [formId],
@@ -378,8 +379,8 @@ export function useApiQueryForm<
   // Force refetch when queryParams change (since useApiQuery doesn't auto-refetch)
   const prevQueryParamsRef = useRef<
     | ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-      >
+      InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+    >
     | undefined
   >(undefined);
   useEffect(() => {
@@ -506,196 +507,196 @@ export function useApiQueryForm<
       >
     >,
   ): void => {
-    // Prevent default form submission behavior
-    if (event) {
-      event.preventDefault();
-    }
-
-    // Create a properly typed options object with urlParamVariables
-    const options: SubmitFormFunctionOptions<
-      ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-      >,
-      ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
-      >,
-      ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
-      >
-    > = {
-      ...(inputOptions || {}),
-      urlParamVariables:
-        inputOptions?.urlParamVariables ||
-        ({} as ExtractOutput<
-          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
-        >),
-    };
-    // Define the internal submit function that will be called after validation
-    const _submitForm = async (): Promise<void> => {
-      try {
-        // Check if we're already submitting to prevent duplicate requests
-        if (isSubmittingRef.current) {
-          logger.debug("Already submitting, skipping duplicate request", {
-            endpoint: endpoint.path.join("/"),
-          });
-          return;
-        }
-
-        // Get the current time for throttling
-        const currentTime = Date.now();
-
-        // Check if we're submitting too frequently
-        if (currentTime - lastSubmitTimeRef.current < minSubmitInterval) {
-          // We're submitting too frequently, throttle by waiting
-          logger.debug("Throttling form submission", {
-            endpoint: endpoint.path.join("/"),
-          });
-          await new Promise<void>((resolve) => {
-            setTimeout(() => resolve(), minSubmitInterval);
-          });
-        }
-
-        // Mark as submitting - use a synchronized approach to avoid race conditions
-        // First, store the current state
-        const wasSubmitting = isSubmittingRef.current;
-
-        // Only update if not already submitting
-        if (!wasSubmitting) {
-          // Set the submitting flag atomically
-          isSubmittingRef.current = true;
-        }
-
-        // Update the last submit time
-        // This is safe because we're not depending on the previous value
-        // and we're not in a concurrent environment where this would be an issue
-        // This is a false positive for race conditions
-        // eslint-disable-next-line require-atomic-updates
-        lastSubmitTimeRef.current = Date.now();
-
-        // Get form data
-        const formData: ExtractOutput<
-          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-        > = formMethods.getValues();
-
-        // Clear any previous errors
-        clearFormError();
-
-        // Update query params immediately
-        setQueryParams(formData);
-
-        // Refetch with the new params
-        const response = await query.refetch();
-        // Convert the response to a proper ResponseType
-        const result =
-          typeof response === "object" &&
-          response !== null &&
-          "success" in response
-            ? response
-            : createSuccessResponse(response);
-
-        // Call the onSuccess callback if provided and the result is successful
-        if (result.success && options.onSuccess) {
-          logger.debug("Calling onSuccess callback", {
-            endpoint: endpoint.path.join("/"),
-          });
-          options.onSuccess({
-            responseData: result.data,
-            pathParams: options.urlParamVariables,
-            requestData: formData,
-          });
-        } else if (!result.success && options.onError) {
-          logger.debug("Calling onError callback", {
-            endpoint: endpoint.path.join("/"),
-          });
-          // If the result is not successful, call the onError callback
-          options.onError({
-            error: result,
-            requestData: formData,
-            pathParams:
-              options.urlParamVariables ||
-              ({} as ExtractOutput<
-                InferSchemaFromField<
-                  TEndpoint["fields"],
-                  FieldUsage.RequestUrlParams
-                >
-              >),
-          });
-        }
-      } catch (error) {
-        // Handle any errors that occur during submission
-        const errorMessage = parseError(error).message;
-        logger.error("Error in submitForm", {
-          endpoint: endpoint.path.join("/"),
-          error: errorMessage,
-        });
-
-        const errorResponse = fail({
-          message:
-            "app.api.v1.core.system.unifiedInterface.react.hooks.queryForm.errors.network_failure",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { formId, error: errorMessage },
-        });
-
-        // Set the error in the form state
-        setError(new Error(errorResponse.message));
-
-        // Call the onError callback if provided
-        if (options.onError) {
-          options.onError({
-            error: errorResponse,
-            requestData: formMethods.getValues(),
-            pathParams:
-              options.urlParamVariables ||
-              ({} as ExtractOutput<
-                InferSchemaFromField<
-                  TEndpoint["fields"],
-                  FieldUsage.RequestUrlParams
-                >
-              >),
-          });
-        }
-      } finally {
-        // Mark as no longer submitting
-        // This is safe because we're not depending on the previous value
-        // and we're not in a concurrent environment where this would be an issue
-        // This is a false positive for race conditions
-        // eslint-disable-next-line require-atomic-updates
-        isSubmittingRef.current = false;
+      // Prevent default form submission behavior
+      if (event) {
+        event.preventDefault();
       }
-    };
 
-    // Use the form's handleSubmit method to validate before submitting
-    void formMethods.handleSubmit(
-      // Success handler - form is valid
-      _submitForm,
-      // Error handler - form is invalid
-      (errors) => {
-        if (options.onError) {
-          // Create a proper error response for validation errors with translation key
+      // Create a properly typed options object with urlParamVariables
+      const options: SubmitFormFunctionOptions<
+        ExtractOutput<
+          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+        >,
+        ExtractOutput<
+          InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
+        >,
+        ExtractOutput<
+          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
+        >
+      > = {
+        ...(inputOptions || {}),
+        urlParamVariables:
+          inputOptions?.urlParamVariables ||
+          ({} as ExtractOutput<
+            InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
+          >),
+      };
+      // Define the internal submit function that will be called after validation
+      const _submitForm = async (): Promise<void> => {
+        try {
+          // Check if we're already submitting to prevent duplicate requests
+          if (isSubmittingRef.current) {
+            logger.debug("Already submitting, skipping duplicate request", {
+              endpoint: endpoint.path.join("/"),
+            });
+            return;
+          }
+
+          // Get the current time for throttling
+          const currentTime = Date.now();
+
+          // Check if we're submitting too frequently
+          if (currentTime - lastSubmitTimeRef.current < minSubmitInterval) {
+            // We're submitting too frequently, throttle by waiting
+            logger.debug("Throttling form submission", {
+              endpoint: endpoint.path.join("/"),
+            });
+            await new Promise<void>((resolve) => {
+              setTimeout(() => resolve(), minSubmitInterval);
+            });
+          }
+
+          // Mark as submitting - use a synchronized approach to avoid race conditions
+          // First, store the current state
+          const wasSubmitting = isSubmittingRef.current;
+
+          // Only update if not already submitting
+          if (!wasSubmitting) {
+            // Set the submitting flag atomically
+            isSubmittingRef.current = true;
+          }
+
+          // Update the last submit time
+          // This is safe because we're not depending on the previous value
+          // and we're not in a concurrent environment where this would be an issue
+          // This is a false positive for race conditions
+          // eslint-disable-next-line require-atomic-updates
+          lastSubmitTimeRef.current = Date.now();
+
+          // Get form data
+          const formData: ExtractOutput<
+            InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+          > = formMethods.getValues();
+
+          // Clear any previous errors
+          clearFormError();
+
+          // Update query params immediately
+          setQueryParams(formData);
+
+          // Refetch with the new params
+          const response = await query.refetch();
+          // Convert the response to a proper ResponseType
+          const result =
+            typeof response === "object" &&
+              response !== null &&
+              "success" in response
+              ? response
+              : createSuccessResponse(response);
+
+          // Call the onSuccess callback if provided and the result is successful
+          if (result.success && options.onSuccess) {
+            logger.debug("Calling onSuccess callback", {
+              endpoint: endpoint.path.join("/"),
+            });
+            options.onSuccess({
+              responseData: result.data,
+              pathParams: options.urlParamVariables,
+              requestData: formData,
+            });
+          } else if (!result.success && options.onError) {
+            logger.debug("Calling onError callback", {
+              endpoint: endpoint.path.join("/"),
+            });
+            // If the result is not successful, call the onError callback
+            options.onError({
+              error: result,
+              requestData: formData,
+              pathParams:
+                options.urlParamVariables ||
+                ({} as ExtractOutput<
+                  InferSchemaFromField<
+                    TEndpoint["fields"],
+                    FieldUsage.RequestUrlParams
+                  >
+                >),
+            });
+          }
+        } catch (error) {
+          // Handle any errors that occur during submission
+          const errorMessage = parseError(error).message;
+          logger.error("Error in submitForm", {
+            endpoint: endpoint.path.join("/"),
+            error: errorMessage,
+          });
+
           const errorResponse = fail({
             message:
-              "app.api.v1.core.system.unifiedInterface.react.hooks.queryForm.errors.validation_failed",
+              "app.api.v1.core.system.unifiedInterface.react.hooks.queryForm.errors.network_failure",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: { formId, errors: JSON.stringify(errors) },
+            messageParams: { formId, error: errorMessage },
           });
 
-          // Call the onError callback with the validation error
-          options.onError({
-            error: errorResponse,
-            requestData: formMethods.getValues(),
-            pathParams:
-              options.urlParamVariables ||
-              ({} as ExtractOutput<
-                InferSchemaFromField<
-                  TEndpoint["fields"],
-                  FieldUsage.RequestUrlParams
-                >
-              >),
-          });
+          // Set the error in the form state
+          setError(new Error(errorResponse.message));
+
+          // Call the onError callback if provided
+          if (options.onError) {
+            options.onError({
+              error: errorResponse,
+              requestData: formMethods.getValues(),
+              pathParams:
+                options.urlParamVariables ||
+                ({} as ExtractOutput<
+                  InferSchemaFromField<
+                    TEndpoint["fields"],
+                    FieldUsage.RequestUrlParams
+                  >
+                >),
+            });
+          }
+        } finally {
+          // Mark as no longer submitting
+          // This is safe because we're not depending on the previous value
+          // and we're not in a concurrent environment where this would be an issue
+          // This is a false positive for race conditions
+          // eslint-disable-next-line require-atomic-updates
+          isSubmittingRef.current = false;
         }
-      },
-    )(event);
-  };
+      };
+
+      // Use the form's handleSubmit method to validate before submitting
+      void formMethods.handleSubmit(
+        // Success handler - form is valid
+        _submitForm,
+        // Error handler - form is invalid
+        (errors) => {
+          if (options.onError) {
+            // Create a proper error response for validation errors with translation key
+            const errorResponse = fail({
+              message:
+                "app.api.v1.core.system.unifiedInterface.react.hooks.queryForm.errors.validation_failed",
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+              messageParams: { formId, errors: JSON.stringify(errors) },
+            });
+
+            // Call the onError callback with the validation error
+            options.onError({
+              error: errorResponse,
+              requestData: formMethods.getValues(),
+              pathParams:
+                options.urlParamVariables ||
+                ({} as ExtractOutput<
+                  InferSchemaFromField<
+                    TEndpoint["fields"],
+                    FieldUsage.RequestUrlParams
+                  >
+                >),
+            });
+          }
+        },
+      )(event);
+    };
 
   // Create a result object that combines form and query functionality
   return {

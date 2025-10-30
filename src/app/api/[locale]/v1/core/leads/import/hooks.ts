@@ -58,13 +58,16 @@ export function useLeadsImportEndpoint(
         // Convert file to base64
         const fileContent = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
-          reader.onload = (): void => {
-            const result = reader.result as string;
+          reader.addEventListener("load", (): void => {
+            if (typeof reader.result !== "string") {
+              reject(new Error("Failed to read file as string"));
+              return;
+            }
             // Remove data URL prefix to get just base64
-            const base64 = result.split(",")[1];
+            const base64 = reader.result.split(",")[1];
             resolve(base64);
-          };
-          reader.onerror = reject;
+          });
+          reader.addEventListener("error", reject);
           reader.readAsDataURL(file);
         });
 

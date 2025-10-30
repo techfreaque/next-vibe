@@ -39,7 +39,7 @@ import type {
   UserSearchOptions,
   UserType,
 } from "./types";
-import type { UserRole, UserRoleValue } from "./user-roles/enum";
+import type { UserRoleValue } from "./user-roles/enum";
 
 /**
  * Native User Repository Implementation
@@ -99,12 +99,11 @@ class UserRepositoryNativeImpl implements UserRepository {
     // The response from /me endpoint has shape: { user: CompleteUserType }
     // Since native always calls GET /me which returns CompleteUserType,
     // and CompleteUserType satisfies all UserType<T> variants (it's the most complete),
-    // TypeScript should infer this correctly. The generic T parameter doesn't affect
-    // what data we fetch - we always get complete user data from the endpoint.
+    // we can safely return it for any UserType<T> generic parameter.
     if (response.success) {
       return {
         success: true,
-        data: response.data.user,
+        data: response.data.user as UserType<T>,
         message: response.message,
       };
     }

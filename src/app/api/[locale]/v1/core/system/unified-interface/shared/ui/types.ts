@@ -12,6 +12,7 @@ import type {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
@@ -66,7 +67,7 @@ export interface WidgetRenderContext {
   isInteractive: boolean;
 
   /** User permissions for conditional rendering */
-  permissions: readonly string[];
+  permissions: readonly (typeof UserRoleValue)[];
 
   /** Navigation callback for links and routing */
   onNavigate?: (url: string) => void;
@@ -125,8 +126,8 @@ export interface WidgetRegistryEntry<TData = unknown> {
 
   /** Widget component or renderer function */
   component:
-    | React.ComponentType<WidgetComponentProps<TData>>
-    | WidgetRenderer<TData>;
+  | React.ComponentType<WidgetComponentProps<TData>>
+  | WidgetRenderer<TData>;
 
   /** Supported platforms */
   platforms?: Array<"web" | "native" | "cli">;
@@ -279,13 +280,13 @@ export interface ContainerWidgetData {
     gap?: string;
   };
   [key: string]:
-    | RenderableValue
-    | Array<{
-        type: WidgetType;
-        data: RenderableValue;
-        metadata: ResponseFieldMetadata;
-      }>
-    | { type: "grid" | "flex" | "stack"; columns?: number; gap?: string };
+  | RenderableValue
+  | Array<{
+    type: WidgetType;
+    data: RenderableValue;
+    metadata: ResponseFieldMetadata;
+  }>
+  | { type: "grid" | "flex" | "stack"; columns?: number; gap?: string };
 }
 
 /**

@@ -44,8 +44,7 @@ export interface MessageSearchRepositoryInterface {
  * Message Search Repository Implementation
  */
 export class MessageSearchRepositoryImpl
-  implements MessageSearchRepositoryInterface
-{
+  implements MessageSearchRepositoryInterface {
   /**
    * Search messages within a specific thread using full-text search
    */
@@ -159,7 +158,7 @@ export class MessageSearchRepositoryImpl
           role: r.role,
           rank: r.rank,
           headline: r.headline,
-          createdAt: r.createdAt,
+          createdAt: r.createdAt.toISOString(),
         })),
         totalCount,
       });

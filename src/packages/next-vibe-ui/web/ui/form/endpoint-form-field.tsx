@@ -562,20 +562,20 @@ function renderFieldInput<
     }
 
     case "phone":
+      if (config.type !== "phone") {
+        throw new Error("Invalid config type for phone field");
+      }
       return (
         <PhoneField
-          value={String(field.value || "")}
+          value={String(field.value ?? "")}
           onChange={(value) => field.onChange(value)}
           onBlur={field.onBlur}
           placeholder={
-            config.placeholder ||
-            "packages.nextVibeUi.web.common.enterPhoneNumber"
+            config.placeholder ?? "packages.nextVibeUi.web.common.enterPhoneNumber"
           }
-          defaultCountry={config.defaultCountry || "DE"}
-          preferredCountries={
-            config.preferredCountries || ["DE", "PL", "GLOBAL"]
-          }
-          disabled={disabled || config.disabled}
+          defaultCountry={config.defaultCountry ?? "DE"}
+          preferredCountries={config.preferredCountries ?? ["DE", "PL", "GLOBAL"]}
+          disabled={disabled ?? config.disabled}
           className={inputClassName}
           name={field.name}
         />

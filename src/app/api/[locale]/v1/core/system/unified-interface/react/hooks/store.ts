@@ -18,7 +18,6 @@ import { create } from "zustand";
 
 import { generateStorageKey } from "@/app/api/[locale]/v1/core/system/unified-interface/react/storage-storage-client";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
-import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -205,7 +204,7 @@ export interface ApiStore {
 
   // Methods
   executeQuery: <
-    TUserRoleValue extends readonly UserRoleValue[],
+    TUserRoleValue extends readonly (typeof UserRoleValue)[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
@@ -232,7 +231,7 @@ export interface ApiStore {
   ) => Promise<ResponseType<TEndpoint["TResponseOutput"]>>;
 
   executeMutation: <
-    TUserRoleValue extends readonly UserRoleValue[],
+    TUserRoleValue extends readonly (typeof UserRoleValue)[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
@@ -279,23 +278,24 @@ export interface ApiStore {
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
-      readonly UserRoleValue[],
-      UnifiedField<z.ZodTypeAny>
+      readonly (typeof UserRoleValue)[],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      any
     >,
   >(
     endpoint: TEndpoint,
     updater: (
       oldData:
         | {
-            success: boolean;
-            data: TEndpoint["TResponseOutput"];
-          }
-        | undefined,
-    ) =>
-      | {
           success: boolean;
           data: TEndpoint["TResponseOutput"];
         }
+        | undefined,
+    ) =>
+      | {
+        success: boolean;
+        data: TEndpoint["TResponseOutput"];
+      }
       | undefined,
     requestData?: TEndpoint["TRequestOutput"],
     urlPathParams?: TEndpoint["TUrlVariablesOutput"],
@@ -361,7 +361,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
   }): string => `form-${endpoint.path.join("-")}-${endpoint.method}`,
 
   executeQuery: async <
-    TUserRoleValue extends readonly UserRoleValue[],
+    TUserRoleValue extends readonly (typeof UserRoleValue)[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
@@ -876,8 +876,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   response: onSuccessResult as ResponseType<AnyData>,
                   data: (
                     state.queries[queryId] as
-                      | QueryStoreType<AnyData>
-                      | undefined
+                    | QueryStoreType<AnyData>
+                    | undefined
                   )?.data,
                   error: onSuccessResult,
                   isLoading: false,
@@ -987,17 +987,17 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const errorResponse = isErrorResponseType(error)
         ? error
         : fail({
-            message:
-              "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed",
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { error: parseError(error).message },
-          });
+          message:
+            "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { error: parseError(error).message },
+        });
       return errorResponse;
     }
   },
 
   executeMutation: async <
-    TUserRoleValue extends readonly UserRoleValue[],
+    TUserRoleValue extends readonly (typeof UserRoleValue)[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
@@ -1226,11 +1226,11 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const errorResponse = isErrorResponseType(error)
         ? error
         : fail({
-            message:
-              "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed",
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { error: parseError(error).message },
-          });
+          message:
+            "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { error: parseError(error).message },
+        });
 
       // Update error state
       set((state) => ({
@@ -1376,23 +1376,24 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
-      readonly UserRoleValue[],
-      UnifiedField<z.ZodTypeAny>
+      readonly (typeof UserRoleValue)[],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      any
     >,
   >(
     endpoint: TEndpoint,
     updater: (
       oldData:
         | {
-            success: boolean;
-            data: TEndpoint["TResponseOutput"];
-          }
-        | undefined,
-    ) =>
-      | {
           success: boolean;
           data: TEndpoint["TResponseOutput"];
         }
+        | undefined,
+    ) =>
+      | {
+        success: boolean;
+        data: TEndpoint["TResponseOutput"];
+      }
       | undefined,
     requestData?: TEndpoint["TRequestOutput"],
     urlPathParams?: TEndpoint["TUrlVariablesOutput"],
@@ -1445,9 +1446,9 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       // Use response field (not deprecated data field) to get the full ResponseType
       const oldData = existingQuery.response as
         | {
-            success: boolean;
-            data: TEndpoint["TResponseOutput"];
-          }
+          success: boolean;
+          data: TEndpoint["TResponseOutput"];
+        }
         | undefined;
 
       const newData = updater(oldData);
@@ -1486,8 +1487,13 @@ export const apiClient = {
     TRequestOutput,
     TResponseOutput,
     TUrlVariablesOutput,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    TEndpoint extends CreateApiEndpoint<any, any, any, any>,
+    TEndpoint extends CreateApiEndpoint<
+      string,
+      Methods,
+      readonly (typeof UserRoleValue)[],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      any
+    >,
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
@@ -1552,7 +1558,7 @@ export const apiClient = {
    * Mutate data through an API endpoint without using React hooks
    */
   mutate: async <
-    TUserRoleValue extends readonly UserRoleValue[],
+    TUserRoleValue extends readonly (typeof UserRoleValue)[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
@@ -1628,7 +1634,7 @@ export const apiClient = {
    * Get current mutation state without using React hooks
    */
   getMutationState: <
-    TUserRoleValue extends readonly UserRoleValue[],
+    TUserRoleValue extends readonly (typeof UserRoleValue)[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
@@ -1675,23 +1681,24 @@ export const apiClient = {
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
-      readonly UserRoleValue[],
-      UnifiedField<z.ZodTypeAny>
+      readonly (typeof UserRoleValue)[],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      any
     >,
   >(
     endpoint: TEndpoint,
     updater: (
       oldData:
         | {
-            success: boolean;
-            data: TEndpoint["TResponseOutput"];
-          }
-        | undefined,
-    ) =>
-      | {
           success: boolean;
           data: TEndpoint["TResponseOutput"];
         }
+        | undefined,
+    ) =>
+      | {
+        success: boolean;
+        data: TEndpoint["TResponseOutput"];
+      }
       | undefined,
     requestData?: TEndpoint["TRequestOutput"],
     urlPathParams?: TEndpoint["TUrlVariablesOutput"],

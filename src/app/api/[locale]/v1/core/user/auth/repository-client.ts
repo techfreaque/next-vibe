@@ -70,8 +70,11 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
   setAuthStatus(logger: EndpointLogger): ResponseType<void> {
     try {
       if (envClient.platform.isServer) {
-        // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
-        throw new Error("setAuthStatus cannot be called on the server");
+        logger.error("setAuthStatus cannot be called on the server");
+        return createErrorResponse(
+          "app.api.v1.core.user.auth.authClient.errors.status_save_failed",
+          ErrorResponseTypes.AUTH_ERROR,
+        );
       }
 
       logger.debug("Setting auth status cookie", {
@@ -100,8 +103,11 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
   removeAuthStatus(logger: EndpointLogger): ResponseType<void> {
     try {
       if (envClient.platform.isServer) {
-        // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
-        throw new Error("removeAuthStatus cannot be called on the server");
+        logger.error("removeAuthStatus cannot be called on the server");
+        return createErrorResponse(
+          "app.api.v1.core.user.auth.authClient.errors.status_remove_failed",
+          ErrorResponseTypes.AUTH_ERROR,
+        );
       }
       deleteCookie(AUTH_STATUS_COOKIE_NAME);
 
@@ -125,8 +131,11 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
   hasAuthStatus(logger: EndpointLogger): ResponseType<boolean> {
     try {
       if (envClient.platform.isServer) {
-        // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
-        throw new Error("hasAuthStatus cannot be called on the server");
+        logger.error("hasAuthStatus cannot be called on the server");
+        return createErrorResponse(
+          "app.api.v1.core.user.auth.authClient.errors.status_check_failed",
+          ErrorResponseTypes.AUTH_ERROR,
+        );
       }
 
       const status = getCookie(AUTH_STATUS_COOKIE_NAME);

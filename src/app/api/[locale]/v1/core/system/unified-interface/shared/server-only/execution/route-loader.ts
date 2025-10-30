@@ -39,13 +39,13 @@ export interface RouteLoaderResult<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   > = CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
@@ -90,13 +90,13 @@ export async function loadRouteModule<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   > = CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
@@ -201,13 +201,13 @@ export function extractHandlerFromModule<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   > = CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
@@ -268,13 +268,13 @@ export async function loadRouteHandler<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   > = CreateApiEndpoint<
     string,
     Methods,
-    readonly UserRoleValue[],
+    readonly (typeof UserRoleValue)[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,

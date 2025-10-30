@@ -6,6 +6,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import type { JSX } from "react";
 import * as React from "react";
 import {
   ActivityIndicator,
@@ -70,9 +71,9 @@ export function DataTable<TData, TValue>({
         <Animated.View
           entering={FadeInUp}
           exiting={FadeOutUp}
-          className="h-14 top-16 absolute items-center justify-center w-screen"
+          {...{ className: "h-14 top-16 absolute items-center justify-center w-screen" }}
         >
-          <ActivityIndicator size="small" className="text-foreground" />
+          <ActivityIndicator size="small" {...{ className: "text-foreground" }} />
         </Animated.View>
       )}
       <ScrollView
@@ -122,12 +123,13 @@ export function DataTable<TData, TValue>({
                 />
               }
               renderItem={({ item: row, index }) => {
+                const rowClassName = cn(
+                  "active:opacity-70",
+                  index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50",
+                );
                 return (
                   <TableRow
-                    className={cn(
-                      "active:opacity-70",
-                      index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50",
-                    )}
+                    {...(rowClassName ? { className: rowClassName } : {})}
                     onPress={
                       onRowPress
                         ? (): void => {

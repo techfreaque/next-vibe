@@ -55,13 +55,13 @@ interface CliHandlerFunction<
 // Input data interfaces
 interface InputData {
   [key: string]:
-    | string
-    | number
-    | boolean
-    | null
-    | undefined
-    | InputData
-    | InputData[];
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | InputData
+  | InputData[];
 }
 
 interface CollectedInputData {
@@ -82,13 +82,13 @@ interface SchemaValidator {
 // CLI data types
 export interface CliRequestData {
   [key: string]:
-    | string
-    | number
-    | boolean
-    | null
-    | undefined
-    | CliRequestData
-    | CliRequestData[];
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | CliRequestData
+  | CliRequestData[];
 }
 
 interface CliUrlParams {
@@ -101,13 +101,13 @@ interface CliNamedArgs {
 
 interface CliResponseData {
   [key: string]:
-    | string
-    | number
-    | boolean
-    | null
-    | undefined
-    | CliResponseData
-    | CliResponseData[];
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | CliResponseData
+  | CliResponseData[];
 }
 
 /**
@@ -302,7 +302,7 @@ export class RouteDelegationHandler {
         errorParams: result.success
           ? undefined
           : (result as { messageParams?: Record<string, string | number> })
-              .messageParams,
+            .messageParams,
         cause: result.success
           ? undefined
           : (result as { cause?: ErrorResponseType }).cause,
@@ -777,18 +777,18 @@ export class RouteDelegationHandler {
       const metadata = responseMetadataExtractor.extractResponseMetadata(
         endpointDefinition,
         data as
+        | string
+        | number
+        | boolean
+        | null
+        | (
           | string
           | number
           | boolean
           | null
-          | (
-              | string
-              | number
-              | boolean
-              | null
-              | (string | number | boolean | null)[]
-            )[]
-          | { [key: string]: string | number | boolean | null },
+          | (string | number | boolean | null)[]
+        )[]
+        | { [key: string]: string | number | boolean | null },
       );
 
       // Use enhanced modular renderer with locale
@@ -854,8 +854,8 @@ export class RouteDelegationHandler {
         : null;
     const firstCliArgKey =
       cliConfig &&
-      typeof cliConfig === "object" &&
-      "firstCliArgKey" in cliConfig
+        typeof cliConfig === "object" &&
+        "firstCliArgKey" in cliConfig
         ? cliConfig.firstCliArgKey
         : null;
 

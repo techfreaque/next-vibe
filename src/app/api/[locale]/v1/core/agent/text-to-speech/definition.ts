@@ -21,9 +21,9 @@ import {
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import {
-  ttsLanguageOptions,
-  ttsProviderOptions,
-  ttsVoiceOptions,
+  TtsLanguageOptions,
+  TtsProviderOptions,
+  TtsVoiceOptions,
 } from "./enum";
 
 /**
@@ -75,7 +75,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.textToSpeech.post.provider.description",
           layout: { columns: 4 },
-          options: ttsProviderOptions,
+          options: TtsProviderOptions,
         },
         z.string().default("openai"),
       ),
@@ -87,7 +87,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.textToSpeech.post.voice.description",
           layout: { columns: 4 },
-          options: ttsVoiceOptions,
+          options: TtsVoiceOptions,
         },
         z.string().default("MALE"),
       ),
@@ -99,7 +99,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.textToSpeech.post.language.description",
           layout: { columns: 4 },
-          options: ttsLanguageOptions,
+          options: TtsLanguageOptions,
         },
         z.string().default("en"),
       ),

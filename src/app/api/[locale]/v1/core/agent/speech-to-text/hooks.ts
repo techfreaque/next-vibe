@@ -8,6 +8,7 @@
 import { useCallback, useRef, useState } from "react";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
+
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -83,13 +84,13 @@ export function useEdenAISpeech({
   }, []);
 
   const processRecording = useCallback(async (): Promise<void> => {
-    logger.debug("STT", "Processing recording", {
+    logger.debug("STT: Processing recording", {
       hasEndpointCreate: !!endpoint.create,
     });
 
     if (!endpoint.create) {
       const errorMsg = t("app.chat.hooks.stt.endpoint-not-available");
-      logger.error("STT", errorMsg);
+      logger.error("STT: Endpoint not available", errorMsg);
       setError(errorMsg);
       onError?.(errorMsg);
       return;
@@ -98,7 +99,7 @@ export function useEdenAISpeech({
     try {
       setIsProcessing(true);
       setError(null);
-      logger.debug("STT", "Starting processing");
+      logger.debug("STT: Starting processing");
 
       // Create audio blob
       const audioBlob = new Blob(audioChunksRef.current, {
@@ -114,7 +115,7 @@ export function useEdenAISpeech({
       });
 
       // Set form values and submit
-      logger.debug("STT", "Submitting audio", {
+      logger.debug("STT: Submitting audio", {
         fileSize: audioFile.size,
         provider: "openai",
         languageCode,
@@ -130,7 +131,7 @@ export function useEdenAISpeech({
         onSuccess: ({ responseData }) => {
           if (responseData.response.success) {
             const transcribedText = responseData.response.text;
-            logger.debug("STT", "Success! Transcription received", {
+            logger.debug("STT: Transcription received successfully", {
               textLength: transcribedText.length,
             });
             setTranscript(transcribedText);
@@ -139,7 +140,7 @@ export function useEdenAISpeech({
             cleanup();
           } else {
             const errorMessage = t("app.chat.hooks.stt.transcription-failed");
-            logger.error("STT", errorMessage);
+            logger.error("STT: Transcription failed", errorMessage);
             setError(errorMessage);
             onError?.(errorMessage);
             setIsProcessing(false);
@@ -149,7 +150,10 @@ export function useEdenAISpeech({
         onError: ({ error }) => {
           const errorMessage =
             error.message ?? t("app.chat.hooks.stt.transcription-failed");
-          logger.error("STT", errorMessage, { error });
+          logger.error("STT: API returned error", {
+            errorType: error.errorType,
+            errorMessage: error.message,
+          });
           setError(errorMessage);
           onError?.(errorMessage);
           setIsProcessing(false);
@@ -161,7 +165,7 @@ export function useEdenAISpeech({
         err instanceof Error
           ? err.message
           : t("app.chat.hooks.stt.transcription-failed");
-      logger.error("STT", "Exception during transcription", parseError(err));
+      logger.error("STT: Exception during transcription", parseError(err));
       setError(errorMsg);
       onError?.(errorMsg);
       setIsProcessing(false);
@@ -171,11 +175,11 @@ export function useEdenAISpeech({
 
   const startRecording = useCallback(async (): Promise<void> => {
     try {
-      logger.debug("STT", "Requesting microphone access");
+      logger.debug("STT: Requesting microphone access");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      logger.debug("STT", "Creating MediaRecorder");
+      logger.debug("STT: Creating MediaRecorder");
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
@@ -183,27 +187,27 @@ export function useEdenAISpeech({
       mediaRecorder.ondataavailable = (event): void => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
-          logger.debug("STT", "Audio chunk received", {
+          logger.debug("STT: Audio chunk received", {
             size: event.data.size,
           });
         }
       };
 
       mediaRecorder.onstop = (): void => {
-        logger.debug("STT", "Recording stopped, processing...");
+        logger.debug("STT: Recording stopped, processing...");
         void processRecording();
       };
 
       mediaRecorder.start();
       setIsRecording(true);
       setError(null);
-      logger.debug("STT", "Recording started");
+      logger.debug("STT: Recording started");
     } catch (err) {
       const errorMsg =
         err instanceof Error
           ? err.message
           : t("app.chat.hooks.stt.permission-denied");
-      logger.error("STT", "Failed to start recording", parseError(err));
+      logger.error("STT: Failed to start recording", parseError(err));
       setError(errorMsg);
       onError?.(errorMsg);
       cleanup();
@@ -211,7 +215,7 @@ export function useEdenAISpeech({
   }, [logger, t, onError, cleanup, processRecording]);
 
   const stopRecording = useCallback((): void => {
-    logger.debug("STT", "Stop recording called");
+    logger.debug("STT: Stop recording called");
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);

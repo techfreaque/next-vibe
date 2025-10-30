@@ -197,8 +197,20 @@ export function SidebarWrapper({
             onCreateFolder={handleCreateFolder}
             onUpdateFolder={onUpdateFolder}
             onDeleteFolder={chat.deleteFolder}
-            onToggleFolderExpanded={undefined}
-            onReorderFolder={undefined}
+            onToggleFolderExpanded={(folderId: string): void => {
+              logger.debug("SidebarWrapper", "Toggle folder expanded", {
+                folderId,
+              });
+            }}
+            onReorderFolder={(
+              folderId: string,
+              direction: "up" | "down",
+            ): void => {
+              logger.debug("SidebarWrapper", "Reorder folder", {
+                folderId,
+                direction,
+              });
+            }}
             onMoveFolderToParent={handleMoveFolderToParent}
             onUpdateThreadTitle={onUpdateThreadTitle}
             searchThreads={() => []}

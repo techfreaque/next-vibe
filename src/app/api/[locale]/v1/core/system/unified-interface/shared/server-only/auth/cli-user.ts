@@ -29,13 +29,13 @@ export function getCliUserEmail(): string {
  * Used as fallback when database user doesn't exist (e.g., before seeds)
  */
 export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<
-  readonly UserRoleValue[]
+  readonly (typeof UserRoleValue)[]
 > {
   return {
     isPublic: false,
     id: DEFAULT_CLI_USER_ID,
     leadId: DEFAULT_CLI_USER_ID,
-  } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
+  } as InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>;
 }
 
 /**
@@ -44,12 +44,12 @@ export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<
 export function createCliUserFromDb(
   userId: string,
   leadId?: string | null,
-): InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> {
+): InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]> {
   return {
     isPublic: false,
     id: userId,
     leadId: leadId || userId,
-  } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
+  } as InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>;
 }
 
 /**
@@ -79,7 +79,7 @@ export function createMockUser(): {
 export async function getCliUser(
   logger: EndpointLogger,
   locale: CountryLanguage,
-): Promise<InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>> {
+): Promise<InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>> {
   try {
     const cliUserEmail = getCliUserEmail();
 
@@ -126,7 +126,7 @@ export async function getCliUser(
  * @returns Default CLI user payload
  */
 export function getCliUserSync(): InferJwtPayloadTypeFromRoles<
-  readonly UserRoleValue[]
+  readonly (typeof UserRoleValue)[]
 > {
   return createDefaultCliUser();
 }
@@ -166,7 +166,7 @@ export async function getCliUserForCommand(
   command: string,
   logger: EndpointLogger,
   locale: CountryLanguage,
-): Promise<InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>> {
+): Promise<InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>> {
   if (needsFallbackAuth(command)) {
     logger.debug("Using fallback CLI authentication for command", { command });
     return createDefaultCliUser();

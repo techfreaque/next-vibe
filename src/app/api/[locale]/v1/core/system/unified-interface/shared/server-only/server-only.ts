@@ -1,7 +1,3 @@
-import { Environment } from "next-vibe/shared/utils/env-util";
-
-import { env } from "@/config/env";
-
-if (env.NODE_ENV !== Environment.TEST) {
+if (process.env.NODE_ENV !== "test") {
   void import("server-only");
 }

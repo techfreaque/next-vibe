@@ -5,8 +5,6 @@
  * and Zod schema generation for the data-driven UI system.
  */
 
-import { z } from "zod";
-
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 export interface EnumOptions<T extends Record<string, TranslationKey>> {
@@ -54,55 +52,10 @@ export function createEnumOptions<
   return {
     enum: enumObj,
     options: optionsArray,
-    Value: "" satisfies keyof T as keyof T,
+    // intentianally unsafe cast to get a enum value type
+    // eslint-disable-next-line no-restricted-syntax
+    Value: undefined as unknown as keyof T as keyof T,
   };
-}
-
-/**
- * Create enum options from a simple array of values
- * Useful when you have simple string enums without i18n
- */
-export function createSimpleEnumOptions<T extends string>(
-  values: readonly T[],
-  labelPrefix?: string,
-): {
-  enum: { readonly [K in T]: K };
-  options: Array<{ value: T; label: string }>;
-  schema: z.ZodString;
-} {
-  const enumObj: { [K in T]: K } = {} as { [K in T]: K };
-  const optionsArray: Array<{ value: T; label: string }> = [];
-
-  for (const value of values) {
-    // Make enum behave like a real enum
-    Object.defineProperty(enumObj, value, {
-      value,
-      writable: false,
-      enumerable: true,
-      configurable: false,
-    });
-
-    // Generate label with optional prefix
-    const labelValue: string = labelPrefix ? `${labelPrefix}.${value}` : value;
-    const label: string = labelValue;
-
-    const optionItem = {
-      value,
-      label: label,
-    };
-    optionsArray.push(optionItem);
-  }
-
-  // Freeze the enum object
-  Object.freeze(enumObj);
-
-  const schema = z
-    .string()
-    .refine((value): value is T => values.includes(value as T), {
-      message: "validation.enum.invalid",
-    });
-
-  return { enum: enumObj, options: optionsArray, schema };
 }
 
 /**

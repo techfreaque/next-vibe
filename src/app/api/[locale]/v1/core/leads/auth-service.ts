@@ -43,33 +43,24 @@ class LeadAuthServiceImpl {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<{ leadId: string; isNew: boolean }> {
-    try {
-      // If cookie has leadId, validate it
-      if (cookieLeadId) {
-        const isValid = await this.validateLeadId(cookieLeadId, logger);
-        if (isValid) {
-          logger.debug("app.api.v1.core.leads.auth.public.validCookie", {
-            leadId: cookieLeadId,
-          });
-          return { leadId: cookieLeadId, isNew: false };
-        }
-        logger.debug("app.api.v1.core.leads.auth.public.invalidCookie", {
-          invalidLeadId: cookieLeadId,
+    // If cookie has leadId, validate it
+    if (cookieLeadId) {
+      const isValid = await this.validateLeadId(cookieLeadId, logger);
+      if (isValid) {
+        logger.debug("app.api.v1.core.leads.auth.public.validCookie", {
+          leadId: cookieLeadId,
         });
+        return { leadId: cookieLeadId, isNew: false };
       }
-
-      // Create new anonymous lead
-      const leadId = await this.createAnonymousLead(clientInfo, locale, logger);
-      logger.debug("app.api.v1.core.leads.auth.public.created", { leadId });
-      return { leadId, isNew: true };
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.public.error",
-        parseError(error).message,
-      );
-      // eslint-disable-next-line no-restricted-syntax
-      throw error;
+      logger.debug("app.api.v1.core.leads.auth.public.invalidCookie", {
+        invalidLeadId: cookieLeadId,
+      });
     }
+
+    // Create new anonymous lead
+    const leadId = await this.createAnonymousLead(clientInfo, locale, logger);
+    logger.debug("app.api.v1.core.leads.auth.public.created", { leadId });
+    return { leadId, isNew: true };
   }
 
   /**
@@ -83,40 +74,42 @@ class LeadAuthServiceImpl {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<{ leadId: string; shouldUpdateCookie: boolean }> {
-    try {
-      // Get primary leadId from user_leads table
-      const [primaryUserLead] = await db
-        .select()
-        .from(userLeads)
-        .where(and(eq(userLeads.userId, userId), eq(userLeads.isPrimary, true)))
-        .limit(1);
+    // Get primary leadId from user_leads table
+    const [primaryUserLead] = await db
+      .select()
+      .from(userLeads)
+      .where(and(eq(userLeads.userId, userId), eq(userLeads.isPrimary, true)))
+      .limit(1);
 
-      if (!primaryUserLead) {
-        logger.error("app.api.v1.core.leads.auth.authenticated.noPrimary", {
-          userId,
-        });
-        // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
-        throw new Error(`User ${userId} has no primary leadId`);
-      }
-
-      const shouldUpdate = cookieLeadId !== primaryUserLead.leadId;
-      logger.debug("app.api.v1.core.leads.auth.authenticated.primaryFound", {
+    if (!primaryUserLead) {
+      logger.error("app.api.v1.core.leads.auth.authenticated.noPrimary", {
         userId,
-        leadId: primaryUserLead.leadId,
-        shouldUpdateCookie: shouldUpdate,
       });
-      return {
-        leadId: primaryUserLead.leadId,
-        shouldUpdateCookie: shouldUpdate,
-      };
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.authenticated.error",
-        parseError(error).message,
+      // Create a lead for this user as fallback
+      const newLeadId = await this.createLeadForUser(userId, locale, logger);
+      logger.debug(
+        "app.api.v1.core.leads.auth.authenticated.createdFallbackLead",
+        {
+          userId,
+          leadId: newLeadId,
+        },
       );
-      // eslint-disable-next-line no-restricted-syntax
-      throw error;
+      return {
+        leadId: newLeadId,
+        shouldUpdateCookie: true,
+      };
     }
+
+    const shouldUpdate = cookieLeadId !== primaryUserLead.leadId;
+    logger.debug("app.api.v1.core.leads.auth.authenticated.primaryFound", {
+      userId,
+      leadId: primaryUserLead.leadId,
+      shouldUpdateCookie: shouldUpdate,
+    });
+    return {
+      leadId: primaryUserLead.leadId,
+      shouldUpdateCookie: shouldUpdate,
+    };
   }
 
   /**
@@ -129,60 +122,51 @@ class LeadAuthServiceImpl {
     userId: string,
     logger: EndpointLogger,
   ): Promise<void> {
-    try {
-      // Check if this link already exists
-      const [existing] = await db
-        .select()
-        .from(userLeads)
-        .where(and(eq(userLeads.userId, userId), eq(userLeads.leadId, leadId)))
-        .limit(1);
+    // Check if this link already exists
+    const [existing] = await db
+      .select()
+      .from(userLeads)
+      .where(and(eq(userLeads.userId, userId), eq(userLeads.leadId, leadId)))
+      .limit(1);
 
-      if (existing) {
-        logger.debug("app.api.v1.core.leads.auth.link.alreadyExists", {
-          leadId,
-          userId,
-        });
-        return;
-      }
-
-      // Check if user has any leads (to determine if this should be primary)
-      const existingLeads = await db
-        .select()
-        .from(userLeads)
-        .where(eq(userLeads.userId, userId));
-
-      const isPrimary = existingLeads.length === 0;
-
-      // Create the link
-      await db.insert(userLeads).values({
-        userId,
-        leadId,
-        isPrimary,
-      });
-
-      // Update lead status to SIGNED_UP if not already
-      await db
-        .update(leads)
-        .set({
-          status: LeadStatus.SIGNED_UP,
-          signedUpAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .where(eq(leads.id, leadId));
-
-      logger.debug("app.api.v1.core.leads.auth.link.created", {
+    if (existing) {
+      logger.debug("app.api.v1.core.leads.auth.link.alreadyExists", {
         leadId,
         userId,
-        isPrimary,
       });
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.link.error",
-        parseError(error).message,
-      );
-      // eslint-disable-next-line no-restricted-syntax
-      throw error;
+      return;
     }
+
+    // Check if user has any leads (to determine if this should be primary)
+    const existingLeads = await db
+      .select()
+      .from(userLeads)
+      .where(eq(userLeads.userId, userId));
+
+    const isPrimary = existingLeads.length === 0;
+
+    // Create the link
+    await db.insert(userLeads).values({
+      userId,
+      leadId,
+      isPrimary,
+    });
+
+    // Update lead status to SIGNED_UP if not already
+    await db
+      .update(leads)
+      .set({
+        status: LeadStatus.SIGNED_UP,
+        signedUpAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(leads.id, leadId));
+
+    logger.debug("app.api.v1.core.leads.auth.link.created", {
+      leadId,
+      userId,
+      isPrimary,
+    });
   }
 
   /**
@@ -219,28 +203,19 @@ class LeadAuthServiceImpl {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<string> {
-    try {
-      // If leadId provided, validate it
-      if (leadId) {
-        const isValid = await this.validateLeadId(leadId, logger);
-        if (isValid) {
-          return leadId;
-        }
-        logger.debug("app.api.v1.core.leads.auth.getOrCreate.invalid", {
-          invalidLeadId: leadId,
-        });
+    // If leadId provided, validate it
+    if (leadId) {
+      const isValid = await this.validateLeadId(leadId, logger);
+      if (isValid) {
+        return leadId;
       }
-
-      // Create new lead
-      return await this.createAnonymousLead(clientInfo, locale, logger);
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.getOrCreate.error",
-        parseError(error).message,
-      );
-      // eslint-disable-next-line no-restricted-syntax
-      throw error;
+      logger.debug("app.api.v1.core.leads.auth.getOrCreate.invalid", {
+        invalidLeadId: leadId,
+      });
     }
+
+    // Create new lead
+    return await this.createAnonymousLead(clientInfo, locale, logger);
   }
 
   /**
@@ -251,84 +226,75 @@ class LeadAuthServiceImpl {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<string> {
-    try {
-      // Check for existing anonymous lead with same IP and user agent within last 5 minutes
-      // to prevent duplicate lead creation from multiple simultaneous requests
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    // Check for existing anonymous lead with same IP and user agent within last 5 minutes
+    // to prevent duplicate lead creation from multiple simultaneous requests
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
 
-      // Build conditions array, only adding metadata checks if values exist
-      const conditions = [
-        eq(leads.status, LeadStatus.WEBSITE_USER),
-        eq(leads.source, LeadSource.WEBSITE),
-        isNull(leads.email), // Anonymous leads have no email
-        sql`${leads.createdAt} > ${fiveMinutesAgo}`,
-      ];
+    // Build conditions array, only adding metadata checks if values exist
+    const conditions = [
+      eq(leads.status, LeadStatus.WEBSITE_USER),
+      eq(leads.source, LeadSource.WEBSITE),
+      isNull(leads.email), // Anonymous leads have no email
+      sql`${leads.createdAt} > ${fiveMinutesAgo}`,
+    ];
 
-      if (clientInfo.ipAddress) {
-        conditions.push(
-          sql`${leads.metadata}->>'ipAddress' = ${clientInfo.ipAddress}`,
-        );
-      }
-
-      if (clientInfo.userAgent) {
-        conditions.push(
-          sql`${leads.metadata}->>'userAgent' = ${clientInfo.userAgent}`,
-        );
-      }
-
-      const [existingLead] = await db
-        .select()
-        .from(leads)
-        .where(and(...conditions))
-        .limit(1);
-
-      if (existingLead) {
-        logger.debug("app.api.v1.core.leads.auth.create.existingFound", {
-          leadId: existingLead.id,
-        });
-        return existingLead.id;
-      }
-
-      // Extract country and language from locale using proper utility
-      const { language, country } = getLanguageAndCountryFromLocale(locale);
-
-      // Create new anonymous lead
-      const [newLead] = await db
-        .insert(leads)
-        .values({
-          email: null,
-          businessName: "",
-          contactName: null,
-          phone: null,
-          website: null,
-          country,
-          language,
-          source: LeadSource.WEBSITE,
-          status: LeadStatus.WEBSITE_USER,
-          notes: null,
-          metadata: {
-            anonymous: true,
-            createdFromTracking: true,
-            userAgent: clientInfo.userAgent ?? null,
-            ipAddress: clientInfo.ipAddress ?? null,
-            referer: clientInfo.referer ?? null,
-            timestamp: new Date().toISOString(),
-          },
-        })
-        .returning();
-
-      logger.debug("app.api.v1.core.leads.auth.create.success", {
-        leadId: newLead.id,
-      });
-      return newLead.id;
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.create.error",
-        parseError(error).message,
+    if (clientInfo.ipAddress) {
+      conditions.push(
+        sql`${leads.metadata}->>'ipAddress' = ${clientInfo.ipAddress}`,
       );
-      // eslint-disable-next-line no-restricted-syntax
-      throw error;
     }
+
+    if (clientInfo.userAgent) {
+      conditions.push(
+        sql`${leads.metadata}->>'userAgent' = ${clientInfo.userAgent}`,
+      );
+    }
+
+    const [existingLead] = await db
+      .select()
+      .from(leads)
+      .where(and(...conditions))
+      .limit(1);
+
+    if (existingLead) {
+      logger.debug("app.api.v1.core.leads.auth.create.existingFound", {
+        leadId: existingLead.id,
+      });
+      return existingLead.id;
+    }
+
+    // Extract country and language from locale using proper utility
+    const { language, country } = getLanguageAndCountryFromLocale(locale);
+
+    // Create new anonymous lead
+    const [newLead] = await db
+      .insert(leads)
+      .values({
+        email: null,
+        businessName: "",
+        contactName: null,
+        phone: null,
+        website: null,
+        country,
+        language,
+        source: LeadSource.WEBSITE,
+        status: LeadStatus.WEBSITE_USER,
+        notes: null,
+        metadata: {
+          anonymous: true,
+          createdFromTracking: true,
+          userAgent: clientInfo.userAgent ?? null,
+          ipAddress: clientInfo.ipAddress ?? null,
+          referer: clientInfo.referer ?? null,
+          timestamp: new Date().toISOString(),
+        },
+      })
+      .returning();
+
+    logger.debug("app.api.v1.core.leads.auth.create.success", {
+      leadId: newLead.id,
+    });
+    return newLead.id;
   }
 
   /**
@@ -340,54 +306,80 @@ class LeadAuthServiceImpl {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<string> {
-    try {
-      // Get user email
-      const { users } = await import("../user/db");
-      const [user] = await db
-        .select({ email: users.email })
-        .from(users)
-        .where(eq(users.id, userId))
-        .limit(1);
+    // Get user email
+    const { users } = await import("../user/db");
+    const [user] = await db
+      .select({ email: users.email })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
 
-      if (!user) {
-        // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
-        throw new Error(`User not found: ${userId}`);
-      }
-
-      // Parse locale to get country and language using proper utility
+    if (!user) {
+      logger.error("app.api.v1.core.leads.auth.createForUser.userNotFound", {
+        userId,
+      });
+      // Create a lead with minimal data as fallback
+      // This should never happen in normal operation, but we handle it gracefully
       const { language, country } = getLanguageAndCountryFromLocale(locale);
+      const [fallbackLead] = await db
+        .insert(leads)
+        .values({
+          email: null,
+          businessName: "",
+          status: LeadStatus.SIGNED_UP,
+          source: LeadSource.WEBSITE,
+          country,
+          language,
+          metadata: {
+            fallbackCreated: true,
+            reason: "User not found during lead creation",
+            userId,
+          },
+        })
+        .returning();
 
-      // Create lead with proper locale from request context
-      const leadData = {
-        email: user.email,
-        businessName: "",
-        status: LeadStatus.SIGNED_UP,
-        source: LeadSource.WEBSITE,
-        country,
-        language,
-      };
-      const [newLead] = await db.insert(leads).values(leadData).returning();
-
-      // Link to user as primary
       await db.insert(userLeads).values({
         userId,
-        leadId: newLead.id,
+        leadId: fallbackLead.id,
         isPrimary: true,
       });
 
-      logger.debug("app.api.v1.core.leads.auth.createForUser.success", {
-        userId,
-        leadId: newLead.id,
-      });
-      return newLead.id;
-    } catch (error) {
       logger.error(
-        "app.api.v1.core.leads.auth.createForUser.error",
-        parseError(error).message,
+        "app.api.v1.core.leads.auth.createForUser.createdFallback",
+        {
+          userId,
+          leadId: fallbackLead.id,
+        },
       );
-      // eslint-disable-next-line no-restricted-syntax
-      throw error;
+      return fallbackLead.id;
     }
+
+    // Parse locale to get country and language using proper utility
+    const { language, country } = getLanguageAndCountryFromLocale(locale);
+
+    // Create lead with proper locale from request context
+    const leadData = {
+      email: user.email,
+      businessName: "",
+      status: LeadStatus.SIGNED_UP,
+      source: LeadSource.WEBSITE,
+      country,
+      language,
+    };
+    const [newLead] = await db.insert(leads).values(leadData).returning();
+
+    // Link to user as primary
+    await db.insert(userLeads).values({
+      userId,
+      leadId: newLead.id,
+      isPrimary: true,
+    });
+
+    logger.debug("app.api.v1.core.leads.auth.createForUser.success", {
+      userId,
+      leadId: newLead.id,
+    });
+    return newLead.id;
   }
 
   /**
@@ -443,62 +435,53 @@ class LeadAuthServiceImpl {
     metadata: Record<string, string | number | boolean>,
     logger: EndpointLogger,
   ): Promise<void> {
-    try {
-      // Don't link a lead to itself
-      if (primaryLeadId === linkedLeadId) {
-        logger.debug("app.api.v1.core.leads.auth.linkLeads.sameId", {
-          leadId: primaryLeadId,
-        });
-        return;
-      }
-
-      // Check if link already exists (either direction)
-      const [existingLink] = await db
-        .select()
-        .from(leadLinks)
-        .where(
-          or(
-            and(
-              eq(leadLinks.primaryLeadId, primaryLeadId),
-              eq(leadLinks.linkedLeadId, linkedLeadId),
-            ),
-            and(
-              eq(leadLinks.primaryLeadId, linkedLeadId),
-              eq(leadLinks.linkedLeadId, primaryLeadId),
-            ),
-          ),
-        )
-        .limit(1);
-
-      if (existingLink) {
-        logger.debug("app.api.v1.core.leads.auth.linkLeads.alreadyExists", {
-          primaryLeadId,
-          linkedLeadId,
-        });
-        return;
-      }
-
-      // Create the link
-      await db.insert(leadLinks).values({
-        primaryLeadId,
-        linkedLeadId,
-        linkReason: reason,
-        metadata,
+    // Don't link a lead to itself
+    if (primaryLeadId === linkedLeadId) {
+      logger.debug("app.api.v1.core.leads.auth.linkLeads.sameId", {
+        leadId: primaryLeadId,
       });
-
-      logger.debug("app.api.v1.core.leads.auth.linkLeads.created", {
-        primaryLeadId,
-        linkedLeadId,
-        reason,
-      });
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.linkLeads.error",
-        parseError(error).message,
-      );
-      // eslint-disable-next-line no-restricted-syntax
-      throw error;
+      return;
     }
+
+    // Check if link already exists (either direction)
+    const [existingLink] = await db
+      .select()
+      .from(leadLinks)
+      .where(
+        or(
+          and(
+            eq(leadLinks.primaryLeadId, primaryLeadId),
+            eq(leadLinks.linkedLeadId, linkedLeadId),
+          ),
+          and(
+            eq(leadLinks.primaryLeadId, linkedLeadId),
+            eq(leadLinks.linkedLeadId, primaryLeadId),
+          ),
+        ),
+      )
+      .limit(1);
+
+    if (existingLink) {
+      logger.debug("app.api.v1.core.leads.auth.linkLeads.alreadyExists", {
+        primaryLeadId,
+        linkedLeadId,
+      });
+      return;
+    }
+
+    // Create the link
+    await db.insert(leadLinks).values({
+      primaryLeadId,
+      linkedLeadId,
+      linkReason: reason,
+      metadata,
+    });
+
+    logger.debug("app.api.v1.core.leads.auth.linkLeads.created", {
+      primaryLeadId,
+      linkedLeadId,
+      reason,
+    });
   }
 
   /**
