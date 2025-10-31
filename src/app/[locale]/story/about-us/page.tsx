@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
-import { H1, H2, H3, P } from "next-vibe-ui/ui";
+import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

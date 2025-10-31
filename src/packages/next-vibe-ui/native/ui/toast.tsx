@@ -2,20 +2,52 @@
  * Toast Component for React Native
  * Simple toast notification system
  */
-import type { ReactNode } from "react";
 import React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
 import { cn } from "../lib/utils";
 
-export interface ToastProps {
+// Cross-platform base props interfaces
+export interface ToastBaseProps {
   variant?: "default" | "destructive";
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  children?: ReactNode;
+  children?: React.ReactNode;
   className?: string;
 }
+
+export interface ToastTitleProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export interface ToastDescriptionProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export interface ToastCloseProps {
+  className?: string;
+}
+
+export interface ToastProviderProps {
+  children: React.ReactNode;
+}
+
+export interface ToastViewportProps {
+  className?: string;
+}
+
+export interface ToastActionProps {
+  children: React.ReactNode;
+  className?: string;
+  altText?: string;
+}
+
+export type ToastActionElement = React.ReactElement<ToastActionProps>;
+
+export type ToastProps = ToastBaseProps;
 
 export function Toast({
   variant = "default",
@@ -23,13 +55,14 @@ export function Toast({
   children,
   className,
 }: ToastProps): React.JSX.Element | null {
-  // TODO: Implement onOpenChange functionality
   if (!open) {
     return null;
   }
 
+  const AnimatedView = Animated.View;
+
   return (
-    <Animated.View
+    <AnimatedView
       entering={FadeInUp}
       exiting={FadeOutUp}
       className={cn(
@@ -41,19 +74,18 @@ export function Toast({
       )}
     >
       {children}
-    </Animated.View>
+    </AnimatedView>
   );
 }
 
 export function ToastTitle({
   children,
   className,
-}: {
-  children: ReactNode;
-  className?: string;
-}): React.JSX.Element {
+}: ToastTitleProps): React.JSX.Element {
   return (
-    <RNText className={cn("font-semibold text-foreground", className)}>
+    <RNText
+      className={cn("font-semibold text-foreground", className)}
+    >
       {children}
     </RNText>
   );
@@ -62,48 +94,43 @@ export function ToastTitle({
 export function ToastDescription({
   children,
   className,
-}: {
-  children: ReactNode;
-  className?: string;
-}): React.JSX.Element {
+}: ToastDescriptionProps): React.JSX.Element {
   return (
-    <RNText className={cn("text-sm text-muted-foreground mt-1", className)}>
+    <RNText
+      className={cn("text-sm text-muted-foreground mt-1", className)}
+    >
       {children}
     </RNText>
   );
 }
 
 export function ToastClose({
-  onPress,
-}: {
-  onPress?: () => void;
-}): React.JSX.Element {
+  className,
+}: ToastCloseProps & { onPress?: () => void }): React.JSX.Element {
   return (
     <Pressable
-      onPress={onPress}
-      className="absolute top-2 right-2 p-1"
+      className={cn("absolute top-2 right-2 p-1", className)}
       accessibilityRole="button"
-      accessibilityLabel="Close" // eslint-disable-line i18next/no-literal-string -- Accessibility label
+      accessibilityLabel="Close"
     >
-      {/* eslint-disable-next-line i18next/no-literal-string -- Close icon */}
-      <RNText className="text-foreground">✕</RNText>
+      <RNText
+        className="text-foreground"
+      >
+        ✕
+      </RNText>
     </Pressable>
   );
 }
 
 export function ToastProvider({
   children,
-}: {
-  children: ReactNode;
-}): React.JSX.Element {
+}: ToastProviderProps): React.JSX.Element {
   return <>{children}</>;
 }
 
 export function ToastViewport({
   className,
-}: {
-  className?: string;
-}): React.JSX.Element {
+}: ToastViewportProps): React.JSX.Element {
   return (
     <View
       className={cn(
@@ -114,24 +141,18 @@ export function ToastViewport({
   );
 }
 
-export type ToastActionElement = React.ReactElement;
-
 export function ToastAction({
   children,
-  onPress,
   className,
-}: {
-  children: ReactNode;
-  onPress?: () => void;
-  className?: string;
-}): React.JSX.Element {
+}: ToastActionProps & { onPress?: () => void }): React.JSX.Element {
   return (
     <Pressable
-      onPress={onPress}
       className={cn("mt-2 rounded px-3 py-2 bg-primary", className)}
       accessibilityRole="button"
     >
-      <RNText className="text-primary-foreground text-sm font-medium">
+      <RNText
+        className="text-primary-foreground text-sm font-medium"
+      >
         {children}
       </RNText>
     </Pressable>

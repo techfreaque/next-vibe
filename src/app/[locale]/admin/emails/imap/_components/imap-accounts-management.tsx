@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useState } from "react";
 

@@ -27,8 +27,9 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
-import { Div, Span } from "next-vibe-ui/ui";
-import { P } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

@@ -6,7 +6,7 @@
 import { BarChart3 } from "lucide-react";
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import type React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

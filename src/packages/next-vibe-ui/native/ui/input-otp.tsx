@@ -9,6 +9,30 @@ import { Text as RNText, TextInput, View } from "react-native";
 
 import { cn } from "../lib/utils";
 
+// Define types locally to avoid web dependency issues
+interface InputOTPProps {
+  className?: string;
+  containerClassName?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  maxLength?: number;
+  children: React.ReactNode;
+}
+
+interface InputOTPGroupProps {
+  className?: string;
+  children: React.ReactNode;
+}
+
+interface InputOTPSlotProps {
+  index: number;
+  className?: string;
+}
+
+interface InputOTPSeparatorProps {
+  className?: string;
+}
+
 interface OTPContextValue {
   value: string;
   onChange: (value: string) => void;
@@ -26,20 +50,14 @@ function useOTP(): OTPContextValue {
   return context;
 }
 
-interface InputOTPProps extends Omit<TextInputProps, "value" | "onChangeText"> {
-  value?: string;
-  onValueChange?: (value: string) => void;
-  maxLength?: number;
-  className?: string;
-  containerClassName?: string;
-  children: React.ReactNode;
-}
-
-export const InputOTP = React.forwardRef<TextInput, InputOTPProps>(
+export const InputOTP = React.forwardRef<
+  TextInput,
+  InputOTPProps & Omit<TextInputProps, keyof InputOTPProps>
+>(
   (
     {
       value: controlledValue,
-      onValueChange,
+      onChange,
       maxLength = 6,
       className,
       containerClassName,
@@ -50,10 +68,12 @@ export const InputOTP = React.forwardRef<TextInput, InputOTPProps>(
   ) => {
     const [uncontrolledValue, setUncontrolledValue] = useState("");
     const value = controlledValue ?? uncontrolledValue;
-    const onChange = onValueChange ?? setUncontrolledValue;
+    const onChangeValue = onChange ?? setUncontrolledValue;
 
     return (
-      <OTPContext.Provider value={{ value, onChange, maxLength }}>
+      <OTPContext.Provider
+        value={{ value, onChange: onChangeValue, maxLength }}
+      >
         <View
           className={cn(
             "flex flex-row items-center gap-2 opacity-100",
@@ -65,7 +85,7 @@ export const InputOTP = React.forwardRef<TextInput, InputOTPProps>(
         <TextInput
           ref={ref}
           value={value}
-          onChangeText={onChange}
+          onChangeText={onChangeValue}
           maxLength={maxLength}
           keyboardType="number-pad"
           className={cn("absolute opacity-0 w-0 h-0", className)}
@@ -78,17 +98,11 @@ export const InputOTP = React.forwardRef<TextInput, InputOTPProps>(
 
 InputOTP.displayName = "InputOTP";
 
-interface InputOTPGroupProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
 export const InputOTPGroup = React.forwardRef<View, InputOTPGroupProps>(
-  ({ className, children, ...props }, ref) => (
+  ({ className, children }, ref) => (
     <View
       ref={ref}
       className={cn("flex flex-row items-center", className)}
-      {...props}
     >
       {children}
     </View>
@@ -97,13 +111,8 @@ export const InputOTPGroup = React.forwardRef<View, InputOTPGroupProps>(
 
 InputOTPGroup.displayName = "InputOTPGroup";
 
-interface InputOTPSlotProps {
-  index: number;
-  className?: string;
-}
-
 export const InputOTPSlot = React.forwardRef<View, InputOTPSlotProps>(
-  ({ index, className, ...props }, ref) => {
+  ({ index, className }, ref) => {
     const { value } = useOTP();
     const char = value[index] || "";
     const isActive = index === value.length;
@@ -116,7 +125,6 @@ export const InputOTPSlot = React.forwardRef<View, InputOTPSlotProps>(
           isActive ? "z-10 ring-1 ring-ring" : "",
           className,
         )}
-        {...props}
       >
         <RNText className="text-foreground">{char}</RNText>
       </View>
@@ -126,14 +134,10 @@ export const InputOTPSlot = React.forwardRef<View, InputOTPSlotProps>(
 
 InputOTPSlot.displayName = "InputOTPSlot";
 
-interface InputOTPSeparatorProps {
-  className?: string;
-}
-
 export const InputOTPSeparator = React.forwardRef<View, InputOTPSeparatorProps>(
-  ({ ...props }, ref) => (
-    <View ref={ref} role="separator" {...props}>
-      <Minus className="h-4 w-4 text-muted-foreground" />
+  ({ className }, ref) => (
+    <View ref={ref} role="separator" className={className}>
+      <Minus size={16} strokeWidth={2} color="#888" />
     </View>
   ),
 );

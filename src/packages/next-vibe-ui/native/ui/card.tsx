@@ -1,79 +1,109 @@
 import type { TextRef, ViewRef } from "@rn-primitives/types";
 import * as React from "react";
-import { Text, type TextProps, View, type ViewProps } from "react-native";
+import type { ViewProps } from "react-native";
+import { View } from "react-native";
 
 import { cn } from "../lib/utils";
+import { Span } from "./span";
 import { TextClassContext } from "./text";
 
-const Card = React.forwardRef<ViewRef, ViewProps>(
-  ({ className, ...props }, ref) => (
-    <View
+// Cross-platform types for native - import from web
+export type {
+  CardProps,
+  CardHeaderProps,
+  CardTitleProps,
+  CardDescriptionProps,
+  CardContentProps,
+  CardFooterProps,
+} from "next-vibe-ui/ui/card";
+
+import type {
+  CardProps,
+  CardHeaderProps,
+  CardTitleProps,
+  CardDescriptionProps,
+  CardContentProps,
+  CardFooterProps,
+} from "next-vibe-ui/ui/card";
+
+// Type-safe View with className support (NativeWind)
+const StyledView = View as unknown as React.ForwardRefExoticComponent<
+  ViewProps & { className?: string } & React.RefAttributes<View>
+>;
+
+const Card = React.forwardRef<ViewRef, CardProps>(
+  ({ className, children, ...props }, ref) => (
+    <StyledView
       ref={ref}
       className={cn(
         "rounded-lg border border-border bg-card shadow-sm shadow-foreground/10",
         className,
       )}
-      {...props}
-    />
+    >
+      {children}
+    </StyledView>
   ),
 );
 Card.displayName = "Card";
 
-const CardHeader = React.forwardRef<ViewRef, ViewProps>(
-  ({ className, ...props }, ref) => (
-    <View
+const CardHeader = React.forwardRef<ViewRef, CardHeaderProps>(
+  ({ className, children, ...props }, ref) => (
+    <StyledView
       ref={ref}
       className={cn("flex flex-col space-y-1.5 p-6", className)}
-      {...props}
-    />
+    >
+      {children}
+    </StyledView>
   ),
 );
 CardHeader.displayName = "CardHeader";
 
-const CardTitle = React.forwardRef<TextRef, TextProps>(
-  ({ className, ...props }, ref) => (
-    <Text
-      // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
-      role="heading"
-      aria-level={3}
+const CardTitle = React.forwardRef<TextRef, CardTitleProps>(
+  ({ className, children, ...props }, ref) => (
+    <Span
       ref={ref}
       className={cn(
         "text-2xl text-card-foreground font-semibold leading-none tracking-tight",
         className,
       )}
-      {...props}
-    />
+    >
+      {children}
+    </Span>
   ),
 );
 CardTitle.displayName = "CardTitle";
 
-const CardDescription = React.forwardRef<TextRef, TextProps>(
-  ({ className, ...props }, ref) => (
-    <Text
+const CardDescription = React.forwardRef<TextRef, CardDescriptionProps>(
+  ({ className, children, ...props }, ref) => (
+    <Span
       ref={ref}
       className={cn("text-sm text-muted-foreground", className)}
-      {...props}
-    />
+    >
+      {children}
+    </Span>
   ),
 );
 CardDescription.displayName = "CardDescription";
 
-const CardContent = React.forwardRef<ViewRef, ViewProps>(
-  ({ className, ...props }, ref) => (
+const CardContent = React.forwardRef<ViewRef, CardContentProps>(
+  ({ className, children, ...props }, ref) => (
     <TextClassContext.Provider value="text-card-foreground">
-      <View ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+      <StyledView ref={ref} className={cn("p-6 pt-0", className)}>
+        {children}
+      </StyledView>
     </TextClassContext.Provider>
   ),
 );
 CardContent.displayName = "CardContent";
 
-const CardFooter = React.forwardRef<ViewRef, ViewProps>(
-  ({ className, ...props }, ref) => (
-    <View
+const CardFooter = React.forwardRef<ViewRef, CardFooterProps>(
+  ({ className, children, ...props }, ref) => (
+    <StyledView
       ref={ref}
       className={cn("flex flex-row items-center p-6 pt-0", className)}
-      {...props}
-    />
+    >
+      {children}
+    </StyledView>
   ),
 );
 CardFooter.displayName = "CardFooter";

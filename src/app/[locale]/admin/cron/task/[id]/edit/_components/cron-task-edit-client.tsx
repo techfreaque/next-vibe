@@ -7,8 +7,8 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui";
-import { H2, P } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { H2, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

@@ -1,4 +1,4 @@
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";

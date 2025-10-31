@@ -1,4 +1,5 @@
-import { Div, H3, P } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import {
   Briefcase,
   Edit,

@@ -1,15 +1,16 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-  Div,
-  Span,
-} from "next-vibe-ui/ui";
-import { ChevronDown, ChevronRight, Lightbulb, Loader2 } from "next-vibe-ui/ui/icons";
-import { Markdown } from "next-vibe-ui/ui/markdown";
+import { Collapsible } from "@/packages/next-vibe-ui/web/ui/collapsible";
+import { CollapsibleContent } from "@/packages/next-vibe-ui/web/ui/collapsible";
+import { CollapsibleTrigger } from "@/packages/next-vibe-ui/web/ui/collapsible";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { ChevronDown } from "@/packages/next-vibe-ui/web/ui/icons/ChevronDown";
+import { ChevronRight } from "@/packages/next-vibe-ui/web/ui/icons/ChevronRight";
+import { Lightbulb } from "@/packages/next-vibe-ui/web/ui/icons/Lightbulb";
+import { Loader2 } from "@/packages/next-vibe-ui/web/ui/icons/Loader2";
+import { Markdown } from "@/packages/next-vibe-ui/web/ui/markdown";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -34,9 +35,17 @@ export function ReasoningDisplay({
   const { t } = simpleT(locale);
   // Open by default if no content after OR if streaming, collapsed if there is content
   const [isOpen, setIsOpen] = useState(!hasContent || isStreaming);
+  // Track if user has manually toggled the state
+  const [userToggled, setUserToggled] = useState(false);
 
   // Auto-collapse when text content appears after thinking tags
+  // BUT: respect user's manual toggle - don't auto-collapse if user has interacted
   useEffect(() => {
+    // If user has manually toggled, don't auto-collapse
+    if (userToggled) {
+      return;
+    }
+
     // If there's content after reasoning and we're not streaming, auto-collapse with a slight delay
     // to avoid jarring transitions during streaming
     if (hasContent && !isStreaming && isOpen) {
@@ -47,15 +56,21 @@ export function ReasoningDisplay({
 
       return (): void => clearTimeout(timeoutId);
     }
-  }, [hasContent, isStreaming, isOpen]);
+  }, [hasContent, isStreaming, isOpen, userToggled]);
 
   if (!reasoningMessages || reasoningMessages.length === 0) {
     return null;
   }
 
+  // Handle manual toggle by user
+  const handleToggle = (open: boolean): void => {
+    setIsOpen(open);
+    setUserToggled(true); // Mark that user has manually interacted
+  };
+
   return (
     <Div className="mb-3">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <Collapsible open={isOpen} onOpenChange={handleToggle}>
         <Div
           className={cn(
             "rounded-lg border transition-all",

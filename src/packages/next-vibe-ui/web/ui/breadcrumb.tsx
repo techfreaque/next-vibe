@@ -5,6 +5,44 @@ import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
 
+// Cross-platform types
+export interface BreadcrumbProps {
+  separator?: React.ReactNode;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface BreadcrumbListProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface BreadcrumbItemProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface BreadcrumbLinkProps {
+  asChild?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+  href?: string;
+}
+
+export interface BreadcrumbPageProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface BreadcrumbSeparatorProps {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export interface BreadcrumbEllipsisProps {
+  className?: string;
+}
+
 const Breadcrumb = React.forwardRef<
   HTMLElement,
   React.ComponentPropsWithoutRef<"nav"> & {

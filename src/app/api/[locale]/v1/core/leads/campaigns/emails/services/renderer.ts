@@ -3,6 +3,8 @@
  * Handles email template rendering and journey management
  */
 
+import "server-only";
+
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";

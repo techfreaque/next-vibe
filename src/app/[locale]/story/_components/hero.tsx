@@ -4,9 +4,10 @@ import { motion } from "framer-motion";
 import { ArrowDown, Play } from "lucide-react";
 import Image from "next/image";
 import { Button } from "next-vibe-ui/ui/button";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
-import { H1, P } from "next-vibe-ui/ui";
+import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

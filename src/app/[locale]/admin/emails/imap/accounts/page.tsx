@@ -3,8 +3,8 @@
  * Page for managing IMAP accounts
  */
 
-import { Div, P } from "next-vibe-ui/ui";
-import { H1 } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

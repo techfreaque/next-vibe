@@ -5,7 +5,8 @@
 import type { ReactNode } from "react";
 import React from "react";
 
-interface ThemeProviderProps {
+// Cross-platform interface - matches web version
+export interface ThemeProviderProps {
   children: ReactNode;
   defaultTheme?: "light" | "dark" | "system";
   storageKey?: string;

@@ -678,6 +678,13 @@ export const translations = {
       title: "Thread Permissions",
       description: "Manage who can moderate this thread",
     },
+    visibility: {
+      label: "Who can see this?",
+      description: "Select which user roles can view this folder/thread",
+      public: "Public (All Users)",
+      customer: "Customers Only",
+      admin: "Admins Only",
+    },
     addModerator: {
       label: "Add Moderator",
       placeholder: "Enter user ID...",

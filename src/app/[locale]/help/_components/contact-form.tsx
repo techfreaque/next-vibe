@@ -1,13 +1,16 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
-import { Button, Div, Form } from "next-vibe-ui/ui";
+import { Loader2 } from "next-vibe-ui/ui/icons";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { H2 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { useContactWithEngagement } from "@/app/api/[locale]/v1/core/contact/hooks";
+import contactDefinitions from "@/app/api/[locale]/v1/core/contact/definition";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -69,6 +72,7 @@ export default function ContactForm({
               style: "none",
               showAllRequired: false,
             }}
+            endpointFields={contactDefinitions.POST.fields}
           />
 
           <EndpointFormField
@@ -78,6 +82,8 @@ export default function ContactForm({
               style: "none",
               showAllRequired: false,
             }}
+            endpointFields={contactDefinitions.POST.fields}
+
           />
         </Div>
 
@@ -88,6 +94,8 @@ export default function ContactForm({
             style: "none",
             showAllRequired: false,
           }}
+            endpointFields={contactDefinitions.POST.fields}
+
         />
 
         <EndpointFormField
@@ -97,6 +105,8 @@ export default function ContactForm({
             style: "none",
             showAllRequired: false,
           }}
+            endpointFields={contactDefinitions.POST.fields}
+
         />
 
         <EndpointFormField
@@ -106,6 +116,8 @@ export default function ContactForm({
             style: "none",
             showAllRequired: false,
           }}
+            endpointFields={contactDefinitions.POST.fields}
+
         />
 
         <Button

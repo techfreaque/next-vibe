@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";

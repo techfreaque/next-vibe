@@ -4,6 +4,7 @@
  */
 
 import type { TranslationKey } from "@/i18n/core/static-types";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type { IconValue } from "./model-access/icons";
 
@@ -57,6 +58,9 @@ export interface DefaultFolderConfig {
 
   /** URL path segment for routing */
   urlPath: string;
+
+  /** Default allowed roles for folders in this root folder */
+  defaultAllowedRoles: (typeof UserRole)[keyof typeof UserRole][];
 }
 
 /**
@@ -72,6 +76,7 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     order: 0,
     color: "sky", // Softer blue for private/secure
     urlPath: "private",
+    defaultAllowedRoles: [], // Owner only
   },
   {
     id: DEFAULT_FOLDER_IDS.INCOGNITO,
@@ -81,6 +86,7 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     order: 1,
     color: "zinc", // Neutral gray for incognito/hidden
     urlPath: "incognito",
+    defaultAllowedRoles: [], // Local only
   },
   {
     id: DEFAULT_FOLDER_IDS.SHARED,
@@ -90,6 +96,7 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     order: 2,
     color: "teal", // Collaborative teal for shared
     urlPath: "shared",
+    defaultAllowedRoles: [], // Will be set via share links
   },
   {
     id: DEFAULT_FOLDER_IDS.PUBLIC,
@@ -99,6 +106,7 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     order: 3,
     color: "amber", // Premium gold/amber for public 1A
     urlPath: "public",
+    defaultAllowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN], // Visible to all
   },
 ] as const;
 

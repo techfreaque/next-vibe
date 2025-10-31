@@ -2,36 +2,32 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { useRouter } from "next-vibe-ui/hooks";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  Button,
-  Div,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Span,
-} from "next-vibe-ui/ui";
-import {
-  ArrowDown,
-  ArrowUp,
-  ChevronDown,
-  ChevronRight,
-  Edit,
-  FolderInput,
-  FolderPlus,
-  MessageSquarePlus,
-  MoreVertical,
-  Shield,
-  Trash2,
-} from "next-vibe-ui/ui/icons";
+import { AlertDialog } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogAction } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogCancel } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogContent } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogDescription } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogFooter } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogHeader } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogTitle } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { DropdownMenu } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuContent } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuItem } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuTrigger } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { ArrowDown } from "@/packages/next-vibe-ui/web/ui/icons/ArrowDown";
+import { ArrowUp } from "@/packages/next-vibe-ui/web/ui/icons/ArrowUp";
+import { ChevronDown } from "@/packages/next-vibe-ui/web/ui/icons/ChevronDown";
+import { ChevronRight } from "@/packages/next-vibe-ui/web/ui/icons/ChevronRight";
+import { Edit } from "@/packages/next-vibe-ui/web/ui/icons/Edit";
+import { FolderInput } from "@/packages/next-vibe-ui/web/ui/icons/FolderInput";
+import { FolderPlus } from "@/packages/next-vibe-ui/web/ui/icons/FolderPlus";
+import { MessageSquarePlus } from "@/packages/next-vibe-ui/web/ui/icons/MessageSquarePlus";
+import { MoreVertical } from "@/packages/next-vibe-ui/web/ui/icons/MoreVertical";
+import { Shield } from "@/packages/next-vibe-ui/web/ui/icons/Shield";
+import { Trash2 } from "@/packages/next-vibe-ui/web/ui/icons/Trash2";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
@@ -579,8 +575,8 @@ function FolderItem({
               {t("app.chat.folderList.newSubfolder")}
             </DropdownMenuItem>
 
-            {/* Permissions for PUBLIC folders or folder owners */}
-            {(folder.rootFolderId === "public" || !isDefault) && (
+            {/* Permissions only for PUBLIC root folder */}
+            {folder.rootFolderId === "public" && (
               <DropdownMenuItem onSelect={handleManagePermissions}>
                 <Shield className="h-4 w-4 mr-2" />
                 {t("app.chat.folderList.managePermissions")}

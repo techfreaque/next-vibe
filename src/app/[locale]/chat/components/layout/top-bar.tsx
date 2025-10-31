@@ -1,18 +1,9 @@
 "use client";
 
-import {
-  Button,
-  Div,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-  Span,
-} from "next-vibe-ui/ui";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "next-vibe-ui/ui/dropdown-menu";
+import { Span } from "next-vibe-ui/ui/span";
 import {
   Menu,
   MessageSquarePlus,

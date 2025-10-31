@@ -1,4 +1,4 @@
-import { FlashList, type FlashListProps } from "@shopify/flash-list";
+import { FlashList } from "@shopify/flash-list";
 import type { ColumnDef, Row, SortingState } from "@tanstack/react-table";
 import {
   flexRender,
@@ -28,13 +28,14 @@ import {
   TableRow,
 } from "./table";
 
-interface DataTableProps<TData, TValue> {
+// Cross-platform DataTable props
+export interface DataTableProps<TData, TValue = unknown> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onRowPress?: (row: Row<TData>) => void;
   estimatedItemSize?: number;
-  ListEmptyComponent?: React.ComponentType<unknown> | React.ReactElement | null;
-  ListFooterComponent?: React.ComponentType<unknown> | React.ReactElement | null;
+  ListEmptyComponent?: React.ComponentType;
+  ListFooterComponent?: React.ComponentType;
   isRefreshing?: boolean;
   onRefresh?: () => void;
 }
@@ -43,7 +44,7 @@ interface DataTableProps<TData, TValue> {
  * @docs https://tanstack.com/table
  */
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData, TValue = unknown>({
   columns,
   data,
   onRowPress,

@@ -21,6 +21,10 @@ export const translations = {
     unknownFieldType: "Unknown field type",
     selectDate: "Select date",
     other: "Other",
+    searchCountries: "Search countries...",
+    noCountryFound: "No country found",
+    preferred: "Preferred",
+    allCountries: "All Countries",
   },
   ui: {
     markdown: {

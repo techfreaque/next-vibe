@@ -79,6 +79,8 @@ export const translations = {
       storage_failed: "Failed to store authentication data",
       clear_failed: "Failed to clear authentication data",
     },
+    not_implemented_native:
+      "This feature is not yet implemented for React Native",
   },
   post: {
     title: "Auth",

@@ -6,7 +6,7 @@
 
 "use client";
 
-import { FormAlert } from "next-vibe-ui/ui";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Label } from "next-vibe-ui/ui/label";
@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe-ui/ui/select";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { useImapAccountsList } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/hooks";

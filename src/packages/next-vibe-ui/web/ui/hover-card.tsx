@@ -4,6 +4,28 @@ import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
+// Cross-platform type exports
+export interface HoverCardRootProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+  defaultOpen?: boolean;
+  openDelay?: number;
+  closeDelay?: number;
+}
+
+export interface HoverCardTriggerProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface HoverCardContentProps {
+  className?: string;
+  children?: React.ReactNode;
+  align?: "start" | "center" | "end";
+  sideOffset?: number;
+}
+
 const HoverCard = HoverCardPrimitive.Root;
 
 const HoverCardTrigger = HoverCardPrimitive.Trigger;

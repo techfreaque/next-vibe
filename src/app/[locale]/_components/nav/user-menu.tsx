@@ -1,24 +1,13 @@
 "use client";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-  Div,
-  P,
-  Span,
-} from "next-vibe-ui/ui";
+import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui/avatar";
 import { Button } from "next-vibe-ui/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "next-vibe-ui/ui/dropdown-menu";
+import { Div } from "next-vibe-ui/ui/div";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "next-vibe-ui/ui/dropdown-menu";
 import { HelpCircle, LogOut, User } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
+import { P } from "next-vibe-ui/ui/typography";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

@@ -2,17 +2,15 @@
 "use client";
 
 import { useRouter } from "next-vibe-ui/hooks";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  Div,
-} from "next-vibe-ui/ui";
+import { AlertDialog } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogAction } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogCancel } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogContent } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogDescription } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogFooter } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogHeader } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogTitle } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -28,7 +26,7 @@ import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
 import { parseChatUrl } from "../lib/url-parser";
-import type { ChatThread, ModelId } from "../shared/types";
+import type { ChatFolder, ChatThread, ModelId } from "../shared/types";
 import { ChatArea } from "./layout/chat-area";
 import { SidebarWrapper } from "./layout/sidebar-wrapper";
 import { TopBar } from "./layout/top-bar";
@@ -62,6 +60,7 @@ const buildThreadUrl = (
 const buildNewThreadUrl = (
   locale: string,
   folderId: string | null | undefined,
+  folders: Record<string, ChatFolder>,
 ): string => {
   // If no folder specified, default to private
   if (!folderId) {
@@ -80,8 +79,15 @@ const buildNewThreadUrl = (
     return `/${locale}/threads/${folderId}/new`;
   }
 
-  // Subfolder: use the folderId directly (subfolders are accessed via their UUID)
-  return `/${locale}/threads/${folderId}/new`;
+  // Subfolder: need to include rootFolderId in URL
+  // URL structure: /threads/rootId/subFolderId/new
+  const folder = folders[folderId];
+  if (folder) {
+    return `/${locale}/threads/${folder.rootFolderId}/${folderId}/new`;
+  }
+
+  // Fallback if folder not found (shouldn't happen)
+  return `/${locale}/threads/private/new`;
 };
 
 interface ChatInterfaceProps {
@@ -294,20 +300,22 @@ export function ChatInterface({
       };
     }, [urlPath, deprecatedFolderId, deprecatedThreadId]);
 
-  // Redirect public users to incognito mode if they try to access non-incognito folders
+  // Redirect public users to incognito if they try to access PRIVATE or SHARED folders
+  // PUBLIC users can access PUBLIC and INCOGNITO folders
   useEffect(() => {
     // Wait for authentication check to complete
     if (isAuthenticated === null) {
       return;
     }
 
-    // If user is not authenticated and tries to access non-incognito folder, redirect to incognito
+    // If user is not authenticated and tries to access PRIVATE or SHARED folder, redirect to incognito
     if (
       !isAuthenticated &&
-      initialRootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO
+      initialRootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO &&
+      initialRootFolderId !== DEFAULT_FOLDER_IDS.PUBLIC
     ) {
       logger.info(
-        "Non-authenticated user attempted to access non-incognito folder, redirecting to incognito",
+        "Non-authenticated user attempted to access restricted folder, redirecting to incognito",
         {
           attemptedFolder: initialRootFolderId,
         },
@@ -328,48 +336,51 @@ export function ChatInterface({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialThreadId]);
 
+  // DISABLED: This effect was causing issues with new thread navigation
+  // The onThreadCreated callback in sendMessage already handles setting the active thread
+  // and navigating to the new thread, so this effect is redundant and causes conflicts
   // Update active thread when new thread is created (without navigation)
-  const prevThreadCountRef = React.useRef(Object.keys(threads).length);
-  const initialLoadCompleteRef = React.useRef(false);
-  useEffect(() => {
-    const currentThreadCount = Object.keys(threads).length;
-    const prevThreadCount = prevThreadCountRef.current;
+  // const prevThreadCountRef = React.useRef(Object.keys(threads).length);
+  // const initialLoadCompleteRef = React.useRef(false);
+  // useEffect(() => {
+  //   const currentThreadCount = Object.keys(threads).length;
+  //   const prevThreadCount = prevThreadCountRef.current;
 
-    // Mark initial load as complete after first render with threads
-    if (!initialLoadCompleteRef.current && currentThreadCount > 0) {
-      initialLoadCompleteRef.current = true;
-      prevThreadCountRef.current = currentThreadCount;
-      return;
-    }
+  //   // Mark initial load as complete after first render with threads
+  //   if (!initialLoadCompleteRef.current && currentThreadCount > 0) {
+  //     initialLoadCompleteRef.current = true;
+  //     prevThreadCountRef.current = currentThreadCount;
+  //     return;
+  //   }
 
-    // Only auto-select if:
-    // 1. Thread count increased (new thread created)
-    // 2. We're on "new" page
-    // 3. Initial load is complete (not just loading existing threads from server)
-    if (
-      currentThreadCount > prevThreadCount &&
-      initialThreadId &&
-      isNewThread(initialThreadId) &&
-      initialLoadCompleteRef.current
-    ) {
-      // Find the newest thread (highest createdAt)
-      const newestThread = Object.values(threads).reduce<ChatThread | null>(
-        (newest, thread) =>
-          !newest || thread.createdAt > newest.createdAt ? thread : newest,
-        null,
-      );
+  //   // Only auto-select if:
+  //   // 1. Thread count increased (new thread created)
+  //   // 2. We're on "new" page
+  //   // 3. Initial load is complete (not just loading existing threads from server)
+  //   if (
+  //     currentThreadCount > prevThreadCount &&
+  //     initialThreadId &&
+  //     isNewThread(initialThreadId) &&
+  //     initialLoadCompleteRef.current
+  //   ) {
+  //     // Find the newest thread (highest createdAt)
+  //     const newestThread = Object.values(threads).reduce<ChatThread | null>(
+  //       (newest, thread) =>
+  //         !newest || thread.createdAt > newest.createdAt ? thread : newest,
+  //       null,
+  //     );
 
-      if (newestThread) {
-        logger.debug("Chat", "New thread created, setting active thread", {
-          threadId: newestThread.id,
-        });
-        // Only set active thread, don't navigate away from current page
-        setActiveThread(newestThread.id);
-      }
-    }
+  //     if (newestThread) {
+  //       logger.debug("Chat", "New thread created, setting active thread", {
+  //         threadId: newestThread.id,
+  //       });
+  //       // Only set active thread, don't navigate away from current page
+  //       setActiveThread(newestThread.id);
+  //     }
+  //   }
 
-    prevThreadCountRef.current = currentThreadCount;
-  }, [threads, initialThreadId, setActiveThread, logger]);
+  //   prevThreadCountRef.current = currentThreadCount;
+  // }, [threads, initialThreadId, setActiveThread, logger]);
 
   // Handle thread selection with navigation
   const handleSelectThread = useCallback(
@@ -389,10 +400,10 @@ export function ChatInterface({
     (folderId?: string | null): void => {
       // Navigate to /threads/[folderId]/new
       // Don't create thread yet - will be created on first message
-      const url = buildNewThreadUrl(locale, folderId);
+      const url = buildNewThreadUrl(locale, folderId, chat.folders);
       router.push(url);
     },
-    [locale, router],
+    [locale, router, chat.folders],
   );
 
   // Set current folder for draft storage based on URL or active thread
@@ -423,13 +434,17 @@ export function ChatInterface({
 
       if (isValidInput(input) && !isLoading) {
         logger.debug("Chat", "handleSubmit calling sendMessage");
-        await sendMessage(input, (threadId, rootFolderId) => {
+        await sendMessage(input, (threadId, rootFolderId, subFolderId) => {
           // Navigate to the newly created thread
           logger.debug("Chat", "Navigating to newly created thread", {
             threadId,
             rootFolderId,
+            subFolderId,
           });
-          const url = `/${locale}/threads/${rootFolderId}/${threadId}`;
+          // Build URL with proper subfolder path if present
+          const url = subFolderId
+            ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
+            : `/${locale}/threads/${rootFolderId}/${threadId}`;
           router.push(url);
         });
         logger.debug("Chat", "handleSubmit sendMessage completed");
@@ -490,6 +505,21 @@ export function ChatInterface({
     return Promise.resolve();
   }, [logger]);
 
+  const handleDeleteThread = useCallback(
+    async (threadId: string): Promise<void> => {
+      logger.debug("Chat: Handling thread deletion", { threadId });
+
+      // Delete the thread
+      await deleteThread(threadId);
+
+      // Navigate to the root folder page
+      const url = `/${locale}/threads/${currentRootFolderId}`;
+      logger.debug("Chat: Navigating after thread deletion", { url });
+      router.push(url);
+    },
+    [deleteThread, logger, locale, currentRootFolderId, router],
+  );
+
   return (
     <>
       <Div className="flex h-dvh overflow-hidden bg-background">
@@ -525,7 +555,7 @@ export function ChatInterface({
           onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
           onCreateThread={handleCreateThread}
           onSelectThread={handleSelectThread}
-          onDeleteThread={deleteThread}
+          onDeleteThread={handleDeleteThread}
           onUpdateFolder={updateFolder}
           onDeleteFolder={deleteFolder}
           onUpdateThreadTitle={(threadId, title) => {

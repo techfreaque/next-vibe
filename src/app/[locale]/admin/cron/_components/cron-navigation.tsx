@@ -11,8 +11,9 @@ import { cn } from "next-vibe/shared/utils/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div, Span } from "next-vibe-ui/ui";
-import { P } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

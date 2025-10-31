@@ -675,6 +675,13 @@ export const translations: typeof enTranslations = {
       title: "Uprawnienia wątku",
       description: "Zarządzaj tym, kto może moderować ten wątek",
     },
+    visibility: {
+      label: "Kto może to zobaczyć?",
+      description: "Wybierz, które role użytkowników mogą przeglądać ten folder/wątek",
+      public: "Publiczny (Wszyscy użytkownicy)",
+      customer: "Tylko klienci",
+      admin: "Tylko administratorzy",
+    },
     addModerator: {
       label: "Dodaj moderatora",
       placeholder: "Wprowadź ID użytkownika...",

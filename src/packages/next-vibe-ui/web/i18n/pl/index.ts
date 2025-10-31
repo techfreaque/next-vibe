@@ -23,6 +23,10 @@ export const translations: typeof enTranslations = {
     unknownFieldType: "Nieznany typ pola",
     selectDate: "Wybierz datę",
     other: "Inne",
+    searchCountries: "Wyszukaj kraje...",
+    noCountryFound: "Nie znaleziono kraju",
+    preferred: "Preferowane",
+    allCountries: "Wszystkie kraje",
   },
   ui: {
     markdown: {

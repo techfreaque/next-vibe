@@ -5,10 +5,12 @@
 
 "use client";
 
-import { Form, FormAlert, Div } from "next-vibe-ui/ui";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import { H3 } from "next-vibe-ui/ui";
+import { H3 } from "next-vibe-ui/ui/typography";
 import type { FormEvent, JSX } from "react";
 
 import { useImapAccountCreateEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/create/hooks";

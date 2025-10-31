@@ -1,8 +1,10 @@
 import * as Slot from "@rn-primitives/slot";
 import type { SlottableViewProps } from "@rn-primitives/types";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
+import type * as React from "react";
 import { View } from "react-native";
 
+import type { BadgeProps, BadgeVariant } from "next-vibe-ui/ui/badge";
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
 
@@ -40,26 +42,25 @@ const badgeTextVariants = cva("text-xs font-semibold ", {
   },
 });
 
-type BadgeProps = SlottableViewProps &
-  VariantProps<typeof badgeVariants> & {
-    asChild?: boolean;
-  };
+type NativeBadgeProps = BadgeProps & {
+  asChild?: boolean;
+} & SlottableViewProps;
 
 function Badge({
   className,
   variant,
   asChild,
+  children,
   ...props
-}: BadgeProps): React.JSX.Element {
+}: NativeBadgeProps): React.JSX.Element {
   const Component = asChild ? Slot.View : View;
   const combinedClassName = cn(badgeVariants({ variant }), className);
 
   return (
     <TextClassContext.Provider value={badgeTextVariants({ variant })}>
-      <Component
-        {...props}
-        className={combinedClassName}
-      />
+      <Component className={combinedClassName} {...props}>
+        {children}
+      </Component>
     </TextClassContext.Provider>
   );
 }

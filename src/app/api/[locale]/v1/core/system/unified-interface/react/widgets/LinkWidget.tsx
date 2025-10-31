@@ -2,8 +2,8 @@
 
 import { ExternalLink } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
-import { Span } from "next-vibe-ui/ui";
-import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Link } from "@/packages/next-vibe-ui/web/ui/link";
 import type { JSX, MouseEvent } from "react";
 
 import { simpleT } from "@/i18n/core/shared";

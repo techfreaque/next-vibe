@@ -17,7 +17,9 @@
     "resolveJsonModule": true,
     "resolvePackageJsonExports": true,
     "resolvePackageJsonImports": true,
-    "customConditions": ["react-native"],
+    "customConditions": [
+      "react-native"
+    ],
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
@@ -62,5 +64,5 @@
     "to_migrate/**/*.ts",
     "to_migrate/**/*.tsx"
   ],
-  // "extends": "expo/tsconfig.base"
+  "extends": "expo/tsconfig.base"
 }

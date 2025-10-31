@@ -5,51 +5,74 @@
  */
 import type { ReactNode } from "react";
 import React from "react";
-import type { ScrollViewProps } from "react-native";
+import type { ScrollViewProps, ViewProps } from "react-native";
 import { ScrollView, View } from "react-native";
 
+import type { CarouselProps as WebCarouselProps } from "next-vibe-ui/ui/carousel";
 import { cn } from "../lib/utils";
 
-interface CarouselProps extends ScrollViewProps {
+// Native carousel uses subset of web props, with ScrollView native props
+export type CarouselProps = Pick<WebCarouselProps, "orientation"> & {
   children: ReactNode;
   className?: string;
-}
+} & Omit<ScrollViewProps, "horizontal" | "children">;
+
+// Type-safe ScrollView with className support (NativeWind)
+const StyledScrollView = ScrollView as unknown as React.ForwardRefExoticComponent<
+  ScrollViewProps & { className?: string } & React.RefAttributes<ScrollView>
+>;
+
+// Type-safe View with className support (NativeWind)
+const StyledView = View as unknown as React.ForwardRefExoticComponent<
+  ViewProps & { className?: string } & React.RefAttributes<View>
+>;
 
 export const Carousel = React.forwardRef<ScrollView, CarouselProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, children, orientation = "horizontal", ...props }, ref) => {
     return (
-      <ScrollView
+      <StyledScrollView
         ref={ref}
-        horizontal={true}
+        horizontal={orientation === "horizontal"}
         showsHorizontalScrollIndicator={false}
-        className={cn("flex flex-row", className)}
+        showsVerticalScrollIndicator={false}
+        className={cn(
+          orientation === "horizontal" ? "flex flex-row" : "flex flex-col",
+          className,
+        )}
         {...props}
       >
         {children}
-      </ScrollView>
+      </StyledScrollView>
     );
   },
 );
 
 Carousel.displayName = "Carousel";
 
-interface CarouselItemProps {
+// Cross-platform interface
+export interface CarouselItemProps {
   children: ReactNode;
   className?: string;
 }
 
 export const CarouselItem = React.forwardRef<View, CarouselItemProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, children }, ref) => {
     return (
-      <View ref={ref} className={cn("shrink-0", className)} {...props}>
+      <StyledView ref={ref} className={cn("shrink-0", className)}>
         {children}
-      </View>
+      </StyledView>
     );
   },
 );
 
 CarouselItem.displayName = "CarouselItem";
 
+// Cross-platform interface
+export type CarouselContentProps = CarouselProps;
+
 export const CarouselContent = Carousel;
+
+// Note: CarouselPrevious, CarouselNext are simplified for React Native
+// Web version uses Button components with full interactivity
 export const CarouselPrevious = View;
 export const CarouselNext = View;

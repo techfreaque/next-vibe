@@ -142,11 +142,23 @@ export function deleteMessage(messageId: string): void {
 
 /**
  * Delete folder from localStorage
+ * Also deletes all threads and messages inside the folder
  */
 export function deleteFolder(folderId: string): void {
   const folders = getItem<Record<string, ChatFolder>>(STORAGE_KEYS.FOLDERS, {});
   delete folders[folderId];
   setItem(STORAGE_KEYS.FOLDERS, folders);
+
+  // Delete all threads in this folder
+  const threads = getItem<Record<string, ChatThread>>(STORAGE_KEYS.THREADS, {});
+  const threadsToDelete = Object.entries(threads)
+    .filter(([, thread]) => thread.folderId === folderId)
+    .map(([threadId]) => threadId);
+
+  // Delete each thread (which will also delete its messages)
+  threadsToDelete.forEach((threadId) => {
+    deleteThread(threadId);
+  });
 }
 
 /**

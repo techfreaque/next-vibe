@@ -1,25 +1,16 @@
 "use client";
 
 import { parseError } from "next-vibe/shared/utils";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Div,
-  Input,
-  Label,
-  P,
-  ScrollArea,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Span,
-  Textarea,
-} from "next-vibe-ui/ui";
+import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/packages/next-vibe-ui/web/ui/dialog";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { Input } from "@/packages/next-vibe-ui/web/ui/input";
+import { Label } from "@/packages/next-vibe-ui/web/ui/label";
+import { P } from "@/packages/next-vibe-ui/web/ui/typography";
+import { ScrollArea } from "@/packages/next-vibe-ui/web/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/next-vibe-ui/web/ui/select";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Textarea } from "@/packages/next-vibe-ui/web/ui/textarea";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 

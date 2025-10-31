@@ -11,6 +11,36 @@ import { useTranslation } from "@/i18n/core/client";
 
 import { type ButtonProps, buttonVariants } from "./button";
 
+// Cross-platform types
+export interface PaginationProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface PaginationContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface PaginationItemProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface PaginationPreviousProps {
+  className?: string;
+  href?: string;
+}
+
+export interface PaginationNextProps {
+  className?: string;
+  href?: string;
+}
+
+export interface PaginationEllipsisProps {
+  className?: string;
+}
+
 const Pagination = ({
   className,
   ...props
@@ -43,10 +73,13 @@ const PaginationItem = React.forwardRef<
 ));
 PaginationItem.displayName = "PaginationItem";
 
-type PaginationLinkProps = {
+export type PaginationLinkProps = {
   isActive?: boolean;
-} & Pick<ButtonProps, "size"> &
-  React.ComponentProps<"a">;
+  size?: ButtonProps["size"];
+  className?: string;
+  children?: React.ReactNode;
+  href?: string;
+} & React.ComponentProps<"a">;
 
 const PaginationLink = ({
   className,

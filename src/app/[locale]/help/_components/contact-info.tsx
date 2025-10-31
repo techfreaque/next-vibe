@@ -1,10 +1,15 @@
-import { Globe, Mail, MessageCircle, Twitter } from "lucide-react";
-import { Div, Link } from "next-vibe-ui/ui";
+"use client"
+
+import { Globe, Mail, MessageCircle, Twitter } from "next-vibe-ui/ui/icons";
+import { Div } from "next-vibe-ui/ui/div";
+import { Link } from "next-vibe-ui/ui/link";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
+import { openUrl } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { Button } from "next-vibe-ui/ui/button";
 
 interface ContactInfoProps {
   locale: CountryLanguage;
@@ -36,14 +41,14 @@ export default function ContactInfo({
                 {t("app.help.components.pages.help.info.email")}
               </H3>
             </Div>
-            <button
+            <Button
               onClick={() => {
-                window.location.href = `mailto:${supportEmail}`;
+                openUrl(`mailto:${supportEmail}`);
               }}
               className="text-blue-600 dark:text-blue-400 hover:underline ml-8 bg-transparent border-none p-0 cursor-pointer"
             >
               {supportEmail}
-            </button>
+            </Button>
           </Div>
 
           <Div>

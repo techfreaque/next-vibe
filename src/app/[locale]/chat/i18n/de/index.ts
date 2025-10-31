@@ -694,6 +694,13 @@ export const translations: typeof enTranslations = {
       title: "Thread-Berechtigungen",
       description: "Verwalten Sie, wer diesen Thread moderieren kann",
     },
+    visibility: {
+      label: "Wer kann das sehen?",
+      description: "Wählen Sie aus, welche Benutzerrollen diesen Ordner/Thread sehen können",
+      public: "Öffentlich (Alle Benutzer)",
+      customer: "Nur Kunden",
+      admin: "Nur Administratoren",
+    },
     addModerator: {
       label: "Moderator hinzufügen",
       placeholder: "Benutzer-ID eingeben...",

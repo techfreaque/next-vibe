@@ -4,10 +4,65 @@ import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 
+// Cross-platform type exports
+export interface DrawerRootProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+  shouldScaleBackground?: boolean;
+  defaultOpen?: boolean;
+  modal?: boolean;
+}
+
+export interface DrawerTriggerProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface DrawerPortalProps {
+  children?: React.ReactNode;
+  container?: HTMLElement | null;
+}
+
+export interface DrawerCloseProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface DrawerOverlayProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DrawerContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DrawerHeaderProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DrawerFooterProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DrawerTitleProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DrawerDescriptionProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
 const Drawer = ({
   shouldScaleBackground = true,
   ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Root>): React.JSX.Element => (
+}: DrawerRootProps): React.JSX.Element => (
   <DrawerPrimitive.Root
     shouldScaleBackground={shouldScaleBackground}
     {...props}
@@ -56,23 +111,21 @@ DrawerContent.displayName = "DrawerContent";
 
 const DrawerHeader = ({
   className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
-  <div
-    className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)}
-    {...props}
-  />
+  children,
+}: DrawerHeaderProps): React.JSX.Element => (
+  <div className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)}>
+    {children}
+  </div>
 );
 DrawerHeader.displayName = "DrawerHeader";
 
 const DrawerFooter = ({
   className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
-  <div
-    className={cn("mt-auto flex flex-col gap-2 p-4", className)}
-    {...props}
-  />
+  children,
+}: DrawerFooterProps): React.JSX.Element => (
+  <div className={cn("mt-auto flex flex-col gap-2 p-4", className)}>
+    {children}
+  </div>
 );
 DrawerFooter.displayName = "DrawerFooter";
 

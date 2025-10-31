@@ -19,7 +19,9 @@ import {
   Users,
 } from "lucide-react";
 import type { HistoricalDataSeriesType } from "next-vibe/shared/types/stats-filtering.schema";
-import { Div, P, Span } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
+import { Span } from "next-vibe-ui/ui/span";  
 import { H4 } from "next-vibe-ui/ui/typography";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";

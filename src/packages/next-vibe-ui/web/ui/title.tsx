@@ -3,7 +3,7 @@
 import { cn } from "next-vibe/shared/utils";
 import React from "react";
 
-interface TitleProps {
+export interface TitleProps {
   children: React.ReactNode;
   className?: string;
   customSizeClassName?: string;

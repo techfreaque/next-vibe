@@ -18,10 +18,31 @@ import { Button } from "./button";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
+// Cross-platform base interface (no TranslationKey dependency)
+export interface TagOptionBase {
+  value: string;
+  label: string;
+  category?: string;
+}
+
 export interface TagOption {
   value: string;
   label: TranslationKey;
   category?: string;
+}
+
+// Cross-platform props interface
+export interface TagsFieldPropsBase {
+  value?: string[];
+  onChange: (value: string[]) => void;
+  onBlur?: () => void;
+  suggestions?: TagOptionBase[];
+  placeholder?: string;
+  maxTags?: number;
+  allowCustom?: boolean;
+  disabled?: boolean;
+  className?: string;
+  name?: string;
 }
 
 export interface TagsFieldProps {
@@ -172,17 +193,18 @@ export function TagsField({
         {canAddMore && !disabled && (
           <Popover open={showSuggestions} onOpenChange={setShowSuggestions}>
             <PopoverTrigger asChild>
-              <Input
-                ref={inputRef}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onFocus={handleInputFocus}
-                onBlur={handleInputBlur}
-                placeholder={value.length === 0 ? t(placeholder) : ""}
-                className="border-0 p-0 h-6 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
-                style={{ minWidth: "120px", width: "auto" }}
-              />
+              <div className="flex-1 min-w-[120px]">
+                <Input
+                  ref={inputRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  placeholder={value.length === 0 ? t(placeholder) : ""}
+                  className="border-0 p-0 h-6 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent w-full"
+                />
+              </div>
             </PopoverTrigger>
 
             {suggestions.length > 0 && (

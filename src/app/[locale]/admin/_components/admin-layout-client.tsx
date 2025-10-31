@@ -15,13 +15,13 @@ import {
   Users,
   X,
 } from "lucide-react";
-import NextLink from "next/link";
-import { usePathname } from "next/navigation";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import { Div, Span } from "next-vibe-ui/ui";
-import { H1 } from "next-vibe-ui/ui";
-import { Link } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
+import { H1 } from "next-vibe-ui/ui/typography";
+import { Link } from "next-vibe-ui/ui/link";
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -126,7 +126,7 @@ export function AdminLayoutClient({
           </Div>
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map((item) => (
-              <NextLink
+              <Link
                 key={item.name}
                 href={item.href}
                 className={cn(
@@ -146,7 +146,7 @@ export function AdminLayoutClient({
                   )}
                 />
                 {item.name}
-              </NextLink>
+              </Link>
             ))}
           </nav>
         </Div>
@@ -163,7 +163,7 @@ export function AdminLayoutClient({
           </Div>
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map((item) => (
-              <NextLink
+              <Link
                 key={item.name}
                 href={item.href}
                 className={cn(
@@ -182,7 +182,7 @@ export function AdminLayoutClient({
                   )}
                 />
                 {item.name}
-              </NextLink>
+              </Link>
             ))}
           </nav>
 

@@ -111,17 +111,52 @@ const ToastDescription = React.forwardRef<
 ));
 ToastDescription.displayName = ToastPrimitives.Description.displayName;
 
-type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
+export type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
 
-type ToastActionElement = React.ReactElement<typeof ToastAction>;
+export type ToastActionElement = React.ReactElement<typeof ToastAction>;
+
+// Cross-platform base props interfaces
+export interface ToastBaseProps {
+  variant?: "default" | "destructive";
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export interface ToastTitleProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export interface ToastDescriptionProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export interface ToastCloseProps {
+  className?: string;
+}
+
+export interface ToastProviderProps {
+  children: React.ReactNode;
+}
+
+export interface ToastViewportProps {
+  className?: string;
+}
+
+export interface ToastActionProps {
+  children: React.ReactNode;
+  className?: string;
+  altText?: string;
+}
 
 export {
   Toast,
   ToastAction,
-  type ToastActionElement,
   ToastClose,
   ToastDescription,
-  type ToastProps,
   ToastProvider,
   ToastTitle,
   ToastViewport,

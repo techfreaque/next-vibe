@@ -8,8 +8,10 @@ import {
   type LeadStatusValues,
 } from "next-vibe/leads/enum";
 import type { LeadListGetResponseTypeOutput } from "next-vibe/leads/list/definition";
-import { Div, P, Span } from "next-vibe-ui/ui";
+import { P} from "next-vibe-ui/ui/typography";
+import { Div } from "next-vibe-ui/ui/div";
 import { Badge } from "next-vibe-ui/ui/badge";
+import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Table,

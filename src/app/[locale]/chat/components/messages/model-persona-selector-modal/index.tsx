@@ -1,7 +1,11 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Button, Div, H3, P, Textarea } from "next-vibe-ui/ui";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { H3 } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui/typography";
+import { Textarea } from "next-vibe-ui/ui/textarea";
 import { Send, X } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useState } from "react";

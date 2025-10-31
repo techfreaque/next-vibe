@@ -1,7 +1,8 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   DropdownMenu,

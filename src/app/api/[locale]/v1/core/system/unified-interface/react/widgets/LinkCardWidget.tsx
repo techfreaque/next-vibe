@@ -3,15 +3,14 @@
 import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { cn } from "next-vibe/shared/utils";
-import { Div, Span } from "next-vibe-ui/ui";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "next-vibe-ui/ui/card";
-import { Link } from "next-vibe-ui/ui/link";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Card } from "@/packages/next-vibe-ui/web/ui/card";
+import { CardContent } from "@/packages/next-vibe-ui/web/ui/card";
+import { CardDescription } from "@/packages/next-vibe-ui/web/ui/card";
+import { CardHeader } from "@/packages/next-vibe-ui/web/ui/card";
+import { CardTitle } from "@/packages/next-vibe-ui/web/ui/card";
+import { Link } from "@/packages/next-vibe-ui/web/ui/link";
 import type { JSX, MouseEvent } from "react";
 
 import type { RenderableValue, WidgetComponentProps } from "../types";

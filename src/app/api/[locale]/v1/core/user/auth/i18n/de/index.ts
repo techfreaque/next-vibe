@@ -40,6 +40,8 @@ export const translations: typeof enTranslations = {
         "Authentifizierungsdaten konnten nicht gespeichert werden",
       clear_failed: "Authentifizierungsdaten konnten nicht gelöscht werden",
     },
+    not_implemented_native:
+      "Diese Funktion ist noch nicht für React Native implementiert",
   },
   post: {
     title: "Titel",

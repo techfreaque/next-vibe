@@ -8,7 +8,8 @@
 import { BarChart3, List, UserPlus } from "lucide-react";
 import NextLink from "next/link";
 import { cn } from "next-vibe/shared/utils";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

@@ -2,9 +2,14 @@
 
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import { Button, Card, CardContent, Div, Form, Link, Span } from "next-vibe-ui/ui";
+import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

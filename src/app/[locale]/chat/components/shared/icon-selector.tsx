@@ -1,18 +1,11 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import {
-  Button,
-  Div,
-  Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "next-vibe-ui/ui";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { Input } from "next-vibe-ui/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { H4 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useState } from "react";

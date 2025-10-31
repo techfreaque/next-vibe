@@ -4,9 +4,16 @@ import * as SeparatorPrimitive from "@radix-ui/react-separator";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
+// Cross-platform types for native import
+export interface SeparatorProps {
+  className?: string;
+  orientation?: "horizontal" | "vertical";
+  decorative?: boolean;
+}
+
 const Separator = React.forwardRef<
   React.ElementRef<typeof SeparatorPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root>
+  SeparatorProps
 >(
   (
     { className, orientation = "horizontal", decorative = true, ...props },

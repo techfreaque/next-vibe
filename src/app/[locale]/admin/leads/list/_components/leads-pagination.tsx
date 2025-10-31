@@ -11,7 +11,8 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Select,

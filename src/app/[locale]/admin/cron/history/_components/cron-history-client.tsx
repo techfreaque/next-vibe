@@ -6,7 +6,7 @@
 "use client";
 
 import type React from "react";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 
 import { useTaskHistory } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/history/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";

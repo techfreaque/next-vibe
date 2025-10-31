@@ -2,32 +2,27 @@
 
 import Link from "next/link";
 import { useRouter } from "next-vibe-ui/hooks";
-import {
-  Button,
-  Div,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Input,
-  P,
-  ScrollArea,
-  Span,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe-ui/ui";
-import {
-  Coins,
-  FolderPlus,
-  HelpCircle,
-  Info,
-  MessageSquarePlus,
-  Search,
-  Settings,
-} from "next-vibe-ui/ui/icons";
+import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { DropdownMenu } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuContent } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuItem } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuSeparator } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuTrigger } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { Input } from "@/packages/next-vibe-ui/web/ui/input";
+import { P } from "@/packages/next-vibe-ui/web/ui/typography";
+import { ScrollArea } from "@/packages/next-vibe-ui/web/ui/scroll-area";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Tooltip } from "@/packages/next-vibe-ui/web/ui/tooltip";
+import { TooltipContent } from "@/packages/next-vibe-ui/web/ui/tooltip";
+import { TooltipProvider } from "@/packages/next-vibe-ui/web/ui/tooltip";
+import { TooltipTrigger } from "@/packages/next-vibe-ui/web/ui/tooltip";
+import { Coins } from "@/packages/next-vibe-ui/web/ui/icons/Coins";
+import { FolderPlus } from "@/packages/next-vibe-ui/web/ui/icons/FolderPlus";
+import { HelpCircle } from "@/packages/next-vibe-ui/web/ui/icons/HelpCircle";
+import { Info } from "@/packages/next-vibe-ui/web/ui/icons/Info";
+import { MessageSquarePlus } from "@/packages/next-vibe-ui/web/ui/icons/MessageSquarePlus";
+import { Search } from "@/packages/next-vibe-ui/web/ui/icons/Search";
 import type { JSX } from "react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -160,15 +155,19 @@ export function ChatSidebar({
   const handleSelectFolder = (folderId: string): void => {
     const rootFolderId = getRootFolderId(chat.folders, folderId);
 
-    // If user is not authenticated and tries to access non-incognito folder, redirect to incognito
-    if (!isAuthenticated && rootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO) {
+    // If user is not authenticated and tries to access private/shared folders, redirect to public
+    if (
+      !isAuthenticated &&
+      rootFolderId !== DEFAULT_FOLDER_IDS.PUBLIC &&
+      rootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO
+    ) {
       logger.info(
-        "Non-authenticated user attempted to access non-incognito folder, redirecting to incognito",
+        "Non-authenticated user attempted to access private/shared folder, redirecting to public",
         {
           attemptedFolder: rootFolderId,
         },
       );
-      const url = buildFolderUrl(locale, DEFAULT_FOLDER_IDS.INCOGNITO, null);
+      const url = buildFolderUrl(locale, DEFAULT_FOLDER_IDS.PUBLIC, null);
       router.push(url);
       return;
     }
@@ -209,6 +208,7 @@ export function ChatSidebar({
         activeFolderId={activeRootFolderId}
         locale={locale}
         onSelectFolder={handleSelectFolder}
+        isAuthenticated={isAuthenticated}
       />
       {/* New Chat Button */}
       <Div className="flex items-center gap-1 px-3 pb-2 min-w-max">
@@ -426,16 +426,6 @@ export function ChatSidebar({
         )}
 
         <Div className="flex flex-col gap-1">
-          <Link href={`/${locale}/app/dashboard`}>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start h-8 px-2"
-            >
-              <Settings className="h-3.5 w-3.5 mr-2" />
-              {t("app.chat.credits.navigation.profile")}
-            </Button>
-          </Link>
           <UserMenu user={user} locale={locale} logger={logger} />
           <Link href={`/${locale}/subscription`}>
             <Button

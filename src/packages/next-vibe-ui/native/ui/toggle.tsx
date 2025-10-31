@@ -51,10 +51,24 @@ const toggleTextVariants = cva(
   },
 );
 
+// Cross-platform types
+export type ToggleVariant = VariantProps<typeof toggleVariants>["variant"];
+export type ToggleSize = VariantProps<typeof toggleVariants>["size"];
+
+export interface ToggleProps {
+  variant?: ToggleVariant;
+  size?: ToggleSize;
+  className?: string;
+  children?: React.ReactNode;
+  pressed?: boolean;
+  onPressedChange?: (pressed: boolean) => void;
+  disabled?: boolean;
+}
+
 const Toggle = React.forwardRef<
   TogglePrimitive.RootRef,
-  WithClassName<TogglePrimitive.RootProps> & VariantProps<typeof toggleVariants>
->(({ className, variant, size, pressed, onPressedChange, ...props }, ref) => {
+  WithClassName<TogglePrimitive.RootProps> & ToggleProps
+>(({ className, variant, size, pressed, onPressedChange, children, ...props }, ref) => {
   const isPressed = pressed ?? false;
   const handlePressedChange = onPressedChange ?? (() => {});
   return (
@@ -78,7 +92,9 @@ const Toggle = React.forwardRef<
           isPressed && "bg-accent",
           className,
         )}
-      />
+      >
+        {children}
+      </TogglePrimitive.Root>
     </TextClassContext.Provider>
   );
 });
@@ -86,14 +102,14 @@ const Toggle = React.forwardRef<
 Toggle.displayName = TogglePrimitive.Root.displayName;
 
 function ToggleIcon({
-  className,
   icon: Icon,
   ...props
-}: WithClassName<React.ComponentPropsWithoutRef<LucideIcon>> & {
+}: Omit<React.ComponentPropsWithoutRef<LucideIcon>, "className"> & {
   icon: LucideIcon;
+  className?: string;
 }): React.JSX.Element {
   const textClass = React.useContext(TextClassContext);
-  return <Icon {...props} className={cn(textClass, className)} />;
+  return <Icon {...props} color={textClass} />;
 }
 
 export { Toggle, ToggleIcon, toggleTextVariants, toggleVariants };

@@ -11,7 +11,8 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Select,
@@ -20,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe-ui/ui/select";
-import { P } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { UsersListEndpointReturn } from "@/app/api/[locale]/v1/core/users/list/hooks";

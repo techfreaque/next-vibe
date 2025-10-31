@@ -6,8 +6,10 @@
 "use client";
 
 import Image from "next/image";
-import { Div, Span } from "next-vibe-ui/ui";
-import { H3, P } from "next-vibe-ui/ui/typography";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { H3 } from "@/packages/next-vibe-ui/web/ui/typography";
+import { P } from "@/packages/next-vibe-ui/web/ui/typography";
 import type { JSX } from "react";
 
 import type { RenderableValue, WidgetComponentProps } from "../types";

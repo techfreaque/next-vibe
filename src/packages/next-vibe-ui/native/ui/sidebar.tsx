@@ -3,22 +3,25 @@
  * TODO: Implement collapsible sidebar with navigation
  * Currently a simple container
  */
-import type { ReactNode } from "react";
-import React, { createContext, useContext, useState } from "react";
-import { Pressable, Text as RNText, View } from "react-native";
+import React, { createContext, useContext, useMemo, useState } from "react";
+import type { PressableProps, ViewProps } from "react-native";
+import { Pressable, View } from "react-native";
 
+import type {
+  SidebarContentProps,
+  SidebarContextType,
+  SidebarFooterProps,
+  SidebarHeaderProps,
+  SidebarMenuItemProps,
+  SidebarProps as WebSidebarProps,
+  SidebarProviderProps,
+  SidebarTriggerProps,
+} from "next-vibe-ui/ui/sidebar";
 import { cn } from "../lib/utils";
 
-interface SidebarContextValue {
-  collapsed: boolean;
-  setCollapsed: (collapsed: boolean) => void;
-}
+const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
-const SidebarContext = createContext<SidebarContextValue | undefined>(
-  undefined,
-);
-
-function useSidebar(): SidebarContextValue {
+export function useSidebar(): SidebarContextType {
   const context = useContext(SidebarContext);
   if (!context) {
     // eslint-disable-next-line no-restricted-syntax -- Error handling for context
@@ -27,26 +30,38 @@ function useSidebar(): SidebarContextValue {
   return context;
 }
 
-interface SidebarProps {
-  children: ReactNode;
-  className?: string;
-  defaultCollapsed?: boolean;
-}
+// Native sidebar props combine web props with ViewProps
+type NativeSidebarProps = WebSidebarProps & ViewProps & { defaultOpen?: boolean };
 
-export const Sidebar = React.forwardRef<View, SidebarProps>(
-  ({ className, children, defaultCollapsed = false, ...props }, ref) => {
-    const [collapsed, setCollapsed] = useState(defaultCollapsed);
+export const Sidebar = React.forwardRef<View, NativeSidebarProps>(
+  ({ className, children, defaultOpen = true, ...props }, ref) => {
+    const [open, setOpen] = useState(defaultOpen);
+
+    const contextValue = useMemo<SidebarContextType>(
+      () => ({
+        state: open ? "expanded" : "collapsed",
+        open,
+        setOpen,
+        openMobile: false,
+        setOpenMobile: () => {},
+        isMobile: false,
+        toggleSidebar: () => setOpen(!open),
+      }),
+      [open],
+    );
 
     return (
-      <SidebarContext.Provider value={{ collapsed, setCollapsed }}>
+      <SidebarContext.Provider value={contextValue}>
         <View
           ref={ref}
-          className={cn(
-            "flex flex-col border-r border-border bg-background",
-            collapsed ? "w-16" : "w-64",
-            className,
-          )}
-          {...props}
+          {...({
+            className: cn(
+              "flex flex-col border-r border-border bg-background",
+              open ? "w-64" : "w-16",
+              className,
+            ),
+            ...props,
+          } as any)}
         >
           {children}
         </View>
@@ -57,54 +72,41 @@ export const Sidebar = React.forwardRef<View, SidebarProps>(
 
 Sidebar.displayName = "Sidebar";
 
-export const SidebarHeader = React.forwardRef<
-  View,
-  { children: ReactNode; className?: string }
->(({ className, children, ...props }, ref) => (
-  <View
-    ref={ref}
-    className={cn("flex flex-col gap-2 p-4", className)}
-    {...props}
-  >
-    {children}
-  </View>
-));
+export const SidebarHeader = React.forwardRef<View, SidebarHeaderProps & ViewProps>(
+  ({ className, children, ...props }, ref) => (
+    <View ref={ref} className={cn("flex flex-col gap-2 p-4", className)} {...props as any}>
+      {children}
+    </View>
+  ),
+);
 
 SidebarHeader.displayName = "SidebarHeader";
 
-export const SidebarContent = React.forwardRef<
-  View,
-  { children: ReactNode; className?: string }
->(({ className, children, ...props }, ref) => (
-  <View
-    ref={ref}
-    className={cn("flex-1 overflow-y-auto", className)}
-    {...props}
-  >
-    {children}
-  </View>
-));
+export const SidebarContent = React.forwardRef<View, SidebarContentProps & ViewProps>(
+  ({ className, children, ...props }, ref) => (
+    <View ref={ref} className={cn("flex-1 overflow-y-auto", className)} {...props as any}>
+      {children}
+    </View>
+  ),
+);
 
 SidebarContent.displayName = "SidebarContent";
 
-export const SidebarFooter = React.forwardRef<
-  View,
-  { children: ReactNode; className?: string }
->(({ className, children, ...props }, ref) => (
-  <View
-    ref={ref}
-    className={cn("flex flex-col gap-2 p-4", className)}
-    {...props}
-  >
-    {children}
-  </View>
-));
+export const SidebarFooter = React.forwardRef<View, SidebarFooterProps & ViewProps>(
+  ({ className, children, ...props }, ref) => (
+    <View ref={ref} className={cn("flex flex-col gap-2 p-4", className)} {...props as any}>
+      {children}
+    </View>
+  ),
+);
 
 SidebarFooter.displayName = "SidebarFooter";
 
-export const SidebarItem = React.forwardRef<
+// Note: Web has many more sidebar components (SidebarMenu, SidebarMenuItem, etc.)
+// This native implementation provides essential functionality only
+export const SidebarMenuItem = React.forwardRef<
   React.ElementRef<typeof Pressable>,
-  { children: ReactNode; className?: string; onPress?: () => void }
+  SidebarMenuItemProps & PressableProps
 >(({ className, children, onPress, ...props }, ref) => (
   <Pressable
     ref={ref}
@@ -113,39 +115,26 @@ export const SidebarItem = React.forwardRef<
       "flex flex-row items-center gap-2 rounded-md px-3 py-2 text-sm active:bg-accent active:text-accent-foreground",
       className,
     )}
-    {...props}
+    {...props as any}
   >
     {children}
   </Pressable>
 ));
 
-SidebarItem.displayName = "SidebarItem";
-
-export const SidebarLabel = React.forwardRef<
-  RNText,
-  { children: ReactNode; className?: string }
->(({ className, children, ...props }, ref) => (
-  <RNText ref={ref} className={cn("text-sm font-medium", className)} {...props}>
-    {children}
-  </RNText>
-));
-
-SidebarLabel.displayName = "SidebarLabel";
+SidebarMenuItem.displayName = "SidebarMenuItem";
 
 export const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Pressable>,
-  { children?: ReactNode; className?: string }
->(({ className, children, ...props }, ref) => {
-  const { collapsed, setCollapsed } = useSidebar();
+  SidebarTriggerProps & PressableProps
+>(({ className, children, onClick, ...props }, ref) => {
+  const { toggleSidebar } = useSidebar();
 
   return (
     <Pressable
       ref={ref}
-      onPress={() => {
-        setCollapsed(!collapsed);
-      }}
+      onPress={toggleSidebar}
       className={cn("flex items-center justify-center p-2", className)}
-      {...props}
+      {...props as any}
     >
       {children}
     </Pressable>
@@ -153,3 +142,6 @@ export const SidebarTrigger = React.forwardRef<
 });
 
 SidebarTrigger.displayName = "SidebarTrigger";
+
+// Provider for web compatibility - simplified for native
+export const SidebarProvider = Sidebar;

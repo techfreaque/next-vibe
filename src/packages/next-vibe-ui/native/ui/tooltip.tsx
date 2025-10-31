@@ -6,12 +6,46 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
 
+// Cross-platform type exports
+export interface TooltipProviderProps {
+  children?: React.ReactNode;
+  delayDuration?: number;
+  skipDelayDuration?: number;
+  disableHoverableContent?: boolean;
+}
+
+export interface TooltipRootProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+  defaultOpen?: boolean;
+  delayDuration?: number;
+}
+
+export interface TooltipTriggerProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface TooltipContentProps {
+  className?: string;
+  children?: React.ReactNode;
+  sideOffset?: number;
+  side?: "top" | "right" | "bottom" | "left";
+  align?: "start" | "center" | "end";
+  alignOffset?: number;
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
+  onPointerDownOutside?: (event: Event) => void;
+  portalHost?: string;
+}
+
+const TooltipProvider = TooltipPrimitive.Root;
 const Tooltip = TooltipPrimitive.Root;
 const TooltipTrigger = TooltipPrimitive.Trigger;
 
 const TooltipContent = React.forwardRef<
   TooltipPrimitive.ContentRef,
-  TooltipPrimitive.ContentProps & { portalHost?: string }
+  TooltipPrimitive.ContentProps & TooltipContentProps
 >(({ className, sideOffset = 4, portalHost, ...props }, ref) => (
   <TooltipPrimitive.Portal hostName={portalHost}>
     <TooltipPrimitive.Overlay
@@ -42,4 +76,4 @@ const TooltipContent = React.forwardRef<
 ));
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
-export { Tooltip, TooltipContent, TooltipTrigger };
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };

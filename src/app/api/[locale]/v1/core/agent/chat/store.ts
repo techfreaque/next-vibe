@@ -28,6 +28,7 @@ export interface ChatThread {
   tags: string[];
   preview: string | null;
   moderatorIds?: string[] | null;
+  allowedRoles?: string[] | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -74,7 +75,8 @@ export interface ChatFolder {
   expanded: boolean;
   sortOrder: number;
   metadata: Record<string, string | number | boolean | null>;
-  moderatorIds?: string[] | null;
+  allowedRoles?: string[] | null; // Roles that can view this folder (PUBLIC, CUSTOMER, ADMIN)
+  moderatorIds?: string[] | null; // User IDs that can moderate this folder
   createdAt: Date;
   updatedAt: Date;
 }

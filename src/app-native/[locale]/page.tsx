@@ -10,19 +10,20 @@
  * The index.tsx wrapper handles converting this to work with Expo Router
  */
 
+import { Button } from "next-vibe-ui/ui/button";
 import {
-  Button,
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-  Div,
-  Link,
-  Text,
-} from "next-vibe-ui/ui";
-import { H1, H2, P } from "next-vibe-ui/ui/typography";
+} from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
+import { H1, H2 } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -37,7 +38,6 @@ export default async function HomePage({
   params,
 }: HomePageProps): Promise<JSX.Element> {
   const { locale } = await params;
-
   return (
     <Div className="flex-1 p-6 bg-background">
       <Div className="max-w-4xl mx-auto space-y-6">
@@ -45,7 +45,7 @@ export default async function HomePage({
         <Div className="text-center space-y-2">
           <H1>Welcome to Next Vibe</H1>
           <P className="text-muted-foreground">
-            A unified Next.js and React Native application
+            A unified Next.js and React Native application {locale}
           </P>
         </Div>
 
@@ -59,7 +59,7 @@ export default async function HomePage({
           </CardHeader>
           <CardContent>
             <Div className="flex flex-row items-center space-x-2">
-              <Text className="text-2xl font-bold text-primary">{locale}</Text>
+              <Span className="text-2xl font-bold text-primary">{locale}</Span>
             </Div>
           </CardContent>
         </Card>
@@ -94,11 +94,18 @@ export default async function HomePage({
             </Div>
           </CardContent>
           <CardFooter>
+            <Div>
             <Link href={`/${locale}/chat`} asChild>
               <Button className="w-full">
-                <Text>Go to Chat</Text>
+                <Span>Go to Chat</Span>
               </Button>
             </Link>
+            <Link href={`/${locale}/help`} asChild>
+              <Button className="w-full">
+                <Span>Go to Help</Span>
+              </Button>
+            </Link>
+            </Div> 
           </CardFooter>
         </Card>
 
@@ -110,16 +117,16 @@ export default async function HomePage({
           <CardContent>
             <Div className="space-y-2">
               <Div className="flex flex-row justify-between">
-                <Text className="text-muted-foreground">Platform:</Text>
-                <Text className="font-medium">Universal</Text>
+                <Span className="text-muted-foreground">Platform:</Span>
+                <Span className="font-medium">Universal</Span>
               </Div>
               <Div className="flex flex-row justify-between">
-                <Text className="text-muted-foreground">Routing:</Text>
-                <Text className="font-medium">File-based</Text>
+                <Span className="text-muted-foreground">Routing:</Span>
+                <Span className="font-medium">File-based</Span>
               </Div>
               <Div className="flex flex-row justify-between">
-                <Text className="text-muted-foreground">Styling:</Text>
-                <Text className="font-medium">NativeWind</Text>
+                <Span className="text-muted-foreground">Styling:</Span>
+                <Span className="font-medium">NativeWind</Span>
               </Div>
             </Div>
           </CardContent>

@@ -22,6 +22,7 @@ import { subscriptions } from "@/app/api/[locale]/v1/core/subscription/db";
 import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
@@ -79,8 +80,7 @@ export interface CreditRepositoryInterface {
 
   // Get credit balance for user (handles both subscription and lead credits)
   getCreditBalanceForUser(
-    userId: string,
-    leadId: string,
+    user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditBalance>>;
 
@@ -286,15 +286,21 @@ class CreditRepository
    * Determines whether to use user credits or lead credits based on subscription status
    */
   async getCreditBalanceForUser(
-    userId: string,
-    leadId: string,
+    user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditBalance>> {
     try {
-      // Get credit identifier (determines if we use user credits or lead credits)
+      // Public users only have leadId and always use lead credits
+      // Private users have id and leadId, may use either based on subscription
+      if (user.isPublic) {
+        // Public users always use lead credits
+        return await this.getLeadBalanceAsBalance(user.leadId);
+      }
+
+      // Private user - check subscription to determine credit source
       const identifierResult = await this.getCreditIdentifierBySubscription(
-        userId,
-        leadId,
+        user.id,
+        user.leadId,
         logger,
       );
 
@@ -368,8 +374,9 @@ class CreditRepository
       );
     } catch (error) {
       logger.error("Failed to get credit balance for user", parseError(error), {
-        userId,
-        leadId,
+        userId: user.isPublic ? undefined : user.id,
+        leadId: user.leadId,
+        isPublic: user.isPublic,
       });
       return createErrorResponse(
         "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",

@@ -2,9 +2,10 @@
 
 import { Check, Edit2, X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
-import { Div, Span } from "next-vibe-ui/ui";
-import { Button } from "next-vibe-ui/ui/button";
-import { Input } from "next-vibe-ui/ui/input";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Input } from "@/packages/next-vibe-ui/web/ui/input";
 import type { JSX, KeyboardEvent } from "react";
 import { useState } from "react";
 

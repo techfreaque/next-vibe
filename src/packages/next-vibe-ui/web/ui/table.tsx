@@ -1,9 +1,45 @@
 import { cn } from "next-vibe/shared/utils/utils";
+import type { ReactNode } from "react";
 import * as React from "react";
+import type { CSSProperties } from "react";
+
+// Cross-platform base props for table components
+export interface TableBaseProps {
+  children?: ReactNode;
+  className?: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface TableProps extends TableBaseProps {}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface TableHeaderProps extends TableBaseProps {}
+
+export interface TableBodyProps extends TableBaseProps {
+  style?: CSSProperties;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface TableFooterProps extends TableBaseProps {}
+
+export interface TableRowProps extends TableBaseProps {
+  onPress?: () => void;
+}
+
+export interface TableHeadProps extends TableBaseProps {
+  style?: CSSProperties;
+}
+
+export interface TableCellProps extends TableBaseProps {
+  style?: CSSProperties;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface TableCaptionProps extends TableBaseProps {}
 
 const Table = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
+  TableProps & React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
   <div className="relative w-full overflow-auto">
     <table
@@ -17,7 +53,7 @@ Table.displayName = "Table";
 
 const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
+  TableHeaderProps & React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
   <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
 ));
@@ -25,7 +61,7 @@ TableHeader.displayName = "TableHeader";
 
 const TableBody = React.forwardRef<
   HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
+  TableBodyProps & React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
   <tbody
     ref={ref}
@@ -37,7 +73,7 @@ TableBody.displayName = "TableBody";
 
 const TableFooter = React.forwardRef<
   HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
+  TableFooterProps & React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
   <tfoot
     ref={ref}
@@ -52,14 +88,24 @@ TableFooter.displayName = "TableFooter";
 
 const TableRow = React.forwardRef<
   HTMLTableRowElement,
-  React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => (
+  TableRowProps & React.HTMLAttributes<HTMLTableRowElement>
+>(({ className, onPress, ...props }, ref) => (
   <tr
     ref={ref}
     className={cn(
       "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      onPress && "cursor-pointer",
       className,
     )}
+    onClick={onPress}
+    onKeyDown={(e) => {
+      if (onPress && (e.key === "Enter" || e.key === " ")) {
+        e.preventDefault();
+        onPress();
+      }
+    }}
+    role={onPress ? "button" : undefined}
+    tabIndex={onPress ? 0 : undefined}
     {...props}
   />
 ));
@@ -67,7 +113,7 @@ TableRow.displayName = "TableRow";
 
 const TableHead = React.forwardRef<
   HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
+  TableHeadProps & React.ThHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
   <th
     ref={ref}
@@ -82,7 +128,7 @@ TableHead.displayName = "TableHead";
 
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
-  React.TdHTMLAttributes<HTMLTableCellElement>
+  TableCellProps & React.TdHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
@@ -97,7 +143,7 @@ TableCell.displayName = "TableCell";
 
 const TableCaption = React.forwardRef<
   HTMLTableCaptionElement,
-  React.HTMLAttributes<HTMLTableCaptionElement>
+  TableCaptionProps & React.HTMLAttributes<HTMLTableCaptionElement>
 >(({ className, ...props }, ref) => (
   <caption
     ref={ref}

@@ -10,8 +10,8 @@ import {
   Html,
   Preview,
   Section,
-  Text,
 } from "@react-email/components";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -103,7 +103,7 @@ export function HumanEmailLayout({
                   marginBottom: "10px",
                 }}
               >
-                <Text
+                <Span
                   style={{
                     fontSize: "20px",
                     fontWeight: "700",
@@ -117,8 +117,8 @@ export function HumanEmailLayout({
                   }}
                 >
                   {t("app.common.logoPart1")}
-                </Text>
-                <Text
+                </Span>
+                <Span
                   style={{
                     fontSize: "20px",
                     fontWeight: "700",
@@ -132,9 +132,9 @@ export function HumanEmailLayout({
                   }}
                 >
                   {t("app.common.logoPart2")}
-                </Text>
+                </Span>
               </div>
-              <Text
+              <Span
                 style={{
                   fontSize: "12px",
                   color: "#64748b",
@@ -143,11 +143,11 @@ export function HumanEmailLayout({
                 }}
               >
                 {t("app.api.v1.core.emails.template.tagline")}
-              </Text>
+              </Span>
             </div>
 
             {/* Contact info */}
-            <Text
+            <Span
               style={{
                 fontSize: "14px",
                 color: "#6b7280",
@@ -167,10 +167,10 @@ export function HumanEmailLayout({
               >
                 {companyEmail}
               </TrackedLink>
-            </Text>
+            </Span>
 
             {/* Unsubscribe */}
-            <Text
+            <Span
               style={{
                 fontSize: "12px",
                 color: "#9ca3af",
@@ -192,10 +192,10 @@ export function HumanEmailLayout({
                   "app.api.v1.core.emails.smtpClient.components.email.footer.unsubscribeLink",
                 )}
               </TrackedLink>
-            </Text>
+            </Span>
 
             {/* Copyright */}
-            <Text
+            <Span
               style={{
                 fontSize: "12px",
                 color: "#9ca3af",
@@ -209,7 +209,7 @@ export function HumanEmailLayout({
                   companyName,
                 },
               )}
-            </Text>
+            </Span>
           </Section>
         </Container>
         <TrackedPixel tracking={tracking} />

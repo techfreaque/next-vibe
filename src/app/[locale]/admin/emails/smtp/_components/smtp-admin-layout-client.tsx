@@ -6,10 +6,12 @@
 "use client";
 
 import { Plus, Users } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
+import { Link } from "next-vibe-ui/ui/link";
 import { cn } from "next-vibe/shared/utils";
-import { Div, P, Span } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
+import { Span } from "next-vibe-ui/ui/span";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { H2 } from "next-vibe-ui/ui/typography";
 import type { ComponentType, JSX, ReactNode } from "react";

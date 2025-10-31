@@ -1,17 +1,11 @@
 "use client";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  Div,
-  H1,
-  P,
-  ScrollArea,
-  Span,
-} from "next-vibe-ui/ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "next-vibe-ui/ui/dialog";
+import { Div } from "next-vibe-ui/ui/div";
+import { H1 } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui/typography";
+import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
+import { Span } from "next-vibe-ui/ui/span";
 import { MoreHorizontal } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useState } from "react";

@@ -77,6 +77,14 @@ export interface UserRolesRepository {
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>>;
+
+  /**
+   * Get user role values as array of strings
+   */
+  getUserRoles(
+    userId: DbId,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<string[]>>;
 }
 
 /**
@@ -361,6 +369,40 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
       logger.error("Error deleting user roles by user ID", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.userRoles.errors.delete_failed",
+        ErrorResponseTypes.DATABASE_ERROR,
+        { userId, error: parseError(error).message },
+      );
+    }
+  }
+
+  /**
+   * Get user role values as array of strings
+   * @param userId - The user ID
+   * @returns Array of role strings or error response
+   */
+  async getUserRoles(
+    userId: DbId,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<string[]>> {
+    try {
+      logger.debug("Getting user role values", { userId });
+
+      const rolesResult = await this.findByUserId(userId, logger);
+
+      if (!rolesResult.success || !rolesResult.data) {
+        return createErrorResponse(
+          "app.api.v1.core.user.userRoles.errors.find_failed",
+          ErrorResponseTypes.DATABASE_ERROR,
+          { userId },
+        );
+      }
+
+      const roleValues = rolesResult.data.map((r) => r.role);
+      return createSuccessResponse(roleValues);
+    } catch (error) {
+      logger.error("Error getting user role values", parseError(error));
+      return createErrorResponse(
+        "app.api.v1.core.user.userRoles.errors.find_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { userId, error: parseError(error).message },
       );

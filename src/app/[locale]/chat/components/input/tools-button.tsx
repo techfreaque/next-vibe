@@ -1,7 +1,9 @@
 "use client";
 
-import { Badge, Button, Span } from "next-vibe-ui/ui";
-import { Wrench } from "next-vibe-ui/ui/icons";
+import { Badge } from "@/packages/next-vibe-ui/web/ui/badge";
+import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Wrench } from "@/packages/next-vibe-ui/web/ui/icons/Wrench";
 import type { JSX } from "react";
 import React from "react";
 
@@ -29,6 +31,7 @@ export function ToolsButton({
 
   return (
     <Button
+      type="button"
       onClick={onOpenToolsModal}
       disabled={disabled}
       variant="outline"

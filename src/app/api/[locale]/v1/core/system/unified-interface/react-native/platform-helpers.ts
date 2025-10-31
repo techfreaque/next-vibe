@@ -46,12 +46,6 @@ export async function importNextModule<T>(
 }
 
 /**
- * Mock Next.js Link component for React Native
- * Falls back to TouchableOpacity with navigation
- */
-export { Link } from "expo-router";
-
-/**
  * Type guard for checking if code is running in React Native
  */
 export function assertNative(): asserts this is typeof isNative {
@@ -69,12 +63,4 @@ export function assertWeb(): asserts this is typeof isWeb {
     // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Platform guard assertion requires throwing for incorrect platform
     throw new Error("This code should only run on web platform");
   }
-}
-
-/**
- * Create a page wrapper for React Native
- * This is a simple identity function for compatibility
- */
-export function createPageWrapper<T>(component: T): T {
-  return component;
 }

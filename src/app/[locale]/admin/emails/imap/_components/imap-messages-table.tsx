@@ -7,7 +7,7 @@
 
 import { Eye, Mail, MailOpen, Paperclip, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import {
@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { P } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { ImapMessageResponseType } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/list/definition";

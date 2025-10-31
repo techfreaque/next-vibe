@@ -5,9 +5,9 @@
 
 "use client";
 
-import { usePathname } from "next/navigation";
-import { Div } from "next-vibe-ui/ui";
-import { H1 } from "next-vibe-ui/ui";
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
+import { Div } from "next-vibe-ui/ui/div";
+import { H1 } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import type { ReactNode } from "react";
 

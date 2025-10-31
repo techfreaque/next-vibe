@@ -17,7 +17,8 @@ import { useTranslation } from "@/i18n/core/client";
 const DECORATIVE_QUOTE = String.fromCharCode(0x201c); // Left double quotation mark
 const CODE_BLOCK_BG_COLOR = `rgb(${30} ${41} ${59})`; // Slate-800 background
 
-interface MarkdownProps {
+// Cross-platform interface - must match native version
+export interface MarkdownProps {
   content: string;
   className?: string;
 }

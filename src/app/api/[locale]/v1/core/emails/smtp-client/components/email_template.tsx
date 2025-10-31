@@ -4,8 +4,8 @@ import {
   Html,
   Preview,
   Section,
-  Text,
 } from "@react-email/components";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX, ReactNode } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
@@ -85,7 +85,7 @@ export function EmailTemplate({
                   marginBottom: "12px",
                 }}
               >
-                <Text
+                <Span
                   style={{
                     fontSize: "24px",
                     fontWeight: "700",
@@ -100,8 +100,8 @@ export function EmailTemplate({
                   }}
                 >
                   {t("app.common.logoPart1")}
-                </Text>
-                <Text
+                </Span>
+                <Span
                   style={{
                     fontSize: "24px",
                     fontWeight: "700",
@@ -116,11 +116,11 @@ export function EmailTemplate({
                   }}
                 >
                   {t("app.common.logoPart2")}
-                </Text>
+                </Span>
               </div>
 
               {/* Tagline - below logo, left aligned */}
-              <Text
+              <Span
                 style={{
                   fontSize: "14px",
                   fontWeight: "500",
@@ -131,7 +131,7 @@ export function EmailTemplate({
                 }}
               >
                 {t("app.api.v1.core.emails.template.tagline")}
-              </Text>
+              </Span>
             </div>
           </Section>
 
@@ -146,7 +146,7 @@ export function EmailTemplate({
             }}
           >
             {/* Title */}
-            <Text
+            <Span
               style={{
                 fontSize: "24px",
                 fontWeight: "700",
@@ -156,7 +156,7 @@ export function EmailTemplate({
               }}
             >
               {title}
-            </Text>
+            </Span>
 
             {/* Decorative line under title */}
             <div
@@ -210,7 +210,7 @@ export function EmailTemplate({
               </TrackedLink>
             </div>
 
-            <Text
+            <Span
               style={{
                 fontSize: "14px",
                 color: "#6b7280",
@@ -222,9 +222,9 @@ export function EmailTemplate({
                 currentYear,
                 appName: `${t("app.common.logoPart1")} ${t("app.common.logoPart2")}`,
               })}
-            </Text>
+            </Span>
 
-            <Text
+            <Span
               style={{
                 fontSize: "14px",
                 color: "#6b7280",
@@ -242,9 +242,9 @@ export function EmailTemplate({
               >
                 {contactClientRepository.getSupportEmail(locale)}
               </TrackedLink>
-            </Text>
+            </Span>
 
-            <Text
+            <Span
               style={{
                 fontSize: "12px",
                 color: "#9ca3af",
@@ -259,7 +259,7 @@ export function EmailTemplate({
                   appName: `${t("app.common.logoPart1")} ${t("app.common.logoPart2")}`,
                 },
               )}
-            </Text>
+            </Span>
           </Section>
         </Container>
 

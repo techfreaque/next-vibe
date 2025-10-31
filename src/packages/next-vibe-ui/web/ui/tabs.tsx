@@ -4,6 +4,33 @@ import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
+// Cross-platform types
+export interface TabsProps {
+  value?: string;
+  onValueChange?: (value: string) => void;
+  defaultValue?: string;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface TabsListProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface TabsTriggerProps {
+  value: string;
+  disabled?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface TabsContentProps {
+  value: string;
+  className?: string;
+  children?: React.ReactNode;
+}
+
 const Tabs = TabsPrimitive.Root;
 
 const TabsList = React.forwardRef<

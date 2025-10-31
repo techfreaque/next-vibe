@@ -3,26 +3,33 @@
  * TODO: Implement full calendar functionality with date selection
  * Currently a placeholder that accepts date props
  */
-import type { ReactNode } from "react";
 import React from "react";
+import type { ViewProps } from "react-native";
 import { Text as RNText, View } from "react-native";
 
+import type { CalendarBaseProps } from "next-vibe-ui/ui/calendar";
 import { cn } from "../lib/utils";
 
-interface CalendarProps {
-  children?: ReactNode;
-  className?: string;
-  selected?: Date;
-  onSelect?: (date: Date | undefined) => void;
-  mode?: "single" | "multiple" | "range";
-  disabled?: boolean;
-}
+// Native calendar props extend base props with native View props
+export type CalendarProps = CalendarBaseProps & Omit<ViewProps, 'children'> & {
+  children?: React.ReactNode;
+};
+
+// Type-safe View with className support (NativeWind)
+const StyledView = View as unknown as React.ForwardRefExoticComponent<
+  ViewProps & { className?: string } & React.RefAttributes<View>
+>;
+
+// Type-safe Text with className support (NativeWind)
+const StyledText = RNText as unknown as React.ForwardRefExoticComponent<
+  React.ComponentProps<typeof RNText> & { className?: string } & React.RefAttributes<RNText>
+>;
 
 export const Calendar = React.forwardRef<View, CalendarProps>(
-  ({ className, children, selected, ...props }, ref) => {
+  ({ className, children, selected, onSelect, mode, disabled, ...props }, ref) => {
     // TODO: Implement onSelect, mode, disabled functionality
     return (
-      <View
+      <StyledView
         ref={ref}
         className={cn(
           "p-3 rounded-md border border-border bg-background",
@@ -30,13 +37,13 @@ export const Calendar = React.forwardRef<View, CalendarProps>(
         )}
         {...props}
       >
-        <RNText className="text-sm text-muted-foreground text-center">
+        <StyledText className="text-sm text-muted-foreground text-center">
           {/* TODO: Implement calendar UI */}
           {/* eslint-disable-next-line i18next/no-literal-string -- Placeholder text */}
           {selected ? selected.toLocaleDateString() : "No date selected"}
-        </RNText>
+        </StyledText>
         {children}
-      </View>
+      </StyledView>
     );
   },
 );

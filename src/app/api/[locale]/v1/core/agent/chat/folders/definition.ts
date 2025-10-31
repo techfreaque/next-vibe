@@ -7,7 +7,7 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
-  arrayField,
+  field,
   objectField,
   requestDataField,
   responseArrayField,
@@ -20,9 +20,18 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { UserRole, UserRoleOptions } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { UserRoleDB, UserRoleOptions, UserRole,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { DEFAULT_FOLDER_IDS } from "../config";
+
+// Create Zod enum from DEFAULT_FOLDER_IDS values
+const RootFolderIdValues = [
+  DEFAULT_FOLDER_IDS.PRIVATE,
+  DEFAULT_FOLDER_IDS.SHARED,
+  DEFAULT_FOLDER_IDS.PUBLIC,
+  DEFAULT_FOLDER_IDS.INCOGNITO,
+] as const;
 
 /**
  * Get Folders List Endpoint (GET)
@@ -132,12 +141,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.folders.get.response.folders.folder.rootFolderId.content" as const,
               },
-              z.enum([
-                DEFAULT_FOLDER_IDS.PRIVATE,
-                DEFAULT_FOLDER_IDS.SHARED,
-                DEFAULT_FOLDER_IDS.PUBLIC,
-                DEFAULT_FOLDER_IDS.INCOGNITO,
-              ]),
+              z.enum(RootFolderIdValues),
             ),
             name: responseField(
               {
@@ -195,25 +199,32 @@ const { GET } = createEndpoint({
               },
               z.record(z.string(), z.any()),
             ),
-            allowedRoles: arrayField(
-              { response: true },
+            allowedRoles: responseArrayField(
               {
-                type: WidgetType.MULTI_SELECT,
-                title:
-                  "app.api.v1.core.agent.chat.folders.get.response.folders.folder.allowedRoles.title" as const,
-                description:
-                  "app.api.v1.core.agent.chat.folders.get.response.folders.folder.allowedRoles.description" as const,
-                options: UserRoleOptions,
+                type: WidgetType.DATA_LIST,
+                layout: "inline",
               },
-              stringField(
+              field(
+                z.enum(UserRoleDB),
                 { response: true },
                 {
-                  type: WidgetType.SELECT,
+                  type: WidgetType.BADGE,
                   options: UserRoleOptions,
                 },
-                z.string(),
               ),
-              undefined,
+            ),
+            moderatorIds: responseArrayField(
+              {
+                type: WidgetType.DATA_LIST,
+                layout: "inline",
+              },
+              field(
+                z.string(),
+                { response: true },
+                {
+                  type: WidgetType.TEXT,
+                },
+              ),
             ),
             createdAt: responseField(
               {
@@ -479,12 +490,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.post.response.folder.rootFolderId.content" as const,
                 },
-                z.enum([
-                  DEFAULT_FOLDER_IDS.PRIVATE,
-                  DEFAULT_FOLDER_IDS.SHARED,
-                  DEFAULT_FOLDER_IDS.PUBLIC,
-                  DEFAULT_FOLDER_IDS.INCOGNITO,
-                ]),
+                z.enum(RootFolderIdValues),
               ),
               name: responseField(
                 {
@@ -542,25 +548,32 @@ const { POST } = createEndpoint({
                 },
                 z.record(z.string(), z.any()),
               ),
-              allowedRoles: arrayField(
-                { response: true },
+              allowedRoles: responseArrayField(
                 {
-                  type: WidgetType.MULTI_SELECT,
-                  title:
-                    "app.api.v1.core.agent.chat.folders.post.response.folder.allowedRoles.title" as const,
-                  description:
-                    "app.api.v1.core.agent.chat.folders.post.response.folder.allowedRoles.description" as const,
-                  options: UserRoleOptions,
+                  type: WidgetType.DATA_LIST,
+                  layout: "inline",
                 },
-                stringField(
+                field(
+                  z.enum(UserRoleDB),
                   { response: true },
                   {
-                    type: WidgetType.SELECT,
+                    type: WidgetType.BADGE,
                     options: UserRoleOptions,
                   },
-                  z.string(),
                 ),
-                undefined,
+              ),
+              moderatorIds: responseArrayField(
+                {
+                  type: WidgetType.DATA_LIST,
+                  layout: "inline",
+                },
+                field(
+                  z.string(),
+                  { response: true },
+                  {
+                    type: WidgetType.TEXT,
+                  },
+                ),
               ),
               createdAt: responseField(
                 {
@@ -665,6 +678,8 @@ const { POST } = createEndpoint({
             expanded: true,
             sortOrder: 0,
             metadata: {},
+            allowedRoles: [],
+            moderatorIds: [],
             createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
             updatedAt: new Date("2024-01-01T00:00:00Z").toISOString(),
           },

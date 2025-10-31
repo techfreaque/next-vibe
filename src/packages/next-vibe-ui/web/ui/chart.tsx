@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import type { ReactNode } from "react";
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 
@@ -36,6 +37,20 @@ export interface PayloadItem<TData extends ChartDataPoint = ChartDataPoint> {
   fill?: string;
   stroke?: string;
   payload?: TData;
+}
+
+// Cross-platform base props interfaces
+export interface ChartBaseProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export interface ChartContainerBaseProps<
+  TData extends ChartDataPoint = ChartDataPoint,
+> {
+  children: ReactNode;
+  className?: string;
+  config: ChartConfig<TData>;
 }
 
 interface ChartContextProps<TData extends ChartDataPoint = ChartDataPoint> {

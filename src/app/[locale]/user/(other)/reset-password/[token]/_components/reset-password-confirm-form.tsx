@@ -5,19 +5,19 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { Environment } from "next-vibe/shared/utils/env-util";
+import { Button } from "next-vibe-ui/ui/button";
 import {
-  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  Div,
-  Form,
-  FormItem,
-} from "next-vibe-ui/ui";
+} from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+import { FormItem } from "next-vibe-ui/ui/form/form";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

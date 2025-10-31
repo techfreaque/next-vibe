@@ -7,10 +7,11 @@
 
 import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schema";
 import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
-import { H4, P } from "next-vibe-ui/ui";
+import { H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 import {

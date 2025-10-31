@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  DropdownMenuItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  Span,
-} from "next-vibe-ui/ui";
+import { DropdownMenuItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "next-vibe-ui/ui/dropdown-menu";
+import { Span } from "next-vibe-ui/ui/span";
 import { Check, Globe } from "next-vibe-ui/ui/icons";
 import type { FC } from "react";
 import { useCallback } from "react";

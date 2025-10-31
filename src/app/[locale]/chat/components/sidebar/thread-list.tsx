@@ -2,42 +2,39 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { useRouter } from "next-vibe-ui/hooks";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  Button,
-  Div,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-  P,
-  Span,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe-ui/ui";
-import {
-  Archive,
-  ArchiveRestore,
-  Edit2,
-  FolderInput,
-  MoreVertical,
-  Pin,
-  PinOff,
-  Trash2,
-} from "next-vibe-ui/ui/icons";
+import { AlertDialog } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogAction } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogCancel } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogContent } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogDescription } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogFooter } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogHeader } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { AlertDialogTitle } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { DropdownMenu } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuContent } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuItem } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuSeparator } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuSub } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuSubContent } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuSubTrigger } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { DropdownMenuTrigger } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { P } from "@/packages/next-vibe-ui/web/ui/typography";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Tooltip } from "@/packages/next-vibe-ui/web/ui/tooltip";
+import { TooltipContent } from "@/packages/next-vibe-ui/web/ui/tooltip";
+import { TooltipProvider } from "@/packages/next-vibe-ui/web/ui/tooltip";
+import { TooltipTrigger } from "@/packages/next-vibe-ui/web/ui/tooltip";
+import { Archive } from "@/packages/next-vibe-ui/web/ui/icons/Archive";
+import { ArchiveRestore } from "@/packages/next-vibe-ui/web/ui/icons/ArchiveRestore";
+import { Edit2 } from "@/packages/next-vibe-ui/web/ui/icons/Edit2";
+import { FolderInput } from "@/packages/next-vibe-ui/web/ui/icons/FolderInput";
+import { MoreVertical } from "@/packages/next-vibe-ui/web/ui/icons/MoreVertical";
+import { Pin } from "@/packages/next-vibe-ui/web/ui/icons/Pin";
+import { PinOff } from "@/packages/next-vibe-ui/web/ui/icons/PinOff";
+import { Shield } from "@/packages/next-vibe-ui/web/ui/icons/Shield";
+import { Trash2 } from "@/packages/next-vibe-ui/web/ui/icons/Trash2";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -49,6 +46,7 @@ import { simpleT } from "@/i18n/core/shared";
 import { useTouchDevice } from "../../hooks/use-touch-device";
 import { chatColors, chatTransitions } from "../../lib/design-tokens";
 import type { ChatThread } from "../../types";
+import { PermissionsDialog } from "./permissions-dialog";
 
 interface ThreadListProps {
   threads: ChatThread[];
@@ -108,6 +106,10 @@ interface ThreadItemProps {
   onMoveThread?: (threadId: string, folderId: string | null) => void;
   onPinThread?: (threadId: string, pinned: boolean) => void;
   onArchiveThread?: (threadId: string, archived: boolean) => void;
+  onUpdatePermissions?: (
+    threadId: string,
+    data: { moderatorIds: string[]; allowedRoles?: string[] },
+  ) => void;
   chat?: UseChatReturn;
   compact?: boolean;
   locale: CountryLanguage;
@@ -121,6 +123,7 @@ function ThreadItem({
   onMoveThread,
   onPinThread,
   onArchiveThread,
+  onUpdatePermissions,
   chat,
   compact = false,
   locale,
@@ -134,6 +137,7 @@ function ThreadItem({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isTouched, setIsTouched] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
 
   // Get model icon (fallback to default model if not set)
   // Model config removed - icons no longer shown in thread list for clean design
@@ -194,8 +198,26 @@ function ThreadItem({
     }
   };
 
-  // Get all folders for the move menu
-  const allFolders = chat ? Object.values(chat.folders) : [];
+  const handleManagePermissions = (): void => {
+    setDropdownOpen(false);
+    setPermissionsDialogOpen(true);
+  };
+
+  const handleSavePermissions = (data: {
+    moderatorIds: string[];
+    allowedRoles?: string[];
+  }): void => {
+    if (onUpdatePermissions) {
+      onUpdatePermissions(thread.id, data);
+    }
+  };
+
+  // Get all folders for the move menu - only folders from the same root folder
+  const allFolders = chat
+    ? Object.values(chat.folders).filter(
+        (folder) => folder.rootFolderId === thread.rootFolderId,
+      )
+    : [];
   const currentFolderId = thread.folderId;
 
   // Handle thread click to navigate
@@ -359,6 +381,13 @@ function ThreadItem({
                 </DropdownMenuItem>
               )}
 
+              {onUpdatePermissions && (
+                <DropdownMenuItem onSelect={handleManagePermissions}>
+                  <Shield className="h-4 w-4 mr-2" />
+                  {t("app.chat.folderList.managePermissions")}
+                </DropdownMenuItem>
+              )}
+
               {onMoveThread && chat && (
                 <>
                   <DropdownMenuSeparator />
@@ -460,6 +489,18 @@ function ThreadItem({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Permissions Dialog */}
+      <PermissionsDialog
+        open={permissionsDialogOpen}
+        onOpenChange={setPermissionsDialogOpen}
+        resourceType="thread"
+        resourceName={thread.title}
+        moderatorIds={(thread.moderatorIds as string[]) || []}
+        allowedRoles={(thread.allowedRoles as string[]) || []}
+        onSave={handleSavePermissions}
+        locale={locale}
+      />
     </Div>
   );
 }

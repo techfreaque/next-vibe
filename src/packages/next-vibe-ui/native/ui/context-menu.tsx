@@ -15,7 +15,62 @@ import { Check } from "./icons/Check";
 import { ChevronDown } from "./icons/ChevronDown";
 import { ChevronRight } from "./icons/ChevronRight";
 import { ChevronUp } from "./icons/ChevronUp";
+import { Span } from "./span";
 import { TextClassContext } from "./text";
+
+// Cross-platform type definitions
+export interface ContextMenuSubTriggerProps {
+  className?: string;
+  inset?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface ContextMenuSubContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface ContextMenuContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface ContextMenuItemProps {
+  className?: string;
+  inset?: boolean;
+  disabled?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface ContextMenuCheckboxItemProps {
+  className?: string;
+  checked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  disabled?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface ContextMenuRadioItemProps {
+  className?: string;
+  value?: string;
+  disabled?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface ContextMenuLabelProps {
+  className?: string;
+  inset?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface ContextMenuSeparatorProps {
+  className?: string;
+}
+
+export interface ContextMenuShortcutProps {
+  className?: string;
+  children?: React.ReactNode;
+}
 
 // Local styled components - use direct primitives to avoid type instantiation issues
 // The styled() function from nativewind has overly complex type inference for these components
@@ -37,10 +92,7 @@ const ContextMenuRadioGroup = ContextMenuPrimitive.RadioGroup;
 
 const ContextMenuSubTrigger = React.forwardRef<
   ContextMenuPrimitive.SubTriggerRef,
-  ContextMenuPrimitive.SubTriggerProps & {
-    inset?: boolean;
-    className?: string;
-  }
+  ContextMenuSubTriggerProps & ContextMenuPrimitive.SubTriggerProps
 >(({ className, inset, children, ...props }, ref) => {
   const { open } = ContextMenuPrimitive.useSubContext();
   const Icon =
@@ -80,7 +132,7 @@ ContextMenuSubTrigger.displayName = ContextMenuPrimitive.SubTrigger.displayName;
 
 const ContextMenuSubContent = React.forwardRef<
   ContextMenuPrimitive.SubContentRef,
-  ContextMenuPrimitive.SubContentProps & { className?: string }
+  ContextMenuSubContentProps & ContextMenuPrimitive.SubContentProps
 >(({ className, ...props }, ref) => {
   const { open } = ContextMenuPrimitive.useSubContext();
   return (
@@ -101,11 +153,10 @@ ContextMenuSubContent.displayName = ContextMenuPrimitive.SubContent.displayName;
 
 const ContextMenuContent = React.forwardRef<
   ContextMenuPrimitive.ContentRef,
-  ContextMenuPrimitive.ContentProps & {
+  ContextMenuContentProps & ContextMenuPrimitive.ContentProps & {
     overlayStyle?: StyleProp<ViewStyle>;
     overlayClassName?: string;
     portalHost?: string;
-    className?: string;
   }
 >(
   (
@@ -119,9 +170,9 @@ const ContextMenuContent = React.forwardRef<
           style={
             overlayStyle
               ? StyleSheet.flatten([
-                  Platform.OS !== "web" ? StyleSheet.absoluteFill : undefined,
-                  overlayStyle,
-                ])
+                Platform.OS !== "web" ? StyleSheet.absoluteFill : undefined,
+                overlayStyle,
+              ])
               : Platform.OS !== "web"
                 ? StyleSheet.absoluteFill
                 : undefined
@@ -148,10 +199,7 @@ ContextMenuContent.displayName = ContextMenuPrimitive.Content.displayName;
 
 const ContextMenuItem = React.forwardRef<
   ContextMenuPrimitive.ItemRef,
-  ContextMenuPrimitive.ItemProps & {
-    inset?: boolean;
-    className?: string;
-  }
+  ContextMenuItemProps & ContextMenuPrimitive.ItemProps
 >(({ className, inset, ...props }, ref) => (
   // eslint-disable-next-line i18next/no-literal-string
   <TextClassContext.Provider value="select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground">
@@ -171,7 +219,7 @@ ContextMenuItem.displayName = ContextMenuPrimitive.Item.displayName;
 
 const ContextMenuCheckboxItem = React.forwardRef<
   ContextMenuPrimitive.CheckboxItemRef,
-  ContextMenuPrimitive.CheckboxItemProps & { className?: string }
+  ContextMenuCheckboxItemProps & ContextMenuPrimitive.CheckboxItemProps
 >(({ className, children, disabled, ...props }, ref) => {
   const renderChildren = () => {
     if (typeof children === "function") {
@@ -205,7 +253,7 @@ ContextMenuCheckboxItem.displayName =
 
 const ContextMenuRadioItem = React.forwardRef<
   ContextMenuPrimitive.RadioItemRef,
-  ContextMenuPrimitive.RadioItemProps & { className?: string; disabled?: boolean }
+  ContextMenuRadioItemProps & ContextMenuPrimitive.RadioItemProps
 >(({ className, children, disabled, ...props }, ref) => (
   <StyledContextMenuRadioItem
     ref={ref}
@@ -228,10 +276,7 @@ ContextMenuRadioItem.displayName = ContextMenuPrimitive.RadioItem.displayName;
 
 const ContextMenuLabel = React.forwardRef<
   ContextMenuPrimitive.LabelRef,
-  ContextMenuPrimitive.LabelProps & {
-    inset?: boolean;
-    className?: string;
-  }
+  ContextMenuLabelProps & ContextMenuPrimitive.LabelProps
 >(({ className, inset, ...props }, ref) => (
   <StyledContextMenuLabel
     ref={ref}
@@ -247,7 +292,7 @@ ContextMenuLabel.displayName = ContextMenuPrimitive.Label.displayName;
 
 const ContextMenuSeparator = React.forwardRef<
   ContextMenuPrimitive.SeparatorRef,
-  ContextMenuPrimitive.SeparatorProps & { className?: string }
+  ContextMenuSeparatorProps & ContextMenuPrimitive.SeparatorProps
 >(({ className, ...props }, ref) => (
   <StyledContextMenuSeparator
     ref={ref}
@@ -260,9 +305,9 @@ ContextMenuSeparator.displayName = ContextMenuPrimitive.Separator.displayName;
 const ContextMenuShortcut = ({
   className,
   ...props
-}: TextProps & { className?: string }): React.JSX.Element => {
+}: ContextMenuShortcutProps & TextProps): React.JSX.Element => {
   return (
-    <Text
+    <Span
       className={cn(
         "ml-auto text-xs native:text-sm tracking-widest text-muted-foreground",
         className,

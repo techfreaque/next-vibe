@@ -1,20 +1,102 @@
 /**
- * STUB: form/form-section
- * Auto-generated placeholder for web-only form component
+ * Enhanced Form Field Component
+ * Reusable form field with required field highlighting and validation
+ * Native implementation aligned with web version interfaces
  */
-import type { ReactNode } from "react";
-import { Text, View } from "react-native";
 
-export function FormSection(_props: { children?: ReactNode }): ReactNode {
-  // eslint-disable-next-line no-console
-  console.warn("🔶 Using stub: FormSection");
+"use client";
+
+import type { JSX, ReactNode } from "react";
+
+import { useTranslation } from "@/i18n/core/client";
+import type { TranslationKey } from "@/i18n/core/static-types";
+
+/**
+ * Form Field Group Component
+ * Groups multiple form fields with consistent spacing
+ */
+interface FormFieldGroupProps {
+  children: ReactNode;
+  title?: TranslationKey;
+  description?: TranslationKey;
+  className?: string;
+}
+
+export function FormFieldGroup({
+  children,
+  title,
+  description,
+  className = "",
+}: FormFieldGroupProps): JSX.Element {
+  const { t } = useTranslation();
+
   return (
-    <View style={{ padding: 8, backgroundColor: "#FEF3C7", marginVertical: 4 }}>
-      <Text style={{ fontSize: 12, color: "#92400E" }}>
-        FormSection (form stub)
-      </Text>
-    </View>
+    <div className={`space-y-4 ${className}`}>
+      {title && (
+        <div className="space-y-1">
+          <h3 className="text-lg font-semibold">{t(title)}</h3>
+          {description && (
+            <p className="text-sm text-muted-foreground">{t(description)}</p>
+          )}
+        </div>
+      )}
+      <div className="space-y-6">{children}</div>
+    </div>
   );
 }
 
-export default FormSection;
+/**
+ * Form Section Component
+ * Wraps form content with consistent styling and completion status
+ */
+interface FormSectionProps {
+  children: ReactNode;
+  title: TranslationKey;
+  description?: TranslationKey;
+  completionStatus?: {
+    isComplete: boolean;
+    completedFields: number;
+    totalFields: number;
+    completionPercentage: number;
+    missingRequiredFields: string[];
+  };
+  className?: string;
+}
+
+export function FormSection({
+  children,
+  title,
+  description,
+  completionStatus,
+  className = "",
+}: FormSectionProps): JSX.Element {
+  const { t } = useTranslation();
+
+  return (
+    <div className={`space-y-6 ${className}`}>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">{t(title)}</h2>
+          {completionStatus && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                {completionStatus.completedFields} of{" "}
+                {completionStatus.totalFields} fields
+              </span>
+              <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-300"
+                  style={{ width: `${completionStatus.completionPercentage}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+        {description && (
+          <p className="text-muted-foreground">{t(description)}</p>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+}

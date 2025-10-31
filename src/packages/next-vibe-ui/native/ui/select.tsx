@@ -11,6 +11,16 @@ import { Check } from "./icons/Check";
 import { ChevronDown } from "./icons/ChevronDown";
 import { ChevronUp } from "./icons/ChevronUp";
 
+// Import cross-platform types from web
+import type {
+  SelectOption,
+  SelectTriggerProps as WebSelectTriggerProps,
+  SelectContentProps as WebSelectContentProps,
+  SelectItemProps as WebSelectItemProps,
+  SelectLabelProps as WebSelectLabelProps,
+  SelectSeparatorProps as WebSelectSeparatorProps,
+} from "next-vibe-ui/ui/select";
+
 // Type-safe View component with className support for NativeWind
 const View = RNView as React.ComponentType<ViewPropsWithClassName>;
 
@@ -229,6 +239,7 @@ SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
 export {
   type Option,
+  type SelectOption,
   Select,
   SelectContent,
   SelectGroup,
@@ -239,4 +250,13 @@ export {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
+};
+
+// Re-export cross-platform types
+export type {
+  WebSelectTriggerProps as SelectTriggerProps,
+  WebSelectContentProps as SelectContentProps,
+  WebSelectItemProps as SelectItemProps,
+  WebSelectLabelProps as SelectLabelProps,
+  WebSelectSeparatorProps as SelectSeparatorProps,
 };

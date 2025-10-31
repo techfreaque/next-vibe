@@ -1,8 +1,11 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Button, Div, Form, Textarea } from "next-vibe-ui/ui";
-import { GitBranch, X } from "next-vibe-ui/ui/icons";
+import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { Form } from "@/packages/next-vibe-ui/web/ui/form/form";
+import { Textarea } from "@/packages/next-vibe-ui/web/ui/textarea";
+import { GitBranch, X } from "lucide-react";
 import type { JSX } from "react";
 import React from "react";
 
@@ -54,7 +57,7 @@ export function MessageEditor({
   return (
     <Div ref={editor.editorRef} className="w-full">
       <Form
-        onSubmit={(e) => {
+        onSubmit={(e: React.FormEvent) => {
           e.preventDefault();
           void editor.handleBranch();
         }}

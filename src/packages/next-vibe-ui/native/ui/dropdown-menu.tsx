@@ -15,7 +15,58 @@ import { Check } from "./icons/Check";
 import { ChevronDown } from "./icons/ChevronDown";
 import { ChevronRight } from "./icons/ChevronRight";
 import { ChevronUp } from "./icons/ChevronUp";
+import { Span } from "./span";
 import { TextClassContext } from "./text";
+
+// Cross-platform type definitions for native
+export interface DropdownMenuSubTriggerProps {
+  className?: string;
+  inset?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface DropdownMenuSubContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DropdownMenuContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DropdownMenuItemProps {
+  className?: string;
+  inset?: boolean;
+  disabled?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface DropdownMenuCheckboxItemProps {
+  className?: string;
+  disabled?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface DropdownMenuRadioItemProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DropdownMenuLabelProps {
+  className?: string;
+  inset?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface DropdownMenuSeparatorProps {
+  className?: string;
+}
+
+export interface DropdownMenuShortcutProps {
+  className?: string;
+  children?: React.ReactNode;
+}
 
 // Local styled components - use direct primitives to avoid type instantiation issues
 // The styled() function from nativewind has overly complex type inference for these components
@@ -43,10 +94,7 @@ const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
 const DropdownMenuSubTrigger = React.forwardRef<
   DropdownMenuPrimitive.SubTriggerRef,
-  DropdownMenuPrimitive.SubTriggerProps & {
-    inset?: boolean;
-    className?: string;
-  }
+  DropdownMenuSubTriggerProps & DropdownMenuPrimitive.SubTriggerProps
 >(({ className, inset, children, ...props }, ref) => {
   const { open } = DropdownMenuPrimitive.useSubContext();
   const Icon =
@@ -68,7 +116,11 @@ const DropdownMenuSubTrigger = React.forwardRef<
         )}
         {...props}
       >
-        {typeof children === "function" ? (children as (props: { pressed: boolean }) => React.ReactNode)({ pressed: open }) : children}
+        {typeof children === "function"
+          ? (
+              children as (props: { pressed: boolean }) => React.ReactNode
+            )({ pressed: open })
+          : children}
         <Icon size={18} className="ml-auto text-foreground" />
       </StyledDropdownMenuSubTrigger>
     </TextClassContext.Provider>
@@ -79,7 +131,7 @@ DropdownMenuSubTrigger.displayName =
 
 const DropdownMenuSubContent = React.forwardRef<
   DropdownMenuPrimitive.SubContentRef,
-  DropdownMenuPrimitive.SubContentProps & { className?: string }
+  DropdownMenuSubContentProps & DropdownMenuPrimitive.SubContentProps
 >(({ className, ...props }, ref) => {
   const { open } = DropdownMenuPrimitive.useSubContext();
   return (
@@ -101,12 +153,12 @@ DropdownMenuSubContent.displayName =
 
 const DropdownMenuContent = React.forwardRef<
   DropdownMenuPrimitive.ContentRef,
-  DropdownMenuPrimitive.ContentProps & {
-    overlayStyle?: StyleProp<ViewStyle>;
-    overlayClassName?: string;
-    portalHost?: string;
-    className?: string;
-  }
+  DropdownMenuContentProps &
+    DropdownMenuPrimitive.ContentProps & {
+      overlayStyle?: StyleProp<ViewStyle>;
+      overlayClassName?: string;
+      portalHost?: string;
+    }
 >(
   (
     { className, overlayClassName, overlayStyle, portalHost, ...props },
@@ -148,10 +200,7 @@ DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
 const DropdownMenuItem = React.forwardRef<
   DropdownMenuPrimitive.ItemRef,
-  DropdownMenuPrimitive.ItemProps & {
-    inset?: boolean;
-    className?: string;
-  }
+  DropdownMenuItemProps & DropdownMenuPrimitive.ItemProps
 >(({ className, inset, ...props }, ref) => (
   <TextClassContext.Provider
     value={
@@ -174,7 +223,7 @@ DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
 
 const DropdownMenuCheckboxItem = React.forwardRef<
   DropdownMenuPrimitive.CheckboxItemRef,
-  DropdownMenuPrimitive.CheckboxItemProps & { className?: string }
+  DropdownMenuCheckboxItemProps & DropdownMenuPrimitive.CheckboxItemProps
 >(({ className, children, ...props }, ref) => (
   <StyledDropdownMenuCheckboxItem
     ref={ref}
@@ -190,7 +239,11 @@ const DropdownMenuCheckboxItem = React.forwardRef<
         <Check size={14} strokeWidth={3} className="text-foreground" />
       </StyledDropdownMenuItemIndicator>
     </View>
-    {typeof children === "function" ? (children as (props: { pressed: boolean }) => React.ReactNode)({ pressed: false }) : children}
+    {typeof children === "function"
+      ? (children as (props: { pressed: boolean }) => React.ReactNode)({
+          pressed: false,
+        })
+      : children}
   </StyledDropdownMenuCheckboxItem>
 ));
 DropdownMenuCheckboxItem.displayName =
@@ -198,7 +251,7 @@ DropdownMenuCheckboxItem.displayName =
 
 const DropdownMenuRadioItem = React.forwardRef<
   DropdownMenuPrimitive.RadioItemRef,
-  DropdownMenuPrimitive.RadioItemProps & { className?: string }
+  DropdownMenuRadioItemProps & DropdownMenuPrimitive.RadioItemProps
 >(({ className, children, ...props }, ref) => (
   <StyledDropdownMenuRadioItem
     ref={ref}
@@ -220,10 +273,7 @@ DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 
 const DropdownMenuLabel = React.forwardRef<
   DropdownMenuPrimitive.LabelRef,
-  DropdownMenuPrimitive.LabelProps & {
-    inset?: boolean;
-    className?: string;
-  }
+  DropdownMenuLabelProps & DropdownMenuPrimitive.LabelProps
 >(({ className, inset, ...props }, ref) => (
   <StyledDropdownMenuLabel
     ref={ref}
@@ -239,7 +289,7 @@ DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
 
 const DropdownMenuSeparator = React.forwardRef<
   DropdownMenuPrimitive.SeparatorRef,
-  DropdownMenuPrimitive.SeparatorProps & { className?: string }
+  DropdownMenuSeparatorProps & DropdownMenuPrimitive.SeparatorProps
 >(({ className, ...props }, ref) => (
   <StyledDropdownMenuSeparator
     ref={ref}
@@ -252,9 +302,9 @@ DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
 const DropdownMenuShortcut = ({
   className,
   ...props
-}: TextProps & { className?: string }): React.JSX.Element => {
+}: DropdownMenuShortcutProps & TextProps): React.JSX.Element => {
   return (
-    <Text
+    <Span
       className={cn(
         "ml-auto text-xs native:text-sm tracking-widest text-muted-foreground",
         className,

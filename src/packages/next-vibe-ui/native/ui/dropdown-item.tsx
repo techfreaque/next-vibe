@@ -14,8 +14,8 @@ import { Button } from "./button";
 export interface DropdownItemProps {
   /** Whether this dropdown item is currently selected/active */
   isSelected?: boolean;
-  /** Press handler for the dropdown item */
-  onPress?: (e?: GestureResponderEvent) => void;
+  /** Click handler for the dropdown item */
+  onClick?: (e?: GestureResponderEvent) => void;
   /** Icon component to display */
   icon?: React.ComponentType<{ className?: string }> | React.ReactNode;
   /** Display label */
@@ -30,7 +30,7 @@ export interface DropdownItemProps {
 
 export function DropdownItem({
   isSelected = false,
-  onPress,
+  onClick,
   icon,
   label,
   description,
@@ -50,9 +50,9 @@ export function DropdownItem({
     setIsPressed(false);
   };
 
-  const handlePress = (e: GestureResponderEvent): void => {
-    if (!disabled && onPress) {
-      onPress(e);
+  const handlePress = (_e: GestureResponderEvent): void => {
+    if (!disabled && onClick) {
+      onClick();
     }
   };
 
@@ -72,11 +72,11 @@ export function DropdownItem({
     >
       <View className="flex flex-row items-center gap-3 w-full">
         {icon && (
-          <View className="text-base w-6 h-6 flex items-center justify-center shrink-0">
+          <View className="w-6 h-6 flex items-center justify-center shrink-0">
             {React.isValidElement(icon) ? (
               icon
             ) : typeof icon === "string" ? (
-              <RNText>{icon}</RNText>
+              <RNText style={{ fontSize: 16 }}>{icon}</RNText>
             ) : (
               React.createElement(
                 icon as React.ComponentType<{ className?: string }>,
@@ -86,9 +86,14 @@ export function DropdownItem({
           </View>
         )}
         <View className="flex flex-col items-start flex-1 min-w-0">
-          <RNText className="font-medium text-sm w-full">{label}</RNText>
+          <RNText style={{ fontWeight: "500", fontSize: 14 }} className="w-full">
+            {label}
+          </RNText>
           {description && (
-            <RNText className="text-xs text-muted-foreground/80 w-full leading-tight mt-0.5">
+            <RNText
+              style={{ fontSize: 12, lineHeight: 16, marginTop: 2 }}
+              className="w-full"
+            >
               {description}
             </RNText>
           )}

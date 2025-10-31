@@ -2,23 +2,19 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import {
-  Button,
-  Div,
-  Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Span,
-} from "next-vibe-ui/ui";
-import {
-  Check,
-  ChevronDown,
-  ChevronUp,
-  Plus,
-  Search,
-  Star,
-} from "next-vibe-ui/ui/icons";
+import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { Input } from "@/packages/next-vibe-ui/web/ui/input";
+import { Popover } from "@/packages/next-vibe-ui/web/ui/popover";
+import { PopoverContent } from "@/packages/next-vibe-ui/web/ui/popover";
+import { PopoverTrigger } from "@/packages/next-vibe-ui/web/ui/popover";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Check } from "@/packages/next-vibe-ui/web/ui/icons/Check";
+import { ChevronDown } from "@/packages/next-vibe-ui/web/ui/icons/ChevronDown";
+import { ChevronUp } from "@/packages/next-vibe-ui/web/ui/icons/ChevronUp";
+import { Plus } from "@/packages/next-vibe-ui/web/ui/icons/Plus";
+import { Search } from "@/packages/next-vibe-ui/web/ui/icons/Search";
+import { Star } from "@/packages/next-vibe-ui/web/ui/icons/Star";
 import type { JSX, ReactNode } from "react";
 import React, { useMemo, useState } from "react";
 
@@ -222,6 +218,7 @@ export function SelectorBase<T extends string = string>({
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           className="h-auto min-h-9 gap-2 px-3 py-1 hover:bg-accent text-sm font-normal touch-manipulation"
@@ -275,6 +272,7 @@ export function SelectorBase<T extends string = string>({
               {/* Group Mode Toggle */}
               <Div className="flex gap-1 bg-muted rounded-md p-0.5">
                 <Button
+                  type="button"
                   variant={groupMode === "provider" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setGroupMode("provider")}
@@ -283,6 +281,7 @@ export function SelectorBase<T extends string = string>({
                   {providerLabel}
                 </Button>
                 <Button
+                  type="button"
                   variant={groupMode === "utility" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setGroupMode("utility")}
@@ -296,6 +295,7 @@ export function SelectorBase<T extends string = string>({
               {groupMode === "provider" && (
                 <Div className="flex gap-1 bg-muted rounded-md p-0.5">
                   <Button
+                    type="button"
                     variant={sortOrder === "asc" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => setSortOrder("asc")}
@@ -304,6 +304,7 @@ export function SelectorBase<T extends string = string>({
                     {t("app.chat.selectorBase.sortAZ")}
                   </Button>
                   <Button
+                    type="button"
                     variant={sortOrder === "desc" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => setSortOrder("desc")}
@@ -544,6 +545,7 @@ export function SelectorBase<T extends string = string>({
           {/* Footer - Show All / Favorites Toggle + Add New */}
           <Div className="border-t p-2 flex gap-2 flex-shrink-0">
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => setShowAll(!showAll)}
@@ -563,6 +565,7 @@ export function SelectorBase<T extends string = string>({
             </Button>
             {onAddNew && (
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => {

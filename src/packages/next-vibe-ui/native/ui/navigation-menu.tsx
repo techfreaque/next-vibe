@@ -1,5 +1,4 @@
 import * as NavigationMenuPrimitive from "@rn-primitives/navigation-menu";
-import { cva } from "class-variance-authority";
 import * as React from "react";
 import { Platform, View } from "react-native";
 import Animated, {
@@ -13,14 +12,47 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { cn } from "../lib/utils";
+import { buttonVariants } from "./button";
+
+// Define types locally to avoid web dependency issues
+interface NavigationMenuProps {
+  className?: string;
+  value?: string;
+  onValueChange?: (value: string | undefined) => void;
+}
+
+interface NavigationMenuListProps {
+  className?: string;
+}
+
+interface NavigationMenuTriggerProps {
+  className?: string;
+}
+
+interface NavigationMenuContentProps {
+  className?: string;
+}
+
+interface NavigationMenuViewportProps {
+  className?: string;
+}
+
+interface NavigationMenuIndicatorProps {
+  className?: string;
+}
+
+// navigationMenuTriggerStyle helper function
+function navigationMenuTriggerStyle(): string {
+  return cn(
+    buttonVariants({ variant: "ghost" }),
+    "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50",
+  );
+}
 import { ChevronDown } from "./icons/ChevronDown";
 
 const NavigationMenu = React.forwardRef<
   NavigationMenuPrimitive.RootRef,
-  Omit<NavigationMenuPrimitive.RootProps, 'value' | 'onValueChange'> & {
-    value?: string | undefined;
-    onValueChange?: (value: string | undefined) => void;
-  }
+  NavigationMenuProps & Omit<NavigationMenuPrimitive.RootProps, keyof NavigationMenuProps>
 >(({ className, children, value, onValueChange, ...props }, ref) => (
   <NavigationMenuPrimitive.Root
     ref={ref}
@@ -40,7 +72,7 @@ NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName;
 
 const NavigationMenuList = React.forwardRef<
   NavigationMenuPrimitive.ListRef,
-  NavigationMenuPrimitive.ListProps
+  NavigationMenuListProps & Omit<NavigationMenuPrimitive.ListProps, keyof NavigationMenuListProps>
 >(({ className, ...props }, ref) => (
   <NavigationMenuPrimitive.List
     ref={ref}
@@ -55,13 +87,9 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
-const navigationMenuTriggerStyle = cva(
-  "web:group web:inline-flex flex-row h-10 native:h-12 native:px-3 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium web:transition-colors web:hover:bg-accent active:bg-accent web:hover:text-accent-foreground web:focus:bg-accent web:focus:text-accent-foreground web:focus:outline-none web:disabled:pointer-events-none disabled:opacity-50 web:data-[active]:bg-accent/50 web:data-[state=open]:bg-accent/50",
-);
-
 const NavigationMenuTrigger = React.forwardRef<
   NavigationMenuPrimitive.TriggerRef,
-  Omit<NavigationMenuPrimitive.TriggerProps, 'children'> & {
+  NavigationMenuTriggerProps & Omit<NavigationMenuPrimitive.TriggerProps, keyof NavigationMenuTriggerProps | 'children'> & {
     children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
   }
 >(({ className, children, ...props }, ref) => {
@@ -106,7 +134,7 @@ NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName;
 
 const NavigationMenuContent = React.forwardRef<
   NavigationMenuPrimitive.ContentRef,
-  NavigationMenuPrimitive.ContentProps & {
+  NavigationMenuContentProps & Omit<NavigationMenuPrimitive.ContentProps, keyof NavigationMenuContentProps> & {
     portalHost?: string;
   }
 >(({ className, children, portalHost, ...props }, ref) => {
@@ -141,7 +169,7 @@ const NavigationMenuLink = NavigationMenuPrimitive.Link;
 
 const NavigationMenuViewport = React.forwardRef<
   NavigationMenuPrimitive.ViewportRef,
-  NavigationMenuPrimitive.ViewportProps
+  NavigationMenuViewportProps & Omit<NavigationMenuPrimitive.ViewportProps, keyof NavigationMenuViewportProps>
 >(({ className, ...props }, ref) => {
   return (
     <View className={cn("absolute left-0 top-full flex justify-center")}>
@@ -163,7 +191,7 @@ NavigationMenuViewport.displayName =
 
 const NavigationMenuIndicator = React.forwardRef<
   NavigationMenuPrimitive.IndicatorRef,
-  NavigationMenuPrimitive.IndicatorProps
+  NavigationMenuIndicatorProps & Omit<NavigationMenuPrimitive.IndicatorProps, keyof NavigationMenuIndicatorProps>
 >(({ className, ...props }, ref) => {
   const { value } = NavigationMenuPrimitive.useRootContext();
   const { value: itemValue } = NavigationMenuPrimitive.useItemContext();

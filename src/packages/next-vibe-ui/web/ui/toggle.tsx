@@ -27,6 +27,20 @@ const toggleVariants = cva(
   },
 );
 
+// Cross-platform types - exported for native
+export type ToggleVariant = VariantProps<typeof toggleVariants>["variant"];
+export type ToggleSize = VariantProps<typeof toggleVariants>["size"];
+
+export interface ToggleProps {
+  variant?: ToggleVariant;
+  size?: ToggleSize;
+  className?: string;
+  children?: React.ReactNode;
+  pressed?: boolean;
+  onPressedChange?: (pressed: boolean) => void;
+  disabled?: boolean;
+}
+
 const Toggle = React.forwardRef<
   React.ElementRef<typeof TogglePrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root> &

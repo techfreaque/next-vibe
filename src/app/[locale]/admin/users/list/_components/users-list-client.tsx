@@ -8,11 +8,12 @@
 import { Filter, List, RefreshCw, Table } from "lucide-react";
 import NextLink from "next/link";
 import { cn } from "next-vibe/shared/utils";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import { P } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import React, { useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

@@ -4,8 +4,9 @@
  * Focuses on relationship building while providing concrete pricing and service details
  */
 
-import { Section, Text } from "@react-email/components";
+import { Section } from "@react-email/components";
 import React from "react";
+import { Span } from "next-vibe-ui/ui/span";
 
 import {
   HumanCTAButton,
@@ -199,7 +200,7 @@ export const personalPracticalFollowup1Email: EmailTemplateFunction = ({
           border: "1px solid #e2e8f0",
         }}
       >
-        <Text
+        <Span
           style={{
             fontSize: "18px",
             fontWeight: "600",
@@ -211,7 +212,7 @@ export const personalPracticalFollowup1Email: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personalPractical.followup1.timelineTitle",
           )}
-        </Text>
+        </Span>
 
         {/* Week 1-2 */}
         <div
@@ -221,7 +222,7 @@ export const personalPracticalFollowup1Email: EmailTemplateFunction = ({
             borderLeft: "3px solid #2c82c9",
           }}
         >
-          <Text
+          <Span
             style={{
               fontSize: "14px",
               fontWeight: "600",
@@ -232,8 +233,8 @@ export const personalPracticalFollowup1Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personalPractical.followup1.week1Title",
             )}
-          </Text>
-          <Text
+          </Span>
+          <Span
             style={{
               fontSize: "14px",
               color: "#374151",
@@ -244,7 +245,7 @@ export const personalPracticalFollowup1Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personalPractical.followup1.week1Content",
             )}
-          </Text>
+          </Span>
         </div>
 
         {/* Week 3-4 */}
@@ -255,7 +256,7 @@ export const personalPracticalFollowup1Email: EmailTemplateFunction = ({
             borderLeft: "3px solid #059669",
           }}
         >
-          <Text
+          <Span
             style={{
               fontSize: "14px",
               fontWeight: "600",
@@ -266,8 +267,8 @@ export const personalPracticalFollowup1Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personalPractical.followup1.week3Title",
             )}
-          </Text>
-          <Text
+          </Span>
+          <Span
             style={{
               fontSize: "14px",
               color: "#374151",
@@ -278,12 +279,12 @@ export const personalPracticalFollowup1Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personalPractical.followup1.week3Content",
             )}
-          </Text>
+          </Span>
         </div>
 
         {/* Month 2-3 */}
         <div style={{ paddingLeft: "16px", borderLeft: "3px solid #dc2626" }}>
-          <Text
+          <Span
             style={{
               fontSize: "14px",
               fontWeight: "600",
@@ -294,8 +295,8 @@ export const personalPracticalFollowup1Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personalPractical.followup1.month2Title",
             )}
-          </Text>
-          <Text
+          </Span>
+          <Span
             style={{
               fontSize: "14px",
               color: "#374151",
@@ -306,7 +307,7 @@ export const personalPracticalFollowup1Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personalPractical.followup1.month2Content",
             )}
-          </Text>
+          </Span>
         </div>
       </Section>
 

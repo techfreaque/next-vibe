@@ -2,7 +2,8 @@ import { FileText, Scale } from "lucide-react";
 import type { Metadata, ResolvingMetadata } from "next";
 import type { JSX } from "react";
 
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";

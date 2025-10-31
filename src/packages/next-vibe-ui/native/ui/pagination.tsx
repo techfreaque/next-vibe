@@ -3,31 +3,58 @@
  * Navigation for paginated content
  */
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
-import type { ReactNode } from "react";
 import React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
 
 import { cn } from "../lib/utils";
-import { type ButtonProps, buttonVariants } from "./button";
 
+// Define types locally to avoid web dependency issues
 interface PaginationProps {
-  children: ReactNode;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+interface PaginationContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+interface PaginationItemProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+interface PaginationLinkProps {
+  className?: string;
+  isActive?: boolean;
+  size?: "default" | "sm" | "lg" | "icon";
+  children?: React.ReactNode;
+}
+
+interface PaginationPreviousProps {
   className?: string;
 }
+
+interface PaginationNextProps {
+  className?: string;
+}
+
+interface PaginationEllipsisProps {
+  className?: string;
+}
+import { buttonVariants } from "./button";
 
 export function Pagination({
   className,
   children,
-  ...props
 }: PaginationProps): React.JSX.Element {
   return (
     <View
       accessible={true}
       accessibilityLabel="pagination"
       className={cn("mx-auto flex w-full justify-center", className)}
-      {...props}
     >
       {children}
     </View>
@@ -36,18 +63,12 @@ export function Pagination({
 
 Pagination.displayName = "Pagination";
 
-interface PaginationContentProps {
-  children: ReactNode;
-  className?: string;
-}
-
 export const PaginationContent = React.forwardRef<View, PaginationContentProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, children }, ref) => {
     return (
       <View
         ref={ref}
         className={cn("flex flex-row items-center gap-1", className)}
-        {...props}
       >
         {children}
       </View>
@@ -57,15 +78,10 @@ export const PaginationContent = React.forwardRef<View, PaginationContentProps>(
 
 PaginationContent.displayName = "PaginationContent";
 
-interface PaginationItemProps {
-  children: ReactNode;
-  className?: string;
-}
-
 export const PaginationItem = React.forwardRef<View, PaginationItemProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, children }, ref) => {
     return (
-      <View ref={ref} className={cn("", className)} {...props}>
+      <View ref={ref} className={cn("", className)}>
         {children}
       </View>
     );
@@ -74,14 +90,6 @@ export const PaginationItem = React.forwardRef<View, PaginationItemProps>(
 
 PaginationItem.displayName = "PaginationItem";
 
-interface PaginationLinkProps {
-  isActive?: boolean;
-  size?: ButtonProps["size"];
-  children: ReactNode;
-  className?: string;
-  onPress?: () => void;
-}
-
 export function PaginationLink({
   className,
   isActive,
@@ -89,7 +97,7 @@ export function PaginationLink({
   children,
   onPress,
   ...props
-}: PaginationLinkProps): React.JSX.Element {
+}: PaginationLinkProps & { onPress?: () => void }): React.JSX.Element {
   return (
     <Pressable
       onPress={onPress}
@@ -110,16 +118,11 @@ export function PaginationLink({
 
 PaginationLink.displayName = "PaginationLink";
 
-interface PaginationPreviousProps {
-  className?: string;
-  onPress?: () => void;
-}
-
 export function PaginationPrevious({
   className,
   onPress,
   ...props
-}: PaginationPreviousProps): React.JSX.Element {
+}: PaginationPreviousProps & { onPress?: () => void }): React.JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -130,7 +133,7 @@ export function PaginationPrevious({
       onPress={onPress}
       {...props}
     >
-      <ChevronLeft className="h-4 w-4" />
+      <ChevronLeft size={16} color="#000" />
       <RNText>{t("app.common.actions.previous")}</RNText>
     </PaginationLink>
   );
@@ -138,16 +141,11 @@ export function PaginationPrevious({
 
 PaginationPrevious.displayName = "PaginationPrevious";
 
-interface PaginationNextProps {
-  className?: string;
-  onPress?: () => void;
-}
-
 export function PaginationNext({
   className,
   onPress,
   ...props
-}: PaginationNextProps): React.JSX.Element {
+}: PaginationNextProps & { onPress?: () => void }): React.JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -159,20 +157,15 @@ export function PaginationNext({
       {...props}
     >
       <RNText>{t("app.common.actions.next")}</RNText>
-      <ChevronRight className="h-4 w-4" />
+      <ChevronRight size={16} color="#000" />
     </PaginationLink>
   );
 }
 
 PaginationNext.displayName = "PaginationNext";
 
-interface PaginationEllipsisProps {
-  className?: string;
-}
-
 export function PaginationEllipsis({
   className,
-  ...props
 }: PaginationEllipsisProps): React.JSX.Element {
   const { t } = useTranslation();
 
@@ -180,7 +173,6 @@ export function PaginationEllipsis({
     <View
       aria-hidden={true}
       className={cn("flex h-9 w-9 items-center justify-center", className)}
-      {...props}
     >
       <RNText className="text-muted-foreground">...</RNText>
       <RNText className="sr-only">

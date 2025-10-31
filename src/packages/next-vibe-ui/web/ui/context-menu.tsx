@@ -9,6 +9,55 @@ import {
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
+// Cross-platform types
+export interface ContextMenuSubTriggerProps {
+  className?: string;
+  children?: React.ReactNode;
+  inset?: boolean;
+}
+
+export interface ContextMenuSubContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface ContextMenuContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface ContextMenuItemProps {
+  className?: string;
+  children?: React.ReactNode;
+  inset?: boolean;
+}
+
+export interface ContextMenuCheckboxItemProps {
+  className?: string;
+  children?: React.ReactNode;
+  checked?: boolean;
+}
+
+export interface ContextMenuRadioItemProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface ContextMenuLabelProps {
+  className?: string;
+  children?: React.ReactNode;
+  inset?: boolean;
+}
+
+export interface ContextMenuSeparatorProps {
+  className?: string;
+}
+
+export interface ContextMenuShortcutProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
 const ContextMenu = ContextMenuPrimitive.Root;
 
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger;

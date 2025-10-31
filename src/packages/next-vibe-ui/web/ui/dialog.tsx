@@ -7,6 +7,66 @@ import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
 
+// Cross-platform type exports
+export interface DialogRootProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+  defaultOpen?: boolean;
+  modal?: boolean;
+}
+
+export interface DialogTriggerProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface DialogPortalProps {
+  children?: React.ReactNode;
+  forceMount?: boolean;
+  container?: HTMLElement | null;
+}
+
+export interface DialogCloseProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface DialogOverlayProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DialogContentProps {
+  className?: string;
+  children?: React.ReactNode;
+  onOpenAutoFocus?: (event: Event) => void;
+  onCloseAutoFocus?: (event: Event) => void;
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
+  onPointerDownOutside?: (event: Event) => void;
+  onInteractOutside?: (event: Event) => void;
+}
+
+export interface DialogHeaderProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DialogFooterProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DialogTitleProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DialogDescriptionProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
 const Dialog = DialogPrimitive.Root;
 
 const DialogTrigger = DialogPrimitive.Trigger;
@@ -62,29 +122,31 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({
   className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
+  children,
+}: DialogHeaderProps): React.JSX.Element => (
   <div
     className={cn(
       "flex flex-col space-y-1.5 text-center sm:text-left",
       className,
     )}
-    {...props}
-  />
+  >
+    {children}
+  </div>
 );
 DialogHeader.displayName = "DialogHeader";
 
 const DialogFooter = ({
   className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
+  children,
+}: DialogFooterProps): React.JSX.Element => (
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
       className,
     )}
-    {...props}
-  />
+  >
+    {children}
+  </div>
 );
 DialogFooter.displayName = "DialogFooter";
 

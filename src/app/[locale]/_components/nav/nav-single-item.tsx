@@ -1,17 +1,12 @@
 import { cn } from "next-vibe/shared/utils";
-import {
-  Badge,
-  Button,
-  Div,
-  P,
-  Span,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe-ui/ui";
+import { Badge } from "next-vibe-ui/ui/badge";
 import type { BadeVariant } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
+import { P } from "next-vibe-ui/ui/typography";
+import { Span } from "next-vibe-ui/ui/span";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "next-vibe-ui/ui/tooltip";
 import type { JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 

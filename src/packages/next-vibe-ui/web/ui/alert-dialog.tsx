@@ -6,6 +6,70 @@ import * as React from "react";
 
 import { buttonVariants } from "./button";
 
+// Cross-platform type exports
+export interface AlertDialogRootProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+  defaultOpen?: boolean;
+}
+
+export interface AlertDialogTriggerProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface AlertDialogPortalProps {
+  children?: React.ReactNode;
+  forceMount?: boolean;
+  container?: HTMLElement | null;
+}
+
+export interface AlertDialogOverlayProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface AlertDialogContentProps {
+  className?: string;
+  children?: React.ReactNode;
+  onOpenAutoFocus?: (event: Event) => void;
+  onCloseAutoFocus?: (event: Event) => void;
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
+}
+
+export interface AlertDialogHeaderProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface AlertDialogFooterProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface AlertDialogTitleProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface AlertDialogDescriptionProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface AlertDialogActionProps {
+  className?: string;
+  children?: React.ReactNode;
+  asChild?: boolean;
+}
+
+export interface AlertDialogCancelProps {
+  className?: string;
+  children?: React.ReactNode;
+  asChild?: boolean;
+}
+
 const AlertDialog = AlertDialogPrimitive.Root;
 
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
@@ -47,29 +111,31 @@ AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
 
 const AlertDialogHeader = ({
   className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
+  children,
+}: AlertDialogHeaderProps): React.JSX.Element => (
   <div
     className={cn(
       "flex flex-col space-y-2 text-center sm:text-left",
       className,
     )}
-    {...props}
-  />
+  >
+    {children}
+  </div>
 );
 AlertDialogHeader.displayName = "AlertDialogHeader";
 
 const AlertDialogFooter = ({
   className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
+  children,
+}: AlertDialogFooterProps): React.JSX.Element => (
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
       className,
     )}
-    {...props}
-  />
+  >
+    {children}
+  </div>
 );
 AlertDialogFooter.displayName = "AlertDialogFooter";
 

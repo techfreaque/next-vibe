@@ -1,14 +1,10 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-  Div,
-  Pre,
-  Span,
-} from "next-vibe-ui/ui";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "next-vibe-ui/ui/collapsible";
+import { Div } from "next-vibe-ui/ui/div";
+import { Pre } from "next-vibe-ui/ui/pre";
+import { Span } from "next-vibe-ui/ui/span";
 import { ChevronDown, ChevronRight, Search } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import { useState } from "react";

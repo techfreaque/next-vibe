@@ -6,7 +6,9 @@
 "use client";
 
 import { Save } from "lucide-react";
-import { Form, FormAlert, FormSection } from "next-vibe-ui/ui";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+import { FormSection } from "next-vibe-ui/ui/form/form-section";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
@@ -15,7 +17,7 @@ import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { useCampaignStarterConfigEndpoint } from "@/app/api/[locale]/v1/core/leads/campaigns/campaign-starter/campaign-starter-config/hooks";

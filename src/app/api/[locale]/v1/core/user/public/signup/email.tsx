@@ -772,54 +772,56 @@ function renderAdminNotificationEmailContent(
                 >
                   {requestData.signupType.includes(SignupType.MEETING)
                     ? t(
-                        "app.api.v1.core.user.public.signup.admin_notification.consultation_first",
-                      )
+                      "app.api.v1.core.user.public.signup.admin_notification.consultation_first",
+                    )
                     : t(
-                        "app.api.v1.core.user.public.signup.admin_notification.direct_signup",
-                      )}
+                      "app.api.v1.core.user.public.signup.admin_notification.direct_signup",
+                    )}
                 </span>
               </Text>
             )}
 
-            {requestData.subscribeToNewsletter !== undefined && (
-              <Text
-                style={{
-                  fontSize: "14px",
-                  marginBottom: "6px",
-                  color: "#4b5563",
-                  lineHeight: "1.5",
-                }}
-              >
-                <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                  {t(
-                    "app.api.v1.core.user.public.signup.admin_notification.newsletter",
-                  )}
-                  :
-                </Text>{" "}
-                <span
+            {
+              requestData.subscribeToNewsletter !== undefined && (
+                <Text
                   style={{
-                    backgroundColor: requestData.subscribeToNewsletter
-                      ? "#dcfce7"
-                      : "#fee2e2",
-                    color: requestData.subscribeToNewsletter
-                      ? "#166534"
-                      : "#991b1b",
-                    padding: "2px 8px",
-                    borderRadius: "4px",
-                    fontSize: "12px",
-                    fontWeight: "600",
+                    fontSize: "14px",
+                    marginBottom: "6px",
+                    color: "#4b5563",
+                    lineHeight: "1.5",
                   }}
                 >
-                  {requestData.subscribeToNewsletter
-                    ? t(
+                  <Text style={{ fontWeight: "700", color: "#1f2937" }}>
+                    {t(
+                      "app.api.v1.core.user.public.signup.admin_notification.newsletter",
+                    )}
+                    :
+                  </Text>{" "}
+                  <span
+                    style={{
+                      backgroundColor: requestData.subscribeToNewsletter
+                        ? "#dcfce7"
+                        : "#fee2e2",
+                      color: requestData.subscribeToNewsletter
+                        ? "#166534"
+                        : "#991b1b",
+                      padding: "2px 8px",
+                      borderRadius: "4px",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {requestData.subscribeToNewsletter
+                      ? t(
                         "app.api.v1.core.user.public.signup.admin_notification.subscribed",
                       )
-                    : t(
+                      : t(
                         "app.api.v1.core.user.public.signup.admin_notification.not_subscribed",
                       )}
-                </span>
-              </Text>
-            )}
+                  </span>
+                </Text>
+              )
+            }
           </div>
         </div>
 
@@ -931,11 +933,11 @@ function renderAdminNotificationEmailContent(
         >
           {requestData.signupType.includes(SignupType.MEETING)
             ? t(
-                "app.api.v1.core.user.public.signup.admin_notification.consultation_recommendation",
-              )
+              "app.api.v1.core.user.public.signup.admin_notification.consultation_recommendation",
+            )
             : t(
-                "app.api.v1.core.user.public.signup.admin_notification.direct_recommendation",
-              )}
+              "app.api.v1.core.user.public.signup.admin_notification.direct_recommendation",
+            )}
         </Text>
       </Section>
 
@@ -972,9 +974,10 @@ function renderAdminNotificationEmailContent(
           paddingTop: "16px",
         }}
       >
-        {t("app.api.v1.core.user.public.signup.admin_notification.footer", {
-          appName: t("app.api.common.appName"),
-        })}
+        {
+          t("app.api.v1.core.user.public.signup.admin_notification.footer", {
+            appName: t("app.api.common.appName"),
+          })}
       </Text>
     </EmailTemplate>
   );

@@ -2,7 +2,8 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { parseError } from "next-vibe/shared/utils";
-import { Div, P } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import { useEffect, useMemo } from "react";
 

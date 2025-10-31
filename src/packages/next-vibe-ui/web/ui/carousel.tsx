@@ -11,12 +11,13 @@ import { useTranslation } from "@/i18n/core/client";
 
 import { Button } from "./button";
 
-type CarouselApi = UseEmblaCarouselType[1];
+// Cross-platform type exports
+export type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
-type CarouselOptions = UseCarouselParameters[0];
-type CarouselPlugin = UseCarouselParameters[1];
+export type CarouselOptions = UseCarouselParameters[0];
+export type CarouselPlugin = UseCarouselParameters[1];
 
-interface CarouselProps {
+export interface CarouselProps {
   opts?: CarouselOptions;
   plugins?: CarouselPlugin;
   orientation?: "horizontal" | "vertical";
@@ -269,7 +270,6 @@ CarouselNext.displayName = "CarouselNext";
 
 export {
   Carousel,
-  type CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,

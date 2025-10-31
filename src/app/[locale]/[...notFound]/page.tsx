@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
-import { Div, H1, H2, P } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { H1 } from "next-vibe-ui/ui/typography";
+import { H2 } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui/typography";
 import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Home } from "next-vibe-ui/ui/icons";
+import { Card } from "next-vibe-ui/ui/card";
+import { CardContent } from "next-vibe-ui/ui/card";
+import { Home } from "lucide-react";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";

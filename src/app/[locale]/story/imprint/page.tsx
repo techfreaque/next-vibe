@@ -1,7 +1,8 @@
 import { Building, FileText, Info } from "lucide-react";
 import type { Metadata, ResolvingMetadata } from "next";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 

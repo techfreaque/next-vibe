@@ -11,8 +11,6 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import { Countries } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { Button } from "./button";
 import {
@@ -26,8 +24,16 @@ import {
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
+// Cross-platform country data
+export interface CountryData {
+  code: string;
+  name: string;
+  prefix: string;
+  flag: string;
+}
+
 // Common country codes and their phone prefixes
-const COUNTRIES = [
+export const COUNTRIES: CountryData[] = [
   { code: "US", name: "United States", prefix: "+1", flag: "🇺🇸" },
   { code: "CA", name: "Canada", prefix: "+1", flag: "🇨🇦" },
   { code: "GB", name: "United Kingdom", prefix: "+44", flag: "🇬🇧" },
@@ -60,32 +66,33 @@ const COUNTRIES = [
   { code: "MX", name: "Mexico", prefix: "+52", flag: "🇲🇽" },
   { code: "AR", name: "Argentina", prefix: "+54", flag: "🇦🇷" },
   { code: "ZA", name: "South Africa", prefix: "+27", flag: "🇿🇦" },
-] as const;
+];
 
+// Cross-platform props interface
 export interface PhoneFieldProps {
   value?: string;
   onChange: (value: string) => void;
   onBlur?: () => void;
-  placeholder: TranslationKey;
-  defaultCountry: Countries;
-  preferredCountries: Countries[];
+  placeholder?: string;
+  defaultCountry?: string;
+  preferredCountries?: string[];
   disabled?: boolean;
   className?: string;
-  name: string;
+  name?: string;
 }
 
 export function PhoneField({
   value = "",
   onChange,
   onBlur,
-  placeholder = "app.common.enterPhoneNumber",
-  defaultCountry,
-  preferredCountries,
+  placeholder = "Enter phone number",
+  defaultCountry = "US",
+  preferredCountries = [],
   disabled = false,
   className,
   name,
 }: PhoneFieldProps): JSX.Element {
-  const { t } = useTranslation();
+  const { t: _t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   // Parse the current value to extract country and number
@@ -94,7 +101,7 @@ export function PhoneField({
   ): { country: string; number: string } => {
     if (!phoneValue) {
       return {
-        country: defaultCountry === Countries.GLOBAL ? "US" : defaultCountry,
+        country: defaultCountry || "US",
         number: "",
       };
     }
@@ -111,7 +118,7 @@ export function PhoneField({
       };
     }
 
-    return { country: defaultCountry, number: phoneValue };
+    return { country: defaultCountry || "US", number: phoneValue };
   };
 
   const { country: selectedCountry, number: phoneNumber } =
@@ -122,10 +129,10 @@ export function PhoneField({
   // Organize countries with preferred ones first
   const organizedCountries = useMemo(() => {
     const preferred = COUNTRIES.filter((country) =>
-      (preferredCountries as string[]).includes(country.code),
+      preferredCountries.includes(country.code),
     );
     const others = COUNTRIES.filter(
-      (country) => !(preferredCountries as string[]).includes(country.code),
+      (country) => !preferredCountries.includes(country.code),
     );
     return { preferred, others };
   }, [preferredCountries]);
@@ -175,12 +182,20 @@ export function PhoneField({
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-0" align="start">
           <Command id="country-listbox">
-            <CommandInput placeholder={t("app.common.searchCountries")} />
+            <CommandInput
+              placeholder={_t(
+                "packages.nextVibeUi.web.common.searchCountries",
+              )}
+            />
             <CommandList className="max-h-[200px]">
-              <CommandEmpty>{t("app.common.noCountryFound")}</CommandEmpty>
+              <CommandEmpty>
+                {_t("packages.nextVibeUi.web.common.noCountryFound")}
+              </CommandEmpty>
 
               {organizedCountries.preferred.length > 0 && (
-                <CommandGroup heading={t("app.common.preferred")}>
+                <CommandGroup
+                  heading={_t("packages.nextVibeUi.web.common.preferred")}
+                >
                   {organizedCountries.preferred.map((country) => (
                     <CommandItem
                       key={country.code}
@@ -200,7 +215,9 @@ export function PhoneField({
                 </CommandGroup>
               )}
 
-              <CommandGroup heading={t("app.common.allCountries")}>
+              <CommandGroup
+                heading={_t("packages.nextVibeUi.web.common.allCountries")}
+              >
                 {organizedCountries.others.map((country) => (
                   <CommandItem
                     key={country.code}
@@ -231,7 +248,7 @@ export function PhoneField({
           value={phoneNumber}
           onChange={(e) => handleNumberChange(e.target.value)}
           onBlur={onBlur}
-          placeholder={t(placeholder)}
+          placeholder={placeholder}
           disabled={disabled}
           className="rounded-l-none pl-10 h-10"
         />

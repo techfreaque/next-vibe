@@ -6,7 +6,9 @@
 "use client";
 
 import { Plus, Save } from "lucide-react";
-import { Form, FormAlert, Div, P } from "next-vibe-ui/ui";
+import { Form, } from "next-vibe-ui/ui/form/form";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import {
@@ -28,6 +30,7 @@ import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/unified-inte
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 
 interface CreateTaskDialogProps {
   open: boolean;

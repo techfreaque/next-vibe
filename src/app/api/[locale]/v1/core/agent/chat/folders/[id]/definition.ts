@@ -146,6 +146,22 @@ const { GET } = createEndpoint({
                 },
                 z.record(z.string(), z.any()),
               ),
+              allowedRoles: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.allowedRoles.content" as const,
+                },
+                z.array(z.string()),
+              ),
+              moderatorIds: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.moderatorIds.content" as const,
+                },
+                z.array(z.string()),
+              ),
               createdAt: responseField(
                 {
                   type: WidgetType.TEXT,
@@ -244,6 +260,8 @@ const { GET } = createEndpoint({
             expanded: true,
             sortOrder: 0,
             metadata: {},
+            allowedRoles: [],
+            moderatorIds: [],
             createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
             updatedAt: new Date("2024-01-01T00:00:00Z").toISOString(),
           },
@@ -388,6 +406,30 @@ const { PATCH } = createEndpoint({
             },
             z.record(z.string(), z.any()).optional(),
           ),
+          allowedRoles: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.JSON,
+              label:
+                "app.api.v1.core.agent.chat.folders.id.patch.allowedRoles.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.folders.id.patch.allowedRoles.description" as const,
+              layout: { columns: 12 },
+            },
+            z.array(z.string()).optional(),
+          ),
+          moderatorIds: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.JSON,
+              label:
+                "app.api.v1.core.agent.chat.folders.id.patch.moderatorIds.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.folders.id.patch.moderatorIds.description" as const,
+              layout: { columns: 12 },
+            },
+            z.array(z.string()).optional(),
+          ),
         },
       ),
 
@@ -483,6 +525,22 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.agent.chat.folders.id.patch.response.folder.metadata.content" as const,
                 },
                 z.record(z.string(), z.any()),
+              ),
+              allowedRoles: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.allowedRoles.content" as const,
+                },
+                z.array(z.string()),
+              ),
+              moderatorIds: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.moderatorIds.content" as const,
+                },
+                z.array(z.string()),
               ),
               createdAt: responseField(
                 {
@@ -592,6 +650,8 @@ const { PATCH } = createEndpoint({
             expanded: true,
             sortOrder: 0,
             metadata: {},
+            allowedRoles: [],
+            moderatorIds: [],
             createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
             updatedAt: new Date().toISOString(),
           },

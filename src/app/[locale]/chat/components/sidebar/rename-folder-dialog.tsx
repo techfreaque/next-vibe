@@ -1,15 +1,10 @@
 "use client";
 
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Div,
-  Input,
-  Label,
-} from "next-vibe-ui/ui";
+import { Button } from "next-vibe-ui/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
+import { Div } from "next-vibe-ui/ui/div";
+import { Input } from "next-vibe-ui/ui/input";
+import { Label } from "next-vibe-ui/ui/label";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 

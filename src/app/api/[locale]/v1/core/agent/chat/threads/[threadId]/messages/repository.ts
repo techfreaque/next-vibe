@@ -107,7 +107,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       }
 
       // Check read permission using permission system
-      if (!canReadThread(user, thread, folder)) {
+      if (!(await canReadThread(user, thread, folder, logger))) {
         return fail({
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.title" as const,
@@ -239,7 +239,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       }
 
       // Check write permission using permission system
-      if (!canWriteThread(user, thread, folder)) {
+      if (!canWriteThread(user, thread, folder, logger)) {
         return fail({
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,

@@ -30,7 +30,8 @@ import { Slot, useLocalSearchParams } from "expo-router";
 import type React from "react";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
+import { Span } from "next-vibe-ui/ui/span";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -69,12 +70,146 @@ export interface ExpoRouterParams extends Record<string, string | string[]> {
  * Type for any Next.js page component (handles various signatures)
  * Using a single flexible signature to avoid intersection type issues
  */
-type AnyNextPageComponent<TParams extends RouteParams = ExpoRouterParams> = (
-  props: { params: Promise<TParams> } | { params: TParams } | Record<string, string | number | boolean>
-) => Promise<JSX.Element> | JSX.Element | never;
+type AnyNextPageComponent<_TParams extends RouteParams = ExpoRouterParams> =
+  // eslint-disable-next-line typescript-eslint/no-explicit-any -- Need flexible type to support various Next.js component signatures
+  (props: any) => Promise<JSX.Element> | JSX.Element | never;
+
+/**
+ * Creates a wrapper for Next.js page components with lazy loading and error boundaries
+ *
+ * Features:
+ * - Dynamic import with error handling
+ * - Full loading and error UI
+ * - ActivityIndicator during load
+ * - Error display with message
+ * - Async component resolution
+ * - Handles server-only import errors gracefully
+ *
+ * @param importFn - Function that dynamically imports the page component
+ * @returns A synchronous Expo Router compatible component
+ */
+export function createPageWrapperWithImport<
+  TParams extends ExpoRouterParams = ExpoRouterParams,
+>(
+  importFn: () => Promise<{ default: AnyNextPageComponent<TParams> }>,
+): () => React.ReactElement {
+  return function PageWrapper(): React.ReactElement {
+    const params = useLocalSearchParams<TParams>();
+    const [content, setContent] = useState<JSX.Element | null>(null);
+    const [error, setError] = useState<Error | null>(null);
+    const logger = useMemo(
+      () => createEndpointLogger(true, Date.now(), params.locale),
+      [params.locale],
+    );
+    const { t } = simpleT(params.locale);
+
+    useEffect(() => {
+      let cancelled = false;
+
+      queueMicrotask(() => {
+        void (async (): Promise<void> => {
+          try {
+            // Dynamically import the component
+            const componentModule = await importFn();
+            const PageComponent = componentModule.default;
+
+            // Create a proper Promise<TParams> for Next.js 15 async params
+            const paramsPromise: Promise<TParams> = Promise.resolve(params);
+            // Call the async page component with Next.js 15 format params
+            const result = await PageComponent({
+              params: paramsPromise,
+            });
+
+            if (!cancelled) {
+              setContent(result);
+            }
+          } catch (err) {
+            if (!cancelled) {
+              const parsedError = parseError(err);
+              const errorMessage = parsedError.message;
+
+              // Check if this is a server-only or Node.js module error
+              const isServerOnlyError =
+                errorMessage.includes("server-only") ||
+                errorMessage.includes("Node standard library") ||
+                errorMessage.includes("node:") ||
+                errorMessage.includes("Module not found");
+
+              if (isServerOnlyError) {
+                logger.warn(
+                  "Page uses server-only features not available in React Native. " +
+                  "A .native override is needed for this route.",
+                  { error: parsedError, route: params }
+                );
+              } else {
+                logger.error("Failed to load page", { error: parsedError });
+              }
+
+              setError(
+                err instanceof Error
+                  ? err
+                  : new Error(
+                    t(
+                      "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+                    ),
+                  ),
+              );
+            }
+          }
+        })();
+      });
+
+      return (): void => {
+        cancelled = true;
+      };
+    }, [logger, params, t]);
+
+    // Error state
+    if (error) {
+      return (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 20,
+          }}
+        >
+          <Span style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
+            {t(
+              "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+            )}
+          </Span>
+          <Span style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
+            {error.message}
+          </Span>
+        </View>
+      );
+    }
+
+    // Loading state
+    if (!content) {
+      return (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size="large" />
+        </View>
+      );
+    }
+
+    // Render the loaded page content
+    return content;
+  };
+}
 
 /**
  * Creates a wrapper for Next.js page components to work in Expo Router
+ * (Legacy version with static import - kept for backwards compatibility)
  *
  * Features:
  * - Full loading and error UI
@@ -119,15 +254,33 @@ export function createPageWrapper<
             }
           } catch (err) {
             if (!cancelled) {
-              logger.error("Failed to load page", { error: parseError(err) });
+              const parsedError = parseError(err);
+              const errorMessage = parsedError.message;
+
+              // Check if this is a Node.js module import error (admin routes with server code)
+              const isNodeModuleError =
+                errorMessage.includes("Node standard library") ||
+                errorMessage.includes("node:") ||
+                errorMessage.includes("Module not found");
+
+              if (isNodeModuleError) {
+                logger.warn(
+                  "Page uses server-only features not available in React Native. " +
+                  "A .native override is needed for this route.",
+                  { error: parsedError, route: params }
+                );
+              } else {
+                logger.error("Failed to load page", { error: parsedError });
+              }
+
               setError(
                 err instanceof Error
                   ? err
                   : new Error(
-                      t(
-                        "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
-                      ),
+                    t(
+                      "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
                     ),
+                  ),
               );
             }
           }
@@ -150,14 +303,14 @@ export function createPageWrapper<
             padding: 20,
           }}
         >
-          <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
+          <Span style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
             {t(
               "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
             )}
-          </Text>
-          <Text style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
+          </Span>
+          <Span style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
             {error.message}
-          </Text>
+          </Span>
         </View>
       );
     }
@@ -186,12 +339,9 @@ export function createPageWrapper<
  * Type for any Next.js layout component (handles various signatures)
  * Using a single flexible signature to avoid intersection type issues
  */
-type AnyNextLayoutComponent<TParams extends RouteParams = ExpoRouterParams> = (
-  props:
-    | { params: Promise<TParams>; children: React.ReactNode }
-    | { params: TParams; children: React.ReactNode }
-    | Record<string, string | number | boolean>
-) => Promise<JSX.Element> | JSX.Element;
+type AnyNextLayoutComponent<_TParams extends RouteParams = ExpoRouterParams> =
+  // eslint-disable-next-line typescript-eslint/no-explicit-any -- Need flexible type to support various Next.js component signatures
+  (props: any) => Promise<JSX.Element> | JSX.Element;
 
 /**
  * Creates a wrapper for Next.js layout components to work in Expo Router
@@ -231,6 +381,79 @@ export function createLayoutWrapper<
       queueMicrotask(() => {
         void (async (): Promise<void> => {
           try {
+            // Create a proper Promise<TParams> for Next.js 15 async params
+            const paramsPromise: Promise<TParams> = Promise.resolve(params);
+            // Call the async layout component with Next.js 15 format params
+            const result = await LayoutComponent({
+              params: paramsPromise,
+              children: slotElement,
+            });
+
+            if (!cancelled) {
+              setContent(result);
+            }
+          } catch (err) {
+            if (!cancelled) {
+              logger.error("Failed to load layout", { error: parseError(err) });
+              // On error, just render Slot directly
+              setContent(slotElement);
+            }
+          }
+        })();
+      });
+
+      return (): void => {
+        cancelled = true;
+      };
+    }, [logger, params]);
+
+    // Render the loaded layout content or Slot while loading
+    // Layout routes must only contain Screen children, so we can't show custom loading/error UI
+    return content ?? <Slot />;
+  };
+}
+
+/**
+ * Creates a wrapper for Next.js layout components with dynamic import
+ *
+ * Features:
+ * - Dynamic import with error handling
+ * - Uses Slot for children rendering
+ * - No custom loading/error UI (layout route constraint)
+ * - Falls back to Slot on error
+ * - Async component resolution with React 19 compatibility
+ * - Handles server-only import errors gracefully
+ *
+ * @param importFn - Function that dynamically imports the layout component
+ * @returns A synchronous Expo Router compatible component
+ */
+export function createLayoutWrapperWithImport<
+  TParams extends ExpoRouterParams = ExpoRouterParams,
+>(
+  importFn: () => Promise<{ default: AnyNextLayoutComponent<TParams> }>,
+): () => React.ReactElement {
+  return function LayoutWrapper(): React.ReactElement {
+    const params = useLocalSearchParams<TParams>();
+    const [content, setContent] = useState<React.ReactElement | null>(null);
+    const logger = useMemo(
+      () => createEndpointLogger(true, Date.now(), params.locale),
+      [params.locale],
+    );
+
+    useEffect(() => {
+      let cancelled = false;
+
+      const slotElement = <Slot />;
+
+      // Use queueMicrotask to defer promise creation outside of React's render phase
+      // This prevents React 19's Suspense from detecting an uncached promise
+      queueMicrotask(() => {
+        void (async (): Promise<void> => {
+          try {
+            // Dynamically import the component
+            const layoutModule = await importFn();
+            const LayoutComponent = layoutModule.default;
+
             // Create a proper Promise<TParams> for Next.js 15 async params
             const paramsPromise: Promise<TParams> = Promise.resolve(params);
             // Call the async layout component with Next.js 15 format params
@@ -329,10 +552,10 @@ export function createPageWrapperWithOptions<
                 err instanceof Error
                   ? err
                   : new Error(
-                      t(
-                        "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
-                      ),
+                    t(
+                      "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
                     ),
+                  ),
               );
             }
           }
@@ -359,14 +582,14 @@ export function createPageWrapperWithOptions<
             padding: 20,
           }}
         >
-          <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
+          <Span style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
             {t(
               "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
             )}
-          </Text>
-          <Text style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
+          </Span>
+          <Span style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
             {error.message}
-          </Text>
+          </Span>
         </View>
       );
     }

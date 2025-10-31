@@ -5,7 +5,34 @@ import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
-// import { cn } from "next-vibe/shared/utils/utils";
+// Cross-platform types
+export interface AccordionProps {
+  type?: "single" | "multiple";
+  value?: string | string[];
+  onValueChange?: (value: string | string[]) => void;
+  defaultValue?: string | string[];
+  collapsible?: boolean;
+  disabled?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface AccordionItemProps {
+  value: string;
+  disabled?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface AccordionTriggerProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface AccordionContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
 
 const Accordion = AccordionPrimitive.Root;
 

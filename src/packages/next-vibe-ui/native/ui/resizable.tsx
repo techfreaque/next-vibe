@@ -4,62 +4,55 @@
  * Provides layout structure similar to web version
  */
 import { GripVertical } from "lucide-react-native";
-import type { ReactNode } from "react";
 import React from "react";
-import { View } from "react-native";
+import { View as RNView } from "react-native";
 
+import type { ViewPropsWithClassName } from "../lib/types";
 import { cn } from "../lib/utils";
+import type {
+  ResizablePanelGroupProps,
+  ResizablePanelProps,
+  ResizableHandleProps,
+} from "next-vibe-ui/ui/resizable";
 
-interface ResizablePanelGroupProps {
-  children: ReactNode;
-  className?: string;
-  direction?: "horizontal" | "vertical";
-}
+// Type-safe View component with className support for NativeWind
+const View = RNView as React.ComponentType<ViewPropsWithClassName>;
 
 export const ResizablePanelGroup = React.forwardRef<
-  View,
+  RNView,
   ResizablePanelGroupProps
->(({ className, direction = "horizontal", children, ...props }, ref) => (
-  <View
-    ref={ref}
-    className={cn(
-      "flex h-full w-full",
-      direction === "vertical" ? "flex-col" : "flex-row",
-      className,
-    )}
-    {...props}
-  >
-    {children}
-  </View>
-));
+>(function ResizablePanelGroup({ className, direction = "horizontal", children }, ref) {
+  return (
+    <View
+      ref={ref}
+      className={cn(
+        "flex h-full w-full",
+        direction === "vertical" ? "flex-col" : "flex-row",
+        className,
+      )}
+    >
+      {children}
+    </View>
+  );
+});
 
 ResizablePanelGroup.displayName = "ResizablePanelGroup";
 
-interface ResizablePanelProps {
-  children: ReactNode;
-  className?: string;
-  defaultSize?: number;
-}
-
-export const ResizablePanel = React.forwardRef<View, ResizablePanelProps>(
-  ({ className, children, ...props }, ref) => (
-    <View ref={ref} className={cn("flex-1", className)} {...props}>
-      {children}
-    </View>
-  ),
+export const ResizablePanel = React.forwardRef<RNView, ResizablePanelProps>(
+  function ResizablePanel({ className, children }, ref) {
+    return (
+      <View ref={ref} className={cn("flex-1", className)}>
+        {children}
+      </View>
+    );
+  },
 );
 
 ResizablePanel.displayName = "ResizablePanel";
 
-interface ResizableHandleProps {
-  className?: string;
-  withHandle?: boolean;
-}
-
 export function ResizableHandle({
   withHandle,
   className,
-  ...props
 }: ResizableHandleProps): React.JSX.Element {
   return (
     <View
@@ -67,11 +60,10 @@ export function ResizableHandle({
         "relative flex w-px items-center justify-center bg-border",
         className,
       )}
-      {...props}
     >
       {withHandle && (
         <View className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border bg-border">
-          <GripVertical className="h-2.5 w-2.5 text-muted-foreground" />
+          <GripVertical size={10} color="currentColor" />
         </View>
       )}
     </View>

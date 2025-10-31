@@ -1,7 +1,8 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import { Moon, Sun } from "next-vibe-ui/ui/icons";
 import { type JSX, useEffect, useState } from "react";

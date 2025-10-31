@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Div, H1, H3, P } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
+import { H1, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

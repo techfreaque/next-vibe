@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Div, H1, H2, H3, P } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import { ChevronLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";

@@ -13,35 +13,40 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import type {
+  AccordionContentProps,
+  AccordionItemProps,
+  AccordionProps,
+  AccordionTriggerProps,
+} from "next-vibe-ui/ui/accordion";
 import { cn } from "../lib/utils";
 import { ChevronDown } from "./icons/ChevronDown";
 import { TextClassContext } from "./text";
 
-// Local aliases - use direct primitives to avoid type instantiation issues with styled()
-const StyledAccordionRoot = AccordionPrimitive.Root;
-const StyledAccordionItem = AccordionPrimitive.Item;
-const StyledAccordionHeader = AccordionPrimitive.Header;
-const StyledAccordionTrigger = AccordionPrimitive.Trigger;
-const StyledAccordionContent = AccordionPrimitive.Content;
-const StyledAnimatedView = Animated.View;
-
 const Accordion = React.forwardRef<
   AccordionPrimitive.RootRef,
-  AccordionPrimitive.RootProps & { children?: React.ReactNode }
+  AccordionProps
 >((props, ref) => {
-  const { children, asChild, ...rest } = props;
-  const shouldUseAsChild = asChild ?? (Platform.OS !== "web");
+  const { children, className, type, value, onValueChange, defaultValue, collapsible, disabled } = props;
+  const asChild = Platform.OS !== "web";
+
   return (
     <LayoutAnimationConfig skipEntering>
-      <StyledAccordionRoot
+      <AccordionPrimitive.Root
         ref={ref}
-        {...(rest as AccordionPrimitive.RootProps)}
-        asChild={shouldUseAsChild}
+        type={type}
+        value={value}
+        onValueChange={onValueChange}
+        defaultValue={defaultValue}
+        collapsible={collapsible}
+        disabled={disabled}
+        className={className}
+        asChild={asChild}
       >
-        <StyledAnimatedView layout={LinearTransition.duration(200)}>
+        <Animated.View layout={LinearTransition.duration(200)}>
           {children}
-        </StyledAnimatedView>
-      </StyledAccordionRoot>
+        </Animated.View>
+      </AccordionPrimitive.Root>
     </LayoutAnimationConfig>
   );
 });
@@ -50,30 +55,30 @@ Accordion.displayName = AccordionPrimitive.Root.displayName;
 
 const AccordionItem = React.forwardRef<
   AccordionPrimitive.ItemRef,
-  AccordionPrimitive.ItemProps & { className?: string }
->(({ className, value, ...props }, ref) => {
+  AccordionItemProps
+>(({ className, value, children, disabled }, ref) => {
   return (
-    <StyledAnimatedView
-      className={"overflow-hidden"}
+    <Animated.View
+      className="overflow-hidden"
       layout={LinearTransition.duration(200)}
     >
-      <StyledAccordionItem
+      <AccordionPrimitive.Item
         ref={ref}
         className={cn("border-b border-border", className)}
         value={value}
-        {...props}
-      />
-    </StyledAnimatedView>
+        disabled={disabled}
+      >
+        {children}
+      </AccordionPrimitive.Item>
+    </Animated.View>
   );
 });
 AccordionItem.displayName = AccordionPrimitive.Item.displayName;
 
 const AccordionTrigger = React.forwardRef<
   AccordionPrimitive.TriggerRef,
-  AccordionPrimitive.TriggerProps & {
-    className?: string;
-  }
->(({ className, children, ...props }, ref) => {
+  AccordionTriggerProps
+>(({ className, children }, ref) => {
   const { isExpanded } = AccordionPrimitive.useItemContext();
 
   const progress = useDerivedValue(() =>
@@ -94,9 +99,9 @@ const AccordionTrigger = React.forwardRef<
   const TriggerContent = (): React.JSX.Element => (
     <>
       {children}
-      <StyledAnimatedView style={chevronStyle}>
+      <Animated.View style={chevronStyle}>
         <ChevronDown size={18} className="text-foreground shrink-0" />
-      </StyledAnimatedView>
+      </Animated.View>
     </>
   );
 
@@ -106,8 +111,8 @@ const AccordionTrigger = React.forwardRef<
         "native:text-lg font-medium web:group-hover:underline" // eslint-disable-line i18next/no-literal-string -- CSS class names
       }
     >
-      <StyledAccordionHeader className="flex">
-        <StyledAccordionTrigger ref={ref} {...props} asChild>
+      <AccordionPrimitive.Header className="flex">
+        <AccordionPrimitive.Trigger ref={ref} asChild>
           {Platform.OS === "web" ? (
             <View className={triggerClassName}>
               <TriggerContent />
@@ -117,8 +122,8 @@ const AccordionTrigger = React.forwardRef<
               <TriggerContent />
             </Pressable>
           )}
-        </StyledAccordionTrigger>
-      </StyledAccordionHeader>
+        </AccordionPrimitive.Trigger>
+      </AccordionPrimitive.Header>
     </TextClassContext.Provider>
   );
 });
@@ -126,12 +131,12 @@ AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
 const AccordionContent = React.forwardRef<
   AccordionPrimitive.ContentRef,
-  AccordionPrimitive.ContentProps & { className?: string }
->(({ className, children, ...props }, ref) => {
+  AccordionContentProps
+>(({ className, children }, ref) => {
   const { isExpanded } = AccordionPrimitive.useItemContext();
   return (
     <TextClassContext.Provider value="native:text-lg">
-      <StyledAccordionContent
+      <AccordionPrimitive.Content
         className={cn(
           "overflow-hidden text-sm web:transition-all",
           isExpanded
@@ -139,12 +144,11 @@ const AccordionContent = React.forwardRef<
             : "web:animate-accordion-up",
         )}
         ref={ref}
-        {...props}
       >
         <InnerContent className={cn("pb-4", className)}>
           {children}
         </InnerContent>
-      </StyledAccordionContent>
+      </AccordionPrimitive.Content>
     </TextClassContext.Provider>
   );
 });
@@ -159,13 +163,13 @@ function InnerContent({ children, className }: InnerContentProps): React.JSX.Ele
     return <View className={cn("pb-4", className)}>{children}</View>;
   }
   return (
-    <StyledAnimatedView
+    <Animated.View
       entering={FadeIn}
       exiting={FadeOutUp.duration(200)}
       className={cn("pb-4", className)}
     >
       {children}
-    </StyledAnimatedView>
+    </Animated.View>
   );
 }
 

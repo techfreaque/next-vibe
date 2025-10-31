@@ -6,7 +6,9 @@
 "use client";
 
 import { AlertTriangle, CheckCircle, Eye, Users } from "lucide-react";
-import { Div, H4, P, Span } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { H4, P } from "next-vibe-ui/ui/typography";
+import { Span } from "next-vibe-ui/ui/span";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";

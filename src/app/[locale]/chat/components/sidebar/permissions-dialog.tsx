@@ -1,17 +1,12 @@
 "use client";
 
-import {
-  Button,
-  Checkbox,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Div,
-  Input,
-  Label,
-  ScrollArea,
-} from "next-vibe-ui/ui";
+import { Button } from "next-vibe-ui/ui/button";
+import { Checkbox } from "next-vibe-ui/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
+import { Div } from "next-vibe-ui/ui/div";
+import { Input } from "next-vibe-ui/ui/input";
+import { Label } from "next-vibe-ui/ui/label";
+import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Plus, X } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";

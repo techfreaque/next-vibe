@@ -5,7 +5,8 @@
 
 "use client";
 
-import { Form, FormAlert } from "next-vibe-ui/ui";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";

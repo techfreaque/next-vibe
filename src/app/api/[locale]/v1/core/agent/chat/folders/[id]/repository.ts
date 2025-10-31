@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import {
   createSuccessResponse,
   ErrorResponseTypes,
@@ -74,6 +74,8 @@ export async function getFolder(
               string,
               string | number | boolean | null
             >) || {},
+          allowedRoles: folder.allowedRoles || [],
+          moderatorIds: folder.moderatorIds || [],
           createdAt: folder.createdAt.toISOString(),
           updatedAt: folder.updatedAt.toISOString(),
         },
@@ -93,23 +95,16 @@ export async function getFolder(
 export async function updateFolder(
   user: JwtPayloadType,
   data: FolderUpdateRequestOutput & { id: string },
+  logger: EndpointLogger,
 ): Promise<ResponseType<FolderUpdateResponseOutput>> {
-  if (user.isPublic) {
-    return fail({
-      message:
-        "app.api.v1.core.agent.chat.folders.id.patch.errors.unauthorized.title",
-      errorType: ErrorResponseTypes.UNAUTHORIZED,
-    });
-  }
-
   try {
     const { id, updates } = data;
 
-    // Verify folder exists and belongs to user
+    // Verify folder exists
     const [existingFolder] = await db
       .select()
       .from(chatFolders)
-      .where(and(eq(chatFolders.id, id), eq(chatFolders.userId, user.id)))
+      .where(eq(chatFolders.id, id))
       .limit(1);
 
     if (!existingFolder) {
@@ -117,6 +112,15 @@ export async function updateFolder(
         message:
           "app.api.v1.core.agent.chat.folders.id.patch.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    // Check if user can manage this folder
+    if (!(await canManageFolder(user, existingFolder, logger))) {
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.folders.id.patch.errors.forbidden.title",
+        errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
 
@@ -132,14 +136,16 @@ export async function updateFolder(
     }
 
     // Update the folder
+    logger.info("Updating folder with data:", { id, updates });
     const [updatedFolder] = await db
       .update(chatFolders)
       .set({
         ...updates,
         updatedAt: new Date(),
       })
-      .where(and(eq(chatFolders.id, id), eq(chatFolders.userId, user.id)))
+      .where(eq(chatFolders.id, id))
       .returning();
+    logger.info("Updated folder result:", { updatedFolder: updatedFolder ? { id: updatedFolder.id } : null });
 
     if (!updatedFolder) {
       return fail({
@@ -165,6 +171,8 @@ export async function updateFolder(
               string,
               string | number | boolean | null
             >) || {},
+          allowedRoles: (updatedFolder.allowedRoles as string[]) || [],
+          moderatorIds: (updatedFolder.moderatorIds as string[]) || [],
           createdAt: updatedFolder.createdAt.toISOString(),
           updatedAt: updatedFolder.updatedAt.toISOString(),
         },
@@ -185,23 +193,16 @@ export async function updateFolder(
 export async function deleteFolder(
   user: JwtPayloadType,
   data: { id: string },
+  logger: EndpointLogger,
 ): Promise<ResponseType<FolderDeleteResponseOutput>> {
-  if (user.isPublic) {
-    return fail({
-      message:
-        "app.api.v1.core.agent.chat.folders.id.delete.errors.unauthorized.title",
-      errorType: ErrorResponseTypes.UNAUTHORIZED,
-    });
-  }
-
   try {
     const { id } = data;
 
-    // Verify folder exists and belongs to user
+    // Verify folder exists
     const [existingFolder] = await db
       .select()
       .from(chatFolders)
-      .where(and(eq(chatFolders.id, id), eq(chatFolders.userId, user.id)))
+      .where(eq(chatFolders.id, id))
       .limit(1);
 
     if (!existingFolder) {
@@ -212,10 +213,27 @@ export async function deleteFolder(
       });
     }
 
+    // Get all folders for recursive moderator check
+    const allFolders = await db.select().from(chatFolders);
+    const foldersMap = allFolders.reduce(
+      (acc, folder) => {
+        acc[folder.id] = folder;
+        return acc;
+      },
+      {} as Record<string, typeof existingFolder>,
+    );
+
+    // Check if user can delete this folder
+    if (!(await canDeleteFolder(user, existingFolder, logger, foldersMap))) {
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.folders.id.delete.errors.forbidden.title",
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
+
     // Delete the folder (cascade will handle child folders and threads)
-    await db
-      .delete(chatFolders)
-      .where(and(eq(chatFolders.id, id), eq(chatFolders.userId, user.id)));
+    await db.delete(chatFolders).where(eq(chatFolders.id, id));
 
     return createSuccessResponse({
       response: {

@@ -13,6 +13,7 @@ import { canManageThread } from "@/app/api/[locale]/v1/core/agent/chat/permissio
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
+import type { UserRoleDB } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {
   ThreadPermissionsGetResponseOutput,
@@ -64,9 +65,13 @@ export async function getThreadPermissions(
     const moderatorIds = Array.isArray(thread.moderatorIds)
       ? thread.moderatorIds
       : [];
+    const allowedRoles = Array.isArray(thread.allowedRoles)
+      ? thread.allowedRoles
+      : [];
 
     return createSuccessResponse({
       response: {
+        allowedRoles,
         moderatorIds,
       },
     });
@@ -96,7 +101,7 @@ export async function updateThreadPermissions(
   }
 
   try {
-    const { threadId, moderatorIds } = data;
+    const { threadId, moderatorIds, allowedRoles } = data;
 
     // Verify thread exists
     const [existingThread] = await db
@@ -123,23 +128,47 @@ export async function updateThreadPermissions(
       });
     }
 
-    // Update the moderator IDs
+    // Prepare update data - only update fields that are provided
+    const updateData: {
+      moderatorIds?: string[];
+      allowedRoles?: (typeof UserRoleDB)[number][];
+      updatedAt: Date;
+    } = {
+      updatedAt: new Date(),
+    };
+
+    if (moderatorIds !== undefined) {
+      updateData.moderatorIds = moderatorIds;
+    }
+
+    if (allowedRoles !== undefined) {
+      updateData.allowedRoles = allowedRoles;
+    }
+
+    // Update the permissions
     await db
       .update(chatThreads)
-      .set({
-        moderatorIds,
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(eq(chatThreads.id, threadId));
 
     logger.info("Thread permissions updated", {
       threadId,
-      moderatorCount: moderatorIds.length,
+      moderatorCount: moderatorIds?.length ?? 0,
+      allowedRolesCount: allowedRoles?.length ?? 0,
     });
+
+    // Return updated values
+    const finalModeratorIds = moderatorIds ?? existingThread.moderatorIds ?? [];
+    const finalAllowedRoles = allowedRoles ?? existingThread.allowedRoles ?? [];
 
     return createSuccessResponse({
       response: {
-        moderatorIds,
+        allowedRoles: Array.isArray(finalAllowedRoles)
+          ? finalAllowedRoles
+          : [],
+        moderatorIds: Array.isArray(finalModeratorIds)
+          ? finalModeratorIds
+          : [],
       },
     });
   } catch {

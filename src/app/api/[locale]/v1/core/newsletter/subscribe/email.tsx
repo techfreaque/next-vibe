@@ -3,7 +3,7 @@
  * React Email templates for newsletter subscription operations
  */
 
-import { Button, Hr, Link, Section, Text } from "@react-email/components";
+import { Button, Hr, Link, Section } from "@react-email/components";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -11,6 +11,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
 import React from "react";
+import { Span } from "next-vibe-ui/ui/span";
 
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
 import {
@@ -62,7 +63,7 @@ function WelcomeEmailContent({
       tracking={tracking}
     >
       {/* Greeting */}
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -72,13 +73,13 @@ function WelcomeEmailContent({
       >
         {requestData.name
           ? t("app.api.v1.core.newsletter.email.welcome.greeting_with_name", {
-              name: requestData.name,
-            })
+            name: requestData.name,
+          })
           : t("app.api.v1.core.newsletter.email.welcome.greeting")}
-      </Text>
+      </Span>
 
       {/* Welcome message */}
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -87,10 +88,10 @@ function WelcomeEmailContent({
         }}
       >
         {t("app.api.v1.core.newsletter.email.welcome.message", { appName })}
-      </Text>
+      </Span>
 
       {/* What to expect */}
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -99,7 +100,7 @@ function WelcomeEmailContent({
         }}
       >
         {t("app.api.v1.core.newsletter.email.welcome.what_to_expect")}
-      </Text>
+      </Span>
 
       <ul
         style={{
@@ -123,7 +124,7 @@ function WelcomeEmailContent({
       </ul>
 
       {/* Frequency note */}
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -132,10 +133,10 @@ function WelcomeEmailContent({
         }}
       >
         {t("app.api.v1.core.newsletter.email.welcome.frequency")}
-      </Text>
+      </Span>
 
       {/* Unsubscribe link */}
-      <Text
+      <Span
         style={{
           fontSize: "12px",
           color: "#6b7280",
@@ -152,7 +153,7 @@ function WelcomeEmailContent({
         >
           {t("app.api.v1.core.newsletter.email.welcome.unsubscribe_link")}
         </Link>
-      </Text>
+      </Span>
     </EmailTemplate>
   );
 }
@@ -187,7 +188,7 @@ function AdminNotificationEmailContent({
       )}
       tracking={tracking}
     >
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -196,12 +197,12 @@ function AdminNotificationEmailContent({
         }}
       >
         {t("app.api.v1.core.newsletter.email.admin_notification.message")}
-      </Text>
+      </Span>
 
       <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
 
       {/* Subscriber details */}
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           fontWeight: "700",
@@ -213,9 +214,9 @@ function AdminNotificationEmailContent({
           "app.api.v1.core.newsletter.email.admin_notification.subscriber_details",
         )}
         :
-      </Text>
+      </Span>
 
-      <Text
+      <Span
         style={{
           fontSize: "14px",
           lineHeight: "1.6",
@@ -227,10 +228,10 @@ function AdminNotificationEmailContent({
           {t("app.api.v1.core.newsletter.email.admin_notification.email")}:
         </strong>{" "}
         {requestData.email}
-      </Text>
+      </Span>
 
       {requestData.name && (
-        <Text
+        <Span
           style={{
             fontSize: "14px",
             lineHeight: "1.6",
@@ -242,12 +243,12 @@ function AdminNotificationEmailContent({
             {t("app.api.v1.core.newsletter.email.admin_notification.name")}:
           </strong>{" "}
           {requestData.name}
-        </Text>
+        </Span>
       )}
 
       {requestData.preferences && requestData.preferences.length > 0 && (
         <>
-          <Text
+          <Span
             style={{
               fontSize: "14px",
               lineHeight: "1.6",
@@ -261,7 +262,7 @@ function AdminNotificationEmailContent({
               )}
               :
             </strong>
-          </Text>
+          </Span>
           <ul style={{ color: "#4b5563", paddingLeft: "20px" }}>
             {requestData.preferences.map((preference: string) => (
               <li key={preference} style={{ margin: "4px 0" }}>

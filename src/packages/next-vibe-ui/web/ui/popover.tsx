@@ -4,6 +4,39 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
+// Cross-platform type exports
+export interface PopoverRootProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+  defaultOpen?: boolean;
+  modal?: boolean;
+}
+
+export interface PopoverTriggerProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface PopoverAnchorProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface PopoverContentProps {
+  className?: string;
+  children?: React.ReactNode;
+  align?: "start" | "center" | "end";
+  sideOffset?: number;
+  alignOffset?: number;
+  side?: "top" | "right" | "bottom" | "left";
+  onOpenAutoFocus?: (event: Event) => void;
+  onCloseAutoFocus?: (event: Event) => void;
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
+  onPointerDownOutside?: (event: Event) => void;
+  onInteractOutside?: (event: Event) => void;
+}
+
 const Popover = PopoverPrimitive.Root;
 
 const PopoverTrigger = PopoverPrimitive.Trigger;

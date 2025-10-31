@@ -21,14 +21,10 @@ import {
   SiTypescript,
 } from "@icons-pack/react-simple-icons";
 import { cn } from "next-vibe/shared/utils";
-import {
-  Button,
-  Div,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Span,
-} from "next-vibe-ui/ui";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
+import { Span } from "next-vibe-ui/ui/span";
 import {
   Activity,
   Atom,

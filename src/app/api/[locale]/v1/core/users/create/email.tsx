@@ -307,30 +307,34 @@ function AdminNotificationEmailContent({
           <Text style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.users.create.email.users.labels.created")}
           </Text>{" "}
-          {new Date(userData.responseCreatedAt).toLocaleDateString(locale, {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          {
+            new Date(userData.responseCreatedAt).toLocaleDateString(locale, {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          }
         </Text>
 
-        {userData.responseLeadId && (
-          <Text
-            style={{
-              fontSize: "14px",
-              marginBottom: "4px",
-              color: "#4b5563",
-            }}
-          >
-            <Text style={{ fontWeight: "700" }}>
-              {t("app.api.v1.core.users.create.email.users.labels.leadId")}
-            </Text>{" "}
-            {userData.responseLeadId}
-          </Text>
-        )}
+        {
+          userData.responseLeadId && (
+            <Text
+              style={{
+                fontSize: "14px",
+                marginBottom: "4px",
+                color: "#4b5563",
+              }}
+            >
+              <Text style={{ fontWeight: "700" }}>
+                {t("app.api.v1.core.users.create.email.users.labels.leadId")}
+              </Text>{" "}
+              {userData.responseLeadId}
+            </Text>
+          )
+        }
       </Section>
 
       {/* Admin Action Button */}

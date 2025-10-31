@@ -23,7 +23,8 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 

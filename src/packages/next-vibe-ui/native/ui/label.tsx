@@ -3,40 +3,29 @@ import * as React from "react";
 
 import { cn } from "../lib/utils";
 
-interface LabelProps extends React.ComponentPropsWithoutRef<typeof LabelPrimitive.Text> {
+interface LabelProps {
   className?: string;
-  onPress?: () => void;
+  children?: React.ReactNode;
   nativeID?: string;
   htmlFor?: string;
-  asChild?: boolean;
 }
 
-const Label = React.forwardRef<
-  LabelPrimitive.TextRef,
-  LabelProps
->(({ className, children, onPress, nativeID, htmlFor, asChild, ...props }, ref) => {
-  const textClassName = cn(
-    "text-sm text-foreground native:text-base font-medium leading-none web:peer-disabled:cursor-not-allowed web:peer-disabled:opacity-70 web:cursor-default",
-    className,
-  );
+const Label = React.forwardRef<LabelPrimitive.TextRef, LabelProps>(
+  ({ className, children, ...props }, ref) => {
+    const textClassName = cn(
+      "text-sm text-foreground native:text-base font-medium leading-none web:peer-disabled:cursor-not-allowed web:peer-disabled:opacity-70 web:cursor-default",
+      className,
+    );
 
-  return (
-    <LabelPrimitive.Root {...({ onPress } as any)}>
-      <LabelPrimitive.Text
-        ref={ref}
-        {...({
-          nativeID,
-          htmlFor,
-          asChild,
-          className: textClassName,
-          ...props,
-        } as any)}
-      >
-        {children}
-      </LabelPrimitive.Text>
-    </LabelPrimitive.Root>
-  );
-});
-Label.displayName = LabelPrimitive.Root.displayName;
+    return (
+      <LabelPrimitive.Root>
+        <LabelPrimitive.Text ref={ref} className={textClassName} {...props}>
+          {children}
+        </LabelPrimitive.Text>
+      </LabelPrimitive.Root>
+    );
+  },
+);
+Label.displayName = "Label";
 
 export { Label };

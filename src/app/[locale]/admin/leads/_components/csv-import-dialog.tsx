@@ -6,7 +6,11 @@
 "use client";
 
 import { CheckCircle, Download, FileText, Upload } from "lucide-react";
-import { Div, Form, FormAlert, P, Span } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+import { P } from "next-vibe-ui/ui/typography";
+import { Span } from "next-vibe-ui/ui/span";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";

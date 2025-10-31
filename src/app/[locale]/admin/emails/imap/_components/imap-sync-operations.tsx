@@ -14,7 +14,8 @@ import {
   RefreshCw,
   Square,
 } from "lucide-react";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -27,7 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { P } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 

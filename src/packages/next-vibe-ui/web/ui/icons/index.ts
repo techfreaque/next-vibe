@@ -5,6 +5,7 @@
 
 export { Activity } from "./Activity";
 export { AlertCircle } from "./AlertCircle";
+export { AlertTriangle } from "./AlertTriangle";
 export { Archive } from "./Archive";
 export { ArchiveRestore } from "./ArchiveRestore";
 export { ArrowBigDown } from "./ArrowBigDown";
@@ -72,8 +73,10 @@ export { List } from "./List";
 export { Loader2 } from "./Loader2";
 export { Lock } from "./Lock";
 export { LogOut } from "./LogOut";
+export { Mail } from "./Mail";
 export { Map } from "./Map";
 export { Menu } from "./Menu";
+export { MessageCircle } from "./MessageCircle";
 export { MessageSquare } from "./MessageSquare";
 export { MessageSquarePlus } from "./MessageSquarePlus";
 export { Mic } from "./Mic";
@@ -114,6 +117,7 @@ export { ThumbsUp } from "./ThumbsUp";
 export { Trash2 } from "./Trash2";
 export { TrendingUp } from "./TrendingUp";
 export { Trophy } from "./Trophy";
+export { Twitter } from "./Twitter";
 export { User } from "./User";
 export { Users } from "./Users";
 export { Utensils } from "./Utensils";

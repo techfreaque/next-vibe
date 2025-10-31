@@ -1,6 +1,10 @@
 "use client";
 
-import { Button, Div, Form, H3, Input, P } from "next-vibe-ui/ui";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { H3, P } from "next-vibe-ui/ui/typography";
+import { Input } from "next-vibe-ui/ui/input";
 import { Check, Send, X } from "next-vibe-ui/ui/icons";
 import type { FormEvent, JSX } from "react";
 

@@ -3,6 +3,8 @@
  * Provides secure password hashing and verification using Argon2
  */
 
+import "server-only";
+
 import * as argon2 from "argon2";
 
 /**

@@ -105,6 +105,16 @@ class UserRolesRepositoryNativeImpl implements UserRolesRepository {
       this.createNotImplementedError<boolean>("hasRole"),
     );
   }
+
+  async getUserRoles(
+    userId: DbId,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<string[]>> {
+    logger.warn("getUserRoles not implemented on native - not used in page.tsx");
+    return await Promise.resolve(
+      this.createNotImplementedError<string[]>("getUserRoles"),
+    );
+  }
 }
 
 /**

@@ -2,9 +2,11 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+import { getCurrentUrl, getReferrer, getUserAgent } from "next-vibe-ui/utils/browser";
 import { useEffect, useMemo } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 
 import { EngagementTypes } from "../../api/[locale]/v1/core/leads/enum";
@@ -28,7 +30,8 @@ export function LeadTrackingProvider(): null {
       try {
         // Call the engagement endpoint to record website visit
         // Server will handle leadid creation/validation via JWT payload
-        const apiUrl = `/api/${locale}/v1/core/leads/tracking/engagement`;
+        const baseUrl = envClient.NEXT_PUBLIC_APP_URL;
+        const apiUrl = `${baseUrl}/api/${locale}/v1/core/leads/tracking/engagement`;
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
@@ -38,9 +41,9 @@ export function LeadTrackingProvider(): null {
             // No leadId needed - server gets it from JWT payload
             engagementType: EngagementTypes.WEBSITE_VISIT,
             metadata: {
-              url: window.location.href,
-              referrer: document.referrer,
-              userAgent: navigator.userAgent,
+              url: getCurrentUrl(),
+              referrer: getReferrer(),
+              userAgent: getUserAgent(),
               timestamp: new Date().toISOString(),
             },
           }),

@@ -23,6 +23,7 @@ import { chatFolders, chatThreads } from "../../db";
 import {
   canDeleteThread,
   canReadThread,
+  canWriteThread,
 } from "../../permissions/permissions";
 import type { PersonaId } from "../../personas/config";
 import type {
@@ -106,7 +107,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       }
 
       // Use permission system to check read access
-      if (!canReadThread(user, thread, folder)) {
+      if (!(await canReadThread(user, thread, folder, logger))) {
         return fail({
           message:
             "app.api.v1.core.agent.chat.threads.threadId.get.errors.forbidden.title",
@@ -171,15 +172,6 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         updates: data.updates,
       });
 
-      // Public users cannot update threads
-      if (user.isPublic) {
-        return fail({
-          message:
-            "app.api.v1.core.agent.chat.threads.threadId.patch.errors.forbidden.title",
-          errorType: ErrorResponseTypes.FORBIDDEN,
-        });
-      }
-
       // Get thread without user filter to allow permission check
       const [existingThread] = await db
         .select()
@@ -196,8 +188,18 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         });
       }
 
-      // Only owner can update their thread (no moderator update permissions)
-      if (user.id !== existingThread.userId) {
+      // Get parent folder for permission check
+      let folder = null;
+      if (existingThread.folderId) {
+        [folder] = await db
+          .select()
+          .from(chatFolders)
+          .where(eq(chatFolders.id, existingThread.folderId))
+          .limit(1);
+      }
+
+      // Check if user can write to this thread
+      if (!canWriteThread(user, existingThread, folder, logger)) {
         return fail({
           message:
             "app.api.v1.core.agent.chat.threads.threadId.patch.errors.forbidden.title",

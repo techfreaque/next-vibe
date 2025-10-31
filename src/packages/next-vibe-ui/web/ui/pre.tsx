@@ -1,5 +1,13 @@
-import type { ComponentPropsWithoutRef, JSX } from "react";
+import type { JSX, ReactNode } from "react";
 
-export function Pre(props: ComponentPropsWithoutRef<"pre">): JSX.Element {
+// Cross-platform props interface - narrowed to what both platforms support
+// Excludes style to allow platform-specific styling
+export interface PreProps {
+  children?: ReactNode;
+  className?: string;
+  id?: string;
+}
+
+export function Pre(props: PreProps): JSX.Element {
   return <pre {...props} />;
 }

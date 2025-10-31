@@ -21,8 +21,16 @@ import type { z } from "zod";
 import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 
-import type { DefaultFolderId } from "./config";
+import { DEFAULT_FOLDER_IDS, type DefaultFolderId } from "./config";
 import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
+
+// Create array of root folder IDs for Drizzle enum
+const RootFolderIdDB = [
+  DEFAULT_FOLDER_IDS.PRIVATE,
+  DEFAULT_FOLDER_IDS.SHARED,
+  DEFAULT_FOLDER_IDS.PUBLIC,
+  DEFAULT_FOLDER_IDS.INCOGNITO,
+] as const;
 import type { ModelId } from "./model-access/models";
 import type { PersonaId } from "./personas/config";
 import {
@@ -145,7 +153,7 @@ export const chatFolders = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
 
     // Root folder (constant: private, shared, public, incognito)
-    rootFolderId: text("root_folder_id").notNull().default("private"),
+    rootFolderId: text("root_folder_id", { enum: RootFolderIdDB }).$type<DefaultFolderId>().notNull().default("private"),
 
     // Folder details
     name: text("name").notNull(),

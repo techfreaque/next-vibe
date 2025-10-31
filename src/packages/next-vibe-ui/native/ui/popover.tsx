@@ -6,6 +6,26 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
 
+// Define types locally to avoid web dependency issues
+interface PopoverRootProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+interface PopoverTriggerProps {
+  className?: string;
+}
+
+interface PopoverAnchorProps {
+  className?: string;
+}
+
+interface PopoverContentProps {
+  className?: string;
+  align?: "start" | "center" | "end";
+  sideOffset?: number;
+}
+
 const Popover = PopoverPrimitive.Root;
 
 const PopoverTrigger = PopoverPrimitive.Trigger;
@@ -44,4 +64,7 @@ const PopoverContent = React.forwardRef<
 );
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-export { Popover, PopoverContent, PopoverTrigger };
+// Export PopoverAnchor separately since it's not available in @rn-primitives/popover
+const PopoverAnchor = PopoverPrimitive.Root;
+
+export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger };

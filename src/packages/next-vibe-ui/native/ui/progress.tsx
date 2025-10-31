@@ -1,6 +1,6 @@
 import * as ProgressPrimitive from "@rn-primitives/progress";
 import * as React from "react";
-import { Platform, View } from "react-native";
+import { Platform, View as RNView } from "react-native";
 import Animated, {
   Extrapolation,
   interpolate,
@@ -9,27 +9,30 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
+import type { ProgressProps } from "next-vibe-ui/ui/progress";
+import type { ViewPropsWithClassName } from "../lib/types";
 import { cn } from "../lib/utils";
 
-const Progress = React.forwardRef<
-  ProgressPrimitive.RootRef,
-  ProgressPrimitive.RootProps & {
-    indicatorClassName?: string;
-  }
->(({ className, indicatorClassName, ...props }, ref) => {
-  return (
-    <ProgressPrimitive.Root
-      ref={ref}
-      className={cn(
-        "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
-        className,
-      )}
-      {...props}
-    >
-      <Indicator value={props.value} className={indicatorClassName} />
-    </ProgressPrimitive.Root>
-  );
-});
+// Type-safe View component with className support for NativeWind
+const View = RNView as React.ComponentType<ViewPropsWithClassName>;
+
+const Progress = React.forwardRef<ProgressPrimitive.RootRef, ProgressProps>(
+  ({ className, indicatorClassName, value, max, ...props }, ref) => {
+    return (
+      <ProgressPrimitive.Root
+        ref={ref}
+        className={cn(
+          "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
+          className,
+        )}
+        value={value ?? undefined}
+        {...props}
+      >
+        <Indicator value={value} className={indicatorClassName} />
+      </ProgressPrimitive.Root>
+    );
+  },
+);
 Progress.displayName = ProgressPrimitive.Root.displayName;
 
 export { Progress };
@@ -59,7 +62,9 @@ function Indicator({
           "h-full w-full flex-1 bg-primary web:transition-all",
           className,
         )}
-        style={{ transform: `translateX(-${100 - (value ?? 0)}%)` }}
+        style={{
+          transform: `translateX(-${100 - (value ?? 0)}%)`,
+        }}
       >
         <ProgressPrimitive.Indicator
           className={cn("h-full w-full", className)}

@@ -20,6 +20,7 @@ import { simpleT } from "@/i18n/core/shared";
 import { useAIStream } from "../ai-stream/hooks/hooks";
 import { useAIStreamStore } from "../ai-stream/hooks/store";
 import type { DefaultFolderId } from "./config";
+import { DEFAULT_FOLDER_IDS } from "./config";
 import { createCreditUpdateCallback } from "./credit-updater";
 import { ChatMessageRole } from "./enum";
 import {
@@ -114,7 +115,11 @@ export interface UseChatReturn {
   // Message operations
   sendMessage: (
     content: string,
-    onThreadCreated?: (threadId: string, rootFolderId: string) => void,
+    onThreadCreated?: (
+      threadId: string,
+      rootFolderId: string,
+      subFolderId: string | null,
+    ) => void,
   ) => Promise<void>;
   retryMessage: (messageId: string) => Promise<void>;
   branchMessage: (messageId: string, newContent: string) => Promise<void>;
@@ -269,16 +274,14 @@ export function useChat(
         );
       }
 
-      // Skip loading server data for non-authenticated users
-      if (!isAuthenticated) {
-        logger.info(
-          "useChat",
-          "User not authenticated, skipping server data load",
-        );
-        return;
-      }
+      // Load PUBLIC threads and folders for non-authenticated users
+      // Load ALL threads and folders for authenticated users
+      logger.info("Chat: Loading server data", {
+        isAuthenticated,
+        loadingScope: isAuthenticated ? "all" : "public only",
+      });
 
-      // Load ALL threads (no rootFolderId filter)
+      // Load threads (PUBLIC only for non-authenticated, ALL for authenticated)
       // IMPORTANT: Disable local cache to ensure threads are always fresh from server
       // Only incognito threads should use localStorage
       try {
@@ -388,6 +391,10 @@ export function useChat(
                 expanded: folder.expanded,
                 sortOrder: folder.sortOrder,
                 metadata: folder.metadata,
+                allowedRoles: folder.allowedRoles || [],
+                // moderatorIds is not included in the API response, so we set it to undefined
+                // It will be loaded separately if needed
+                moderatorIds: undefined,
                 createdAt: new Date(folder.createdAt),
                 updatedAt: new Date(folder.updatedAt),
               });
@@ -510,9 +517,17 @@ export function useChat(
 
   // Get active thread and messages - use subscribed variables
   const activeThread = activeThreadId ? threads[activeThreadId] || null : null;
-  const activeThreadMessages = activeThreadId
-    ? chatStore.getThreadMessages(activeThreadId)
-    : [];
+
+  // Compute active thread messages from subscribed messages state
+  // This ensures component re-renders when messages change
+  const activeThreadMessages = useMemo(() => {
+    if (!activeThreadId) {
+      return [];
+    }
+    return Object.values(messages)
+      .filter((msg) => msg.threadId === activeThreadId)
+      .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  }, [activeThreadId, messages]);
 
   // Sync streaming messages to chat store
   useEffect(() => {
@@ -715,17 +730,29 @@ export function useChat(
   const sendMessage = useCallback(
     async (
       content: string,
-      onThreadCreated?: (threadId: string, rootFolderId: string) => void,
+      onThreadCreated?: (
+        threadId: string,
+        rootFolderId: string,
+        subFolderId: string | null,
+      ) => void,
     ): Promise<void> => {
-      logger.debug("Chat: Sending message", { content });
+      logger.debug("Chat: Sending message", {
+        content: content.substring(0, 50),
+        activeThreadId: chatStore.activeThreadId,
+        currentRootFolderId: chatStore.currentRootFolderId,
+      });
 
       chatStore.setLoading(true);
 
       try {
+        // IMPORTANT: Use activeThreadId from the store at the time of sending
+        // This ensures we use the correct thread ID (or null for new threads)
+        const threadIdToUse = chatStore.activeThreadId;
+
         // Get the last message in the thread to use as parent
         // This ensures new messages continue the conversation instead of creating branches
         let parentMessageId: string | null = null;
-        if (chatStore.activeThreadId) {
+        if (threadIdToUse) {
           // For incognito mode, get messages from localStorage
           // For authenticated mode, get messages from chat store
           let threadMessages: ChatMessage[] = [];
@@ -734,11 +761,9 @@ export function useChat(
             const { getMessagesForThread } = await import(
               "./incognito/storage"
             );
-            threadMessages = getMessagesForThread(chatStore.activeThreadId);
+            threadMessages = getMessagesForThread(threadIdToUse);
           } else {
-            threadMessages = chatStore.getThreadMessages(
-              chatStore.activeThreadId,
-            );
+            threadMessages = chatStore.getThreadMessages(threadIdToUse);
           }
 
           if (threadMessages.length > 0) {
@@ -751,6 +776,11 @@ export function useChat(
               isIncognito: chatStore.currentRootFolderId === "incognito",
             });
           }
+        } else {
+          logger.debug("Chat: No active thread, creating new thread", {
+            rootFolderId: chatStore.currentRootFolderId,
+            subFolderId: chatStore.currentSubFolderId,
+          });
         }
 
         await aiStream.startStream(
@@ -758,7 +788,7 @@ export function useChat(
             operation: "send",
             rootFolderId: chatStore.currentRootFolderId,
             subFolderId: chatStore.currentSubFolderId,
-            threadId: chatStore.activeThreadId,
+            threadId: threadIdToUse,
             parentMessageId,
             content,
             role: "user",
@@ -773,6 +803,7 @@ export function useChat(
               logger.debug("Chat: Thread created during send", {
                 threadId: data.threadId,
                 rootFolderId: data.rootFolderId,
+                subFolderId: data.subFolderId,
               });
 
               // Set the active thread in the chat store
@@ -784,7 +815,11 @@ export function useChat(
 
               // Call the callback if provided
               if (onThreadCreated) {
-                onThreadCreated(data.threadId, data.rootFolderId);
+                onThreadCreated(
+                  data.threadId,
+                  data.rootFolderId,
+                  data.subFolderId,
+                );
               }
             },
             onContentDone: createCreditUpdateCallback(selectedModel, logger),
@@ -935,6 +970,28 @@ export function useChat(
       chatStore.setLoading(true);
 
       try {
+        // For incognito mode, build message history from localStorage
+        let messageHistory: Array<{ role: "user" | "assistant" | "system"; content: string }> | undefined;
+
+        if (chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+          // Get all messages in the thread up to and including the parent message
+          const threadMessages = Object.values(chatStore.messages)
+            .filter((msg) => msg.threadId === message.threadId)
+            .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+          // Find the index of the parent message
+          const parentIndex = threadMessages.findIndex((msg) => msg.id === messageId);
+
+          if (parentIndex !== -1) {
+            // Include all messages up to and including the parent
+            const contextMessages = threadMessages.slice(0, parentIndex + 1);
+            messageHistory = contextMessages.map((msg) => ({
+              role: msg.role.toLowerCase() as "user" | "assistant" | "system",
+              content: msg.content,
+            }));
+          }
+        }
+
         await aiStream.startStream(
           {
             operation: "answer-as-ai",
@@ -949,6 +1006,7 @@ export function useChat(
             temperature,
             maxTokens,
             tools: enabledToolIds,
+            messageHistory,
           },
           {
             onContentDone: createCreditUpdateCallback(selectedModel, logger),
@@ -1034,6 +1092,16 @@ export function useChat(
         // Delete from store (in-memory)
         chatStore.deleteMessage(messageId);
 
+        // Also delete from streaming store to prevent re-adding
+        if (streamStore.streamingMessages[messageId]) {
+          const { [messageId]: _deleted, ...remainingMessages } =
+            streamStore.streamingMessages;
+          streamStore.reset();
+          Object.values(remainingMessages).forEach((msg) => {
+            streamStore.addMessage(msg);
+          });
+        }
+
         // Also delete from localStorage
         try {
           const { deleteMessage: deleteIncognitoMessage } = await import(
@@ -1076,11 +1144,21 @@ export function useChat(
 
         // Remove from store
         chatStore.deleteMessage(messageId);
+
+        // Also delete from streaming store to prevent re-adding
+        if (streamStore.streamingMessages[messageId]) {
+          const { [messageId]: _deleted, ...remainingMessages } =
+            streamStore.streamingMessages;
+          streamStore.reset();
+          Object.values(remainingMessages).forEach((msg) => {
+            streamStore.addMessage(msg);
+          });
+        }
       } catch (error) {
         logger.error("Chat: Failed to delete message", parseError(error));
       }
     },
-    [logger, chatStore, locale],
+    [logger, chatStore, streamStore, locale],
   );
 
   const voteMessage = useCallback(
@@ -1161,6 +1239,57 @@ export function useChat(
     async (threadId: string): Promise<void> => {
       logger.debug("Chat: Deleting thread", { threadId });
 
+      // Check if this is the active thread - we'll need to navigate away
+      const isActiveThread = chatStore.activeThreadId === threadId;
+      const thread = chatStore.threads[threadId];
+
+      if (!thread) {
+        logger.error("Chat: Thread not found", { threadId });
+        return;
+      }
+
+      // Store thread's folder context for navigation
+      const threadRootFolderId = thread.rootFolderId;
+      const threadSubFolderId = thread.folderId;
+
+      // Check if this is an incognito thread
+      if (thread.rootFolderId === "incognito") {
+        logger.debug("Chat: Deleting incognito thread (localStorage only)", {
+          threadId,
+        });
+
+        // Import incognito storage functions
+        const { deleteThread: deleteIncognitoThread } = await import(
+          "./incognito/storage"
+        );
+
+        // Delete from localStorage
+        deleteIncognitoThread(threadId);
+
+        // Remove from store
+        chatStore.deleteThread(threadId);
+
+        // If this was the active thread, navigate to new thread page
+        if (isActiveThread) {
+          chatStore.setActiveThread(null);
+
+          // Navigate to new thread page in the thread's folder context
+          const { buildFolderUrl } = await import(
+            "@/app/[locale]/chat/lib/utils/navigation"
+          );
+          const url = `${buildFolderUrl(locale, threadRootFolderId, threadSubFolderId)}/new`;
+          logger.debug("Chat: Navigating to new thread page after deletion", {
+            url,
+            threadRootFolderId,
+            threadSubFolderId,
+          });
+          window.location.href = url;
+        }
+
+        return;
+      }
+
+      // For non-incognito threads, use API
       try {
         const response = await fetch(
           `/api/${locale}/v1/core/agent/chat/threads/${threadId}`,
@@ -1179,15 +1308,37 @@ export function useChat(
         // Remove from store
         chatStore.deleteThread(threadId);
 
-        // If this was the active thread, clear it
-        if (chatStore.activeThreadId === threadId) {
+        // Also delete from streaming store to prevent re-adding
+        if (streamStore.threads[threadId]) {
+          const { [threadId]: _deleted, ...remainingThreads } =
+            streamStore.threads;
+          streamStore.reset();
+          Object.values(remainingThreads).forEach((thread) => {
+            streamStore.addThread(thread);
+          });
+        }
+
+        // If this was the active thread, navigate to new thread page
+        if (isActiveThread) {
           chatStore.setActiveThread(null);
+
+          // Navigate to new thread page in the thread's folder context
+          const { buildFolderUrl } = await import(
+            "@/app/[locale]/chat/lib/utils/navigation"
+          );
+          const url = `${buildFolderUrl(locale, threadRootFolderId, threadSubFolderId)}/new`;
+          logger.debug("Chat: Navigating to new thread page after deletion", {
+            url,
+            threadRootFolderId,
+            threadSubFolderId,
+          });
+          window.location.href = url;
         }
       } catch (error) {
         logger.error("Chat: Failed to delete thread", parseError(error));
       }
     },
-    [logger, chatStore, locale],
+    [logger, chatStore, locale, streamStore],
   );
 
   const updateThread = useCallback(
@@ -1197,6 +1348,26 @@ export function useChat(
         updatedFields: Object.keys(updates).join(", "),
       });
 
+      // Check if this is an incognito thread
+      const thread = chatStore.threads[threadId];
+      if (thread && thread.rootFolderId === "incognito") {
+        logger.debug("Chat: Updating incognito thread (localStorage only)", {
+          threadId,
+        });
+
+        // Import incognito storage functions
+        const { updateIncognitoThread } = await import("./incognito/storage");
+
+        // Update in localStorage
+        updateIncognitoThread(threadId, updates);
+
+        // Update local store
+        chatStore.updateThread(threadId, updates);
+
+        return;
+      }
+
+      // For non-incognito threads, use API
       try {
         const response = await fetch(
           `/api/${locale}/v1/core/agent/chat/threads/${threadId}`,
@@ -1239,6 +1410,44 @@ export function useChat(
         icon,
       });
 
+      // Check if this is an incognito folder
+      if (rootFolderId === "incognito") {
+        logger.debug("Chat: Creating incognito folder (localStorage only)", {
+          name,
+          rootFolderId,
+          parentId,
+        });
+
+        // Import incognito storage functions
+        const { generateIncognitoId, saveFolder } = await import(
+          "./incognito/storage"
+        );
+
+        // Create folder in localStorage
+        const folder: ChatFolder = {
+          id: generateIncognitoId("folder"),
+          userId: "incognito",
+          rootFolderId,
+          name,
+          icon: (icon as IconValue) || null,
+          color: null,
+          parentId,
+          expanded: true,
+          sortOrder: 0,
+          metadata: {},
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        saveFolder(folder);
+
+        // Add to store
+        chatStore.addFolder(folder);
+
+        return folder.id;
+      }
+
+      // For non-incognito folders, use API
       try {
         const response = await fetch(
           `/api/${locale}/v1/core/agent/chat/folders`,
@@ -1298,6 +1507,31 @@ export function useChat(
         updatedFields: Object.keys(updates).join(", "),
       });
 
+      // Check if this is an incognito folder
+      const folder = chatStore.folders[folderId];
+      if (folder && folder.rootFolderId === "incognito") {
+        logger.debug("Chat: Updating incognito folder (localStorage only)", {
+          folderId,
+        });
+
+        // Import incognito storage functions
+        const { saveFolder } = await import("./incognito/storage");
+
+        // Update in localStorage
+        const updatedFolder = {
+          ...folder,
+          ...updates,
+          updatedAt: new Date(),
+        };
+        saveFolder(updatedFolder);
+
+        // Update local store
+        chatStore.updateFolder(folderId, updates);
+
+        return;
+      }
+
+      // For non-incognito folders, use API
       try {
         const response = await fetch(
           `/api/${locale}/v1/core/agent/chat/folders/${folderId}`,
@@ -1330,6 +1564,28 @@ export function useChat(
     async (folderId: string): Promise<void> => {
       logger.debug("Chat: Deleting folder", { folderId });
 
+      // Check if this is an incognito folder
+      const folder = chatStore.folders[folderId];
+      if (folder && folder.rootFolderId === "incognito") {
+        logger.debug("Chat: Deleting incognito folder (localStorage only)", {
+          folderId,
+        });
+
+        // Import incognito storage functions
+        const { deleteFolder: deleteIncognitoFolder } = await import(
+          "./incognito/storage"
+        );
+
+        // Delete from localStorage
+        deleteIncognitoFolder(folderId);
+
+        // Remove from store
+        chatStore.deleteFolder(folderId);
+
+        return;
+      }
+
+      // For non-incognito folders, use API
       try {
         const response = await fetch(
           `/api/${locale}/v1/core/agent/chat/folders/${folderId}`,

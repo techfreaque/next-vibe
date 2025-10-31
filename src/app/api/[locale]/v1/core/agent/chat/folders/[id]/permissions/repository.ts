@@ -13,6 +13,7 @@ import { canManageFolder } from "@/app/api/[locale]/v1/core/agent/chat/permissio
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
+import type { UserRoleDB } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {
   FolderPermissionsGetResponseOutput,
@@ -130,7 +131,7 @@ export async function updateFolderPermissions(
     // Prepare update data - only update fields that are provided
     const updateData: {
       moderatorIds?: string[];
-      allowedRoles?: string[];
+      allowedRoles?: (typeof UserRoleDB)[number][];
       updatedAt: Date;
     } = {
       updatedAt: new Date(),

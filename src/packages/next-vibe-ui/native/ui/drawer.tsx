@@ -2,12 +2,53 @@
  * Drawer Component for React Native
  * Bottom sheet drawer implementation using Modal
  */
-import type { ReactNode } from "react";
 import React, { createContext, useContext, useState } from "react";
 import { Modal, Pressable, Text as RNText, View } from "react-native";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
 import { cn } from "../lib/utils";
+
+// Cross-platform type definitions for native
+export interface DrawerRootProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+}
+
+export interface DrawerTriggerProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface DrawerCloseProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface DrawerContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DrawerHeaderProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DrawerFooterProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DrawerTitleProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DrawerDescriptionProps {
+  className?: string;
+  children?: React.ReactNode;
+}
 
 interface DrawerContextValue {
   open: boolean;
@@ -25,18 +66,11 @@ function useDrawer(): DrawerContextValue {
   return context;
 }
 
-interface DrawerProps {
-  children: ReactNode;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  shouldScaleBackground?: boolean;
-}
-
 export function Drawer({
   children,
   open: controlledOpen,
   onOpenChange,
-}: DrawerProps): React.JSX.Element {
+}: DrawerRootProps): React.JSX.Element {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const open = controlledOpen ?? uncontrolledOpen;
   const setOpen = onOpenChange ?? setUncontrolledOpen;
@@ -48,11 +82,6 @@ export function Drawer({
   );
 }
 
-interface DrawerTriggerProps {
-  children: ReactNode;
-  asChild?: boolean;
-}
-
 export function DrawerTrigger({
   children,
   asChild,
@@ -60,11 +89,15 @@ export function DrawerTrigger({
   const { setOpen } = useDrawer();
 
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
+    // Clone element with properly typed onPress handler
+    const childElement = children as React.ReactElement<{
+      onPress?: () => void;
+    }>;
+    return React.cloneElement(childElement, {
       onPress: () => {
         setOpen(true);
       },
-    } as never);
+    });
   }
 
   return (
@@ -81,15 +114,19 @@ export function DrawerTrigger({
 export function DrawerClose({
   children,
   asChild,
-}: DrawerTriggerProps): React.JSX.Element {
+}: DrawerCloseProps): React.JSX.Element {
   const { setOpen } = useDrawer();
 
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
+    // Clone element with properly typed onPress handler
+    const childElement = children as React.ReactElement<{
+      onPress?: () => void;
+    }>;
+    return React.cloneElement(childElement, {
       onPress: () => {
         setOpen(false);
       },
-    } as never);
+    });
   }
 
   return (
@@ -103,9 +140,18 @@ export function DrawerClose({
   );
 }
 
-interface DrawerContentProps {
-  children: ReactNode;
-  className?: string;
+// Portal is a no-op in native, but exported for compatibility
+export function DrawerPortal({
+  children,
+}: {
+  children?: React.ReactNode;
+}): React.JSX.Element {
+  return <>{children}</>;
+}
+
+// Overlay is rendered as part of DrawerContent in native
+export function DrawerOverlay(): null {
+  return null;
 }
 
 export function DrawerContent({
@@ -123,31 +169,38 @@ export function DrawerContent({
         setOpen(false);
       }}
     >
-      <Pressable
-        className="flex-1 bg-black/80"
-        onPress={() => {
-          setOpen(false);
-        }}
-      >
+      <View className="flex-1">
+        <Pressable
+          className="flex-1 bg-black/80"
+          onPress={() => {
+            setOpen(false);
+          }}
+        >
+          <View style={{ flex: 1 }} />
+        </Pressable>
         <Animated.View
           entering={SlideInDown}
           exiting={SlideOutDown}
-          className={cn(
-            "absolute bottom-0 left-0 right-0 mt-24 flex flex-col rounded-t-[10px] border bg-background",
-            className,
-          )}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+          }}
         >
-          <View className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
-          {children}
+          <View
+            className={cn(
+              "mt-24 flex flex-col rounded-t-[10px] border bg-background",
+              className,
+            )}
+          >
+            <View className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
+            {children}
+          </View>
         </Animated.View>
-      </Pressable>
+      </View>
     </Modal>
   );
-}
-
-interface DrawerHeaderProps {
-  children: ReactNode;
-  className?: string;
 }
 
 export function DrawerHeader({
@@ -155,20 +208,11 @@ export function DrawerHeader({
   children,
 }: DrawerHeaderProps): React.JSX.Element {
   return (
-    <View
-      className={cn("grid gap-1.5 p-4 text-center native:text-left", className)}
-    >
-      {children}
-    </View>
+    <View className={cn("flex gap-1.5 p-4", className)}>{children}</View>
   );
 }
 
 DrawerHeader.displayName = "DrawerHeader";
-
-interface DrawerFooterProps {
-  children: ReactNode;
-  className?: string;
-}
 
 export function DrawerFooter({
   className,
@@ -183,21 +227,18 @@ export function DrawerFooter({
 
 DrawerFooter.displayName = "DrawerFooter";
 
-interface DrawerTitleProps {
-  children: ReactNode;
-  className?: string;
-}
-
 export function DrawerTitle({
   className,
   children,
 }: DrawerTitleProps): React.JSX.Element {
   return (
     <RNText
-      className={cn(
-        "text-lg font-semibold leading-none tracking-tight",
-        className,
-      )}
+      style={{
+        fontSize: 18,
+        fontWeight: "600",
+        lineHeight: 18,
+      }}
+      className={className}
     >
       {children}
     </RNText>
@@ -206,17 +247,17 @@ export function DrawerTitle({
 
 DrawerTitle.displayName = "DrawerTitle";
 
-interface DrawerDescriptionProps {
-  children: ReactNode;
-  className?: string;
-}
-
 export function DrawerDescription({
   className,
   children,
 }: DrawerDescriptionProps): React.JSX.Element {
   return (
-    <RNText className={cn("text-sm text-muted-foreground", className)}>
+    <RNText
+      style={{
+        fontSize: 14,
+      }}
+      className={className}
+    >
       {children}
     </RNText>
   );

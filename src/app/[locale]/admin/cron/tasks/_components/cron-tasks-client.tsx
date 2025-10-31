@@ -8,7 +8,8 @@
 import { Plus, RefreshCw } from "lucide-react";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { Div, P } from "next-vibe-ui/ui";
+import { Div} from "next-vibe-ui/ui/div";
+import { P} from "next-vibe-ui/ui/typography";
 import type React from "react";
 import { useState } from "react";
 

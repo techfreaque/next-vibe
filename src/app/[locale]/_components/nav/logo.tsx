@@ -1,7 +1,8 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Image, Link } from "next-vibe-ui/ui";
+import { Image } from "next-vibe-ui/ui/image";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

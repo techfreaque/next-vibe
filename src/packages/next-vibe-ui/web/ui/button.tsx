@@ -25,7 +25,6 @@ const buttonVariants = cva(
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
-        unset: "",
       },
     },
     defaultVariants: {
@@ -35,6 +34,20 @@ const buttonVariants = cva(
   },
 );
 
+// Cross-platform types - exported for native
+export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
+export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
+
+// Platform-agnostic props that work on both web and native
+export interface ButtonProps {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  className?: string;
+  disabled?: boolean;
+  children?: React.ReactNode;
+}
+
+// Web-specific props with full HTML attributes
 export interface BaseButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
@@ -51,9 +64,9 @@ export interface RegularButtonProps extends BaseButtonProps {
   children?: React.ReactNode;
 }
 
-export type ButtonProps = AsChildButtonProps | RegularButtonProps;
+export type WebButtonProps = AsChildButtonProps | RegularButtonProps;
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = React.forwardRef<HTMLButtonElement, WebButtonProps>(
   (
     {
       className,

@@ -2,8 +2,12 @@
 
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
-import { Div, Span } from "next-vibe-ui/ui";
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Card } from "@/packages/next-vibe-ui/web/ui/card";
+import { CardContent } from "@/packages/next-vibe-ui/web/ui/card";
+import { CardHeader } from "@/packages/next-vibe-ui/web/ui/card";
+import { CardTitle } from "@/packages/next-vibe-ui/web/ui/card";
 import type { JSX } from "react";
 
 import type {

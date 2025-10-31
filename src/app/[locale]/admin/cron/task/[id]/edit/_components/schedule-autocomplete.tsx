@@ -21,8 +21,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "next-vibe-ui/ui/popover";
-import { Div, Span } from "next-vibe-ui/ui";
-import { P } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 

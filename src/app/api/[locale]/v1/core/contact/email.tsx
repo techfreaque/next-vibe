@@ -3,7 +3,7 @@
  * React Email templates for contact form submissions
  */
 
-import { Button, Hr, Link, Section, Text } from "@react-email/components";
+import { Button, Hr, Link, Section, Text as Span } from "@react-email/components";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -61,7 +61,7 @@ function ContactEmailContent({
       previewText={requestData.subject}
       tracking={tracking}
     >
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -70,7 +70,7 @@ function ContactEmailContent({
         }}
       >
         {t("app.api.v1.core.contact.email.partner.thankYou")}
-      </Text>
+      </Span>
 
       {/* Contact Details Section */}
       <Section
@@ -81,7 +81,7 @@ function ContactEmailContent({
           marginBottom: "24px",
         }}
       >
-        <Text
+        <Span
           style={{
             fontSize: "14px",
             fontWeight: "700",
@@ -90,70 +90,72 @@ function ContactEmailContent({
           }}
         >
           {t("app.api.v1.core.contact.email.company.contactDetails")}
-        </Text>
+        </Span>
 
-        <Text
+        <Span
           style={{
             fontSize: "14px",
             marginBottom: "4px",
             color: "#4b5563",
           }}
         >
-          <Text style={{ fontWeight: "700" }}>
+          <Span style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.contact.email.company.name")}:
-          </Text>{" "}
+          </Span>{" "}
           {requestData.name}
-        </Text>
+        </Span>
 
-        <Text
+        <Span
           style={{
             fontSize: "14px",
             marginBottom: "4px",
             color: "#4b5563",
           }}
         >
-          <Text style={{ fontWeight: "700" }}>
+          <Span style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.contact.email.company.email")}:
-          </Text>{" "}
+          </Span>{" "}
           <Link
             href={`mailto:${requestData.email}`}
             style={{ color: "#4f46e5" }}
           >
             {requestData.email}
           </Link>
-        </Text>
+        </Span>
 
-        {requestData.company && (
-          <Text
-            style={{
-              fontSize: "14px",
-              marginBottom: "4px",
-              color: "#4b5563",
-            }}
-          >
-            <Text style={{ fontWeight: "700" }}>
-              {t("app.api.v1.core.contact.email.company.company")}:
-            </Text>{" "}
-            {requestData.company}
-          </Text>
-        )}
+        {
+          requestData.company && (
+            <Span
+              style={{
+                fontSize: "14px",
+                marginBottom: "4px",
+                color: "#4b5563",
+              }}
+            >
+              <Span style={{ fontWeight: "700" }}>
+                {t("app.api.v1.core.contact.email.company.company")}:
+              </Span>{" "}
+              {requestData.company}
+            </Span>
+          )
+        }
 
-        <Text
+        <Span
           style={{
             fontSize: "14px",
             marginBottom: "4px",
             color: "#4b5563",
           }}
         >
-          <Text style={{ fontWeight: "700" }}>
+          <Span style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.contact.email.company.contactSubject")}:
-          </Text>{" "}
+          </Span>{" "}
           {requestData.subject}
-        </Text>
+        </Span>
 
         <Hr style={{ borderColor: "#e5e7eb", margin: "12px 0" }} />
 
-        <Text
+        <Span
           style={{
             fontSize: "14px",
             fontWeight: "700",
@@ -162,9 +164,9 @@ function ContactEmailContent({
           }}
         >
           {t("app.api.v1.core.contact.email.partner.message")}
-        </Text>
+        </Span>
 
-        <Text
+        <Span
           style={{
             fontSize: "14px",
             color: "#4b5563",
@@ -176,11 +178,11 @@ function ContactEmailContent({
           }}
         >
           {requestData.message}
-        </Text>
+        </Span>
       </Section>
 
       {/* Additional Info Section */}
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -189,26 +191,28 @@ function ContactEmailContent({
         }}
       >
         {t("app.api.v1.core.contact.email.partner.additionalInfo")}
-      </Text>
+      </Span>
 
       {/* Admin Button for Company Emails */}
-      {isForCompany && (
-        <Section style={{ textAlign: "center", marginTop: "24px" }}>
-          <Button
-            href={`${env.NEXT_PUBLIC_APP_URL}/admin/contacts`}
-            style={{
-              backgroundColor: "#4f46e5",
-              borderRadius: "6px",
-              color: "#ffffff",
-              fontSize: "14px",
-              padding: "10px 20px",
-              textDecoration: "none",
-            }}
-          >
-            {t("app.api.v1.core.contact.email.company.viewDetails")}
-          </Button>
-        </Section>
-      )}
+      {
+        isForCompany && (
+          <Section style={{ textAlign: "center", marginTop: "24px" }}>
+            <Button
+              href={`${env.NEXT_PUBLIC_APP_URL}/admin/contacts`}
+              style={{
+                backgroundColor: "#4f46e5",
+                borderRadius: "6px",
+                color: "#ffffff",
+                fontSize: "14px",
+                padding: "10px 20px",
+                textDecoration: "none",
+              }}
+            >
+              {t("app.api.v1.core.contact.email.company.viewDetails")}
+            </Button>
+          </Section>
+        )
+      }
     </EmailTemplate>
   );
 }

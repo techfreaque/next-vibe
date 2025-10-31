@@ -8,13 +8,28 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+// Cross-platform props interface
+export interface SwitchBaseProps {
+  checked?: boolean;
+  defaultChecked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  disabled?: boolean;
+  className?: string;
+  name?: string;
+  value?: string;
+  required?: boolean;
+}
+
 import { useColorScheme } from "../lib/useColorScheme";
 import { cn } from "../lib/utils";
 
+// Native switch props that align with web interface
+type NativeSwitchProps = SwitchBaseProps;
+
 const SwitchWeb = React.forwardRef<
   SwitchPrimitives.RootRef,
-  SwitchPrimitives.RootProps
->(({ className, checked, onCheckedChange, ...props }, ref) => {
+  NativeSwitchProps
+>(({ className, checked, onCheckedChange, disabled, ...props }, ref) => {
   const isChecked = checked ?? false;
   const handleCheckedChange = onCheckedChange ?? (() => {});
   return (
@@ -22,11 +37,12 @@ const SwitchWeb = React.forwardRef<
       className={cn(
         "peer flex-row h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed",
         isChecked ? "bg-primary" : "bg-input",
-        props.disabled && "opacity-50",
+        disabled && "opacity-50",
         className,
-      )}
+      ) as never}
       checked={isChecked}
       onCheckedChange={handleCheckedChange}
+      disabled={disabled}
       {...props}
       ref={ref}
     >
@@ -34,7 +50,7 @@ const SwitchWeb = React.forwardRef<
         className={cn(
           "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-md shadow-foreground/5 ring-0 transition-transform",
           isChecked ? "translate-x-5" : "translate-x-0",
-        )}
+        ) as never}
       />
     </SwitchPrimitives.Root>
   );
@@ -55,8 +71,8 @@ const RGB_COLORS = {
 
 const SwitchNative = React.forwardRef<
   SwitchPrimitives.RootRef,
-  SwitchPrimitives.RootProps
->(({ className, checked, onCheckedChange, ...props }, ref) => {
+  NativeSwitchProps
+>(({ className, checked, onCheckedChange, disabled, ...props }, ref) => {
   const { colorScheme } = useColorScheme();
   const isChecked = checked ?? false;
   const handleCheckedChange = onCheckedChange ?? (() => {});
@@ -80,24 +96,25 @@ const SwitchNative = React.forwardRef<
       style={animatedRootStyle}
       className={cn(
         "h-8 w-[46px] rounded-full",
-        props.disabled && "opacity-50",
-      )}
+        disabled && "opacity-50",
+      ) as never}
     >
       <SwitchPrimitives.Root
         className={cn(
           "flex-row h-8 w-[46px] shrink-0 items-center rounded-full border-2 border-transparent",
           isChecked ? "bg-primary" : "bg-input",
           className,
-        )}
+        ) as never}
         checked={isChecked}
         onCheckedChange={handleCheckedChange}
+        disabled={disabled}
         {...props}
         ref={ref}
       >
         <Animated.View style={animatedThumbStyle}>
           <SwitchPrimitives.Thumb
             className={
-              "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0"
+              "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0" as never
             }
           />
         </Animated.View>
@@ -113,3 +130,4 @@ const Switch = Platform.select({
 });
 
 export { Switch };
+export type { NativeSwitchProps as SwitchProps };

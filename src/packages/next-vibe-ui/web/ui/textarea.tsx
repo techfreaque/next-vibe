@@ -1,6 +1,19 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils";
+import type { TextareaHTMLAttributes } from "react";
 import React from "react";
+
+// Cross-platform props interface
+export interface TextareaBaseProps
+  extends Omit<
+    TextareaHTMLAttributes<HTMLTextAreaElement>,
+    "onChange" | "onChangeText"
+  > {
+  onChangeText?: (text: string) => void;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  minRows?: number;
+  maxRows?: number;
+}
 
 export const textareaVariants = cva(
   "flex w-full rounded-md text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 transition-[color,box-shadow] outline-none resize-none overflow-hidden",
@@ -20,15 +33,12 @@ export const textareaVariants = cva(
 );
 
 export interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-    VariantProps<typeof textareaVariants> {
-  minRows?: number;
-  maxRows?: number;
-}
+  extends TextareaBaseProps,
+    VariantProps<typeof textareaVariants> {}
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
-    { className, variant, minRows = 2, maxRows = 10, onChange, ...props },
+    { className, variant, minRows = 2, maxRows = 10, onChange, onChangeText, ...props },
     ref,
   ) => {
     const internalRef = React.useRef<HTMLTextAreaElement>(null);
@@ -73,6 +83,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
       adjustHeight();
       onChange?.(e);
+      onChangeText?.(e.target.value);
     };
 
     const content = (

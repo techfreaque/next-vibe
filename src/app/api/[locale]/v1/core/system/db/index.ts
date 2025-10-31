@@ -1,3 +1,5 @@
+import "server-only";
+
 import { drizzle } from "drizzle-orm/node-postgres";
 import { parseError } from "next-vibe/shared/utils";
 import { Pool } from "pg";

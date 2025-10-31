@@ -6,6 +6,29 @@ import { OTPInput, OTPInputContext } from "input-otp";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
+export interface InputOTPProps {
+  className?: string;
+  containerClassName?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  maxLength?: number;
+  children: React.ReactNode;
+}
+
+export interface InputOTPGroupProps {
+  className?: string;
+  children: React.ReactNode;
+}
+
+export interface InputOTPSlotProps {
+  index: number;
+  className?: string;
+}
+
+export interface InputOTPSeparatorProps {
+  className?: string;
+}
+
 const InputOTP = React.forwardRef<
   React.ElementRef<typeof OTPInput>,
   React.ComponentPropsWithoutRef<typeof OTPInput>

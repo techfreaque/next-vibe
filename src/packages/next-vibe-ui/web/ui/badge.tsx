@@ -14,8 +14,6 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80 shadow-sm",
         outline: "text-foreground",
-        notification:
-          "border-transparent bg-red-500 bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg hover:bg-red-600 hover:from-red-600 hover:to-red-700 animate-pulse",
       },
     },
     defaultVariants: {
@@ -23,9 +21,19 @@ const badgeVariants = cva(
     },
   },
 );
-export type BadeVariant = VariantProps<typeof badgeVariants>["variant"];
 
-export interface BadgeProps
+// Cross-platform types - exported for native
+export type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
+
+// Platform-agnostic props that work on both web and native
+export interface BadgeProps {
+  variant?: BadgeVariant;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+// Web-specific props with full HTML attributes
+export interface WebBadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}
 
@@ -33,7 +41,7 @@ function Badge({
   className,
   variant,
   ...props
-}: BadgeProps): React.JSX.Element {
+}: WebBadgeProps): React.JSX.Element {
   return (
     <div className={cn(badgeVariants({ variant }), className)} {...props} />
   );

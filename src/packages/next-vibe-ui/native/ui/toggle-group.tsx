@@ -1,43 +1,62 @@
 import * as ToggleGroupPrimitive from "@rn-primitives/toggle-group";
-import type { VariantProps } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react-native";
 import * as React from "react";
 
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
-import { toggleTextVariants, toggleVariants } from "./toggle";
+import {
+  toggleTextVariants,
+  toggleVariants,
+  type ToggleSize,
+  type ToggleVariant,
+} from "./toggle";
 
-const ToggleGroupContext = React.createContext<VariantProps<
-  typeof toggleVariants
-> | null>(null);
+// Cross-platform type exports
+export interface ToggleGroupProps {
+  variant?: ToggleVariant;
+  size?: ToggleSize;
+  className?: string;
+  children?: React.ReactNode;
+}
 
-type ToggleGroupProps = ToggleGroupPrimitive.RootProps &
-  VariantProps<typeof toggleVariants> & {
-    className?: string;
-  };
+export interface ToggleGroupItemProps {
+  variant?: ToggleVariant;
+  size?: ToggleSize;
+  className?: string;
+  children?: React.ReactNode;
+  value: string;
+  disabled?: boolean;
+}
+
+const ToggleGroupContext = React.createContext<{
+  size?: ToggleSize;
+  variant?: ToggleVariant;
+} | null>(null);
 
 const ToggleGroup = React.forwardRef<
   ToggleGroupPrimitive.RootRef,
-  ToggleGroupProps
+  ToggleGroupPrimitive.RootProps & ToggleGroupProps
 >((allProps, ref) => {
   const { className, variant, size, children, ...props } = allProps;
   return (
-    <ToggleGroupContext.Provider value={{ variant, size }}>
-      {/* @ts-expect-error - TypeScript can't verify discriminated union props are passed correctly via spread */}
-      <ToggleGroupPrimitive.Root
-        ref={ref}
-        {...props}
-        className={cn("flex flex-row items-center justify-center gap-1", className)}
-      >
+    <ToggleGroupPrimitive.Root
+      ref={ref}
+      {...props}
+      className={cn("flex flex-row items-center justify-center gap-1", className)}
+    >
+      <ToggleGroupContext.Provider value={{ variant, size }}>
         {children}
-      </ToggleGroupPrimitive.Root>
-    </ToggleGroupContext.Provider>
+      </ToggleGroupContext.Provider>
+    </ToggleGroupPrimitive.Root>
   );
 });
 
 ToggleGroup.displayName = ToggleGroupPrimitive.Root.displayName;
 
-function useToggleGroupContext(): VariantProps<typeof toggleVariants> {
+function useToggleGroupContext(): {
+  size?: ToggleSize;
+  variant?: ToggleVariant;
+} {
   const context = React.useContext(ToggleGroupContext);
   if (context === null) {
     // eslint-disable-next-line no-restricted-syntax -- Error handling for context
@@ -50,7 +69,7 @@ function useToggleGroupContext(): VariantProps<typeof toggleVariants> {
 
 const ToggleGroupItem = React.forwardRef<
   ToggleGroupPrimitive.ItemRef,
-  ToggleGroupPrimitive.ItemProps & VariantProps<typeof toggleVariants>
+  ToggleGroupPrimitive.ItemProps & ToggleGroupItemProps
 >(({ className, children, variant, size, ...props }, ref) => {
   const context = useToggleGroupContext();
   const { value } = ToggleGroupPrimitive.useRootContext();
@@ -87,14 +106,14 @@ const ToggleGroupItem = React.forwardRef<
 ToggleGroupItem.displayName = ToggleGroupPrimitive.Item.displayName;
 
 function ToggleGroupIcon({
-  className,
   icon: Icon,
   ...props
-}: React.ComponentPropsWithoutRef<LucideIcon> & {
+}: Omit<React.ComponentPropsWithoutRef<LucideIcon>, "className"> & {
   icon: LucideIcon;
+  className?: string;
 }): React.JSX.Element {
   const textClass = React.useContext(TextClassContext);
-  return <Icon {...props} className={cn(textClass, className)} />;
+  return <Icon {...props} color={textClass} />;
 }
 
 export { ToggleGroup, ToggleGroupIcon, ToggleGroupItem };

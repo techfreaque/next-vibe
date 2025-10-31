@@ -13,21 +13,12 @@ import {
   Zap,
 } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Div,
-  Span,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "next-vibe-ui/ui";
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { Container } from "next-vibe-ui/ui/container";
 import { H1, H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";

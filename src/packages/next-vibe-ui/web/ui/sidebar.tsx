@@ -29,7 +29,8 @@ const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
-interface SidebarContextType {
+// Cross-platform type exports
+export interface SidebarContextType {
   state: "expanded" | "collapsed";
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -37,6 +38,50 @@ interface SidebarContextType {
   setOpenMobile: (open: boolean) => void;
   isMobile: boolean;
   toggleSidebar: () => void;
+}
+
+export interface SidebarProviderProps {
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+export interface SidebarProps {
+  children: React.ReactNode;
+  side?: "left" | "right";
+  variant?: "sidebar" | "floating" | "inset";
+  collapsible?: "offcanvas" | "icon" | "none";
+  className?: string;
+}
+
+export interface SidebarHeaderProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export interface SidebarContentProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export interface SidebarFooterProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export interface SidebarMenuItemProps {
+  children: React.ReactNode;
+  className?: string;
+  onPress?: () => void;
+}
+
+export interface SidebarTriggerProps {
+  children?: React.ReactNode;
+  className?: string;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const SidebarContext = React.createContext<SidebarContextType | null>(null);

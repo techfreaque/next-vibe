@@ -37,7 +37,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { H3, H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";

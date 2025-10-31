@@ -1,7 +1,13 @@
 import type { JSX } from "react";
-import type { TextProps } from "react-native";
-import { Text } from "react-native";
+import type { PreProps } from "next-vibe-ui/ui/pre";
+import type { TextStyle } from "react-native";
 
-export function Pre(props: TextProps): JSX.Element {
-  return <Text {...props} style={[{ fontFamily: "monospace" }, props.style]} />;
+import { Span } from "./span";
+
+export function Pre(props: PreProps): JSX.Element {
+  const monoStyle: TextStyle = {
+    fontFamily: "monospace",
+  };
+
+  return <Span {...props} style={monoStyle} />;
 }

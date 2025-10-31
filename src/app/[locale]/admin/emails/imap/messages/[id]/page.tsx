@@ -4,7 +4,8 @@
  */
 
 import { notFound } from "next/navigation";
-import { Div, H1 } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { H1 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { imapMessagesRepository } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/repository";

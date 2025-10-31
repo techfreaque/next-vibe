@@ -3,6 +3,7 @@ import * as React from "react";
 import { Platform, StyleSheet } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
+import type { WithClassName } from "../lib/types";
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
 
@@ -12,8 +13,8 @@ const HoverCardTrigger = HoverCardPrimitive.Trigger;
 
 const HoverCardContent = React.forwardRef<
   HoverCardPrimitive.ContentRef,
-  HoverCardPrimitive.ContentProps
->(({ className, align = "center", sideOffset = 4, ...props }, ref) => {
+  WithClassName<HoverCardPrimitive.ContentProps>
+>(({ align = "center", sideOffset = 4, className, ...props }, ref) => {
   const { open } = HoverCardPrimitive.useRootContext();
   return (
     <HoverCardPrimitive.Portal>
@@ -21,7 +22,11 @@ const HoverCardContent = React.forwardRef<
         style={Platform.OS !== "web" ? StyleSheet.absoluteFill : undefined}
       >
         <Animated.View entering={FadeIn}>
-          <TextClassContext.Provider value="text-popover-foreground">
+          <TextClassContext.Provider
+            value={
+              "text-popover-foreground" // eslint-disable-line i18next/no-literal-string -- CSS class
+            }
+          >
             <HoverCardPrimitive.Content
               ref={ref}
               align={align}

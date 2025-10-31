@@ -2,27 +2,27 @@
 
 import { motion } from "framer-motion";
 import { Calendar, CreditCard, Loader2 } from "lucide-react";
+import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent, CardHeader } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Div,
-  Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-  Link,
-  Span,
+} from "next-vibe-ui/ui/form/form";
+import { Link } from "next-vibe-ui/ui/link";
+import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "next-vibe-ui/ui";
-import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+} from "next-vibe-ui/ui/tabs";
 import { H3 } from "next-vibe-ui/ui/typography";
+import { Span } from "next-vibe-ui/ui/span";
 import type React from "react";
 
 import signupDefinitions from "@/app/api/[locale]/v1/core/user/public/signup/definition";

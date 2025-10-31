@@ -3,11 +3,22 @@
 
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { cn } from "next-vibe/shared/utils/utils";
-import type { ComponentProps, JSX } from "react";
+import type { ComponentProps, JSX, ReactNode } from "react";
 import { DayPicker } from "react-day-picker";
 
 import { buttonVariants } from "./button";
 
+// Cross-platform base props interface for native
+export interface CalendarBaseProps {
+  children?: ReactNode;
+  className?: string;
+  selected?: Date;
+  onSelect?: (date: Date | undefined) => void;
+  mode?: "single" | "multiple" | "range";
+  disabled?: boolean;
+}
+
+// Web uses full DayPicker props
 export type CalendarProps = ComponentProps<typeof DayPicker>;
 
 function Calendar({

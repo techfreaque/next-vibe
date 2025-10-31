@@ -4,8 +4,26 @@ import { cn } from "next-vibe/shared/utils/utils";
 import type { ComponentPropsWithoutRef, ForwardedRef } from "react";
 import { forwardRef } from "react";
 
+// Cross-platform prop types
+export interface TypographyProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface H1Props extends ComponentPropsWithoutRef<"h1">, TypographyProps {}
+export interface H2Props extends ComponentPropsWithoutRef<"h2">, TypographyProps {}
+export interface H3Props extends ComponentPropsWithoutRef<"h3">, TypographyProps {}
+export interface H4Props extends ComponentPropsWithoutRef<"h4">, TypographyProps {}
+export interface PProps extends ComponentPropsWithoutRef<"p">, TypographyProps {}
+export interface BlockQuoteProps extends ComponentPropsWithoutRef<"blockquote">, TypographyProps {}
+export interface CodeProps extends ComponentPropsWithoutRef<"code">, TypographyProps {}
+export interface LeadProps extends ComponentPropsWithoutRef<"p">, TypographyProps {}
+export interface LargeProps extends ComponentPropsWithoutRef<"div">, TypographyProps {}
+export interface SmallProps extends ComponentPropsWithoutRef<"small">, TypographyProps {}
+export interface MutedProps extends ComponentPropsWithoutRef<"p">, TypographyProps {}
+
 export const H1 = forwardRef(function H1(
-  { className, children, ...props }: ComponentPropsWithoutRef<"h1">,
+  { className, children, ...props }: H1Props,
   ref: ForwardedRef<HTMLHeadingElement>,
 ) {
   return (
@@ -23,7 +41,7 @@ export const H1 = forwardRef(function H1(
 });
 
 export const H2 = forwardRef(function H2(
-  { className, children, ...props }: ComponentPropsWithoutRef<"h2">,
+  { className, children, ...props }: H2Props,
   ref: ForwardedRef<HTMLHeadingElement>,
 ) {
   return (
@@ -41,7 +59,7 @@ export const H2 = forwardRef(function H2(
 });
 
 export const H3 = forwardRef(function H3(
-  { className, children, ...props }: ComponentPropsWithoutRef<"h3">,
+  { className, children, ...props }: H3Props,
   ref: ForwardedRef<HTMLHeadingElement>,
 ) {
   return (
@@ -59,7 +77,7 @@ export const H3 = forwardRef(function H3(
 });
 
 export const H4 = forwardRef(function H4(
-  { className, children, ...props }: ComponentPropsWithoutRef<"h4">,
+  { className, children, ...props }: H4Props,
   ref: ForwardedRef<HTMLHeadingElement>,
 ) {
   return (
@@ -77,7 +95,7 @@ export const H4 = forwardRef(function H4(
 });
 
 export const P = forwardRef(function P(
-  { className, ...props }: ComponentPropsWithoutRef<"p">,
+  { className, ...props }: PProps,
   ref: ForwardedRef<HTMLParagraphElement>,
 ) {
   return (
@@ -90,7 +108,7 @@ export const P = forwardRef(function P(
 });
 
 export const BlockQuote = forwardRef(function BlockQuote(
-  { className, ...props }: ComponentPropsWithoutRef<"blockquote">,
+  { className, ...props }: BlockQuoteProps,
   ref: ForwardedRef<HTMLQuoteElement>,
 ) {
   return (
@@ -103,7 +121,7 @@ export const BlockQuote = forwardRef(function BlockQuote(
 });
 
 export const Code = forwardRef(function Code(
-  { className, ...props }: ComponentPropsWithoutRef<"code">,
+  { className, ...props }: CodeProps,
   ref: ForwardedRef<HTMLElement>,
 ) {
   return (
@@ -119,7 +137,7 @@ export const Code = forwardRef(function Code(
 });
 
 export const Lead = forwardRef(function Lead(
-  { className, ...props }: ComponentPropsWithoutRef<"p">,
+  { className, ...props }: LeadProps,
   ref: ForwardedRef<HTMLParagraphElement>,
 ) {
   return (
@@ -132,7 +150,7 @@ export const Lead = forwardRef(function Lead(
 });
 
 export const Large = forwardRef(function Large(
-  { className, ...props }: ComponentPropsWithoutRef<"div">,
+  { className, ...props }: LargeProps,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
   return (
@@ -145,7 +163,7 @@ export const Large = forwardRef(function Large(
 });
 
 export const Small = forwardRef(function Small(
-  { className, ...props }: ComponentPropsWithoutRef<"small">,
+  { className, ...props }: SmallProps,
   ref: ForwardedRef<HTMLElement>,
 ) {
   return (
@@ -158,7 +176,7 @@ export const Small = forwardRef(function Small(
 });
 
 export const Muted = forwardRef(function Muted(
-  { className, ...props }: ComponentPropsWithoutRef<"p">,
+  { className, ...props }: MutedProps,
   ref: ForwardedRef<HTMLParagraphElement>,
 ) {
   return (
@@ -170,9 +188,3 @@ export const Muted = forwardRef(function Muted(
   );
 });
 
-export const Text = forwardRef(function Text(
-  { className, ...props }: ComponentPropsWithoutRef<"span">,
-  ref: ForwardedRef<HTMLSpanElement>,
-) {
-  return <span ref={ref} className={cn(className)} {...props} />;
-});

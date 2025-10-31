@@ -11,14 +11,14 @@ import {
   Img,
   Preview,
   Section,
-  Text,
 } from "@react-email/components";
+import { Span } from "next-vibe-ui/ui/span";
 import type * as icons from "lucide-react";
 import {
   createDataUrl,
   createTransparentPixelDataUrl,
 } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
 import type React from "react";
 import type { JSX, ReactNode } from "react";
 
@@ -108,7 +108,7 @@ export function EmailHeader({
             alignItems: "flex-start",
           }}
         >
-          <Text
+          <Span
             style={{
               fontSize: "24px",
               fontWeight: "700",
@@ -123,8 +123,8 @@ export function EmailHeader({
             }}
           >
             {t("app.api.v1.core.leads.campaigns.emails.common.logoPart1")}
-          </Text>
-          <Text
+          </Span>
+          <Span
             style={{
               fontSize: "24px",
               fontWeight: "700",
@@ -139,9 +139,9 @@ export function EmailHeader({
             }}
           >
             {t("app.api.v1.core.leads.campaigns.emails.common.logoPart2")}
-          </Text>
+          </Span>
         </Div>
-        <Text
+        <Span
           style={{
             fontSize: "14px",
             color: "#64748b",
@@ -150,7 +150,7 @@ export function EmailHeader({
           }}
         >
           {t("app.api.v1.core.leads.campaigns.emails.email.template.tagline")}
-        </Text>
+        </Span>
       </Div>
     </Section>
   );
@@ -216,7 +216,7 @@ export function EmailFooter({
         border: "1px solid #e5e7eb",
       }}
     >
-      <Text
+      <Span
         style={{
           fontSize: "14px",
           color: "#6b7280",
@@ -230,9 +230,9 @@ export function EmailFooter({
             companyName,
           },
         )}
-      </Text>
+      </Span>
 
-      <Text
+      <Span
         style={{
           fontSize: "12px",
           color: "#9ca3af",
@@ -252,9 +252,9 @@ export function EmailFooter({
         >
           {companyEmail}
         </TrackedLink>
-      </Text>
+      </Span>
 
-      <Text
+      <Span
         style={{
           fontSize: "12px",
           color: "#9ca3af",
@@ -276,7 +276,7 @@ export function EmailFooter({
             "app.api.v1.core.leads.campaigns.emails.emailJourneys.components.footer.unsubscribeLink",
           )}
         </TrackedLink>
-      </Text>
+      </Span>
     </Section>
   );
 }
@@ -357,7 +357,7 @@ export function SocialProofBox({
         borderLeft: "4px solid #3b82f6",
       }}
     >
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           fontStyle: "italic",
@@ -373,8 +373,8 @@ export function SocialProofBox({
         {t(
           "app.api.v1.core.leads.campaigns.emails.emailJourneys.components.socialProof.quoteSuffix",
         )}
-      </Text>
-      <Text
+      </Span>
+      <Span
         style={{
           fontSize: "14px",
           fontWeight: "600",
@@ -389,7 +389,7 @@ export function SocialProofBox({
             company,
           },
         )}
-      </Text>
+      </Span>
     </Section>
   );
 }
@@ -431,7 +431,7 @@ export function StatsGrid({ stats }: StatsGridProps): React.JSX.Element {
               border: "1px solid #e5e7eb",
             }}
           >
-            <Text
+            <Span
               style={{
                 fontSize: "24px",
                 fontWeight: "800",
@@ -440,8 +440,8 @@ export function StatsGrid({ stats }: StatsGridProps): React.JSX.Element {
               }}
             >
               {stat.value}
-            </Text>
-            <Text
+            </Span>
+            <Span
               style={{
                 fontSize: "12px",
                 color: "#6b7280",
@@ -450,7 +450,7 @@ export function StatsGrid({ stats }: StatsGridProps): React.JSX.Element {
               }}
             >
               {stat.label}
-            </Text>
+            </Span>
           </Div>
         ))}
       </Div>

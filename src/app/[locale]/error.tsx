@@ -3,7 +3,9 @@
 
 import { useParams } from "next/navigation";
 import { Environment } from "next-vibe/shared/utils";
-import { Div, H2, P, Span } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { H2, P, } from "next-vibe-ui/ui/typography";
+import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
 import { Link } from "next-vibe-ui/ui/link";
 import type { ReactElement } from "react";

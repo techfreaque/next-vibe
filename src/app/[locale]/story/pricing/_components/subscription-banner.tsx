@@ -5,7 +5,8 @@ import { AlertCircle, AlertTriangle, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useState } from "react";
 

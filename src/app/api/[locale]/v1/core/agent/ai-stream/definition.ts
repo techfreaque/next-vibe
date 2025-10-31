@@ -134,13 +134,13 @@ const { POST } = createEndpoint({
       subFolderId: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
+          fieldType: FieldDataType.TEXT,
           label: "app.api.v1.core.agent.chat.aiStream.post.subFolderId.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.subFolderId.description",
           layout: { columns: 3 },
         },
-        z.uuid().nullable().optional(),
+        z.string().nullable().optional(),
       ),
       threadId: requestDataField(
         {
@@ -285,6 +285,26 @@ const { POST } = createEndpoint({
           .optional()
           .describe(
             "Array of endpoint IDs to enable. null = no tools, undefined/[] = all available tools for user (filtered by permissions), ['get_v1_core_agent_chat_folders', 'post_v1_core_user_create'] = specific endpoints",
+          ),
+      ),
+
+      // === MESSAGE HISTORY (for incognito mode) ===
+      messageHistory: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label:
+            "app.api.v1.core.agent.chat.aiStream.post.messageHistory.label",
+          description:
+            "app.api.v1.core.agent.chat.aiStream.post.messageHistory.description",
+          layout: { columns: 12 },
+        },
+        z
+          .array(chatMessageSchema)
+          .nullable()
+          .optional()
+          .describe(
+            "Optional message history for incognito mode. For non-incognito mode, history is fetched from database. For incognito mode (answer-as-ai operation), client must provide the conversation history.",
           ),
       ),
 

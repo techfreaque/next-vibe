@@ -3,7 +3,6 @@
  * Results Journey - Initial Contact Email Template
  */
 
-import { Text } from "@react-email/components";
 import React from "react";
 
 import { getPricingPlansArray } from "@/app/[locale]/story/pricing/_components/pricing";
@@ -12,6 +11,7 @@ import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import { getLocaleString } from "@/i18n/core/localization-utils";
+import { Span } from "next-vibe-ui/ui/span";
 
 import {
   CTAButton,
@@ -75,7 +75,7 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
       <EmailHeader backgroundColor="#2c82c9" t={t} />
       <EmailContent>
         {/* Hero Section */}
-        <Text
+        <Span
           style={{
             fontSize: "48px",
             fontWeight: "700",
@@ -88,9 +88,9 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.heroTitle",
           )}
-        </Text>
+        </Span>
 
-        <Text
+        <Span
           style={{
             fontSize: "30px",
             color: "#54acd2",
@@ -102,9 +102,9 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.heroSubtitle",
           )}
-        </Text>
+        </Span>
 
-        <Text
+        <Span
           style={{
             fontSize: "36px",
             fontWeight: "700",
@@ -123,7 +123,7 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
               ),
             },
           )}
-        </Text>
+        </Span>
 
         {/* Process/Content Image */}
         <div
@@ -149,7 +149,7 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
         {await EmailPricingSection({ t, locale })}
 
         {/* No Contract Section */}
-        <Text
+        <Span
           style={{
             fontSize: "36px",
             fontWeight: "700",
@@ -161,9 +161,9 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.noContractTitle",
           )}
-        </Text>
+        </Span>
 
-        <Text
+        <Span
           style={{
             fontSize: "36px",
             color: "#374151",
@@ -174,7 +174,7 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.monthlyCancellation",
           )}
-        </Text>
+        </Span>
 
         <CTAButton
           href={trackingUrl}
@@ -187,7 +187,7 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
         />
 
         {/* Contact Information */}
-        <Text
+        <Span
           style={{
             fontSize: "16px",
             color: "#374151",
@@ -200,9 +200,9 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.contactTitle",
             )}
           </strong>
-        </Text>
+        </Span>
 
-        <Text
+        <Span
           style={{
             fontSize: "16px",
             color: "#2563eb",
@@ -211,7 +211,7 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
           }}
         >
           {contactClientRepository.getSupportEmail(locale)}
-        </Text>
+        </Span>
       </EmailContent>
       <EmailFooter
         companyName={companyName}

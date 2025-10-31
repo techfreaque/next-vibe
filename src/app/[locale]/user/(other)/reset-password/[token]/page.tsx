@@ -1,7 +1,8 @@
 import { AlertCircle } from "lucide-react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Alert, AlertDescription, AlertTitle, Div } from "next-vibe-ui/ui";
+import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { Suspense } from "react";
 

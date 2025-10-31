@@ -1,7 +1,8 @@
 "use client";
 
 import { Printer } from "lucide-react";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import type { ReactElement } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

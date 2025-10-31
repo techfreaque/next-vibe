@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "next-vibe-ui/ui/button";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { Input } from "next-vibe-ui/ui/input";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useEffect, useRef } from "react";

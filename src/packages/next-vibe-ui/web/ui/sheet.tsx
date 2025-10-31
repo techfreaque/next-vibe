@@ -8,6 +8,56 @@ import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
 
+// Cross-platform type exports
+export interface SheetRootProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+  defaultOpen?: boolean;
+  modal?: boolean;
+}
+
+export interface SheetTriggerProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface SheetCloseProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
+
+export interface SheetPortalProps {
+  children?: React.ReactNode;
+  forceMount?: boolean;
+  container?: HTMLElement | null;
+}
+
+export interface SheetOverlayProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface SheetHeaderProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface SheetFooterProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface SheetTitleProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface SheetDescriptionProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
 const Sheet = SheetPrimitive.Root;
 
 const SheetTrigger = SheetPrimitive.Trigger;
@@ -50,7 +100,7 @@ const sheetVariants = cva(
   },
 );
 
-interface SheetContentProps
+export interface SheetContentProps
   extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
     VariantProps<typeof sheetVariants> {}
 
@@ -83,29 +133,31 @@ SheetContent.displayName = SheetPrimitive.Content.displayName;
 
 const SheetHeader = ({
   className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
+  children,
+}: SheetHeaderProps): React.JSX.Element => (
   <div
     className={cn(
       "flex flex-col space-y-2 text-center sm:text-left",
       className,
     )}
-    {...props}
-  />
+  >
+    {children}
+  </div>
 );
 SheetHeader.displayName = "SheetHeader";
 
 const SheetFooter = ({
   className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
+  children,
+}: SheetFooterProps): React.JSX.Element => (
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
       className,
     )}
-    {...props}
-  />
+  >
+    {children}
+  </div>
 );
 SheetFooter.displayName = "SheetFooter";
 

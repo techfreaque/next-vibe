@@ -33,10 +33,31 @@ const CATEGORY_TRANSLATION_KEYS: Record<FormFieldCategory, TranslationKey> = {
   [FormFieldCategory.OTHER]: "packages.nextVibeUi.web.common.other",
 };
 
+// Cross-platform base interface (no TranslationKey dependency)
+export interface AutocompleteOptionBase {
+  value: string;
+  label: string;
+  category?: string;
+}
+
 export interface AutocompleteOption {
   value: string;
   label: TranslationKey;
   category?: string;
+}
+
+// Cross-platform props interface
+export interface AutocompleteFieldPropsBase {
+  value?: string;
+  onChange: (value: string) => void;
+  onBlur?: () => void;
+  options: AutocompleteOptionBase[];
+  placeholder?: string;
+  searchPlaceholder?: string;
+  allowCustom?: boolean;
+  disabled?: boolean;
+  className?: string;
+  name?: string;
 }
 
 export interface AutocompleteFieldProps {

@@ -4,19 +4,17 @@ import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
-import { ThemeProvider } from "next-vibe-ui/ui/theme-provider";
-import { Toaster } from "next-vibe-ui/ui/toaster";
+import { Html } from "next-vibe-ui/ui/html";
+import { Head } from "next-vibe-ui/ui/head";
+import { Body } from "next-vibe-ui/ui/body";
 import type { JSX, ReactNode } from "react";
 
 import { env } from "@/config/env";
-import { TranslationProvider } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
-import { ErrorBoundary } from "./_components/error-boundary";
-import ErrorFallback from "./_components/error-fallback";
-import { LeadTrackingProvider } from "./_components/lead-tracking-provider";
+import { RootProviders } from "./layout-shared";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -93,22 +91,16 @@ export default async function RootLayoutServer({
   };
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <head>
+    <Html lang={locale} suppressHydrationWarning>
+      <Head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/images/apple-icon.png" />
         <link rel="manifest" href={`/api/${locale}/v1/core/manifest`} />
-      </head>
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TranslationProvider currentLocale={locale}>
-            <LeadTrackingProvider />
-            <ErrorBoundary fallback={<ErrorFallback />} locale={locale}>
-              {children}
-            </ErrorBoundary>
-            <Toaster />
-          </TranslationProvider>
-        </ThemeProvider>
+      </Head>
+      <Body className={inter.className}>
+        <RootProviders locale={locale}>
+          {children}
+        </RootProviders>
         <Script
           id="structured-data"
           type="application/ld+json"
@@ -117,7 +109,7 @@ export default async function RootLayoutServer({
           }}
         />
         {env.ENABLE_ANALYTICS ? <Analytics /> : null}
-      </body>
-    </html>
+      </Body>
+    </Html>
   );
 }

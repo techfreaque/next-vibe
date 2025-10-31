@@ -1,4 +1,4 @@
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX, ReactNode } from "react";
 
 export default function SignupLayout({

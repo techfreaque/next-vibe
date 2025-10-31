@@ -32,7 +32,7 @@ const { GET } = createEndpoint({
     "app.api.v1.core.agent.chat.tags.credits",
     "app.api.v1.core.agent.chat.tags.balance",
   ],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   fields: objectField(
     {

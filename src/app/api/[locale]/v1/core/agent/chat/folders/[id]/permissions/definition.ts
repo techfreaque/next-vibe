@@ -14,7 +14,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { UserRole, UserRoleDB } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
  * Get Folder Permissions Endpoint (GET)
@@ -229,7 +229,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.allowedRoles.description" as const,
           layout: { columns: 12 },
         },
-        z.array(z.string()).optional(),
+        z.array(z.enum(UserRoleDB)).optional(),
       ),
       moderatorIds: requestDataField(
         {

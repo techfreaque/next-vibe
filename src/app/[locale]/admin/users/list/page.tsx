@@ -4,7 +4,8 @@
  */
 
 import type { JSX } from "react";
-import { Div, P } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

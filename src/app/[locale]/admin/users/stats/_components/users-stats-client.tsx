@@ -16,13 +16,14 @@ import {
   UserCheck,
   Users,
 } from "lucide-react";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Progress } from "next-vibe-ui/ui/progress";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
-import { P } from "next-vibe-ui/ui";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

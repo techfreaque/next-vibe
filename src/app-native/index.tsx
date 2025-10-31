@@ -8,5 +8,5 @@ import { defaultLocale } from "@/i18n/core/config";
  */
 export default function RootIndex(): React.ReactElement {
   // TODO: Make this dynamic based on user locale
-  return <Redirect href={`/${defaultLocale}/test`} />;
+  return <Redirect href={`/${defaultLocale}/help`} />;
 }

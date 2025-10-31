@@ -10,7 +10,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import type { FC } from "react";

@@ -4,17 +4,17 @@ import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle, Loader2, Mail } from "lucide-react";
 import Link from "next/link";
 import { Environment } from "next-vibe/shared/utils/env-util";
+import { Button } from "next-vibe-ui/ui/button";
 import {
-  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  Div,
-  Form,
-} from "next-vibe-ui/ui";
+} from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";

@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import { GitBranch, RotateCcw, Trash2 } from "next-vibe-ui/ui/icons";
 import type React from "react";
 

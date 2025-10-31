@@ -1,28 +1,22 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import {
-  Badge,
-  Button,
-  Checkbox,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  Div,
-  Input,
-  P,
-  ScrollArea,
-  Span,
-} from "next-vibe-ui/ui";
+import { Badge } from "@/packages/next-vibe-ui/web/ui/badge";
+import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Checkbox } from "@/packages/next-vibe-ui/web/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/packages/next-vibe-ui/web/ui/dialog";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { Input } from "@/packages/next-vibe-ui/web/ui/input";
+import { P } from "@/packages/next-vibe-ui/web/ui/typography";
+import { ScrollArea } from "@/packages/next-vibe-ui/web/ui/scroll-area";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
 import {
   Check,
   ChevronDown,
   ChevronRight,
   Search,
   X,
-} from "next-vibe-ui/ui/icons";
+} from "lucide-react";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 

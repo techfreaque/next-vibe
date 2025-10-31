@@ -1,6 +1,7 @@
-import { Div, H1, P } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
+import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

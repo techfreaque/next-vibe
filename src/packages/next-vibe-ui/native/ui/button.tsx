@@ -1,9 +1,9 @@
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import * as React from "react";
 import { Pressable } from "react-native";
 
+import type { ButtonSize, ButtonVariant } from "next-vibe-ui/ui/button";
 import { cn } from "../lib/utils";
-import type { WithClassName } from "../lib/types";
 import { TextClassContext } from "./text";
 
 const buttonVariants = cva(
@@ -61,8 +61,13 @@ const buttonTextVariants = cva(
   },
 );
 
-type ButtonProps = WithClassName<React.ComponentPropsWithoutRef<typeof Pressable>> &
-  VariantProps<typeof buttonVariants>;
+// Native uses only the variant and size from web ButtonProps
+// asChild and HTML button props are web-only
+type ButtonProps = {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  className?: string;
+} & React.ComponentPropsWithoutRef<typeof Pressable>;
 
 const Button = React.forwardRef<
   React.ElementRef<typeof Pressable>,
@@ -80,7 +85,7 @@ const Button = React.forwardRef<
         ref={ref}
         // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="button"
-        {...props}
+        {...(props as any)}
         className={cn(
           props.disabled && "opacity-50 web:pointer-events-none",
           buttonVariants({ variant, size, className }),

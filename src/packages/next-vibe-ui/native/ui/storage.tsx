@@ -3,15 +3,23 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Simple logger for storage errors
 const logStorageError = (operation: string, error: unknown): void => {
-  if (__DEV__) {
+  // @ts-expect-error - __DEV__ exists in React Native
+  if (typeof __DEV__ !== "undefined" && __DEV__) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     // eslint-disable-next-line no-console, i18next/no-literal-string
     console.error(`[Storage] Error ${operation}:`, errorMsg);
   }
 };
 
-// Storage interface matching web localStorage API
-export const storage = {
+// Cross-platform storage interface
+export interface Storage {
+  getItem: (key: string) => Promise<string | null>;
+  setItem: (key: string, value: string) => Promise<void>;
+  removeItem: (key: string) => Promise<void>;
+}
+
+// Storage implementation matching web localStorage API
+export const storage: Storage = {
   getItem: async (key: string): Promise<string | null> => {
     try {
       return await AsyncStorage.getItem(key);

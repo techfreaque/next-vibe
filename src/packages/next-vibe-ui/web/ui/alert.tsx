@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
@@ -23,36 +23,53 @@ const alertVariants = cva(
   },
 );
 
-const Alert = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
-  <div
-    ref={ref}
-    role="alert"
-    className={cn(alertVariants({ variant }), className)}
-    {...props}
-  />
-));
+// Cross-platform types for native import
+export type AlertVariant = "default" | "destructive" | "success" | "warning";
+
+export interface AlertProps {
+  className?: string;
+  variant?: AlertVariant;
+  children?: React.ReactNode;
+}
+
+export interface AlertTitleProps {
+  className?: string;
+  children: React.ReactNode;
+}
+
+export interface AlertDescriptionProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+  ({ className, variant, ...props }, ref) => (
+    <div
+      ref={ref}
+      role="alert"
+      className={cn(alertVariants({ variant }), className)}
+      {...props}
+    />
+  ),
+);
 Alert.displayName = "Alert";
 
-const AlertTitle = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLHeadingElement> & { children: React.ReactNode }
->(({ className, children, ...props }, ref) => (
-  <h5
-    ref={ref}
-    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
-    {...props}
-  >
-    {children}
-  </h5>
-));
+const AlertTitle = React.forwardRef<HTMLParagraphElement, AlertTitleProps>(
+  ({ className, children, ...props }, ref) => (
+    <h5
+      ref={ref}
+      className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+      {...props}
+    >
+      {children}
+    </h5>
+  ),
+);
 AlertTitle.displayName = "AlertTitle";
 
 const AlertDescription = React.forwardRef<
   HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
+  AlertDescriptionProps
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}

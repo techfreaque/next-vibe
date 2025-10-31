@@ -1,11 +1,64 @@
 import * as DialogPrimitive from "@rn-primitives/dialog";
 import * as React from "react";
-import { Platform, StyleSheet, View, type ViewProps } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import type { WithClassName } from "../lib/types";
 import { cn } from "../lib/utils";
 import { X } from "./icons/X";
+
+// Cross-platform type definitions
+export interface DialogRootProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+}
+
+export interface DialogTriggerProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DialogPortalProps {
+  children?: React.ReactNode;
+  hostName?: string;
+}
+
+export interface DialogOverlayProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DialogContentProps {
+  className?: string;
+  children?: React.ReactNode;
+  portalHost?: string;
+}
+
+export interface DialogHeaderProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DialogFooterProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DialogTitleProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DialogDescriptionProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DialogCloseProps {
+  className?: string;
+  children?: React.ReactNode;
+}
 
 const Dialog = DialogPrimitive.Root;
 
@@ -117,26 +170,26 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({
   className,
-  ...props
-}: ViewProps): React.JSX.Element => (
-  <View
-    className={cn("flex flex-col gap-1.5 text-center sm:text-left", className)}
-    {...props}
-  />
+  children,
+}: DialogHeaderProps): React.JSX.Element => (
+  <View className={cn("flex flex-col gap-1.5 text-center sm:text-left", className)}>
+    {children}
+  </View>
 );
 DialogHeader.displayName = "DialogHeader";
 
 const DialogFooter = ({
   className,
-  ...props
-}: ViewProps): React.JSX.Element => (
+  children,
+}: DialogFooterProps): React.JSX.Element => (
   <View
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end gap-2",
       className,
     )}
-    {...props}
-  />
+  >
+    {children}
+  </View>
 );
 DialogFooter.displayName = "DialogFooter";
 

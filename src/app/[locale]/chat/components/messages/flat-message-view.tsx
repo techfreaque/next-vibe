@@ -6,7 +6,9 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Div, Markdown, Span } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { Markdown } from "next-vibe-ui/ui/markdown";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useState } from "react";
 

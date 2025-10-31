@@ -4,9 +4,10 @@
  * 2x2 grid layout with tables for email compatibility
  */
 
-import { Section, Text } from "@react-email/components";
+import { Section } from "@react-email/components";
 import type * as icons from "lucide-react";
 import React, { type JSX } from "react";
+import { Span } from "next-vibe-ui/ui/span";
 
 import {
   getPricingPlansArray,
@@ -148,7 +149,7 @@ export async function EmailPricingSection({
                   </div>
                 </td>
                 <td style={{ verticalAlign: "top", paddingTop: "0px" }}>
-                  <Text
+                  <Span
                     style={{
                       fontSize: "14px",
                       color: "#374151",
@@ -159,7 +160,7 @@ export async function EmailPricingSection({
                     }}
                   >
                     {feature}
-                  </Text>
+                  </Span>
                 </td>
               </tr>
             </tbody>
@@ -258,7 +259,7 @@ export async function EmailPricingSection({
                           {icon}
                         </td>
                         <td style={{ verticalAlign: "middle" }}>
-                          <Text
+                          <Span
                             style={{
                               fontSize: "12px",
                               fontWeight: "500",
@@ -267,7 +268,7 @@ export async function EmailPricingSection({
                             }}
                           >
                             {feature.feature}
-                          </Text>
+                          </Span>
                         </td>
                       </tr>
                     </tbody>
@@ -303,7 +304,7 @@ export async function EmailPricingSection({
                               width: "20%",
                             }}
                           >
-                            <Text
+                            <Span
                               style={{
                                 fontSize: "12px",
                                 color: "#6b7280",
@@ -318,7 +319,7 @@ export async function EmailPricingSection({
                               {t(
                                 "app.api.v1.core.leads.campaigns.emails.journeys.components.pricing.plans.orSeparator",
                               )}
-                            </Text>
+                            </Span>
                           </td>
                           <td
                             style={{
@@ -446,7 +447,7 @@ export async function EmailPricingSection({
             }}
           >
             {/* Plan Name */}
-            <Text
+            <Span
               style={{
                 fontSize: "18px",
                 fontWeight: "600",
@@ -455,14 +456,14 @@ export async function EmailPricingSection({
               }}
             >
               {plan.name}
-            </Text>
+            </Span>
 
             {/* Price */}
             <table style={{ width: "100%", marginBottom: "12px" }}>
               <tbody>
                 <tr>
                   <td style={{ textAlign: "center" }}>
-                    <Text
+                    <Span
                       style={{
                         fontSize: "48px",
                         fontWeight: "800",
@@ -491,14 +492,14 @@ export async function EmailPricingSection({
                           )}
                         </span>
                       }
-                    </Text>
+                    </Span>
                   </td>
                 </tr>
               </tbody>
             </table>
 
             {/* Description */}
-            <Text
+            <Span
               style={{
                 fontSize: "16px",
                 color: "#6b7280",
@@ -507,7 +508,7 @@ export async function EmailPricingSection({
               }}
             >
               {plan.description}
-            </Text>
+            </Span>
 
             {/* Premium Features */}
             {plan.renderedPremiumFeatures && (

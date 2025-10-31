@@ -6,7 +6,9 @@
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Div, H1, P, Span } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { H1, P } from "next-vibe-ui/ui/typography";
+import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
 import type React from "react";
 

@@ -9,6 +9,68 @@ import * as MenubarPrimitive from "@radix-ui/react-menubar";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
+// Cross-platform types
+export interface MenubarProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface MenubarTriggerProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface MenubarSubTriggerProps {
+  className?: string;
+  children?: React.ReactNode;
+  inset?: boolean;
+}
+
+export interface MenubarSubContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface MenubarContentProps {
+  className?: string;
+  children?: React.ReactNode;
+  align?: "start" | "center" | "end";
+  alignOffset?: number;
+  sideOffset?: number;
+}
+
+export interface MenubarItemProps {
+  className?: string;
+  children?: React.ReactNode;
+  inset?: boolean;
+}
+
+export interface MenubarCheckboxItemProps {
+  className?: string;
+  children?: React.ReactNode;
+  checked?: boolean;
+}
+
+export interface MenubarRadioItemProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface MenubarLabelProps {
+  className?: string;
+  children?: React.ReactNode;
+  inset?: boolean;
+}
+
+export interface MenubarSeparatorProps {
+  className?: string;
+}
+
+export interface MenubarShortcutProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
 const MenubarMenu = MenubarPrimitive.Menu;
 
 const MenubarGroup = MenubarPrimitive.Group;

@@ -44,6 +44,7 @@ import {
 import { Switch } from "./switch";
 import { Text } from "./text";
 import { Textarea } from "./textarea";
+import { Span } from "./span";
 
 const Form = FormProvider;
 
@@ -175,7 +176,7 @@ const FormDescription = React.forwardRef<
   const { formDescriptionNativeID } = useFormField();
 
   return (
-    <Text
+    <Span
       ref={ref}
       {...({
         nativeID: formDescriptionNativeID,
@@ -445,9 +446,9 @@ const FormDatePicker = React.forwardRef<React.ElementRef<typeof Button>, FormDat
               <CalendarIcon
                 size={18}
               />
-              <Text>
+              <Span>
                 {value ?? "Pick a date"}
-              </Text>
+              </Span>
               {!!value && (
                 <Button
                   className={clearButtonClassName}
@@ -472,7 +473,7 @@ const FormDatePicker = React.forwardRef<React.ElementRef<typeof Button>, FormDat
               <View {...({ className: viewClassName } as any)}>
                 <BottomSheetCloseTrigger asChild>
                   <Button>
-                    <Text>Close</Text>
+                    <Span>Close</Span>
                   </Button>
                 </BottomSheetCloseTrigger>
               </View>

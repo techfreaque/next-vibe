@@ -14,13 +14,15 @@ import {
   XCircle,
 } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
-import { Form, FormAlert } from "next-vibe-ui/ui";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import { H4, P } from "next-vibe-ui/ui";
+import { H4, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import type { CronHistoryResponseOutput } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/history/definition";

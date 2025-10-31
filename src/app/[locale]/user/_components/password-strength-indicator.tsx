@@ -1,6 +1,8 @@
 "use client";
 
-import { Div, P, Span } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

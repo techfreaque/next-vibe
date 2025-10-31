@@ -6,7 +6,8 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { Div, P } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import type { PieLabelRenderProps } from "recharts";
 import {

@@ -9,7 +9,7 @@ import { BarChart3, Database, List, Settings } from "lucide-react";
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

@@ -3,8 +3,9 @@
  * Results Journey - Follow-up 3 Email Template (Final Opportunity)
  */
 
-import { Text } from "@react-email/components";
 import React from "react";
+
+import { Span } from "next-vibe-ui/ui/span";
 
 import {
   CTAButton,
@@ -35,7 +36,7 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
     >
       <EmailHeader backgroundColor="#ea580c" t={t} />
       <EmailContent>
-        <Text
+        <Span
           style={{
             fontSize: "24px",
             fontWeight: "600",
@@ -47,9 +48,9 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup3.greeting",
           )}
-        </Text>
+        </Span>
 
-        <Text
+        <Span
           style={{
             fontSize: "18px",
             lineHeight: "1.6",
@@ -61,7 +62,7 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup3.intro",
           )}
-        </Text>
+        </Span>
 
         {/* Final Opportunity Section */}
         <div
@@ -73,7 +74,7 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
             border: "1px solid #fecaca",
           }}
         >
-          <Text
+          <Span
             style={{
               fontSize: "20px",
               fontWeight: "600",
@@ -85,9 +86,9 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup3.finalOpportunityTitle",
             )}
-          </Text>
+          </Span>
 
-          <Text
+          <Span
             style={{
               fontSize: "16px",
               lineHeight: "1.6",
@@ -99,9 +100,9 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup3.finalOpportunityText",
             )}
-          </Text>
+          </Span>
 
-          <Text
+          <Span
             style={{
               fontSize: "18px",
               fontWeight: "600",
@@ -113,11 +114,11 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup3.limitedTimeOffer",
             )}
-          </Text>
+          </Span>
         </div>
 
         {/* What You're Missing */}
-        <Text
+        <Span
           style={{
             fontSize: "20px",
             fontWeight: "700",
@@ -129,10 +130,10 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup3.whatYoureMissingTitle",
           )}
-        </Text>
+        </Span>
 
         <div style={{ paddingLeft: "20px", margin: "0 0 24px 0" }}>
-          <Text
+          <Span
             style={{
               fontSize: "16px",
               color: "#374151",
@@ -144,19 +145,19 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup3.missingPoint1",
             )}
-          </Text>
-          <Text style={{ fontSize: "16px", color: "#374151", margin: "8px 0" }}>
+          </Span>
+          <Span style={{ fontSize: "16px", color: "#374151", margin: "8px 0" }}>
             •{" "}
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup3.missingPoint2",
             )}
-          </Text>
-          <Text style={{ fontSize: "16px", color: "#374151", margin: "8px 0" }}>
+          </Span>
+          <Span style={{ fontSize: "16px", color: "#374151", margin: "8px 0" }}>
             •{" "}
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup3.missingPoint3",
             )}
-          </Text>
+          </Span>
         </div>
 
         {/* Last Chance Offer */}
@@ -170,7 +171,7 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
             textAlign: "center",
           }}
         >
-          <Text
+          <Span
             style={{
               fontSize: "24px",
               fontWeight: "700",
@@ -181,7 +182,7 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup3.lastChance",
             )}
-          </Text>
+          </Span>
         </div>
 
         {/* CTA Button */}
@@ -195,7 +196,7 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
           tracking={tracking}
         />
 
-        <Text
+        <Span
           style={{
             fontSize: "14px",
             lineHeight: "1.5",
@@ -208,7 +209,7 @@ export const resultsFollowup3Email: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup3.lastChance",
           )}
-        </Text>
+        </Span>
       </EmailContent>
       <EmailFooter
         companyName={companyName}

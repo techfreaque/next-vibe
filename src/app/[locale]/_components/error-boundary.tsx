@@ -1,8 +1,9 @@
 "use client";
 
-import { H3, P } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { Card } from "next-vibe-ui/ui/card";
+import { CardContent } from "next-vibe-ui/ui/card";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import { Info, RotateCcw } from "next-vibe-ui/ui/icons";
 import type { JSX, ReactNode } from "react";
 import { useState } from "react";

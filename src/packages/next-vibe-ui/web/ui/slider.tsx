@@ -4,9 +4,21 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
+// Cross-platform props interface - only shared props
+export interface SliderProps {
+  className?: string;
+  value?: number[];
+  defaultValue?: number[];
+  onValueChange?: (value: number[]) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+  disabled?: boolean;
+}
+
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
+  SliderProps
 >(({ className, ...props }, ref) => (
   <SliderPrimitive.Root
     ref={ref}

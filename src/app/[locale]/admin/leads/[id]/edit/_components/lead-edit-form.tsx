@@ -7,7 +7,8 @@
 
 import { ArrowLeft, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";

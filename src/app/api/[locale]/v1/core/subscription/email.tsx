@@ -1,4 +1,4 @@
-import { Button, Link, Section, Text } from "@react-email/components";
+import { Button, Link, Section, Text as Span } from "@react-email/components";
 import type React from "react";
 import type { JSX } from "react";
 
@@ -110,7 +110,7 @@ function renderSubscriptionSuccessEmailContent(
       tracking={tracking}
     >
       {/* Welcome Message */}
-      <Text
+      <Span
         style={{
           fontSize: "18px",
           lineHeight: "1.6",
@@ -122,9 +122,9 @@ function renderSubscriptionSuccessEmailContent(
         {t("app.api.v1.core.subscription.email.success.welcomeMessage", {
           planName,
         })}
-      </Text>
+      </Span>
 
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -135,7 +135,7 @@ function renderSubscriptionSuccessEmailContent(
         {t("app.api.v1.core.subscription.email.success.description", {
           appName: t("app.common.appName"),
         })}
-      </Text>
+      </Span>
 
       {/* Next Steps Section */}
       <Section
@@ -148,7 +148,7 @@ function renderSubscriptionSuccessEmailContent(
           boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <Text
+        <Span
           style={{
             fontSize: "20px",
             lineHeight: "1.6",
@@ -159,8 +159,8 @@ function renderSubscriptionSuccessEmailContent(
           }}
         >
           {t("app.api.v1.core.subscription.email.success.nextSteps.title")}
-        </Text>
-        <Text
+        </Span>
+        <Span
           style={{
             fontSize: "16px",
             lineHeight: "1.6",
@@ -172,7 +172,7 @@ function renderSubscriptionSuccessEmailContent(
           {t(
             "app.api.v1.core.subscription.email.success.nextSteps.description",
           )}
-        </Text>
+        </Span>
 
         <div style={{ textAlign: "center", marginBottom: "16px" }}>
           <Button
@@ -203,7 +203,7 @@ function renderSubscriptionSuccessEmailContent(
           textAlign: "center",
         }}
       >
-        <Text
+        <Span
           style={{
             fontSize: "18px",
             lineHeight: "1.6",
@@ -213,8 +213,8 @@ function renderSubscriptionSuccessEmailContent(
           }}
         >
           {t("app.api.v1.core.subscription.email.success.support.title")}
-        </Text>
-        <Text
+        </Span>
+        <Span
           style={{
             fontSize: "16px",
             lineHeight: "1.6",
@@ -223,7 +223,7 @@ function renderSubscriptionSuccessEmailContent(
           }}
         >
           {t("app.api.v1.core.subscription.email.success.support.description")}
-        </Text>
+        </Span>
         <Button
           href={`${baseUrl}/${locale}/help`}
           style={{
@@ -243,7 +243,7 @@ function renderSubscriptionSuccessEmailContent(
       </Section>
 
       {/* Footer */}
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -254,9 +254,9 @@ function renderSubscriptionSuccessEmailContent(
         }}
       >
         {t("app.api.v1.core.subscription.email.success.footer.message")}
-      </Text>
+      </Span>
 
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -268,7 +268,7 @@ function renderSubscriptionSuccessEmailContent(
         {t("app.api.v1.core.subscription.email.success.footer.signoff", {
           appName: t("app.common.appName"),
         })}
-      </Text>
+      </Span>
     </EmailTemplate>
   );
 }
@@ -302,7 +302,7 @@ function renderAdminSubscriptionNotificationEmailContent(
       tracking={tracking}
     >
       {/* Header Message */}
-      <Text
+      <Span
         style={{
           fontSize: "18px",
           lineHeight: "1.6",
@@ -312,9 +312,9 @@ function renderAdminSubscriptionNotificationEmailContent(
         }}
       >
         {t("app.api.v1.core.subscription.email.admin_notification.title")}
-      </Text>
+      </Span>
 
-      <Text
+      <Span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -325,7 +325,7 @@ function renderAdminSubscriptionNotificationEmailContent(
         {t("app.api.v1.core.subscription.email.admin_notification.message", {
           appName: t("app.common.appName"),
         })}
-      </Text>
+      </Span>
 
       {/* User and Subscription Details */}
       <Section
@@ -338,7 +338,7 @@ function renderAdminSubscriptionNotificationEmailContent(
           boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
         }}
       >
-        <Text
+        <Span
           style={{
             fontSize: "18px",
             fontWeight: "700",
@@ -349,10 +349,10 @@ function renderAdminSubscriptionNotificationEmailContent(
           }}
         >
           {t("app.api.v1.core.subscription.email.admin_notification.details")}
-        </Text>
+        </Span>
 
         <div style={{ marginBottom: "16px" }}>
-          <Text
+          <Span
             style={{
               fontSize: "14px",
               marginBottom: "6px",
@@ -360,16 +360,16 @@ function renderAdminSubscriptionNotificationEmailContent(
               lineHeight: "1.5",
             }}
           >
-            <Text style={{ fontWeight: "700", color: "#1f2937" }}>
+            <Span style={{ fontWeight: "700", color: "#1f2937" }}>
               {t(
                 "app.api.v1.core.subscription.email.admin_notification.user_name",
               )}
               :
-            </Text>{" "}
+            </Span>{" "}
             {user.firstName} {user.lastName}
-          </Text>
+          </Span>
 
-          <Text
+          <Span
             style={{
               fontSize: "14px",
               marginBottom: "6px",
@@ -377,21 +377,21 @@ function renderAdminSubscriptionNotificationEmailContent(
               lineHeight: "1.5",
             }}
           >
-            <Text style={{ fontWeight: "700", color: "#1f2937" }}>
+            <Span style={{ fontWeight: "700", color: "#1f2937" }}>
               {t(
                 "app.api.v1.core.subscription.email.admin_notification.user_email",
               )}
               :
-            </Text>{" "}
+            </Span>{" "}
             <Link
               href={`mailto:${user.email}`}
               style={{ color: "#3b82f6", textDecoration: "none" }}
             >
               {user.email}
             </Link>
-          </Text>
+          </Span>
 
-          <Text
+          <Span
             style={{
               fontSize: "14px",
               marginBottom: "6px",
@@ -399,9 +399,9 @@ function renderAdminSubscriptionNotificationEmailContent(
               lineHeight: "1.5",
             }}
           >
-            <Text style={{ fontWeight: "700", color: "#1f2937" }}>
+            <Span style={{ fontWeight: "700", color: "#1f2937" }}>
               {t("app.api.v1.core.subscription.email.admin_notification.plan")}:
-            </Text>{" "}
+            </Span>{" "}
             <span
               style={{
                 backgroundColor: "#dbeafe",
@@ -414,9 +414,9 @@ function renderAdminSubscriptionNotificationEmailContent(
             >
               {planName}
             </span>
-          </Text>
+          </Span>
 
-          <Text
+          <Span
             style={{
               fontSize: "14px",
               marginBottom: "6px",
@@ -424,12 +424,12 @@ function renderAdminSubscriptionNotificationEmailContent(
               lineHeight: "1.5",
             }}
           >
-            <Text style={{ fontWeight: "700", color: "#1f2937" }}>
+            <Span style={{ fontWeight: "700", color: "#1f2937" }}>
               {t(
                 "app.api.v1.core.subscription.email.admin_notification.status",
               )}
               :
-            </Text>{" "}
+            </Span>{" "}
             <span
               style={{
                 backgroundColor: "#dcfce7",
@@ -442,7 +442,7 @@ function renderAdminSubscriptionNotificationEmailContent(
             >
               {statusName}
             </span>
-          </Text>
+          </Span>
         </div>
       </Section>
 
@@ -468,7 +468,7 @@ function renderAdminSubscriptionNotificationEmailContent(
       </Section>
 
       {/* Footer */}
-      <Text
+      <Span
         style={{
           fontSize: "12px",
           lineHeight: "1.5",
@@ -482,7 +482,7 @@ function renderAdminSubscriptionNotificationEmailContent(
         {t("app.api.v1.core.subscription.email.admin_notification.footer", {
           appName: t("app.common.appName"),
         })}
-      </Text>
+      </Span>
     </EmailTemplate>
   );
 }

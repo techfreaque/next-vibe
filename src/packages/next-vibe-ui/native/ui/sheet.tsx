@@ -3,14 +3,30 @@
  * Modal-based sheet implementation
  */
 import { X } from "lucide-react-native";
-import type { ReactNode } from "react";
 import React, { createContext, useContext, useState } from "react";
-import { Modal, Pressable, Text as RNText, View } from "react-native";
+import { Modal, Pressable as RNPressable, Text as RNText, View as RNView } from "react-native";
 import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
 
 import { useTranslation } from "@/i18n/core/client";
 
+import { StyledAnimatedView } from "../lib/styled";
+import type { PressablePropsWithClassName, TextPropsWithClassName, ViewPropsWithClassName } from "../lib/types";
 import { cn } from "../lib/utils";
+import type {
+  SheetCloseProps,
+  SheetContentProps,
+  SheetDescriptionProps,
+  SheetFooterProps,
+  SheetHeaderProps,
+  SheetRootProps,
+  SheetTitleProps,
+  SheetTriggerProps,
+} from "next-vibe-ui/ui/sheet";
+
+// Type-safe components with className support for NativeWind
+const View = RNView as React.ComponentType<ViewPropsWithClassName>;
+const Pressable = RNPressable as React.ComponentType<PressablePropsWithClassName>;
+const Text = RNText as React.ComponentType<TextPropsWithClassName>;
 
 interface SheetContextValue {
   open: boolean;
@@ -28,17 +44,11 @@ function useSheet(): SheetContextValue {
   return context;
 }
 
-interface SheetProps {
-  children: ReactNode;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-}
-
 export function Sheet({
   children,
   open: controlledOpen,
   onOpenChange,
-}: SheetProps): React.JSX.Element {
+}: SheetRootProps): React.JSX.Element {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const open = controlledOpen ?? uncontrolledOpen;
   const setOpen = onOpenChange ?? setUncontrolledOpen;
@@ -48,11 +58,6 @@ export function Sheet({
       {children}
     </SheetContext.Provider>
   );
-}
-
-interface SheetTriggerProps {
-  children: ReactNode;
-  asChild?: boolean;
 }
 
 export function SheetTrigger({
@@ -83,7 +88,7 @@ export function SheetTrigger({
 export function SheetClose({
   children,
   asChild,
-}: SheetTriggerProps): React.JSX.Element {
+}: SheetCloseProps): React.JSX.Element {
   const { setOpen } = useSheet();
 
   if (asChild && React.isValidElement(children)) {
@@ -105,10 +110,18 @@ export function SheetClose({
   );
 }
 
-interface SheetContentProps {
-  children: ReactNode;
-  className?: string;
-  side?: "top" | "bottom" | "left" | "right";
+// Portal is a no-op in native, but exported for compatibility
+export function SheetPortal({
+  children,
+}: {
+  children?: React.ReactNode;
+}): React.JSX.Element {
+  return <>{children}</>;
+}
+
+// Overlay is rendered as part of SheetContent in native
+export function SheetOverlay(): null {
+  return null;
 }
 
 export function SheetContent({
@@ -134,7 +147,7 @@ export function SheetContent({
           setOpen(false);
         }}
       >
-        <Animated.View
+        <StyledAnimatedView
           entering={SlideInRight}
           exiting={SlideOutRight}
           className={cn(
@@ -153,21 +166,16 @@ export function SheetContent({
               setOpen(false);
             }}
           >
-            <X className="h-4 w-4 text-foreground" />
-            <RNText className="sr-only">
+            <X size={16} color="currentColor" />
+            <Text className="sr-only">
               {t("app.common.accessibility.srOnly.close")}
-            </RNText>
+            </Text>
           </Pressable>
           {children}
-        </Animated.View>
+        </StyledAnimatedView>
       </Pressable>
     </Modal>
   );
-}
-
-interface SheetHeaderProps {
-  children: ReactNode;
-  className?: string;
 }
 
 export function SheetHeader({
@@ -188,11 +196,6 @@ export function SheetHeader({
 
 SheetHeader.displayName = "SheetHeader";
 
-interface SheetFooterProps {
-  children: ReactNode;
-  className?: string;
-}
-
 export function SheetFooter({
   className,
   children,
@@ -211,37 +214,27 @@ export function SheetFooter({
 
 SheetFooter.displayName = "SheetFooter";
 
-interface SheetTitleProps {
-  children: ReactNode;
-  className?: string;
-}
-
 export function SheetTitle({
   className,
   children,
 }: SheetTitleProps): React.JSX.Element {
   return (
-    <RNText className={cn("text-lg font-semibold text-foreground", className)}>
+    <Text className={cn("text-lg font-semibold text-foreground", className)}>
       {children}
-    </RNText>
+    </Text>
   );
 }
 
 SheetTitle.displayName = "SheetTitle";
-
-interface SheetDescriptionProps {
-  children: ReactNode;
-  className?: string;
-}
 
 export function SheetDescription({
   className,
   children,
 }: SheetDescriptionProps): React.JSX.Element {
   return (
-    <RNText className={cn("text-sm text-muted-foreground", className)}>
+    <Text className={cn("text-sm text-muted-foreground", className)}>
       {children}
-    </RNText>
+    </Text>
   );
 }
 

@@ -19,8 +19,8 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { Div } from "next-vibe-ui/ui";
-import { H3, P } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import React, { useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

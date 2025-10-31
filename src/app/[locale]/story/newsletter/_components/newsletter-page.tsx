@@ -2,10 +2,10 @@
 
 import { Check, Mail, Send, TrendingUp, Users, X, Zap } from "lucide-react";
 import Link from "next/link";
-import { Form } from "next-vibe-ui/ui";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { Button } from "next-vibe-ui/ui/button";
 import { Input } from "next-vibe-ui/ui/input";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useRef } from "react";
@@ -106,7 +106,7 @@ export function NewsletterPage({
           {/* Newsletter Form */}
           <Div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-16 max-w-md mx-auto">
             <Form
-              onSubmit={(e) => {
+              onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
                 // Validate email before submission
                 if (!email.includes("@")) {

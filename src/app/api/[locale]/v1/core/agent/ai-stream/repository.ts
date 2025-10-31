@@ -186,6 +186,7 @@ async function ensureThread({
   content,
   isIncognito,
   logger,
+  user,
 }: {
   threadId: string | null | undefined;
   rootFolderId: string;
@@ -194,6 +195,7 @@ async function ensureThread({
   content: string;
   isIncognito: boolean;
   logger: EndpointLogger;
+  user: JwtPayloadType;
 }): Promise<{ threadId: string; isNew: boolean }> {
   // If threadId provided, verify it exists (unless incognito)
   if (threadId) {
@@ -215,12 +217,89 @@ async function ensureThread({
     return { threadId, isNew: false };
   }
 
-  // Create new thread
+  // Create new thread - check permissions first
   const newThreadId = crypto.randomUUID();
   const title = generateThreadTitle(content);
 
   // Only store in DB if not incognito
   if (!isIncognito && userId) {
+    // Check permissions: get folder if subFolderId is provided
+    const { canWriteFolder } = await import("../chat/permissions/permissions");
+    const { chatFolders } = await import("../chat/db");
+
+    let folder: typeof chatFolders.$inferSelect | null = null;
+
+    if (subFolderId) {
+      // Get parent folder to check permissions
+      const [folderResult] = await db
+        .select()
+        .from(chatFolders)
+        .where(eq(chatFolders.id, subFolderId))
+        .limit(1);
+
+      if (!folderResult) {
+        logger.error("Folder not found", { subFolderId });
+        return await Promise.reject(new Error("FOLDER_NOT_FOUND"));
+      }
+
+      folder = folderResult;
+      logger.debug("Found folder for permission check", {
+        folderId: folder.id,
+        folderName: folder.name,
+        rootFolderId: folder.rootFolderId,
+        parentId: folder.parentId,
+      });
+    } else if (rootFolderId === "public" && !subFolderId) {
+      // Creating thread directly in PUBLIC root (no folder) - need to check ADMIN permission
+      // This is the only case where we need to check for ADMIN role
+      const { isAdmin } = await import("../chat/permissions/permissions");
+      const isAdminUser = await isAdmin(userId, logger);
+
+      if (!isAdminUser) {
+        logger.error("Only ADMIN can create threads directly in PUBLIC root", {
+          userId,
+          rootFolderId,
+        });
+        return await Promise.reject(new Error("PERMISSION_DENIED"));
+      }
+
+      // Admin user - allow thread creation in PUBLIC root
+      logger.info("ADMIN user creating thread in PUBLIC root", {
+        userId,
+        rootFolderId,
+      });
+    }
+
+    // Check if user has permission to create thread in this folder (only if folder exists)
+    if (folder) {
+      logger.debug("About to check permissions", {
+        hasFolder: !!folder,
+        folderId: folder?.id,
+        folderName: folder?.name,
+        folderParentId: folder?.parentId,
+        userId,
+        rootFolderId,
+        subFolderId,
+      });
+      const hasPermission = await canWriteFolder(user, folder, logger);
+
+      logger.debug("Permission check result", {
+        hasPermission,
+        userId,
+        rootFolderId,
+        subFolderId,
+      });
+
+      if (!hasPermission) {
+        logger.error("User does not have permission to create thread", {
+          userId,
+          rootFolderId,
+          subFolderId,
+        });
+        return await Promise.reject(new Error("PERMISSION_DENIED"));
+      }
+    }
+
     await db.insert(chatThreads).values({
       id: newThreadId,
       userId,
@@ -514,6 +593,7 @@ class AiStreamRepository implements IAiStreamRepository {
       content: " ", // Use space instead of empty string (DB constraint requires non-empty)
       parentId: params.parentId,
       depth: params.depth,
+      authorId: params.userId, // Set authorId so user can delete their AI messages
       sequenceId: params.sequenceId,
       sequenceIndex: params.sequenceIndex,
       isAI: true,
@@ -540,11 +620,27 @@ class AiStreamRepository implements IAiStreamRepository {
     role: "user" | "assistant" | "system";
     userId: string | undefined;
     isIncognito: boolean;
+    messageHistory?: Array<{ role: "user" | "assistant" | "system"; content: string }> | null;
     logger: EndpointLogger;
   }): Promise<
     Array<{ role: "user" | "assistant" | "system"; content: string }>
   > {
     if (params.operation === "answer-as-ai") {
+      // For incognito mode, use provided message history
+      if (params.isIncognito && params.messageHistory) {
+        const messages = [...params.messageHistory];
+        if (params.content.trim()) {
+          messages.push({ role: "user", content: params.content });
+        } else {
+          messages.push({
+            role: "user",
+            content: CONTINUE_CONVERSATION_PROMPT,
+          });
+        }
+        return messages;
+      }
+
+      // For non-incognito mode, fetch from database
       if (
         !params.isIncognito &&
         params.userId &&
@@ -946,11 +1042,23 @@ class AiStreamRepository implements IAiStreamRepository {
         content: effectiveContent,
         isIncognito,
         logger,
+        user,
       });
     } catch (error) {
+      const errorMessage = parseError(error).message;
       logger.error("Failed to ensure thread", {
-        error: parseError(error).message,
+        error: errorMessage,
       });
+
+      // Check if it's a permission error
+      if (errorMessage === "PERMISSION_DENIED") {
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.aiStream.post.errors.forbidden.title",
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
       return fail({
         message:
           "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
@@ -996,6 +1104,7 @@ class AiStreamRepository implements IAiStreamRepository {
       role: effectiveRole,
       userId,
       isIncognito,
+      messageHistory: data.messageHistory,
       logger,
     });
 

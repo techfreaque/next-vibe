@@ -1,6 +1,7 @@
 "use client";
 
-import { Div, H2, P } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { H2, P } from "next-vibe-ui/ui/typography";
 import { Button } from "next-vibe-ui/ui/button";
 import type React from "react";
 

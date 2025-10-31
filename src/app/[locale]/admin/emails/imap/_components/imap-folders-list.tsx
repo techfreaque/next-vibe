@@ -16,7 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { useImapFoldersList } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/list/hooks";

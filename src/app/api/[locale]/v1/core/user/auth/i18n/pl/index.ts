@@ -35,6 +35,8 @@ export const translations: typeof enTranslations = {
       storage_failed: "Nie udało się zapisać danych uwierzytelniania",
       clear_failed: "Nie udało się wyczyścić danych uwierzytelniania",
     },
+    not_implemented_native:
+      "Ta funkcja nie jest jeszcze zaimplementowana dla React Native",
   },
   post: {
     title: "Tytuł",

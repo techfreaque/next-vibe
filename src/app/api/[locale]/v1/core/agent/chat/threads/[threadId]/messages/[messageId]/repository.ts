@@ -19,7 +19,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { chatMessages, chatThreads } from "../../../../db";
+import { chatFolders, chatMessages, chatThreads } from "../../../../db";
+import {
+  canDeleteMessage,
+  canEditMessage,
+  canReadMessage,
+} from "../../../../permissions/permissions";
 import { validateNotIncognito } from "../../../../validation";
 import type {
   MessageDeleteResponseOutput,
@@ -72,27 +77,11 @@ class MessageRepository implements MessageRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<ResponseType<MessageGetResponseOutput>> {
     try {
-      // Type guard to ensure user has id
-      if (!user.id) {
-        return fail({
-          message:
-            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.unauthorized.title",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-        });
-      }
-
-      const userId = user.id;
-
-      // Verify thread ownership
+      // Get thread
       const [thread] = await db
         .select()
         .from(chatThreads)
-        .where(
-          and(
-            eq(chatThreads.id, urlPathParams.threadId),
-            eq(chatThreads.userId, userId),
-          ),
-        )
+        .where(eq(chatThreads.id, urlPathParams.threadId))
         .limit(1);
 
       if (!thread) {
@@ -133,6 +122,25 @@ class MessageRepository implements MessageRepositoryInterface {
         });
       }
 
+      // Get parent folder for permission check
+      let folder = null;
+      if (thread.folderId) {
+        [folder] = await db
+          .select()
+          .from(chatFolders)
+          .where(eq(chatFolders.id, thread.folderId))
+          .limit(1);
+      }
+
+      // Check if user can read this message
+      if (!(await canReadMessage(user, message, thread, folder, logger))) {
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.forbidden.title" as const,
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
       return createSuccessResponse({
         message: {
           id: message.id,
@@ -170,27 +178,11 @@ class MessageRepository implements MessageRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<ResponseType<MessagePatchResponseOutput>> {
     try {
-      // Type guard to ensure user has id
-      if (!user.id) {
-        return fail({
-          message:
-            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.unauthorized.title",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-        });
-      }
-
-      const userId = user.id;
-
-      // Verify thread ownership
+      // Get thread
       const [thread] = await db
         .select()
         .from(chatThreads)
-        .where(
-          and(
-            eq(chatThreads.id, urlPathParams.threadId),
-            eq(chatThreads.userId, userId),
-          ),
-        )
+        .where(eq(chatThreads.id, urlPathParams.threadId))
         .limit(1);
 
       if (!thread) {
@@ -228,6 +220,15 @@ class MessageRepository implements MessageRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.messageNotFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      // Check if user can edit this message
+      if (!canEditMessage(user, existingMessage, thread)) {
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.forbidden.title" as const,
+          errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
@@ -277,27 +278,11 @@ class MessageRepository implements MessageRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<ResponseType<MessageDeleteResponseOutput>> {
     try {
-      // Type guard to ensure user has id
-      if (!user.id) {
-        return fail({
-          message:
-            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.unauthorized.title",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-        });
-      }
-
-      const userId = user.id;
-
-      // Verify thread ownership
+      // Get thread
       const [thread] = await db
         .select()
         .from(chatThreads)
-        .where(
-          and(
-            eq(chatThreads.id, urlPathParams.threadId),
-            eq(chatThreads.userId, userId),
-          ),
-        )
+        .where(eq(chatThreads.id, urlPathParams.threadId))
         .limit(1);
 
       if (!thread) {
@@ -335,6 +320,25 @@ class MessageRepository implements MessageRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.messageNotFound.title" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      // Get parent folder for permission check
+      let folder = null;
+      if (thread.folderId) {
+        [folder] = await db
+          .select()
+          .from(chatFolders)
+          .where(eq(chatFolders.id, thread.folderId))
+          .limit(1);
+      }
+
+      // Check if user can delete this message
+      if (!(await canDeleteMessage(user, existingMessage, thread, folder, logger))) {
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.forbidden.title" as const,
+          errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 

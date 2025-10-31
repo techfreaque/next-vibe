@@ -17,7 +17,8 @@ import {
 } from "next-vibe-ui/ui/card";
 import { Label } from "next-vibe-ui/ui/label";
 import { Switch } from "next-vibe-ui/ui/switch";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";

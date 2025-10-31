@@ -8,7 +8,9 @@
 import { render } from "@react-email/render";
 import { Mail, Send } from "lucide-react";
 import { parseError } from "next-vibe/shared/utils";
-import { Div, H2, P, Span } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { H2, P } from "next-vibe-ui/ui/typography";
+import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "next-vibe-ui/ui/dialog";
 import type React from "react";

@@ -1,15 +1,13 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-  Div,
-  Pre,
-  Span,
-} from "next-vibe-ui/ui";
-import { ChevronDown, ChevronRight } from "next-vibe-ui/ui/icons";
+import { Collapsible } from "@/packages/next-vibe-ui/web/ui/collapsible";
+import { CollapsibleContent } from "@/packages/next-vibe-ui/web/ui/collapsible";
+import { CollapsibleTrigger } from "@/packages/next-vibe-ui/web/ui/collapsible";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { Pre } from "@/packages/next-vibe-ui/web/ui/pre";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import type { JSX } from "react";
 import { useState } from "react";
 

@@ -7,11 +7,13 @@
 "use client";
 
 import { Filter, RefreshCw } from "lucide-react";
-import { Div, FormAlert, Span } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import { H1, P } from "next-vibe-ui/ui";
+import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { useImapAccountsListEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/hooks";

@@ -1,5 +1,12 @@
+// Cross-platform storage interface
+export interface Storage {
+  getItem: (key: string) => Promise<string | null>;
+  setItem: (key: string, value: string) => Promise<void>;
+  removeItem: (key: string) => Promise<void>;
+}
+
 // Platform-specific storage for Web using localStorage
-export const storage = {
+export const storage: Storage = {
   getItem: (key: string): Promise<string | null> => {
     try {
       return Promise.resolve(localStorage.getItem(key));

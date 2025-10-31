@@ -1,8 +1,9 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui";
-import { H3, P } from "next-vibe-ui/ui/typography";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { H3 } from "@/packages/next-vibe-ui/web/ui/typography";
+import { P } from "@/packages/next-vibe-ui/web/ui/typography";
 import type { JSX } from "react";
 
 import { simpleT } from "@/i18n/core/shared";

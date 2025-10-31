@@ -713,6 +713,54 @@ declare module '@rn-primitives/tooltip' {
   }
 }
 
+declare module '@rn-primitives/accordion' {
+  interface RootProps {
+    className?: string;
+    children?: React.ReactNode;
+  }
+
+  interface ItemProps {
+    className?: string;
+    value: string;
+    children?: React.ReactNode;
+  }
+
+  interface TriggerProps {
+    className?: string;
+    children?: React.ReactNode;
+    asChild?: boolean;
+  }
+
+  interface HeaderProps {
+    className?: string;
+    children?: React.ReactNode;
+  }
+
+  interface ContentProps {
+    className?: string;
+    children?: React.ReactNode;
+  }
+}
+
+declare module '@rn-primitives/avatar' {
+  interface RootProps {
+    className?: string;
+    alt: string;
+    children?: React.ReactNode;
+  }
+
+  interface ImageProps {
+    className?: string;
+    src?: string;
+    alt?: string;
+  }
+
+  interface FallbackProps {
+    className?: string;
+    children?: React.ReactNode;
+  }
+}
+
 // Augment JSX namespace for className support
 declare global {
   namespace JSX {

@@ -9,6 +9,56 @@ import {
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
+// Cross-platform types
+export interface DropdownMenuSubTriggerProps {
+  className?: string;
+  children?: React.ReactNode;
+  inset?: boolean;
+}
+
+export interface DropdownMenuSubContentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DropdownMenuContentProps {
+  className?: string;
+  children?: React.ReactNode;
+  sideOffset?: number;
+}
+
+export interface DropdownMenuItemProps {
+  className?: string;
+  children?: React.ReactNode;
+  inset?: boolean;
+}
+
+export interface DropdownMenuCheckboxItemProps {
+  className?: string;
+  children?: React.ReactNode;
+  checked?: boolean;
+}
+
+export interface DropdownMenuRadioItemProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface DropdownMenuLabelProps {
+  className?: string;
+  children?: React.ReactNode;
+  inset?: boolean;
+}
+
+export interface DropdownMenuSeparatorProps {
+  className?: string;
+}
+
+export interface DropdownMenuShortcutProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;

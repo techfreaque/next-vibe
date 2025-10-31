@@ -65,8 +65,11 @@ export default async function SubscriptionPage({
 
   // Fetch credit balance
   const creditsResponse = await creditRepository.getCreditBalanceForUser(
-    userResponse.data.id,
-    userResponse.data.leadId,
+    {
+      id: userResponse.data.id,
+      leadId: userResponse.data.leadId!,
+      isPublic: false,
+    },
     createEndpointLogger(false, Date.now(), locale),
   );
   const credits = creditsResponse.success ? creditsResponse.data : null;

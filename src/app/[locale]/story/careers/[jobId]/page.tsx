@@ -3,8 +3,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div, Link, Span } from "next-vibe-ui/ui";
-import { H1, H2, H3, P } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
+import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import { Separator } from "next-vibe-ui/ui/separator";
 import type { JSX } from "react";
 

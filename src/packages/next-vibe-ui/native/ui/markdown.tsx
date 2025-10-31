@@ -9,19 +9,15 @@ import { Text as RNText, View } from "react-native";
 import { cn } from "../lib/utils";
 
 interface MarkdownProps {
-  children?: string;
+  content: string;
   className?: string;
 }
 
 export const Markdown = React.forwardRef<View, MarkdownProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, content }, ref) => {
     return (
-      <View
-        ref={ref}
-        className={cn("flex flex-col gap-2", className)}
-        {...props}
-      >
-        <RNText className="text-sm text-foreground">{children}</RNText>
+      <View ref={ref} className={cn("flex flex-col gap-2", className)}>
+        <RNText className="text-sm text-foreground">{content}</RNText>
       </View>
     );
   },

@@ -6,7 +6,7 @@
 "use client";
 
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import type { Control } from "react-hook-form";
 

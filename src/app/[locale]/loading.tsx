@@ -1,4 +1,4 @@
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import React, { type JSX } from "react";
 
 /**

@@ -1,19 +1,18 @@
 "use client";
 
-import {
-  Button,
-  Div,
-  P,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe-ui/ui";
+import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { P } from "@/packages/next-vibe-ui/web/ui/typography";
+import { Tooltip } from "@/packages/next-vibe-ui/web/ui/tooltip";
+import { TooltipContent } from "@/packages/next-vibe-ui/web/ui/tooltip";
+import { TooltipProvider } from "@/packages/next-vibe-ui/web/ui/tooltip";
+import { TooltipTrigger } from "@/packages/next-vibe-ui/web/ui/tooltip";
 import type { JSX } from "react";
 import React, { useCallback } from "react";
 
 import {
   DEFAULT_FOLDER_CONFIGS,
+  DEFAULT_FOLDER_IDS,
   isDefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
@@ -24,6 +23,7 @@ interface RootFolderBarProps {
   activeFolderId: string | null;
   locale: CountryLanguage;
   onSelectFolder: (folderId: string) => void;
+  isAuthenticated: boolean;
 }
 
 /**
@@ -90,20 +90,40 @@ export function RootFolderBar({
   activeFolderId,
   locale,
   onSelectFolder,
+  isAuthenticated,
 }: RootFolderBarProps): JSX.Element {
   const { t } = simpleT(locale);
 
   // Get root folders from DEFAULT_FOLDER_CONFIGS
+  // Show all folders to all users, but disable PRIVATE and SHARED for public users
   const rootFolders = DEFAULT_FOLDER_CONFIGS;
+
+  // Check if a folder is accessible to the current user
+  const isFolderAccessible = useCallback(
+    (folderId: string): boolean => {
+      if (isAuthenticated) {
+        return true; // Authenticated users can access all folders
+      }
+      // Public users can only access PUBLIC and INCOGNITO folders
+      return (
+        folderId === DEFAULT_FOLDER_IDS.PUBLIC ||
+        folderId === DEFAULT_FOLDER_IDS.INCOGNITO
+      );
+    },
+    [isAuthenticated],
+  );
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>): void => {
       const folderId = event.currentTarget.dataset.folderId;
       if (folderId && isDefaultFolderId(folderId)) {
-        onSelectFolder(folderId);
+        // Only allow navigation if folder is accessible
+        if (isFolderAccessible(folderId)) {
+          onSelectFolder(folderId);
+        }
       }
     },
-    [onSelectFolder],
+    [onSelectFolder, isFolderAccessible],
   );
 
   return (
@@ -115,6 +135,7 @@ export function RootFolderBar({
             const folderDisplayName = t(folderConfig.translationKey);
             const isActive = folderConfig.id === activeFolderId;
             const folderColor = folderConfig.color;
+            const isAccessible = isFolderAccessible(folderConfig.id);
             const colorClasses = getColorClasses(folderColor, isActive);
 
             const tooltipColorClasses = getTooltipColorClasses(folderColor);
@@ -130,6 +151,7 @@ export function RootFolderBar({
                     className={`h-11 w-11 ${colorClasses}`}
                     data-folder-id={folderConfig.id}
                     onClick={handleClick}
+                    disabled={!isAccessible}
                     suppressHydrationWarning
                   >
                     <FolderIcon className="h-6 w-6 flex items-center justify-center" />
@@ -144,6 +166,11 @@ export function RootFolderBar({
                     <P className="text-xs opacity-90 mt-0.5">
                       {folderDescription}
                     </P>
+                    {!isAccessible && (
+                      <P className="text-xs opacity-70 mt-1 font-medium">
+                        {t("app.chat.common.loginRequired")}
+                      </P>
+                    )}
                   </Div>
                 </TooltipContent>
               </Tooltip>

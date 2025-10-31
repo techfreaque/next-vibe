@@ -19,7 +19,8 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe-ui/ui/card";
-import { Div, Span } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
 import type React from "react";
 import type { JSX } from "react";

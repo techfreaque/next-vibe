@@ -8,6 +8,52 @@ import * as React from "react";
 
 import { Dialog, DialogContent } from "./dialog";
 
+// Cross-platform type exports - narrowed to work on both platforms
+export interface CommandProps {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export interface CommandInputProps {
+  className?: string;
+  placeholder?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
+}
+
+export interface CommandListProps {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export interface CommandEmptyProps {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export interface CommandGroupProps {
+  children?: React.ReactNode;
+  className?: string;
+  heading?: string;
+}
+
+export interface CommandItemProps {
+  children?: React.ReactNode;
+  className?: string;
+  disabled?: boolean;
+}
+
+export interface CommandSeparatorProps {
+  className?: string;
+}
+
+export interface CommandShortcutProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export type CommandDialogProps = DialogProps;
+
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -22,8 +68,6 @@ const Command = React.forwardRef<
   />
 ));
 Command.displayName = CommandPrimitive.displayName;
-
-type CommandDialogProps = DialogProps;
 
 const CommandDialog = ({
   children,

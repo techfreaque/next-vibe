@@ -1,7 +1,9 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Div, Span, Switch } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
+import { Switch } from "next-vibe-ui/ui/switch";
 import { Search } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React from "react";

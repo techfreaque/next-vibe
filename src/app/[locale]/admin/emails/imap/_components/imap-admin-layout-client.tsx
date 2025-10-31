@@ -6,12 +6,14 @@
 "use client";
 
 import { BarChart3, Mail, RefreshCw, Settings, Users } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
+import { Link } from "next-vibe-ui/ui/link";
 import { cn } from "next-vibe/shared/utils";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div, Span } from "next-vibe-ui/ui";
-import { H2, P } from "next-vibe-ui/ui";
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
+import { H2 } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui/typography";
 import type { ComponentType, JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

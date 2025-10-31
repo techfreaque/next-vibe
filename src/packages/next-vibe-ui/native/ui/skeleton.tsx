@@ -7,17 +7,12 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import type { SkeletonProps } from "next-vibe-ui/ui/skeleton";
 import { cn } from "../lib/utils";
 
 const duration = 1000;
 
-function Skeleton({
-  className,
-  ...props
-}: Omit<
-  React.ComponentPropsWithoutRef<typeof Animated.View>,
-  "style"
->): React.JSX.Element {
+function Skeleton({ className, style: customStyle, ...props }: SkeletonProps): React.JSX.Element {
   const sv = useSharedValue(1);
 
   React.useEffect(() => {
@@ -27,15 +22,15 @@ function Skeleton({
     );
   }, [sv]);
 
-  const style = useAnimatedStyle(() => ({
+  const animStyle = useAnimatedStyle(() => ({
     opacity: sv.value,
   }));
 
   return (
     <Animated.View
-      style={style}
+      style={[animStyle, customStyle as any]}
       className={cn("rounded-md bg-secondary dark:bg-muted", className)}
-      {...props}
+      {...props as any}
     />
   );
 }

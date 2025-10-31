@@ -1,36 +1,210 @@
 /**
  * TagsField Component for React Native
- * TODO: Implement full tags input functionality with add/remove
- * Currently a simple TextInput wrapper
+ * Production-ready multi-select tags input with suggestions and custom values
  */
-import type { ReactNode } from "react";
-import React from "react";
-import type { TextInputProps } from "react-native";
-import { TextInput, View } from "react-native";
+import React, { useState } from "react";
+import type { NativeSyntheticEvent, TextInputKeyPressEventData } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
+import { Plus, X } from "./icons";
 
 import { cn } from "../lib/utils";
+import { Badge } from "./badge";
+import { Input } from "./input";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import { Text as UIText } from "./text";
 
-interface TagsFieldProps extends TextInputProps {
-  children?: ReactNode;
-  className?: string;
-  tags?: string[];
-  onTagsChange?: (tags: string[]) => void;
-}
+// Import cross-platform interfaces from web
+import type { TagOptionBase, TagsFieldPropsBase } from "../../../web/ui/tags-field";
 
-export const TagsField = React.forwardRef<TextInput, TagsFieldProps>(
-  ({ className, children, ...props }, ref) => {
-    // TODO: Implement tags and onTagsChange functionality
-    return (
-      <View className={cn("flex flex-col gap-2", className)}>
-        <TextInput
-          ref={ref}
-          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-          {...props}
-        />
-        {children}
+// Native uses base interface directly - no modifications needed
+export type { TagOptionBase };
+export type TagsFieldProps = TagsFieldPropsBase;
+
+export function TagsField({
+  value = [],
+  onChange,
+  onBlur,
+  suggestions = [],
+  placeholder = "Add tags...",
+  maxTags,
+  allowCustom = true,
+  disabled = false,
+  className,
+  name,
+}: TagsFieldProps): React.JSX.Element {
+  const [inputValue, setInputValue] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Filter suggestions based on input and exclude already selected
+  const filteredSuggestions = suggestions.filter((suggestion: TagOptionBase) => {
+    const matchesInput = suggestion.label.toLowerCase().includes(inputValue.toLowerCase());
+    const notSelected = !value.includes(suggestion.value);
+    return matchesInput && notSelected;
+  });
+
+  // Group suggestions by category
+  const groupedSuggestions = filteredSuggestions.reduce(
+    (groups: Record<string, TagOptionBase[]>, suggestion: TagOptionBase) => {
+      const category = suggestion.category || "other";
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(suggestion);
+      return groups;
+    },
+    {} as Record<string, TagOptionBase[]>,
+  );
+
+  const addTag = (tagValue: string): void => {
+    if (!tagValue.trim()) {
+      return;
+    }
+
+    const trimmedValue = tagValue.trim();
+
+    // Check if tag already exists
+    if (value.includes(trimmedValue)) {
+      return;
+    }
+
+    // Check max tags limit
+    if (maxTags && value.length >= maxTags) {
+      return;
+    }
+
+    onChange([...value, trimmedValue]);
+    setInputValue("");
+    setShowSuggestions(false);
+  };
+
+  const removeTag = (tagToRemove: string): void => {
+    onChange(value.filter((tag: string) => tag !== tagToRemove));
+  };
+
+  const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>): void => {
+    if (e.nativeEvent.key === "Enter" && inputValue.trim()) {
+      e.preventDefault();
+      if (allowCustom) {
+        addTag(inputValue);
+      }
+    } else if (e.nativeEvent.key === "Backspace" && !inputValue && value.length > 0) {
+      removeTag(value[value.length - 1]);
+    }
+  };
+
+  const handleInputFocus = (): void => {
+    if (suggestions.length > 0) {
+      setShowSuggestions(true);
+    }
+  };
+
+  const handleInputBlur = (): void => {
+    // Delay hiding suggestions to allow for clicks
+    setTimeout(() => {
+      setShowSuggestions(false);
+      onBlur?.();
+    }, 200);
+  };
+
+  const getTagLabel = (tagValue: string): string => {
+    const suggestion = suggestions.find((s: TagOptionBase) => s.value === tagValue);
+    return suggestion ? suggestion.label : tagValue;
+  };
+
+  const canAddMore = !maxTags || value.length < maxTags;
+
+  return (
+    <View className={cn("relative", className)}>
+      <View
+        className={cn(
+          "min-h-[48px] w-full rounded-md border border-input bg-background px-3 py-2",
+          disabled && "cursor-not-allowed opacity-50",
+          "flex-row flex-wrap gap-2 items-center",
+        )}
+      >
+        {/* Render selected tags */}
+        {value.map((tag: string) => (
+          <Badge key={tag} variant="secondary" className="flex-row items-center gap-1 px-2 py-1">
+            <UIText className="text-xs">{getTagLabel(tag)}</UIText>
+            {!disabled && (
+              <Pressable
+                onPress={() => removeTag(tag)}
+                className="h-3 w-3 items-center justify-center"
+              >
+                <X size={10} className="text-foreground" />
+              </Pressable>
+            )}
+          </Badge>
+        ))}
+
+        {/* Input field */}
+        {canAddMore && !disabled && (
+          <Popover open={showSuggestions} onOpenChange={setShowSuggestions}>
+            <PopoverTrigger>
+              <View className="flex-1 min-w-[120px]">
+                <Input
+                  value={inputValue}
+                  onChangeText={setInputValue}
+                  onKeyPress={handleKeyPress}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  placeholder={value.length === 0 ? placeholder : ""}
+                  className="border-0 p-0 h-6 bg-transparent"
+                />
+              </View>
+            </PopoverTrigger>
+
+            {suggestions.length > 0 && filteredSuggestions.length > 0 && (
+              <PopoverContent className="w-80 p-0" align="start">
+                <ScrollView className="max-h-[200px]">
+                  {Object.entries(groupedSuggestions).map(([category, categorySuggestions]) => (
+                    <View key={category} className="p-2">
+                      {category !== "other" && (
+                        <UIText className="px-2 py-1 text-xs font-medium text-muted-foreground uppercase">
+                          {category}
+                        </UIText>
+                      )}
+                      <View className="gap-1">
+                        {(categorySuggestions as TagOptionBase[]).map((suggestion: TagOptionBase) => (
+                          <Pressable
+                            key={suggestion.value}
+                            onPress={() => addTag(suggestion.value)}
+                            className="flex-row items-center w-full h-8 px-2 rounded-sm active:bg-accent"
+                          >
+                            <Plus size={14} className="mr-2 text-foreground" />
+                            <UIText className="text-base">{suggestion.label}</UIText>
+                          </Pressable>
+                        ))}
+                      </View>
+                    </View>
+                  ))}
+
+                  {allowCustom &&
+                    inputValue.trim() &&
+                    !filteredSuggestions.some((s: TagOptionBase) => s.value === inputValue.trim()) && (
+                      <View className="p-2 border-t border-border">
+                        <Pressable
+                          onPress={() => addTag(inputValue)}
+                          className="flex-row items-center w-full h-8 px-2 rounded-sm active:bg-accent"
+                        >
+                          <Plus size={14} className="mr-2 text-foreground" />
+                          <UIText className="text-base">Add "{inputValue.trim()}"</UIText>
+                        </Pressable>
+                      </View>
+                    )}
+                </ScrollView>
+              </PopoverContent>
+            )}
+          </Popover>
+        )}
+
+        {/* Max tags indicator */}
+        {maxTags && (
+          <UIText className="text-xs text-muted-foreground ml-auto">
+            {value.length}/{maxTags}
+          </UIText>
+        )}
       </View>
-    );
-  },
-);
-
-TagsField.displayName = "TagsField";
+    </View>
+  );
+}

@@ -5,9 +5,27 @@ import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
+// Cross-platform props interface
+export interface RadioGroupBaseProps {
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+  disabled?: boolean;
+  className?: string;
+  name?: string;
+  required?: boolean;
+}
+
+export interface RadioGroupItemBaseProps {
+  value: string;
+  disabled?: boolean;
+  className?: string;
+  id?: string;
+}
+
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
+  RadioGroupBaseProps & React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
 >(({ className, ...props }, ref) => {
   return (
     <RadioGroupPrimitive.Root
@@ -21,7 +39,7 @@ RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
 
 const RadioGroupItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
+  RadioGroupItemBaseProps & React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
 >(({ className, ...props }, ref) => {
   return (
     <RadioGroupPrimitive.Item

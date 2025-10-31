@@ -18,7 +18,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { WidgetConfig } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/ui/widgets";
-import type { UserRoleDB } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {
   RenderableValue,
@@ -130,7 +130,7 @@ export class ResponseMetadataExtractor {
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleDB)[number][],
+      readonly (typeof UserRole)[keyof typeof UserRole][],
       UnifiedField<z.ZodTypeAny>
     >,
   >(

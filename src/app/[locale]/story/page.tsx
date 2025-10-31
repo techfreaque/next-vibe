@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { subscriptionRepository } from "@/app/api/[locale]/v1/core/subscription/repository";

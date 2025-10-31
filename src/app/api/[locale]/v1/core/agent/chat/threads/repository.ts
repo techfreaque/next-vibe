@@ -17,10 +17,13 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
+import type { UserRoleDB } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { chatThreads } from "../db";
+import { getDefaultFolderConfig } from "../config";
+import { chatFolders, chatThreads, type ChatFolder } from "../db";
+import { canReadThread, canWriteFolder } from "../permissions/permissions";
 import { ThreadStatus } from "../enum";
 import type { PersonaId } from "../personas/config";
 import { validateNotIncognito } from "../validation";
@@ -185,15 +188,35 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         .limit(limit)
         .offset(offset);
 
+      // Filter threads based on user permissions
+      const visibleThreads = [];
+      for (const thread of dbThreads) {
+        // Get folder if thread has one
+        let folder = null;
+        if (thread.folderId) {
+          const [folderResult] = await db
+            .select()
+            .from(chatFolders)
+            .where(eq(chatFolders.id, thread.folderId))
+            .limit(1);
+          folder = folderResult || null;
+        }
+
+        if (await canReadThread(user, thread, folder, logger)) {
+          visibleThreads.push(thread);
+        }
+      }
+
       // Map DB fields to API response format (DB has rootFolderId as DefaultFolderId, folderId as UUID)
-      const threads = dbThreads.map((thread) => ({
+      const threads = visibleThreads.map((thread) => ({
         id: thread.id,
         title: thread.title,
-        rootFolderId: thread.rootFolderId,
+        rootFolderId: thread.rootFolderId as "incognito" | "private" | "public" | "shared",
         folderId: thread.folderId,
         status: thread.status,
         preview: thread.preview,
         pinned: thread.pinned,
+        allowedRoles: (thread.allowedRoles || []) as ("ADMIN" | "AI_TOOL_OFF" | "CLI_OFF" | "CUSTOMER" | "PARTNER_ADMIN" | "PARTNER_EMPLOYEE" | "PUBLIC" | "WEB_OFF")[],
         createdAt: thread.createdAt.toISOString(),
         updatedAt: thread.updatedAt.toISOString(),
       }));
@@ -271,6 +294,77 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         });
       }
 
+      // Check permissions: get folder if subFolderId is provided
+      const folderId = data.thread?.subFolderId;
+      let folder: ChatFolder | null = null;
+
+      if (folderId) {
+        // Get parent folder to check permissions
+        const [folderResult] = await db
+          .select()
+          .from(chatFolders)
+          .where(eq(chatFolders.id, folderId))
+          .limit(1);
+
+        if (!folderResult) {
+          return fail({
+            message:
+              "app.api.v1.core.agent.chat.threads.post.errors.notFound.title",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+            messageParams: {
+              message: "Folder not found",
+            },
+          });
+        }
+
+        folder = folderResult;
+      } else if (data.thread?.rootFolderId === "public") {
+        // Creating thread in PUBLIC root - need to check ADMIN permission
+        // Create a virtual folder object for permission check
+        folder = {
+          id: "public-root",
+          userId: "", // Root folders have no owner
+          rootFolderId: "public" as const,
+          name: "Public",
+          icon: null,
+          color: null,
+          parentId: null, // This is the key - null means root level
+          expanded: true,
+          sortOrder: 0,
+          metadata: {},
+          allowedRoles: [],
+          moderatorIds: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+      }
+
+      // Check if user has permission to create thread in this folder
+      const hasPermission = await canWriteFolder(user, folder, logger);
+
+      if (!hasPermission) {
+        return fail({
+          message:
+            "app.api.v1.core.agent.chat.threads.post.errors.forbidden.title",
+          errorType: ErrorResponseTypes.FORBIDDEN,
+          messageParams: {
+            message: "Cannot create thread in this location",
+          },
+        });
+      }
+
+      // Determine allowedRoles: inherit from parent folder or set based on rootFolderId
+      let allowedRoles: (typeof UserRoleDB)[number][] = [];
+
+      if (folder && folderId) {
+        // Inherit allowedRoles from parent folder (already fetched above)
+        allowedRoles = (folder.allowedRoles || []) as (typeof UserRoleDB)[number][];
+      } else {
+        // Get default allowedRoles from root folder config
+        const rootFolderConfig = getDefaultFolderConfig(data.thread?.rootFolderId);
+        allowedRoles = rootFolderConfig?.defaultAllowedRoles || [];
+      }
+
       const threadData = {
         userId: userIdentifier,
         title:
@@ -289,6 +383,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         tags: [],
         preview: null,
         metadata: {},
+        allowedRoles,
       } satisfies typeof chatThreads.$inferInsert;
 
       const [dbThread] = await db

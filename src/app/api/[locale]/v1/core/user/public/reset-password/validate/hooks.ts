@@ -2,7 +2,7 @@
  * Hooks for password reset token validation
  */
 
-import { useToast } from "next-vibe-ui/ui";
+import { useToast } from "@/packages/next-vibe-ui/web/hooks/use-toast";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useApiQuery } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";

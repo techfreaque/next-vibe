@@ -1,19 +1,20 @@
 import "server-only";
 
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull, or } from "drizzle-orm";
 import {
   createSuccessResponse,
   ErrorResponseTypes,
   fail,
+  type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
-import { canCreateFolder } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
+import { getDefaultFolderConfig } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { canCreateFolder, canReadFolder } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -25,11 +26,6 @@ import type {
 } from "./definition";
 
 /**
- * Metadata type for folder metadata (JSON object)
- */
-type FolderMetadata = Record<string, string | number | boolean | null>;
-
-/**
  * Chat Folders Repository Interface
  */
 export interface ChatFoldersRepositoryInterface {
@@ -38,14 +34,14 @@ export interface ChatFoldersRepositoryInterface {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; data?: FolderListResponseOutput; error?: { message: string; type: string } }>;
+  ): Promise<ResponseType<FolderListResponseOutput>>;
 
   createFolder(
     data: FolderCreateRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; data?: FolderCreateResponseOutput; error?: { message: string; type: string } }>;
+  ): Promise<ResponseType<FolderCreateResponseOutput>>;
 }
 
 /**
@@ -60,7 +56,7 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; data?: FolderListResponseOutput; error?: { message: string; type: string } }> {
+  ): Promise<ResponseType<FolderListResponseOutput>> {
     // For anonymous users (public), use leadId instead of userId
     // For authenticated users, use userId
     const userIdentifier = user.isPublic ? user.leadId : user.id;
@@ -79,41 +75,61 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
     try {
       logger.debug("Fetching folders", { userIdentifier, rootFolderId });
 
-      // Build where conditions - only filter by rootFolderId if provided
-      const whereConditions = rootFolderId
-        ? and(
+      // Build where conditions based on rootFolderId
+      // For PUBLIC root folder: fetch ALL folders (permission filtering happens later)
+      // For other root folders: only fetch user's own folders
+      let whereConditions;
+      if (rootFolderId === "public") {
+        // PUBLIC folder: fetch all folders in this root folder
+        whereConditions = eq(chatFolders.rootFolderId, rootFolderId);
+      } else if (rootFolderId) {
+        // Other specific root folder: only user's own folders
+        whereConditions = and(
           eq(chatFolders.userId, userIdentifier),
           eq(chatFolders.rootFolderId, rootFolderId),
-        )
-        : eq(chatFolders.userId, userIdentifier);
+        );
+      } else {
+        // No rootFolderId specified: fetch all PUBLIC folders + user's own folders from other root folders
+        // This allows the permission system to work correctly for shared/public folders
+        whereConditions = or(
+          eq(chatFolders.rootFolderId, "public"), // All PUBLIC folders
+          eq(chatFolders.userId, userIdentifier), // User's own folders from any root folder
+        );
+      }
 
-      const folders = await db
+      const allFolders = await db
         .select()
         .from(chatFolders)
         .where(whereConditions)
         .orderBy(desc(chatFolders.sortOrder), desc(chatFolders.createdAt));
 
-      return createSuccessResponse<FolderListResponseOutput>({
-        folders: folders.map((folder) => ({
+      // Filter folders based on user permissions using canReadFolder
+      const visibleFolders = [];
+      for (const folder of allFolders) {
+        if (await canReadFolder(user, folder, logger)) {
+          visibleFolders.push(folder);
+        }
+      }
+
+      return createSuccessResponse({
+        folders: visibleFolders.map((folder) => ({
           id: folder.id,
           userId: folder.userId,
-          rootFolderId: folder.rootFolderId as
-            | "private"
-            | "shared"
-            | "public"
-            | "incognito",
+          rootFolderId: folder.rootFolderId as "incognito" | "private" | "public" | "shared",
           name: folder.name,
           icon: folder.icon,
           color: folder.color,
           parentId: folder.parentId,
           expanded: folder.expanded,
           sortOrder: folder.sortOrder,
-          metadata: (folder.metadata || {}) as FolderMetadata,
-          allowedRoles: (folder.allowedRoles || []) as string[],
+          metadata: folder.metadata || {},
+          allowedRoles: folder.allowedRoles || [],
+          moderatorIds: folder.moderatorIds || [],
           createdAt: folder.createdAt.toISOString(),
           updatedAt: folder.updatedAt.toISOString(),
         })),
-      });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }) as any;
     } catch (error) {
       logger.error("Failed to fetch folders", parseError(error));
       return fail({
@@ -131,7 +147,7 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; data?: FolderCreateResponseOutput; error?: { message: string; type: string } }> {
+  ): Promise<ResponseType<FolderCreateResponseOutput>> {
     try {
       const { folder: folderData } = data;
 
@@ -214,15 +230,9 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
 
       const nextSortOrder = existingFolders.length;
 
-      // Set allowedRoles based on rootFolderId
-      let allowedRoles: string[] = [];
-      if (folderData.rootFolderId === "public") {
-        // PUBLIC folders visible to all by default
-        allowedRoles = [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN];
-      } else {
-        // PRIVATE/SHARED folders: owner only (empty array)
-        allowedRoles = [];
-      }
+      // Set allowedRoles based on rootFolderId config
+      const rootFolderConfig = getDefaultFolderConfig(folderData.rootFolderId);
+      const allowedRoles = rootFolderConfig?.defaultAllowedRoles || [];
 
       const [newFolder] = await db
         .insert(chatFolders)
@@ -249,29 +259,27 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
         });
       }
 
-      return createSuccessResponse<FolderCreateResponseOutput>({
+      return createSuccessResponse({
         response: {
           folder: {
             id: newFolder.id,
             userId: newFolder.userId,
-            rootFolderId: newFolder.rootFolderId as
-              | "private"
-              | "shared"
-              | "public"
-              | "incognito",
+            rootFolderId: newFolder.rootFolderId as "incognito" | "private" | "public" | "shared",
             name: newFolder.name,
             icon: newFolder.icon,
             color: newFolder.color,
             parentId: newFolder.parentId,
             expanded: newFolder.expanded,
             sortOrder: newFolder.sortOrder,
-            metadata: (newFolder.metadata || {}) as FolderMetadata,
-            allowedRoles: (newFolder.allowedRoles || []) as string[],
+            metadata: newFolder.metadata || {},
+            allowedRoles: newFolder.allowedRoles || [],
+            moderatorIds: newFolder.moderatorIds || [],
             createdAt: newFolder.createdAt.toISOString(),
             updatedAt: newFolder.updatedAt.toISOString(),
           },
         },
-      });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }) as any;
     } catch (error) {
       logger.error("Failed to create folder", parseError(error));
       return fail({

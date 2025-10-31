@@ -6,8 +6,9 @@
 import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
 
-interface ContainerProps {
-  children: ReactNode;
+// Cross-platform props interface
+export interface ContainerProps {
+  children?: ReactNode;
   className?: string;
   size?: "sm" | "md" | "lg" | "xl" | "2xl" | "full";
 }

@@ -150,6 +150,33 @@ const SelectSeparator = React.forwardRef<
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
+// Cross-platform type exports
+export interface SelectOption {
+  value: string;
+  label: string;
+}
+
+export type SelectTriggerProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+  children?: React.ReactNode;
+  disabled?: boolean;
+};
+
+export type SelectContentProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> & {
+  children?: React.ReactNode;
+  position?: "popper" | "item-aligned";
+};
+
+export type SelectItemProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item> & {
+  value: string;
+  label?: string;
+  children?: React.ReactNode;
+  disabled?: boolean;
+};
+
+export type SelectLabelProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>;
+
+export type SelectSeparatorProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>;
+
 export {
   Select,
   SelectContent,

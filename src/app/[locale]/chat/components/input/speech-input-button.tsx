@@ -1,8 +1,11 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Button, Div, P, Span } from "next-vibe-ui/ui";
-import { Loader2, Mic, MicOff } from "next-vibe-ui/ui/icons";
+import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { P } from "@/packages/next-vibe-ui/web/ui/typography";
+import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Loader2, Mic, MicOff } from "lucide-react";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 

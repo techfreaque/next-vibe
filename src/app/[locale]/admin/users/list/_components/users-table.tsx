@@ -7,7 +7,7 @@
 
 import NextLink from "next/link";
 import { Badge } from "next-vibe-ui/ui/badge";
-import { Div } from "next-vibe-ui/ui";
+import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Table,
@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { H3, P } from "next-vibe-ui/ui";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import { useCallback } from "react";
 

@@ -6,7 +6,11 @@
 "use client";
 
 import { Mail, Send } from "lucide-react";
-import { Div, FormAlert, H3, P, Span } from "next-vibe-ui/ui";
+
+import { Span } from "next-vibe-ui/ui/span";
+import { Div } from "next-vibe-ui/ui/div";
+import { H3, P } from "next-vibe-ui/ui/typography";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";

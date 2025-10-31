@@ -36,29 +36,6 @@ import type { StreamingMessage, StreamingThread } from "./store";
 import { useAIStreamStore } from "./store";
 
 /**
- * Helper function to create error messages in the chat thread
- */
-function createErrorMessage(
-  store: ReturnType<typeof useAIStreamStore.getState>,
-  threadId: string,
-  errorMessage: string,
-): void {
-  const errorMessageId = crypto.randomUUID();
-  store.addMessage({
-    messageId: errorMessageId,
-    threadId,
-    role: ChatMessageRole.ERROR,
-    content: errorMessage,
-    parentId: null,
-    depth: 0,
-    model: null,
-    persona: null,
-    isStreaming: false,
-    error: errorMessage,
-  });
-}
-
-/**
  * SSE Stream Options
  */
 export interface StreamOptions {
@@ -156,7 +133,7 @@ export function useAIStream(
             errorMessage,
           });
           store.setError(errorMessage);
-          createErrorMessage(store, data.threadId || "", errorMessage);
+          // Don't create error messages as chat messages - they're displayed in the global error banner
           store.stopStream();
           return;
         }
@@ -167,7 +144,7 @@ export function useAIStream(
           );
           logger.error("Stream response has no body");
           store.setError(errorMessage);
-          createErrorMessage(store, data.threadId || "", errorMessage);
+          // Don't create error messages as chat messages - they're displayed in the global error banner
           store.stopStream();
           return;
         }
@@ -903,11 +880,7 @@ export function useAIStream(
               case StreamEventType.ERROR: {
                 const eventData = event.data as ErrorEventData;
                 store.setError(eventData.message);
-                createErrorMessage(
-                  store,
-                  data.threadId || "",
-                  eventData.message,
-                );
+                // Don't create error messages as chat messages - they're displayed in the global error banner
                 options.onError?.(eventData);
                 break;
               }
@@ -924,7 +897,7 @@ export function useAIStream(
           } else {
             logger.error("Stream error", { error: error.message });
             store.setError(error.message);
-            createErrorMessage(store, data.threadId || "", error.message);
+            // Don't create error messages as chat messages - they're displayed in the global error banner
           }
         }
         store.stopStream();
