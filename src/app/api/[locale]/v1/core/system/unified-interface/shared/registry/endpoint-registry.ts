@@ -3,13 +3,11 @@
  * Single source of truth for loading endpoint definitions from generated index
  */
 
-import "server-only";
-
 import { endpoints } from "@/app/api/[locale]/v1/core/system/generated/endpoints";
-import type { EndpointLogger } from "../../logger/endpoint";
-import type { Methods } from "../../types/enums";
-import type { ApiSection } from "../../types/endpoint";
-import { normalizeRoutePath } from "../utils/normalize-route-path";
+import type { EndpointLogger } from "../logger/endpoint";
+import type { Methods } from "../types/enums";
+import type { ApiSection } from "../types/endpoint";
+import { normalizeRoutePath } from "./normalize-route-path";
 
 /**
  * Endpoint loading options

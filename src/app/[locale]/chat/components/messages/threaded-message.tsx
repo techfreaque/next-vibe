@@ -19,7 +19,7 @@ import {
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import { Logo } from "@/app/[locale]/_components/nav/logo";
+import { Logo } from "@/app/[locale]/_components/logo";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { getPersonaName } from "@/app/api/[locale]/v1/core/agent/chat/personas/config";
 import { useTTSAudio } from "@/app/api/[locale]/v1/core/agent/text-to-speech/hooks";
@@ -36,7 +36,7 @@ import type { ChatMessage, ModelId } from "../../types";
 import { ErrorMessageBubble } from "./error-message-bubble";
 import { MessageEditor } from "./message-editor";
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
-import { ToolCallDisplay } from "./tool-call-display";
+import { ToolDisplay } from "./tool-display";
 import { useMessageActions } from "./use-message-actions";
 import { UserProfileCard } from "./user-profile-card";
 
@@ -125,7 +125,7 @@ export function ThreadedMessage({
       {/* Thread connector line - vertical line on the left */}
       {depth > 0 && (
         <Div
-          className="absolute left-0 top-0 bottom-0 bg-gradient-to-b from-blue-500/30 via-blue-500/20 to-transparent"
+          className="absolute left-0 top-0 bottom-0 bg-linear-to-b from-blue-500/30 via-blue-500/20 to-transparent"
           style={{
             marginLeft: `${indent - LAYOUT.THREAD_LINE_MARGIN_OFFSET}px`,
             width: `${LAYOUT.THREAD_LINE_WIDTH}px`,
@@ -341,7 +341,7 @@ export function ThreadedMessage({
                     <Div>
                       {/* NEW ARCHITECTURE: TOOL messages have toolCalls in metadata */}
                       {message.toolCalls && message.toolCalls.length > 0 && (
-                        <ToolCallDisplay
+                        <ToolDisplay
                           toolCalls={message.toolCalls}
                           locale={locale}
                           hasContent={false}
@@ -399,7 +399,7 @@ export function ThreadedMessage({
                   {voteScore !== 0 && (
                     <Span
                       className={cn(
-                        "text-xs font-medium min-w-[1.5rem] text-center",
+                        "text-xs font-medium min-w-6 text-center",
                         voteScore > 0 && "text-blue-400",
                         voteScore < 0 && "text-red-400",
                       )}

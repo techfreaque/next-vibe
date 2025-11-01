@@ -665,14 +665,67 @@ export function useAIStream(
               }
 
               case StreamEventType.TOOL_RESULT: {
-                // NEW ARCHITECTURE: Tool results are stored in TOOL message metadata
-                // TOOL_RESULT event is redundant - backend already updates the TOOL message
-                // Keep event for backward compatibility but don't process it
+                // NEW ARCHITECTURE: Update TOOL message with result data
                 const eventData = event.data as ToolResultEventData;
-                logger.debug("Tool result event received (ignored in new architecture)", {
+                logger.debug("Tool result event received - updating TOOL message", {
                   messageId: eventData.messageId,
                   toolName: eventData.toolName,
+                  hasResult: !!eventData.result,
+                  hasError: !!eventData.error,
+                  hasToolCall: !!eventData.toolCall,
                 });
+
+                // Update streaming message with tool call result
+                const currentMessage = useAIStreamStore.getState().streamingMessages[eventData.messageId];
+                if (currentMessage && eventData.toolCall) {
+                  // Update the tool call with result
+                  store.updateMessageContent(eventData.messageId, currentMessage.content);
+
+                  // Update toolCalls array with result
+                  const updatedToolCalls = currentMessage.toolCalls?.map(tc =>
+                    tc.toolName === eventData.toolName ? eventData.toolCall! : tc
+                  ) || [eventData.toolCall];
+
+                  // Update message in stream store
+                  useAIStreamStore.setState((state) => ({
+                    streamingMessages: {
+                      ...state.streamingMessages,
+                      [eventData.messageId]: {
+                        ...currentMessage,
+                        toolCalls: updatedToolCalls,
+                      },
+                    },
+                  }));
+
+                  // Update message in chat store if incognito
+                  const streamThread = useAIStreamStore.getState().threads[currentMessage.threadId];
+                  const isIncognitoFromStream = streamThread?.rootFolderId === "incognito";
+
+                  if (isIncognitoFromStream) {
+                    void import("../../chat/store").then(({ useChatStore }) => {
+                      useChatStore.getState().updateMessage(eventData.messageId, {
+                        toolCalls: updatedToolCalls,
+                      });
+
+                      // Also update localStorage
+                      return import("../../chat/incognito/storage").then(({ saveMessage }) => {
+                        const chatMessage = useChatStore.getState().messages[eventData.messageId];
+                        if (chatMessage) {
+                          saveMessage(chatMessage);
+                        }
+                      });
+                    }).catch((error) => {
+                      logger.error("Failed to update tool result in chat store", {
+                        error: error instanceof Error ? error.message : String(error),
+                      });
+                    });
+                  }
+
+                  logger.debug("Tool result updated in message", {
+                    messageId: eventData.messageId,
+                    toolCallsCount: updatedToolCalls.length,
+                  });
+                }
 
                 options.onToolResult?.(eventData);
                 break;

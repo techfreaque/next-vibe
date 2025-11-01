@@ -145,6 +145,39 @@ export function validateGetRequestData<TSchema extends z.ZodTypeAny>(
   request: NextRequest,
   logger: EndpointLogger,
 ): ResponseType<z.output<TSchema>> {
+  // Check if the schema is z.undefined(), z.never(), or empty z.object({}) (no request data expected)
+  // This happens when an endpoint has no request fields (e.g., GET with only response fields)
+  const isEmptyObject =
+    endpoint.requestSchema instanceof z.ZodObject &&
+    Object.keys(endpoint.requestSchema.shape).length === 0;
+
+  // Check if schema is z.never() by testing if it rejects empty object
+  const isNeverSchema = ((): boolean => {
+    try {
+      const testResult = endpoint.requestSchema.safeParse({});
+      return (
+        !testResult.success &&
+        testResult.error?.issues?.[0]?.code === "invalid_type" &&
+        testResult.error?.issues?.[0]?.expected === "never"
+      );
+    } catch {
+      return false;
+    }
+  })();
+
+  if (
+    endpoint.requestSchema instanceof z.ZodUndefined ||
+    endpoint.requestSchema instanceof z.ZodNever ||
+    isNeverSchema ||
+    isEmptyObject
+  ) {
+    // Return success with undefined as the data for GET requests with no params
+    return {
+      success: true,
+      data: undefined as z.output<TSchema>,
+    };
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const queryData: Record<string, string> = {};
@@ -152,6 +185,11 @@ export function validateGetRequestData<TSchema extends z.ZodTypeAny>(
     // Convert URLSearchParams to object
     for (const [key, value] of searchParams.entries()) {
       queryData[key] = value;
+    }
+
+    // If no query params and schema expects data, validate empty object
+    if (Object.keys(queryData).length === 0) {
+      return validateEndpointRequestData({}, endpoint.requestSchema, logger);
     }
 
     // Types flow naturally through validateEndpointRequestData

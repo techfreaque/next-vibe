@@ -12,7 +12,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import { Logo } from "@/app/[locale]/_components/nav/logo";
+import { Logo } from "@/app/[locale]/_components/logo";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -29,7 +29,7 @@ import { formatPostNumber, getPostNumber } from "../../lib/utils/post-numbers";
 import type { ChatMessage, ChatThread, ModelId } from "../../types";
 import { MessageEditor } from "./message-editor";
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
-import { ToolCallDisplay } from "./tool-call-display";
+import { ToolDisplay } from "./tool-display";
 import { useMessageActions } from "./use-message-actions";
 
 interface FlatMessageViewProps {
@@ -620,7 +620,7 @@ function FlatMessage({
             "border-red-500/60 bg-red-500/10",
           )}
         >
-          <Div className="whitespace-pre-wrap break-words text-red-400 font-medium">
+          <Div className="whitespace-pre-wrap wrap-break-word text-red-400 font-medium">
             {message.content}
           </Div>
         </Div>
@@ -637,7 +637,7 @@ function FlatMessage({
         >
           {/* NEW ARCHITECTURE: TOOL messages have toolCalls in metadata */}
           {message.toolCalls && message.toolCalls.length > 0 && (
-            <ToolCallDisplay
+            <ToolDisplay
               toolCalls={message.toolCalls}
               locale={locale}
               hasContent={false}

@@ -1,8 +1,6 @@
-import { translations as navTranslations } from "../../nav/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  nav: navTranslations,
   common: {
     active: "Aktywny",
     filter: "Filtruj",

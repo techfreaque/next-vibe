@@ -181,8 +181,8 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
         return value.replace(/([A-Z])/g, (match) => `_${match}`).toLowerCase();
       }) || [
-        "card",
-      ]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
+          "card",
+        ]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
 
       // Extract mode value from translation key
       const modeParts = data.mode.split(".");
@@ -519,8 +519,8 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           dueDate: data.dueDate || new Date().toISOString(),
           paidAt: finalizedInvoice.status_transitions?.paid_at
             ? new Date(
-                finalizedInvoice.status_transitions.paid_at * 1000,
-              ).toISOString()
+              finalizedInvoice.status_transitions.paid_at * 1000,
+            ).toISOString()
             : undefined,
           createdAt: new Date(finalizedInvoice.created * 1000).toISOString(),
           updatedAt: new Date().toISOString(),
@@ -863,13 +863,35 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         ? new Date(subscription.current_period_end * 1000)
         : undefined;
 
-      // Import credit repository dynamically to avoid circular dependencies
+      // Import repositories dynamically to avoid circular dependencies
       const { creditRepository } = await import("../credits/repository");
+      const { productsRepository, ProductIds } = await import("../products/repository-client");
+      const { userRepository } = await import("../user/repository");
+      const { UserDetailLevel } = await import("../user/enum");
 
-      // Add 1000 expiring credits for the subscription
+      // Get user's locale from database
+      const userResult = await userRepository.getUserById(
+        userId,
+        UserDetailLevel.STANDARD,
+        locale,
+        logger,
+      );
+
+      if (!userResult.success || !userResult.data) {
+        logger.error("Failed to get user for locale", { userId });
+        return;
+      }
+
+      const userLocale = userResult.data.locale
+
+      // Get subscription credits from products repository with user's locale
+      const subscriptionProduct = productsRepository.getProduct(ProductIds.SUBSCRIPTION, userLocale);
+      const subscriptionCredits = subscriptionProduct.credits;
+
+      // Add expiring credits for the subscription
       const result = await creditRepository.addUserCredits(
         userId,
-        1000,
+        subscriptionCredits,
         "subscription",
         logger,
         expiresAt,
@@ -887,7 +909,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       logger.info("Subscription credits added successfully", {
         invoiceId: invoice.id,
         userId,
-        credits: 1000,
+        credits: subscriptionCredits,
         expiresAt: expiresAt?.toISOString(),
       });
     } catch (error) {

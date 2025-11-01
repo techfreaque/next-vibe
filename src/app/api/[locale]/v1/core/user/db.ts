@@ -9,6 +9,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
 import { UserRoleDB } from "./user-roles/enum";
+import { type CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Users table schema
@@ -20,6 +21,8 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   privateName: text("private_name").notNull(),
   publicName: text("public_name").notNull(),
+
+  locale: text("locale").$type<CountryLanguage>().notNull(),
 
   emailVerified: boolean("email_verified").default(false).notNull(),
   isActive: boolean("is_active").default(true).notNull(),

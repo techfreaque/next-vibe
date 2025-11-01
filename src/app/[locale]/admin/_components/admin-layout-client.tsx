@@ -27,7 +27,7 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 
 import CountrySelector from "@/app/[locale]/_components/country-selector";
-import { ThemeToggle } from "@/app/[locale]/_components/nav/theme-toggle";
+import { ThemeToggle } from "@/app/[locale]/_components/theme-toggle";
 import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";

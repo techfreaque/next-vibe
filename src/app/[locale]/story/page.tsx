@@ -10,8 +10,11 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
+import CallToAction from "./_components/call-to-action";
+import Features from "./_components/features";
+import Footer from "./_components/footer";
 import Hero from "./_components/hero";
-import PricingComparison from "./pricing/_components/pricing-comparison-table";
+import Process from "./_components/process";
 import PricingSection from "./pricing/_components/pricing-section";
 
 interface HomePageProps {
@@ -86,10 +89,15 @@ export default async function HomePage({
   return (
     <Div
       role="main"
-      className="flex min-h-screen flex-col items-center justify-between w-full"
+      className="flex min-h-screen flex-col w-full"
     >
+      {/* Hero Section */}
       <Hero locale={locale} />
-      {/* <BrandsSection locale={locale} /> */}
+
+      {/* Features Section */}
+      <Features locale={locale} />
+
+      {/* Pricing Section */}
       <PricingSection
         locale={locale}
         currentUser={user}
@@ -98,7 +106,15 @@ export default async function HomePage({
         hideFooterAndHeader={false}
         isProcessing={null}
       />
-      <PricingComparison locale={locale} />
+
+      {/* How It Works */}
+      <Process locale={locale} />
+
+      {/* Call to Action */}
+      <CallToAction locale={locale} />
+
+      {/* Footer */}
+      <Footer locale={locale} />
     </Div>
   );
 }

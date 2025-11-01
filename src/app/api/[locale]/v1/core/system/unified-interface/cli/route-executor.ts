@@ -15,7 +15,7 @@ import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 import type { CreateApiEndpoint } from "../shared/endpoint/create";
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import { getCliUser } from "../shared/server-only/auth/cli-user";
-import { loadEndpointDefinition } from "../shared/server-only/execution/definition-loader";
+import { loadEndpointDefinition } from "../shared/registry/definition-loader";
 import type {
   BaseExecutionContext,
   BaseExecutionResult,

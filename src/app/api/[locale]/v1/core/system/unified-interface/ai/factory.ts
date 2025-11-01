@@ -14,6 +14,7 @@ import { FieldUsage } from "@/app/api/[locale]/v1/core/system/unified-interface/
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { Platform } from "../shared/server-only/config";
 import type {
   AIToolExecutionContext,
   CoreTool,
@@ -197,6 +198,7 @@ export class ToolFactory {
             // Transform validated params to tool parameter format
             data: transformedParams as Record<string, ToolParameterValue>,
             user: context.user,
+            platform: Platform.AI,
             locale: context.locale,
             logger: context.logger,
             metadata: {

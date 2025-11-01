@@ -4,11 +4,9 @@
  * This file maintained for backwards compatibility
  */
 
-import "server-only";
-
-import type { EndpointLogger } from "../../logger/endpoint";
-import type { Methods } from "../../types/enums";
-import { endpointRegistry } from "../registry/endpoint-registry";
+import type { EndpointLogger } from "../logger/endpoint";
+import type { Methods } from "../types/enums";
+import { endpointRegistry } from "./endpoint-registry";
 
 /**
  * Definition loading options

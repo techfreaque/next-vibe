@@ -24,13 +24,13 @@ export function Notifications({
     level: "info" | "success" | "warning" | "error";
     href: string;
   }[] = [
-    {
-      title: "app.common.api.notifications.welcome.title",
-      description: "app.common.api.notifications.welcome.description",
-      level: "info",
-      href: "/",
-    },
-  ]; // TODO: create notifications repository in api folder
+      {
+        title: "app.common.api.notifications.welcome.title",
+        description: "app.common.api.notifications.welcome.description",
+        level: "info",
+        href: "/",
+      },
+    ]; // TODO: create notifications repository in api folder
   const unreadNotificationCount = unreadNotifications?.length;
   return (
     <TooltipProvider>
@@ -92,11 +92,10 @@ function NotificationButton({
             className="relative h-9 w-9 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 rounded-lg group"
           >
             <Bell
-              className={`h-5 w-5 transition-colors duration-200 ${
-                hasNotifications
-                  ? "text-blue-600 dark:text-blue-400"
-                  : "text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400"
-              }`}
+              className={`h-5 w-5 transition-colors duration-200 ${hasNotifications
+                ? "text-blue-600 dark:text-blue-400"
+                : "text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                }`}
             />
             {hasNotifications && (
               <Badge
@@ -110,7 +109,7 @@ function NotificationButton({
         </DropdownMenuTrigger>
       </TooltipTrigger>
       <TooltipContent>
-        <P>{t("app.nav.notifications")}</P>
+        <P>{t("app.story._components.nav.notifications")}</P>
       </TooltipContent>
     </Tooltip>
   );

@@ -109,6 +109,8 @@ export interface ToolResultEventData {
   messageId: string;
   toolName: string;
   result: ToolCallResult | undefined;
+  error?: string; // Tool execution error message
+  toolCall?: ToolCall; // Full tool call data with result for frontend rendering
 }
 
 /**

@@ -780,11 +780,14 @@ export function useChat(
 
             // CRITICAL FIX: For incognito mode, build complete message history
             // The backend doesn't have database access for incognito, so we must send all messages
+            // IMPORTANT: Filter out TOOL messages as they have role="tool" which is not accepted by AI
             if (chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
-              messageHistory = threadMessages.map((msg) => ({
-                role: msg.role.toLowerCase() as "user" | "assistant" | "system",
-                content: msg.content,
-              }));
+              messageHistory = threadMessages
+                .filter((msg) => msg.role !== "tool") // Exclude TOOL messages
+                .map((msg) => ({
+                  role: msg.role.toLowerCase() as "user" | "assistant" | "system",
+                  content: msg.content,
+                }));
               logger.debug("Chat: Built message history for incognito mode", {
                 messageCount: messageHistory.length,
                 threadId: threadIdToUse,
@@ -896,11 +899,14 @@ export function useChat(
 
           if (messageIndex !== -1 && messageIndex > 0) {
             // Include all messages up to (but not including) the message being retried
+            // IMPORTANT: Filter out TOOL messages as they have role="tool" which is not accepted by AI
             const contextMessages = threadMessages.slice(0, messageIndex);
-            messageHistory = contextMessages.map((msg) => ({
-              role: msg.role.toLowerCase() as "user" | "assistant" | "system",
-              content: msg.content,
-            }));
+            messageHistory = contextMessages
+              .filter((msg) => msg.role !== "tool") // Exclude TOOL messages
+              .map((msg) => ({
+                role: msg.role.toLowerCase() as "user" | "assistant" | "system",
+                content: msg.content,
+              }));
             logger.debug("Chat: Built message history for incognito retry", {
               messageCount: messageHistory.length,
               threadId: message.threadId,
@@ -987,11 +993,14 @@ export function useChat(
 
             if (parentIndex !== -1) {
               // Include all messages up to and including the parent
+              // IMPORTANT: Filter out TOOL messages as they have role="tool" which is not accepted by AI
               const contextMessages = threadMessages.slice(0, parentIndex + 1);
-              messageHistory = contextMessages.map((msg) => ({
-                role: msg.role.toLowerCase() as "user" | "assistant" | "system",
-                content: msg.content,
-              }));
+              messageHistory = contextMessages
+                .filter((msg) => msg.role !== "tool") // Exclude TOOL messages
+                .map((msg) => ({
+                  role: msg.role.toLowerCase() as "user" | "assistant" | "system",
+                  content: msg.content,
+                }));
             }
           }
           // If branchParentId is null (branching from root), messageHistory stays undefined
@@ -1065,11 +1074,14 @@ export function useChat(
 
           if (parentIndex !== -1) {
             // Include all messages up to and including the parent
+            // IMPORTANT: Filter out TOOL messages as they have role="tool" which is not accepted by AI
             const contextMessages = threadMessages.slice(0, parentIndex + 1);
-            messageHistory = contextMessages.map((msg) => ({
-              role: msg.role.toLowerCase() as "user" | "assistant" | "system",
-              content: msg.content,
-            }));
+            messageHistory = contextMessages
+              .filter((msg) => msg.role !== "tool") // Exclude TOOL messages
+              .map((msg) => ({
+                role: msg.role.toLowerCase() as "user" | "assistant" | "system",
+                content: msg.content,
+              }));
           }
         }
 

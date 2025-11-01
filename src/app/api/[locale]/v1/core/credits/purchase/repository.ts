@@ -20,6 +20,7 @@ import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { productsRepository, ProductIds } from "../../products/repository-client";
 import type {
   CreditsPurchasePostRequestOutput,
   CreditsPurchasePostResponseOutput,
@@ -28,9 +29,6 @@ import type {
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: "2025-09-30.clover",
 });
-
-const PACK_CREDITS = 500;
-const PACK_PRICE_CENTS = 500; // €5 = 500 cents
 
 /**
  * Ensure user has a Stripe customer ID
@@ -116,6 +114,11 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditsPurchasePostResponseOutput>> {
     try {
+      // Get pricing from centralized products repository with proper locale
+      const creditPack = productsRepository.getProduct(ProductIds.CREDIT_PACK, locale);
+      const PACK_CREDITS = creditPack.credits;
+      const PACK_PRICE_CENTS = creditPack.price * 100; // Convert EUR to cents
+
       // Ensure user has a Stripe customer
       const customerResult = await ensureStripeCustomer(userId, logger);
       if (!customerResult.success) {

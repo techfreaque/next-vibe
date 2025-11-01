@@ -74,6 +74,7 @@ const IGNORED_PATHS = [] as const;
 const PERMISSION_ERROR_CODES = ["EACCES", "permission denied"] as const;
 
 export const LINT_CONFIG_PATH = "../../../../../../../../../lint.config.ts" as const;
+export const OXLINT_CONFIG_PATH = "./.tmp/.oxlintrc.json" as const;
 
 /**
  * System resource information
@@ -90,7 +91,6 @@ interface SystemResources {
 interface WorkerTask {
   id: number;
   files: string[];
-  cacheDir: string;
   fix: boolean;
   timeout: number;
 }
@@ -143,7 +143,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       });
 
       // Ensure cache directory exists
-      const cacheDir = data.cacheDir || "./.tmp";
+      const cacheDir = "./.tmp";
       await fs.mkdir(cacheDir, { recursive: true });
 
       // Generate/update oxlint config if needed
@@ -499,7 +499,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         tasks.push({
           id: i,
           files: workerFiles,
-          cacheDir: data.cacheDir, // Use global cache directory for all workers
           fix: data.fix,
           timeout: data.timeout,
         });
@@ -520,14 +519,11 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       return;
     }
 
-    // All workers use the same cache directory now
-    const globalCacheDir = tasks[0].cacheDir;
-
     try {
-      await fs.mkdir(dirname(globalCacheDir), { recursive: true });
+      await fs.mkdir(dirname(OXLINT_CONFIG_PATH), { recursive: true });
     } catch (error) {
       logger.warn(
-        `Failed to create global cache directory: ${globalCacheDir}`,
+        `Failed to create global cache directory: ${OXLINT_CONFIG_PATH}`,
         {
           error: parseError(error).message,
         },
@@ -595,7 +591,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       // Cache directory already created in parallel during setup
 
       // Build oxlint command arguments
-      const oxlintConfigPath = resolve(task.cacheDir, ".oxlintrc.json");
+      const oxlintConfigPath = resolve(OXLINT_CONFIG_PATH);
 
       // Check if config exists, if not use default settings
       const configExists = existsSync(oxlintConfigPath);
@@ -633,7 +629,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         // Run both oxlint --fix and prettier in parallel
         const [fixResult, prettierResult] = await Promise.allSettled([
           this.runOxlintCommand(fixArgs, task, logger),
-          this.runPrettierFix(task.files, task.cacheDir, logger),
+          this.runPrettierFix(task.files, OXLINT_CONFIG_PATH, logger),
         ]);
 
         // Handle oxlint result

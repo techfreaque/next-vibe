@@ -8,7 +8,7 @@ import "server-only";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import { simpleT } from "@/i18n/core/shared";
 
-import { AI_CONFIG } from "../shared/server-only/config";
+import { AI_CONFIG, Platform } from "../shared/server-only/config";
 import { BaseExecutor } from "../shared/server-only/execution/executor";
 import type {
   AIToolExecutionContext,
@@ -152,6 +152,7 @@ export class ToolExecutor extends BaseExecutor implements IToolExecutor {
       toolName,
       data,
       user,
+      platform: Platform.AI,
       locale,
       logger,
       metadata: metadata || {

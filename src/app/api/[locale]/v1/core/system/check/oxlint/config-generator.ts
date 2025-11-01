@@ -30,7 +30,6 @@ export async function generateOxlintConfig(
   error?: string;
 }> {
   try {
-    const projectRoot = process.cwd();
     const jsonConfigPath = resolve(cacheDir, ".oxlintrc.json");
 
     logger.debug("Loading lint.config.ts", { path: LINT_CONFIG_PATH });

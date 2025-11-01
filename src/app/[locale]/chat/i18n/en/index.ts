@@ -480,6 +480,22 @@ export const translations = {
     result: "Result",
     error: "Error",
     executing: "Executing...",
+    status: {
+      error: "Error",
+      executing: "Executing...",
+      complete: "Complete",
+    },
+    sections: {
+      request: "Request",
+      response: "Response",
+    },
+    messages: {
+      executingTool: "Executing tool...",
+      errorLabel: "Error:",
+      noArguments: "No arguments",
+      noResult: "No result",
+      metadataNotAvailable: "Widget metadata not available. Showing raw result.",
+    },
   },
   reasoning: {
     title: "Thinking",

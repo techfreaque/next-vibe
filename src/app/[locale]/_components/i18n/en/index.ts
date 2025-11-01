@@ -1,7 +1,4 @@
-import { translations as navTranslations } from "../../nav/i18n/en";
-
 export const translations = {
-  nav: navTranslations,
   common: {
     active: "Active",
     filter: "Filter",

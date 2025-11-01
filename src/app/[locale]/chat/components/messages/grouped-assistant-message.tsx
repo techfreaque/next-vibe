@@ -6,7 +6,6 @@ import { Markdown } from "next-vibe-ui/ui/markdown";
 import type { JSX } from "react";
 
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
-import { ToolCallRenderer } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/tool-call-renderer";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -15,6 +14,7 @@ import { chatProse } from "../../lib/design-tokens";
 import { AssistantMessageActions } from "./assistant-message-actions";
 import { MessageAuthorInfo } from "./message-author";
 import type { MessageGroup } from "./message-grouping";
+import { ToolDisplay } from "./tool-display";
 
 interface GroupedAssistantMessageProps {
   group: MessageGroup;
@@ -103,7 +103,7 @@ export function GroupedAssistantMessage({
             // TOOL message
             if (message.role === "tool" && message.toolCalls) {
               return (
-                <ToolCallRenderer
+                <ToolDisplay
                   key={message.id}
                   toolCalls={message.toolCalls}
                   locale={locale}

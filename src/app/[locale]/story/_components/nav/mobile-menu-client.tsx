@@ -14,7 +14,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { NavItemType } from "./nav-constants";
-import { ThemeToggleMobile } from "./theme-toggle";
+import { ThemeToggleMobile } from "../../../_components/theme-toggle";
 
 interface MobileMenuClientProps {
   locale: CountryLanguage;
@@ -191,7 +191,7 @@ export function MobileMenuClient({
                                   className={cn(
                                     "text-base flex items-center py-1 hover:text-primary transition-colors",
                                     isChildActive &&
-                                      "text-primary font-semibold",
+                                    "text-primary font-semibold",
                                   )}
                                   onClick={toggleMenu}
                                 >

@@ -13,7 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ParameterValue } from "../../shared/server-only/execution/executor";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
-import { MCP_CONFIG } from "../../shared/server-only/config";
+import { MCP_CONFIG, Platform } from "../../shared/server-only/config";
 import { getMCPRegistry, toolMetadataToMCPTool } from "../registry";
 import type {
   IMCPProtocolHandler,
@@ -223,6 +223,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       locale: this.locale,
       requestId: Date.now(),
       logger: this.logger,
+      platform: Platform.MCP,
     });
 
     this.logger.info("[MCP Protocol] Tool call complete", {

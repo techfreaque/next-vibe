@@ -1,17 +1,19 @@
 import type { translations as enTranslations } from "../en";
+import { translations as navTranslations } from "../../nav/i18n/de";
 
 export const translations: typeof enTranslations = {
+  nav: navTranslations,
   home: {
     hero: {
-      badge: "🔥 Unzensierter KI-Chat",
-      title: "Chatten ohne Grenzen",
+      badge: "🔥 KI-Chat + Community-Forum",
+      title: "Chatten Sie mit KI, Verbinden Sie sich mit der Community",
       subtitle:
-        "Erleben Sie wirklich unzensierte KI-Gespräche mit über 40 Modellen. Keine Filter, keine Einschränkungen, nur ehrliche KI.",
+        "Erleben Sie unzensierte KI-Gespräche mit über 40 Modellen. Nehmen Sie an Forum-Diskussionen teil. Alles auf einer Plattform.",
       description:
-        "Zugriff auf GPT-4, Claude, Gemini, Llama und über 40 weitere KI-Modelle ohne Zensur. Erstellen Sie benutzerdefinierte Personas, organisieren Sie Chats in Ordnern und genießen Sie vollständige Privatsphäre.",
+        "Private KI-Chats, kollaborative Räume und öffentliche Forum-Threads. Wählen Sie Ihr Privatsphäre-Level: Privat (verschlüsselt), Inkognito (nur lokal), Geteilt (kollaborativ) oder Öffentlich (Community-Forum).",
       cta: "Kostenlos chatten",
       learnMore: "Mehr erfahren",
-      secondaryCta: "Preise ansehen",
+      secondaryCta: "Forum durchsuchen",
       userAvatarAlt: "Benutzer-Avatar",
       satisfiedClients: "Schließen Sie sich 10.000+ zufriedenen Nutzern an",
       imageAlt: "Unbottled.ai Chat-Oberfläche",
@@ -39,6 +41,14 @@ export const translations: typeof enTranslations = {
       },
       videoAlt: "Unbottled.ai Demo",
       scrollDown: "Scrollen zum Erkunden",
+    },
+    forumHero: {
+      badge: "Willkommen in der Community",
+      title: "Das KI-gestützte Community-Forum",
+      subtitle: "Stellen Sie Fragen, teilen Sie Ihr Wissen und vernetzen Sie sich mit anderen in der Welt der KI.",
+      description: "Erkunden Sie Diskussionen, erhalten Sie Hilfe und tragen Sie zur Zukunft der KI-Entwicklung bei.",
+      cta: "Neuen Thread erstellen",
+      secondaryCta: "Threads durchsuchen",
     },
     brands: {
       title: "Unterstützt von führenden KI-Modellen",
@@ -84,75 +94,75 @@ export const translations: typeof enTranslations = {
       },
     },
     features: {
-      title: "Alles, was Sie für unzensierten KI-Chat brauchen",
+      title: "Alles für KI-Chat + Community",
       subtitle: "Leistungsstarke Funktionen",
       description:
-        "Vollständige Freiheit und Kontrolle über Ihre KI-Gespräche mit erweiterten Funktionen.",
+        "Wählen Sie Ihr Privatsphäre-Level. Chatten Sie mit KI. Verbinden Sie sich mit der Community. Alles auf einer Plattform.",
       contentCreation: {
-        title: "40+ unzensierte KI-Modelle",
+        title: "Private Ordner - Ihre persönliche KI",
         description:
-          "Zugriff auf GPT-4, Claude, Gemini, Llama und mehr. Alles ohne Filter oder Einschränkungen.",
+          "Verschlüsselt, server-gespeicherte Chats. Zugriff auf GPT-4, Claude, Gemini und 40+ Modelle. Ihre privaten Gespräche, synchronisiert über Geräte.",
       },
       strategyDevelopment: {
-        title: "Benutzerdefinierte Personas",
+        title: "Inkognito-Ordner - Nur lokal",
         description:
-          "Erstellen Sie KI-Charaktere mit einzigartigen Persönlichkeiten, Hintergründen und Gesprächsstilen.",
+          "Nur LocalStorage, nie an Server gesendet. Perfekt für maximale Privatsphäre. Gespräche bleiben auf Ihrem Gerät, bis Sie sie löschen.",
       },
       performanceAnalytics: {
-        title: "Erweiterte Analysen",
+        title: "Geteilte Ordner - Zusammenarbeiten",
         description:
-          "Verfolgen Sie Ihre Nutzung, Token-Verbrauch und Gesprächsverlauf über alle Modelle hinweg.",
+          "Teilen Sie bestimmte Chats mit Teammitgliedern oder Freunden. Kollaborative KI-Gespräche mit Berechtigungskontrolle.",
       },
       communityEngagement: {
-        title: "Community-Personas",
+        title: "Öffentliche Ordner - Community-Forum",
         description:
-          "Entdecken und nutzen Sie von der Community erstellte Personas. Teilen Sie Ihre eigenen Kreationen.",
+          "Treten Sie der Community bei! Erstellen Sie öffentliche Threads, nehmen Sie an Diskussionen teil, voten Sie Inhalte hoch und vernetzen Sie sich mit anderen KI-Enthusiasten.",
       },
       growth: {
-        title: "Unbegrenztes Wachstum",
+        title: "40+ unzensierte KI-Modelle",
         description:
-          "Keine Nachrichtenlimits mit Abonnement. Skalieren Sie Ihre KI-Nutzung so viel Sie benötigen.",
+          "GPT-4, Claude, Gemini, Llama, Mistral und mehr. Keine Filter, keine Einschränkungen. Wechseln Sie Modelle mitten im Gespräch.",
       },
       audience: {
-        title: "Mehrsprachige Unterstützung",
+        title: "Benutzerdefinierte KI-Personas",
         description:
-          "Chatten Sie in jeder Sprache mit KI-Modellen, die Kontext und Nuancen verstehen.",
+          "Erstellen Sie KI-Charaktere mit einzigartigen Persönlichkeiten. Nutzen Sie Community-Personas oder erstellen Sie eigene. Teilen Sie mit anderen.",
       },
       global: {
-        title: "Globaler Zugriff",
+        title: "Intelligente Organisation",
         description:
-          "Zugriff von überall auf der Welt. Ihre Gespräche synchronisieren sich über alle Geräte.",
+          "Organisieren Sie Chats nach Ordnern. Durchsuchen Sie Gespräche. Taggen Sie Threads. Exportieren Sie Verlauf. Alles bleibt organisiert.",
       },
       adCampaigns: {
-        title: "Krypto-Zahlungen",
-        description:
-          "Bezahlen Sie mit Bitcoin, Ethereum oder Stablecoins. Schnell, sicher und anonym.",
-      },
-      dataAnalysis: {
-        title: "Intelligente Ordnerverwaltung",
-        description:
-          "Organisieren Sie Gespräche nach Themen mit End-to-End-Verschlüsselung für private Ordner.",
-      },
-      automation: {
-        title: "Multi-Modell-Gespräche",
-        description:
-          "Vergleichen Sie Antworten verschiedener KI-Modelle nebeneinander im selben Chat.",
-      },
-      collaboration: {
-        title: "Inkognito-Modus",
-        description:
-          "Nur-Sitzungs-Chats, die verschwinden, wenn Sie den Browser schließen. Perfekt für sensible Themen.",
-      },
-      analytics: {
         title: "Flexible Preisgestaltung",
         description:
-          "Wählen Sie zwischen unbegrenztem Abonnement (€10/Monat) oder Pay-as-you-go-Guthaben (€5). Keine versteckten Gebühren.",
+          "Kostenlos: 10 Nachrichten/Tag. Unbegrenzt: €10/Monat. Guthaben-Pakete: €5. Krypto- oder Kartenzahlungen akzeptiert.",
+      },
+      dataAnalysis: {
+        title: "Erweiterte Analysen",
+        description:
+          "Verfolgen Sie Ihre Nutzung, Token-Verbrauch und Gesprächsverlauf. Sehen Sie Ihre KI-Chat-Muster und optimieren Sie Ihren Workflow.",
+      },
+      automation: {
+        title: "Multi-Modell-Chat",
+        description:
+          "Vergleichen Sie KI-Modelle nebeneinander. Wechseln Sie zwischen GPT-4, Claude und anderen im selben Gesprächsthread.",
+      },
+      collaboration: {
+        title: "Web-Such-Integration",
+        description:
+          "KI kann das Web durchsuchen (Brave Search) für aktuelle Informationen. Erhalten Sie Echtzeit-Daten in Ihren Gesprächen.",
+      },
+      analytics: {
+        title: "Mehrsprachige Unterstützung",
+        description:
+          "Englisch, Deutsch, Polnisch-Interface. Chatten Sie mit KI in jeder Sprache. Globale Community, lokale Gespräche.",
       },
     },
     cta: {
-      title: "Bereit für unzensierte KI?",
+      title: "Bereit, der KI + Community-Plattform beizutreten?",
       subtitle:
-        "Schließen Sie sich Tausenden von Nutzern an, die ehrliche Gespräche mit KI führen. Starten Sie heute kostenlos.",
+        "Chatten Sie privat mit 40+ KI-Modellen. Nehmen Sie an öffentlichen Forum-Diskussionen teil. Wählen Sie Ihr Privatsphäre-Level. Starten Sie heute kostenlos.",
       button: "Kostenlos starten",
       viewPlans: "Preispläne ansehen",
       noCredit: "Keine Kreditkarte erforderlich",

@@ -451,6 +451,7 @@ export const translations: typeof enTranslations = {
     user: "Użytkownik",
     anonymous: "Anonim",
     edited: "edytowano",
+    error: "Błąd",
     postNumber: "Nr.{{number}}",
     actions: {
       handleSaveEdit: {
@@ -807,6 +808,22 @@ export const translations: typeof enTranslations = {
     result: "Wynik",
     error: "Błąd",
     executing: "Wykonywanie...",
+    status: {
+      error: "Błąd",
+      executing: "Wykonywanie...",
+      complete: "Zakończono",
+    },
+    sections: {
+      request: "Żądanie",
+      response: "Odpowiedź",
+    },
+    messages: {
+      executingTool: "Wykonywanie narzędzia...",
+      errorLabel: "Błąd:",
+      noArguments: "Brak argumentów",
+      noResult: "Brak wyniku",
+      metadataNotAvailable: "Metadane widgetu niedostępne. Pokazywanie surowych danych.",
+    },
   },
   threadList: {
     deleteDialog: {

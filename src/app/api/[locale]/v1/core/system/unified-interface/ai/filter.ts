@@ -200,6 +200,7 @@ export class ToolFilter implements IToolFilter {
       [UserRole.CLI_OFF]: -1,
       [UserRole.AI_TOOL_OFF]: -1,
       [UserRole.WEB_OFF]: -1,
+      [UserRole.PRODUCTION_OFF]: -1,
     };
 
     return priorities[role];

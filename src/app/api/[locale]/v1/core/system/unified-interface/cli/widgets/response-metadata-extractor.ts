@@ -160,8 +160,8 @@ export class ResponseMetadataExtractor {
         // This is safe because extractFromFieldsDefinition handles both cases
         return this.extractFromFieldsDefinition(
           definition.fields as
-            | UnifiedField<z.ZodTypeAny>
-            | Record<string, UnifiedField<z.ZodTypeAny>>,
+          | UnifiedField<z.ZodTypeAny>
+          | Record<string, UnifiedField<z.ZodTypeAny>>,
           responseData,
         );
       }
@@ -603,9 +603,9 @@ export class ResponseMetadataExtractor {
   private extractContainerFromDefinition(
     definition:
       | ObjectField<
-          Record<string, UnifiedField<z.ZodTypeAny>>,
-          FieldUsageConfig
-        >
+        Record<string, UnifiedField<z.ZodTypeAny>>,
+        FieldUsageConfig
+      >
       | Record<string, UnifiedField<z.ZodTypeAny>>
       | UnifiedField<z.ZodTypeAny>,
     responseData?: ExtractOutput<z.ZodTypeAny>,
@@ -645,10 +645,10 @@ export class ResponseMetadataExtractor {
         : undefined;
     const layout =
       ui &&
-      "layout" in ui &&
-      typeof ui.layout === "object" &&
-      ui.layout !== null &&
-      ("columns" in ui.layout || "spacing" in ui.layout)
+        "layout" in ui &&
+        typeof ui.layout === "object" &&
+        ui.layout !== null &&
+        ("columns" in ui.layout || "spacing" in ui.layout)
         ? (ui.layout as { columns?: number; spacing?: string } | undefined)
         : undefined;
 
@@ -1169,6 +1169,8 @@ export class ResponseMetadataExtractor {
       data_list: WidgetType.DATA_LIST,
       grouped_list: WidgetType.GROUPED_LIST,
       code_quality_list: WidgetType.CODE_QUALITY_LIST,
+      link_list: WidgetType.LINK_LIST,
+      link_card: WidgetType.LINK_CARD,
       text: WidgetType.TEXT,
       title: WidgetType.TITLE,
       badge: WidgetType.BADGE,

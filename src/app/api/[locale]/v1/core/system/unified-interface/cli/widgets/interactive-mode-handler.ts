@@ -17,6 +17,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
+import { Platform } from "../../shared/server-only/config";
 import { schemaUIHandler } from "./schema-ui-handler";
 
 /**
@@ -744,15 +745,13 @@ export class InteractiveModeHandler {
     requestUrlPathParamsSchema?: z.ZodTypeAny;
   } | null> {
     const { loadEndpointDefinition } = await import(
-      "../../shared/server-only/execution/definition-loader"
+      "../../shared/registry/definition-loader"
     );
 
     const result = await loadEndpointDefinition(
       {
         routePath: route.routePath,
         method: route.method,
-        tryRegistry: false, // Interactive mode only needs dynamic import
-        tryDefinitionFile: true,
       },
       this.logger,
     );
@@ -813,6 +812,7 @@ export class InteractiveModeHandler {
       locale: session.locale,
       options: session.options,
       logger: this.logger,
+      platform: Platform.CLI,
     };
 
     try {
@@ -859,6 +859,7 @@ export class InteractiveModeHandler {
       locale: session.locale,
       options: session.options,
       logger: this.logger,
+      platform: Platform.CLI,
     };
 
     try {

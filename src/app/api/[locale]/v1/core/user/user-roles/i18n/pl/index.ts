@@ -77,6 +77,7 @@ export const translations: typeof enTranslations = {
       cliOff: "CLI Wyłączone",
       aiToolOff: "Narzędzie AI Wyłączone",
       webOff: "Web Wyłączone",
+      productionOff: "Produkcja Wyłączona",
     },
   },
 };

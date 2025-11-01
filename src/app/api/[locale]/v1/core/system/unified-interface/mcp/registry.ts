@@ -160,6 +160,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
         user: context.user,
         locale: context.locale,
         logger: this.logger,
+        platform: context.platform,
         options: {
           dryRun: false,
           interactive: false,

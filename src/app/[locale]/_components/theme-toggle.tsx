@@ -70,8 +70,8 @@ export function ThemeToggleMobile({
       )}
       <Span className="text-base font-medium my-auto">
         {resolvedTheme === "dark" || !isMounted
-          ? t("app.nav.enableLightMode")
-          : t("app.nav.enableDarkMode")}
+          ? t("app.story._components.nav.enableLightMode")
+          : t("app.story._components.nav.enableDarkMode")}
       </Span>
     </Div>
   );

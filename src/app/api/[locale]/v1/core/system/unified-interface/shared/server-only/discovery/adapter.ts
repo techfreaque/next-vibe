@@ -9,7 +9,7 @@ import "server-only";
 import type { z } from "zod";
 
 import { endpoints } from "@/app/api/[locale]/v1/core/system/generated/endpoints";
-import { normalizeRoutePath } from "../utils/normalize-route-path";
+import { normalizeRoutePath } from "../../registry/normalize-route-path";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";

@@ -21,24 +21,33 @@ export const translations = {
   },
   home: "Home",
   pricing: "Pricing",
+  features: "Features",
+  forum: "Forum",
   contact: "Contact",
+  getStarted: "Get Started Free",
+  signIn: "Sign In",
+  goToApp: "Open App",
   services: {
-    title: "Services",
+    title: "Platform",
     features: {
       title: "Features",
-      description: "Explore our powerful features",
+      description: "AI Chat + Forum capabilities",
     },
     process: {
-      title: "Our Process",
-      description: "How we work with you",
+      title: "How It Works",
+      description: "Get started in 4 simple steps",
     },
-    premiumContent: {
-      title: "Premium Content",
-      description: "Access exclusive content",
+    aiModels: {
+      title: "AI Models",
+      description: "40+ uncensored AI models",
     },
-    contact: {
-      title: "Contact Us",
-      description: "Get in touch with our team",
+    folders: {
+      title: "Privacy Levels",
+      description: "Private, Incognito, Shared, Public",
+    },
+    personas: {
+      title: "AI Personas",
+      description: "Custom & community personas",
     },
   },
   post: {

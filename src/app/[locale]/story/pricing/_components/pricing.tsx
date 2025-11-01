@@ -6,6 +6,8 @@ import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
 import type { Countries, Currencies } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import { productsRepository, ProductIds } from "@/app/api/[locale]/v1/core/products/repository-client";
+
 // Custom icon components with enhanced styling
 const StarterIcon = (): JSX.Element => (
   <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/30">
@@ -55,54 +57,71 @@ export function calculateSavingsPercent(country: Countries): number {
   return Math.round(averageSavingsPercent);
 }
 
-export const pricingPlans: Record<SubscriptionPlanValue, PricingPlan> = {
-  [SubscriptionPlan.SUBSCRIPTION]: {
-    id: SubscriptionPlan.SUBSCRIPTION,
-    name: "app.story.pricing.plans.STARTER.name",
-    description: "app.story.pricing.plans.STARTER.description",
-
-    features: [
-      "app.story.pricing.plans.STARTER.features.messages",
-      "app.story.pricing.plans.STARTER.features.models",
-      "app.story.pricing.plans.STARTER.features.folders",
-      "app.story.pricing.plans.STARTER.features.personas",
-    ],
-    priceByCountry: {
-      DE: {
-        monthly: 79,
-        annual: 69,
-        currency: "EUR",
-      },
-      PL: {
-        currency: "PLN",
-        monthly: 249,
-        annual: 199,
-      },
-      GLOBAL: {
-        currency: "USD",
-        monthly: 89,
-        annual: 79,
-      },
-    },
-    pricing: "app.story.pricing.plans.STARTER.price",
-    cta: "app.story.pricing.plans.STARTER.cta",
-    highlighted: false,
-    icon: <StarterIcon />,
-  },
-};
-
 /**
- * Get plan details by plan ID
+ * Build pricing plans from centralized products repository
+ * This ensures all pricing comes from a single source of truth
  */
-export function getPlanDetails(planId: SubscriptionPlanValue): PricingPlan {
-  return pricingPlans[planId];
+function buildPricingPlans(locale: CountryLanguage): Record<SubscriptionPlanValue, PricingPlan> {
+  const subscriptionProduct = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
+  const definitions = productsRepository.getProductDefinitions();
+  const subscriptionDef = definitions[ProductIds.SUBSCRIPTION];
+
+  return {
+    [SubscriptionPlan.SUBSCRIPTION]: {
+      id: SubscriptionPlan.SUBSCRIPTION,
+      name: subscriptionProduct.name,
+      description: subscriptionProduct.description,
+
+      features: [
+        "app.story.pricing.plans.STARTER.features.messages",
+        "app.story.pricing.plans.STARTER.features.models",
+        "app.story.pricing.plans.STARTER.features.folders",
+        "app.story.pricing.plans.STARTER.features.personas",
+      ],
+      priceByCountry: {
+        DE: {
+          monthly: subscriptionDef.priceByCountry.DE,
+          annual: Math.round(subscriptionDef.priceByCountry.DE * 0.9 * 100) / 100, // 10% discount for annual
+          currency: subscriptionDef.currency,
+        },
+        PL: {
+          currency: subscriptionDef.currency,
+          monthly: subscriptionDef.priceByCountry.PL,
+          annual: Math.round(subscriptionDef.priceByCountry.PL * 0.9 * 100) / 100, // 10% discount for annual
+        },
+        GLOBAL: {
+          currency: subscriptionDef.currency,
+          monthly: subscriptionDef.priceByCountry.GLOBAL,
+          annual: Math.round(subscriptionDef.priceByCountry.GLOBAL * 0.9 * 100) / 100, // 10% discount for annual
+        },
+      },
+      pricing: "app.story.pricing.plans.STARTER.price",
+      cta: "app.story.pricing.plans.STARTER.cta",
+      highlighted: false,
+      icon: <StarterIcon />,
+    },
+  };
 }
 
 /**
- * Get all pricing plans as an array
+ * Get pricing plans for a specific locale
  */
-export function getPricingPlansArray(): PricingPlan[] {
-  return Object.values(pricingPlans);
+export function getPricingPlans(locale: CountryLanguage): Record<SubscriptionPlanValue, PricingPlan> {
+  return buildPricingPlans(locale);
+}
+
+/**
+ * Get plan details by plan ID for a locale
+ */
+export function getPlanDetails(planId: SubscriptionPlanValue, locale: CountryLanguage): PricingPlan {
+  return getPricingPlans(locale)[planId];
+}
+
+/**
+ * Get all pricing plans as an array for a locale
+ */
+export function getPricingPlansArray(locale: CountryLanguage): PricingPlan[] {
+  return Object.values(getPricingPlans(locale));
 }
 
 export interface PricingPlan {

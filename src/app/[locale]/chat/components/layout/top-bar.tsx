@@ -17,7 +17,7 @@ import {
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
-import { Logo } from "@/app/[locale]/_components/nav/logo";
+import { Logo } from "@/app/[locale]/_components/logo";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

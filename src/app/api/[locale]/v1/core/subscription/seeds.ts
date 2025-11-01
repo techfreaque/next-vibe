@@ -141,17 +141,23 @@ export async function dev(
           ? new Date(subscription.currentPeriodEnd)
           : undefined;
 
+        // Get subscription credits from products repository
+        const { productsRepository, ProductIds } = await import("../products/repository-client");
+        const subscription = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
+        const subscriptionCredits = subscription.credits;
+
         const creditsResult = await creditRepository.addUserCredits(
           demoUser.id,
-          1000,
+          subscriptionCredits,
           "subscription",
           logger,
           expiresAt,
         );
 
         if (creditsResult.success) {
-          logger.debug("Added 1000 subscription credits to demo user", {
+          logger.debug(`Added ${subscriptionCredits} subscription credits to demo user`, {
             userId: demoUser.id,
+            credits: subscriptionCredits,
           });
         } else {
           logger.error("Failed to add subscription credits to demo user", {
@@ -245,17 +251,23 @@ export async function dev(
             ? new Date(adminSubscriptionData.currentPeriodEnd)
             : undefined;
 
+          // Get subscription credits from products repository
+          const { productsRepository, ProductIds } = await import("../products/repository-client");
+          const subscription = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
+          const subscriptionCredits = subscription.credits;
+
           const creditsResult = await creditRepository.addUserCredits(
             adminUser.id,
-            1000,
+            subscriptionCredits,
             "subscription",
             logger,
             expiresAt,
           );
 
           if (creditsResult.success) {
-            logger.debug("Added 1000 subscription credits to admin user", {
+            logger.debug(`Added ${subscriptionCredits} subscription credits to admin user`, {
               userId: adminUser.id,
+              credits: subscriptionCredits,
             });
           } else {
             logger.error("Failed to add subscription credits to admin user", {

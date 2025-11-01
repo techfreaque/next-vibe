@@ -11,6 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { Platform } from "../../shared/server-only/config";
 import { getMCPRegistry } from "../registry";
 import type {
   MCPExecuteRequestOutput,
@@ -71,6 +72,7 @@ export class MCPExecuteRepositoryImpl implements MCPExecuteRepository {
       locale,
       requestId: Date.now(),
       logger,
+      platform: Platform.MCP,
     });
 
     logger.info("[MCP Execute Repository] Tool execution complete", {

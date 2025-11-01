@@ -1,14 +1,14 @@
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX, ReactNode } from "react";
 
-import Footer from "@/app/[locale]/_components/footer";
-import { Navbar } from "@/app/[locale]/_components/nav/navbar";
+import Footer from "@/app/[locale]/story/_components/footer";
+import { Navbar } from "@/app/[locale]/story/_components/nav/navbar";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { navItems } from "../_components/nav/nav-constants";
+import { navItems } from "../story/_components/nav/nav-constants";
 
 interface SiteLayoutProps {
   children: ReactNode;

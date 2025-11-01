@@ -74,7 +74,8 @@ export class WebAuthHandler extends BaseAuthHandler {
       // Verify token
       const verifyResult = await this.verifyToken(token, logger);
       if (!verifyResult.success) {
-        logger.debug("Token verification failed");
+        logger.debug("Token verification failed - clearing invalid cookies");
+        await this.clearAuthToken(logger);
         const leadId = await this.getOrCreateLeadId(
           existingLeadId,
           undefined,
@@ -93,7 +94,8 @@ export class WebAuthHandler extends BaseAuthHandler {
       );
 
       if (!sessionValid) {
-        logger.debug("Session validation failed");
+        logger.debug("Session validation failed - clearing invalid cookies");
+        await this.clearAuthToken(logger);
         const leadId = await this.getOrCreateLeadId(
           existingLeadId,
           undefined,
@@ -105,7 +107,8 @@ export class WebAuthHandler extends BaseAuthHandler {
 
       return createSuccessResponse(verifyResult.data);
     } catch (error) {
-      logger.error("Web authentication failed", parseError(error));
+      logger.error("Web authentication failed - clearing cookies", parseError(error));
+      await this.clearAuthToken(logger);
       const leadId = await this.getLeadIdFromDb(
         undefined,
         context.locale,

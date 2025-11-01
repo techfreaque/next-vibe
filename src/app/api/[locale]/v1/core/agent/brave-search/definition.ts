@@ -175,12 +175,12 @@ const { GET } = createEndpoint({
 
       results: responseArrayField(
         {
-          type: WidgetType.GROUPED_LIST,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          type: WidgetType.LINK_LIST,
+          layout: { type: LayoutType.GRID, columns: 1 },
         },
         objectField(
           {
-            type: WidgetType.CONTAINER,
+            type: WidgetType.LINK_CARD,
             title:
               "app.api.v1.core.agent.chat.tools.braveSearch.get.response.results.item.title" as const,
             description:

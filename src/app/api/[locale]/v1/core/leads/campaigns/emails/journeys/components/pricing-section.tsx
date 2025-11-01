@@ -354,7 +354,7 @@ export async function EmailPricingSection({
   const country = getCountryFromLocale(locale);
 
   // Get all pricing plans using the same structure as main pricing section
-  const allPlans: PricingPlan[] = getPricingPlansArray();
+  const allPlans: PricingPlan[] = getPricingPlansArray(locale);
 
   // Build plans array matching the main pricing section structure
   const plans = allPlans.map((plan) => ({

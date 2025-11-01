@@ -156,6 +156,14 @@ export class ToolFilter implements IToolFilter {
       return false;
     }
 
+    // Check if endpoint is disabled in production environment
+    if (
+      process.env.NODE_ENV === "production" &&
+      endpoint.definition.allowedRoles.includes(UserRole.PRODUCTION_OFF)
+    ) {
+      return true;
+    }
+
     // Normalize platform to lowercase string
     const platformStr = String(platform).toLowerCase();
 
@@ -178,7 +186,8 @@ export class ToolFilter implements IToolFilter {
     return (
       role === UserRole.CLI_OFF ||
       role === UserRole.AI_TOOL_OFF ||
-      role === UserRole.WEB_OFF
+      role === UserRole.WEB_OFF ||
+      role === UserRole.PRODUCTION_OFF
     );
   }
 
@@ -196,6 +205,7 @@ export class ToolFilter implements IToolFilter {
       [UserRole.CLI_OFF]: -1,
       [UserRole.AI_TOOL_OFF]: -1,
       [UserRole.WEB_OFF]: -1,
+      [UserRole.PRODUCTION_OFF]: -1,
     };
 
     return priorities[role];

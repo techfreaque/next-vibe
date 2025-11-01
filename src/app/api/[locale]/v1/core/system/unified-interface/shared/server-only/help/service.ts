@@ -9,7 +9,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../logger/endpoint";
 import { routeRegistry } from "../registry/route-registry";
-import { endpointRegistry } from "../registry/endpoint-registry";
+import { endpointRegistry } from "../../registry/endpoint-registry";
 
 /**
  * Command metadata structure
@@ -157,8 +157,8 @@ export class HelpService {
     const firstMethodDef = definition[actualMethods[0]];
     const customAliases = Array.isArray(firstMethodDef?.aliases)
       ? firstMethodDef.aliases.filter(
-          (alias): alias is string => typeof alias === "string",
-        )
+        (alias): alias is string => typeof alias === "string",
+      )
       : [];
 
     let endpointDescription: string | undefined = firstMethodDef?.description;

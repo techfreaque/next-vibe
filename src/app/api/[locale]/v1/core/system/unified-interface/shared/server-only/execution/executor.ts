@@ -19,6 +19,7 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import { getDiscoveredEndpoints } from "../discovery/adapter";
 import type { DiscoveredEndpoint } from "../types/registry";
+import { type Platform } from "../config";
 
 /**
  * Extract error message from unknown error
@@ -63,6 +64,9 @@ export interface BaseExecutionContext<
 
   /** User context - uses JWT payload type for consistency */
   user: JwtPayloadType;
+
+  /** Platform where the request originated */
+  platform: Platform;
 
   /** Locale for translations */
   locale: CountryLanguage;
@@ -258,6 +262,7 @@ export abstract class BaseExecutor {
       user: context.user,
       locale: context.locale,
       logger: context.logger,
+      platform: context.platform,
       options: {
         verbose: options.verbose || false,
         dryRun: options.dryRun || false,

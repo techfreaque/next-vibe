@@ -74,6 +74,7 @@ export const translations = {
       cliOff: "CLI Disabled",
       aiToolOff: "AI Tool Disabled",
       webOff: "Web Disabled",
+      productionOff: "Production Disabled",
     },
   },
 };

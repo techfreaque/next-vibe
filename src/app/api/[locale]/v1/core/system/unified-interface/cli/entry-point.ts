@@ -21,6 +21,7 @@ import type { ParameterValue } from "../shared/server-only/execution/executor";
 import { findRouteFiles } from "../shared/server-only/filesystem/scanner";
 import { memoryMonitor } from "../shared/server-only/utils/performance";
 import type { InferJwtPayloadTypeFromRoles } from "../shared/types/handler";
+import { Platform } from "../shared/server-only/config";
 import { getConfig } from "./config";
 import type {
   CliRequestData,
@@ -182,6 +183,7 @@ export class CliEntryPoint {
       user: cliUser,
       locale: options.locale || this.locale,
       logger: this.logger,
+      platform: Platform.CLI,
       options: {
         dryRun: options.dryRun,
         interactive: options.interactive,

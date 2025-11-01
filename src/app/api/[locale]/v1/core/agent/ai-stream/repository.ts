@@ -1714,6 +1714,30 @@ class AiStreamRepository implements IAiStreamRepository {
               } else if (part.type === "tool-call") {
                 // NEW ARCHITECTURE: Finalize current ASSISTANT message before creating tool message
                 if (currentAssistantMessageId && currentAssistantContent) {
+                  // CRITICAL FIX: If reasoning block is still open, close it before tool call
+                  if (isInReasoningBlock) {
+                    const thinkCloseTag = "</think>";
+                    currentAssistantContent += thinkCloseTag;
+
+                    // Emit closing tag delta
+                    const thinkCloseDelta = createStreamEvent.contentDelta({
+                      messageId: currentAssistantMessageId,
+                      delta: thinkCloseTag,
+                    });
+                    controller.enqueue(
+                      encoder.encode(formatSSEEvent(thinkCloseDelta)),
+                    );
+
+                    isInReasoningBlock = false;
+
+                    logger.info(
+                      "[AI Stream] ⏱️ Reasoning interrupted by tool call → </think>",
+                      {
+                        messageId: currentAssistantMessageId,
+                      },
+                    );
+                  }
+
                   // Update ASSISTANT message in database with accumulated content
                   if (!isIncognito && userId) {
                     await updateMessageContent({
@@ -1760,8 +1784,27 @@ class AiStreamRepository implements IAiStreamRepository {
                       "@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/response-metadata-extractor"
                     );
                     const extractor = new ResponseMetadataExtractor();
+
+                    // Debug: Log endpoint structure
+                    logger.info("[AI Stream] Endpoint structure", {
+                      toolName: part.toolName,
+                      hasDefinition: !!endpoint.definition,
+                      hasFields: !!endpoint.definition?.fields,
+                      fieldsType: typeof endpoint.definition?.fields,
+                      fieldsKeys: endpoint.definition?.fields && typeof endpoint.definition.fields === 'object'
+                        ? Object.keys(endpoint.definition.fields).slice(0, 5)
+                        : [],
+                    });
+
                     const metadata =
-                      extractor.extractResponseMetadata(endpoint);
+                      extractor.extractResponseMetadata(endpoint.definition);
+
+                    logger.info("[AI Stream] Widget metadata extraction", {
+                      toolName: part.toolName,
+                      hasMetadata: !!metadata,
+                      hasFields: !!metadata?.fields,
+                      fieldsCount: metadata?.fields?.length || 0,
+                    });
 
                     if (metadata?.fields && metadata.fields.length > 0) {
                       widgetMetadata = {
@@ -1777,16 +1820,28 @@ class AiStreamRepository implements IAiStreamRepository {
                           >,
                         })),
                       };
+                      logger.info("[AI Stream] Widget metadata created", {
+                        toolName: part.toolName,
+                        endpointId: widgetMetadata.endpointId,
+                        responseFieldsCount: widgetMetadata.responseFields.length,
+                      });
                     } else {
                       widgetMetadata = undefined;
+                      logger.warn("[AI Stream] No widget metadata fields found", {
+                        toolName: part.toolName,
+                      });
                     }
                   } catch (error) {
                     logger.error("Failed to extract widget metadata", {
                       error: String(error),
+                      toolName: part.toolName,
                     });
                     widgetMetadata = undefined;
                   }
                 } else {
+                  logger.warn("[AI Stream] No endpoint found for tool", {
+                    toolName: part.toolName,
+                  });
                   widgetMetadata = undefined;
                 }
 
@@ -1818,6 +1873,7 @@ class AiStreamRepository implements IAiStreamRepository {
                 };
 
                 // Emit MESSAGE_CREATED event for UI (immediate feedback)
+                // Include toolCalls array so frontend can render tool display
                 const toolMessageEvent = createStreamEvent.messageCreated({
                   messageId: currentToolMessageId,
                   threadId: threadResult.threadId,
@@ -1827,6 +1883,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   depth: currentDepth,
                   sequenceId,
                   sequenceIndex,
+                  toolCalls: [toolCallData], // Include tool call data for frontend rendering
                 });
                 controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
 
@@ -1912,15 +1969,15 @@ class AiStreamRepository implements IAiStreamRepository {
                     });
                   }
 
+                  // Add result to tool call data (for both DB and UI)
+                  const toolCallWithResult: ToolCall = {
+                    ...currentToolCallData.toolCall,
+                    result: validatedOutput,
+                    error: toolError,
+                  };
+
                   // NOW create TOOL message in DB with result/error
                   if (!isIncognito && userId) {
-                    // Add result to tool call data
-                    const toolCallWithResult: ToolCall = {
-                      ...currentToolCallData.toolCall,
-                      result: validatedOutput,
-                      error: toolError,
-                    };
-
                     await createToolMessage({
                       messageId: currentToolMessageId,
                       threadId: threadResult.threadId,
@@ -1944,11 +2001,13 @@ class AiStreamRepository implements IAiStreamRepository {
                     wasCleaned: output !== cleanedOutput,
                   });
 
-                  // Emit TOOL_RESULT event for real-time UX
+                  // Emit TOOL_RESULT event for real-time UX with updated tool call data
                   const toolResultEvent = createStreamEvent.toolResult({
                     messageId: currentToolMessageId,
                     toolName: part.toolName,
                     result: validatedOutput,
+                    error: toolError,
+                    toolCall: toolCallWithResult, // Include full tool call data with result
                   });
                   controller.enqueue(
                     encoder.encode(formatSSEEvent(toolResultEvent)),
@@ -1977,6 +2036,30 @@ class AiStreamRepository implements IAiStreamRepository {
 
             // NEW ARCHITECTURE: Finalize current ASSISTANT message if exists
             if (currentAssistantMessageId && currentAssistantContent) {
+              // CRITICAL FIX: If reasoning block is still open, close it at stream end
+              if (isInReasoningBlock) {
+                const thinkCloseTag = "</think>";
+                currentAssistantContent += thinkCloseTag;
+
+                // Emit closing tag delta
+                const thinkCloseDelta = createStreamEvent.contentDelta({
+                  messageId: currentAssistantMessageId,
+                  delta: thinkCloseTag,
+                });
+                controller.enqueue(
+                  encoder.encode(formatSSEEvent(thinkCloseDelta)),
+                );
+
+                isInReasoningBlock = false;
+
+                logger.info(
+                  "[AI Stream] ⏱️ Reasoning closed at stream end → </think>",
+                  {
+                    messageId: currentAssistantMessageId,
+                  },
+                );
+              }
+
               // Emit CONTENT_DONE event for ASSISTANT message
               // Wait for completion first to get tokens and finishReason
               const [finishReason, usage] = await Promise.all([

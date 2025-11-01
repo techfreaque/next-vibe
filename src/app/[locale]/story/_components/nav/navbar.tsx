@@ -13,13 +13,13 @@ import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import CountrySelector from "../country-selector";
+import CountrySelector from "../../../_components/country-selector";
 import { AuthButtons, MobileAuthButtons } from "./auth-buttons";
-import { Logo } from "./logo";
+import { Logo } from "../../../_components/logo";
 import { MobileMenuClient } from "./mobile-menu-client";
 import type { NavItemType } from "./nav-constants";
 import { NavSingleItem } from "./nav-single-item";
-import { ThemeToggle } from "./theme-toggle";
+import { ThemeToggle } from "../../../_components/theme-toggle";
 import { UserMenu } from "./user-menu";
 
 interface NavbarProps {
@@ -103,7 +103,7 @@ export function Navbar({
                                       )}
                                     >
                                       {typeof badge === "string" &&
-                                      badge.includes(".")
+                                        badge.includes(".")
                                         ? t(badge, badgeTranslationPayload)
                                         : badge}
                                     </Span>
@@ -144,7 +144,7 @@ export function Navbar({
                                     )}
                                   >
                                     {typeof badge === "string" &&
-                                    badge.includes(".")
+                                      badge.includes(".")
                                       ? t(badge)
                                       : badge}
                                   </Span>

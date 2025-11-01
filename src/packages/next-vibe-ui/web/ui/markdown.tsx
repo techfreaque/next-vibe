@@ -4,7 +4,7 @@ import { Brain, Check, ChevronDown, Copy, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
@@ -87,7 +87,19 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
     return new Set();
   });
 
+  // Track if user has manually toggled any thinking section
+  const [userToggledThinking, setUserToggledThinking] = useState(false);
+
+  // Auto-collapse thinking sections when content arrives (only if user hasn't manually toggled)
+  useEffect(() => {
+    if (hasContent && !userToggledThinking && allThinkingSections.length > 0) {
+      // Content arrived - auto-collapse all thinking sections
+      setExpandedThinking(new Set());
+    }
+  }, [hasContent, userToggledThinking, allThinkingSections.length]);
+
   const toggleThinking = (index: number): void => {
+    setUserToggledThinking(true); // Mark that user has manually toggled
     setExpandedThinking((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(index)) {

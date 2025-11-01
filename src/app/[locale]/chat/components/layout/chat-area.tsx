@@ -15,7 +15,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 import { _simpleT } from "@/i18n/core/shared";
 
-import { Logo } from "../../../_components/nav/logo";
+import { Logo } from "../../../_components/logo";
 import { DOM_IDS, LAYOUT } from "../../lib/config/constants";
 import type { ChatMessage, ChatThread, ModelId, ViewMode } from "../../types";
 import { AIToolsModal } from "../ai-tools-modal";

@@ -363,7 +363,7 @@ export default function PricingSection({
         initial="hidden"
         animate={inView ? "show" : "hidden"}
       >
-        {getPricingPlansArray().map((plan, index) => {
+        {getPricingPlansArray(locale).map((plan, index) => {
           const pricing = getPlanPriceForCountry(plan, country, annual);
           const action = getButtonAction(plan.id);
           const isCurrent = action === "current";

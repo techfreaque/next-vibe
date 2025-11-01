@@ -1,25 +1,28 @@
+import { translations as navTranslations } from "../../nav/i18n/en";
+
 export const translations = {
+  nav: navTranslations,
   home: {
     hero: {
-      badge: "🔥 Uncensored AI Chat",
-      title: "Chat Without Limits",
+      badge: "🔥 AI Chat + Community Forum",
+      title: "Chat with AI, Connect with Community",
       subtitle:
-        "Experience truly uncensored AI conversations with 40+ models. No filters, no restrictions, just honest AI.",
+        "Experience uncensored AI conversations with 40+ models. Join forum discussions. All in one platform.",
       description:
-        "Access GPT-4, Claude, Gemini, Llama, and 40+ other AI models without censorship. Create custom personas, organize chats in folders, and enjoy complete privacy.",
+        "Private AI chats, collaborative spaces, and public forum threads. Choose your privacy level: Private (encrypted), Incognito (local-only), Shared (collaborative), or Public (community forum).",
       cta: "Start Chatting Free",
       learnMore: "Learn More",
-      secondaryCta: "View Pricing",
+      secondaryCta: "Browse Forum",
       userAvatarAlt: "User avatar",
       satisfiedClients: "Join 10,000+ satisfied users",
-      imageAlt: "Unbottled.ai Chat Interface",
+      imageAlt: "Unbottled.ai Chat + Forum Interface",
       stats: {
         users: "10,000+ Users",
         models: "40+ AI Models",
         messages: "1M+ Messages",
       },
       imageOverlay: {
-        title: "Real-time AI Conversations",
+        title: "Real-time AI + Community",
         metrics: {
           yearlyGrowth: {
             label: "User Growth",
@@ -37,6 +40,14 @@ export const translations = {
       },
       videoAlt: "Unbottled.ai Demo",
       scrollDown: "Scroll to explore",
+    },
+    forumHero: {
+      badge: "Welcome to the Community",
+      title: "The AI-Powered Community Forum",
+      subtitle: "Ask questions, share your knowledge, and connect with others in the world of AI.",
+      description: "Explore discussions, get help, and contribute to the future of AI development.",
+      cta: "Create New Thread",
+      secondaryCta: "Browse Threads",
     },
     brands: {
       title: "Powered by Leading AI Models",
@@ -82,75 +93,75 @@ export const translations = {
       },
     },
     features: {
-      title: "Everything You Need for Uncensored AI Chat",
+      title: "Everything You Need for AI Chat + Community",
       subtitle: "Powerful Features",
       description:
-        "Complete freedom and control over your AI conversations with advanced features.",
+        "Choose your privacy level. Chat with AI. Connect with community. All in one platform.",
       contentCreation: {
-        title: "40+ Uncensored AI Models",
+        title: "Private Folders - Your Personal AI",
         description:
-          "Access GPT-4, Claude, Gemini, Llama, and more. All without filters or restrictions.",
+          "Encrypted, server-stored chats. Access GPT-4, Claude, Gemini, and 40+ models. Your private conversations, synced across devices.",
       },
       strategyDevelopment: {
-        title: "Custom Personas",
+        title: "Incognito Folders - Local Only",
         description:
-          "Create AI characters with unique personalities, backgrounds, and conversation styles.",
+          "LocalStorage only, never sent to server. Perfect for maximum privacy. Conversations stay on your device until you clear them.",
       },
       performanceAnalytics: {
-        title: "Advanced Analytics",
+        title: "Shared Folders - Collaborate",
         description:
-          "Track your usage, token consumption, and conversation history across all models.",
+          "Share specific chats with team members or friends. Collaborative AI conversations with permission control.",
       },
       communityEngagement: {
-        title: "Community Personas",
+        title: "Public Folders - Community Forum",
         description:
-          "Discover and use personas created by the community. Share your own creations.",
+          "Join the community! Create public threads, participate in discussions, upvote content, and connect with other AI enthusiasts.",
       },
       growth: {
-        title: "Unlimited Growth",
+        title: "40+ Uncensored AI Models",
         description:
-          "No message limits with subscription. Scale your AI usage as much as you need.",
+          "GPT-4, Claude, Gemini, Llama, Mistral, and more. No filters, no restrictions. Switch models mid-conversation.",
       },
       audience: {
-        title: "Multi-Language Support",
+        title: "Custom AI Personas",
         description:
-          "Chat in any language with AI models that understand context and nuance.",
+          "Create AI characters with unique personalities. Use community personas or build your own. Share with others.",
       },
       global: {
-        title: "Global Access",
+        title: "Smart Organization",
         description:
-          "Access from anywhere in the world. Your conversations sync across all devices.",
+          "Organize chats by folders. Search conversations. Tag threads. Export history. Everything stays organized.",
       },
       adCampaigns: {
-        title: "Crypto Payments",
-        description:
-          "Pay with Bitcoin, Ethereum, or stablecoins. Fast, secure, and anonymous.",
-      },
-      dataAnalysis: {
-        title: "Smart Folder Management",
-        description:
-          "Organize conversations by topic with end-to-end encryption for private folders.",
-      },
-      automation: {
-        title: "Multi-Model Conversations",
-        description:
-          "Compare responses from different AI models side-by-side in the same chat.",
-      },
-      collaboration: {
-        title: "Incognito Mode",
-        description:
-          "Session-only chats that disappear when you close the browser. Perfect for sensitive topics.",
-      },
-      analytics: {
         title: "Flexible Pricing",
         description:
-          "Choose between unlimited subscription (€10/month) or pay-as-you-go credits (€5). No hidden fees.",
+          "Free tier: 10 messages/day. Unlimited plan: €10/month. Credit packs: €5. Crypto or card payments accepted.",
+      },
+      dataAnalysis: {
+        title: "Advanced Analytics",
+        description:
+          "Track your usage, token consumption, and conversation history. See your AI chat patterns and optimize your workflow.",
+      },
+      automation: {
+        title: "Multi-Model Chat",
+        description:
+          "Compare AI models side-by-side. Switch between GPT-4, Claude, and others in the same conversation thread.",
+      },
+      collaboration: {
+        title: "Web Search Integration",
+        description:
+          "AI can search the web (Brave Search) for up-to-date information. Get real-time data in your conversations.",
+      },
+      analytics: {
+        title: "Multi-Language Support",
+        description:
+          "English, German, Polish interface. Chat with AI in any language. Global community, local conversations.",
       },
     },
     cta: {
-      title: "Ready to Experience Uncensored AI?",
+      title: "Ready to Join the AI + Community Platform?",
       subtitle:
-        "Join thousands of users having honest conversations with AI. Start free today.",
+        "Chat privately with 40+ AI models. Join public forum discussions. Choose your privacy level. Start free today.",
       button: "Get Started Free",
       viewPlans: "View Pricing Plans",
       noCredit: "No credit card required",
@@ -160,11 +171,63 @@ export const translations = {
       posts: "Messages Sent",
       growth: "User Growth",
     },
+    pricing: {
+      free: {
+        name: "Free Tier",
+        description: "Get started with 20 free credits - no card required",
+        credits: "20 free credits (one-time)",
+        features: {
+          credits: "20 credits to start",
+          models: "Access to all 40+ AI models",
+          folders: "All folder types (private, incognito, shared, public)",
+          personas: "Use community personas",
+          support: "Community support",
+        },
+        cta: "Start Free",
+      },
+      subscription: {
+        name: "Unlimited Plan",
+        description: "Unlimited messages for serious users",
+        price: "€10/month",
+        credits: "1,000 credits/month",
+        features: {
+          unlimited: "Unlimited AI conversations",
+          models: "All 40+ AI models",
+          folders: "All folder types",
+          personas: "Create unlimited personas",
+          priority: "Priority support",
+          analytics: "Advanced analytics",
+        },
+        cta: "Subscribe Now",
+        popular: "Most Popular",
+      },
+      creditPack: {
+        name: "Credit Pack",
+        description: "Pay as you go, never expires",
+        price: "€5",
+        credits: "500 credits",
+        features: {
+          payAsYouGo: "Pay only for what you use",
+          neverExpires: "Credits never expire",
+          models: "All 40+ AI models",
+          folders: "All folder types",
+          buyMore: "Buy more anytime",
+        },
+        cta: "Buy Credits",
+        note: "Subscription required to purchase credit packs",
+      },
+      comparison: {
+        title: "Compare Plans",
+        free: "Free",
+        subscription: "Unlimited",
+        credits: "Credit Pack",
+      },
+    },
     freeSocialSetup: {
       badge: "Free Trial",
       title: "Try All AI Models Free",
       description:
-        "Start with 10 free messages per day. Test all 40+ AI models before upgrading.",
+        "Start with 20 free credits. Test all 40+ AI models before upgrading.",
       card: {
         title: "Free Access",
         subtitle: "Everything you need to get started",
@@ -177,60 +240,60 @@ export const translations = {
       benefits: {
         professionalSetup: "No credit card required",
         brandConsistency: "Access to all 40+ models",
-        optimizedProfiles: "10 free messages daily",
+        optimizedProfiles: "20 free credits to start",
         strategicPlanning: "Upgrade anytime",
       },
     },
     process: {
-      badge: "Our Process",
-      title: "How It Works",
-      subtitle: "Get started with Unbottled.ai in 4 simple steps",
-      readyTransform: "Ready to transform your AI chat experience?",
-      handleSocial: "Let us handle your uncensored AI conversations",
+      badge: "How It Works",
+      title: "Get Started in 4 Simple Steps",
+      subtitle: "From private AI chats to public forum discussions - all in one platform",
+      readyTransform: "Ready to experience AI chat + community?",
+      handleSocial: "Your privacy, your choice",
       getStarted: "Get Started Today",
       steps: {
         strategyDevelopment: {
-          title: "Sign Up Free",
+          title: "1. Sign Up Free",
           description:
-            "Create your account in seconds. No credit card required. Start with 10 free messages per day.",
+            "Create your account in seconds. No credit card required. Start with 10 free messages per day across all 40+ AI models.",
           tags: {
             audienceAnalysis: "Quick Setup",
             competitorResearch: "No Credit Card",
           },
           insights: {
             title: "Free Forever",
-            description: "10 messages daily, access to all models",
+            description: "10 messages daily, all models, all folder types",
           },
         },
         contentCreation: {
-          title: "Choose Your AI Model",
+          title: "2. Choose Your Privacy Level",
           description:
-            "Select from 40+ uncensored AI models including GPT-4, Claude, Gemini, and more.",
+            "Private (encrypted), Incognito (local-only), Shared (collaborative), or Public (forum). Switch between them anytime.",
           tags: {
-            brandAlignedContent: "40+ Models",
-            engagingVisuals: "No Censorship",
+            brandAlignedContent: "4 Folder Types",
+            engagingVisuals: "Full Control",
           },
           insights: {
-            title: "Unrestricted Access",
-            description: "Honest AI responses without filters",
+            title: "Your Data, Your Rules",
+            description: "From local-only to public forum discussions",
           },
         },
         publishingManagement: {
-          title: "Start Chatting",
+          title: "3. Chat with AI or Community",
           description:
-            "Have honest, unrestricted conversations. Create personas, organize in folders, or go incognito.",
+            "Have private AI conversations, collaborate with friends, or join public forum discussions. Use custom personas and switch AI models mid-chat.",
           tags: {
-            optimalTiming: "Custom Personas",
-            communityBuilding: "Folder Management",
+            optimalTiming: "40+ AI Models",
+            communityBuilding: "Community Forum",
           },
         },
         analysisOptimization: {
-          title: "Upgrade When Ready",
+          title: "4. Upgrade When Ready",
           description:
-            "Get unlimited access for €10/month or buy credit packs for €5. Pay with card or crypto.",
+            "Free tier forever, or unlock unlimited for €10/month. Buy credit packs for €5. Pay with card or crypto. No hidden fees.",
           tags: {
             performanceMetrics: "Unlimited Plan",
-            strategyRefinement: "Credit Packs",
+            strategyRefinement: "Flexible Pricing",
           },
         },
       },
@@ -238,19 +301,19 @@ export const translations = {
     about: {
       hero: {
         title: "About Unbottled.ai",
-        subtitle: "Honest AI. No Censorship. Your Data.",
+        subtitle: "AI Chat + Community Forum. Your Privacy. Your Choice.",
         description:
-          "We're building the future of uncensored AI chat, where you can have genuine conversations without filters or restrictions.",
+          "We're building a platform that combines private AI conversations with community forum discussions. Choose your privacy level, chat with 40+ AI models, and connect with our community.",
       },
       mission: {
         title: "Our Mission",
         description:
-          "To provide access to uncensored AI conversations while respecting user privacy and data ownership. We believe AI should be honest, transparent, and accessible to everyone.",
+          "To provide a unified platform for both private AI conversations and public community discussions. We believe you should control your privacy level—from local-only chats to public forum threads—while accessing the best AI models without censorship.",
       },
       story: {
         title: "Our Story",
         description:
-          "Unbottled.ai was created out of frustration with censored AI platforms. We wanted to build a place where users could have honest conversations with AI without arbitrary restrictions. Today, we serve thousands of users who value freedom of expression and privacy.",
+          "Unbottled.ai was created to solve two problems: censored AI platforms and fragmented chat experiences. We built a single platform where you can have private AI chats, collaborate with teams, and participate in public forum discussions. Today, thousands of users enjoy complete privacy control while accessing 40+ uncensored AI models.",
       },
       values: {
         excellence: {

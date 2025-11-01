@@ -48,6 +48,8 @@ import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { productsRepository, ProductIds } from "@/app/api/[locale]/v1/core/products/repository-client";
+
 import { modelOptions } from "./models-config";
 
 interface CreditPricingSectionProps {
@@ -70,10 +72,13 @@ export default function CreditPricingSection({
   const [isProcessing, setIsProcessing] = useState(false);
   const [calculatorMessages, setCalculatorMessages] = useState(100);
 
-  const SUBSCRIPTION_PRICE = 10; // EUR
-  const SUBSCRIPTION_CREDITS = 1000;
-  const PACK_PRICE = 5; // EUR
-  const PACK_CREDITS = 500;
+  // Use centralized pricing from products repository with proper locale
+  const products = productsRepository.getProducts(locale);
+  const SUBSCRIPTION_PRICE = products[ProductIds.SUBSCRIPTION].price;
+  const SUBSCRIPTION_CREDITS = products[ProductIds.SUBSCRIPTION].credits;
+  const PACK_PRICE = products[ProductIds.CREDIT_PACK].price;
+  const PACK_CREDITS = products[ProductIds.CREDIT_PACK].credits;
+  const FREE_CREDITS = products[ProductIds.FREE_TIER].credits;
 
   const container = {
     hidden: { opacity: 0 },

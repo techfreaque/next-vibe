@@ -74,7 +74,6 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
                     verbose: logger.isDebugEnabled,
                     fix: data.fix || false,
                     timeout: data.timeout,
-                    cacheDir: "./.tmp",
                   },
                   locale,
                   logger,

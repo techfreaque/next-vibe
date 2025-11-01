@@ -1,12 +1,15 @@
 import {
   BarChart3,
+  Bot,
   Brush,
   Building,
+  Folder,
   Home,
   Info,
   MessageSquare,
+  Sparkles,
   Tag,
-  Video,
+  Users,
 } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 
@@ -78,73 +81,63 @@ export interface NavParentItemType {
 export const navItems: NavItemType[] = [
   {
     icon: <Home className="h-4 w-4" />,
-    title: "app.nav.home",
+    title: "app.story._components.nav.home",
     href: "",
   },
   {
+    icon: <Sparkles className="h-4 w-4" />,
+    title: "app.story._components.nav.features",
+    href: "#features",
+  },
+  {
     icon: <Tag className="h-4 w-4" />,
-    title: "app.nav.pricing",
+    title: "app.story._components.nav.pricing",
     href: "#pricing",
   },
-  // {
-  //   translationKey: "app.nav.blog",
-  //   href: "/blog",
-  // },
-  // {
-  //   translationKey: "app.nav.caseStudies",
-  //   href: "/case-studies",
-  // },
-
   {
-    title: "app.nav.services.title",
-    icon: <Brush className="h-4 w-4" />,
+    title: "app.story._components.nav.services.title",
+    icon: <MessageSquare className="h-4 w-4" />,
     children: [
       {
-        icon: <Brush className="h-4 w-4" />,
-        title: "app.nav.services.features.title",
-        description: "app.nav.services.features.description",
+        icon: <Bot className="h-4 w-4" />,
+        title: "app.story._components.nav.services.aiModels.title",
+        description: "app.story._components.nav.services.aiModels.description",
+        href: "#features",
+      },
+      {
+        icon: <Folder className="h-4 w-4" />,
+        title: "app.story._components.nav.services.folders.title",
+        description: "app.story._components.nav.services.folders.description",
+        href: "#features",
+      },
+      {
+        icon: <Users className="h-4 w-4" />,
+        title: "app.story._components.nav.services.personas.title",
+        description: "app.story._components.nav.services.personas.description",
         href: "#features",
       },
       {
         icon: <BarChart3 className="h-4 w-4" />,
-        title: "app.nav.services.process.title",
-        description: "app.nav.services.process.description",
+        title: "app.story._components.nav.services.process.title",
+        description: "app.story._components.nav.services.process.description",
         href: "#process",
-      },
-      {
-        icon: <Video className="h-4 w-4" />,
-        title: "app.nav.services.premiumContent.title",
-        description: "app.nav.services.premiumContent.description",
-        href: "#features",
-      },
-      // {
-      //   icon: LayoutDashboard,
-      //   title: "app.nav.services.dashboard.title",
-      //   description: "app.nav.services.dashboard.description",
-      //   href: "/dashboard",
-      // } ,
-      {
-        icon: <MessageSquare className="h-4 w-4" />,
-        title: "app.nav.services.contact.title",
-        description: "app.nav.services.contact.description",
-        href: "#features",
       },
     ],
   },
   {
-    title: "app.nav.company",
+    title: "app.story._components.nav.company",
     icon: <Building className="h-4 w-4" />,
     children: [
       {
         icon: <Info className="h-4 w-4" />,
-        title: "app.nav.about.title",
-        description: "app.nav.about.description",
+        title: "app.story._components.nav.about.title",
+        description: "app.story._components.nav.about.description",
         href: "/about-us",
       },
       {
         icon: <Building className="h-4 w-4" />,
-        title: "app.nav.careers.title",
-        description: "app.nav.careers.description",
+        title: "app.story._components.nav.careers.title",
+        description: "app.story._components.nav.careers.description",
         href: "/careers",
       },
     ],

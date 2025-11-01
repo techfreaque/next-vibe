@@ -28,6 +28,8 @@ import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
+import { productsRepository, ProductIds } from "@/app/api/[locale]/v1/core/products/repository-client";
+
 /**
  * Credit Balance Interface
  */
@@ -112,6 +114,12 @@ export function SubscriptionClientContent({
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
   const [packQuantity, setPackQuantity] = useState(1);
+
+  // Get pricing from centralized products repository with proper locale
+  const products = productsRepository.getProducts(locale);
+  const SUBSCRIPTION_PRICE = products[ProductIds.SUBSCRIPTION].price;
+  const PACK_PRICE = products[ProductIds.CREDIT_PACK].price;
+  const PACK_CREDITS = products[ProductIds.CREDIT_PACK].credits;
 
   return (
     <Container className="py-8 space-y-8">
@@ -481,7 +489,7 @@ export function SubscriptionClientContent({
               </CardHeader>
               <CardContent className="space-y-6">
                 <Div className="space-y-2">
-                  <Div className="text-4xl font-bold">{formatPrice(10, locale)}</Div>
+                  <Div className="text-4xl font-bold">{formatPrice(SUBSCRIPTION_PRICE, locale)}</Div>
                   <Div className="text-sm text-muted-foreground">
                     {t(
                       "app.subscription.subscription.buy.subscription.perMonth",
@@ -534,7 +542,7 @@ export function SubscriptionClientContent({
               </CardHeader>
               <CardContent className="space-y-6">
                 <Div className="space-y-2">
-                  <Div className="text-4xl font-bold">{formatPrice(5, locale)}</Div>
+                  <Div className="text-4xl font-bold">{formatPrice(PACK_PRICE, locale)}</Div>
                   <Div className="text-sm text-muted-foreground">
                     {t("app.subscription.subscription.buy.pack.perPack")}
                   </Div>
@@ -589,7 +597,7 @@ export function SubscriptionClientContent({
                       </Div>
                       <Div className="text-xs text-muted-foreground">
                         {t("app.subscription.subscription.buy.pack.total", {
-                          count: packQuantity * 500,
+                          count: packQuantity * PACK_CREDITS,
                         })}
                       </Div>
                     </Div>
@@ -606,7 +614,7 @@ export function SubscriptionClientContent({
                   </Div>
                   <Div className="text-center text-sm text-muted-foreground">
                     {t("app.subscription.subscription.buy.pack.totalPrice", {
-                      price: formatPrice(5 * packQuantity, locale),
+                      price: formatPrice(PACK_PRICE * packQuantity, locale),
                     })}
                   </Div>
                 </Div>

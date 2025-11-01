@@ -16,7 +16,7 @@ import type { CreateApiEndpoint } from "../../endpoint/create";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Methods } from "../../types/enums";
 import type { RouteModule } from "../../types/handler";
-import { normalizeRoutePath } from "../utils/normalize-route-path";
+import { normalizeRoutePath } from "../../registry/normalize-route-path";
 
 /**
  * Default request data type

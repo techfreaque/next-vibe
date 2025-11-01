@@ -26,6 +26,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types"
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
+import { productsRepository, ProductIds } from "../products/repository-client";
 import type {
   CreditBalance,
   CreditIdentifier,
@@ -432,28 +433,32 @@ class CreditRepository
         })
         .returning();
 
-      // Create initial 20 credits
+      // Create initial free tier credits from products repository
+      const freeTier = productsRepository.getProduct(ProductIds.FREE_TIER, locale);
+      const freeCredits = freeTier.credits;
+
       await db.insert(leadCredits).values({
         leadId: newLead.id,
-        amount: 20,
+        amount: freeCredits,
       });
 
       // Create transaction record
       await db.insert(creditTransactions).values({
         leadId: newLead.id,
-        amount: 20,
-        balanceAfter: 20,
+        amount: freeCredits,
+        balanceAfter: freeCredits,
         type: "free_tier",
       });
 
       logger.debug("Created new lead with free tier credits", {
         leadId: newLead.id,
         ipAddress,
+        credits: freeCredits,
       });
 
       return createSuccessResponse({
         leadId: newLead.id,
-        credits: 20,
+        credits: freeCredits,
       });
     } catch (error) {
       logger.error("Failed to get or create lead by IP", parseError(error), {

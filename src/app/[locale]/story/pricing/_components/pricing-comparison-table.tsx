@@ -36,7 +36,7 @@ export default function PricingComparison({
     threshold: 0.1,
   });
 
-  const pricingPlans = getPricingPlansArray();
+  const pricingPlans = getPricingPlansArray(locale);
 
   function isTextFeature(
     feature: PricingComparisonFeature,

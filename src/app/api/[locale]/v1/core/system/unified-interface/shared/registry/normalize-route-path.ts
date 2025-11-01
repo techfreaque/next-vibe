@@ -3,8 +3,6 @@
  * Converts various path formats to the generated index format: "core/system/help"
  */
 
-import "server-only";
-
 /**
  * Normalize route path to generated index format
  *

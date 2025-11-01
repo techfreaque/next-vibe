@@ -1,17 +1,19 @@
 import type { translations as enTranslations } from "../en";
+import { translations as navTranslations } from "../../nav/i18n/pl";
 
 export const translations: typeof enTranslations = {
+  nav: navTranslations,
   home: {
     hero: {
-      badge: "🔥 Czat AI bez cenzury",
-      title: "Czatuj bez ograniczeń",
+      badge: "🔥 Czat AI + Forum społeczności",
+      title: "Czatuj z AI, Łącz się ze społecznością",
       subtitle:
-        "Doświadcz prawdziwie niecenzurowanych rozmów z AI z ponad 40 modelami. Bez filtrów, bez ograniczeń, tylko szczera AI.",
+        "Doświadcz niecenzurowanych rozmów z AI z ponad 40 modelami. Dołącz do dyskusji na forum. Wszystko na jednej platformie.",
       description:
-        "Dostęp do GPT-4, Claude, Gemini, Llama i ponad 40 innych modeli AI bez cenzury. Twórz niestandardowe persony, organizuj czaty w folderach i ciesz się pełną prywatnością.",
+        "Prywatne czaty AI, przestrzenie współpracy i publiczne wątki forum. Wybierz poziom prywatności: Prywatny (zaszyfrowany), Incognito (tylko lokalnie), Współdzielony (współpraca) lub Publiczny (forum społeczności).",
       cta: "Zacznij czatować za darmo",
       learnMore: "Dowiedz się więcej",
-      secondaryCta: "Zobacz ceny",
+      secondaryCta: "Przeglądaj forum",
       userAvatarAlt: "Awatar użytkownika",
       satisfiedClients: "Dołącz do 10 000+ zadowolonych użytkowników",
       imageAlt: "Interfejs czatu Unbottled.ai",
@@ -39,6 +41,14 @@ export const translations: typeof enTranslations = {
       },
       videoAlt: "Demo Unbottled.ai",
       scrollDown: "Przewiń, aby odkryć",
+    },
+    forumHero: {
+      badge: "Witamy w społeczności",
+      title: "Forum społeczności wspierane przez AI",
+      subtitle: "Zadawaj pytania, dziel się wiedzą i łącz się z innymi w świecie AI.",
+      description: "Eksploruj dyskusje, uzyskaj pomoc i przyczyń się do przyszłości rozwoju AI.",
+      cta: "Utwórz nowy wątek",
+      secondaryCta: "Przeglądaj wątki",
     },
     brands: {
       title: "Zasilane przez wiodące modele AI",
@@ -84,75 +94,75 @@ export const translations: typeof enTranslations = {
       },
     },
     features: {
-      title: "Wszystko, czego potrzebujesz do niecenzurowanego czatu AI",
+      title: "Wszystko dla czatu AI + społeczności",
       subtitle: "Potężne funkcje",
       description:
-        "Pełna swoboda i kontrola nad rozmowami z AI dzięki zaawansowanym funkcjom.",
+        "Wybierz poziom prywatności. Czatuj z AI. Łącz się ze społecznością. Wszystko na jednej platformie.",
       contentCreation: {
-        title: "40+ niecenzurowanych modeli AI",
+        title: "Foldery prywatne - Twoja osobista AI",
         description:
-          "Dostęp do GPT-4, Claude, Gemini, Llama i więcej. Wszystko bez filtrów i ograniczeń.",
+          "Zaszyfrowane, zapisane na serwerze czaty. Dostęp do GPT-4, Claude, Gemini i 40+ modeli. Twoje prywatne rozmowy, zsynchronizowane na urządzeniach.",
       },
       strategyDevelopment: {
-        title: "Niestandardowe persony",
+        title: "Foldery incognito - Tylko lokalnie",
         description:
-          "Twórz postacie AI z unikalnymi osobowościami, historiami i stylami rozmowy.",
+          "Tylko LocalStorage, nigdy nie wysyłane na serwer. Idealne dla maksymalnej prywatności. Rozmowy pozostają na Twoim urządzeniu, dopóki ich nie usuniesz.",
       },
       performanceAnalytics: {
-        title: "Zaawansowane analizy",
+        title: "Foldery współdzielone - Współpraca",
         description:
-          "Śledź swoje użycie, zużycie tokenów i historię rozmów we wszystkich modelach.",
+          "Udostępniaj konkretne czaty członkom zespołu lub przyjaciołom. Wspólne rozmowy z AI z kontrolą uprawnień.",
       },
       communityEngagement: {
-        title: "Persony społeczności",
+        title: "Foldery publiczne - Forum społeczności",
         description:
-          "Odkrywaj i używaj person stworzonych przez społeczność. Dziel się własnymi kreacjami.",
+          "Dołącz do społeczności! Twórz publiczne wątki, uczestniczę w dyskusjach, głosuj na treści i łącz się z innymi entuzjastami AI.",
       },
       growth: {
-        title: "Nieograniczony rozwój",
+        title: "40+ niecenzurowanych modeli AI",
         description:
-          "Brak limitów wiadomości z subskrypcją. Skaluj swoje użycie AI tak bardzo, jak potrzebujesz.",
+          "GPT-4, Claude, Gemini, Llama, Mistral i więcej. Bez filtrów, bez ograniczeń. Zmieniaj modele w trakcie rozmowy.",
       },
       audience: {
-        title: "Wsparcie wielojęzyczne",
+        title: "Niestandardowe persony AI",
         description:
-          "Czatuj w dowolnym języku z modelami AI, które rozumieją kontekst i niuanse.",
+          "Twórz postacie AI z unikalnymi osobowościami. Używaj person społeczności lub twórz własne. Dziel się z innymi.",
       },
       global: {
-        title: "Globalny dostęp",
+        title: "Inteligentna organizacja",
         description:
-          "Dostęp z dowolnego miejsca na świecie. Twoje rozmowy synchronizują się na wszystkich urządzeniach.",
+          "Organizuj czaty według folderów. Przeszukuj rozmowy. Taguj wątki. Eksportuj historię. Wszystko pozostaje zorganizowane.",
       },
       adCampaigns: {
-        title: "Płatności kryptowalutowe",
-        description:
-          "Płać Bitcoinem, Ethereum lub stablecoinami. Szybko, bezpiecznie i anonimowo.",
-      },
-      dataAnalysis: {
-        title: "Inteligentne zarządzanie folderami",
-        description:
-          "Organizuj rozmowy według tematów z szyfrowaniem end-to-end dla prywatnych folderów.",
-      },
-      automation: {
-        title: "Rozmowy z wieloma modelami",
-        description:
-          "Porównuj odpowiedzi różnych modeli AI obok siebie w tym samym czacie.",
-      },
-      collaboration: {
-        title: "Tryb incognito",
-        description:
-          "Czaty tylko na czas sesji, które znikają po zamknięciu przeglądarki. Idealne dla wrażliwych tematów.",
-      },
-      analytics: {
         title: "Elastyczne ceny",
         description:
-          "Wybierz między nieograniczoną subskrypcją (€10/miesiąc) lub kredytami pay-as-you-go (€5). Bez ukrytych opłat.",
+          "Darmowy plan: 10 wiadomości/dzień. Nieograniczony: €10/miesiąc. Pakiety kredytów: €5. Akceptujemy płatności krypto i kartą.",
+      },
+      dataAnalysis: {
+        title: "Zaawansowane analizy",
+        description:
+          "Śledź swoje użycie, zużycie tokenów i historię rozmów. Zobacz wzorce czatu AI i optymalizuj swój przepływ pracy.",
+      },
+      automation: {
+        title: "Czat z wieloma modelami",
+        description:
+          "Porównuj modele AI obok siebie. Przełączaj między GPT-4, Claude i innymi w tym samym wątku rozmowy.",
+      },
+      collaboration: {
+        title: "Integracja z wyszukiwaniem",
+        description:
+          "AI może przeszukiwać internet (Brave Search) w poszukiwaniu aktualnych informacji. Otrzymuj dane w czasie rzeczywistym w swoich rozmowach.",
+      },
+      analytics: {
+        title: "Wsparcie wielojęzyczne",
+        description:
+          "Interfejs w języku angielskim, niemieckim, polskim. Czatuj z AI w dowolnym języku. Globalna społeczność, lokalne rozmowy.",
       },
     },
     cta: {
-      title: "Gotowy na niecenzurowaną AI?",
+      title: "Gotowy dołączyć do platformy AI + społeczności?",
       subtitle:
-        "Dołącz do tysięcy użytkowników prowadzących szczere rozmowy z AI. Zacznij za darmo już dziś.",
+        "Czatuj prywatnie z 40+ modelami AI. Dołącz do publicznych dyskusji na forum. Wybierz poziom prywatności. Zacznij za darmo już dziś.",
       button: "Zacznij za darmo",
       viewPlans: "Zobacz plany cenowe",
       noCredit: "Nie wymagana karta kredytowa",
