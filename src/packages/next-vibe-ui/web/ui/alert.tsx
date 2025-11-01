@@ -26,10 +26,13 @@ const alertVariants = cva(
 // Cross-platform types for native import
 export type AlertVariant = "default" | "destructive" | "success" | "warning";
 
-export interface AlertProps {
+export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   variant?: AlertVariant;
   children?: React.ReactNode;
+  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>> | React.ComponentType<{ size?: number; color?: string }>; // Support both SVG and Lucide icons
+  iconSize?: number;
+  iconClassName?: string;
 }
 
 export interface AlertTitleProps {
@@ -43,13 +46,16 @@ export interface AlertDescriptionProps {
 }
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
-  ({ className, variant, ...props }, ref) => (
+  ({ className, variant, icon: Icon, children, ...props }, ref) => (
     <div
       ref={ref}
       role="alert"
       className={cn(alertVariants({ variant }), className)}
       {...props}
-    />
+    >
+      {Icon && <Icon />}
+      {children}
+    </div>
   ),
 );
 Alert.displayName = "Alert";
@@ -79,4 +85,4 @@ const AlertDescription = React.forwardRef<
 ));
 AlertDescription.displayName = "AlertDescription";
 
-export { Alert, AlertDescription, AlertTitle };
+export { Alert, AlertDescription, AlertTitle, alertVariants };

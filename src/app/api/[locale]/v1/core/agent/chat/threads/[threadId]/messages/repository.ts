@@ -128,14 +128,38 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       });
 
       // Map messages to include toolCalls from metadata and sequencing fields
-      const mappedMessages = messages.map((msg) => ({
-        ...msg,
-        sequenceId: msg.sequenceId ?? null,
-        sequenceIndex: msg.sequenceIndex ?? 0,
-        toolCalls: msg.metadata?.toolCalls || null,
-        createdAt: msg.createdAt.toISOString(),
-        updatedAt: msg.updatedAt.toISOString(),
-      }));
+      const mappedMessages = messages.map((msg) => {
+        // NEW ARCHITECTURE: For TOOL messages, construct toolCalls array from metadata
+        let toolCalls = null;
+        if (msg.role === "tool" && msg.metadata) {
+          // TOOL message - construct toolCalls array from metadata
+          toolCalls = [
+            {
+              toolName: msg.metadata.toolName || "",
+              displayName: msg.metadata.displayName || "",
+              icon: msg.metadata.icon,
+              args: msg.metadata.args,
+              result: msg.metadata.result,
+              error: msg.metadata.error,
+              executionTime: msg.metadata.executionTime,
+              widgetMetadata: msg.metadata.widgetMetadata,
+              creditsUsed: msg.metadata.creditsUsed,
+            },
+          ];
+        } else if (msg.metadata?.toolCalls) {
+          // Legacy: toolCalls array in metadata (will be removed)
+          toolCalls = msg.metadata.toolCalls;
+        }
+
+        return {
+          ...msg,
+          sequenceId: msg.sequenceId ?? null,
+          sequenceIndex: msg.sequenceIndex ?? 0,
+          toolCalls,
+          createdAt: msg.createdAt.toISOString(),
+          updatedAt: msg.updatedAt.toISOString(),
+        };
+      });
 
       return createSuccessResponse({ messages: mappedMessages });
     } catch (error) {
@@ -239,7 +263,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       }
 
       // Check write permission using permission system
-      if (!canWriteThread(user, thread, folder, logger)) {
+      if (!(await canWriteThread(user, thread, folder, logger))) {
         return fail({
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,

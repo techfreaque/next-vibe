@@ -65,6 +65,7 @@ CREATE TABLE "chat_threads" (
 	"metadata" jsonb DEFAULT '{}'::jsonb,
 	"moderator_ids" jsonb DEFAULT '[]'::jsonb,
 	"allowed_roles" jsonb DEFAULT '[]'::jsonb,
+	"published" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"search_vector" text

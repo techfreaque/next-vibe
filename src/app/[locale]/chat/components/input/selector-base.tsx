@@ -2,19 +2,19 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Button } from "@/packages/next-vibe-ui/web/ui/button";
-import { Div } from "@/packages/next-vibe-ui/web/ui/div";
-import { Input } from "@/packages/next-vibe-ui/web/ui/input";
-import { Popover } from "@/packages/next-vibe-ui/web/ui/popover";
-import { PopoverContent } from "@/packages/next-vibe-ui/web/ui/popover";
-import { PopoverTrigger } from "@/packages/next-vibe-ui/web/ui/popover";
-import { Span } from "@/packages/next-vibe-ui/web/ui/span";
-import { Check } from "@/packages/next-vibe-ui/web/ui/icons/Check";
-import { ChevronDown } from "@/packages/next-vibe-ui/web/ui/icons/ChevronDown";
-import { ChevronUp } from "@/packages/next-vibe-ui/web/ui/icons/ChevronUp";
-import { Plus } from "@/packages/next-vibe-ui/web/ui/icons/Plus";
-import { Search } from "@/packages/next-vibe-ui/web/ui/icons/Search";
-import { Star } from "@/packages/next-vibe-ui/web/ui/icons/Star";
+import { Button } from "next-vibe-ui//ui/button";
+import { Div } from "next-vibe-ui//ui/div";
+import { Input } from "next-vibe-ui//ui/input";
+import { Popover } from "next-vibe-ui//ui/popover";
+import { PopoverContent } from "next-vibe-ui//ui/popover";
+import { PopoverTrigger } from "next-vibe-ui//ui/popover";
+import { Span } from "next-vibe-ui//ui/span";
+import { Check } from "next-vibe-ui//ui/icons/Check";
+import { ChevronDown } from "next-vibe-ui//ui/icons/ChevronDown";
+import { ChevronUp } from "next-vibe-ui//ui/icons/ChevronUp";
+import { Plus } from "next-vibe-ui//ui/icons/Plus";
+import { Search } from "next-vibe-ui//ui/icons/Search";
+import { Star } from "next-vibe-ui//ui/icons/Star";
 import type { JSX, ReactNode } from "react";
 import React, { useMemo, useState } from "react";
 

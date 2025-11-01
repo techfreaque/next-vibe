@@ -6,27 +6,23 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
 
-// Define types locally to avoid web dependency issues
-interface PopoverRootProps {
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-}
+// Import all types from web (web is source of truth)
+import type {
+  PopoverRootProps,
+  PopoverTriggerProps,
+  PopoverAnchorProps,
+  PopoverContentProps,
+} from "next-vibe-ui/ui/popover";
 
-interface PopoverTriggerProps {
-  className?: string;
-}
-
-interface PopoverAnchorProps {
-  className?: string;
-}
-
-interface PopoverContentProps {
-  className?: string;
-  align?: "start" | "center" | "end";
-  sideOffset?: number;
-}
-
-const Popover = PopoverPrimitive.Root;
+const Popover = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Root>,
+  PopoverRootProps
+>(({ children, ...props }, ref) => (
+  <PopoverPrimitive.Root ref={ref} {...props}>
+    {children}
+  </PopoverPrimitive.Root>
+));
+Popover.displayName = "Popover";
 
 const PopoverTrigger = PopoverPrimitive.Trigger;
 

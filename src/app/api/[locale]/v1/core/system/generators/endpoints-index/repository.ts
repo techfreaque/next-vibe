@@ -82,7 +82,7 @@ class EndpointsIndexGeneratorRepositoryImpl
       logger.debug(`Found ${definitionFiles.length} definition files`);
 
       // Generate content
-      const content = this.generateContent(definitionFiles, outputFile);
+      const content = await this.generateContent(definitionFiles, outputFile);
 
       // Write file
       await writeGeneratedFile(outputFile, content, data.dryRun);
@@ -117,12 +117,58 @@ class EndpointsIndexGeneratorRepositoryImpl
   }
 
   /**
-   * Generate endpoints content with singleton pattern
+   * Extract aliases from definition file (async)
    */
-  private generateContent(
+  private async extractAliasesFromDefinition(
+    defFile: string,
+  ): Promise<string[]> {
+    try {
+      const definition = (await import(defFile)) as {
+        default?: Record<string, { aliases?: string[] }>;
+      };
+      const defaultExport = definition.default;
+
+      if (!defaultExport) {
+        return [];
+      }
+
+      // Get aliases from any method (usually POST)
+      for (const method of Object.keys(defaultExport)) {
+        const methodDef = defaultExport[method];
+        if (methodDef?.aliases && Array.isArray(methodDef.aliases)) {
+          return methodDef.aliases;
+        }
+      }
+    } catch {
+      // Definition file doesn't exist or can't be loaded
+    }
+    return [];
+  }
+
+  /**
+   * Helper function to format path array
+   */
+  private formatPathArray(pathSegments: string[]): string {
+    // eslint-disable-next-line i18next/no-literal-string
+    const pathArrayElements = pathSegments.map((p) => `"${p}"`);
+    const pathArrayLiteral = pathArrayElements.join(", ");
+    const shouldSplitArray =
+      pathArrayElements.length > 7 || pathArrayLiteral.length > 70;
+
+    if (shouldSplitArray) {
+      // eslint-disable-next-line i18next/no-literal-string
+      return `[\n      ${pathArrayElements.join(",\n      ")},\n    ]`;
+    }
+    return `[${pathArrayLiteral}]`;
+  }
+
+  /**
+   * Generate endpoints content with singleton pattern and full alias support
+   */
+  private async generateContent(
     definitionFiles: string[],
     outputFile: string,
-  ): string {
+  ): Promise<string> {
     const imports: string[] = [];
     const setNestedPathCalls: string[] = [];
 
@@ -135,30 +181,29 @@ class EndpointsIndexGeneratorRepositoryImpl
       const importStatement = `import { default as endpointDefinition${i} } from "${relativePath}";`;
       imports.push(importStatement);
 
-      // Format array - split if too many elements or total length > 70
-      // eslint-disable-next-line i18next/no-literal-string
-      const pathArrayElements = nestedPath.map((p) => `"${p}"`);
-      const pathArrayLiteral = pathArrayElements.join(", ");
-      const shouldSplitArray =
-        pathArrayElements.length > 7 || pathArrayLiteral.length > 70;
-
-      let arrayStr;
-      if (shouldSplitArray) {
+      // Helper function to add setNestedPath call
+      const addSetNestedPathCall = (pathSegments: string[]): void => {
+        const arrayStr = this.formatPathArray(pathSegments);
         // eslint-disable-next-line i18next/no-literal-string
-        arrayStr = `[\n      ${pathArrayElements.join(",\n      ")},\n    ]`;
-      } else {
-        arrayStr = `[${pathArrayLiteral}]`;
-      }
+        const singleLine = `  setNestedPath(endpoints, ${arrayStr}, endpointDefinition${i});`;
+        if (singleLine.length > 80 || arrayStr.includes("\n")) {
+          // eslint-disable-next-line i18next/no-literal-string
+          const multiLine = `  setNestedPath(\n    endpoints,\n    ${arrayStr},\n    endpointDefinition${i},\n  );`;
+          setNestedPathCalls.push(multiLine);
+        } else {
+          setNestedPathCalls.push(singleLine);
+        }
+      };
 
-      // Format as multiline if too long (>80 chars)
-      // eslint-disable-next-line i18next/no-literal-string
-      const singleLine = `  setNestedPath(endpoints, ${arrayStr}, endpointDefinition${i});`;
-      if (singleLine.length > 80 || shouldSplitArray) {
-        // eslint-disable-next-line i18next/no-literal-string
-        const multiLine = `  setNestedPath(\n    endpoints,\n    ${arrayStr},\n    endpointDefinition${i},\n  );`;
-        setNestedPathCalls.push(multiLine);
-      } else {
-        setNestedPathCalls.push(singleLine);
+      // Add main path (with [id] format only)
+      addSetNestedPathCall(nestedPath);
+
+      // Extract and add real aliases from definition file
+      const definitionAliases = await this.extractAliasesFromDefinition(defFile);
+      for (const alias of definitionAliases) {
+        // Treat single-word aliases as standalone, multi-segment aliases as paths
+        const aliasSegments = alias.includes("/") ? alias.split("/") : [alias];
+        addSetNestedPathCall(aliasSegments);
       }
     }
 

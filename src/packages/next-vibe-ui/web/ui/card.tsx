@@ -2,34 +2,41 @@ import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
 // Cross-platform types for native import
-export interface CardProps {
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   children?: React.ReactNode;
+  style?: React.CSSProperties;
 }
 
-export interface CardHeaderProps {
+export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   children?: React.ReactNode;
+  style?: React.CSSProperties;
 }
 
-export interface CardTitleProps {
+export interface CardTitleProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   children?: React.ReactNode;
+  style?: React.CSSProperties;
 }
 
-export interface CardDescriptionProps {
+export interface CardDescriptionProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   children?: React.ReactNode;
+  style?: React.CSSProperties;
 }
 
-export interface CardContentProps {
+export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   children?: React.ReactNode;
+  style?: React.CSSProperties;
 }
 
-export interface CardFooterProps {
+export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   children?: React.ReactNode;
+  style?: React.CSSProperties;
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(

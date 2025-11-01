@@ -2,6 +2,8 @@
  * Breadcrumb Component for React Native
  * Navigation breadcrumb trail
  */
+/// <reference path="../../../../../nativewind-env.d.ts" />
+
 import * as Slot from "@rn-primitives/slot";
 import { ChevronRight } from "lucide-react-native";
 import React from "react";
@@ -77,20 +79,25 @@ export const BreadcrumbLink = React.forwardRef<
   React.ElementRef<typeof Pressable>,
   NativeBreadcrumbLinkProps
 >(({ asChild, className, children, onPress }, ref) => {
-  const Component = asChild ? Slot.Pressable : Pressable;
+  const combinedClassName = cn("transition-colors active:text-foreground", className);
+  const content = typeof children === "string" ? (
+    <RNText className="text-muted-foreground">{children}</RNText>
+  ) : (
+    children
+  );
+
+  if (asChild) {
+    return (
+      <Slot.Pressable ref={ref} onPress={onPress} className={combinedClassName}>
+        {content}
+      </Slot.Pressable>
+    );
+  }
 
   return (
-    <Component
-      ref={ref}
-      onPress={onPress}
-      className={cn("transition-colors active:text-foreground", className)}
-    >
-      {typeof children === "string" ? (
-        <RNText className="text-muted-foreground">{children}</RNText>
-      ) : (
-        children
-      )}
-    </Component>
+    <Pressable ref={ref} onPress={onPress} className={combinedClassName}>
+      {content}
+    </Pressable>
   );
 });
 
@@ -125,7 +132,7 @@ export function BreadcrumbSeparator({
       className={cn("w-3.5 h-3.5", className)}
     >
       {children ?? (
-        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
+        <ChevronRight size={14} color="currentColor" />
       )}
     </View>
   );

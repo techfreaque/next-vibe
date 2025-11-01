@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "@/packages/next-vibe-ui/web/ui/button";
-import { Div } from "@/packages/next-vibe-ui/web/ui/div";
-import { AlertCircle } from "@/packages/next-vibe-ui/web/ui/icons/AlertCircle";
-import { Camera } from "@/packages/next-vibe-ui/web/ui/icons/Camera";
-import { Loader2 } from "@/packages/next-vibe-ui/web/ui/icons/Loader2";
-import { X } from "@/packages/next-vibe-ui/web/ui/icons/X";
+import { Button } from "next-vibe-ui//ui/button";
+import { Div } from "next-vibe-ui//ui/div";
+import { AlertCircle } from "next-vibe-ui//ui/icons/AlertCircle";
+import { Camera } from "next-vibe-ui//ui/icons/Camera";
+import { Loader2 } from "next-vibe-ui//ui/icons/Loader2";
+import { X } from "next-vibe-ui//ui/icons/X";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 

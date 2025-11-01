@@ -5,17 +5,28 @@ import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
-// Cross-platform types
-export interface AccordionProps {
-  type?: "single" | "multiple";
-  value?: string | string[];
-  onValueChange?: (value: string | string[]) => void;
-  defaultValue?: string | string[];
-  collapsible?: boolean;
-  disabled?: boolean;
-  className?: string;
-  children?: React.ReactNode;
-}
+// Cross-platform types - aligned with native requirements
+export type AccordionProps =
+  | {
+      type?: "single";
+      value?: string;
+      onValueChange?: (value: string) => void;
+      defaultValue?: string;
+      collapsible?: boolean;
+      disabled?: boolean;
+      className?: string;
+      children?: React.ReactNode;
+    }
+  | {
+      type: "multiple";
+      value?: string[];
+      onValueChange?: (value: string[]) => void;
+      defaultValue?: string[];
+      collapsible?: never;
+      disabled?: boolean;
+      className?: string;
+      children?: React.ReactNode;
+    };
 
 export interface AccordionItemProps {
   value: string;

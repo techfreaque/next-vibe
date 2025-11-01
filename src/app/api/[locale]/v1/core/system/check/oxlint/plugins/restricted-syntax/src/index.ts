@@ -10,52 +10,52 @@
 
 // Type definitions for Oxlint AST nodes
 interface OxlintASTNode {
-  type: string;
-  [key: string]: unknown;
+    type: string;
+    [key: string]: unknown;
 }
 
 interface Property extends OxlintASTNode {
-  type: "Property";
-  key?: OxlintASTNode;
-  value?: OxlintASTNode;
-  computed?: boolean;
-  method?: boolean;
+    type: "Property";
+    key?: OxlintASTNode;
+    value?: OxlintASTNode;
+    computed?: boolean;
+    method?: boolean;
 }
 
 interface ParenthesizedExpression extends OxlintASTNode {
-  type: "ParenthesizedExpression";
-  expression?: OxlintASTNode;
+    type: "ParenthesizedExpression";
+    expression?: OxlintASTNode;
 }
 
 interface OxlintComment {
-  type: "Line" | "Block";
-  value: string;
+    type: "Line" | "Block";
+    value: string;
 }
 
 interface OxlintRuleContext {
-  report: (descriptor: { node: OxlintASTNode; message: string }) => void;
-  options?: unknown[];
-  getCommentsInside?: (node: OxlintASTNode) => OxlintComment[];
-  getCommentsBefore?: (node: OxlintASTNode) => OxlintComment[];
-  getFilename?: () => string;
-  filename?: string;
-  sourceCode?: {
-    getCommentsBefore?: (node: OxlintASTNode) => OxlintComment[];
+    report: (descriptor: { node: OxlintASTNode; message: string }) => void;
+    options?: unknown[];
     getCommentsInside?: (node: OxlintASTNode) => OxlintComment[];
-  };
+    getCommentsBefore?: (node: OxlintASTNode) => OxlintComment[];
+    getFilename?: () => string;
+    filename?: string;
+    sourceCode?: {
+        getCommentsBefore?: (node: OxlintASTNode) => OxlintComment[];
+        getCommentsInside?: (node: OxlintASTNode) => OxlintComment[];
+    };
 }
 
 interface RuleModule {
-  meta: {
-    type: string;
-    docs: {
-      description: string;
-      category: string;
-      recommended: boolean;
+    meta: {
+        type: string;
+        docs: {
+            description: string;
+            category: string;
+            recommended: boolean;
+        };
+        schema: Array<Record<string, never>>;
     };
-    schema: Array<Record<string, never>>;
-  };
-  create: (context: OxlintRuleContext) => Record<string, (node: OxlintASTNode) => void>;
+    create: (context: OxlintRuleContext) => Record<string, (node: OxlintASTNode) => void>;
 }
 
 // Helper functions for type checking and node traversal
@@ -63,7 +63,7 @@ interface RuleModule {
  * Type guard to check if a node is a Property node
  */
 function isProperty(node: OxlintASTNode): node is Property {
-  return node.type === "Property" && typeof (node as Property).method === "boolean";
+    return node.type === "Property" && typeof (node as Property).method === "boolean";
 }
 /**
  * Check if the current file is in an allowed path where restricted syntax is permitted
@@ -172,6 +172,10 @@ function unwrapParen(n: OxlintASTNode): OxlintASTNode {
     return cur;
 }
 
+function getRestrictedSyntaxtMessage(type: string): string {
+    return `Usage of the '${type}' type isn't allowed. Consider using the inferred types from the unified interface system based on definition.ts`;
+}
+
 // Define the restricted-syntax rule
 const restrictedSyntaxRule: RuleModule = {
     meta: {
@@ -194,7 +198,7 @@ const restrictedSyntaxRule: RuleModule = {
                 }
                 context.report({
                     node,
-                    message: "Usage of the 'unknown' type isn't allowed. Consider using generics with interface or type alias for explicit structure."
+                    message: getRestrictedSyntaxtMessage("unknown")
                 });
             },
 
@@ -204,7 +208,7 @@ const restrictedSyntaxRule: RuleModule = {
                 }
                 context.report({
                     node,
-                    message: "Usage of the 'object' type isn't allowed. Consider using generics with interface or type alias for explicit structure."
+                    message: getRestrictedSyntaxtMessage("object")
                 });
             },
 
@@ -214,7 +218,7 @@ const restrictedSyntaxRule: RuleModule = {
                 }
                 context.report({
                     node,
-                    message: "Usage of 'throw' statements is not allowed. Use proper ResponseType<T> patterns instead."
+                    message: getRestrictedSyntaxtMessage("throw")
                 });
             },
 

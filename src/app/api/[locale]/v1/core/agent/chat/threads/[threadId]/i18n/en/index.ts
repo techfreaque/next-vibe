@@ -53,6 +53,9 @@ export const translations = {
         tags: {
           content: "Tags",
         },
+        published: {
+          content: "Published",
+        },
         preview: {
           content: "Preview",
         },
@@ -165,6 +168,10 @@ export const translations = {
       label: "Tags",
       description: "Tags for organization",
     },
+    published: {
+      label: "Published",
+      description: "Make this thread publicly accessible via link (SHARED folders only)",
+    },
     response: {
       thread: {
         title: "Updated Thread",
@@ -201,6 +208,9 @@ export const translations = {
         },
         tags: {
           content: "Tags",
+        },
+        published: {
+          content: "Published",
         },
         preview: {
           content: "Preview",

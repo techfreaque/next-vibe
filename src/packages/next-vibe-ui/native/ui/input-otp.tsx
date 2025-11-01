@@ -1,3 +1,4 @@
+/// <reference path="../../../../../nativewind-env.d.ts" />
 /**
  * InputOTP Component for React Native
  * Simple OTP input implementation using TextInput
@@ -9,29 +10,13 @@ import { Text as RNText, TextInput, View } from "react-native";
 
 import { cn } from "../lib/utils";
 
-// Define types locally to avoid web dependency issues
-interface InputOTPProps {
-  className?: string;
-  containerClassName?: string;
-  value?: string;
-  onChange?: (value: string) => void;
-  maxLength?: number;
-  children: React.ReactNode;
-}
-
-interface InputOTPGroupProps {
-  className?: string;
-  children: React.ReactNode;
-}
-
-interface InputOTPSlotProps {
-  index: number;
-  className?: string;
-}
-
-interface InputOTPSeparatorProps {
-  className?: string;
-}
+// Import all public types from web version (web is source of truth)
+import type {
+  InputOTPGroupProps,
+  InputOTPProps,
+  InputOTPSeparatorProps,
+  InputOTPSlotProps,
+} from "../../web/ui/input-otp";
 
 interface OTPContextValue {
   value: string;

@@ -41,7 +41,6 @@ config.resolver.blockList = [
   /src\/.*\/\.next\/.*/,
   /src\/.*\/\.expo\/.*/,
   /src\/.*\/dist\/.*/,
-  /src\/.*\/build\/.*/,
 ];
 
 // Only watch src and node_modules
@@ -85,8 +84,13 @@ config.resolver.blockList = [
   /.*\/middleware\.ts$/,
 ];
 
+// Configure transformer to use custom transformer for server-only handling
+config.transformer = {
+  ...config.transformer,
+  babelTransformerPath: require.resolve('./metro.transformer.cjs'),
+};
+
 // Apply NativeWind BEFORE custom resolveRequest so resolution happens after transformation
-// NativeWind v5 uses @source directives in global.css (Tailwind v4 format)
 const nativeWindConfig = withNativeWind(config, {
   input: './src/app/api/[locale]/v1/core/system/unified-interface/react-native/global.css',
   // Running from workspace root now, so projectRoot is already correct
@@ -97,7 +101,7 @@ const nativeWindConfig = withNativeWind(config, {
 const originalResolveRequest = nativeWindConfig.resolver.resolveRequest;
 
 nativeWindConfig.resolver.resolveRequest = (context, moduleName, platform) => {
-  // CRITICAL: Redirect next-vibe-ui imports to native version
+  // Redirect next-vibe-ui imports to native version
   if (moduleName.startsWith('next-vibe-ui/')) {
     const subpath = moduleName.replace('next-vibe-ui/', '');
     const nativePath = path.join(workspaceRoot, 'src/packages/next-vibe-ui/native', subpath);
@@ -112,7 +116,7 @@ nativeWindConfig.resolver.resolveRequest = (context, moduleName, platform) => {
 
   const originPath = context.originModulePath || '';
 
-  // CRITICAL: Prevent infinite recursion by NOT rewriting react-native imports
+  // Prevent infinite recursion by NOT rewriting react-native imports
   // that originate from within react-native-css PACKAGE ITSELF (not from next-vibe-ui)
   // We need to allow rewriting for next-vibe-ui files even though they might be in node_modules
   const isFromReactNativeCssPackage = originPath.includes('/react-native-css/dist/') ||

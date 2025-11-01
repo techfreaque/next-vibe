@@ -155,9 +155,13 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         // Run Next.js build command
         const { execSync } = await import("child_process");
         try {
-          execSync("NODE_ENV=production bun run next build", {
+          execSync("npx next build", {
             stdio: "inherit",
             cwd: process.cwd(),
+            env: {
+              ...process.env,
+              NODE_ENV: "production",
+            },
           });
           output.push(MESSAGES.NEXTJS_BUILD_SUCCESS);
         } catch (buildError) {

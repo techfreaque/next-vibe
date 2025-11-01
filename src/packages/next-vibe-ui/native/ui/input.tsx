@@ -1,31 +1,47 @@
+/// <reference path="../../../../../nativewind-env.d.ts" />
 import * as React from "react";
 import type { TextInputProps } from "react-native";
 import { TextInput } from "react-native";
 
 import { cn } from "../lib/utils";
 
-interface InputProps extends Omit<TextInputProps, "onChange"> {
-  className?: string;
-  disabled?: boolean;
-  onChangeText?: (text: string) => void;
-}
+// Import all public types from web version (web is source of truth)
+import type { InputProps as WebInputProps } from "next-vibe-ui/ui/input";
+import { Div } from "./div";
+
+// Native input props combine web interface with native TextInput props
+// Exclude conflicting event handlers - onKeyPress has different signatures on web/native
+type NativeInputProps = Omit<WebInputProps, "onKeyPress"> &
+  Omit<TextInputProps, "className" | "disabled" | "onKeyPress"> & {
+    onKeyPress?: TextInputProps["onKeyPress"]; // Use native signature
+  };
 
 const Input = React.forwardRef<
   React.ElementRef<typeof TextInput>,
-  InputProps
->(({ className, onChangeText, disabled, ...props }, ref) => {
+  NativeInputProps
+>(({ className, onChangeText, disabled, editable, ...props }, ref) => {
   return (
-    <TextInput
-      ref={ref}
+    <Div
       className={cn(
-        "web:flex h-10 native:h-12 web:w-full rounded-md border border-input bg-background px-3 web:py-2 text-base lg:text-sm native:text-lg native:leading-[1.25] text-foreground placeholder:text-muted-foreground web:ring-offset-background file:border-0 file:bg-transparent file:font-medium web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
-        disabled && "opacity-50 web:cursor-not-allowed",
+        // Wrapper handles: border, background, padding, rounded corners
+        "flex h-10 native:h-12 w-full rounded-md border border-input bg-background px-3 py-2",
+        disabled && "opacity-50",
         className,
       )}
-      onChangeText={onChangeText}
-      editable={!disabled}
-      {...props}
-    />
+    >
+      <TextInput
+        ref={ref}
+        className={cn(
+          // Input handles: text color, size, flex - NO border/background (wrapper handles that)
+          "flex-1 text-base lg:text-sm native:text-lg native:leading-[1.25] text-foreground border-0",
+        )}
+        style={{ outlineWidth: 0 }} // Remove any default outline/border
+        placeholderTextColor="rgb(var(--muted-foreground))"
+        onChangeText={onChangeText}
+        editable={editable !== undefined ? editable : !disabled}
+        {...props}
+      />
+    </Div>
   );
 });
 

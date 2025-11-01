@@ -97,17 +97,6 @@ const { POST } = createEndpoint({
         z.number().min(1).max(3600).default(3600),
       ),
 
-      cacheDir: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.v1.core.system.check.oxlint.fields.cacheDir.label",
-          description:
-            "app.api.v1.core.system.check.oxlint.fields.cacheDir.description",
-          layout: { columns: 3 },
-        },
-        z.string().optional().default("./.tmp"),
-      ),
 
       // === RESPONSE FIELDS ===
       success: responseField(

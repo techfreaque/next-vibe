@@ -219,6 +219,30 @@ const { GET } = createEndpoint({
               },
               z.number().nullable(),
             ),
+            sequenceId: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.sequenceId.content" as const,
+              },
+              z.uuid().nullable(),
+            ),
+            sequenceIndex: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.sequenceIndex.content" as const,
+              },
+              z.number(),
+            ),
+            toolCalls: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.toolCalls.content" as const,
+              },
+              z.array(z.any()).nullable(),
+            ),
             createdAt: responseField(
               {
                 type: WidgetType.TEXT,
@@ -267,6 +291,9 @@ const { GET } = createEndpoint({
             isAI: false,
             model: null,
             tokens: null,
+            sequenceId: null,
+            sequenceIndex: 0,
+            toolCalls: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },
@@ -281,6 +308,9 @@ const { GET } = createEndpoint({
             isAI: true,
             model: "gpt-4o",
             tokens: 150,
+            sequenceId: null,
+            sequenceIndex: 0,
+            toolCalls: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },

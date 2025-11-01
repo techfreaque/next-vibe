@@ -14,3 +14,9 @@ export const formattingInstructions = [
   "Keep formatting clean and readable with proper spacing",
   "NEVER write walls of text - break content into readable paragraphs with blank lines between them",
 ] as const;
+
+/**
+ * Default prompt when user wants AI to answer to an AI message
+ */
+export const CONTINUE_CONVERSATION_PROMPT =
+  "Answer to the previous AI message, add extra context, call out issues, and potentially drive the conversation in a different direction.";

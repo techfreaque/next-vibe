@@ -6,18 +6,40 @@ import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
 const toggleVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground",
+  "web:group web:inline-flex items-center justify-center rounded-md web:ring-offset-background web:transition-colors web:hover:bg-muted active:bg-muted web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
   {
     variants: {
       variant: {
         default: "bg-transparent",
         outline:
-          "border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "border border-input bg-transparent web:hover:bg-accent active:bg-accent active:bg-accent",
       },
       size: {
-        default: "h-9 px-3",
-        sm: "h-8 px-2",
-        lg: "h-10 px-3",
+        default: "h-10 px-3 native:h-12 native:px-[12]",
+        sm: "h-9 px-2.5 native:h-10 native:px-[9]",
+        lg: "h-11 px-5 native:h-14 native:px-6",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+);
+
+const toggleTextVariants = cva(
+  "text-sm native:text-base text-foreground font-medium",
+  {
+    variants: {
+      variant: {
+        default: "",
+        outline:
+          "web:group-hover:text-accent-foreground web:group-active:text-accent-foreground",
+      },
+      size: {
+        default: "",
+        sm: "",
+        lg: "",
       },
     },
     defaultVariants: {
@@ -55,4 +77,4 @@ const Toggle = React.forwardRef<
 
 Toggle.displayName = TogglePrimitive.Root.displayName;
 
-export { Toggle, toggleVariants };
+export { Toggle, toggleVariants, toggleTextVariants };

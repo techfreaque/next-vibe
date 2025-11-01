@@ -8,23 +8,27 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-// Cross-platform props interface
-export interface SwitchBaseProps {
-  checked?: boolean;
-  defaultChecked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
-  disabled?: boolean;
-  className?: string;
-  name?: string;
-  value?: string;
-  required?: boolean;
-}
+import { StyledAnimatedView } from "../lib/styled";
 
+// Import cross-platform props interface from web (source of truth)
+import type { SwitchBaseProps } from "next-vibe-ui/ui/switch";
+
+import type { WithClassName } from "../lib/types";
 import { useColorScheme } from "../lib/useColorScheme";
 import { cn } from "../lib/utils";
 
 // Native switch props that align with web interface
 type NativeSwitchProps = SwitchBaseProps;
+
+// Type-safe wrapper for primitives
+const StyledSwitchRoot = SwitchPrimitives.Root as React.ForwardRefExoticComponent<
+  WithClassName<React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>> &
+    React.RefAttributes<React.ElementRef<typeof SwitchPrimitives.Root>>
+>;
+const StyledSwitchThumb = SwitchPrimitives.Thumb as React.ForwardRefExoticComponent<
+  WithClassName<React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Thumb>> &
+    React.RefAttributes<React.ElementRef<typeof SwitchPrimitives.Thumb>>
+>;
 
 const SwitchWeb = React.forwardRef<
   SwitchPrimitives.RootRef,
@@ -33,26 +37,26 @@ const SwitchWeb = React.forwardRef<
   const isChecked = checked ?? false;
   const handleCheckedChange = onCheckedChange ?? (() => {});
   return (
-    <SwitchPrimitives.Root
+    <StyledSwitchRoot
       className={cn(
         "peer flex-row h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed",
         isChecked ? "bg-primary" : "bg-input",
         disabled && "opacity-50",
         className,
-      ) as never}
+      )}
       checked={isChecked}
       onCheckedChange={handleCheckedChange}
       disabled={disabled}
       {...props}
       ref={ref}
     >
-      <SwitchPrimitives.Thumb
+      <StyledSwitchThumb
         className={cn(
           "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-md shadow-foreground/5 ring-0 transition-transform",
           isChecked ? "translate-x-5" : "translate-x-0",
-        ) as never}
+        )}
       />
-    </SwitchPrimitives.Root>
+    </StyledSwitchRoot>
   );
 });
 
@@ -92,34 +96,34 @@ const SwitchNative = React.forwardRef<
     ],
   }));
   return (
-    <Animated.View
+    <StyledAnimatedView
       style={animatedRootStyle}
       className={cn(
         "h-8 w-[46px] rounded-full",
         disabled && "opacity-50",
-      ) as never}
+      )}
     >
-      <SwitchPrimitives.Root
+      <StyledSwitchRoot
         className={cn(
           "flex-row h-8 w-[46px] shrink-0 items-center rounded-full border-2 border-transparent",
           isChecked ? "bg-primary" : "bg-input",
           className,
-        ) as never}
+        )}
         checked={isChecked}
         onCheckedChange={handleCheckedChange}
         disabled={disabled}
         {...props}
         ref={ref}
       >
-        <Animated.View style={animatedThumbStyle}>
-          <SwitchPrimitives.Thumb
+        <StyledAnimatedView style={animatedThumbStyle}>
+          <StyledSwitchThumb
             className={
-              "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0" as never
+              "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0"
             }
           />
-        </Animated.View>
-      </SwitchPrimitives.Root>
-    </Animated.View>
+        </StyledAnimatedView>
+      </StyledSwitchRoot>
+    </StyledAnimatedView>
   );
 });
 SwitchNative.displayName = "SwitchNative";

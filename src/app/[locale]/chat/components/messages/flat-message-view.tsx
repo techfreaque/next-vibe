@@ -556,17 +556,17 @@ function FlatMessage({
             onBranch={
               onBranchMessage
                 ? (id, content): Promise<void> =>
-                    messageActions.handleBranchEdit(
-                      id,
-                      content,
-                      onBranchMessage,
-                    )
+                  messageActions.handleBranchEdit(
+                    id,
+                    content,
+                    onBranchMessage,
+                  )
                 : async (): Promise<void> => {
-                    logger.warn(
-                      "FlatMessageView",
-                      "Branch operation not available - onBranchMessage handler not provided",
-                    );
-                  }
+                  logger.warn(
+                    "FlatMessageView",
+                    "Branch operation not available - onBranchMessage handler not provided",
+                  );
+                }
             }
             onCancel={messageActions.cancelAction}
             onModelChange={onModelChange}
@@ -611,6 +611,39 @@ function FlatMessage({
             logger={logger}
           />
         </Div>
+      ) : message.role === "error" ? (
+        <Div
+          className={cn(
+            "text-sm leading-relaxed",
+            "p-3",
+            "rounded border transition-all duration-150",
+            "border-red-500/60 bg-red-500/10",
+          )}
+        >
+          <Div className="whitespace-pre-wrap break-words text-red-400 font-medium">
+            {message.content}
+          </Div>
+        </Div>
+      ) : message.role === "tool" ? (
+        <Div
+          className={cn(
+            "text-sm leading-relaxed",
+            "p-3",
+            "rounded border transition-all duration-150",
+            isHighlighted
+              ? "border-blue-500/60 bg-blue-500/5"
+              : "border-border/30 hover:border-border/50",
+          )}
+        >
+          {/* NEW ARCHITECTURE: TOOL messages have toolCalls in metadata */}
+          {message.toolCalls && message.toolCalls.length > 0 && (
+            <ToolCallDisplay
+              toolCalls={message.toolCalls}
+              locale={locale}
+              hasContent={false}
+            />
+          )}
+        </Div>
       ) : (
         <Div
           className={cn(
@@ -633,19 +666,11 @@ function FlatMessage({
                 "prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline",
               )}
             >
-              {/* Tool calls display */}
-              {message.toolCalls && message.toolCalls.length > 0 && (
-                <ToolCallDisplay
-                  toolCalls={message.toolCalls}
-                  locale={locale}
-                  hasContent={message.content.trim().length > 0}
-                />
-              )}
-
+              {/* NEW ARCHITECTURE: Tool calls are separate TOOL messages now */}
               <Markdown content={message.content} />
             </Div>
           ) : (
-            <Div className="whitespace-pre-wrap break-words text-foreground/95">
+            <Div className="whitespace-pre-wrap wrap-break-word text-foreground/95">
               {renderContentWithReferences(
                 message.content,
                 postNumberToMessageId,

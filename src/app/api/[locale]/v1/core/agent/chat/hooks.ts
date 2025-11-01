@@ -752,6 +752,8 @@ export function useChat(
         // Get the last message in the thread to use as parent
         // This ensures new messages continue the conversation instead of creating branches
         let parentMessageId: string | null = null;
+        let messageHistory: Array<{ role: "user" | "assistant" | "system"; content: string }> | undefined;
+
         if (threadIdToUse) {
           // For incognito mode, get messages from localStorage
           // For authenticated mode, get messages from chat store
@@ -775,6 +777,19 @@ export function useChat(
               lastMessageContent: lastMessage.content.substring(0, 50),
               isIncognito: chatStore.currentRootFolderId === "incognito",
             });
+
+            // CRITICAL FIX: For incognito mode, build complete message history
+            // The backend doesn't have database access for incognito, so we must send all messages
+            if (chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+              messageHistory = threadMessages.map((msg) => ({
+                role: msg.role.toLowerCase() as "user" | "assistant" | "system",
+                content: msg.content,
+              }));
+              logger.debug("Chat: Built message history for incognito mode", {
+                messageCount: messageHistory.length,
+                threadId: threadIdToUse,
+              });
+            }
           }
         } else {
           logger.debug("Chat: No active thread, creating new thread", {
@@ -797,6 +812,7 @@ export function useChat(
             temperature,
             maxTokens,
             tools: enabledToolIds,
+            messageHistory, // Pass message history for incognito mode
           },
           {
             onThreadCreated: (data) => {
@@ -866,8 +882,34 @@ export function useChat(
       chatStore.setLoading(true);
 
       try {
+        // Build message history for incognito mode
+        let messageHistory: Array<{ role: "user" | "assistant" | "system"; content: string }> | undefined;
+
+        if (chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+          // Get all messages in the thread up to (not including) the message being retried
+          const threadMessages = Object.values(chatStore.messages)
+            .filter((msg) => msg.threadId === message.threadId)
+            .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+          // Find the message being retried
+          const messageIndex = threadMessages.findIndex((msg) => msg.id === messageId);
+
+          if (messageIndex !== -1 && messageIndex > 0) {
+            // Include all messages up to (but not including) the message being retried
+            const contextMessages = threadMessages.slice(0, messageIndex);
+            messageHistory = contextMessages.map((msg) => ({
+              role: msg.role.toLowerCase() as "user" | "assistant" | "system",
+              content: msg.content,
+            }));
+            logger.debug("Chat: Built message history for incognito retry", {
+              messageCount: messageHistory.length,
+              threadId: message.threadId,
+            });
+          }
+        }
+
         // Use "retry" operation which creates a branch with the same user message content
-        // For incognito mode, we need to provide the content since there's no database
+        // For incognito mode, we need to provide the content and history since there's no database
         // For authenticated mode, the backend will fetch it from the database
         await aiStream.startStream(
           {
@@ -883,6 +925,7 @@ export function useChat(
             temperature,
             maxTokens,
             tools: enabledToolIds,
+            messageHistory, // Pass message history for incognito mode
           },
           {
             onContentDone: createCreditUpdateCallback(selectedModel, logger),
@@ -919,14 +962,51 @@ export function useChat(
       chatStore.setLoading(true);
 
       try {
-        // Use "edit" operation which creates a branch with the same parent
+        // For incognito mode, build message history up to the parent of the message being branched from
+        let messageHistory: Array<{
+          role: "user" | "assistant" | "system";
+          content: string;
+        }> | undefined;
+
+        // Determine the correct parentId for the new branch
+        // For branching, we want to create a sibling of the source message
+        // So we use the source message's parentId
+        const branchParentId = message.parentId;
+
+        if (chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+          // Get all messages in the thread up to (but not including) the message being branched from
+          const threadMessages = Object.values(chatStore.messages)
+            .filter((msg) => msg.threadId === message.threadId)
+            .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+          // Find the parent message
+          if (branchParentId) {
+            const parentIndex = threadMessages.findIndex(
+              (msg) => msg.id === branchParentId,
+            );
+
+            if (parentIndex !== -1) {
+              // Include all messages up to and including the parent
+              const contextMessages = threadMessages.slice(0, parentIndex + 1);
+              messageHistory = contextMessages.map((msg) => ({
+                role: msg.role.toLowerCase() as "user" | "assistant" | "system",
+                content: msg.content,
+              }));
+            }
+          }
+          // If branchParentId is null (branching from root), messageHistory stays undefined
+        }
+
+        // Use "edit" operation which creates a branch with the same parent as the source message
+        // For server-side threads, the backend will look up the message and use its parentId
+        // For incognito mode, we pass the source message's parentId directly
         await aiStream.startStream(
           {
             operation: "edit",
             rootFolderId: chatStore.currentRootFolderId,
             subFolderId: chatStore.currentSubFolderId,
             threadId: message.threadId,
-            parentMessageId: messageId,
+            parentMessageId: branchParentId, // Pass the source message's parentId to create a sibling
             content: newContent,
             role: "user",
             model: selectedModel,
@@ -934,6 +1014,7 @@ export function useChat(
             temperature,
             maxTokens,
             tools: enabledToolIds,
+            messageHistory,
           },
           {
             onContentDone: createCreditUpdateCallback(selectedModel, logger),

@@ -96,14 +96,19 @@ export default async function HomePage({
           <CardFooter>
             <Div>
             <Link href={`/${locale}/chat`} asChild>
-              <Button className="w-full">
+              {/* <Button className="w-full"> */}
                 <Span>Go to Chat</Span>
-              </Button>
+              {/* </Button> */}
             </Link>
             <Link href={`/${locale}/help`} asChild>
-              <Button className="w-full">
+              {/* <Button className="w-full"> */}
                 <Span>Go to Help</Span>
-              </Button>
+              {/* </Button> */}
+            </Link>
+            <Link href={`/${locale}/story/about-us`} asChild>
+              {/* <Button className="w-full"> */}
+                <Span>Go to About Us</Span>
+              {/* </Button> */}
             </Link>
             </Div> 
           </CardFooter>

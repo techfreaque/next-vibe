@@ -59,7 +59,7 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      // === OPERATION CONTEXT ===
+      // === OPERATION context ===
       operation: requestDataField(
         {
           type: WidgetType.FORM_FIELD,

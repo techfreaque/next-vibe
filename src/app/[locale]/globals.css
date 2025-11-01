@@ -3,8 +3,8 @@
 @plugin 'tailwindcss-animate';
 
 /* you can use dark: or light: prefixes in tailwind <3 */
-@variant dark (&:is(.dark *));
-@variant light (&:not(.dark *));
+@variant dark (.dark &);
+@variant light (&:where(:not(.dark *)));
 
 @theme {
   --color-background: hsl(var(--background));

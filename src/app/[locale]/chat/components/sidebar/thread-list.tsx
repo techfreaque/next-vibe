@@ -2,39 +2,39 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { useRouter } from "next-vibe-ui/hooks";
-import { AlertDialog } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogAction } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogCancel } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogContent } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogDescription } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogFooter } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogHeader } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogTitle } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { Button } from "@/packages/next-vibe-ui/web/ui/button";
-import { Div } from "@/packages/next-vibe-ui/web/ui/div";
-import { DropdownMenu } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuContent } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuItem } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuSeparator } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuSub } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuSubContent } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuSubTrigger } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuTrigger } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { P } from "@/packages/next-vibe-ui/web/ui/typography";
-import { Span } from "@/packages/next-vibe-ui/web/ui/span";
-import { Tooltip } from "@/packages/next-vibe-ui/web/ui/tooltip";
-import { TooltipContent } from "@/packages/next-vibe-ui/web/ui/tooltip";
-import { TooltipProvider } from "@/packages/next-vibe-ui/web/ui/tooltip";
-import { TooltipTrigger } from "@/packages/next-vibe-ui/web/ui/tooltip";
-import { Archive } from "@/packages/next-vibe-ui/web/ui/icons/Archive";
-import { ArchiveRestore } from "@/packages/next-vibe-ui/web/ui/icons/ArchiveRestore";
-import { Edit2 } from "@/packages/next-vibe-ui/web/ui/icons/Edit2";
-import { FolderInput } from "@/packages/next-vibe-ui/web/ui/icons/FolderInput";
-import { MoreVertical } from "@/packages/next-vibe-ui/web/ui/icons/MoreVertical";
-import { Pin } from "@/packages/next-vibe-ui/web/ui/icons/Pin";
-import { PinOff } from "@/packages/next-vibe-ui/web/ui/icons/PinOff";
-import { Shield } from "@/packages/next-vibe-ui/web/ui/icons/Shield";
-import { Trash2 } from "@/packages/next-vibe-ui/web/ui/icons/Trash2";
+import { AlertDialog } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogAction } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogCancel } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogContent } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogDescription } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogFooter } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogHeader } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogTitle } from "next-vibe-ui//ui/alert-dialog";
+import { Button } from "next-vibe-ui//ui/button";
+import { Div } from "next-vibe-ui//ui/div";
+import { DropdownMenu } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuContent } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuItem } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuSeparator } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuSub } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuSubContent } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuSubTrigger } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuTrigger } from "next-vibe-ui//ui/dropdown-menu";
+import { P } from "next-vibe-ui//ui/typography";
+import { Span } from "next-vibe-ui//ui/span";
+import { Tooltip } from "next-vibe-ui//ui/tooltip";
+import { TooltipContent } from "next-vibe-ui//ui/tooltip";
+import { TooltipProvider } from "next-vibe-ui//ui/tooltip";
+import { TooltipTrigger } from "next-vibe-ui//ui/tooltip";
+import { Archive } from "next-vibe-ui//ui/icons/Archive";
+import { ArchiveRestore } from "next-vibe-ui//ui/icons/ArchiveRestore";
+import { Edit2 } from "next-vibe-ui//ui/icons/Edit2";
+import { FolderInput } from "next-vibe-ui//ui/icons/FolderInput";
+import { MoreVertical } from "next-vibe-ui//ui/icons/MoreVertical";
+import { Pin } from "next-vibe-ui//ui/icons/Pin";
+import { PinOff } from "next-vibe-ui//ui/icons/PinOff";
+import { Shield } from "next-vibe-ui//ui/icons/Shield";
+import { Trash2 } from "next-vibe-ui//ui/icons/Trash2";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -215,8 +215,8 @@ function ThreadItem({
   // Get all folders for the move menu - only folders from the same root folder
   const allFolders = chat
     ? Object.values(chat.folders).filter(
-        (folder) => folder.rootFolderId === thread.rootFolderId,
-      )
+      (folder) => folder.rootFolderId === thread.rootFolderId,
+    )
     : [];
   const currentFolderId = thread.folderId;
 

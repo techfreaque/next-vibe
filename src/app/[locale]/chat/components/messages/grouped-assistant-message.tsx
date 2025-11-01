@@ -12,11 +12,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { chatProse } from "../../lib/design-tokens";
-import type { ChatMessage } from "../../types";
 import { AssistantMessageActions } from "./assistant-message-actions";
 import { MessageAuthorInfo } from "./message-author";
 import type { MessageGroup } from "./message-grouping";
-import { ReasoningDisplay } from "./reasoning-display";
 
 interface GroupedAssistantMessageProps {
   group: MessageGroup;
@@ -56,139 +54,24 @@ export function GroupedAssistantMessage({
     ? getModelById(primary.model).name
     : t("app.chat.messages.assistant");
 
-  // Separate TOOL messages from ASSISTANT messages
-  const toolMessages: ChatMessage[] = [];
-  const assistantMessages: ChatMessage[] = [];
-
-  // Check primary message
-  if (primary.role === "tool") {
-    toolMessages.push(primary);
-  } else {
-    assistantMessages.push(primary);
-  }
-
-  // Check continuation messages
-  continuations.forEach((msg) => {
-    if (msg.role === "tool") {
-      toolMessages.push(msg);
-    } else {
-      assistantMessages.push(msg);
-    }
-  });
-
-  // Get all tool calls from TOOL messages AND from ASSISTANT messages
-  // Tool calls can be stored in either:
-  // 1. Separate TOOL messages (legacy)
-  // 2. ASSISTANT message's toolCalls property (new implementation)
-  const allToolCalls = [
-    ...toolMessages.flatMap((msg) => msg.toolCalls || []),
-    ...assistantMessages.flatMap((msg) => msg.toolCalls || []),
-  ];
-
-  // Parse content into ordered segments: reasoning, text, tool calls
-  // We need to preserve the order: <think>...</think> text toolcall <think>...</think> text
-  const allContent = assistantMessages
-    .map((m) => m.content)
-    .filter((c) => c.trim().length > 0)
-    .join("\n\n");
-
-  // Split content into segments while preserving order
-  type ContentSegment =
-    | { type: "reasoning"; content: string; isStreaming?: boolean }
-    | { type: "text"; content: string }
-    | { type: "toolCalls" };
-
-  const segments: ContentSegment[] = [];
-  let lastIndex = 0;
-
-  // Find all <think> tags and split content around them
-  const thinkTagRegex = /<think>([\s\S]*?)<\/think>/gi;
-  let match: RegExpExecArray | null;
-  let hasOpenThinkTag = false;
-
-  // Check if there's an unclosed <think> tag (streaming reasoning)
-  const openThinkMatch = allContent.match(/<think>(?![\s\S]*<\/think>)/);
-  if (openThinkMatch) {
-    hasOpenThinkTag = true;
-  }
-
-  while ((match = thinkTagRegex.exec(allContent)) !== null) {
-    // Add text before this <think> tag
-    if (match.index > lastIndex) {
-      const textBefore = allContent.substring(lastIndex, match.index).trim();
-      if (textBefore) {
-        segments.push({ type: "text", content: textBefore });
-      }
-    }
-
-    // Add reasoning content
-    const reasoningContent = match[1].trim();
-    if (reasoningContent) {
-      segments.push({ type: "reasoning", content: reasoningContent });
-    }
-
-    lastIndex = match.index + match[0].length;
-  }
-
-  // Handle unclosed <think> tag (streaming reasoning)
-  if (hasOpenThinkTag && openThinkMatch) {
-    const streamingReasoningStart = allContent.indexOf("<think>", lastIndex);
-    if (streamingReasoningStart !== -1) {
-      // Add text before streaming reasoning
-      if (streamingReasoningStart > lastIndex) {
-        const textBefore = allContent
-          .substring(lastIndex, streamingReasoningStart)
-          .trim();
-        if (textBefore) {
-          segments.push({ type: "text", content: textBefore });
-        }
-      }
-
-      // Add streaming reasoning
-      const streamingContent = allContent
-        .substring(streamingReasoningStart + 7)
-        .trim(); // +7 for "<think>"
-      if (streamingContent) {
-        segments.push({
-          type: "reasoning",
-          content: streamingContent,
-          isStreaming: true,
-        });
-      }
-
-      lastIndex = allContent.length;
-    }
-  }
-
-  // Add remaining text after last <think> tag
-  if (lastIndex < allContent.length) {
-    const textAfter = allContent.substring(lastIndex).trim();
-    if (textAfter) {
-      segments.push({ type: "text", content: textAfter });
-    }
-  }
-
-  // Insert tool calls at the right position:
-  // - After all reasoning blocks (both complete and streaming)
-  // - Before any text content that comes after reasoning
-  if (allToolCalls.length > 0) {
-    const lastReasoningIndex = segments.findLastIndex(
-      (s) => s.type === "reasoning",
-    );
-    if (lastReasoningIndex !== -1) {
-      // Insert tool calls after last reasoning
-      segments.splice(lastReasoningIndex + 1, 0, { type: "toolCalls" });
-    } else {
-      // No reasoning, insert at the beginning
-      segments.unshift({ type: "toolCalls" });
-    }
-  }
+  // NEW ARCHITECTURE: Sort all messages by sequenceIndex
+  // Each message is already a separate entity (reasoning, text, tool, error)
+  const allMessages = [primary, ...continuations].toSorted(
+    (a, b) => (a.sequenceIndex ?? 0) - (b.sequenceIndex ?? 0),
+  );
 
   // Check if there's any content
-  const hasContent = segments.length > 0;
+  const hasContent = allMessages.some((msg) => msg.content.trim().length > 0);
 
   // Show streaming placeholder when no content yet
-  const isStreaming = segments.length === 0;
+  const isStreaming = !hasContent;
+
+  // Get all content for actions (ASSISTANT messages only, strip <think> tags)
+  const allContent = allMessages
+    .filter((msg) => msg.role === "assistant")
+    .map((m) => m.content.replace(/<think>[\s\S]*?<\/think>/g, "").trim())
+    .filter((content) => content.length > 0)
+    .join("\n\n");
 
   return (
     <Div className="flex items-start gap-3">
@@ -210,45 +93,52 @@ export function GroupedAssistantMessage({
         )}
 
         <Div className={cn(chatProse.all, "px-3 py-2.5 sm:px-4 sm:py-3")}>
-          {/* Render content in order: reasoning, tool calls, text */}
-          {segments.map((segment, index) => {
-            if (segment.type === "reasoning") {
-              // Check if there's any text content after this reasoning block
-              const hasContentAfterReasoning = segments
-                .slice(index + 1)
-                .some((s) => s.type === "text" && s.content.trim().length > 0);
+          {/* NEW ARCHITECTURE: Render messages in sequence order */}
+          {allMessages.map((message, index) => {
+            // Check if there's content after this message
+            const hasContentAfter = allMessages
+              .slice(index + 1)
+              .some((m) => m.content.trim().length > 0);
 
-              return (
-                <ReasoningDisplay
-                  key={`reasoning-${index}`}
-                  reasoningMessages={[
-                    {
-                      ...primary,
-                      content: segment.content,
-                    },
-                  ]}
-                  locale={locale}
-                  hasContent={hasContentAfterReasoning}
-                  isStreaming={segment.isStreaming}
-                />
-              );
-            } else if (segment.type === "toolCalls") {
+            // TOOL message
+            if (message.role === "tool" && message.toolCalls) {
               return (
                 <ToolCallRenderer
-                  key={`toolcalls-${index}`}
-                  toolCalls={allToolCalls}
+                  key={message.id}
+                  toolCalls={message.toolCalls}
                   locale={locale}
-                  hasContent={hasContent}
+                  hasContent={hasContentAfter}
                 />
               );
-            } else {
-              // Text segment
+            }
+
+            // ERROR message
+            if (message.role === "error") {
               return (
-                <Div key={`text-${index}`} className="mb-3 last:mb-0">
-                  <Markdown content={segment.content} />
+                <Div
+                  key={message.id}
+                  className="mb-3 last:mb-0 p-3 border border-red-500/60 bg-red-500/10 rounded-md"
+                >
+                  <Div className="text-red-400 font-medium mb-1">
+                    {t("app.chat.messages.error")}
+                  </Div>
+                  <Div className="text-foreground/90">{message.content}</Div>
                 </Div>
               );
             }
+
+            // ASSISTANT message (with inline <think> tags for reasoning)
+            if (message.role === "assistant" && message.content.trim()) {
+              // NEW ARCHITECTURE: Markdown component handles <think> tags
+              return (
+                <Div key={message.id} className="mb-3 last:mb-0">
+                  <Markdown content={message.content} />
+                </Div>
+              );
+            }
+
+            // Skip empty messages
+            return null;
           })}
 
           {/* Show streaming placeholder when no content yet */}

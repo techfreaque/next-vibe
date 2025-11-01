@@ -23,7 +23,7 @@ import { chatFolders, chatThreads } from "../../db";
 import {
   canDeleteThread,
   canReadThread,
-  canWriteThread,
+  canUpdateThread,
 } from "../../permissions/permissions";
 import type { PersonaId } from "../../personas/config";
 import type {
@@ -188,18 +188,19 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         });
       }
 
-      // Get parent folder for permission check
-      let folder = null;
+      // Get folder if thread is in a folder (needed for permission check)
+      let folder: (typeof chatFolders.$inferSelect) | null = null;
       if (existingThread.folderId) {
-        [folder] = await db
+        const [folderResult] = await db
           .select()
           .from(chatFolders)
           .where(eq(chatFolders.id, existingThread.folderId))
           .limit(1);
+        folder = folderResult ?? null;
       }
 
-      // Check if user can write to this thread
-      if (!canWriteThread(user, existingThread, folder, logger)) {
+      // Check if user can update this thread (moderators can rename)
+      if (!(await canUpdateThread(user, existingThread, folder, logger))) {
         return fail({
           message:
             "app.api.v1.core.agent.chat.threads.threadId.patch.errors.forbidden.title",
@@ -245,6 +246,9 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       if (data.updates?.tags !== undefined) {
         updateData.tags = data.updates.tags;
       }
+      if (data.updates?.published !== undefined) {
+        updateData.published = data.updates.published;
+      }
 
       // Update the thread (user ownership already verified)
       const [updatedThread] = await db
@@ -273,6 +277,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           pinned: updatedThread.pinned,
           archived: updatedThread.archived,
           tags: updatedThread.tags ?? [],
+          published: updatedThread.published,
           preview: updatedThread.preview,
           metadata: (updatedThread.metadata ?? {}) as Record<
             string,

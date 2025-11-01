@@ -1,13 +1,14 @@
 /* eslint-disable no-console */
 /* eslint-disable i18next/no-literal-string */
-import type { ExplicitAnyType } from "next-vibe/shared/types/utils";
 import Constants from 'expo-constants';
 import {
   Environment,
 } from "next-vibe/shared/utils/env-util";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { EnvFrontend } from "@/config/env-client";
+
+// React Native global type
+declare const __DEV__: boolean;
 
 // Platform detection for React Native
 const isServer = false; // React Native is always client-side
@@ -20,44 +21,10 @@ const platform = {
   isBrowser,
 };
 
-// Simple logger for environment validation to avoid circular dependencies
-// React Native environment - keeping simple logging for development
-export const envValidationLogger: EndpointLogger = {
-  info: (message: string, meta?: ExplicitAnyType) => {
-    if (__DEV__) {
-      const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
-      // In React Native, we use LogBox-friendly logging
-      // eslint-disable-next-line no-console
-      console.log(`[ENV] ${message}${metaStr}`);
-    }
-  },
-  error: (message: string, meta?: ExplicitAnyType) => {
-    const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
-    // eslint-disable-next-line no-console
-    console.error(`[ENV] ${message}${metaStr}`);
-  },
-  debug: (message: string, meta?: ExplicitAnyType) => {
-    if (__DEV__) {
-      const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
-      // eslint-disable-next-line no-console
-      console.log(`[ENV] ${message}${metaStr}`);
-    }
-  },
-  warn: (message: string, meta?: ExplicitAnyType) => {
-    const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
-    // eslint-disable-next-line no-console
-    console.warn(`[ENV] ${message}${metaStr}`);
-  },
-  vibe: (message: string, meta?: ExplicitAnyType) => {
-    if (__DEV__) {
-      const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
-      // eslint-disable-next-line no-console
-      console.log(`[ENV] ${message}${metaStr}`);
-    }
-  },
-  isDebugEnabled: __DEV__,
-};
-const devServerIp = Constants.expoConfig.hostUri.split(":")[0];
+// Get dev server IP from Expo config with null checks
+const devServerIp =
+  Constants.expoConfig?.hostUri?.split(":")[0] ?? "localhost";
+
 // Export validated environment for use throughout the application
 export const envClient: EnvFrontend = {
   // Access environment variables from React Native's environment

@@ -187,24 +187,24 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        url: "http://localhost:5555",
+        url: "https://local.drizzle.studio/?port=5555",
         portUsed: 5555,
-        output: "✅ Database Studio opened at http://localhost:5555",
+        output: "✅ Database Studio opened at https://local.drizzle.studio/?port=5555",
         duration: 1200,
       },
       customPort: {
         success: true,
-        url: "http://localhost:8080",
+        url: "https://local.drizzle.studio/?port=8080",
         portUsed: 8080,
         output:
-          "✅ Database Studio opened at http://localhost:8080 (browser not opened)",
+          "✅ Database Studio opened at https://local.drizzle.studio/?port=8080 (browser not opened)",
         duration: 800,
       },
       noBrowser: {
         success: true,
-        url: "http://localhost:5555",
+        url: "https://local.drizzle.studio/?port=5555",
         portUsed: 5555,
-        output: "✅ Database Studio started at http://localhost:5555",
+        output: "✅ Database Studio started at https://local.drizzle.studio/?port=5555",
         duration: 600,
       },
     },

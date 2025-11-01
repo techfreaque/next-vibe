@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, desc, eq, gte, ilike, isNull, lte, or } from "drizzle-orm";
+import { and, count, desc, eq, gte, ilike, isNull, lte, or, sql } from "drizzle-orm";
 import {
   createSuccessResponse,
   ErrorResponseTypes,
@@ -23,7 +23,11 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { getDefaultFolderConfig } from "../config";
 import { chatFolders, chatThreads, type ChatFolder } from "../db";
-import { canReadThread, canWriteFolder } from "../permissions/permissions";
+import {
+  canReadThread,
+  canWriteFolder,
+  isFolderModerator,
+} from "../permissions/permissions";
 import { ThreadStatus } from "../enum";
 import type { PersonaId } from "../personas/config";
 import { validateNotIncognito } from "../validation";
@@ -116,12 +120,48 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
 
       // Build where clause - use leadId for anonymous users, userId for authenticated users
       // For PUBLIC folder, show all public threads from all users
+      // For SHARED folder, show user's own threads + threads where user is moderator
       // For other folders, only show user's own threads
       const conditions = [];
 
       if (rootFolderId === "public") {
         // PUBLIC folder: Show all threads in public folder (from all users)
         conditions.push(eq(chatThreads.rootFolderId, "public"));
+      } else if (rootFolderId === "shared") {
+        // SHARED folder: Show user's own threads + threads where user is moderator (thread-level or folder-level)
+        conditions.push(eq(chatThreads.rootFolderId, "shared"));
+
+        // If subFolderId is specified, check if user is moderator of that folder
+        if (subFolderId && subFolderId !== null) {
+          // Get the folder to check moderatorIds
+          const [targetFolder] = await db
+            .select()
+            .from(chatFolders)
+            .where(eq(chatFolders.id, subFolderId))
+            .limit(1);
+
+          if (targetFolder && isFolderModerator(userIdentifier, targetFolder)) {
+            // User is moderator of the folder, show all threads in this folder
+            logger.debug("User is folder moderator, showing all threads in folder");
+            // No additional user filter needed - show all threads in this folder
+          } else {
+            // User is not folder moderator, only show their own threads or threads they moderate
+            conditions.push(
+              or(
+                eq(chatThreads.userId, userIdentifier), // User's own threads
+                sql`${chatThreads.moderatorIds}::jsonb @> ${JSON.stringify([userIdentifier])}::jsonb`, // User is thread moderator
+              ),
+            );
+          }
+        } else {
+          // No subFolderId specified, show user's own threads + threads they moderate
+          conditions.push(
+            or(
+              eq(chatThreads.userId, userIdentifier), // User's own threads
+              sql`${chatThreads.moderatorIds}::jsonb @> ${JSON.stringify([userIdentifier])}::jsonb`, // User is thread moderator
+            ),
+          );
+        }
       } else {
         // Other folders: Show only user's own threads
         conditions.push(eq(chatThreads.userId, userIdentifier));

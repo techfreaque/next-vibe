@@ -1,7 +1,7 @@
 "use client";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Button } from "next-vibe-ui//ui/button";
 import { Check, Copy } from "lucide-react";
 import type { JSX } from "react";
 import React, { useState } from "react";

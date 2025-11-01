@@ -27,6 +27,7 @@ export interface BreadcrumbLinkProps {
   className?: string;
   children?: React.ReactNode;
   href?: string;
+  onPress?: () => void; // Native-specific, optional for web
 }
 
 export interface BreadcrumbPageProps {

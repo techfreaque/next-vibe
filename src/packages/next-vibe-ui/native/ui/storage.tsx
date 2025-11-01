@@ -1,22 +1,18 @@
 // Platform-specific storage for React Native using AsyncStorage
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// Import cross-platform storage interface from web (source of truth)
+import type { Storage } from "next-vibe-ui/ui/storage";
+
 // Simple logger for storage errors
 const logStorageError = (operation: string, error: unknown): void => {
-  // @ts-expect-error - __DEV__ exists in React Native
-  if (typeof __DEV__ !== "undefined" && __DEV__) {
+  // __DEV__ is a React Native global variable that exists at runtime
+  if (typeof (globalThis as { __DEV__?: boolean }).__DEV__ !== "undefined" && (globalThis as { __DEV__?: boolean }).__DEV__) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     // eslint-disable-next-line no-console, i18next/no-literal-string
     console.error(`[Storage] Error ${operation}:`, errorMsg);
   }
 };
-
-// Cross-platform storage interface
-export interface Storage {
-  getItem: (key: string) => Promise<string | null>;
-  setItem: (key: string, value: string) => Promise<void>;
-  removeItem: (key: string) => Promise<void>;
-}
 
 // Storage implementation matching web localStorage API
 export const storage: Storage = {

@@ -90,11 +90,7 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
 
       const duration = Date.now() - startTime;
 
-      logger.info("Generated seeds file", {
-        seedCount: seedFiles.length,
-        duration,
-        outputPath: data.dryRun ? undefined : outputFile,
-      });
+      logger.info(`Generated seeds file with ${seedFiles.length} seeds in ${duration}ms`);
 
       return createSuccessResponse({
         success: true,

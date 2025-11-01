@@ -20,7 +20,7 @@ import {
   useCustomState,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 
 import { authClientRepository } from "../../auth/repository-client";

@@ -29,6 +29,12 @@ export interface InputOTPSeparatorProps {
   className?: string;
 }
 
+export interface OTPContextValue {
+  value: string;
+  onChange: (value: string) => void;
+  maxLength: number;
+}
+
 const InputOTP = React.forwardRef<
   React.ElementRef<typeof OTPInput>,
   React.ComponentPropsWithoutRef<typeof OTPInput>

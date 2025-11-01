@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, desc, eq, isNull, or } from "drizzle-orm";
+import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
 import {
   createSuccessResponse,
   ErrorResponseTypes,
@@ -77,11 +77,22 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
 
       // Build where conditions based on rootFolderId
       // For PUBLIC root folder: fetch ALL folders (permission filtering happens later)
+      // For SHARED root folder: fetch user's own folders + folders where user is moderator
       // For other root folders: only fetch user's own folders
       let whereConditions;
       if (rootFolderId === "public") {
         // PUBLIC folder: fetch all folders in this root folder
         whereConditions = eq(chatFolders.rootFolderId, rootFolderId);
+      } else if (rootFolderId === "shared") {
+        // SHARED folder: fetch user's own folders + folders where user is moderator
+        // Use JSONB array containment to check if user is in moderatorIds
+        whereConditions = and(
+          eq(chatFolders.rootFolderId, rootFolderId),
+          or(
+            eq(chatFolders.userId, userIdentifier), // User's own folders
+            sql`${chatFolders.moderatorIds}::jsonb @> ${JSON.stringify([userIdentifier])}::jsonb`, // User is moderator
+          ),
+        );
       } else if (rootFolderId) {
         // Other specific root folder: only user's own folders
         whereConditions = and(
@@ -90,10 +101,14 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
         );
       } else {
         // No rootFolderId specified: fetch all PUBLIC folders + user's own folders from other root folders
-        // This allows the permission system to work correctly for shared/public folders
+        // + SHARED folders where user is moderator
         whereConditions = or(
           eq(chatFolders.rootFolderId, "public"), // All PUBLIC folders
           eq(chatFolders.userId, userIdentifier), // User's own folders from any root folder
+          and(
+            eq(chatFolders.rootFolderId, "shared"), // SHARED folders
+            sql`${chatFolders.moderatorIds}::jsonb @> ${JSON.stringify([userIdentifier])}::jsonb`, // User is moderator
+          ),
         );
       }
 

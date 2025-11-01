@@ -2,27 +2,27 @@
 
 import Link from "next/link";
 import { useRouter } from "next-vibe-ui/hooks";
-import { Button } from "@/packages/next-vibe-ui/web/ui/button";
-import { Div } from "@/packages/next-vibe-ui/web/ui/div";
-import { DropdownMenu } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuContent } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuItem } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuSeparator } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuTrigger } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { Input } from "@/packages/next-vibe-ui/web/ui/input";
-import { P } from "@/packages/next-vibe-ui/web/ui/typography";
-import { ScrollArea } from "@/packages/next-vibe-ui/web/ui/scroll-area";
-import { Span } from "@/packages/next-vibe-ui/web/ui/span";
-import { Tooltip } from "@/packages/next-vibe-ui/web/ui/tooltip";
-import { TooltipContent } from "@/packages/next-vibe-ui/web/ui/tooltip";
-import { TooltipProvider } from "@/packages/next-vibe-ui/web/ui/tooltip";
-import { TooltipTrigger } from "@/packages/next-vibe-ui/web/ui/tooltip";
-import { Coins } from "@/packages/next-vibe-ui/web/ui/icons/Coins";
-import { FolderPlus } from "@/packages/next-vibe-ui/web/ui/icons/FolderPlus";
-import { HelpCircle } from "@/packages/next-vibe-ui/web/ui/icons/HelpCircle";
-import { Info } from "@/packages/next-vibe-ui/web/ui/icons/Info";
-import { MessageSquarePlus } from "@/packages/next-vibe-ui/web/ui/icons/MessageSquarePlus";
-import { Search } from "@/packages/next-vibe-ui/web/ui/icons/Search";
+import { Button } from "next-vibe-ui//ui/button";
+import { Div } from "next-vibe-ui//ui/div";
+import { DropdownMenu } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuContent } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuItem } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuSeparator } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuTrigger } from "next-vibe-ui//ui/dropdown-menu";
+import { Input } from "next-vibe-ui//ui/input";
+import { P } from "next-vibe-ui//ui/typography";
+import { ScrollArea } from "next-vibe-ui//ui/scroll-area";
+import { Span } from "next-vibe-ui//ui/span";
+import { Tooltip } from "next-vibe-ui//ui/tooltip";
+import { TooltipContent } from "next-vibe-ui//ui/tooltip";
+import { TooltipProvider } from "next-vibe-ui//ui/tooltip";
+import { TooltipTrigger } from "next-vibe-ui//ui/tooltip";
+import { Coins } from "next-vibe-ui//ui/icons/Coins";
+import { FolderPlus } from "next-vibe-ui//ui/icons/FolderPlus";
+import { HelpCircle } from "next-vibe-ui//ui/icons/HelpCircle";
+import { Info } from "next-vibe-ui//ui/icons/Info";
+import { MessageSquarePlus } from "next-vibe-ui//ui/icons/MessageSquarePlus";
+import { Search } from "next-vibe-ui//ui/icons/Search";
 import type { JSX } from "react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -217,12 +217,13 @@ export function ChatSidebar({
             <TooltipTrigger asChild>
               <Div className="w-full">
                 <Button
-                  onClick={() => onCreateThread(activeRootFolderId)}
+                  onClick={() => onCreateThread(activeFolderId || activeRootFolderId)}
                   className={`w-full h-10 sm:h-9 ${getButtonColorClasses(rootFolderColor)}`}
                   disabled={requiresAuth && !isAuthenticated}
-                >
-                  <MessageSquarePlus className="h-4 w-4 mr-2" />
-                  {t(getNewChatTranslationKey(activeRootFolderId))}
+                ><Span>
+                    <MessageSquarePlus className="h-4 w-4 mr-2" />
+                    {t(getNewChatTranslationKey(activeRootFolderId))}
+                  </Span>
                 </Button>
               </Div>
             </TooltipTrigger>

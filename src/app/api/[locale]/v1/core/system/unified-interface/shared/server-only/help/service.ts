@@ -4,14 +4,12 @@
  * Used by both CLI (helpHandler) and API endpoints (help/list)
  */
 
-import * as fs from "node:fs";
-import * as path from "node:path";
-
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../logger/endpoint";
-import { findRouteFiles } from "../filesystem/scanner";
+import { routeRegistry } from "../registry/route-registry";
+import { endpointRegistry } from "../registry/endpoint-registry";
 
 /**
  * Command metadata structure
@@ -39,7 +37,7 @@ export interface HelpServiceOptions {
  */
 export class HelpService {
   /**
-   * Discover all available commands from the filesystem
+   * Discover all available commands from RouteRegistry
    */
   discoverCommands(
     logger: EndpointLogger,
@@ -48,26 +46,24 @@ export class HelpService {
     const locale = options.locale || "en-GLOBAL";
     const { t } = simpleT(locale);
     const commands: CommandMetadata[] = [];
-    const baseDir = path.join(process.cwd(), "src/app/api/[locale]/v1/core");
 
     logger.debug("Discovering commands", {
-      baseDir,
       category: options.category,
       locale: options.locale,
     });
 
-    // Use consolidated directory scanner
-    const routeFiles = findRouteFiles(baseDir, [
-      "system/builder",
-      "system/launchpad",
-      "system/release-tool",
-    ]);
+    // Get all route paths from RouteRegistry
+    const routePaths = routeRegistry.getAllPaths();
 
-    // Process each route file
-    for (const { pathSegments, fullPath: routeFile } of routeFiles) {
-      const commandsFromRoute = this.extractCommandMetadata(
+    // Process each route path
+    for (const routePath of routePaths) {
+      // Convert route path to path segments
+      // e.g., "core/system/help" -> ["system", "help"]
+      const pathSegments = routePath.split("/");
+
+      const commandsFromRoute = this.extractCommandMetadataFromPath(
         pathSegments,
-        routeFile,
+        routePath,
         t,
         logger,
       );
@@ -100,134 +96,108 @@ export class HelpService {
   }
 
   /**
-   * Extract command metadata from a route file
+   * Extract command metadata using EndpointRegistry
    */
-  private extractCommandMetadata(
+  private extractCommandMetadataFromPath(
     pathSegments: string[],
-    routeFile: string,
+    routePath: string,
     t: ReturnType<typeof simpleT>["t"],
     logger: EndpointLogger,
   ): CommandMetadata[] {
     const commands: CommandMetadata[] = [];
-    const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
 
     // Generate default metadata
     const shortAlias = pathSegments.slice(-2).join(":");
     const fullAlias = pathSegments.join(":");
-    const apiPath = `/${pathSegments.join("/")}`;
+    const apiPath = `/${routePath}`;
 
     // Determine category from path segments
     const category = this.extractCategory(pathSegments);
 
-    try {
-      // Try to load definition file
-      if (!fs.existsSync(definitionPath)) {
-        // If no definition exists, create basic metadata
-        return [
-          {
-            alias: shortAlias,
-            path: apiPath,
-            method: "POST",
-            category,
-            description: t(
-              "app.api.v1.core.system.unifiedInterface.cli.vibe.executeCommand",
-            ),
-            aliases: [shortAlias, fullAlias],
-            routePath: routeFile,
-          },
-        ];
-      }
+    // Try to load endpoint definition using registry
+    const definitionResult = endpointRegistry.loadDefinition<
+      Record<string, { aliases?: string[]; description?: string }>
+    >(
+      { routePath, method: "POST" },
+      logger,
+    );
 
-      // Load definition module
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const definition = require(definitionPath) as {
-        default?: Record<string, Record<string, string | string[]>>;
-      };
-      const defaultExport =
-        definition.default ||
-        (definition as Record<string, Record<string, string | string[]>>);
-
-      // Extract methods from exported handlers
-      const actualMethods = Object.keys(defaultExport).filter((key) =>
-        ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(
-          key,
-        ),
-      );
-
-      if (actualMethods.length === 0) {
-        logger.debug("No methods found in definition", { definitionPath });
-        return [];
-      }
-
-      // Extract metadata from the first method
-      const firstMethod = defaultExport[actualMethods[0]];
-      let customAliases: string[] = [];
-      let endpointDescription: string | undefined;
-
-      if (firstMethod && Array.isArray(firstMethod.aliases)) {
-        customAliases = firstMethod.aliases.filter(
-          (alias): alias is string => typeof alias === "string",
-        );
-      }
-
-      if (firstMethod && typeof firstMethod.description === "string") {
-        endpointDescription = firstMethod.description;
-        if (endpointDescription.includes(".")) {
-          try {
-            endpointDescription = t(
-              endpointDescription as Parameters<typeof t>[0],
-            );
-          } catch {
-            // Keep original if translation fails
-          }
-        }
-      }
-
-      // Use endpoint description or fallback
-      const description =
-        endpointDescription ||
-        t("app.api.v1.core.system.unifiedInterface.cli.vibe.executeCommand");
-
-      // Combine all aliases
-      const allAliases = [
-        shortAlias,
-        ...(fullAlias !== shortAlias ? [fullAlias] : []),
-        ...customAliases,
-      ];
-
-      // Create command metadata for each method
-      for (const method of actualMethods) {
-        // Use the primary alias (first custom alias if available, otherwise short alias)
-        const primaryAlias =
-          customAliases.length > 0 ? customAliases[0] : shortAlias;
-
-        commands.push({
-          alias: primaryAlias,
+    // If no endpoint definition found, create basic metadata
+    if (!definitionResult.definition) {
+      logger.debug("No endpoint definition found", { routePath });
+      return [
+        {
+          alias: shortAlias,
           path: apiPath,
-          method,
+          method: "POST",
           category,
-          description,
-          aliases: allAliases,
-          routePath: routeFile,
-        });
-      }
-    } catch (error) {
-      logger.debug("Failed to load definition", {
-        definitionPath,
-        error: error instanceof Error ? error.message : String(error),
-      });
+          description: t(
+            "app.api.v1.core.system.unifiedInterface.cli.vibe.executeCommand",
+          ),
+          aliases: [shortAlias, fullAlias],
+          routePath: apiPath,
+        },
+      ];
+    }
 
-      // Fallback to basic metadata
+    // Extract available methods
+    const definition = definitionResult.definition;
+    const actualMethods = Object.keys(definition).filter((key) =>
+      ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(
+        key,
+      ),
+    );
+
+    if (actualMethods.length === 0) {
+      logger.debug("No methods found in endpoint definition", { routePath });
+      return [];
+    }
+
+    // Extract metadata from the first method
+    const firstMethodDef = definition[actualMethods[0]];
+    const customAliases = Array.isArray(firstMethodDef?.aliases)
+      ? firstMethodDef.aliases.filter(
+          (alias): alias is string => typeof alias === "string",
+        )
+      : [];
+
+    let endpointDescription: string | undefined = firstMethodDef?.description;
+    if (endpointDescription?.includes(".")) {
+      try {
+        endpointDescription = t(
+          endpointDescription as Parameters<typeof t>[0],
+        );
+      } catch {
+        // Keep original if translation fails
+      }
+    }
+
+    // Use endpoint description or fallback
+    const description =
+      endpointDescription ||
+      t("app.api.v1.core.system.unifiedInterface.cli.vibe.executeCommand");
+
+    // Combine all aliases
+    const allAliases = [
+      shortAlias,
+      ...(fullAlias !== shortAlias ? [fullAlias] : []),
+      ...customAliases,
+    ];
+
+    // Create command metadata for each method
+    for (const method of actualMethods) {
+      // Use the primary alias (first custom alias if available, otherwise short alias)
+      const primaryAlias =
+        customAliases.length > 0 ? customAliases[0] : shortAlias;
+
       commands.push({
-        alias: shortAlias,
+        alias: primaryAlias,
         path: apiPath,
-        method: "POST",
+        method,
         category,
-        description: t(
-          "app.api.v1.core.system.unifiedInterface.cli.vibe.executeCommand",
-        ),
-        aliases: [shortAlias, fullAlias],
-        routePath: routeFile,
+        description,
+        aliases: allAliases,
+        routePath: apiPath,
       });
     }
 

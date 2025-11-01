@@ -4,7 +4,6 @@ import {
   Platform,
   type StyleProp,
   StyleSheet,
-  Text,
   type TextProps,
   View,
   type ViewStyle,

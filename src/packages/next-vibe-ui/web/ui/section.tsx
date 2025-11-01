@@ -1,12 +1,12 @@
-import type { ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { forwardRef } from "react";
 
-// Cross-platform props interface - narrowed to what both platforms support
-export interface SectionProps {
+// Cross-platform props interface
+// Includes all standard HTML section props for web (style, etc.)
+export interface SectionProps extends ComponentPropsWithoutRef<"section"> {
   children?: ReactNode;
   className?: string;
   id?: string;
-  style?: React.CSSProperties;
 }
 
 /**

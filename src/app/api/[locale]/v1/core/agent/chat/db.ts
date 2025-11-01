@@ -116,22 +116,69 @@ export interface ToolCost {
 }
 
 /**
+ * Reasoning metadata for thinking/reasoning messages
+ */
+export interface ReasoningMetadata {
+  isReasoning: boolean;
+  isStreaming?: boolean;
+}
+
+/**
+ * Tool call metadata for TOOL role messages
+ * Contains the tool call information directly in metadata
+ */
+export interface ToolCallMetadata {
+  toolName: string;
+  displayName: string;
+  icon?: string;
+  args: ToolCallResult;
+  result?: ToolCallResult;
+  error?: string;
+  executionTime?: number;
+  widgetMetadata?: ToolCallWidgetMetadata;
+  creditsUsed?: number;
+}
+
+/**
  * Message metadata structure
+ * Can contain different metadata types depending on message role
  */
 export interface MessageMetadata {
+  // Token and generation info (for ASSISTANT messages)
   generationTime?: number;
   promptTokens?: number;
   completionTokens?: number;
   totalTokens?: number;
   finishReason?: string;
   streamingTime?: number;
+
+  // Reasoning metadata (for ASSISTANT messages with reasoning)
+  isReasoning?: boolean;
+  isStreaming?: boolean;
+
+  // Tool call metadata (for TOOL messages)
+  toolName?: string;
+  displayName?: string;
+  icon?: string;
+  args?: ToolCallResult;
+  result?: ToolCallResult;
+  error?: string;
+  executionTime?: number;
+  widgetMetadata?: ToolCallWidgetMetadata;
+  creditsUsed?: number;
+
+  // Legacy: toolCalls array (will be removed in favor of separate TOOL messages)
   toolCalls?: ToolCall[];
   toolCosts?: ToolCost[];
+
+  // Attachments
   attachments?: {
     id: string;
     type: string;
     url: string;
   }[];
+
+  // Voting
   voterIds?: string[];
   voteDetails?: Array<{
     userId: string;
@@ -245,6 +292,9 @@ export const chatThreads = pgTable(
     // Allowed roles (array of UserRole values who can see this thread)
     // If empty, inherits from parent folder's allowedRoles
     allowedRoles: jsonb("allowed_roles").$type<string[]>().default([]),
+
+    // Published status (for SHARED folders - allows public read access via link)
+    published: boolean("published").default(false).notNull(),
 
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),

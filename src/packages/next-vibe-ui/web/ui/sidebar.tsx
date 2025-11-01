@@ -55,6 +55,7 @@ export interface SidebarProps {
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
   className?: string;
+  defaultOpen?: boolean; // Native-specific, optional for web
 }
 
 export interface SidebarHeaderProps {

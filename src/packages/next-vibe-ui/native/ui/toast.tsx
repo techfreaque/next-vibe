@@ -7,45 +7,27 @@ import { Pressable, Text as RNText, View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
 import { cn } from "../lib/utils";
+import type {
+  ToastActionElement,
+  ToastActionProps,
+  ToastBaseProps,
+  ToastCloseProps,
+  ToastDescriptionProps,
+  ToastProviderProps,
+  ToastTitleProps,
+  ToastViewportProps,
+} from "../../web/ui/toast";
 
-// Cross-platform base props interfaces
-export interface ToastBaseProps {
-  variant?: "default" | "destructive";
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  children?: React.ReactNode;
-  className?: string;
-}
-
-export interface ToastTitleProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-export interface ToastDescriptionProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-export interface ToastCloseProps {
-  className?: string;
-}
-
-export interface ToastProviderProps {
-  children: React.ReactNode;
-}
-
-export interface ToastViewportProps {
-  className?: string;
-}
-
-export interface ToastActionProps {
-  children: React.ReactNode;
-  className?: string;
-  altText?: string;
-}
-
-export type ToastActionElement = React.ReactElement<ToastActionProps>;
+export type {
+  ToastActionElement,
+  ToastActionProps,
+  ToastBaseProps,
+  ToastCloseProps,
+  ToastDescriptionProps,
+  ToastProviderProps,
+  ToastTitleProps,
+  ToastViewportProps,
+};
 
 export type ToastProps = ToastBaseProps;
 

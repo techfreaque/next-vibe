@@ -2,15 +2,15 @@
 "use client";
 
 import { useRouter } from "next-vibe-ui/hooks";
-import { AlertDialog } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogAction } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogCancel } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogContent } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogDescription } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogFooter } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogHeader } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogTitle } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { Div } from "@/packages/next-vibe-ui/web/ui/div";
+import { AlertDialog } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogAction } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogCancel } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogContent } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogDescription } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogFooter } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogHeader } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogTitle } from "next-vibe-ui//ui/alert-dialog";
+import { Div } from "next-vibe-ui//ui/div";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -471,7 +471,7 @@ export function ChatInterface({
       const model = getModelById(modelId);
 
       // Auto-remove search tool if the new model doesn't support tools
-      const SEARCH_TOOL_ID = "core_agent_chat_tools_brave-search";
+      const SEARCH_TOOL_ID = "get_v1_core_agent_brave-search";
       if (!model.supportsTools && enabledToolIds.includes(SEARCH_TOOL_ID)) {
         setEnabledToolIds(enabledToolIds.filter((id) => id !== SEARCH_TOOL_ID));
         logger.info("Auto-disabled search tool - model doesn't support tools", {

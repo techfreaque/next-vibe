@@ -6,6 +6,11 @@ import * as React from "react";
 import { cn } from "../lib/utils";
 import type { WithClassName } from "../lib/types";
 import { TextClassContext } from "./text";
+import type {
+  ToggleProps,
+  ToggleSize,
+  ToggleVariant,
+} from "../../web/ui/toggle";
 
 const toggleVariants = cva(
   "web:group web:inline-flex items-center justify-center rounded-md web:ring-offset-background web:transition-colors web:hover:bg-muted active:bg-muted web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
@@ -51,19 +56,7 @@ const toggleTextVariants = cva(
   },
 );
 
-// Cross-platform types
-export type ToggleVariant = VariantProps<typeof toggleVariants>["variant"];
-export type ToggleSize = VariantProps<typeof toggleVariants>["size"];
-
-export interface ToggleProps {
-  variant?: ToggleVariant;
-  size?: ToggleSize;
-  className?: string;
-  children?: React.ReactNode;
-  pressed?: boolean;
-  onPressedChange?: (pressed: boolean) => void;
-  disabled?: boolean;
-}
+export type { ToggleProps, ToggleSize, ToggleVariant };
 
 const Toggle = React.forwardRef<
   TogglePrimitive.RootRef,

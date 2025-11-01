@@ -30,6 +30,7 @@ export const translations: typeof enTranslations = {
   },
   ui: {
     markdown: {
+      thinking: "Denken",
       reasoningProcess: "Denkprozess",
       streaming: "(streaming...)",
       copied: "Kopiert!",

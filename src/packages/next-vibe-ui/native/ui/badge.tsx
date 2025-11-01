@@ -1,5 +1,6 @@
+/// <reference path="../../../../../nativewind-env.d.ts" />
+
 import * as Slot from "@rn-primitives/slot";
-import type { SlottableViewProps } from "@rn-primitives/types";
 import { cva } from "class-variance-authority";
 import type * as React from "react";
 import { View } from "react-native";
@@ -20,6 +21,8 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive web:hover:opacity-80 active:opacity-80",
         outline: "text-foreground",
+        notification:
+          "border-transparent bg-red-500 web:hover:opacity-80 active:opacity-80",
       },
     },
     defaultVariants: {
@@ -35,6 +38,7 @@ const badgeTextVariants = cva("text-xs font-semibold ", {
       secondary: "text-secondary-foreground",
       destructive: "text-destructive-foreground",
       outline: "text-foreground",
+      notification: "text-white",
     },
   },
   defaultVariants: {
@@ -42,25 +46,29 @@ const badgeTextVariants = cva("text-xs font-semibold ", {
   },
 });
 
-type NativeBadgeProps = BadgeProps & {
-  asChild?: boolean;
-} & SlottableViewProps;
-
 function Badge({
   className,
   variant,
   asChild,
   children,
-  ...props
-}: NativeBadgeProps): React.JSX.Element {
-  const Component = asChild ? Slot.View : View;
+}: BadgeProps): React.JSX.Element {
   const combinedClassName = cn(badgeVariants({ variant }), className);
+
+  if (asChild) {
+    return (
+      <TextClassContext.Provider value={badgeTextVariants({ variant })}>
+        <Slot.View className={combinedClassName}>
+          {children}
+        </Slot.View>
+      </TextClassContext.Provider>
+    );
+  }
 
   return (
     <TextClassContext.Provider value={badgeTextVariants({ variant })}>
-      <Component className={combinedClassName} {...props}>
+      <View className={combinedClassName}>
         {children}
-      </Component>
+      </View>
     </TextClassContext.Provider>
   );
 }

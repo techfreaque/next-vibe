@@ -1,25 +1,5 @@
 "use client";
 
-import {
-  SiAndroid,
-  SiApple,
-  SiDiscord,
-  SiDocker,
-  SiGit,
-  SiGithub,
-  SiGo,
-  SiGoogle,
-  SiJavascript,
-  SiLinux,
-  SiNextdotjs,
-  SiNodedotjs,
-  SiOpenai,
-  SiPython,
-  SiReact,
-  SiReddit,
-  SiRust,
-  SiTypescript,
-} from "@icons-pack/react-simple-icons";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -83,6 +63,24 @@ import {
   Users,
   Utensils,
   Zap,
+  SiAndroid,
+  SiApple,
+  SiDiscord,
+  SiDocker,
+  SiGit,
+  SiGithub,
+  SiGo,
+  SiGoogle,
+  SiJavascript,
+  SiLinux,
+  SiNextdotjs,
+  SiNodedotjs,
+  SiOpenai,
+  SiPython,
+  SiReact,
+  SiReddit,
+  SiRust,
+  SiTypescript,
 } from "next-vibe-ui/ui/icons";
 import type { ComponentType, JSX } from "react";
 import React from "react";

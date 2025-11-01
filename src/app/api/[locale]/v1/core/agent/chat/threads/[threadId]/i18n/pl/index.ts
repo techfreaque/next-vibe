@@ -54,6 +54,9 @@ export const translations: typeof enTranslations = {
         tags: {
           content: "Tagi",
         },
+        published: {
+          content: "Opublikowany",
+        },
         preview: {
           content: "Podgląd",
         },
@@ -166,6 +169,10 @@ export const translations: typeof enTranslations = {
       label: "Tagi",
       description: "Tagi do organizacji",
     },
+    published: {
+      label: "Opublikowany",
+      description: "Udostępnij wątek publicznie przez link",
+    },
     response: {
       thread: {
         title: "Zaktualizowany wątek",
@@ -202,6 +209,9 @@ export const translations: typeof enTranslations = {
         },
         tags: {
           content: "Tagi",
+        },
+        published: {
+          content: "Opublikowany",
         },
         preview: {
           content: "Podgląd",

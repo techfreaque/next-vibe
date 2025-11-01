@@ -111,8 +111,9 @@ export function isOwner(userId: string, resourceUserId: string): boolean {
  * Check if user can read a folder
  * Checks allowedRoles field to determine visibility
  * - Owner can always read
+ * - Moderators (in moderatorIds) can always read
  * - If allowedRoles is not empty, user's role must be in the list
- * - If allowedRoles is empty, only owner can read
+ * - If allowedRoles is empty, only owner and moderators can read
  */
 export async function canReadFolder(
   user: JwtPayloadType,
@@ -124,6 +125,13 @@ export async function canReadFolder(
   // Owner can always read
   if (userId && isOwner(userId, folder.userId)) {
     return true;
+  }
+
+  // Moderators can always read (for SHARED folders)
+  if (userId && folder.moderatorIds && Array.isArray(folder.moderatorIds)) {
+    if (folder.moderatorIds.includes(userId)) {
+      return true;
+    }
   }
 
   // Check allowedRoles
@@ -144,7 +152,7 @@ export async function canReadFolder(
     }
   }
 
-  // Empty allowedRoles = owner only
+  // Empty allowedRoles = owner and moderators only
   return false;
 }
 
@@ -153,7 +161,7 @@ export async function canReadFolder(
  * - PRIVATE: Any authenticated user can create subfolders
  * - SHARED: Any authenticated user can create subfolders
  * - PUBLIC: Only ADMIN users can create subfolders in PUBLIC root (top-level)
- *           Any authenticated user can create subfolders within existing PUBLIC folders
+ *           For subfolders within PUBLIC folders, check parent folder's allowedRoles
  * - INCOGNITO: Not allowed on server
  *
  * Note: The 4 root folders (private, shared, public, incognito) are DEFAULT folders
@@ -184,12 +192,40 @@ export async function canCreateFolder(
   }
 
   // PUBLIC root folder: Only ADMIN can create top-level folders (parentId is null)
-  // Any authenticated user can create subfolders within existing PUBLIC folders (parentId is not null)
   if (rootFolderId === "public" && !parentId) {
     return await isAdmin(userId, logger);
   }
 
-  // All authenticated users can create subfolders in PRIVATE, SHARED, or PUBLIC (with parentId) root folders
+  // For PUBLIC subfolders (parentId is not null), only moderators can create subfolders
+  if (rootFolderId === "public" && parentId) {
+    // Get parent folder to check permissions
+    const { chatFolders } = await import("../db");
+    const { db } = await import("../../../system/db");
+    const { eq } = await import("drizzle-orm");
+
+    const [parentFolder] = await db
+      .select()
+      .from(chatFolders)
+      .where(eq(chatFolders.id, parentId))
+      .limit(1);
+
+    if (!parentFolder) {
+      logger.error("Parent folder not found", { parentId });
+      return false;
+    }
+
+    // Only moderators can create subfolders in PUBLIC folders
+    // Regular users and admins cannot create subfolders unless they are moderators
+    const isModerator = isFolderModerator(userId, parentFolder);
+    logger.debug("PUBLIC subfolder creation permission check", {
+      userId,
+      parentFolderId: parentId,
+      isModerator,
+    });
+    return isModerator;
+  }
+
+  // All authenticated users can create subfolders in PRIVATE or SHARED root folders
   // The 4 root folders themselves are default folders and cannot be created by users
   return true;
 }
@@ -202,11 +238,11 @@ export async function canCreateFolder(
  *           Only ADMIN can create threads in PUBLIC root (when folder.parentId is null)
  * - INCOGNITO: Local only (not applicable for server-side checks)
  */
-export function canWriteFolder(
+export async function canWriteFolder(
   user: JwtPayloadType,
   folder: ChatFolder | null,
   logger: EndpointLogger,
-): boolean {
+): Promise<boolean> {
   // Public users cannot write to server-side folders
   if (user.isPublic) {
     return false;
@@ -227,28 +263,52 @@ export function canWriteFolder(
     return true;
   }
 
-  // PUBLIC folders: Only ADMIN can create threads directly in PUBLIC root (no folder)
-  // Any authenticated user can create threads in PUBLIC folders (user-created folders)
+  // PUBLIC folders: Check allowedRoles to determine write access
   if (folder.rootFolderId === "public") {
     logger.debug("Checking PUBLIC folder write permission", {
       folderId: folder.id,
       folderName: folder.name,
       parentId: folder.parentId,
       userId,
+      allowedRoles: folder.allowedRoles,
     });
-    // All PUBLIC folders (both top-level and subfolders) allow any authenticated user to create threads
-    // The only restriction is creating threads directly in PUBLIC root (which is handled in ai-stream/repository.ts)
-    logger.debug("PUBLIC folder - allowing all authenticated users", {
-      userId,
-      folderId: folder.id,
-      parentId: folder.parentId,
-    });
-    return isFolderModerator(userId, folder) || true;
+
+    // Moderators can always write
+    if (isFolderModerator(userId, folder)) {
+      logger.debug("PUBLIC folder - moderator access granted");
+      return true;
+    }
+
+    // Check allowedRoles
+    if (folder.allowedRoles && folder.allowedRoles.length > 0) {
+      // Get user's roles and check if any match the folder's allowedRoles
+      const userRoles = await userRolesRepository.getUserRoles(userId, logger);
+      if (userRoles.success && userRoles.data) {
+        const hasMatchingRole = folder.allowedRoles.some((role) =>
+          userRoles.data!.includes(role),
+        );
+        logger.debug("PUBLIC folder - role check", {
+          userRoles: userRoles.data,
+          folderAllowedRoles: folder.allowedRoles,
+          hasMatchingRole,
+        });
+        return hasMatchingRole;
+      }
+    }
+
+    // Empty allowedRoles = owner only (already checked above)
+    logger.debug("PUBLIC folder - no matching roles, denying access");
+    return false;
   }
 
-  // SHARED folders: check share token or allowed users (future implementation)
+  // SHARED folders: owner and moderators can write
   if (folder.rootFolderId === "shared") {
-    // Share token and allowedUserIds check not yet implemented
+    // Moderators can write to SHARED folders
+    if (isFolderModerator(userId, folder)) {
+      logger.debug("SHARED folder - moderator access granted");
+      return true;
+    }
+    // Non-moderators cannot write
     return false;
   }
 
@@ -290,6 +350,44 @@ export async function canDeleteFolder(
   // Moderators in PUBLIC folders can "delete" (change visibility)
   if (folder.rootFolderId === "public" && allFolders) {
     return isFolderModeratorRecursive(userId, folder, allFolders);
+  }
+
+  return false;
+}
+
+/**
+ * Check if user can update a folder (rename, change icon, etc.)
+ * - ADMIN: Can update any folder
+ * - Owner: Can update their own folders
+ * - Moderators: Can update folders they moderate (for SHARED and PUBLIC folders)
+ */
+export async function canUpdateFolder(
+  user: JwtPayloadType,
+  folder: ChatFolder,
+  logger: EndpointLogger,
+): Promise<boolean> {
+  if (user.isPublic) {
+    return false;
+  }
+
+  const userId = user.id;
+  if (!userId) {
+    return false;
+  }
+
+  // Admin can update any folder
+  if (await isAdmin(userId, logger)) {
+    return true;
+  }
+
+  // Owner can update their own folders
+  if (isOwner(userId, folder.userId)) {
+    return true;
+  }
+
+  // Moderators can update folders they moderate
+  if (isFolderModerator(userId, folder)) {
+    return true;
   }
 
   return false;
@@ -357,6 +455,21 @@ export async function canReadThread(
     return true;
   }
 
+  // Moderators can always read (for SHARED threads)
+  if (userId && thread.moderatorIds && Array.isArray(thread.moderatorIds)) {
+    if (thread.moderatorIds.includes(userId)) {
+      logger.debug("canReadThread: moderator access granted");
+      return true;
+    }
+  }
+
+  // Published threads can be read by anyone (including public users)
+  // This is for SHARED folders where published=true means public read access via link
+  if (thread.published) {
+    logger.debug("canReadThread: published thread, granting read access");
+    return true;
+  }
+
   // Check thread's allowedRoles first
   if (thread.allowedRoles && thread.allowedRoles.length > 0) {
     logger.debug("canReadThread: checking thread allowedRoles", {
@@ -401,18 +514,36 @@ export async function canReadThread(
 /**
  * Check if user can write to a thread (create messages)
  * - PRIVATE: Owner only
- * - SHARED: Owner or link holders (not implemented yet)
- * - PUBLIC: PUBLIC users (anonymous), owner, moderators, or all authenticated users
+ * - SHARED: Owner, moderators, or published thread readers
+ * - PUBLIC: Anyone who can read the thread (including public users)
  */
-export function canWriteThread(
+export async function canWriteThread(
   user: JwtPayloadType,
   thread: ChatThread,
   folder: ChatFolder | null,
   logger: EndpointLogger,
-): boolean {
-  // PUBLIC users can write to PUBLIC threads only
+): Promise<boolean> {
+  // PUBLIC threads: anyone who can read can also write (reply)
+  // This allows public users to reply to messages in PUBLIC threads
+  if (thread.rootFolderId === "public") {
+    logger.debug("Checking PUBLIC thread write permission", {
+      threadId: thread.id,
+      isPublic: user.isPublic,
+      userId: user.id,
+    });
+
+    // Check if user can read the thread - if yes, they can also write
+    const canRead = await canReadThread(user, thread, folder, logger);
+    if (canRead) {
+      logger.debug("PUBLIC thread - read access grants write access");
+      return true;
+    }
+    return false;
+  }
+
+  // For non-PUBLIC threads, public users cannot write
   if (user.isPublic) {
-    return thread.rootFolderId === "public";
+    return false;
   }
 
   const userId = user.id;
@@ -425,14 +556,23 @@ export function canWriteThread(
     return true;
   }
 
-  // PUBLIC threads: moderators or all authenticated users can write
-  if (thread.rootFolderId === "public") {
-    return isThreadModerator(userId, thread) || true; // All authenticated users can write
+  // Moderators can always write (for SHARED and PUBLIC threads)
+  if (isThreadModerator(userId, thread)) {
+    return true;
+  }
+
+  // SHARED threads: check folder permissions (which checks moderators)
+  if (thread.rootFolderId === "shared") {
+    if (folder) {
+      return await canWriteFolder(user, folder, logger);
+    }
+    // If no folder, already checked moderator above
+    return false;
   }
 
   // If folder is provided, check folder permissions
   if (folder) {
-    return canWriteFolder(user, folder, logger);
+    return await canWriteFolder(user, folder, logger);
   }
 
   // PRIVATE threads: owner only
@@ -475,6 +615,55 @@ export async function canDeleteThread(
   // PUBLIC threads: moderators can delete (check recursive)
   if (thread.rootFolderId === "public" && allFolders) {
     return isThreadModeratorRecursive(userId, thread, folder || null, allFolders);
+  }
+
+  return false;
+}
+
+/**
+ * Check if user can update a thread (rename, change settings, etc.)
+ * - ADMIN: Can update any thread
+ * - Owner: Can update their own threads
+ * - Moderators: Can update threads they moderate (thread-level or folder-level for SHARED and PUBLIC threads)
+ */
+export async function canUpdateThread(
+  user: JwtPayloadType,
+  thread: ChatThread,
+  folder: ChatFolder | null,
+  logger: EndpointLogger,
+): Promise<boolean> {
+  if (user.isPublic) {
+    return false;
+  }
+
+  const userId = user.id;
+  if (!userId) {
+    return false;
+  }
+
+  // Admin can update any thread
+  if (await isAdmin(userId, logger)) {
+    return true;
+  }
+
+  // Owner can update their own threads
+  if (isOwner(userId, thread.userId)) {
+    return true;
+  }
+
+  // Thread-level moderators can update threads they moderate
+  if (isThreadModerator(userId, thread)) {
+    return true;
+  }
+
+  // Folder-level moderators can update threads in folders they moderate (for SHARED and PUBLIC threads)
+  if (
+    folder &&
+    (thread.rootFolderId === "shared" || thread.rootFolderId === "public") &&
+    isFolderModerator(userId, folder)
+  ) {
+    logger.debug("canUpdateThread: folder moderator access granted");
+    return true;
   }
 
   return false;
@@ -531,14 +720,14 @@ export async function canReadMessage(
  * Check if user can create a message in a thread
  * Inherits from thread permissions
  */
-export function canWriteMessage(
+export async function canWriteMessage(
   user: JwtPayloadType,
   thread: ChatThread,
   folder: ChatFolder | null,
   logger: EndpointLogger,
-): boolean {
+): Promise<boolean> {
   // Messages inherit thread write permissions
-  return canWriteThread(user, thread, folder, logger);
+  return await canWriteThread(user, thread, folder, logger);
 }
 
 /**

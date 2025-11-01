@@ -83,7 +83,7 @@ class RouteHandlersGeneratorRepositoryImpl
       logger.debug(`Found ${routeFiles.length} route files`);
 
       // Generate content
-      const content = this.generateContent(routeFiles);
+      const content = await this.generateContent(routeFiles);
 
       // Write file
       await writeGeneratedFile(outputFile, content, data.dryRun);
@@ -120,25 +120,63 @@ class RouteHandlersGeneratorRepositoryImpl
   }
 
   /**
-   * Generate route handlers content with dynamic imports
+   * Extract aliases from definition file (async)
    */
-  private generateContent(routeFiles: string[]): string {
+  private async extractAliasesFromDefinition(
+    routeFile: string,
+  ): Promise<string[]> {
+    const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
+    try {
+      const definition = (await import(definitionPath)) as {
+        default?: Record<string, { aliases?: string[] }>;
+      };
+      const defaultExport = definition.default;
+
+      if (!defaultExport) {
+        return [];
+      }
+
+      // Get aliases from any method (usually POST)
+      for (const method of Object.keys(defaultExport)) {
+        const methodDef = defaultExport[method];
+        if (methodDef?.aliases && Array.isArray(methodDef.aliases)) {
+          return methodDef.aliases;
+        }
+      }
+    } catch {
+      // Definition file doesn't exist or can't be loaded
+    }
+    return [];
+  }
+
+  /**
+   * Generate route handlers content with dynamic imports and real aliases from definitions
+   * No duplicate parameter format aliases - only [id] format and real definition aliases
+   */
+  private async generateContent(routeFiles: string[]): Promise<string> {
     const pathMap: Record<string, string> = {};
     const allPaths: string[] = [];
 
-    // Build path map with aliases
+    // Build path map with aliases (deduplicate)
     for (const routeFile of routeFiles) {
-      const { path, aliases } = extractPathKey(routeFile);
+      const { path } = extractPathKey(routeFile);
       const importPath = generateAbsoluteImportPath(routeFile, "route");
 
-      // Add main path
-      pathMap[path] = importPath;
-      allPaths.push(path);
+      // Add main path (with [id] format only) if not already added
+      if (!pathMap[path]) {
+        pathMap[path] = importPath;
+        allPaths.push(path);
+      }
 
-      // Add aliases
-      for (const alias of aliases) {
-        pathMap[alias] = importPath;
-        allPaths.push(alias);
+      // Extract and add real aliases from definition file
+      const definitionAliases =
+        await this.extractAliasesFromDefinition(routeFile);
+      for (const alias of definitionAliases) {
+        // Only add if not already present (first wins)
+        if (!pathMap[alias]) {
+          pathMap[alias] = importPath;
+          allPaths.push(alias);
+        }
       }
     }
 
@@ -175,20 +213,22 @@ import type { RouteModule } from "@/app/api/[locale]/v1/core/system/unified-inte
 
 /**
  * Helper function to load and validate route modules
+ * Accepts any import function and validates the result at runtime
  */
-async function loadRouteModule(
-  importFn: () => Promise<unknown>,
+async function loadRouteModule<T>(
+  importFn: () => Promise<T>,
   path: string
 ): Promise<RouteModule | null> {
   try {
-    const module = await importFn();
+    const routeModule = await importFn();
     // Basic validation that it's a route module
-    if (module && typeof module === "object") {
-      return module as RouteModule;
+    if (routeModule && typeof routeModule === "object") {
+      return routeModule as RouteModule;
     }
     return null;
-  } catch (error) {
-    console.error(\`Failed to load route module for path: \${path}\`, error);
+  } catch (err) {
+    // eslint-disable-next-line no-console -- Required for debugging route module loading errors
+    console.error(\`Failed to load route module for path: \${path}\`, err);
     return null;
   }
 }

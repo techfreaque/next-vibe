@@ -10,49 +10,17 @@ import { Pressable, Text as RNText, TextInput, View } from "react-native";
 
 import { cn } from "../lib/utils";
 
-// Cross-platform type definitions - aligned with web
-export interface CommandProps {
-  children?: ReactNode;
-  className?: string;
-}
-
-export interface CommandInputProps {
-  className?: string;
-  placeholder?: string;
-  value?: string;
-  onValueChange?: (value: string) => void;
-}
-
-export interface CommandListProps {
-  children?: ReactNode;
-  className?: string;
-}
-
-export interface CommandEmptyProps {
-  children?: ReactNode;
-  className?: string;
-}
-
-export interface CommandGroupProps {
-  children?: ReactNode;
-  className?: string;
-  heading?: string;
-}
-
-export interface CommandItemProps {
-  children?: ReactNode;
-  className?: string;
-  disabled?: boolean;
-}
-
-export interface CommandSeparatorProps {
-  className?: string;
-}
-
-export interface CommandShortcutProps {
-  className?: string;
-  children?: ReactNode;
-}
+// Import all cross-platform type definitions from web (source of truth)
+import type {
+  CommandProps,
+  CommandInputProps,
+  CommandListProps,
+  CommandEmptyProps,
+  CommandGroupProps,
+  CommandItemProps,
+  CommandSeparatorProps,
+  CommandShortcutProps,
+} from "next-vibe-ui/ui/command";
 
 export const Command = React.forwardRef<View, CommandProps>(
   ({ className, children, ...props }, ref) => {
@@ -102,12 +70,10 @@ export const CommandList = React.forwardRef<View, CommandListProps>(
 
 CommandList.displayName = "CommandList";
 
-export interface CommandEmptyProps extends ViewProps {
-  children: ReactNode;
+export const CommandEmpty = React.forwardRef<View, Omit<ViewProps, 'children'> & {
+  children?: ReactNode;
   className?: string;
-}
-
-export const CommandEmpty = React.forwardRef<View, CommandEmptyProps>(
+}>(
   ({ className, children, ...props }, ref) => (
     <View
       ref={ref}

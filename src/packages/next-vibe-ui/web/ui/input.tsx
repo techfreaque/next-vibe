@@ -2,17 +2,18 @@ import { cn } from "next-vibe/shared/utils/utils";
 import type { InputHTMLAttributes } from "react";
 import * as React from "react";
 
-// Cross-platform props interface with native-specific additions
-interface NativeSpecificProps {
+export type InputProps = Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "autoCapitalize"
+> & {
+  // Native-specific props (optional for web)
   onChangeText?: (text: string) => void;
-  autoCorrect?: boolean;
+  autoCorrect?: boolean | string;
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   secureTextEntry?: boolean;
   keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";
-}
-
-export type InputProps = InputHTMLAttributes<HTMLInputElement> &
-  NativeSpecificProps;
+  editable?: boolean;
+};
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (

@@ -15,7 +15,7 @@ export interface CalendarBaseProps {
   selected?: Date;
   onSelect?: (date: Date | undefined) => void;
   mode?: "single" | "multiple" | "range";
-  disabled?: boolean;
+  disabled?: boolean | ((date: Date) => boolean);
 }
 
 // Web uses full DayPicker props

@@ -6,7 +6,7 @@
 import { create } from "zustand";
 
 import type { DefaultFolderId } from "./config";
-import type { ToolCall } from "./db";
+import type { MessageMetadata, ToolCall } from "./db";
 import type { IconValue } from "./model-access/icons";
 import { ModelId, type ModelId as ModelIdType } from "./model-access/models";
 
@@ -57,6 +57,7 @@ export interface ChatMessage {
   toolCalls?: ToolCall[] | null;
   upvotes: number | null;
   downvotes: number | null;
+  metadata?: MessageMetadata; // Message metadata (reasoning, tool calls, etc.)
   createdAt: Date;
   updatedAt: Date;
 }

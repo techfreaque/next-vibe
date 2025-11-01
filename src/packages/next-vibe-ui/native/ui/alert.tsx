@@ -31,14 +31,7 @@ const alertVariants = cva(
   },
 );
 
-// Native-specific extension: requires icon prop for visual consistency
-interface NativeAlertProps extends AlertProps {
-  icon: LucideIcon;
-  iconSize?: number;
-  iconClassName?: string;
-}
-
-const Alert = React.forwardRef<React.ElementRef<typeof View>, NativeAlertProps>(
+const Alert = React.forwardRef<React.ElementRef<typeof View>, AlertProps & { icon: LucideIcon }>(
   (
     { className, variant, children, icon: Icon, iconSize = 16 },
     ref,
@@ -48,7 +41,7 @@ const Alert = React.forwardRef<React.ElementRef<typeof View>, NativeAlertProps>(
       <View
         ref={ref}
         role="alert"
-        className={alertVariants({ variant, className })}
+        className={cn(alertVariants({ variant }), className)}
       >
         <View className="absolute left-3.5 top-4 -translate-y-0.5">
           <Icon

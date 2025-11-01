@@ -58,10 +58,8 @@ import {
   FormLabel,
   FormMessage,
 } from "./form";
-import {
-  type EndpointFieldStructure,
-  getFieldConfig,
-} from "./infer-field-config";
+import { getFieldConfig } from "./infer-field-config";
+import type { EndpointFieldStructure } from "./endpoint-field-types";
 
 // Default theme for required fields
 const DEFAULT_THEME: RequiredFieldTheme = {
@@ -660,16 +658,17 @@ function renderFieldInput<
   }
 }
 
-// Generic field props interface
+// Generic field props interface with full type inference from endpoint fields
 export interface EndpointFormFieldProps<
   TFieldValues extends FieldValues,
   TName extends Path<TFieldValues>,
+  TFields extends EndpointFieldStructure = EndpointFieldStructure,
 > extends Omit<
     EndpointFormFieldPropsType<TFieldValues, TName>,
     "requiredFields"
   > {
   schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
-  endpointFields?: EndpointFieldStructure; // Endpoint fields for auto-inference (from definition.POST.fields)
+  endpointFields?: TFields; // Endpoint fields for auto-inference (from definition.POST.fields) - now fully typed
 }
 
 /**
@@ -677,10 +676,16 @@ export interface EndpointFormFieldProps<
  * Integrates with useEndpoint hook and provides comprehensive form field functionality
  *
  * Config is auto-inferred from endpointFields if not provided
+ *
+ * Type Parameters:
+ * - TFieldValues: The form values type from react-hook-form
+ * - TName: The field name (must be a valid path in TFieldValues)
+ * - TFields: The endpoint fields structure (inferred from definition.POST.fields)
  */
 export function EndpointFormField<
   TFieldValues extends FieldValues,
   TName extends Path<TFieldValues>,
+  TFields extends EndpointFieldStructure = EndpointFieldStructure,
 >({
   name,
   config: providedConfig,
@@ -689,7 +694,7 @@ export function EndpointFormField<
   theme = DEFAULT_THEME,
   className,
   endpointFields,
-}: EndpointFormFieldProps<TFieldValues, TName>): JSX.Element {
+}: EndpointFormFieldProps<TFieldValues, TName, TFields>): JSX.Element {
   const { t } = useTranslation();
 
   // Auto-infer config from endpoint fields if not provided
@@ -770,8 +775,15 @@ export function EndpointFormField<
 /**
  * Convenience component for creating multiple form fields
  * Config is auto-inferred from endpointFields if not provided
+ *
+ * Type Parameters:
+ * - TFieldValues: The form values type from react-hook-form
+ * - TFields: The endpoint fields structure (inferred from definition.POST.fields)
  */
-export interface EndpointFormFieldsProps<TFieldValues extends FieldValues> {
+export interface EndpointFormFieldsProps<
+  TFieldValues extends FieldValues,
+  TFields extends EndpointFieldStructure = EndpointFieldStructure,
+> {
   fields: Array<{
     name: Path<TFieldValues>;
     config?: FieldConfig; // Optional - auto-inferred from endpointFields
@@ -779,13 +791,16 @@ export interface EndpointFormFieldsProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
   requiredFields?: string[];
   schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
-  endpointFields?: EndpointFieldStructure; // Endpoint fields for auto-inference
+  endpointFields?: TFields; // Endpoint fields for auto-inference - now fully typed
   theme?: RequiredFieldTheme;
   className?: string;
   fieldClassName?: string;
 }
 
-export function EndpointFormFields<TFieldValues extends FieldValues>({
+export function EndpointFormFields<
+  TFieldValues extends FieldValues,
+  TFields extends EndpointFieldStructure = EndpointFieldStructure,
+>({
   fields,
   control,
   schema,
@@ -793,11 +808,11 @@ export function EndpointFormFields<TFieldValues extends FieldValues>({
   theme = DEFAULT_THEME,
   className,
   fieldClassName,
-}: EndpointFormFieldsProps<TFieldValues>): JSX.Element {
+}: EndpointFormFieldsProps<TFieldValues, TFields>): JSX.Element {
   return (
     <div className={cn("space-y-6", className)}>
       {fields.map((fieldDef) => (
-        <EndpointFormField
+        <EndpointFormField<TFieldValues, Path<TFieldValues>, TFields>
           key={fieldDef.name}
           name={fieldDef.name}
           config={fieldDef.config}

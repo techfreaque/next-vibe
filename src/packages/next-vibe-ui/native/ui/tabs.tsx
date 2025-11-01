@@ -1,35 +1,31 @@
 import * as TabsPrimitive from "@rn-primitives/tabs";
 import * as React from "react";
 
+// Import cross-platform types from web (source of truth)
+import type {
+  TabsProps,
+  TabsListProps,
+  TabsTriggerProps,
+  TabsContentProps,
+} from "next-vibe-ui/ui/tabs";
+
+import type { WithClassName } from "../lib/types";
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
 
-// Cross-platform types
-export interface TabsProps {
-  value?: string;
-  onValueChange?: (value: string) => void;
-  defaultValue?: string;
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface TabsListProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface TabsTriggerProps {
-  value: string;
-  disabled?: boolean;
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface TabsContentProps {
-  value: string;
-  className?: string;
-  children?: React.ReactNode;
-}
+// Type-safe wrappers for primitives
+const StyledTabsList = TabsPrimitive.List as React.ForwardRefExoticComponent<
+  WithClassName<React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>> &
+    React.RefAttributes<React.ElementRef<typeof TabsPrimitive.List>>
+>;
+const StyledTabsTrigger = TabsPrimitive.Trigger as React.ForwardRefExoticComponent<
+  WithClassName<React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>> &
+    React.RefAttributes<React.ElementRef<typeof TabsPrimitive.Trigger>>
+>;
+const StyledTabsContent = TabsPrimitive.Content as React.ForwardRefExoticComponent<
+  WithClassName<React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>> &
+    React.RefAttributes<React.ElementRef<typeof TabsPrimitive.Content>>
+>;
 
 const Tabs = TabsPrimitive.Root;
 
@@ -37,16 +33,16 @@ const TabsList = React.forwardRef<
   TabsPrimitive.ListRef,
   TabsListProps
 >(({ className, children, ...props }, ref) => (
-  <TabsPrimitive.List
+  <StyledTabsList
     ref={ref}
     className={cn(
       "web:inline-flex h-10 native:h-12 items-center justify-center rounded-md bg-muted p-1 native:px-1.5",
       className,
-    ) as never}
+    )}
     {...props}
   >
     {children}
-  </TabsPrimitive.List>
+  </StyledTabsList>
 ));
 TabsList.displayName = TabsPrimitive.List.displayName;
 
@@ -62,7 +58,7 @@ const TabsTrigger = React.forwardRef<
         selectedValue === value && "text-foreground",
       )}
     >
-      <TabsPrimitive.Trigger
+      <StyledTabsTrigger
         ref={ref}
         value={value}
         disabled={disabled}
@@ -72,11 +68,11 @@ const TabsTrigger = React.forwardRef<
           value === selectedValue &&
             "bg-background shadow-lg shadow-foreground/10",
           className,
-        ) as never}
+        )}
         {...props}
       >
         {children}
-      </TabsPrimitive.Trigger>
+      </StyledTabsTrigger>
     </TextClassContext.Provider>
   );
 });
@@ -86,17 +82,17 @@ const TabsContent = React.forwardRef<
   TabsPrimitive.ContentRef,
   TabsContentProps
 >(({ className, value, children, ...props }, ref) => (
-  <TabsPrimitive.Content
+  <StyledTabsContent
     ref={ref}
     value={value}
     className={cn(
       "web:ring-offset-background web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
       className,
-    ) as never}
+    )}
     {...props}
   >
     {children}
-  </TabsPrimitive.Content>
+  </StyledTabsContent>
 ));
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 

@@ -35,7 +35,6 @@ import type { DefaultFolderId } from "../chat/config";
 import {
   chatMessages,
   chatThreads,
-  type MessageMetadata,
   type ToolCall,
   type ToolCallResult,
   type ToolCallWidgetMetadata,
@@ -43,10 +42,7 @@ import {
 import { ChatMessageRole } from "../chat/enum";
 import { getModelCost } from "../chat/model-access/costs";
 import { getModelById, type ModelId } from "../chat/model-access/models";
-import {
-  CONTINUE_CONVERSATION_PROMPT,
-  TOOL_USAGE_GUIDELINES,
-} from "./constants";
+import { CONTINUE_CONVERSATION_PROMPT } from "./system-prompt";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
@@ -610,6 +606,152 @@ class AiStreamRepository implements IAiStreamRepository {
   }
 
   /**
+   * Create ERROR message in database
+   * Used for all error scenarios (API errors, tool errors, validation errors, etc.)
+   */
+  private async createErrorMessage(params: {
+    messageId: string;
+    threadId: string;
+    content: string; // User-friendly error message
+    parentId: string | null;
+    depth: number;
+    userId: string;
+    errorType: string; // e.g., "STREAM_ERROR", "TOOL_ERROR", "API_ERROR"
+    errorDetails?: Record<string, string | number | boolean | null>; // Additional error metadata
+    sequenceId?: string | null; // Sequence ID for grouping messages in same stream
+    sequenceIndex?: number; // Position in sequence
+    logger: EndpointLogger;
+  }): Promise<void> {
+    const metadata: Record<string, string | number | boolean | null | Record<string, string | number | boolean | null>> = {
+      errorType: params.errorType,
+    };
+
+    if (params.errorDetails) {
+      metadata.errorDetails = params.errorDetails;
+    }
+
+    await db.insert(chatMessages).values({
+      id: params.messageId,
+      threadId: params.threadId,
+      role: ChatMessageRole.ERROR,
+      content: params.content,
+      parentId: params.parentId,
+      depth: params.depth,
+      authorId: params.userId,
+      isAI: false,
+      sequenceId: params.sequenceId ?? null,
+      sequenceIndex: params.sequenceIndex ?? 0,
+      metadata,
+    });
+
+    params.logger.info("Created ERROR message", {
+      messageId: params.messageId,
+      threadId: params.threadId,
+      errorType: params.errorType,
+    });
+  }
+
+  /**
+   * Create ASSISTANT message for text content in database
+   */
+  private async createTextMessage(params: {
+    messageId: string;
+    threadId: string;
+    content: string;
+    parentId: string | null;
+    depth: number;
+    userId: string;
+    model: ModelId;
+    persona: string | null | undefined;
+    sequenceId: string | null;
+    sequenceIndex: number;
+    logger: EndpointLogger;
+  }): Promise<void> {
+    await db.insert(chatMessages).values({
+      id: params.messageId,
+      threadId: params.threadId,
+      role: ChatMessageRole.ASSISTANT,
+      content: params.content,
+      parentId: params.parentId,
+      depth: params.depth,
+      authorId: params.userId,
+      sequenceId: params.sequenceId,
+      sequenceIndex: params.sequenceIndex,
+      isAI: true,
+      model: params.model,
+      persona: params.persona ?? undefined,
+    });
+
+    params.logger.debug("Created text message", {
+      messageId: params.messageId,
+      threadId: params.threadId,
+      sequenceId: params.sequenceId,
+      sequenceIndex: params.sequenceIndex,
+    });
+  }
+
+  /**
+   * Update message content in database
+   */
+  private async updateMessageContent(params: {
+    messageId: string;
+    content: string;
+    logger: EndpointLogger;
+  }): Promise<void> {
+    await db
+      .update(chatMessages)
+      .set({ content: params.content })
+      .where(eq(chatMessages.id, params.messageId));
+
+    params.logger.debug("Updated message content", {
+      messageId: params.messageId,
+      contentLength: params.content.length,
+    });
+  }
+
+  /**
+   * Create TOOL message in database
+   * Tool calls are stored as separate messages with role=TOOL
+   */
+  private async createToolMessage(params: {
+    messageId: string;
+    threadId: string;
+    toolCall: ToolCall;
+    parentId: string | null;
+    depth: number;
+    userId: string;
+    sequenceId: string | null;
+    sequenceIndex: number;
+    logger: EndpointLogger;
+  }): Promise<void> {
+    const metadata: Record<string, string | number | boolean | null | Record<string, string | number | boolean | null> | ToolCall> = {
+      toolCall: params.toolCall,
+    };
+
+    await db.insert(chatMessages).values({
+      id: params.messageId,
+      threadId: params.threadId,
+      role: ChatMessageRole.TOOL,
+      content: "", // Tool messages have empty content, data is in metadata
+      parentId: params.parentId,
+      depth: params.depth,
+      authorId: params.userId,
+      sequenceId: params.sequenceId,
+      sequenceIndex: params.sequenceIndex,
+      isAI: true,
+      metadata,
+    });
+
+    params.logger.debug("Created TOOL message", {
+      messageId: params.messageId,
+      threadId: params.threadId,
+      toolName: params.toolCall.toolName,
+      sequenceId: params.sequenceId,
+      sequenceIndex: params.sequenceIndex,
+    });
+  }
+
+  /**
    * Build message context for AI
    */
   private async buildMessageContext(params: {
@@ -625,6 +767,23 @@ class AiStreamRepository implements IAiStreamRepository {
   }): Promise<
     Array<{ role: "user" | "assistant" | "system"; content: string }>
   > {
+    // SECURITY: Reject messageHistory for non-incognito threads
+    // Non-incognito threads must fetch history from database to prevent manipulation
+    if (!params.isIncognito && params.messageHistory) {
+      params.logger.error(
+        "Security violation: messageHistory provided for non-incognito thread",
+        {
+          operation: params.operation,
+          threadId: params.threadId,
+          isIncognito: params.isIncognito,
+        },
+      );
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Security violation should throw immediately
+      throw new Error(
+        "messageHistory is only allowed for incognito mode. Server-side threads fetch history from database.",
+      );
+    }
+
     if (params.operation === "answer-as-ai") {
       // For incognito mode, use provided message history
       if (params.isIncognito && params.messageHistory) {
@@ -694,13 +853,22 @@ class AiStreamRepository implements IAiStreamRepository {
         return [];
       }
     } else if (!params.isIncognito && params.userId && params.threadId) {
+      // Non-incognito mode: fetch history from database
       const history = await fetchMessageHistory(
         params.threadId,
         params.userId,
         params.logger,
       );
       return [...history, { role: params.role, content: params.content }];
+    } else if (params.isIncognito && params.messageHistory) {
+      // Incognito mode with message history: use provided history from client
+      params.logger.debug("Using provided message history for incognito mode", {
+        operation: params.operation,
+        historyLength: params.messageHistory.length,
+      });
+      return [...params.messageHistory, { role: params.role, content: params.content }];
     } else {
+      // Fallback: no thread or no history (new conversation)
       return [{ role: params.role, content: params.content }];
     }
   }
@@ -756,7 +924,7 @@ class AiStreamRepository implements IAiStreamRepository {
 
       // Lazy load ONLY the requested tools by endpoint IDs instead of loading all 143 endpoints
       // This uses the generated/endpoint.ts dynamic import system
-      // requestedTools now contains endpoint IDs (e.g., "get_v1_core_agent_brave_search")
+      // requestedTools contains endpoint IDs (e.g., "get_v1_core_agent_brave_search")
       const enabledEndpoints = await registry.getEndpointsByIdsLazy(
         params.requestedTools,
         params.user,
@@ -794,25 +962,8 @@ class AiStreamRepository implements IAiStreamRepository {
           toolNames: [...toolsMap.keys()],
         });
 
-        // Add tool instructions to system prompt
-        const toolInstructions = enabledEndpoints
-          .map((endpoint) => endpoint.definition.aiTool?.instructions)
-          .filter(
-            (instructions): instructions is string =>
-              typeof instructions === "string" && instructions.length > 0,
-          );
-
-        if (toolInstructions.length > 0) {
-          const combinedInstructions = toolInstructions.join("\n\n");
-
-          enhancedSystemPrompt = enhancedSystemPrompt
-            ? [
-              enhancedSystemPrompt,
-              combinedInstructions,
-              TOOL_USAGE_GUIDELINES,
-            ].join("\n\n")
-            : [combinedInstructions, TOOL_USAGE_GUIDELINES].join("\n\n");
-        }
+        // Model already knows how to call tools from tool descriptions
+        // No need to add extra instructions to system prompt
       }
     } catch (error) {
       params.logger.error("Failed to load tools from registry", {
@@ -998,8 +1149,15 @@ class AiStreamRepository implements IAiStreamRepository {
 
       case "edit":
         if (isIncognito) {
-          // For incognito, use data as-is
-          operationResult = this.handleSendOperation(data);
+          // For incognito mode, the client must pass the correct parentId directly
+          // The client looks up the source message and passes its parentId
+          // This creates a sibling branch with the same parent as the source message
+          operationResult = {
+            threadId: data.threadId!,
+            parentMessageId: data.parentMessageId,
+            content: data.content,
+            role: data.role,
+          };
         } else {
           const editResult = await this.handleEditOperation(
             data,
@@ -1184,15 +1342,24 @@ class AiStreamRepository implements IAiStreamRepository {
       const encoder = new TextEncoder();
       // Bind methods to preserve 'this' context in async callback
       const deductCredits = this.deductCreditsAfterCompletion.bind(this);
-      const createAiMessagePlaceholder =
-        this.createAiMessagePlaceholder.bind(this);
+      const createTextMessage = this.createTextMessage.bind(this);
+      const updateMessageContent = this.updateMessageContent.bind(this);
+      const createToolMessage = this.createToolMessage.bind(this);
+      const createErrorMessage = this.createErrorMessage.bind(this);
+
+      // Track parent/depth/sequence for error handling (accessible in catch block)
+      let lastParentId: string | null = null;
+      let lastDepth = 0;
+      let lastSequenceId: string | null = null;
+      let lastSequenceIndex = 0;
+
       const stream = new ReadableStream({
         async start(controller): Promise<void> {
           try {
-            logger.info("[AI Stream] ⏱️ Stream start() called");
+            logger.debug("Stream start() called");
             // Emit thread-created event if new thread
             if (threadResult.isNew) {
-              logger.debug("[DEBUG] Emitting THREAD_CREATED event", {
+              logger.debug("Emitting THREAD_CREATED event", {
                 threadId: threadResult.threadId,
                 rootFolderId: data.rootFolderId,
               });
@@ -1203,12 +1370,12 @@ class AiStreamRepository implements IAiStreamRepository {
                 subFolderId: data.subFolderId || null,
               });
               controller.enqueue(encoder.encode(formatSSEEvent(threadEvent)));
-              logger.debug("[DEBUG] THREAD_CREATED event emitted", {
+              logger.debug("THREAD_CREATED event emitted", {
                 threadId: threadResult.threadId,
               });
             } else {
               logger.debug(
-                "[DEBUG] Thread already exists, not emitting THREAD_CREATED",
+                "Thread already exists, not emitting THREAD_CREATED",
                 {
                   threadId: threadResult.threadId,
                   isNew: threadResult.isNew,
@@ -1223,7 +1390,7 @@ class AiStreamRepository implements IAiStreamRepository {
               data.operation !== "retry"
             ) {
               // Emit user message-created event
-              logger.debug("[DEBUG] Emitting USER MESSAGE_CREATED event", {
+              logger.debug("Emitting USER MESSAGE_CREATED event", {
                 messageId: userMessageId,
                 threadId: threadResult.threadId,
                 parentId: effectiveParentMessageId || null,
@@ -1237,17 +1404,16 @@ class AiStreamRepository implements IAiStreamRepository {
                 content: effectiveContent,
               });
               const userMessageEventString = formatSSEEvent(userMessageEvent);
-              logger.debug("[DEBUG] USER MESSAGE_CREATED event formatted", {
+              logger.debug("USER MESSAGE_CREATED event formatted", {
                 messageId: userMessageId,
-                eventString: userMessageEventString.substring(0, 200),
               });
               controller.enqueue(encoder.encode(userMessageEventString));
-              logger.debug("[DEBUG] USER MESSAGE_CREATED event emitted", {
+              logger.debug("USER MESSAGE_CREATED event emitted", {
                 messageId: userMessageId,
               });
             } else {
               logger.debug(
-                "[DEBUG] Skipping USER MESSAGE_CREATED event for answer-as-ai operation",
+                "Skipping USER MESSAGE_CREATED event for answer-as-ai operation",
                 {
                   messageId: userMessageId,
                 },
@@ -1270,19 +1436,33 @@ class AiStreamRepository implements IAiStreamRepository {
             // (if there's reasoning, the AI message should be a child of the reasoning message)
 
             // Start streaming
-            let fullContent = "";
-            let fullReasoningContent = "";
-            let hasReasoning = false; // Track if we have reasoning to chain messages properly
-            let aiMessageCreated = false; // Track if we've emitted the AI message-created event
+            // NEW ARCHITECTURE: Single ASSISTANT message with inline <think> tags
+            // Only interrupted by tool calls
+            let currentAssistantMessageId: string | null = null; // Current ASSISTANT message being streamed
+            let currentAssistantContent = ""; // Accumulated content (reasoning + text with <think> tags inline)
+            let currentToolMessageId: string | null = null; // Current tool message being processed
+            let currentToolCallData: {
+              toolCall: ToolCall;
+              parentId: string | null;
+              depth: number;
+              sequenceIndex: number;
+            } | null = null; // Tool call data (stored until result arrives)
+            let isInReasoningBlock = false; // Track if we're inside <think></think> tags
 
             // Track message sequencing - all messages in this response share the same sequenceId
-            const sequenceId = aiMessageId; // First message ID becomes the sequence ID
+            const sequenceId = crypto.randomUUID(); // Generate independent sequence ID
             let sequenceIndex = 0; // Current position in sequence
 
             // Track the current parent for chaining messages
             // This gets updated as we create reasoning messages and tool calls
             let currentParentId = initialAiParentId;
             let currentDepth = initialAiDepth;
+
+            // Update last known values for error handling
+            lastSequenceId = sequenceId;
+            lastParentId = currentParentId;
+            lastDepth = currentDepth;
+            lastSequenceIndex = sequenceIndex;
 
             // Get the OpenRouter model ID (use openRouterModel if available, otherwise use model ID directly)
             const openRouterModelId =
@@ -1326,10 +1506,6 @@ class AiStreamRepository implements IAiStreamRepository {
             });
             logger.info("[AI Stream] ⏱️ streamText returned, starting iteration");
 
-            // Collect tool calls during streaming
-            // NEW ARCHITECTURE: All tool calls are stored in this array and saved to assistant message metadata
-            const collectedToolCalls: ToolCall[] = [];
-
             // Lazy load endpoint metadata only when tool calls are encountered
             // This avoids loading all 143 endpoints when no tools are used
             let endpointMap: Map<string, DiscoveredEndpoint> | null = null;
@@ -1355,59 +1531,11 @@ class AiStreamRepository implements IAiStreamRepository {
             // Stream the response
             logger.info("[AI Stream] ⏱️ Starting to process fullStream");
 
-            // Create initial ASSISTANT message immediately so it shows before any tool calls
-            logger.debug("[DEBUG] Creating initial ASSISTANT message", {
-              messageId: aiMessageId,
-              threadId: threadResult.threadId,
-              parentId: currentParentId,
-              depth: currentDepth,
-              sequenceIndex,
-            });
-
-            const initialMessageEvent = createStreamEvent.messageCreated({
-              messageId: aiMessageId,
-              threadId: threadResult.threadId,
-              role: ChatMessageRole.ASSISTANT,
-              content: "",
-              parentId: currentParentId,
-              depth: currentDepth,
-              model: data.model,
-              persona: data.persona ?? undefined,
-              sequenceId,
-              sequenceIndex,
-            });
-            controller.enqueue(encoder.encode(formatSSEEvent(initialMessageEvent)));
-            aiMessageCreated = true;
-
-            // Save to database if not incognito
-            if (!isIncognito && userId) {
-              await createAiMessagePlaceholder({
-                messageId: aiMessageId,
-                threadId: threadResult.threadId,
-                parentId: currentParentId,
-                depth: currentDepth,
-                userId,
-                model: data.model,
-                persona: data.persona ?? undefined,
-                sequenceId,
-                sequenceIndex,
-                logger,
-              });
-            }
+            // NEW ARCHITECTURE: Don't create initial message
+            // Messages are created on-demand as content arrives (reasoning, text, tool calls)
 
             logger.info("[AI Stream] ⏱️ Entering for-await loop");
             for await (const part of streamResult.fullStream) {
-              // Log event type prominently
-              if (part.type === "text-delta") {
-                logger.info("[AI Stream] ⏱️ TEXT-DELTA", {
-                  text: "text" in part ? String(part.text) : undefined,
-                });
-              } else {
-                logger.info("[AI Stream] Event", {
-                  type: part.type,
-                  hasToolName: "toolName" in part,
-                });
-              }
 
               if (part.type === "start-step") {
                 logger.info("[AI Stream] Step started", {
@@ -1428,33 +1556,76 @@ class AiStreamRepository implements IAiStreamRepository {
                   textDelta !== null &&
                   textDelta !== ""
                 ) {
-                  // NEW ARCHITECTURE: Continue accumulating content in the same assistant message
-                  // Do NOT create new messages after tool calls
-                  // Do NOT reset fullContent
+                  // NEW ARCHITECTURE: Add text to current ASSISTANT message (or create if doesn't exist)
+                  if (!currentAssistantMessageId) {
+                    // Generate new message ID for ASSISTANT message
+                    currentAssistantMessageId = crypto.randomUUID();
+                    currentAssistantContent = textDelta;
 
-                  // Accumulate the content
-                  fullContent += textDelta;
+                    // Emit MESSAGE_CREATED event
+                    const messageEvent = createStreamEvent.messageCreated({
+                      messageId: currentAssistantMessageId,
+                      threadId: threadResult.threadId,
+                      role: ChatMessageRole.ASSISTANT,
+                      content: textDelta,
+                      parentId: currentParentId,
+                      depth: currentDepth,
+                      model: data.model,
+                      persona: data.persona ?? undefined,
+                      sequenceId,
+                      sequenceIndex,
+                    });
+                    controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
+
+                    // Save ASSISTANT message to database if not incognito
+                    if (!isIncognito && userId) {
+                      await createTextMessage({
+                        messageId: currentAssistantMessageId,
+                        threadId: threadResult.threadId,
+                        content: textDelta,
+                        parentId: currentParentId,
+                        depth: currentDepth,
+                        userId,
+                        model: data.model,
+                        persona: data.persona ?? undefined,
+                        sequenceId,
+                        sequenceIndex,
+                        logger,
+                      });
+                    }
+
+                    logger.debug("ASSISTANT message created", {
+                      messageId: currentAssistantMessageId,
+                      sequenceIndex,
+                    });
+                  } else {
+                    // Accumulate content
+                    currentAssistantContent += textDelta;
+                  }
 
                   // Emit content-delta event
                   const deltaEvent = createStreamEvent.contentDelta({
-                    messageId: aiMessageId,
+                    messageId: currentAssistantMessageId,
                     delta: textDelta,
                   });
                   controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
-                  logger.info("[AI Stream] ⏱️ → UI", { delta: textDelta });
                 }
               } else if (part.type === "reasoning-start") {
-                // Reasoning starts - emit opening <think> tag to UI
-                fullReasoningContent = "";
-                hasReasoning = true;
+                // NEW ARCHITECTURE: Add <think> tag inline to current ASSISTANT message
+                isInReasoningBlock = true;
+                const thinkTag = "<think>";
 
-                // Ensure AI message exists before emitting reasoning
-                if (!aiMessageCreated) {
+                // Create ASSISTANT message if it doesn't exist yet
+                if (!currentAssistantMessageId) {
+                  currentAssistantMessageId = crypto.randomUUID();
+                  currentAssistantContent = thinkTag;
+
+                  // Emit MESSAGE_CREATED event
                   const messageEvent = createStreamEvent.messageCreated({
-                    messageId: aiMessageId,
+                    messageId: currentAssistantMessageId,
                     threadId: threadResult.threadId,
                     role: ChatMessageRole.ASSISTANT,
-                    content: "",
+                    content: thinkTag,
                     parentId: currentParentId,
                     depth: currentDepth,
                     model: data.model,
@@ -1464,10 +1635,12 @@ class AiStreamRepository implements IAiStreamRepository {
                   });
                   controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
 
+                  // Save ASSISTANT message to database if not incognito
                   if (!isIncognito && userId) {
-                    await createAiMessagePlaceholder({
-                      messageId: aiMessageId,
+                    await createTextMessage({
+                      messageId: currentAssistantMessageId,
                       threadId: threadResult.threadId,
+                      content: thinkTag,
                       parentId: currentParentId,
                       depth: currentDepth,
                       userId,
@@ -1479,54 +1652,100 @@ class AiStreamRepository implements IAiStreamRepository {
                     });
                   }
 
-                  aiMessageCreated = true;
-                }
+                  logger.debug("ASSISTANT message created with reasoning", {
+                    messageId: currentAssistantMessageId,
+                    sequenceIndex,
+                  });
+                } else {
+                  // Add <think> tag to existing message
+                  currentAssistantContent += thinkTag;
 
-                // Emit opening <think> tag as content delta
-                const thinkOpenDelta = createStreamEvent.contentDelta({
-                  messageId: aiMessageId,
-                  delta: "<think>",
-                });
-                controller.enqueue(encoder.encode(formatSSEEvent(thinkOpenDelta)));
-                fullContent += "<think>";
+                  // Emit delta for <think> tag
+                  const deltaEvent = createStreamEvent.contentDelta({
+                    messageId: currentAssistantMessageId,
+                    delta: thinkTag,
+                  });
+                  controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
+                }
 
                 logger.info("[AI Stream] ⏱️ Reasoning started → <think>");
               } else if (part.type === "reasoning-delta") {
-                // Emit reasoning text as content deltas (inside <think> tags)
+                // NEW ARCHITECTURE: Add reasoning text inline to current ASSISTANT message
                 const reasoningText = "text" in part ? part.text : "";
 
                 if (
                   reasoningText !== undefined &&
                   reasoningText !== null &&
-                  reasoningText !== ""
+                  reasoningText !== "" &&
+                  currentAssistantMessageId
                 ) {
-                  fullReasoningContent += reasoningText;
-                  fullContent += reasoningText;
+                  // Accumulate content
+                  currentAssistantContent += reasoningText;
 
-                  // Emit as regular content delta (it's inside <think> tags)
+                  // Emit content delta
                   const deltaEvent = createStreamEvent.contentDelta({
-                    messageId: aiMessageId,
+                    messageId: currentAssistantMessageId,
                     delta: reasoningText,
                   });
                   controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
-
-                  logger.info("[AI Stream] ⏱️ REASONING → UI", {
-                    delta: reasoningText.substring(0, 50),
-                  });
                 }
               } else if (part.type === "reasoning-end") {
-                // Emit closing </think> tag as content delta
-                const thinkCloseDelta = createStreamEvent.contentDelta({
-                  messageId: aiMessageId,
-                  delta: "</think>",
-                });
-                controller.enqueue(encoder.encode(formatSSEEvent(thinkCloseDelta)));
-                fullContent += "</think>";
+                // NEW ARCHITECTURE: Add </think> tag inline to current ASSISTANT message
+                if (currentAssistantMessageId && isInReasoningBlock) {
+                  const thinkCloseTag = "</think>";
 
-                logger.info("[AI Stream] ⏱️ Reasoning ended → </think>", {
-                  totalLength: fullReasoningContent.length,
-                });
+                  // Add closing tag
+                  currentAssistantContent += thinkCloseTag;
+
+                  // Emit closing tag delta
+                  const thinkCloseDelta = createStreamEvent.contentDelta({
+                    messageId: currentAssistantMessageId,
+                    delta: thinkCloseTag,
+                  });
+                  controller.enqueue(encoder.encode(formatSSEEvent(thinkCloseDelta)));
+
+                  isInReasoningBlock = false;
+
+                  logger.info("[AI Stream] ⏱️ Reasoning ended → </think>", {
+                    messageId: currentAssistantMessageId,
+                    contentLength: currentAssistantContent.length,
+                  });
+                }
               } else if (part.type === "tool-call") {
+                // NEW ARCHITECTURE: Finalize current ASSISTANT message before creating tool message
+                if (currentAssistantMessageId && currentAssistantContent) {
+                  // Update ASSISTANT message in database with accumulated content
+                  if (!isIncognito && userId) {
+                    await updateMessageContent({
+                      messageId: currentAssistantMessageId,
+                      content: currentAssistantContent,
+                      logger,
+                    });
+                  }
+
+                  logger.debug("Finalized ASSISTANT message before tool call", {
+                    messageId: currentAssistantMessageId,
+                    contentLength: currentAssistantContent.length,
+                  });
+
+                  // Increment sequence index for tool message
+                  sequenceIndex++;
+
+                  // Update parent chain: tool message should be child of ASSISTANT message
+                  currentParentId = currentAssistantMessageId;
+                  currentDepth++;
+
+                  // Update last known values for error handling
+                  lastParentId = currentParentId;
+                  lastDepth = currentDepth;
+                  lastSequenceIndex = sequenceIndex;
+
+                  // Clear current ASSISTANT message (tool call interrupts it)
+                  currentAssistantMessageId = null;
+                  currentAssistantContent = "";
+                  isInReasoningBlock = false;
+                }
+
                 // Lazy load endpoint metadata only when tool calls are encountered
                 const map = await getEndpointMap();
                 const endpoint = map.get(part.toolName);
@@ -1571,7 +1790,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   widgetMetadata = undefined;
                 }
 
-                // Collect tool call for database storage
+                // Validate and prepare tool call data
                 const rawArgs = "input" in part ? part.input : {};
                 const validatedArgs: ToolCallResult = isValidToolResult(rawArgs)
                   ? rawArgs
@@ -1585,19 +1804,35 @@ class AiStreamRepository implements IAiStreamRepository {
                   creditsUsed: endpoint?.definition.credits ?? 0,
                   widgetMetadata,
                 };
-                collectedToolCalls.push(toolCallData);
 
-                logger.info("[AI Stream] Tool call received", {
-                  toolName: part.toolName,
-                  argsStringified: JSON.stringify(validatedArgs),
-                  toolCallsCount: collectedToolCalls.length,
+                // NEW ARCHITECTURE: Emit MESSAGE_CREATED for UI, but DON'T store in DB yet
+                // DB storage happens only when tool-result arrives
+                currentToolMessageId = crypto.randomUUID();
+
+                // Store tool call data for later (when result arrives)
+                currentToolCallData = {
+                  toolCall: toolCallData,
+                  parentId: currentParentId,
+                  depth: currentDepth,
+                  sequenceIndex,
+                };
+
+                // Emit MESSAGE_CREATED event for UI (immediate feedback)
+                const toolMessageEvent = createStreamEvent.messageCreated({
+                  messageId: currentToolMessageId,
+                  threadId: threadResult.threadId,
+                  role: ChatMessageRole.TOOL,
+                  content: "",
+                  parentId: currentParentId,
+                  depth: currentDepth,
+                  sequenceId,
+                  sequenceIndex,
                 });
+                controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
 
-                // NEW ARCHITECTURE: Single message with tool calls in metadata
-                // BUT: Stream tool calls immediately for real-time UX
-                // Emit TOOL_CALL event so UI can show tool execution in real-time
+                // Emit TOOL_CALL event for real-time UX
                 const toolCallEvent = createStreamEvent.toolCall({
-                  messageId: aiMessageId, // Use assistant message ID
+                  messageId: currentToolMessageId,
                   toolName: toolCallData.toolName,
                   args: toolCallData.args,
                 });
@@ -1605,18 +1840,21 @@ class AiStreamRepository implements IAiStreamRepository {
                   encoder.encode(formatSSEEvent(toolCallEvent)),
                 );
 
-                logger.info("[AI Stream] Tool call streamed to UI", {
-                  messageId: aiMessageId,
-                  toolName: toolCallData.toolName,
-                  toolCallsCount: collectedToolCalls.length,
+                logger.info("[AI Stream] Tool call started (UI notified, DB storage pending)", {
+                  messageId: currentToolMessageId,
+                  toolName: part.toolName,
+                  sequenceIndex,
                 });
-              } else if (part.type === "tool-result") {
-                // Handle tool results - update the corresponding tool call with result and widget metadata
-                const toolCallIndex = collectedToolCalls.findIndex(
-                  (tc) => tc.toolName === part.toolName,
-                );
 
-                if (toolCallIndex !== -1) {
+                // Increment sequence index for next message
+                sequenceIndex++;
+
+                // Update parent chain: next message should be child of this tool message
+                currentParentId = currentToolMessageId;
+                currentDepth++;
+              } else if (part.type === "tool-result") {
+                // NEW ARCHITECTURE: NOW store TOOL message in DB with result
+                if (currentToolMessageId && currentToolCallData) {
                   // AI SDK returns 'output' as unknown type
                   const output = "output" in part ? part.output : undefined;
 
@@ -1635,15 +1873,11 @@ class AiStreamRepository implements IAiStreamRepository {
                     "success" in output &&
                     "error" in output
                   ) {
-
                     if (output.success === false) {
                       toolError =
-
                         typeof output.error === "string"
-                          ?
-                          (output.error as string)
-                          :
-                          JSON.stringify(output.error);
+                          ? (output.error as string)
+                          : JSON.stringify(output.error);
                     }
                   }
 
@@ -1656,10 +1890,52 @@ class AiStreamRepository implements IAiStreamRepository {
                   const validatedOutput: ToolCallResult | undefined =
                     isValidToolResult(cleanedOutput) ? cleanedOutput : undefined;
 
-                  collectedToolCalls[toolCallIndex].result = validatedOutput;
-                  collectedToolCalls[toolCallIndex].error = toolError;
+                  // If error, create ERROR message first (proper timestamp order)
+                  if (toolError && !isIncognito && userId) {
+                    const errorMessageId = crypto.randomUUID();
+                    await createErrorMessage({
+                      messageId: errorMessageId,
+                      threadId: threadResult.threadId,
+                      content: toolError,
+                      errorType: "TOOL_ERROR",
+                      parentId: currentToolCallData.parentId,
+                      depth: currentToolCallData.depth,
+                      userId,
+                      sequenceId,
+                      sequenceIndex: currentToolCallData.sequenceIndex - 0.5, // Insert before tool message
+                      logger,
+                    });
 
-                  logger.info("[AI Stream] Tool result validated", {
+                    logger.info("[AI Stream] ERROR message created for tool error", {
+                      errorMessageId,
+                      toolError,
+                    });
+                  }
+
+                  // NOW create TOOL message in DB with result/error
+                  if (!isIncognito && userId) {
+                    // Add result to tool call data
+                    const toolCallWithResult: ToolCall = {
+                      ...currentToolCallData.toolCall,
+                      result: validatedOutput,
+                      error: toolError,
+                    };
+
+                    await createToolMessage({
+                      messageId: currentToolMessageId,
+                      threadId: threadResult.threadId,
+                      toolCall: toolCallWithResult,
+                      parentId: currentToolCallData.parentId,
+                      depth: currentToolCallData.depth,
+                      userId,
+                      sequenceId,
+                      sequenceIndex: currentToolCallData.sequenceIndex,
+                      logger,
+                    });
+                  }
+
+                  logger.info("[AI Stream] Tool result validated and saved to DB", {
+                    messageId: currentToolMessageId,
                     toolName: part.toolName,
                     hasResult: !!validatedOutput,
                     hasError: !!toolError,
@@ -1668,11 +1944,9 @@ class AiStreamRepository implements IAiStreamRepository {
                     wasCleaned: output !== cleanedOutput,
                   });
 
-                  // NEW ARCHITECTURE: Tool results stored in collectedToolCalls array
-                  // BUT: Stream results immediately for real-time UX
-                  // Emit TOOL_RESULT event so UI can update tool call state immediately
+                  // Emit TOOL_RESULT event for real-time UX
                   const toolResultEvent = createStreamEvent.toolResult({
-                    messageId: aiMessageId, // Use assistant message ID
+                    messageId: currentToolMessageId,
                     toolName: part.toolName,
                     result: validatedOutput,
                   });
@@ -1680,8 +1954,11 @@ class AiStreamRepository implements IAiStreamRepository {
                     encoder.encode(formatSSEEvent(toolResultEvent)),
                   );
 
+                  // Clear current tool message tracking
+                  currentToolMessageId = null;
+                  currentToolCallData = null;
+
                   logger.info("[AI Stream] Tool result streamed to UI", {
-                    messageId: aiMessageId,
                     toolName: part.toolName,
                     hasResult: !!validatedOutput,
                     hasError: !!toolError,
@@ -1696,92 +1973,50 @@ class AiStreamRepository implements IAiStreamRepository {
               }
             }
 
-            logger.info("[AI Stream] Finished processing fullStream", {
-              totalContentLength: fullContent.length,
-              toolCallsCount: collectedToolCalls.length,
-            });
+            logger.info("[AI Stream] Finished processing fullStream");
 
-            // Wait for completion
-            const [finishReason, usage, steps] = await Promise.all([
-              streamResult.finishReason,
-              streamResult.usage,
-              streamResult.steps,
-            ]);
+            // NEW ARCHITECTURE: Finalize current ASSISTANT message if exists
+            if (currentAssistantMessageId && currentAssistantContent) {
+              // Emit CONTENT_DONE event for ASSISTANT message
+              // Wait for completion first to get tokens and finishReason
+              const [finishReason, usage] = await Promise.all([
+                streamResult.finishReason,
+                streamResult.usage,
+              ]);
 
-            logger.info("[AI Stream] Stream completed", {
-              finishReason,
-              totalTokens: usage.totalTokens,
-              stepsCount: steps.length,
-              hasReasoning,
-              reasoningLength: fullReasoningContent.length,
-              stepsDetails: steps.map((step, index) => ({
-                stepNumber: index + 1,
-                hasText: !!step.text,
-                textLength: step.text?.length || 0,
-                toolCallsCount: step.toolCalls.length,
-                toolResultsCount: step.toolResults.length,
-                finishReason: step.finishReason,
-              })),
-            });
+              const contentDoneEvent = createStreamEvent.contentDone({
+                messageId: currentAssistantMessageId,
+                content: currentAssistantContent,
+                totalTokens: usage.totalTokens ?? null,
+                finishReason: finishReason || null,
+              });
+              controller.enqueue(encoder.encode(formatSSEEvent(contentDoneEvent)));
 
-            // Don't inject <think> tags - the model does that on its own
-            // Just use the content as-is
-            const finalContent = fullContent;
+              // Update ASSISTANT message in database with final content and tokens
+              if (!isIncognito && userId) {
+                await db
+                  .update(chatMessages)
+                  .set({
+                    content: currentAssistantContent,
+                    tokens: usage.totalTokens,
+                    updatedAt: new Date(),
+                  })
+                  .where(eq(chatMessages.id, currentAssistantMessageId));
+              }
 
-            // Update AI message with final content (if not incognito)
-            if (!isIncognito && userId) {
-              const metadata: MessageMetadata = {
-                totalTokens: usage.totalTokens,
-                finishReason: (finishReason ?? "unknown") as string,
-                ...(collectedToolCalls.length > 0
-                  ? {
-                    toolCalls: collectedToolCalls,
-                  }
-                  : {}),
-              };
-
-              await db
-                .update(chatMessages)
-                .set({
-                  content: finalContent,
-                  tokens: usage.totalTokens,
-                  metadata,
-                  updatedAt: new Date(),
-                })
-                .where(eq(chatMessages.id, aiMessageId));
-
-              logger.info("Updated AI message with final content", {
-                messageId: aiMessageId,
-                contentLength: finalContent.length,
+              logger.info("Finalized ASSISTANT message", {
+                messageId: currentAssistantMessageId,
+                contentLength: currentAssistantContent.length,
                 tokens: usage.totalTokens,
-                toolCallsCount: collectedToolCalls.length,
-                toolCallsWithWidgetMetadata: collectedToolCalls.filter(
-                  (tc) => tc.widgetMetadata,
-                ).length,
               });
             }
 
-            // Emit content-done event with tool calls
-            logger.info("[AI Stream] Sending contentDone event", {
-              messageId: aiMessageId,
-              toolCallsCount: collectedToolCalls.length,
-              hasResults: collectedToolCalls.some((tc) => tc.result !== undefined),
-              toolCalls: collectedToolCalls.map((tc) => ({
-                toolName: tc.toolName,
-                hasResult: !!tc.result,
-                hasError: !!tc.error,
-              })),
-            });
+            // Wait for completion to get final usage stats
+            const usage = await streamResult.usage;
 
-            const doneEvent = createStreamEvent.contentDone({
-              messageId: aiMessageId,
-              content: finalContent,
-              totalTokens: usage.totalTokens ?? null,
-              finishReason: finishReason || null,
-              toolCalls:
-                collectedToolCalls.length > 0 ? collectedToolCalls : undefined,
+            logger.info("[AI Stream] Stream completed", {
+              totalTokens: usage.totalTokens,
             });
-            controller.enqueue(encoder.encode(formatSSEEvent(doneEvent)));
 
             // Deduct credits AFTER successful completion (not optimistically)
             await deductCredits({
@@ -1797,7 +2032,37 @@ class AiStreamRepository implements IAiStreamRepository {
               error instanceof Error ? error.message : String(error);
             logger.error("Stream error", { error: errorMessage });
 
-            // Emit error event
+            // NEW ARCHITECTURE: Create ERROR message in DB/localStorage
+            const errorMessageId = crypto.randomUUID();
+            if (!isIncognito && userId) {
+              await createErrorMessage({
+                messageId: errorMessageId,
+                threadId: threadResult.threadId,
+                content: `Stream error: ${errorMessage}`,
+                errorType: "STREAM_ERROR",
+                parentId: lastParentId,
+                depth: lastDepth,
+                userId,
+                sequenceId: lastSequenceId,
+                sequenceIndex: lastSequenceIndex,
+                logger,
+              });
+            }
+
+            // Emit ERROR message event for UI
+            const errorMessageEvent = createStreamEvent.messageCreated({
+              messageId: errorMessageId,
+              threadId: threadResult.threadId,
+              role: ChatMessageRole.ERROR,
+              content: `Stream error: ${errorMessage}`,
+              parentId: lastParentId,
+              depth: lastDepth,
+              sequenceId: lastSequenceId,
+              sequenceIndex: lastSequenceIndex,
+            });
+            controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
+
+            // Also emit legacy error event for compatibility
             const errorEvent = createStreamEvent.error({
               code: "STREAM_ERROR",
               message: errorMessage,

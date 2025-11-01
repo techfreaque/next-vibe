@@ -3,7 +3,6 @@ import * as React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import type { WithClassName } from "../lib/types";
 import { cn } from "../lib/utils";
 import { X } from "./icons/X";
 
@@ -70,7 +69,7 @@ const DialogClose = DialogPrimitive.Close;
 
 const DialogOverlayWeb = React.forwardRef<
   DialogPrimitive.OverlayRef,
-  DialogPrimitive.OverlayProps
+  DialogPrimitive.OverlayProps & { className?: string }
 >(({ className, ...props }, ref) => {
   const { open } = DialogPrimitive.useRootContext();
   return (
@@ -92,7 +91,7 @@ DialogOverlayWeb.displayName = "DialogOverlayWeb";
 
 const DialogOverlayNative = React.forwardRef<
   DialogPrimitive.OverlayRef,
-  DialogPrimitive.OverlayProps
+  DialogPrimitive.OverlayProps & { className?: string }
 >(({ className, children, ...props }, ref) => {
   const renderChildren = () => {
     if (typeof children === "function") {
@@ -130,7 +129,7 @@ const DialogOverlay = Platform.select({
 
 const DialogContent = React.forwardRef<
   DialogPrimitive.ContentRef,
-  DialogPrimitive.ContentProps & { portalHost?: string }
+  DialogPrimitive.ContentProps & { portalHost?: string; className?: string }
 >(({ className, children, portalHost, ...props }, ref) => {
   const { open } = DialogPrimitive.useRootContext();
   return (
@@ -195,7 +194,7 @@ DialogFooter.displayName = "DialogFooter";
 
 const DialogTitle = React.forwardRef<
   DialogPrimitive.TitleRef,
-  WithClassName<DialogPrimitive.TitleProps>
+  DialogPrimitive.TitleProps & { className?: string }
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
@@ -210,7 +209,7 @@ DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
 const DialogDescription = React.forwardRef<
   DialogPrimitive.DescriptionRef,
-  WithClassName<DialogPrimitive.DescriptionProps>
+  DialogPrimitive.DescriptionProps & { className?: string }
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}

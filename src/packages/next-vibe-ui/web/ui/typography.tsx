@@ -10,6 +10,7 @@ export interface TypographyProps {
   children?: React.ReactNode;
 }
 
+// Web-specific prop types
 export interface H1Props extends ComponentPropsWithoutRef<"h1">, TypographyProps {}
 export interface H2Props extends ComponentPropsWithoutRef<"h2">, TypographyProps {}
 export interface H3Props extends ComponentPropsWithoutRef<"h3">, TypographyProps {}

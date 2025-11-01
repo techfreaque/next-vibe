@@ -59,6 +59,12 @@ export interface DrawerDescriptionProps {
   children?: React.ReactNode;
 }
 
+// Internal context type for cross-platform usage
+export interface DrawerContextValue {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
+
 const Drawer = ({
   shouldScaleBackground = true,
   ...props

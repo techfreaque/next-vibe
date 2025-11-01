@@ -1,4 +1,6 @@
 import {
+  MoonIcon,
+  ShieldOffIcon,
   SiAlibabadotcom,
   SiAnthropic,
   SiGooglegemini,
@@ -6,8 +8,7 @@ import {
   SiOpenai,
   SiX,
   SiZendesk,
-} from "@icons-pack/react-simple-icons";
-import { MoonIcon, ShieldOffIcon } from "lucide-react";
+} from "next-vibe-ui/ui/icons";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 

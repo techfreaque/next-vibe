@@ -62,6 +62,8 @@ import {
   FormLabel,
   FormMessage,
 } from "./form";
+import { Div } from "../div";
+import { Span } from "../span";
 
 // Default theme for required fields
 const DEFAULT_THEME: RequiredFieldTheme = {
@@ -90,9 +92,9 @@ function getFieldValidationState<T>(
 ): FieldValidationState {
   const hasValue = Boolean(
     fieldValue !== undefined &&
-      fieldValue !== null &&
-      fieldValue !== "" &&
-      (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
+    fieldValue !== null &&
+    fieldValue !== "" &&
+    (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
   );
 
   return {
@@ -279,15 +281,15 @@ function renderLabel(
   const { style } = theme;
 
   return config.label ? (
-    <div className="flex items-center gap-2">
-      <span className={labelClassName}>
+    <Div className="flex items-center gap-2">
+      <Span className={labelClassName}>
         {t(config.label)}
         {style === "asterisk" && isRequired && (
-          <span className="text-blue-600 dark:text-blue-400 ml-1 font-bold">
+          <Span className="text-blue-600 dark:text-blue-400 ml-1 font-bold">
             *
-          </span>
+          </Span>
         )}
-      </span>
+      </Span>
       {style === "badge" && isRequired && (
         <Badge
           variant="secondary"
@@ -296,7 +298,7 @@ function renderLabel(
           {t("packages.nextVibeUi.web.common.required")}
         </Badge>
       )}
-    </div>
+    </Div>
   ) : null;
 }
 
@@ -321,49 +323,41 @@ function renderFieldInput<
     case "password":
       return (
         <Input
-          name={field.name}
           value={String(field.value || "")}
-          onChange={(e) => field.onChange(e.target.value)}
+          onChangeText={(text: string) => field.onChange(text)}
           onBlur={field.onBlur}
-          type={config.type}
           placeholder={config.placeholder ? t(config.placeholder) : undefined}
           disabled={disabled || config.disabled}
-          className={cn(inputClassName, "h-10")}
+          className={inputClassName}
         />
       );
 
     case "number":
       return (
         <Input
-          name={field.name}
           value={String(field.value || "")}
-          onChange={(e) => {
-            const value = e.target.value;
+          onChangeText={(text: string) => {
             // Convert to number if it's a valid number, otherwise keep as string for validation
-            const numValue = value === "" ? "" : Number(value);
-            field.onChange(Number.isNaN(numValue as number) ? value : numValue);
+            const numValue = text === "" ? "" : Number(text);
+            field.onChange(Number.isNaN(numValue as number) ? text : numValue);
           }}
           onBlur={field.onBlur}
-          type="number"
-          min={config.min}
-          max={config.max}
-          step={config.step}
+          keyboardType="numeric"
           placeholder={config.placeholder ? t(config.placeholder) : undefined}
           disabled={disabled || config.disabled}
-          className={cn(inputClassName, "h-10")}
+          className={inputClassName}
         />
       );
 
     case "textarea":
       return (
         <Textarea
-          name={field.name}
           value={String(field.value || "")}
-          onChange={(e) => field.onChange(e.target.value)}
+          onChangeText={(text: string) => field.onChange(text)}
           onBlur={field.onBlur}
-          className={cn(inputClassName, "min-h-[80px] resize-none")}
+          className={inputClassName}
           placeholder={config.placeholder ? t(config.placeholder) : undefined}
-          rows={config.rows || 3}
+          minRows={config.rows || 3}
           maxLength={config.maxLength}
           disabled={disabled || config.disabled}
         />
@@ -374,14 +368,22 @@ function renderFieldInput<
         <Select
           // Force re-render when value changes
           key={`${field.name}-${String(field.value) || "empty"}`}
-          onValueChange={(value) => field.onChange(value)}
-          value={String(field.value || "")}
+          onValueChange={(selectedOption) => {
+            // Extract the value from the Option object
+            const value = typeof selectedOption === 'string' ? selectedOption : selectedOption?.value;
+            field.onChange(value);
+          }}
+          value={
+            field.value
+              ? { value: String(field.value), label: String(field.value) }
+              : undefined
+          }
           disabled={disabled || config.disabled}
         >
           <SelectTrigger className={cn(inputClassName, "h-10")}>
             <SelectValue
               placeholder={
-                config.placeholder ? t(config.placeholder) : undefined
+                config.placeholder ? t(config.placeholder) : ""
               }
             />
           </SelectTrigger>
@@ -390,6 +392,7 @@ function renderFieldInput<
               <SelectItem
                 key={option.value ?? `${OPTION_KEY_PREFIX}${index}`}
                 value={option.value ?? ""}
+                label={t(option.label, option.labelParams)}
                 disabled={option.disabled}
               >
                 {t(option.label, option.labelParams)}
@@ -401,9 +404,8 @@ function renderFieldInput<
 
     case "checkbox":
       return (
-        <div className="flex items-center space-x-3">
+        <Div className="flex items-center space-x-3">
           <Checkbox
-            id={field.name}
             checked={Boolean(field.value)}
             onCheckedChange={(checked) => field.onChange(checked)}
             disabled={disabled || config.disabled}
@@ -421,15 +423,14 @@ function renderFieldInput<
                   : null}
             </Label>
           )}
-        </div>
+        </Div>
       );
 
     case "radio":
       return (
         <RadioGroup
-          onValueChange={(value) => field.onChange(value)}
+          onValueChange={(value: string) => field.onChange(value)}
           value={String(field.value || "")}
-          disabled={disabled || config.disabled}
           className={cn(
             "flex py-2",
             config.orientation === "horizontal"
@@ -438,7 +439,7 @@ function renderFieldInput<
           )}
         >
           {config.options.map((option) => (
-            <div key={option.value} className="flex items-center space-x-3">
+            <Div key={option.value} className="flex items-center space-x-3">
               <RadioGroupItem
                 value={option.value}
                 id={`${field.name}-${option.value}`}
@@ -451,16 +452,15 @@ function renderFieldInput<
               >
                 {t(option.label)}
               </Label>
-            </div>
+            </Div>
           ))}
         </RadioGroup>
       );
 
     case "switch":
       return (
-        <div className="flex items-center space-x-3 py-2">
+        <Div className="flex items-center space-x-3 py-2">
           <Switch
-            id={field.name}
             checked={Boolean(field.value)}
             onCheckedChange={(checked) => field.onChange(checked)}
             disabled={disabled || config.disabled}
@@ -474,7 +474,7 @@ function renderFieldInput<
               {t(config.switchLabel)}
             </Label>
           )}
-        </div>
+        </Div>
       );
 
     case "date": {
@@ -501,11 +501,11 @@ function renderFieldInput<
               {dateValue ? (
                 parsedDate?.toLocaleDateString()
               ) : (
-                <span>
+                <Span>
                   {config.placeholder
                     ? t(config.placeholder)
                     : t("packages.nextVibeUi.web.common.selectDate")}
-                </span>
+                </Span>
               )}
             </Button>
           </PopoverTrigger>
@@ -514,7 +514,7 @@ function renderFieldInput<
               mode="single"
               selected={parsedDate}
               onSelect={(date) => field.onChange(date?.toISOString())}
-              disabled={(date) => {
+              disabled={(date: Date) => {
                 if (config.minDate && date < config.minDate) {
                   return true;
                 }
@@ -523,7 +523,6 @@ function renderFieldInput<
                 }
                 return false;
               }}
-
             />
           </PopoverContent>
         </Popover>
@@ -598,7 +597,7 @@ function renderFieldInput<
         : [];
 
       return (
-        <div className="space-y-2">
+        <Div className="space-y-2">
           {config.options.map((option) => {
             const isSelected = multiselectValue.includes(option.value);
             const isDisabled = disabled || config.disabled || option.disabled;
@@ -608,7 +607,7 @@ function renderFieldInput<
               multiselectValue.length <= config.maxSelections;
 
             return (
-              <div key={option.value} className="flex items-center space-x-2">
+              <Div key={option.value} className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   id={`${field.name}-${option.value}`}
@@ -631,15 +630,15 @@ function renderFieldInput<
                 >
                   {t(option.label)}
                 </label>
-              </div>
+              </Div>
             );
           })}
           {config.maxSelections && (
-            <div className="text-xs text-gray-500 mt-1">
+            <Div className="text-xs text-gray-500 mt-1">
               {multiselectValue.length} / {config.maxSelections} selected
-            </div>
+            </Div>
           )}
-        </div>
+        </Div>
       );
     }
 
@@ -647,9 +646,8 @@ function renderFieldInput<
       // Fallback for any unknown field types
       return (
         <Input
-          name={field.name}
           value={String(field.value || "")}
-          onChange={(e) => field.onChange(e.target.value)}
+          onChangeText={(text: string) => field.onChange(text)}
           onBlur={field.onBlur}
           disabled={disabled || false}
           className={cn(inputClassName, "h-10")}
@@ -703,7 +701,7 @@ export function EndpointFormField<
     // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for missing config
     throw new Error(
       `EndpointFormField: No config provided for field "${name}". ` +
-        `Either provide a config prop or pass endpointFields for auto-inference.`,
+      `Either provide a config prop or pass endpointFields for auto-inference.`,
     );
   }
 
@@ -741,13 +739,15 @@ export function EndpointFormField<
             </FormLabel>
 
             <FormControl>
-              {renderFieldInput(
-                config,
-                field,
-                styleClassName.inputClassName,
-                t,
-                config.disabled,
-              )}
+              <Div className={styleClassName.inputClassName}>
+                {renderFieldInput(
+                  config,
+                  field,
+                  styleClassName.inputClassName,
+                  t,
+                  config.disabled,
+                )}
+              </Div> 
             </FormControl>
 
             {config.description && !fieldState.error && (
@@ -757,10 +757,10 @@ export function EndpointFormField<
             )}
 
             {fieldState.error && (
-              <div className={styleClassName.errorClassName}>
+              <Div className={styleClassName.errorClassName}>
                 <AlertCircle className="h-4 w-4" />
                 <FormMessage />
-              </div>
+              </Div>
             )}
           </FormItem>
         );
@@ -797,7 +797,7 @@ export function EndpointFormFields<TFieldValues extends FieldValues>({
   fieldClassName,
 }: EndpointFormFieldsProps<TFieldValues>): JSX.Element {
   return (
-    <div className={cn("space-y-6", className)}>
+    <Div className={cn("space-y-6", className)}>
       {fields.map((fieldDef) => (
         <EndpointFormField
           key={fieldDef.name}
@@ -810,6 +810,6 @@ export function EndpointFormFields<TFieldValues extends FieldValues>({
           className={fieldClassName}
         />
       ))}
-    </div>
+    </Div>
   );
 }

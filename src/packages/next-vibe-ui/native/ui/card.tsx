@@ -1,11 +1,13 @@
-import type { TextRef, ViewRef } from "@rn-primitives/types";
 import * as React from "react";
 import type { ViewProps } from "react-native";
-import { View } from "react-native";
-
+import { Text, View } from "react-native";
 import { cn } from "../lib/utils";
 import { Span } from "./span";
 import { TextClassContext } from "./text";
+
+// Define refs inline to avoid module resolution issues
+type ViewRef = React.ElementRef<typeof View>;
+type TextRef = React.ElementRef<typeof Text>;
 
 // Cross-platform types for native - import from web
 export type {

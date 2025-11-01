@@ -12,7 +12,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 // Search tool ID from the unified-interface system
-const SEARCH_TOOL_ID = "core_agent_brave-search";
+const SEARCH_TOOL_ID = "get_v1_core_agent_brave-search";
 
 interface SearchToggleProps {
   enabledToolIds: string[];

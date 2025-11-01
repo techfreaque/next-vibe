@@ -4,9 +4,6 @@
  * NO Vercel AI SDK - custom implementation with 100% type safety
  */
 
-// eslint-disable-next-line import/no-unassigned-import
-import "client-only";
-
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useRef } from "react";
 
@@ -654,101 +651,28 @@ export function useAIStream(
               }
 
               case StreamEventType.TOOL_CALL: {
+                // NEW ARCHITECTURE: Tool calls are separate TOOL messages now
+                // TOOL_CALL event is redundant - MESSAGE_CREATED already creates the TOOL message
+                // Keep event for backward compatibility but don't process it
                 const eventData = event.data as ToolCallEventData;
-                logger.info("Tool call event received", {
+                logger.debug("Tool call event received (ignored in new architecture)", {
                   messageId: eventData.messageId,
                   toolName: eventData.toolName,
-                  args: eventData.args,
                 });
-
-                // Store tool call in the streaming message
-                // Use getState() to get the latest state (in case of batched updates)
-                const currentMessage =
-                  useAIStreamStore.getState().streamingMessages[
-                  eventData.messageId
-                  ];
-                if (currentMessage) {
-                  logger.info("[DEBUG] Adding tool call to streaming message", {
-                    messageId: eventData.messageId,
-                    toolName: eventData.toolName,
-                    currentToolCallsCount:
-                      currentMessage.toolCalls?.length ?? 0,
-                  });
-                  store.addToolCall(eventData.messageId, {
-                    toolName: eventData.toolName,
-                    displayName: eventData.toolName,
-                    args: eventData.args,
-                  });
-                  // Verify it was added
-                  const updatedMessage =
-                    useAIStreamStore.getState().streamingMessages[
-                    eventData.messageId
-                    ];
-                  logger.info("[DEBUG] Tool call added, new state", {
-                    messageId: eventData.messageId,
-                    toolCallsCount: updatedMessage?.toolCalls?.length ?? 0,
-                  });
-                } else {
-                  logger.warn(
-                    "[DEBUG] No streaming message found for tool call",
-                    {
-                      messageId: eventData.messageId,
-                    },
-                  );
-                }
 
                 options.onToolCall?.(eventData);
                 break;
               }
 
               case StreamEventType.TOOL_RESULT: {
+                // NEW ARCHITECTURE: Tool results are stored in TOOL message metadata
+                // TOOL_RESULT event is redundant - backend already updates the TOOL message
+                // Keep event for backward compatibility but don't process it
                 const eventData = event.data as ToolResultEventData;
-                logger.info("Tool result event received", {
+                logger.debug("Tool result event received (ignored in new architecture)", {
                   messageId: eventData.messageId,
                   toolName: eventData.toolName,
-                  hasResult: !!eventData.result,
                 });
-
-                // Update the tool call with the result
-                const currentMessage =
-                  useAIStreamStore.getState().streamingMessages[
-                  eventData.messageId
-                  ];
-                if (currentMessage?.toolCalls) {
-                  const toolCallIndex = currentMessage.toolCalls.findIndex(
-                    (tc) => tc.toolName === eventData.toolName,
-                  );
-                  if (toolCallIndex !== -1) {
-                    logger.info("[DEBUG] Updating tool call with result", {
-                      messageId: eventData.messageId,
-                      toolName: eventData.toolName,
-                      toolCallIndex,
-                    });
-                    // Only update if result is defined
-                    if (eventData.result !== undefined) {
-                      store.updateToolCallResult(
-                        eventData.messageId,
-                        toolCallIndex,
-                        eventData.result,
-                      );
-                    }
-                  } else {
-                    logger.warn(
-                      "[DEBUG] Tool call not found for result update",
-                      {
-                        messageId: eventData.messageId,
-                        toolName: eventData.toolName,
-                      },
-                    );
-                  }
-                } else {
-                  logger.warn(
-                    "[DEBUG] No streaming message or tool calls found for tool result",
-                    {
-                      messageId: eventData.messageId,
-                    },
-                  );
-                }
 
                 options.onToolResult?.(eventData);
                 break;
@@ -773,9 +697,8 @@ export function useAIStream(
                 const isIncognitoFromStream =
                   streamThread?.rootFolderId === "incognito";
 
-                // Use tool calls from streaming message (already added via TOOL_CALL events)
-                // DO NOT use eventData.toolCalls as that would duplicate them
-                const finalToolCalls = message?.toolCalls || null;
+                // NEW ARCHITECTURE: Tool calls are separate TOOL messages now
+                // No need to handle tool calls in CONTENT_DONE
 
                 // Check chat store asynchronously (for existing threads)
                 if (message) {
@@ -795,13 +718,9 @@ export function useAIStream(
                             "../../chat/incognito/storage"
                           );
                           logger.info(
-                            "[DEBUG] Saving incognito message with tool calls",
+                            "[DEBUG] Saving incognito message",
                             {
                               messageId: message.messageId,
-                              toolCallsCount: finalToolCalls?.length ?? 0,
-                              hasResults: finalToolCalls?.some(
-                                (tc) => tc.result !== undefined,
-                              ),
                               contentPreview: eventData.content.substring(
                                 0,
                                 50,
@@ -828,7 +747,7 @@ export function useAIStream(
                             edited: false,
                             originalId: null,
                             tokens: eventData.totalTokens ?? null,
-                            toolCalls: finalToolCalls,
+                            toolCalls: null,
                             collapsed: false,
                             metadata: {},
                             upvotes: 0,
@@ -847,7 +766,7 @@ export function useAIStream(
                             .updateMessage(message.messageId, {
                               content: eventData.content,
                               tokens: eventData.totalTokens ?? null,
-                              toolCalls: finalToolCalls,
+                              toolCalls: null,
                             });
                         } catch (storageError) {
                           logger.error("Failed to update incognito message", {
@@ -855,13 +774,13 @@ export function useAIStream(
                           });
                         }
                       } else {
-                        // Non-incognito message - update chat store with tool calls
+                        // Non-incognito message - update chat store
                         useChatStore
                           .getState()
                           .updateMessage(message.messageId, {
                             content: eventData.content,
                             tokens: eventData.totalTokens,
-                            toolCalls: finalToolCalls,
+                            toolCalls: null,
                           });
                       }
                     } catch (error) {
@@ -880,7 +799,58 @@ export function useAIStream(
               case StreamEventType.ERROR: {
                 const eventData = event.data as ErrorEventData;
                 store.setError(eventData.message);
-                // Don't create error messages as chat messages - they're displayed in the global error banner
+
+                // Create ERROR message in chat so users can see what went wrong
+                // Get the current thread ID from the active stream
+                const activeThreadId = store.threads[Object.keys(store.threads)[0]]?.threadId;
+
+                if (activeThreadId) {
+                  // Import chat store dynamically to avoid circular dependencies
+                  void import("../../chat/store")
+                    .then(({ useChatStore }) => {
+                      const errorMessageId = crypto.randomUUID();
+
+                      // Add error message to chat store
+                      useChatStore.getState().addMessage({
+                        id: errorMessageId,
+                        threadId: activeThreadId,
+                        role: ChatMessageRole.ERROR,
+                        content: eventData.message,
+                        parentId: null,
+                        depth: 0,
+                        authorId: "system",
+                        authorName: null,
+                        isAI: false,
+                        model: null,
+                        persona: null,
+                        errorType: eventData.code ?? "STREAM_ERROR",
+                        errorMessage: eventData.message,
+                        edited: false,
+                        tokens: null,
+                        toolCalls: null,
+                        upvotes: null,
+                        downvotes: null,
+                        sequenceId: null,
+                        sequenceIndex: 0,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                      });
+
+                      logger.info("Created ERROR message in chat", {
+                        messageId: errorMessageId,
+                        threadId: activeThreadId,
+                        error: eventData.message,
+                      });
+                      return;
+                    })
+                    .catch((error: Error) => {
+                      logger.error("Failed to create error message in chat", {
+                        error: parseError(error).message,
+                      });
+                      return;
+                    });
+                }
+
                 options.onError?.(eventData);
                 break;
               }

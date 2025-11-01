@@ -334,19 +334,22 @@ export function ThreadedMessage({
                         "prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline",
                       )}
                     >
-                      {/* Tool calls display */}
+                      {/* NEW ARCHITECTURE: Tool calls are separate TOOL messages now */}
+                      <Markdown content={message.content} />
+                    </Div>
+                  ) : message.role === "tool" ? (
+                    <Div>
+                      {/* NEW ARCHITECTURE: TOOL messages have toolCalls in metadata */}
                       {message.toolCalls && message.toolCalls.length > 0 && (
                         <ToolCallDisplay
                           toolCalls={message.toolCalls}
                           locale={locale}
-                          hasContent={message.content.trim().length > 0}
+                          hasContent={false}
                         />
                       )}
-
-                      <Markdown content={message.content} />
                     </Div>
                   ) : (
-                    <Div className="whitespace-pre-wrap break-words text-foreground/95">
+                    <Div className="whitespace-pre-wrap wrap-break-word text-foreground/95">
                       {message.content}
                     </Div>
                   )}

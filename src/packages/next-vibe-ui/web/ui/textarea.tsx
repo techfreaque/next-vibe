@@ -13,6 +13,11 @@ export interface TextareaBaseProps
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   minRows?: number;
   maxRows?: number;
+  // Native-specific props (optional for web)
+  placeholderClassName?: string;
+  editable?: boolean;
+  numberOfLines?: number;
+  multiline?: boolean;
 }
 
 export const textareaVariants = cva(

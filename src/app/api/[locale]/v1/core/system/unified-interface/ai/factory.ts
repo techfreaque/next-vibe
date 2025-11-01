@@ -51,6 +51,12 @@ function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
     return stripTransformsAndRefinements(schemaDef.schema as z.ZodTypeAny);
   }
 
+  // Handle ZodBranded - unwrap to underlying type
+  // This handles cases like: z.string() as z.ZodType<TranslationKey>
+  if (schemaDef.typeName === "ZodBranded" && hasProperty(schemaDef, "type")) {
+    return stripTransformsAndRefinements(schemaDef.type as z.ZodTypeAny);
+  }
+
   // Handle ZodOptional - has unwrap() method
   if (schemaDef.typeName === "ZodOptional" && hasProperty(schema, "unwrap")) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -177,40 +183,50 @@ export class ToolFactory {
 
     // Create the AI SDK CoreTool - return type is inferred from tool() function
     // The tool() function infers types from inputSchema and execute return type
-    return tool({
-      description,
-      inputSchema: parameters,
-      execute: async (params: z.infer<typeof parameters>) => {
-        // Apply the original schema (with transforms) to the params
-        // This ensures transforms like .toLowerCase().trim() are applied
-        const transformedParams = rawParameters.parse(params);
+    try {
+      return tool({
+        description,
+        inputSchema: parameters,
+        execute: async (params: z.infer<typeof parameters>) => {
+          // Apply the original schema (with transforms) to the params
+          // This ensures transforms like .toLowerCase().trim() are applied
+          const transformedParams = rawParameters.parse(params);
 
-        const executionContext: AIToolExecutionContext = {
-          toolName: endpoint.toolName,
-          // Transform validated params to tool parameter format
-          data: transformedParams as Record<string, ToolParameterValue>,
-          user: context.user,
-          locale: context.locale,
-          logger: context.logger,
-          metadata: {
-            timestamp: Date.now(),
-            endpointId: endpoint.id,
-          },
-        };
-
-        const result = await executor.execute(executionContext);
-
-        if (!result.success) {
-          return {
-            success: false,
-            error: result.error ?? "errors.toolExecutionFailed",
-            message: result.error ?? "errors.toolExecutionFailed",
+          const executionContext: AIToolExecutionContext = {
+            toolName: endpoint.toolName,
+            // Transform validated params to tool parameter format
+            data: transformedParams as Record<string, ToolParameterValue>,
+            user: context.user,
+            locale: context.locale,
+            logger: context.logger,
+            metadata: {
+              timestamp: Date.now(),
+              endpointId: endpoint.id,
+            },
           };
-        }
 
-        return result.data;
-      },
-    });
+          const result = await executor.execute(executionContext);
+
+          if (!result.success) {
+            return {
+              success: false,
+              error: result.error ?? "errors.toolExecutionFailed",
+              message: result.error ?? "errors.toolExecutionFailed",
+            };
+          }
+
+          return result.data;
+        },
+      });
+    } catch (error) {
+      // Log the specific tool that failed and re-throw
+      context.logger.error("[Tool Factory] Failed to create tool", {
+        toolName: endpoint.toolName,
+        endpointId: endpoint.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
   }
 
   /**

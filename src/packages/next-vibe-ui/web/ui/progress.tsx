@@ -5,7 +5,7 @@ import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
 // Cross-platform types for native import
-export interface ProgressProps {
+export interface ProgressProps extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> {
   className?: string;
   value?: number | null;
   max?: number;

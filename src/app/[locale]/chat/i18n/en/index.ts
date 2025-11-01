@@ -446,6 +446,7 @@ export const translations = {
     user: "User",
     anonymous: "Anonymous",
     edited: "edited",
+    error: "Error",
     postNumber: "No.{{number}}",
     actions: {
       handleSaveEdit: {

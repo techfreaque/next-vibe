@@ -39,7 +39,11 @@ export function FormAlert({
     return null;
   }
 
-  const getIcon = (): typeof AlertCircle => {
+  const getIcon = ():
+    | typeof AlertCircle
+    | typeof CheckCircle
+    | typeof AlertTriangle
+    | typeof Info => {
     switch (alert.variant) {
       case "destructive":
         return AlertCircle;
@@ -55,8 +59,7 @@ export function FormAlert({
   const Icon = getIcon();
 
   return (
-    <Alert variant={alert.variant} className={cn("my-4", className)}>
-      <Icon className="h-4 w-4" />
+    <Alert variant={alert.variant} icon={Icon} className={cn("my-4", className)}>
       {alert.title && (
         <AlertTitle>
           {t(alert.title.message, alert.title.messageParams)}

@@ -187,9 +187,13 @@ declare module '@rn-primitives/context-menu' {
 }
 
 declare module '@rn-primitives/slot' {
-  interface ViewProps {
-    className?: string;
-  }
+  import type * as React from 'react';
+  import type { ViewProps as RNViewProps, View as RNView, PressableProps as RNPressableProps, TextProps as RNTextProps, Text as RNText, ImageProps as RNImageProps, Image as RNImage } from 'react-native';
+
+  export const Pressable: React.ForwardRefExoticComponent<RNPressableProps & { className?: string } & React.RefAttributes<RNView>>;
+  export const View: React.ForwardRefExoticComponent<RNViewProps & { className?: string } & React.RefAttributes<RNView>>;
+  export const Text: React.ForwardRefExoticComponent<RNTextProps & { className?: string } & React.RefAttributes<RNText>>;
+  export const Image: React.ForwardRefExoticComponent<RNImageProps & { className?: string; children?: React.ReactNode } & React.RefAttributes<RNImage>>;
 }
 
 declare module '@rn-primitives/table' {
@@ -331,6 +335,9 @@ declare module '@rn-primitives/dropdown-menu' {
 }
 
 declare module '@rn-primitives/hover-card' {
+  import type { ViewProps } from 'react-native';
+  import type { PositionedContentProps } from '@rn-primitives/types';
+
   interface RootProps {
     className?: string;
   }
@@ -339,10 +346,10 @@ declare module '@rn-primitives/hover-card' {
     className?: string;
   }
 
-  interface ContentProps {
+  interface ContentProps extends ViewProps, PositionedContentProps {
     className?: string;
-    align?: 'start' | 'center' | 'end';
-    sideOffset?: number;
+    asChild?: boolean;
+    children?: React.ReactNode;
   }
 }
 

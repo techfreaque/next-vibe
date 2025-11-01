@@ -9,7 +9,7 @@ import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
 
-import { type ButtonProps, buttonVariants } from "./button";
+import { buttonVariants } from "./button";
 
 // Cross-platform types
 export interface PaginationProps {
@@ -75,7 +75,7 @@ PaginationItem.displayName = "PaginationItem";
 
 export type PaginationLinkProps = {
   isActive?: boolean;
-  size?: ButtonProps["size"];
+  size?: "default" | "sm" | "lg" | "icon";
   className?: string;
   children?: React.ReactNode;
   href?: string;

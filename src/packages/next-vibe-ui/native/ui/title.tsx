@@ -5,8 +5,13 @@
 import { Text as RNText } from "react-native";
 
 import { cn } from "../lib/utils";
+import type { TitleProps } from "../../web/ui/title";
+
+// Re-export types from web
+export type { TitleProps };
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
+// Native-specific size classes (override web's responsive classes)
 const sizeClasses: Record<1 | 2 | 3 | 4 | 5 | 6, string> = {
   1: "text-4xl native:text-5xl font-bold",
   2: "text-3xl native:text-4xl font-bold",
@@ -17,19 +22,13 @@ const sizeClasses: Record<1 | 2 | 3 | 4 | 5 | 6, string> = {
 };
 /* eslint-enable i18next/no-literal-string */
 
-export interface TitleProps {
-  children: React.ReactNode;
-  className?: string;
-  customSizeClassName?: string;
-  level: 1 | 2 | 3 | 4 | 5 | 6;
-}
-
 export function Title({
   children,
   className = "",
   customSizeClassName,
   level,
 }: TitleProps): React.JSX.Element {
+  const levelKey = level as 1 | 2 | 3 | 4 | 5 | 6;
   return (
     <RNText
       // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
@@ -37,7 +36,7 @@ export function Title({
       aria-level={level}
       className={cn(
         "leading-tight text-foreground",
-        customSizeClassName ?? sizeClasses[level],
+        customSizeClassName ?? sizeClasses[levelKey],
         className,
       )}
     >

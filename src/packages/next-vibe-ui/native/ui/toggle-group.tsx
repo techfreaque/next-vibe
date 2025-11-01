@@ -1,3 +1,5 @@
+/// <reference path="../../../../../nativewind-env.d.ts" />
+
 import * as ToggleGroupPrimitive from "@rn-primitives/toggle-group";
 import type { LucideIcon } from "lucide-react-native";
 import * as React from "react";
@@ -10,23 +12,12 @@ import {
   type ToggleSize,
   type ToggleVariant,
 } from "./toggle";
+import type {
+  ToggleGroupItemProps,
+  ToggleGroupProps,
+} from "../../web/ui/toggle-group";
 
-// Cross-platform type exports
-export interface ToggleGroupProps {
-  variant?: ToggleVariant;
-  size?: ToggleSize;
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface ToggleGroupItemProps {
-  variant?: ToggleVariant;
-  size?: ToggleSize;
-  className?: string;
-  children?: React.ReactNode;
-  value: string;
-  disabled?: boolean;
-}
+export type { ToggleGroupItemProps, ToggleGroupProps };
 
 const ToggleGroupContext = React.createContext<{
   size?: ToggleSize;
@@ -35,19 +26,93 @@ const ToggleGroupContext = React.createContext<{
 
 const ToggleGroup = React.forwardRef<
   ToggleGroupPrimitive.RootRef,
-  ToggleGroupPrimitive.RootProps & ToggleGroupProps
+  ToggleGroupProps
 >((allProps, ref) => {
-  const { className, variant, size, children, ...props } = allProps;
+  const {
+    variant,
+    size,
+    className,
+    children,
+    type: propType,
+    value,
+    onValueChange,
+    defaultValue,
+    disabled,
+    rovingFocus,
+    loop,
+    orientation,
+    dir,
+  } = allProps;
+  const mergedClassName = cn(
+    "flex flex-row items-center justify-center gap-1",
+    className,
+  );
+
+  // Type is either "single" or "multiple"
+  const type = propType ?? "single";
+
+  // Handle the discriminated union type - RN primitives require separate handlers
+  // for single vs multiple, but web API accepts combined handler
+
+  // Create properly typed handlers for each mode
+  const singleHandler = React.useCallback(
+    (val: string | undefined) => {
+      if (onValueChange) {
+        onValueChange(val ?? "");
+      }
+    },
+    [onValueChange],
+  );
+
+  const multipleHandler = React.useCallback(
+    (val: string[]) => {
+      if (onValueChange) {
+        onValueChange(val);
+      }
+    },
+    [onValueChange],
+  );
+
   return (
-    <ToggleGroupPrimitive.Root
-      ref={ref}
-      {...props}
-      className={cn("flex flex-row items-center justify-center gap-1", className)}
-    >
-      <ToggleGroupContext.Provider value={{ variant, size }}>
-        {children}
-      </ToggleGroupContext.Provider>
-    </ToggleGroupPrimitive.Root>
+    <ToggleGroupContext.Provider value={{ variant, size }}>
+      {type === "single" ? (
+        <ToggleGroupPrimitive.Root
+          ref={ref}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NativeWind className is not in primitive types
+          {...({ className: mergedClassName } as any)}
+          type="single"
+          value={typeof value === "string" ? value : undefined}
+          onValueChange={singleHandler}
+          defaultValue={
+            typeof defaultValue === "string" ? defaultValue : undefined
+          }
+          disabled={disabled}
+          rovingFocus={rovingFocus}
+          loop={loop}
+          orientation={orientation}
+          dir={dir}
+        >
+          {children}
+        </ToggleGroupPrimitive.Root>
+      ) : (
+        <ToggleGroupPrimitive.Root
+          ref={ref}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NativeWind className is not in primitive types
+          {...({ className: mergedClassName } as any)}
+          type="multiple"
+          value={Array.isArray(value) ? value : []}
+          onValueChange={multipleHandler}
+          defaultValue={Array.isArray(defaultValue) ? defaultValue : []}
+          disabled={disabled}
+          rovingFocus={rovingFocus}
+          loop={loop}
+          orientation={orientation}
+          dir={dir}
+        >
+          {children}
+        </ToggleGroupPrimitive.Root>
+      )}
+    </ToggleGroupContext.Provider>
   );
 });
 

@@ -9,6 +9,7 @@ import "server-only";
 import type { z } from "zod";
 
 import { endpoints } from "@/app/api/[locale]/v1/core/system/generated/endpoints";
+import { normalizeRoutePath } from "../utils/normalize-route-path";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
@@ -156,7 +157,7 @@ export async function getEndpointsByToolNames(
 
   for (const toolName of toolNames) {
     // Convert tool name to path (e.g., "core_agent_chat_folders" -> "core/agent/chat/folders")
-    const path = toolName.replace(/_/g, "/");
+    const path = normalizeRoutePath(toolName.replace(/_/g, "/"));
 
     try {
       // Dynamically import only this specific endpoint definition
@@ -250,7 +251,7 @@ export async function getEndpointsByIds(
     const method = methodLower.toUpperCase() as Methods;
 
     // Convert tool name to path (e.g., "core_agent_chat_folders" -> "core/agent/chat/folders")
-    const path = toolName.replace(/_/g, "/");
+    const path = normalizeRoutePath(toolName.replace(/_/g, "/"));
 
     try {
       // Dynamically import only this specific endpoint definition

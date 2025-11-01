@@ -109,58 +109,55 @@ export function DataTable<TData, TValue = unknown>({
           </TableHeader>
           <TableBody>
             <FlashList<Row<TData>>
-              {...({
-                data: table.getRowModel().rows,
-                estimatedItemSize,
-                ListEmptyComponent,
-                ListFooterComponent,
-                showsVerticalScrollIndicator: false,
-                contentContainerStyle: {
-                  paddingBottom: insets.bottom,
-                },
-                refreshControl: (
-                  <RefreshControl
-                    refreshing={isRefreshing}
-                    onRefresh={onRefresh}
-                    style={{ opacity: 0 }}
-                  />
-                ),
-                renderItem: ({ item: row, index }: { item: Row<TData>; index: number }): JSX.Element => {
-                  const rowClassName = cn(
-                    "active:opacity-70",
-                    index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50",
-                  );
-                  const handlePress = onRowPress
-                    ? (): void => {
-                        onRowPress(row);
-                      }
-                    : undefined;
-                  return (
-                    <TableRow
-                      className={rowClassName}
-                      onPress={handlePress}
-                    >
-                      {row.getVisibleCells().map((cell): JSX.Element => (
-                        <TableCell
-                          key={cell.id}
-                          style={{
-                            width: getColumnWidth(
-                              cell.column.getSize(),
-                              columns.length,
-                            ),
-                          }}
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  );
-                },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              } as any)}
+              data={table.getRowModel().rows}
+              estimatedItemSize={estimatedItemSize}
+              ListEmptyComponent={ListEmptyComponent}
+              ListFooterComponent={ListFooterComponent}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingBottom: insets.bottom,
+              }}
+              refreshControl={
+                <RefreshControl
+                  refreshing={isRefreshing}
+                  onRefresh={onRefresh}
+                  style={{ opacity: 0 }}
+                />
+              }
+              renderItem={({ item: row, index }: { item: Row<TData>; index: number }): JSX.Element => {
+                const rowClassName = cn(
+                  "active:opacity-70",
+                  index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50",
+                );
+                const handlePress = onRowPress
+                  ? (): void => {
+                      onRowPress(row);
+                    }
+                  : undefined;
+                return (
+                  <TableRow
+                    className={rowClassName}
+                    onPress={handlePress}
+                  >
+                    {row.getVisibleCells().map((cell): JSX.Element => (
+                      <TableCell
+                        key={cell.id}
+                        style={{
+                          width: getColumnWidth(
+                            cell.column.getSize(),
+                            columns.length,
+                          ),
+                        }}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              }}
             />
           </TableBody>
         </Table>

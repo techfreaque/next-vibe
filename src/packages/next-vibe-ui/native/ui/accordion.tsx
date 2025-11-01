@@ -23,22 +23,53 @@ import { cn } from "../lib/utils";
 import { ChevronDown } from "./icons/ChevronDown";
 import { TextClassContext } from "./text";
 
-const Accordion = React.forwardRef<
-  AccordionPrimitive.RootRef,
-  AccordionProps
->((props, ref) => {
-  const { children, className, type, value, onValueChange, defaultValue, collapsible, disabled } = props;
+function AccordionImpl<T extends AccordionProps>(
+  props: T,
+  ref: React.ForwardedRef<AccordionPrimitive.RootRef>,
+): React.ReactElement {
+  const { children, className, disabled } = props;
   const asChild = Platform.OS !== "web";
+
+  if (props.type === "multiple") {
+    return (
+      <LayoutAnimationConfig skipEntering>
+        <AccordionPrimitive.Root
+          ref={ref}
+          type="multiple"
+          value={props.value}
+          onValueChange={props.onValueChange}
+          defaultValue={props.defaultValue}
+          disabled={disabled}
+          className={className}
+          asChild={asChild}
+        >
+          <Animated.View layout={LinearTransition.duration(200)}>
+            {children}
+          </Animated.View>
+        </AccordionPrimitive.Root>
+      </LayoutAnimationConfig>
+    );
+  }
+
+  // Wrap onValueChange to handle undefined values from primitive
+  const handleValueChange = React.useCallback(
+    (value: string | undefined) => {
+      if (props.onValueChange && value !== undefined) {
+        props.onValueChange(value);
+      }
+    },
+    [props.onValueChange],
+  );
 
   return (
     <LayoutAnimationConfig skipEntering>
       <AccordionPrimitive.Root
         ref={ref}
-        type={type}
-        value={value}
-        onValueChange={onValueChange}
-        defaultValue={defaultValue}
-        collapsible={collapsible}
+        type="single"
+        value={props.value}
+        onValueChange={handleValueChange}
+        defaultValue={props.defaultValue}
+        collapsible={props.collapsible}
         disabled={disabled}
         className={className}
         asChild={asChild}
@@ -49,9 +80,15 @@ const Accordion = React.forwardRef<
       </AccordionPrimitive.Root>
     </LayoutAnimationConfig>
   );
-});
+}
 
-Accordion.displayName = AccordionPrimitive.Root.displayName;
+const AccordionComponent = React.forwardRef(AccordionImpl) as <T extends AccordionProps>(
+  props: T & { ref?: React.ForwardedRef<AccordionPrimitive.RootRef> },
+) => React.ReactElement;
+
+const Accordion = Object.assign(AccordionComponent, {
+  displayName: AccordionPrimitive.Root.displayName,
+});
 
 const AccordionItem = React.forwardRef<
   AccordionPrimitive.ItemRef,

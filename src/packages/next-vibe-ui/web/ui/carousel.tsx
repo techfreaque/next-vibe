@@ -24,6 +24,12 @@ export interface CarouselProps {
   setApi?: (api: CarouselApi) => void;
 }
 
+// Cross-platform interface for carousel items
+export interface CarouselItemProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
 type CarouselContextProps = {
   carouselRef: ReturnType<typeof useEmblaCarousel>[0];
   api: ReturnType<typeof useEmblaCarousel>[1];

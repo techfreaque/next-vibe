@@ -49,11 +49,13 @@ export interface MenubarCheckboxItemProps {
   className?: string;
   children?: React.ReactNode;
   checked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
 }
 
 export interface MenubarRadioItemProps {
   className?: string;
   children?: React.ReactNode;
+  value?: string;
 }
 
 export interface MenubarLabelProps {

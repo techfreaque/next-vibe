@@ -1,9 +1,12 @@
 {
     "recommendations": [
-        "github.vscode-github-actions",
-        "bierner.markdown-mermaid",
         "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
         "davidanson.vscode-markdownlint",
-        "typescriptteam.native-preview"
+        "typescriptteam.native-preview",
+        "oxc.oxc-vscode",
+        "oven.bun-vscode",
+        "bradlc.vscode-tailwindcss",
+        "bourhaouta.tailwindshades",
+        "formulahendry.auto-rename-tag"
     ]
 }

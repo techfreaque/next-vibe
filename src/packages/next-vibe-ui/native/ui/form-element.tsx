@@ -6,14 +6,10 @@
 
 import type { ForwardedRef } from "react";
 import { forwardRef } from "react";
-import type { ViewProps } from "react-native";
 import { View } from "react-native";
 
-// Cross-platform props interface - native version uses ViewProps
-export interface FormElementProps extends ViewProps {
-  className?: string;
-  onSubmit?: (e: React.FormEvent) => void | Promise<void>;
-}
+// Import all types from web version (web is source of truth)
+import type { FormElementProps } from "../../web/ui/form-element";
 
 /**
  * Native implementation using View
@@ -24,7 +20,11 @@ export const FormElement = forwardRef(function FormElement(
   ref: ForwardedRef<View>,
 ) {
   // Extract web-specific props that don't apply to View
-  const { onSubmit: _onSubmit, ...viewProps } = props;
+  const { onSubmit: _onSubmit, className, children } = props;
 
-  return <View ref={ref} {...viewProps} />;
+  return (
+    <View ref={ref} className={className}>
+      {children}
+    </View>
+  );
 });

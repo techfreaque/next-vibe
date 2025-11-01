@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "@/packages/next-vibe-ui/web/ui/button";
-import { Div } from "@/packages/next-vibe-ui/web/ui/div";
-import { P } from "@/packages/next-vibe-ui/web/ui/typography";
-import { Tooltip } from "@/packages/next-vibe-ui/web/ui/tooltip";
-import { TooltipContent } from "@/packages/next-vibe-ui/web/ui/tooltip";
-import { TooltipProvider } from "@/packages/next-vibe-ui/web/ui/tooltip";
-import { TooltipTrigger } from "@/packages/next-vibe-ui/web/ui/tooltip";
+import { Button } from "next-vibe-ui//ui/button";
+import { Div } from "next-vibe-ui//ui/div";
+import { P } from "next-vibe-ui//ui/typography";
+import { Tooltip } from "next-vibe-ui//ui/tooltip";
+import { TooltipContent } from "next-vibe-ui//ui/tooltip";
+import { TooltipProvider } from "next-vibe-ui//ui/tooltip";
+import { TooltipTrigger } from "next-vibe-ui//ui/tooltip";
 import type { JSX } from "react";
 import React, { useCallback } from "react";
 

@@ -24,6 +24,8 @@ export interface HoverCardContentProps {
   children?: React.ReactNode;
   align?: "start" | "center" | "end";
   sideOffset?: number;
+  disablePositioningStyle?: boolean; // Native-specific, optional for web
+  asChild?: boolean; // Native-specific, optional for web
 }
 
 const HoverCard = HoverCardPrimitive.Root;

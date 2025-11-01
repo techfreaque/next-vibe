@@ -101,9 +101,9 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
 
   return (
     <div className={cn("leading-relaxed max-w-none", className)}>
-      {/* Render thinking sections if any */}
+      {/* Render thinking sections if any - NEW ARCHITECTURE: ReasoningDisplay design */}
       {allThinkingSections.length > 0 && (
-        <div className="mb-6 space-y-3">
+        <div className="mb-3 space-y-3">
           {allThinkingSections.map((thinking, index) => {
             const isExpanded = expandedThinking.has(index);
             const isIncomplete =
@@ -112,47 +112,51 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
               <div
                 key={index}
                 className={cn(
-                  "group relative border border-purple-500/20 rounded-xl overflow-hidden",
-                  "bg-gradient-to-br from-purple-500/5 to-blue-500/5",
-                  "dark:from-purple-500/10 dark:to-blue-500/10",
-                  "shadow-sm hover:shadow-md transition-all duration-300",
-                  isIncomplete && "animate-pulse",
+                  "rounded-lg border transition-all",
+                  isExpanded
+                    ? "bg-purple-500/5 border-purple-500/30"
+                    : "bg-purple-500/10 border-purple-500/20 hover:border-purple-500/40",
                 )}
               >
-                {/* Collapsible header */}
+                {/* Header - Always visible */}
                 <button
                   onClick={() => toggleThinking(index)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium",
-                    "text-purple-600 dark:text-purple-400",
-                    "hover:bg-purple-500/10 dark:hover:bg-purple-500/20",
-                    "transition-all duration-200",
+                    "w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-400",
+                    "hover:bg-purple-500/5 transition-colors rounded-lg",
                   )}
                 >
-                  <Brain className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
-                  <span className="flex-1 text-left font-semibold">
-                    {t("packages.nextVibeUi.web.ui.markdown.reasoningProcess")}
-                    {isIncomplete && (
-                      <span className="ml-2 text-xs font-normal text-purple-500 dark:text-purple-400">
-                        {t("packages.nextVibeUi.web.ui.markdown.streaming")}
-                      </span>
-                    )}
-                  </span>
-                  <div
+                  <ChevronDown
                     className={cn(
-                      "transition-transform duration-200",
-                      isExpanded && "rotate-180",
+                      "h-4 w-4 shrink-0 transition-transform duration-200",
+                      isExpanded ? "" : "-rotate-90",
                     )}
-                  >
-                    <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                  </div>
+                  />
+                  <Brain className="h-4 w-4 shrink-0" />
+                  <span className="flex-1 text-left">
+                    {t("packages.nextVibeUi.web.ui.markdown.thinking")}
+                  </span>
+                  {isIncomplete && (
+                    <div className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />
+                  )}
                 </button>
 
-                {/* Collapsible content with animation */}
+                {/* Content - Collapsible */}
                 {isExpanded && (
-                  <div className="border-t border-purple-500/20 bg-purple-500/5 dark:bg-purple-900/10 animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="px-4 py-3 text-xs text-slate-600 dark:text-slate-400 whitespace-pre-wrap leading-relaxed font-mono">
-                      {thinking}
+                  <div className="px-3 pb-2">
+                    <div className="px-3 py-2 rounded-md bg-background/50 border border-border/50 text-sm">
+                      <div className="text-foreground/90 prose prose-sm dark:prose-invert max-w-none">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm, remarkBreaks]}
+                          components={{
+                            p: ({ children }) => (
+                              <p className="mb-2 last:mb-0">{children}</p>
+                            ),
+                          }}
+                        >
+                          {thinking}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -299,7 +303,7 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
           },
 
           blockquote: ({ children }) => (
-            <blockquote className="relative border-l-4 border-blue-500 dark:border-blue-400 pl-6 pr-4 py-4 my-4 bg-gradient-to-r from-blue-50 via-indigo-50/50 to-transparent dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-transparent rounded-r-xl text-base text-slate-700 dark:text-slate-300 shadow-sm">
+            <blockquote className="relative border-l-4 border-blue-500 dark:border-blue-400 pl-6 pr-4 py-4 my-4 bg-linear-to-r from-blue-50 via-indigo-50/50 to-transparent dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-transparent rounded-r-xl text-base text-slate-700 dark:text-slate-300 shadow-sm">
               <div
                 className="absolute left-2 top-4 text-blue-500/20 dark:text-blue-400/20 text-6xl leading-none font-serif"
                 aria-hidden="true"
@@ -318,7 +322,7 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
               className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 inline-flex items-center gap-1 underline underline-offset-2 decoration-2 hover:decoration-blue-600 dark:hover:decoration-blue-400 transition-all duration-200 font-medium"
             >
               {children}
-              <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 opacity-70" />
+              <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" />
             </Link>
           ),
 

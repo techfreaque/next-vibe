@@ -9,7 +9,14 @@ const labelVariants = cva(
   "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 );
 
-// Cross-platform props interface
+// Cross-platform base props interface
+export interface LabelBaseProps {
+  className?: string;
+  children?: React.ReactNode;
+  htmlFor?: string;
+}
+
+// Web-specific props interface that extends Radix UI primitives
 export interface LabelProps extends React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> {
   className?: string;
 }

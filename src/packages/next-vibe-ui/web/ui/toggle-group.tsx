@@ -72,6 +72,15 @@ export interface ToggleGroupProps {
   size?: ToggleSize;
   className?: string;
   children?: React.ReactNode;
+  type?: "single" | "multiple";
+  value?: string | string[];
+  onValueChange?: (value: string | string[]) => void;
+  defaultValue?: string | string[];
+  disabled?: boolean;
+  rovingFocus?: boolean;
+  loop?: boolean;
+  orientation?: "horizontal" | "vertical";
+  dir?: "ltr" | "rtl";
 }
 
 export interface ToggleGroupItemProps {

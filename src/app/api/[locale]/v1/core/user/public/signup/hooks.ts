@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import { useToast } from "@/packages/next-vibe-ui/web/hooks/use-toast";
+import { useToast } from "next-vibe-ui//hooks/use-toast";
 import { useMemo } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

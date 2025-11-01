@@ -10,40 +10,17 @@ import { useTranslation } from "@/i18n/core/client";
 
 import { cn } from "../lib/utils";
 
-// Define types locally to avoid web dependency issues
-interface PaginationProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+// Import all types from web (web is source of truth)
+import type {
+  PaginationProps,
+  PaginationContentProps,
+  PaginationItemProps,
+  PaginationLinkProps,
+  PaginationPreviousProps,
+  PaginationNextProps,
+  PaginationEllipsisProps,
+} from "next-vibe-ui/ui/pagination";
 
-interface PaginationContentProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-interface PaginationItemProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-interface PaginationLinkProps {
-  className?: string;
-  isActive?: boolean;
-  size?: "default" | "sm" | "lg" | "icon";
-  children?: React.ReactNode;
-}
-
-interface PaginationPreviousProps {
-  className?: string;
-}
-
-interface PaginationNextProps {
-  className?: string;
-}
-
-interface PaginationEllipsisProps {
-  className?: string;
-}
 import { buttonVariants } from "./button";
 
 export function Pagination({
@@ -96,7 +73,6 @@ export function PaginationLink({
   size = "icon",
   children,
   onPress,
-  ...props
 }: PaginationLinkProps & { onPress?: () => void }): React.JSX.Element {
   return (
     <Pressable
@@ -109,7 +85,6 @@ export function PaginationLink({
         }),
         className,
       )}
-      {...props}
     >
       {typeof children === "string" ? <RNText>{children}</RNText> : children}
     </Pressable>
@@ -121,7 +96,6 @@ PaginationLink.displayName = "PaginationLink";
 export function PaginationPrevious({
   className,
   onPress,
-  ...props
 }: PaginationPreviousProps & { onPress?: () => void }): React.JSX.Element {
   const { t } = useTranslation();
 
@@ -131,7 +105,6 @@ export function PaginationPrevious({
       size="default"
       className={cn("gap-1 pl-2.5", className)}
       onPress={onPress}
-      {...props}
     >
       <ChevronLeft size={16} color="#000" />
       <RNText>{t("app.common.actions.previous")}</RNText>
@@ -144,7 +117,6 @@ PaginationPrevious.displayName = "PaginationPrevious";
 export function PaginationNext({
   className,
   onPress,
-  ...props
 }: PaginationNextProps & { onPress?: () => void }): React.JSX.Element {
   const { t } = useTranslation();
 
@@ -154,7 +126,6 @@ export function PaginationNext({
       size="default"
       className={cn("gap-1 pr-2.5", className)}
       onPress={onPress}
-      {...props}
     >
       <RNText>{t("app.common.actions.next")}</RNText>
       <ChevronRight size={16} color="#000" />

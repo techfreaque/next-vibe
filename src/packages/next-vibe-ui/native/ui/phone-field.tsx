@@ -11,34 +11,11 @@ import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
 
-// Define types and data locally to avoid web dependency issues
-interface CountryData {
-  code: string;
-  name: string;
-  prefix: string;
-  flag: string;
-}
+// Import all types and constants from web (web is source of truth)
+import type { PhoneFieldProps } from "next-vibe-ui/ui/phone-field";
+import { COUNTRIES } from "next-vibe-ui/ui/phone-field";
 
-interface PhoneFieldProps {
-  value?: string;
-  onChange: (value: string) => void;
-  onBlur?: () => void;
-  placeholder?: string;
-  defaultCountry?: string;
-  preferredCountries?: string[];
-  disabled?: boolean;
-  className?: string;
-  name?: string;
-}
-
-// Minimal country list for native - can be expanded
-const COUNTRIES: CountryData[] = [
-  { code: "US", name: "United States", prefix: "+1", flag: "🇺🇸" },
-  { code: "GB", name: "United Kingdom", prefix: "+44", flag: "🇬🇧" },
-  { code: "DE", name: "Germany", prefix: "+49", flag: "🇩🇪" },
-  { code: "PL", name: "Poland", prefix: "+48", flag: "🇵🇱" },
-  { code: "FR", name: "France", prefix: "+33", flag: "🇫🇷" },
-];
+import type { CountryData } from "next-vibe-ui/ui/phone-field";
 
 export function PhoneField({
   value = "",
@@ -125,10 +102,14 @@ export function PhoneField({
     </Pressable>
   );
 
+  const handleOpenChange = (newOpen: boolean): void => {
+    setOpen(newOpen);
+  };
+
   return (
     <View className={cn("flex-row", className)}>
       {/* Country selector */}
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger>
           <Pressable
             disabled={disabled}

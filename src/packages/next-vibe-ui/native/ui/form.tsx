@@ -13,7 +13,7 @@ import type {
   UseFormHandleSubmit,
 } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { FadeInDown, FadeOut } from "react-native-reanimated";
 
 import { StyledAnimatedText } from "../lib/styled";
@@ -450,15 +450,14 @@ const FormDatePicker = React.forwardRef<React.ElementRef<typeof Button>, FormDat
                 {value ?? "Pick a date"}
               </Span>
               {!!value && (
-                <Button
+                <Pressable
                   className={clearButtonClassName}
-                  variant="ghost"
                   onPress={(): void => {
                     onChange?.("");
                   }}
                 >
                   <X size={18} />
-                </Button>
+                </Pressable>
               )}
             </Button>
           </BottomSheetOpenTrigger>

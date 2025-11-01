@@ -1,9 +1,5 @@
-import type { ReactNode } from "react";
-
-// Cross-platform props interface
-export interface HeadProps {
-  children: ReactNode;
-}
+// Import all public types from web version (web is source of truth)
+import type { HeadProps } from "../../web/ui/head";
 
 /**
  * Platform-agnostic Head wrapper component (Native implementation)

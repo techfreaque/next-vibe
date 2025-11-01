@@ -105,7 +105,6 @@ const DEFAULT_EXCLUDE_DIRS = [
   ".next",
   ".tmp",
   "dist",
-  "build",
   ".dist",
 ];
 

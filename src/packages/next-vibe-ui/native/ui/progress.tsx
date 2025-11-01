@@ -17,7 +17,7 @@ import { cn } from "../lib/utils";
 const View = RNView as React.ComponentType<ViewPropsWithClassName>;
 
 const Progress = React.forwardRef<ProgressPrimitive.RootRef, ProgressProps>(
-  ({ className, indicatorClassName, value, max, ...props }, ref) => {
+  function Progress({ className, indicatorClassName, value, max }, ref) {
     return (
       <ProgressPrimitive.Root
         ref={ref}
@@ -26,7 +26,7 @@ const Progress = React.forwardRef<ProgressPrimitive.RootRef, ProgressProps>(
           className,
         )}
         value={value ?? undefined}
-        {...props}
+        max={max}
       >
         <Indicator value={value} className={indicatorClassName} />
       </ProgressPrimitive.Root>
@@ -57,28 +57,19 @@ function Indicator({
 
   if (Platform.OS === "web") {
     return (
-      <View
-        className={cn(
-          "h-full w-full flex-1 bg-primary web:transition-all",
-          className,
-        )}
-        style={{
-          transform: `translateX(-${100 - (value ?? 0)}%)`,
-        }}
-      >
-        <ProgressPrimitive.Indicator
-          className={cn("h-full w-full", className)}
+      <ProgressPrimitive.Indicator asChild className={cn("h-full w-full flex-1 bg-primary web:transition-all", className)}>
+        <View
+          style={{
+            transform: `translateX(-${100 - (value ?? 0)}%)`,
+          }}
         />
-      </View>
+      </ProgressPrimitive.Indicator>
     );
   }
 
   return (
-    <ProgressPrimitive.Indicator asChild>
-      <Animated.View
-        style={indicator}
-        className={cn("h-full bg-foreground", className)}
-      />
+    <ProgressPrimitive.Indicator asChild className={cn("h-full bg-foreground", className)}>
+      <Animated.View style={indicator} />
     </ProgressPrimitive.Indicator>
   );
 }

@@ -3,7 +3,7 @@
  * Production-ready autocomplete with search, categories, and custom values
  */
 import React, { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 import { Check, ChevronDown, Search, X } from "./icons";
 
 import { cn } from "../lib/utils";
@@ -105,86 +105,82 @@ export function AutocompleteField({
     onBlur?.();
   };
 
+  const handleClearPress = (e: { stopPropagation: () => void }): void => {
+    e.stopPropagation();
+    clearValue();
+  };
+
+  const handleOpenChange = (newOpen: boolean): void => {
+    setOpen(newOpen);
+  };
+
   return (
-    <View {...({className: cn("relative", className)} as any)}>
-      <Popover {...({open, onOpenChange: setOpen} as any)}>
-        <PopoverTrigger {...({asChild: true} as any)}>
+    <View className={cn("relative", className)}>
+      <Popover open={open} onOpenChange={handleOpenChange}>
+        <PopoverTrigger asChild>
           <Pressable
-            {...({
-              disabled,
-              className: cn(
-                "h-12 w-full flex-row items-center justify-between rounded-md border border-input bg-background px-3 py-2",
-                !value && "opacity-70",
-                disabled && "cursor-not-allowed opacity-50",
-              ),
-            } as any)}
+            disabled={disabled}
+            className={cn(
+              "h-12 w-full flex-row items-center justify-between rounded-md border border-input bg-background px-3 py-2",
+              !value && "opacity-70",
+              disabled && "cursor-not-allowed opacity-50",
+            )}
           >
-            <View {...({className: "flex-1 flex-row items-center gap-2 min-w-0"} as any)}>
+            <View className="flex-1 flex-row items-center gap-2 min-w-0">
               {isCustomValue && (
-                <Badge {...({variant: "secondary", className: "text-xs"} as any)}>
+                <Badge variant="secondary" className="text-xs">
                   <UIText>Custom</UIText>
                 </Badge>
               )}
-              <UIText
-                {...({
-                  numberOfLines: 1,
-                  className: cn(
-                    "flex-1 text-base",
-                    !value && "text-muted-foreground",
-                  ),
-                } as any)}
+              <RNText
+                numberOfLines={1}
+                className={cn(
+                  "flex-1 text-base",
+                  !value && "text-muted-foreground",
+                )}
               >
                 {value ? displayValue : placeholder}
-              </UIText>
+              </RNText>
             </View>
-            <View {...({className: "flex-row items-center gap-1"} as any)}>
+            <View className="flex-row items-center gap-1">
               {value && !disabled && (
                 <Pressable
-                  {...({
-                    onPress: (e: any) => {
-                      e.stopPropagation();
-                      clearValue();
-                    },
-                    className: "h-5 w-5 items-center justify-center rounded-sm",
-                  } as any)}
+                  onPress={handleClearPress}
+                  className="h-5 w-5 items-center justify-center rounded-sm"
                 >
-                  <X {...({size: 14, className: "text-foreground"} as any)} />
+                  <X size={14} className="text-foreground" />
                 </Pressable>
               )}
-              <ChevronDown {...({size: 16, className: "text-muted-foreground opacity-50"} as any)} />
+              <ChevronDown size={16} className="text-muted-foreground opacity-50" />
             </View>
           </Pressable>
         </PopoverTrigger>
-        <PopoverContent {...({className: "w-full p-0", align: "start"} as any)}>
-          <View {...({className: "rounded-md border border-border bg-popover"} as any)}>
+        <PopoverContent className="w-full p-0" align="start">
+          <View className="rounded-md border border-border bg-popover">
             {/* Search input */}
-            <View {...({className: "flex-row items-center border-b border-border px-3"} as any)}>
-              <Search {...({size: 16, className: "mr-2 text-muted-foreground opacity-50"} as any)} />
+            <View className="flex-row items-center border-b border-border px-3">
+              <Search size={16} className="mr-2 text-muted-foreground opacity-50" />
               <Input
-                {...({
-                  placeholder: searchPlaceholder,
-                  value: searchValue,
-                  onChangeText: setSearchValue,
-                  className: "h-10 flex-1 border-0 bg-transparent",
-                } as any)}
+                placeholder={searchPlaceholder}
+                value={searchValue}
+                onChangeText={setSearchValue}
+                className="h-10 flex-1 border-0 bg-transparent"
               />
             </View>
 
             {/* Options list */}
-            <ScrollView {...({className: "max-h-[300px]"} as any)}>
+            <ScrollView className="max-h-[300px]">
               {Object.keys(filteredGroups).length === 0 ? (
-                <View {...({className: "py-6 text-center"} as any)}>
-                  <UIText {...({className: "text-sm text-muted-foreground text-center"} as any)}>
+                <View className="py-6 text-center">
+                  <UIText className="text-sm text-muted-foreground text-center">
                     No options found
                   </UIText>
                   {allowCustom && searchValue && (
                     <Pressable
-                      {...({
-                        onPress: () => handleCustomValue(searchValue),
-                        className: "mt-2 items-center",
-                      } as any)}
+                      onPress={() => handleCustomValue(searchValue)}
+                      className="mt-2 items-center"
                     >
-                      <UIText {...({className: "text-sm text-primary"} as any)}>
+                      <UIText className="text-sm text-primary">
                         Use "{searchValue}"
                       </UIText>
                     </Pressable>
@@ -192,25 +188,23 @@ export function AutocompleteField({
                 </View>
               ) : (
                 Object.entries(filteredGroups).map(([category, categoryOptions]) => (
-                  <View key={category} {...({className: "p-1"} as any)}>
+                  <View key={category} className="p-1">
                     {category !== "other" && (
-                      <UIText {...({className: "px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase"} as any)}>
+                      <UIText className="px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase">
                         {category}
                       </UIText>
                     )}
                     {categoryOptions.map((option) => (
                       <Pressable
                         key={option.value}
-                        {...({
-                          onPress: () => handleSelect(option.value),
-                          className: cn(
-                            "flex-row items-center justify-between rounded-sm px-2 py-2 active:bg-accent",
-                          ),
-                        } as any)}
+                        onPress={() => handleSelect(option.value)}
+                        className={cn(
+                          "flex-row items-center justify-between rounded-sm px-2 py-2 active:bg-accent",
+                        )}
                       >
-                        <UIText {...({className: "text-base"} as any)}>{option.label}</UIText>
+                        <UIText className="text-base">{option.label}</UIText>
                         {value === option.value && (
-                          <Check {...({size: 16, className: "text-foreground"} as any)} />
+                          <Check size={16} className="text-foreground" />
                         )}
                       </Pressable>
                     ))}
@@ -219,14 +213,12 @@ export function AutocompleteField({
               )}
 
               {allowCustom && searchValue && Object.keys(filteredGroups).length > 0 && (
-                <View {...({className: "border-t border-border p-1"} as any)}>
+                <View className="border-t border-border p-1">
                   <Pressable
-                    {...({
-                      onPress: () => handleCustomValue(searchValue),
-                      className: "flex-row items-center rounded-sm px-2 py-2 active:bg-accent",
-                    } as any)}
+                    onPress={() => handleCustomValue(searchValue)}
+                    className="flex-row items-center rounded-sm px-2 py-2 active:bg-accent"
                   >
-                    <UIText {...({className: "text-base"} as any)}>Use "{searchValue}"</UIText>
+                    <UIText className="text-base">Use "{searchValue}"</UIText>
                   </Pressable>
                 </View>
               )}

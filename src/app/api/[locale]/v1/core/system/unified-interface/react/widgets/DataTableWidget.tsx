@@ -5,8 +5,8 @@
 
 "use client";
 
-import { Div } from "@/packages/next-vibe-ui/web/ui/div";
-import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Div } from "next-vibe-ui//ui/div";
+import { Span } from "next-vibe-ui//ui/span";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -107,11 +107,10 @@ export const DataTableWidget = ({
             {typedData.columns.map((column) => (
               <th
                 key={column.key}
-                className={`px-6 py-3 text-${column.align ?? "left"} text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 ${
-                  column.sortable
+                className={`px-6 py-3 text-${column.align ?? "left"} text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 ${column.sortable
                     ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                     : ""
-                }`}
+                  }`}
                 style={{ width: column.width }}
                 onClick={(): void => {
                   if (column.sortable) {

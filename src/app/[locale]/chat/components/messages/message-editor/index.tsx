@@ -1,10 +1,10 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Button } from "@/packages/next-vibe-ui/web/ui/button";
-import { Div } from "@/packages/next-vibe-ui/web/ui/div";
-import { Form } from "@/packages/next-vibe-ui/web/ui/form/form";
-import { Textarea } from "@/packages/next-vibe-ui/web/ui/textarea";
+import { Button } from "next-vibe-ui//ui/button";
+import { Div } from "next-vibe-ui//ui/div";
+import { Form } from "next-vibe-ui//ui/form/form";
+import { Textarea } from "next-vibe-ui//ui/textarea";
 import { GitBranch, X } from "lucide-react";
 import type { JSX } from "react";
 import React from "react";

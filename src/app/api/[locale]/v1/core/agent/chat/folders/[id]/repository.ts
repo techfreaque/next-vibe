@@ -11,8 +11,8 @@ import {
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import {
   canDeleteFolder,
-  canManageFolder,
   canReadFolder,
+  canUpdateFolder,
 } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { validateNoCircularReference } from "@/app/api/[locale]/v1/core/agent/chat/validation";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
@@ -115,8 +115,8 @@ export async function updateFolder(
       });
     }
 
-    // Check if user can manage this folder
-    if (!(await canManageFolder(user, existingFolder, logger))) {
+    // Check if user can update this folder (moderators can rename)
+    if (!(await canUpdateFolder(user, existingFolder, logger))) {
       return fail({
         message:
           "app.api.v1.core.agent.chat.folders.id.patch.errors.forbidden.title",

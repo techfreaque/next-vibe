@@ -41,6 +41,8 @@ export interface CommandItemProps {
   children?: React.ReactNode;
   className?: string;
   disabled?: boolean;
+  onPress?: () => void; // Native-specific, optional for web
+  onSelect?: () => void; // Web uses onSelect, native uses onPress
 }
 
 export interface CommandSeparatorProps {

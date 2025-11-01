@@ -1,10 +1,5 @@
 {
   "typescript.experimental.useTsgo": true,
-  "cSpell.words": [
-    "openeats",
-    "sovendus",
-    "vitest"
-  ],
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
@@ -15,15 +10,6 @@
   "oxc.enable": true,
   "oxc.lint.run": "onSave",
   "oxc.configPath": ".tmp/.oxlintrc.json",
-  // ESLint configuration (for i18n and custom AST rules)
-  "eslint.enable": true,
-  "eslint.format.enable": false,
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
   // Prettier configuration
   "prettier.enable": true,
   "prettier.requireConfig": true,
@@ -54,9 +40,7 @@
     "editor.formatOnSave": true
   },
   "files.eol": "\n",
-  "files.exclude": {
-    "postgres_data": true
-  },
+  "files.exclude": {},
   "search.exclude": {
     "**/node_modules": true,
     "**/tsconfig.tsbuildinfo": true,

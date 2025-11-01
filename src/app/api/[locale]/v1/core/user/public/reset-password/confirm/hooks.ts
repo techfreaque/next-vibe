@@ -6,7 +6,7 @@ import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import { useToast } from "@/packages/next-vibe-ui/web/hooks/use-toast";
+import { useToast } from "next-vibe-ui//hooks/use-toast";
 import { useMemo, useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
@@ -166,7 +166,7 @@ export function useResetPasswordConfirm(
   const tokenError = tokenIsValid
     ? ""
     : (tokenValidationResponse.message as string) ||
-      "app.api.v1.core.user.auth.reset.errors.token_invalid";
+    "app.api.v1.core.user.auth.reset.errors.token_invalid";
 
   return {
     form: formResult.form,

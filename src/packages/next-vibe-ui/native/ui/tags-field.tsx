@@ -7,17 +7,16 @@ import type { NativeSyntheticEvent, TextInputKeyPressEventData } from "react-nat
 import { Pressable, ScrollView, View } from "react-native";
 import { Plus, X } from "./icons";
 
+// Import cross-platform types from web (source of truth)
+import type { TagOptionBase, TagsFieldPropsBase } from "next-vibe-ui/ui/tags-field";
+
 import { cn } from "../lib/utils";
 import { Badge } from "./badge";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
 
-// Import cross-platform interfaces from web
-import type { TagOptionBase, TagsFieldPropsBase } from "../../../web/ui/tags-field";
-
-// Native uses base interface directly - no modifications needed
-export type { TagOptionBase };
+// Native uses base interface directly (without TranslationKey dependency)
 export type TagsFieldProps = TagsFieldPropsBase;
 
 export function TagsField({
@@ -83,7 +82,6 @@ export function TagsField({
 
   const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>): void => {
     if (e.nativeEvent.key === "Enter" && inputValue.trim()) {
-      e.preventDefault();
       if (allowCustom) {
         addTag(inputValue);
       }
@@ -113,6 +111,10 @@ export function TagsField({
 
   const canAddMore = !maxTags || value.length < maxTags;
 
+  const handleSuggestionsOpenChange = (newOpen: boolean): void => {
+    setShowSuggestions(newOpen);
+  };
+
   return (
     <View className={cn("relative", className)}>
       <View
@@ -139,7 +141,7 @@ export function TagsField({
 
         {/* Input field */}
         {canAddMore && !disabled && (
-          <Popover open={showSuggestions} onOpenChange={setShowSuggestions}>
+          <Popover open={showSuggestions} onOpenChange={handleSuggestionsOpenChange}>
             <PopoverTrigger>
               <View className="flex-1 min-w-[120px]">
                 <Input

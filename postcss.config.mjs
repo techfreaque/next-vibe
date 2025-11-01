@@ -10,7 +10,9 @@ const config = {
           'custom-properties': {
             preserve: true
           },
-          'nesting-rules': true
+          'nesting-rules': true,
+          // Disable :is() transformation - all modern browsers support it
+          'is-pseudo-class': false
         }
       }
     } : {})

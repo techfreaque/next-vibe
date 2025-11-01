@@ -1,6 +1,6 @@
 import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
-import type { BadeVariant } from "next-vibe-ui/ui/badge";
+import type { BadgeVariant } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
@@ -29,7 +29,7 @@ export interface NavSingleItemType {
   children?: never;
   badge?: TranslationKey | undefined;
   badgeTranslationPayload?: BadgeTranslationPayload | undefined;
-  badgeVariant?: BadeVariant | undefined;
+  badgeVariant?: BadgeVariant | undefined;
   isActive?: boolean | undefined;
   disabled?: boolean | undefined;
   disabledReason?: TranslationKey | undefined;
@@ -100,7 +100,7 @@ function NavButton({
   title: TranslationKey;
   badge: TranslationKey | undefined;
   badgeTranslationPayload: BadgeTranslationPayload | undefined;
-  badgeVariant: BadeVariant | undefined;
+  badgeVariant: BadgeVariant | undefined;
   isActive: boolean | undefined;
   disabled: boolean | undefined;
   t: TFunction;

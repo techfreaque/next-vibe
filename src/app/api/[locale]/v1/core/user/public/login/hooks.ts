@@ -8,7 +8,7 @@
 import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import { useToast } from "@/packages/next-vibe-ui/web/hooks/use-toast";
+import { useToast } from "next-vibe-ui//hooks/use-toast";
 import type { ChangeEvent } from "react";
 import { useCallback, useMemo, useState } from "react";
 

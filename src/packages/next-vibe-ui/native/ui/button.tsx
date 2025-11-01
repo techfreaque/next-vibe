@@ -1,10 +1,11 @@
+/// <reference path="../../../../../nativewind-env.d.ts" />
+
 import { cva } from "class-variance-authority";
 import * as React from "react";
-import { Pressable } from "react-native";
+import { Pressable, Text as RNText } from "react-native";
 
-import type { ButtonSize, ButtonVariant } from "next-vibe-ui/ui/button";
+import type { ButtonProps, ButtonSize, ButtonVariant } from "next-vibe-ui/ui/button";
 import { cn } from "../lib/utils";
-import { TextClassContext } from "./text";
 
 const buttonVariants = cva(
   "group flex items-center justify-center rounded-md web:ring-offset-background web:transition-colors web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
@@ -25,6 +26,7 @@ const buttonVariants = cva(
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8 native:h-14",
         icon: "h-10 w-10",
+        unset: "",
       },
     },
     defaultVariants: {
@@ -52,6 +54,7 @@ const buttonTextVariants = cva(
         sm: "",
         lg: "native:text-lg",
         icon: "",
+        unset: "",
       },
     },
     defaultVariants: {
@@ -61,37 +64,28 @@ const buttonTextVariants = cva(
   },
 );
 
-// Native uses only the variant and size from web ButtonProps
-// asChild and HTML button props are web-only
-type ButtonProps = {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  className?: string;
-} & React.ComponentPropsWithoutRef<typeof Pressable>;
-
 const Button = React.forwardRef<
   React.ElementRef<typeof Pressable>,
   ButtonProps
->(({ className, variant, size, ...props }, ref) => {
+>(({ className, variant, size, disabled, children }, ref) => {
   return (
-    <TextClassContext.Provider
-      value={buttonTextVariants({
-        variant,
-        size,
-        className: "web:pointer-events-none",
-      })}
+    <Pressable
+      ref={ref}
+      role="button"
+      disabled={disabled}
+      className={cn(
+        disabled && "opacity-50 web:pointer-events-none",
+        buttonVariants({ variant, size, className }),
+      )}
     >
-      <Pressable
-        ref={ref}
-        // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
-        role="button"
-        {...(props as any)}
-        className={cn(
-          props.disabled && "opacity-50 web:pointer-events-none",
-          buttonVariants({ variant, size, className }),
-        )}
-      />
-    </TextClassContext.Provider>
+      {typeof children === "string" ? (
+        <RNText className={buttonTextVariants({ variant, size })}>
+          {children}
+        </RNText>
+      ) : (
+        children
+      )}
+    </Pressable>
   );
 });
 Button.displayName = "Button";

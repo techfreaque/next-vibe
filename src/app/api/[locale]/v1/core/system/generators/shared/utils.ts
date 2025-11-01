@@ -189,54 +189,16 @@ export function generateFileHeader(
 
 /**
  * Extract path from definition file for flat structure
- * Returns both the path key and any aliases
+ * Returns path only - no duplicate parameter format aliases
+ * Real aliases come from definition files, not parameter format variations
  */
 export function extractPathKey(
   filePath: string,
   startMarker = "v1",
-): { path: string; aliases: string[] } {
+): { path: string } {
   const nestedPath = extractNestedPath(filePath, startMarker);
   const path = nestedPath.join("/");
-  const aliases: string[] = [];
-
-  // Generate aliases for common dynamic segment patterns
-  if (path.includes("[")) {
-    // Map of common parameter name variations
-    const commonAliases: Record<string, string[]> = {
-      "[id]": [":id", "{id}"],
-      "[threadId]": [":threadId", "{threadId}", "[thread_id]", ":thread_id"],
-      "[messageId]": [
-        ":messageId",
-        "{messageId}",
-        "[message_id]",
-        ":message_id",
-      ],
-      "[jobId]": [":jobId", "{jobId}", "[job_id]", ":job_id"],
-    };
-
-    // Generate aliases by replacing dynamic segments
-    for (const [bracket, replacements] of Object.entries(commonAliases)) {
-      if (path.includes(bracket)) {
-        for (const replacement of replacements) {
-          const alias = path.replaceAll(bracket, replacement);
-          aliases.push(alias);
-        }
-      }
-    }
-
-    // Also add underscore version of camelCase paths
-    const underscorePath = path.replace(
-      /\[([a-z]+)([A-Z][a-z]+)\]/g,
-      (_match, p1, p2) => {
-        return `[${p1.toLowerCase()}_${p2.toLowerCase()}]`;
-      },
-    );
-    if (underscorePath !== path && !aliases.includes(underscorePath)) {
-      aliases.push(underscorePath);
-    }
-  }
-
-  return { path, aliases };
+  return { path };
 }
 
 /**

@@ -10,32 +10,6 @@
  */
 
 import {
-  SiAlibabadotcom,
-  SiAndroid,
-  SiAnthropic,
-  SiApple,
-  SiDiscord,
-  SiDocker,
-  SiGit,
-  SiGithub,
-  SiGo,
-  SiGoogle,
-  SiGooglegemini,
-  SiJavascript,
-  SiLinux,
-  SiMistralai,
-  SiNextdotjs,
-  SiNodedotjs,
-  SiOpenai,
-  SiPython,
-  SiReact,
-  SiReddit,
-  SiRust,
-  SiTypescript,
-  SiX,
-  SiZendesk,
-} from "@icons-pack/react-simple-icons";
-import {
   Activity,
   AlertCircle,
   Archive,
@@ -155,9 +129,33 @@ import {
   Wifi,
   Wind,
   Zap,
-} from "lucide-react";
+  SiAlibabadotcom,
+  SiAndroid,
+  SiAnthropic,
+  SiApple,
+  SiDiscord,
+  SiDocker,
+  SiGit,
+  SiGithub,
+  SiGo,
+  SiGoogle,
+  SiGooglegemini,
+  SiJavascript,
+  SiLinux,
+  SiMistralai,
+  SiNextdotjs,
+  SiNodedotjs,
+  SiOpenai,
+  SiPython,
+  SiReact,
+  SiReddit,
+  SiRust,
+  SiTypescript,
+  SiX,
+  SiZendesk,
+} from "next-vibe-ui//ui/icons";
 import { cn } from "next-vibe/shared/utils";
-import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Span } from "next-vibe-ui//ui/span";
 import React from "react";
 
 /**
@@ -168,9 +166,9 @@ export type IconComponent =
   | React.FC<{ className?: string }>
   | React.ComponentClass<{ className?: string }>
   | React.ForwardRefExoticComponent<
-      React.PropsWithoutRef<{ className?: string }> &
-        React.RefAttributes<HTMLElement>
-    >;
+    React.PropsWithoutRef<{ className?: string }> &
+    React.RefAttributes<HTMLElement>
+  >;
 
 /**
  * Special 1A icon component (defined outside registry due to JSX)

@@ -2,10 +2,10 @@
 
 import { Check, Edit2, X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
-import { Div } from "@/packages/next-vibe-ui/web/ui/div";
-import { Span } from "@/packages/next-vibe-ui/web/ui/span";
-import { Button } from "@/packages/next-vibe-ui/web/ui/button";
-import { Input } from "@/packages/next-vibe-ui/web/ui/input";
+import { Div } from "next-vibe-ui//ui/div";
+import { Span } from "next-vibe-ui//ui/span";
+import { Button } from "next-vibe-ui//ui/button";
+import { Input } from "next-vibe-ui//ui/input";
 import type { JSX, KeyboardEvent } from "react";
 import { useState } from "react";
 
@@ -26,8 +26,8 @@ export function EditableTextWidget({
 }: WidgetComponentProps): JSX.Element {
   const value =
     typeof data === "string" ||
-    typeof data === "number" ||
-    typeof data === "boolean"
+      typeof data === "number" ||
+      typeof data === "boolean"
       ? String(data)
       : "";
   const [isEditing, setIsEditing] = useState(false);

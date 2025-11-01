@@ -9,7 +9,7 @@ import * as React from "react";
 export interface RadioGroupBaseProps {
   value?: string;
   defaultValue?: string;
-  onValueChange?: (value: string) => void;
+  onValueChange?: ((value: string) => void) | undefined;
   disabled?: boolean;
   className?: string;
   name?: string;

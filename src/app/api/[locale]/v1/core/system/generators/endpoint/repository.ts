@@ -80,7 +80,7 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       logger.debug(`Found ${definitionFiles.length} definition files`);
 
       // Generate content
-      const content = this.generateContent(definitionFiles);
+      const content = await this.generateContent(definitionFiles);
 
       // Write file
       await writeGeneratedFile(outputFile, content, data.dryRun);
@@ -117,25 +117,61 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
   }
 
   /**
-   * Generate endpoint content with dynamic imports
+   * Extract aliases from definition file (async)
    */
-  private generateContent(definitionFiles: string[]): string {
+  private async extractAliasesFromDefinition(
+    defFile: string,
+  ): Promise<string[]> {
+    try {
+      const definition = (await import(defFile)) as {
+        default?: Record<string, { aliases?: string[] }>;
+      };
+      const defaultExport = definition.default;
+
+      if (!defaultExport) {
+        return [];
+      }
+
+      // Get aliases from any method (usually POST)
+      for (const method of Object.keys(defaultExport)) {
+        const methodDef = defaultExport[method];
+        if (methodDef?.aliases && Array.isArray(methodDef.aliases)) {
+          return methodDef.aliases;
+        }
+      }
+    } catch {
+      // Definition file doesn't exist or can't be loaded
+    }
+    return [];
+  }
+
+  /**
+   * Generate endpoint content with dynamic imports and real aliases from definitions
+   * No duplicate parameter format aliases - only [id] format and real definition aliases
+   */
+  private async generateContent(definitionFiles: string[]): Promise<string> {
     const pathMap: Record<string, string> = {};
     const allPaths: string[] = [];
 
-    // Build path map with aliases
+    // Build path map with real aliases (deduplicate)
     for (const defFile of definitionFiles) {
-      const { path, aliases } = extractPathKey(defFile);
+      const { path } = extractPathKey(defFile);
       const importPath = generateAbsoluteImportPath(defFile, "definition");
 
-      // Add main path
-      pathMap[path] = importPath;
-      allPaths.push(path);
+      // Add main path (with [id] format only) if not already added
+      if (!pathMap[path]) {
+        pathMap[path] = importPath;
+        allPaths.push(path);
+      }
 
-      // Add aliases
-      for (const alias of aliases) {
-        pathMap[alias] = importPath;
-        allPaths.push(alias);
+      // Extract and add real aliases from definition file
+      const definitionAliases = await this.extractAliasesFromDefinition(defFile);
+      for (const alias of definitionAliases) {
+        // Only add if not already present (first wins)
+        if (!pathMap[alias]) {
+          pathMap[alias] = importPath;
+          allPaths.push(alias);
+        }
       }
     }
 

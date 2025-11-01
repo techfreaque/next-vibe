@@ -4,9 +4,7 @@
  */
 import React, { useState } from "react";
 import type { GestureResponderEvent } from "react-native";
-import { Text as RNText, View } from "react-native";
-
-import { Button } from "./button";
+import { Pressable, Text as RNText, View } from "react-native";
 
 /**
  * Props for the DropdownItem component
@@ -50,25 +48,25 @@ export function DropdownItem({
     setIsPressed(false);
   };
 
-  const handlePress = (_e: GestureResponderEvent): void => {
+  const handlePress = (): void => {
     if (!disabled && onClick) {
       onClick();
     }
   };
 
   return (
-    <Button
-      variant={shouldShowHighlight ? "default" : "ghost"}
-      size="sm"
-      className={`w-full justify-start font-medium rounded-md px-3 py-2.5 min-h-fit h-auto ${
-        shouldShowHighlight
-          ? "border-2 border-blue-500/50 bg-blue-500/10"
-          : "border-2 border-transparent active:bg-accent/50"
-      } ${className}`}
+    <Pressable
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onPress={handlePress}
       disabled={disabled}
+      className={`w-full justify-start font-medium rounded-md px-3 py-2.5 min-h-fit h-auto ${
+        shouldShowHighlight ? "default" : "ghost"
+      } ${
+        shouldShowHighlight
+          ? "border-2 border-blue-500/50 bg-blue-500/10"
+          : "border-2 border-transparent active:bg-accent/50"
+      } ${className}`}
     >
       <View className="flex flex-row items-center gap-3 w-full">
         {icon && (
@@ -99,6 +97,6 @@ export function DropdownItem({
           )}
         </View>
       </View>
-    </Button>
+    </Pressable>
   );
 }

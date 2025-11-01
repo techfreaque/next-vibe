@@ -1,3 +1,4 @@
+/// <reference path="../../../../../nativewind-env.d.ts" />
 /**
  * Markdown Component for React Native
  * TODO: Implement markdown rendering using react-native-markdown-display or similar
@@ -8,10 +9,8 @@ import { Text as RNText, View } from "react-native";
 
 import { cn } from "../lib/utils";
 
-interface MarkdownProps {
-  content: string;
-  className?: string;
-}
+// Import all public types from web version (web is source of truth)
+import type { MarkdownProps } from "../../web/ui/markdown";
 
 export const Markdown = React.forwardRef<View, MarkdownProps>(
   ({ className, content }, ref) => {

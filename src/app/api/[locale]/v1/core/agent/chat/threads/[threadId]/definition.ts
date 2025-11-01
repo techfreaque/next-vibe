@@ -455,6 +455,18 @@ const { PATCH } = createEndpoint({
             },
             z.array(z.string()).optional(),
           ),
+          published: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label:
+                "app.api.v1.core.agent.chat.threads.threadId.patch.published.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.threadId.patch.published.description" as const,
+              layout: { columns: 6 },
+            },
+            z.boolean().optional(),
+          ),
         },
       ),
 
@@ -556,6 +568,14 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.response.thread.tags.content" as const,
             },
             z.array(z.string()),
+          ),
+          published: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.threadId.patch.response.thread.published.content" as const,
+            },
+            z.boolean(),
           ),
           preview: responseField(
             {
@@ -683,6 +703,7 @@ const { PATCH } = createEndpoint({
           pinned: true,
           archived: false,
           tags: [],
+          published: false,
           preview: "Hello, how can I help you?",
           metadata: {},
           createdAt: new Date().toISOString(),

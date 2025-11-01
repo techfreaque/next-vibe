@@ -6,7 +6,7 @@
 "use client";
 
 import type { LucideProps } from "lucide-react";
-import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Button } from "next-vibe-ui//ui/button";
 import type { JSX } from "react";
 
 interface MessageActionButtonProps {

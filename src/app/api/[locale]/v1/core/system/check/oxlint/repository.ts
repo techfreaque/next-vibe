@@ -73,6 +73,8 @@ const IGNORED_PATHS = [] as const;
  */
 const PERMISSION_ERROR_CODES = ["EACCES", "permission denied"] as const;
 
+export const LINT_CONFIG_PATH = "../../../../../../../../../lint.config.ts" as const;
+
 /**
  * System resource information
  */
@@ -601,27 +603,27 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       /* eslint-disable i18next/no-literal-string */
       const baseArgs = configExists
         ? [
-            "oxlint",
-            "--format=json",
-            "--config",
-            oxlintConfigPath,
-            "--tsconfig",
-            "./tsconfig.json",
-            ...task.files,
-          ]
+          "oxlint",
+          "--format=json",
+          "--config",
+          oxlintConfigPath,
+          "--tsconfig",
+          "./tsconfig.json",
+          ...task.files,
+        ]
         : [
-            "oxlint",
-            "--format=json",
-            // Fallback: Enable plugins manually if no config
-            "--tsconfig",
-            "./tsconfig.json",
-            "--react-plugin",
-            "--jsx-a11y-plugin",
-            "--nextjs-plugin",
-            "-D",
-            "all",
-            ...task.files,
-          ];
+          "oxlint",
+          "--format=json",
+          // Fallback: Enable plugins manually if no config
+          "--tsconfig",
+          "./tsconfig.json",
+          "--react-plugin",
+          "--jsx-a11y-plugin",
+          "--nextjs-plugin",
+          "-D",
+          "all",
+          ...task.files,
+        ];
       /* eslint-enable i18next/no-literal-string */
 
       // If fix is requested, run oxlint --fix and prettier in parallel
@@ -964,11 +966,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<PrettierConfig> {
     try {
-      const projectRoot = process.cwd();
-      const tsConfigPath = resolve(projectRoot, "lint.config.ts");
-
-      // Dynamic import of the TypeScript config
-      const configModule = await import(`file://${tsConfigPath}`);
+      const configModule = await import(LINT_CONFIG_PATH);
       const fullConfig = configModule.config || configModule.default;
 
       return fullConfig.prettier || {};

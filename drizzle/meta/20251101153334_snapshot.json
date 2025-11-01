@@ -1,5 +1,5 @@
 {
-  "id": "8a2ee18d-6d9d-4096-a53e-0e411f006c29",
+  "id": "9d8f86df-f925-4c49-8dd1-7701c8719f41",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -615,6 +615,13 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'[]'::jsonb"
+        },
+        "published": {
+          "name": "published",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         },
         "created_at": {
           "name": "created_at",

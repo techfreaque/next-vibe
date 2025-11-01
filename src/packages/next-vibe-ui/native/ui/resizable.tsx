@@ -5,9 +5,9 @@
  */
 import { GripVertical } from "lucide-react-native";
 import React from "react";
-import { View as RNView } from "react-native";
+import type { ViewProps } from "react-native";
+import { View } from "react-native";
 
-import type { ViewPropsWithClassName } from "../lib/types";
 import { cn } from "../lib/utils";
 import type {
   ResizablePanelGroupProps,
@@ -15,15 +15,17 @@ import type {
   ResizableHandleProps,
 } from "next-vibe-ui/ui/resizable";
 
-// Type-safe View component with className support for NativeWind
-const View = RNView as React.ComponentType<ViewPropsWithClassName>;
+// Type-safe View with className support (NativeWind)
+const StyledView = View as unknown as React.ForwardRefExoticComponent<
+  ViewProps & { className?: string } & React.RefAttributes<View>
+>;
 
 export const ResizablePanelGroup = React.forwardRef<
-  RNView,
+  View,
   ResizablePanelGroupProps
 >(function ResizablePanelGroup({ className, direction = "horizontal", children }, ref) {
   return (
-    <View
+    <StyledView
       ref={ref}
       className={cn(
         "flex h-full w-full",
@@ -32,18 +34,18 @@ export const ResizablePanelGroup = React.forwardRef<
       )}
     >
       {children}
-    </View>
+    </StyledView>
   );
 });
 
 ResizablePanelGroup.displayName = "ResizablePanelGroup";
 
-export const ResizablePanel = React.forwardRef<RNView, ResizablePanelProps>(
+export const ResizablePanel = React.forwardRef<View, ResizablePanelProps>(
   function ResizablePanel({ className, children }, ref) {
     return (
-      <View ref={ref} className={cn("flex-1", className)}>
+      <StyledView ref={ref} className={cn("flex-1", className)}>
         {children}
-      </View>
+      </StyledView>
     );
   },
 );
@@ -55,18 +57,18 @@ export function ResizableHandle({
   className,
 }: ResizableHandleProps): React.JSX.Element {
   return (
-    <View
+    <StyledView
       className={cn(
         "relative flex w-px items-center justify-center bg-border",
         className,
       )}
     >
       {withHandle && (
-        <View className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border bg-border">
+        <StyledView className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border bg-border">
           <GripVertical size={10} color="currentColor" />
-        </View>
+        </StyledView>
       )}
-    </View>
+    </StyledView>
   );
 }
 

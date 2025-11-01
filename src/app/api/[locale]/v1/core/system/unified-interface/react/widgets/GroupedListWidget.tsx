@@ -5,8 +5,8 @@
 
 "use client";
 
-import { Div } from "@/packages/next-vibe-ui/web/ui/div";
-import { Span } from "@/packages/next-vibe-ui/web/ui/span";
+import { Div } from "next-vibe-ui//ui/div";
+import { Span } from "next-vibe-ui//ui/span";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -102,9 +102,8 @@ export const GroupedListWidget = ({
                 </Span>
               </Div>
               <svg
-                className={`h-5 w-5 text-gray-500 transition-transform ${
-                  isExpanded ? "rotate-180" : ""
-                }`}
+                className={`h-5 w-5 text-gray-500 transition-transform ${isExpanded ? "rotate-180" : ""
+                  }`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

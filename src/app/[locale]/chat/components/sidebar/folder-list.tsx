@@ -2,32 +2,32 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { useRouter } from "next-vibe-ui/hooks";
-import { AlertDialog } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogAction } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogCancel } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogContent } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogDescription } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogFooter } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogHeader } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { AlertDialogTitle } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
-import { Button } from "@/packages/next-vibe-ui/web/ui/button";
-import { Div } from "@/packages/next-vibe-ui/web/ui/div";
-import { DropdownMenu } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuContent } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuItem } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { DropdownMenuTrigger } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
-import { Span } from "@/packages/next-vibe-ui/web/ui/span";
-import { ArrowDown } from "@/packages/next-vibe-ui/web/ui/icons/ArrowDown";
-import { ArrowUp } from "@/packages/next-vibe-ui/web/ui/icons/ArrowUp";
-import { ChevronDown } from "@/packages/next-vibe-ui/web/ui/icons/ChevronDown";
-import { ChevronRight } from "@/packages/next-vibe-ui/web/ui/icons/ChevronRight";
-import { Edit } from "@/packages/next-vibe-ui/web/ui/icons/Edit";
-import { FolderInput } from "@/packages/next-vibe-ui/web/ui/icons/FolderInput";
-import { FolderPlus } from "@/packages/next-vibe-ui/web/ui/icons/FolderPlus";
-import { MessageSquarePlus } from "@/packages/next-vibe-ui/web/ui/icons/MessageSquarePlus";
-import { MoreVertical } from "@/packages/next-vibe-ui/web/ui/icons/MoreVertical";
-import { Shield } from "@/packages/next-vibe-ui/web/ui/icons/Shield";
-import { Trash2 } from "@/packages/next-vibe-ui/web/ui/icons/Trash2";
+import { AlertDialog } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogAction } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogCancel } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogContent } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogDescription } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogFooter } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogHeader } from "next-vibe-ui//ui/alert-dialog";
+import { AlertDialogTitle } from "next-vibe-ui//ui/alert-dialog";
+import { Button } from "next-vibe-ui//ui/button";
+import { Div } from "next-vibe-ui//ui/div";
+import { DropdownMenu } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuContent } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuItem } from "next-vibe-ui//ui/dropdown-menu";
+import { DropdownMenuTrigger } from "next-vibe-ui//ui/dropdown-menu";
+import { Span } from "next-vibe-ui//ui/span";
+import { ArrowDown } from "next-vibe-ui//ui/icons/ArrowDown";
+import { ArrowUp } from "next-vibe-ui//ui/icons/ArrowUp";
+import { ChevronDown } from "next-vibe-ui//ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe-ui//ui/icons/ChevronRight";
+import { Edit } from "next-vibe-ui//ui/icons/Edit";
+import { FolderInput } from "next-vibe-ui//ui/icons/FolderInput";
+import { FolderPlus } from "next-vibe-ui//ui/icons/FolderPlus";
+import { MessageSquarePlus } from "next-vibe-ui//ui/icons/MessageSquarePlus";
+import { MoreVertical } from "next-vibe-ui//ui/icons/MoreVertical";
+import { Shield } from "next-vibe-ui//ui/icons/Shield";
+import { Trash2 } from "next-vibe-ui//ui/icons/Trash2";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
@@ -55,6 +55,7 @@ import { MoveFolderDialog } from "./move-folder-dialog";
 import { PermissionsDialog } from "./permissions-dialog";
 import { RenameFolderDialog } from "./rename-folder-dialog";
 import { ThreadList } from "./thread-list";
+import { P } from "next-vibe-ui/ui/typography";
 
 // Time grouping helpers
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -281,9 +282,9 @@ export function FolderList({
 
       {/* Empty state */}
       {childFolders.length === 0 && childThreads.length === 0 && (
-        <Div className="px-4 py-8 text-center text-sm text-muted-foreground">
+        <P className="px-4 py-8 text-center text-sm text-muted-foreground">
           {t("app.chat.folderList.emptyFolder")}
-        </Div>
+        </P>
       )}
     </Div>
   );
@@ -750,12 +751,12 @@ function FolderItem({
             <AlertDialogDescription>
               {threadsInFolder.length > 0
                 ? t("app.chat.folderList.deleteDialog.descriptionWithThreads", {
-                    folderName: folderDisplayName,
-                    count: threadsInFolder.length,
-                  })
+                  folderName: folderDisplayName,
+                  count: threadsInFolder.length,
+                })
                 : t("app.chat.folderList.deleteDialog.description", {
-                    folderName: folderDisplayName,
-                  })}
+                  folderName: folderDisplayName,
+                })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

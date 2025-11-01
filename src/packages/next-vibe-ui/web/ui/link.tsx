@@ -3,6 +3,14 @@ import NextLink from "next/link";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
+// Cross-platform base props interface
+export interface LinkBaseProps {
+  asChild?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+// Web-specific props interface that extends Next.js Link
 export interface LinkProps
   extends React.ComponentPropsWithoutRef<typeof NextLink> {
   asChild?: boolean;

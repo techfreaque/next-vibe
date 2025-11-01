@@ -1,7 +1,8 @@
-import type { ViewRef } from "@rn-primitives/types";
 import * as React from "react";
 import type { ViewProps } from "react-native";
 import { View } from "react-native";
+
+type ViewRef = React.ElementRef<typeof View>;
 
 import { cn } from "../lib/utils";
 

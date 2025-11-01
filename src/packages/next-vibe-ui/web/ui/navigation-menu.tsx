@@ -7,7 +7,7 @@ import * as React from "react";
 // Cross-platform types
 export interface NavigationMenuProps {
   value?: string;
-  onValueChange?: (value: string) => void;
+  onValueChange?: (value: string | undefined) => void;
   defaultValue?: string;
   className?: string;
   children?: React.ReactNode;

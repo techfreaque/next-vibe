@@ -1,7 +1,13 @@
 import * as React from "react";
+import type { ViewProps } from "react-native";
 import { View } from "react-native";
 
 import type { SectionProps } from "next-vibe-ui/ui/section";
+
+// Type-safe View with className support (NativeWind)
+const StyledView = View as unknown as React.ForwardRefExoticComponent<
+  ViewProps & { className?: string } & React.RefAttributes<View>
+>;
 
 /**
  * Platform-agnostic Section component for native
@@ -13,8 +19,8 @@ export const Section = React.forwardRef<View, SectionProps>(function Section(
   ref,
 ) {
   return (
-    <View ref={ref} className={className} nativeID={id}>
+    <StyledView ref={ref} className={className} nativeID={id}>
       {children}
-    </View>
+    </StyledView>
   );
 });

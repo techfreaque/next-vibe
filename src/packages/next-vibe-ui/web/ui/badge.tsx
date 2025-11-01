@@ -14,6 +14,8 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80 shadow-sm",
         outline: "text-foreground",
+        notification:
+          "border-transparent bg-red-500 text-white shadow hover:bg-red-600",
       },
     },
     defaultVariants: {
@@ -30,6 +32,7 @@ export interface BadgeProps {
   variant?: BadgeVariant;
   className?: string;
   children?: React.ReactNode;
+  asChild?: boolean; // Native-specific, optional for web
 }
 
 // Web-specific props with full HTML attributes

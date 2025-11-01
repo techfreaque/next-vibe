@@ -10,7 +10,6 @@ import {
   CheckCircle,
   Info,
 } from "lucide-react-native";
-import type { MessageResponseType } from "next-vibe/shared/types/response.schema";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
@@ -18,16 +17,11 @@ import { useTranslation } from "@/i18n/core/client";
 
 import { Alert, AlertDescription, AlertTitle } from "../alert";
 
-export interface FormAlertState {
-  variant: "default" | "destructive" | "success" | "warning";
-  title: MessageResponseType;
-  message: MessageResponseType;
-}
-
-export interface FormAlertProps {
-  alert: FormAlertState | null;
-  className?: string;
-}
+// Import all public types from web version (web is source of truth)
+import type {
+  FormAlertProps,
+  FormAlertState,
+} from "../../../web/ui/form/form-alert";
 
 /**
  * Central alert component for forms with consistent styling and icons

@@ -5,39 +5,19 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
+import type {
+  TooltipContentProps,
+  TooltipProviderProps,
+  TooltipRootProps,
+  TooltipTriggerProps,
+} from "../../web/ui/tooltip";
 
-// Cross-platform type exports
-export interface TooltipProviderProps {
-  children?: React.ReactNode;
-  delayDuration?: number;
-  skipDelayDuration?: number;
-  disableHoverableContent?: boolean;
-}
-
-export interface TooltipRootProps {
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  children?: React.ReactNode;
-  defaultOpen?: boolean;
-  delayDuration?: number;
-}
-
-export interface TooltipTriggerProps {
-  asChild?: boolean;
-  children?: React.ReactNode;
-}
-
-export interface TooltipContentProps {
-  className?: string;
-  children?: React.ReactNode;
-  sideOffset?: number;
-  side?: "top" | "right" | "bottom" | "left";
-  align?: "start" | "center" | "end";
-  alignOffset?: number;
-  onEscapeKeyDown?: (event: KeyboardEvent) => void;
-  onPointerDownOutside?: (event: Event) => void;
-  portalHost?: string;
-}
+export type {
+  TooltipContentProps,
+  TooltipProviderProps,
+  TooltipRootProps,
+  TooltipTriggerProps,
+};
 
 const TooltipProvider = TooltipPrimitive.Root;
 const Tooltip = TooltipPrimitive.Root;

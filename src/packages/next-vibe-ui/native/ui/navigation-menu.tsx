@@ -14,34 +14,17 @@ import Animated, {
 import { cn } from "../lib/utils";
 import { buttonVariants } from "./button";
 
-// Define types locally to avoid web dependency issues
-interface NavigationMenuProps {
-  className?: string;
-  value?: string;
-  onValueChange?: (value: string | undefined) => void;
-}
+// Import all types from web (web is source of truth)
+import type {
+  NavigationMenuProps,
+  NavigationMenuListProps,
+  NavigationMenuTriggerProps,
+  NavigationMenuContentProps,
+  NavigationMenuViewportProps,
+  NavigationMenuIndicatorProps,
+} from "next-vibe-ui/ui/navigation-menu";
 
-interface NavigationMenuListProps {
-  className?: string;
-}
-
-interface NavigationMenuTriggerProps {
-  className?: string;
-}
-
-interface NavigationMenuContentProps {
-  className?: string;
-}
-
-interface NavigationMenuViewportProps {
-  className?: string;
-}
-
-interface NavigationMenuIndicatorProps {
-  className?: string;
-}
-
-// navigationMenuTriggerStyle helper function
+// navigationMenuTriggerStyle helper function (native implementation)
 function navigationMenuTriggerStyle(): string {
   return cn(
     buttonVariants({ variant: "ghost" }),
@@ -53,11 +36,11 @@ import { ChevronDown } from "./icons/ChevronDown";
 const NavigationMenu = React.forwardRef<
   NavigationMenuPrimitive.RootRef,
   NavigationMenuProps & Omit<NavigationMenuPrimitive.RootProps, keyof NavigationMenuProps>
->(({ className, children, value, onValueChange, ...props }, ref) => (
+>(({ className, children, value, onValueChange = () => {}, ...props }, ref) => (
   <NavigationMenuPrimitive.Root
     ref={ref}
     value={value}
-    onValueChange={onValueChange || (() => {})}
+    onValueChange={onValueChange}
     className={cn(
       "relative z-10 flex flex-row max-w-max items-center justify-center",
       className,

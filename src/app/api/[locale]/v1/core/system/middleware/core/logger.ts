@@ -1,3 +1,4 @@
+// oxlint-disable no-console
 /* eslint-disable i18next/no-literal-string */
 
 import { Environment } from "next-vibe/shared/utils";
@@ -27,14 +28,14 @@ const logger = {
       return;
     }
     // Using process.stdout.write for better performance in middleware
-    process.stdout.write(`[Middleware][INFO] ${message} ${args.length > 0 ? JSON.stringify(args) : ""}\n`);
+    console.log(`[Middleware][INFO] ${message} ${args.length > 0 ? JSON.stringify(args) : ""}\n`);
   },
 
   debug(message: string, ...args: Array<string | number | boolean | Record<string, string | number | boolean>>): void {
     if (isProduction || !debugMiddleware) {
       return;
     }
-    process.stdout.write(`[Middleware][DEBUG] ${message} ${args.length > 0 ? JSON.stringify(args) : ""}\n`);
+    console.log(`[Middleware][DEBUG] ${message} ${args.length > 0 ? JSON.stringify(args) : ""}\n`);
   },
 
   error(message: string, error?: Error | string | Record<string, string | number>): void {
@@ -43,7 +44,7 @@ const logger = {
       return;
     }
     const parsedError = error ? parseError(error) : "";
-    process.stderr.write(`[Middleware][ERROR] ${message} ${parsedError ? JSON.stringify(parsedError) : ""}\n`);
+    console.error(`[Middleware][ERROR] ${message} ${parsedError ? JSON.stringify(parsedError) : ""}\n`);
   },
 };
 

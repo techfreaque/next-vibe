@@ -26,7 +26,8 @@
  * ```
  */
 
-import { Slot, useLocalSearchParams } from "expo-router";
+import {
+  Slot, useLocalSearchParams } from "expo-router";
 import type React from "react";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -95,74 +96,73 @@ export function createPageWrapperWithImport<
 ): () => React.ReactElement {
   return function PageWrapper(): React.ReactElement {
     const params = useLocalSearchParams<TParams>();
+
     const [content, setContent] = useState<JSX.Element | null>(null);
     const [error, setError] = useState<Error | null>(null);
     const logger = useMemo(
       () => createEndpointLogger(true, Date.now(), params.locale),
       [params.locale],
     );
-    const { t } = simpleT(params.locale);
-
+    const { t } = useMemo(() => simpleT(params.locale), [params.locale]);
     useEffect(() => {
       let cancelled = false;
 
-      queueMicrotask(() => {
-        void (async (): Promise<void> => {
-          try {
-            // Dynamically import the component
-            const componentModule = await importFn();
-            const PageComponent = componentModule.default;
+      void (async (): Promise<void> => {
+        try {
+          // Dynamically import the component
+          const componentModule = await importFn();
+          const PageComponent = componentModule.default;
 
-            // Create a proper Promise<TParams> for Next.js 15 async params
-            const paramsPromise: Promise<TParams> = Promise.resolve(params);
-            // Call the async page component with Next.js 15 format params
-            const result = await PageComponent({
-              params: paramsPromise,
-            });
+          // Create a proper Promise<TParams> for Next.js 15 async params
+          const paramsPromise: Promise<TParams> = Promise.resolve(params);
+          // Call the async page component with Next.js 15 format params
+          const result = await PageComponent({
+            params: paramsPromise,
+          });
 
-            if (!cancelled) {
-              setContent(result);
-            }
-          } catch (err) {
-            if (!cancelled) {
-              const parsedError = parseError(err);
-              const errorMessage = parsedError.message;
-
-              // Check if this is a server-only or Node.js module error
-              const isServerOnlyError =
-                errorMessage.includes("server-only") ||
-                errorMessage.includes("Node standard library") ||
-                errorMessage.includes("node:") ||
-                errorMessage.includes("Module not found");
-
-              if (isServerOnlyError) {
-                logger.warn(
-                  "Page uses server-only features not available in React Native. " +
-                  "A .native override is needed for this route.",
-                  { error: parsedError, route: params }
-                );
-              } else {
-                logger.error("Failed to load page", { error: parsedError });
-              }
-
-              setError(
-                err instanceof Error
-                  ? err
-                  : new Error(
-                    t(
-                      "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
-                    ),
-                  ),
-              );
-            }
+          if (!cancelled) {
+            setContent(result);
           }
-        })();
-      });
+        } catch (err) {
+          if (!cancelled) {
+            const parsedError = parseError(err);
+            const errorMessage = parsedError.message;
+
+            // Check if this is a server-only or Node.js module error
+            const isServerOnlyError =
+              errorMessage.includes("server-only") ||
+              errorMessage.includes("Node standard library") ||
+              errorMessage.includes("node:") ||
+              errorMessage.includes("Module not found");
+
+            if (isServerOnlyError) {
+              logger.warn(
+                "Page uses server-only features not available in React Native. " +
+                "A .native override is needed for this route.",
+                { error: parsedError, route: params }
+              );
+            } else {
+              logger.error("Failed to load page", { error: parsedError });
+            }
+
+            setError(
+              err instanceof Error
+                ? err
+                : new Error(
+                  t(
+                    "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+                  ),
+                ),
+            );
+          }
+        }
+      })();
 
       return (): void => {
         cancelled = true;
       };
-    }, [logger, params, t]);
+      // oxlint-disable-next-line exhaustive-deps
+    }, [logger, JSON.stringify(params), t]);
 
     // Error state
     if (error) {
@@ -201,8 +201,6 @@ export function createPageWrapperWithImport<
         </View>
       );
     }
-
-    // Render the loaded page content
     return content;
   };
 }

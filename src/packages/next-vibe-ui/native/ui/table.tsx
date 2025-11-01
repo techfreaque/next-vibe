@@ -1,45 +1,61 @@
 import * as TablePrimitive from "@rn-primitives/table";
 import * as React from "react";
-import type { ReactNode, CSSProperties } from "react";
+import type { StyleProp, ViewStyle } from "react-native";
 
+// Import cross-platform types from web (source of truth)
+import type {
+  TableBaseProps,
+  TableProps,
+  TableHeaderProps,
+  TableBodyProps,
+  TableFooterProps,
+  TableRowProps,
+  TableHeadProps,
+  TableCellProps,
+  TableCaptionProps,
+} from "next-vibe-ui/ui/table";
+
+import type { WithClassName } from "../lib/types";
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
 
-// Cross-platform base props for table components
-export interface TableBaseProps {
-  children?: ReactNode;
-  className?: string;
-}
-
-export interface TableProps extends TableBaseProps {}
-
-export interface TableHeaderProps extends TableBaseProps {}
-
-export interface TableBodyProps extends TableBaseProps {
-  style?: CSSProperties;
-}
-
-export interface TableFooterProps extends TableBaseProps {}
-
-export interface TableRowProps extends TableBaseProps {
-  onPress?: () => void;
-}
-
-export interface TableHeadProps extends TableBaseProps {
-  style?: CSSProperties;
-}
-
-export interface TableCellProps extends TableBaseProps {
-  style?: CSSProperties;
-}
+// Type-safe wrappers for primitives
+const StyledTableRoot = TablePrimitive.Root as React.ForwardRefExoticComponent<
+  WithClassName<React.ComponentPropsWithoutRef<typeof TablePrimitive.Root>> &
+    React.RefAttributes<React.ElementRef<typeof TablePrimitive.Root>>
+>;
+const StyledTableHeader = TablePrimitive.Header as React.ForwardRefExoticComponent<
+  WithClassName<React.ComponentPropsWithoutRef<typeof TablePrimitive.Header>> &
+    React.RefAttributes<React.ElementRef<typeof TablePrimitive.Header>>
+>;
+const StyledTableBody = TablePrimitive.Body as React.ForwardRefExoticComponent<
+  WithClassName<React.ComponentPropsWithoutRef<typeof TablePrimitive.Body>> &
+    React.RefAttributes<React.ElementRef<typeof TablePrimitive.Body>>
+>;
+const StyledTableFooter = TablePrimitive.Footer as React.ForwardRefExoticComponent<
+  WithClassName<React.ComponentPropsWithoutRef<typeof TablePrimitive.Footer>> &
+    React.RefAttributes<React.ElementRef<typeof TablePrimitive.Footer>>
+>;
+const StyledTableRow = TablePrimitive.Row as React.ForwardRefExoticComponent<
+  WithClassName<React.ComponentPropsWithoutRef<typeof TablePrimitive.Row>> &
+    React.RefAttributes<React.ElementRef<typeof TablePrimitive.Row>>
+>;
+const StyledTableHead = TablePrimitive.Head as React.ForwardRefExoticComponent<
+  WithClassName<React.ComponentPropsWithoutRef<typeof TablePrimitive.Head>> &
+    React.RefAttributes<React.ElementRef<typeof TablePrimitive.Head>>
+>;
+const StyledTableCell = TablePrimitive.Cell as React.ForwardRefExoticComponent<
+  WithClassName<React.ComponentPropsWithoutRef<typeof TablePrimitive.Cell>> &
+    React.RefAttributes<React.ElementRef<typeof TablePrimitive.Cell>>
+>;
 
 const Table = React.forwardRef<
   TablePrimitive.RootRef,
   TableProps
 >(({ className, ...props }, ref) => (
-  <TablePrimitive.Root
+  <StyledTableRoot
     ref={ref}
-    className={cn("w-full caption-bottom text-sm", className) as never}
+    className={cn("w-full caption-bottom text-sm", className)}
     {...props}
   />
 ));
@@ -49,9 +65,9 @@ const TableHeader = React.forwardRef<
   TablePrimitive.HeaderRef,
   TableHeaderProps
 >(({ className, ...props }, ref) => (
-  <TablePrimitive.Header
+  <StyledTableHeader
     ref={ref}
-    className={cn("border-border [&_tr]:border-b", className) as never}
+    className={cn("border-border [&_tr]:border-b", className)}
     {...props}
   />
 ));
@@ -61,13 +77,13 @@ const TableBody = React.forwardRef<
   TablePrimitive.BodyRef,
   TableBodyProps
 >(({ className, style, ...props }, ref) => (
-  <TablePrimitive.Body
+  <StyledTableBody
     ref={ref}
     className={cn(
       "flex-1 border-border [&_tr:last-child]:border-0",
       className,
-    ) as never}
-    style={[{ minHeight: 2 }, style] as never}
+    )}
+    style={[{ minHeight: 2 }, style] as StyleProp<ViewStyle>}
     {...props}
   />
 ));
@@ -77,9 +93,9 @@ const TableFooter = React.forwardRef<
   TablePrimitive.FooterRef,
   TableFooterProps
 >(({ className, ...props }, ref) => (
-  <TablePrimitive.Footer
+  <StyledTableFooter
     ref={ref}
-    className={cn("bg-muted/50 font-medium [&>tr]:last:border-b-0", className) as never}
+    className={cn("bg-muted/50 font-medium [&>tr]:last:border-b-0", className)}
     {...props}
   />
 ));
@@ -89,12 +105,12 @@ const TableRow = React.forwardRef<
   TablePrimitive.RowRef,
   TableRowProps
 >(({ className, onPress, ...props }, ref) => (
-  <TablePrimitive.Row
+  <StyledTableRow
     ref={ref}
     className={cn(
       "flex-row border-border border-b web:transition-colors web:hover:bg-muted/50 web:data-[state=selected]:bg-muted",
       className,
-    ) as never}
+    )}
     onPress={onPress}
     {...props}
   />
@@ -106,13 +122,13 @@ const TableHead = React.forwardRef<
   TableHeadProps
 >(({ className, style, ...props }, ref) => (
   <TextClassContext.Provider value="text-muted-foreground">
-    <TablePrimitive.Head
+    <StyledTableHead
       ref={ref}
       className={cn(
         "h-12 px-4 text-left justify-center font-medium [&:has([role=checkbox])]:pr-0",
         className,
-      ) as never}
-      style={style as never}
+      )}
+      style={style as StyleProp<ViewStyle>}
       {...props}
     />
   </TextClassContext.Provider>
@@ -123,10 +139,10 @@ const TableCell = React.forwardRef<
   TablePrimitive.CellRef,
   TableCellProps
 >(({ className, style, ...props }, ref) => (
-  <TablePrimitive.Cell
+  <StyledTableCell
     ref={ref}
-    className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className) as never}
-    style={style as never}
+    className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
+    style={style as StyleProp<ViewStyle>}
     {...props}
   />
 ));

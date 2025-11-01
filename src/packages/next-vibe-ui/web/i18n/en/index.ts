@@ -28,6 +28,7 @@ export const translations = {
   },
   ui: {
     markdown: {
+      thinking: "Thinking",
       reasoningProcess: "Reasoning Process",
       streaming: "(streaming...)",
       copied: "Copied!",

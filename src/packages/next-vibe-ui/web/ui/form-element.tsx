@@ -1,8 +1,12 @@
-import type { ComponentPropsWithoutRef, ForwardedRef } from "react";
+import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
 
-// Cross-platform props interface
-export type FormElementProps = ComponentPropsWithoutRef<"form">;
+// Cross-platform props interface - narrowed to work on both web and native
+export interface FormElementProps {
+  className?: string;
+  onSubmit?: (e: React.FormEvent) => void | Promise<void>;
+  children?: ReactNode;
+}
 
 /**
  * Platform-agnostic Form element component for web

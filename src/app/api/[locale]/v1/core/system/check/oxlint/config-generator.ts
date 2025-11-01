@@ -15,6 +15,7 @@ import type {
   OxlintConfig,
   OxlintPrettierEslintConfig,
 } from "./types";
+import { LINT_CONFIG_PATH } from "./repository";
 
 /**
  * Generate oxlint JSON config from TypeScript config
@@ -30,24 +31,12 @@ export async function generateOxlintConfig(
 }> {
   try {
     const projectRoot = process.cwd();
-    const tsConfigPath = resolve(projectRoot, "lint.config.ts");
     const jsonConfigPath = resolve(cacheDir, ".oxlintrc.json");
 
-    // Check if TypeScript config exists
-    if (!existsSync(tsConfigPath)) {
-      return {
-        success: false,
-        configPath: jsonConfigPath,
-        // eslint-disable-next-line i18next/no-literal-string
-        error: "lint.config.ts not found in project root",
-      };
-    }
-
-    logger.debug("Loading lint.config.ts", { path: tsConfigPath });
+    logger.debug("Loading lint.config.ts", { path: LINT_CONFIG_PATH });
 
     // Dynamic import of the TypeScript config
-    // We need to use a file:// URL for Windows compatibility
-    const configModule = await import(`file://${tsConfigPath}`);
+    const configModule = await import(LINT_CONFIG_PATH);
     const fullConfig: OxlintPrettierEslintConfig =
       configModule.config || configModule.default;
 
