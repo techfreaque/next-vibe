@@ -423,4 +423,6 @@ export type LoginPostResponseInput =
 export type LoginPostResponseOutput =
   typeof loginDefinitions.POST.types.ResponseOutput;
 
-export default loginDefinitions;
+const loginEndpoints = { POST: loginDefinitions };
+
+export default loginEndpoints;

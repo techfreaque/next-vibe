@@ -17,13 +17,13 @@ import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
-import type { PricingComparisonFeature, PricingTextFeature } from "./pricing";
+import type { PricingComparisonFeature, PricingTextFeature } from "@/app/api/[locale]/v1/core/products/repository-client";
 import {
   calculateSavingsPercent,
   getPlanPriceForCountry,
   getPricingPlansArray,
   pricingComparisonFeatures,
-} from "./pricing";
+} from "@/app/api/[locale]/v1/core/products/repository-client";
 
 export default function PricingComparison({
   locale,

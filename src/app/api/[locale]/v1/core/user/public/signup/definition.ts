@@ -20,7 +20,6 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 
 import { UserRole } from "../../user-roles/enum";
-import { SignupType, SignupTypeDB, SignupTypeOptions } from "./enum";
 
 /**
  * POST /signup - User registration
@@ -196,38 +195,6 @@ const { POST } = createEndpoint({
         },
       ),
 
-      // === PREFERENCES ===
-      preferences: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.v1.core.user.public.signup.groups.preferences.title" as const,
-          description:
-            "app.api.v1.core.user.public.signup.groups.preferences.description" as const,
-          layout: { type: LayoutType.VERTICAL },
-        },
-        { request: "data" },
-        {
-          signupType: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.v1.core.user.public.signup.fields.signupType.label" as const,
-              description:
-                "app.api.v1.core.user.public.signup.fields.signupType.description" as const,
-              placeholder:
-                "app.api.v1.core.user.public.signup.fields.signupType.placeholder" as const,
-              options: SignupTypeOptions,
-              required: true,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.signupType.help" as const,
-            },
-            z.enum(SignupTypeDB),
-          ),
-        },
-      ),
 
       // === TERMS AND CONSENT ===
       consent: objectField(
@@ -528,9 +495,6 @@ const { POST } = createEndpoint({
           password: "securepassword123",
           confirmPassword: "securepassword123",
         },
-        preferences: {
-          signupType: SignupType.MEETING,
-        },
         consent: {
           acceptTerms: true,
           subscribeToNewsletter: true,
@@ -549,9 +513,6 @@ const { POST } = createEndpoint({
           password: "securepassword123",
           confirmPassword: "securepassword123",
         },
-        preferences: {
-          signupType: SignupType.PRICING,
-        },
         consent: {
           acceptTerms: true,
         },
@@ -566,9 +527,6 @@ const { POST } = createEndpoint({
         security: {
           password: "securepassword123",
           confirmPassword: "securepassword123",
-        },
-        preferences: {
-          signupType: SignupType.MEETING,
         },
         consent: {
           acceptTerms: true,

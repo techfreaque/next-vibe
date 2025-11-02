@@ -1,7 +1,4 @@
-import { translations as componentsTranslations } from "../../_components/i18n/en";
-
 export const translations = {
-  components: componentsTranslations,
   meta: {
     title: "Login - Next Vibe",
     description: "Sign in to your Next Vibe account",

@@ -69,14 +69,40 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
 
       logger.debug("User result", {
         success: userResult.success,
-        hasData: !!userResult.data,
       });
 
-      if (!userResult.success || !userResult.data) {
+      if (!userResult.success) {
+        return userResult;
+      }
+
+      const user = userResult.data;
+
+      // Check if user has an active subscription before allowing credit pack purchase
+      const { subscriptionRepository } = await import("../../subscription/repository");
+      const subscriptionResult = await subscriptionRepository.getSubscription(
+        userId,
+        logger,
+      );
+
+      if (!subscriptionResult.success) {
+        logger.warn("Credit pack purchase attempted without active subscription", {
+          userId,
+        });
         return createErrorResponse(
-          "app.api.v1.core.agent.chat.credits.purchase.post.errors.notFound.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId },
+          "no_active_subscription",
+          ErrorResponseTypes.FORBIDDEN,
+        );
+      }
+
+      const subscription = subscriptionResult.data;
+      if (subscription.status !== "ACTIVE") {
+        logger.warn("Credit pack purchase attempted with inactive subscription", {
+          userId,
+          subscriptionStatus: subscription.status,
+        });
+        return createErrorResponse(
+          "no_active_subscription",
+          ErrorResponseTypes.FORBIDDEN,
         );
       }
 
@@ -88,29 +114,39 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
       // Ensure customer exists with provider
       const customerResult = await provider.ensureCustomer(
         userId,
-        userResult.data.email,
-        userResult.data.publicName,
+        user.email,
+        user.publicName,
         logger,
       );
 
       logger.debug("Customer result", {
         success: customerResult.success,
-        hasData: !!customerResult.data,
       });
 
       if (!customerResult.success) {
         return customerResult;
       }
 
+      const customer = customerResult.data;
       const country = getCountryFromLocale(locale);
 
+      // Get product and calculate totals based on quantity
+      const { productsRepository } = await import("../../products/repository-client");
+      const product = productsRepository.getProduct(ProductIds.CREDIT_PACK, locale, "one_time");
+      const totalAmount = product.price * data.quantity;
+      const totalCredits = product.credits * data.quantity;
+
       // Create checkout session using provider abstraction
+      // Note: We calculate total on our side and send as single line item to Stripe
       logger.debug("About to create checkout session", {
         userId,
         productId: ProductIds.CREDIT_PACK,
         interval: "one_time",
         country,
         customerId: customerResult.data.customerId,
+        quantity: data.quantity,
+        totalAmount,
+        totalCredits,
       });
 
       const session = await provider.createCheckoutSession(
@@ -120,41 +156,34 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
           interval: "one_time",
           country,
           locale,
-          successUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/chat?credits_purchase=success&session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?credits_purchase=canceled`,
+          successUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?payment=success&type=credits&session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?payment=canceled&type=credits`,
           metadata: {
             userId,
             type: "credit_pack",
             productId: ProductIds.CREDIT_PACK,
             quantity: data.quantity.toString(),
+            totalAmount: totalAmount.toString(),
+            totalCredits: totalCredits.toString(),
           },
         },
-        customerResult.data.customerId,
+        customer.customerId,
         logger,
       );
 
       logger.debug("Checkout session result", {
         success: session.success,
-        hasData: !!session.data,
       });
 
       if (!session.success) {
-        logger.error("Checkout session creation failed", {
-          message: session.message,
-          type: session.type,
-        });
         return session;
       }
 
-      // Get product to calculate totals
-      const { productsRepository } = await import("../../products/repository-client");
-      const product = productsRepository.getProduct(ProductIds.CREDIT_PACK, locale, "one_time");
-      const totalAmount = product.price * data.quantity;
-      const totalCredits = product.credits * data.quantity;
+      const sessionData = session.data;
 
       return createSuccessResponse({
-        checkoutUrl: session.data.checkoutUrl,
-        sessionId: session.data.sessionId,
+        checkoutUrl: sessionData.checkoutUrl,
+        sessionId: sessionData.sessionId,
         totalAmount,
         totalCredits,
       });

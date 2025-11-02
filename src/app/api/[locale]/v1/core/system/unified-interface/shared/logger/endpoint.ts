@@ -4,6 +4,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger, LoggerMetadata } from "../types/logger";
+import { debugApp } from "@/config/debug";
 
 // Re-export types for convenience
 export type { EndpointLogger, LoggerMetadata };
@@ -48,7 +49,7 @@ export function createEndpointLogger(
     },
 
     debug(message: string, ...metadata: LoggerMetadata[]): void {
-      if (debugEnabled) {
+      if (debugApp || debugEnabled) {
         console.log(formatMessage("DEBUG", message), ...metadata);
       }
     },

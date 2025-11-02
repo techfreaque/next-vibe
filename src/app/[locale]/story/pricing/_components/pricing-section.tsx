@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, Clock, Loader, Sparkles, Users } from "lucide-react";
+import { Check, Clock, Loader, Sparkles, Star, Users } from "lucide-react";
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import { useToast } from "next-vibe-ui/hooks/use-toast";
@@ -24,7 +24,7 @@ import type { JSX } from "react";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { useSimplifiedCheckout } from "@/app/api/[locale]/v1/core/payment/checkout/hooks";
+import { useCheckout } from "@/app/api/[locale]/v1/core/payment/checkout/hooks";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
 import type {
   BillingIntervalValue,
@@ -46,7 +46,7 @@ import {
   calculateSavingsPercent,
   getPlanPriceForCountry,
   getPricingPlansArray,
-} from "./pricing";
+} from "@/app/api/[locale]/v1/core/products/repository-client";
 
 export default function PricingSection({
   locale,
@@ -88,7 +88,7 @@ export default function PricingSection({
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Use subscription hooks for mutations
-  const { createCheckout } = useSimplifiedCheckout(logger);
+  const { createCheckout } = useCheckout(logger);
 
   const currentPlanId = currentSubscription?.plan;
   const isActive = currentSubscription?.status === SubscriptionStatus.ACTIVE;
@@ -97,6 +97,13 @@ export default function PricingSection({
   const planHierarchy = {
     [SubscriptionPlan.SUBSCRIPTION]: 0,
   };
+
+  // Custom icon for STARTER plan
+  const StarterIcon = (): JSX.Element => (
+    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/30">
+      <Star className="h-6 w-6" />
+    </div>
+  );
 
   const getButtonAction = (
     planId: SubscriptionPlanValue,
@@ -327,11 +334,10 @@ export default function PricingSection({
       >
         <Label
           htmlFor="billing-toggle"
-          className={`${
-            annual
+          className={`${annual
               ? "text-gray-500 dark:text-gray-400"
               : "font-medium text-blue-600 dark:text-blue-400"
-          } transition-colors`}
+            } transition-colors`}
         >
           {t("app.story.pricing.plans.monthly")}
         </Label>
@@ -343,11 +349,10 @@ export default function PricingSection({
         />
         <Label
           htmlFor="billing-toggle"
-          className={`${
-            annual
+          className={`${annual
               ? "font-medium text-blue-600 dark:text-blue-400"
               : "text-gray-500 dark:text-gray-400"
-          } transition-colors flex items-center`}
+            } transition-colors flex items-center`}
         >
           {t("app.story.pricing.plans.annually")}{" "}
           <Span className="ml-1.5 text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2 py-0.5 rounded-full">
@@ -364,7 +369,7 @@ export default function PricingSection({
         initial="hidden"
         animate={inView ? "show" : "hidden"}
       >
-        {getPricingPlansArray(locale).map((plan, index) => {
+        {getPricingPlansArray(locale, <StarterIcon />).map((plan, index) => {
           const pricing = getPlanPriceForCountry(
             plan,
             getCountryFromLocale(currentLocale),
@@ -381,15 +386,13 @@ export default function PricingSection({
               className={`${plan.highlighted ? "lg:-mt-8 z-10" : ""}`}
             >
               <Card
-                className={`flex flex-col h-full transition-all duration-300 ${
-                  plan.highlighted
+                className={`flex flex-col h-full transition-all duration-300 ${plan.highlighted
                     ? "border-2 border-cyan-500 shadow-xl relative hover:shadow-2xl hover:-translate-y-1"
                     : "border border-gray-200 dark:border-gray-800 shadow-md hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-lg"
-                } ${
-                  isCurrent
+                  } ${isCurrent
                     ? "border-green-500 bg-green-50 dark:bg-green-950/20"
                     : ""
-                }`}
+                  }`}
               >
                 {plan.highlighted && plan.badge && (
                   <Div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
@@ -467,18 +470,16 @@ export default function PricingSection({
                         className="flex items-start"
                       >
                         <Div
-                          className={`flex-shrink-0 rounded-full p-1 mt-0.5 ${
-                            plan.highlighted
+                          className={`flex-shrink-0 rounded-full p-1 mt-0.5 ${plan.highlighted
                               ? "bg-cyan-100 dark:bg-cyan-900/30"
                               : "bg-gray-100 dark:bg-gray-800"
-                          }`}
+                            }`}
                         >
                           <Check
-                            className={`h-3 w-3 ${
-                              plan.highlighted
+                            className={`h-3 w-3 ${plan.highlighted
                                 ? "text-cyan-600 dark:text-cyan-400"
                                 : "text-gray-600 dark:text-gray-400"
-                            }`}
+                              }`}
                           />
                         </Div>
                         <Span className="ml-3 text-sm">{t(feature)}</Span>
@@ -489,21 +490,80 @@ export default function PricingSection({
                 <CardFooter className="pt-6">
                   {onPlanSelect
                     ? ((): JSX.Element => {
+                      const action = getButtonAction(plan.id);
+                      const isCurrent = action === "current";
+                      const isLoading = shouldShowLoading(plan.id);
+
+                      return (
+                        <Button
+                          className={`w-full ${isCurrent
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 cursor-default"
+                              : action === "downgrade"
+                                ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50"
+                                : plan.highlighted
+                                  ? "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 text-white"
+                                  : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
+                            }`}
+                          variant={
+                            isCurrent
+                              ? "secondary"
+                              : action === "downgrade"
+                                ? "outline"
+                                : plan.highlighted
+                                  ? "default"
+                                  : "outline"
+                          }
+                          size="lg"
+                          onClick={() => {
+                            const billingInterval = annual
+                              ? BillingInterval.YEARLY
+                              : BillingInterval.MONTHLY;
+
+                            if (action === "downgrade" && onDowngrade) {
+                              onDowngrade(plan.id, billingInterval);
+                            } else if (action === "upgrade") {
+                              onPlanSelect(plan.id, billingInterval, action);
+                            }
+                          }}
+                          disabled={isCurrent || isLoading}
+                        >
+                          {isLoading ? (
+                            <Div className="flex items-center">
+                              <Loader className="mr-2 h-4 w-4 animate-spin" />
+                              {t(
+                                "app.story.pricing.creditPricing.buttons.processing",
+                              )}
+                            </Div>
+                          ) : action === "downgrade" ? (
+                            <Div className="flex flex-col items-center">
+                              <Span>{getButtonText(plan.id)}</Span>
+                              <Span className="text-xs opacity-75">
+                                {t("app.story.pricing.downgrade.nextCycle")}
+                              </Span>
+                            </Div>
+                          ) : (
+                            getButtonText(plan.id)
+                          )}
+                        </Button>
+                      );
+                    })()
+                    : currentUser
+                      ? // Logged in user - show subscription management buttons
+                      ((): JSX.Element => {
                         const action = getButtonAction(plan.id);
                         const isCurrent = action === "current";
                         const isLoading = shouldShowLoading(plan.id);
 
                         return (
                           <Button
-                            className={`w-full ${
-                              isCurrent
+                            className={`w-full ${isCurrent
                                 ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 cursor-default"
                                 : action === "downgrade"
                                   ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50"
                                   : plan.highlighted
                                     ? "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 text-white"
                                     : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
-                            }`}
+                              }`}
                             variant={
                               isCurrent
                                 ? "secondary"
@@ -514,17 +574,7 @@ export default function PricingSection({
                                     : "outline"
                             }
                             size="lg"
-                            onClick={() => {
-                              const billingInterval = annual
-                                ? BillingInterval.YEARLY
-                                : BillingInterval.MONTHLY;
-
-                              if (action === "downgrade" && onDowngrade) {
-                                onDowngrade(plan.id, billingInterval);
-                              } else if (action === "upgrade") {
-                                onPlanSelect(plan.id, billingInterval, action);
-                              }
-                            }}
+                            onClick={() => handlePlanSelect(plan.id)}
                             disabled={isCurrent || isLoading}
                           >
                             {isLoading ? (
@@ -547,36 +597,31 @@ export default function PricingSection({
                           </Button>
                         );
                       })()
-                    : currentUser
-                      ? // Logged in user - show subscription management buttons
-                        ((): JSX.Element => {
-                          const action = getButtonAction(plan.id);
-                          const isCurrent = action === "current";
-                          const isLoading = shouldShowLoading(plan.id);
+                      : // Not logged in - show signup links
+                      ((): JSX.Element => {
+                        const isLoading = shouldShowLoading(plan.id);
 
-                          return (
+                        return (
+                          <Link
+                            href={`/${locale}/user/signup?plan=${plan.id}`}
+                            className="w-full"
+                            onClick={() => {
+                              // Set loading state when clicking the link
+                              if (isProcessing === null) {
+                                setClickedPlan(plan.id);
+                              }
+                            }}
+                          >
                             <Button
-                              className={`w-full ${
-                                isCurrent
-                                  ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 cursor-default"
-                                  : action === "downgrade"
-                                    ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50"
-                                    : plan.highlighted
-                                      ? "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 text-white"
-                                      : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
-                              }`}
+                              className={`w-full ${plan.highlighted
+                                  ? "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 text-white"
+                                  : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
+                                }`}
                               variant={
-                                isCurrent
-                                  ? "secondary"
-                                  : action === "downgrade"
-                                    ? "outline"
-                                    : plan.highlighted
-                                      ? "default"
-                                      : "outline"
+                                plan.highlighted ? "default" : "outline"
                               }
                               size="lg"
-                              onClick={() => handlePlanSelect(plan.id)}
-                              disabled={isCurrent || isLoading}
+                              disabled={isLoading}
                             >
                               {isLoading ? (
                                 <Div className="flex items-center">
@@ -585,60 +630,13 @@ export default function PricingSection({
                                     "app.story.pricing.creditPricing.buttons.processing",
                                   )}
                                 </Div>
-                              ) : action === "downgrade" ? (
-                                <Div className="flex flex-col items-center">
-                                  <Span>{getButtonText(plan.id)}</Span>
-                                  <Span className="text-xs opacity-75">
-                                    {t("app.story.pricing.downgrade.nextCycle")}
-                                  </Span>
-                                </Div>
                               ) : (
-                                getButtonText(plan.id)
+                                getPlanCta(plan.id, t)
                               )}
                             </Button>
-                          );
-                        })()
-                      : // Not logged in - show signup links
-                        ((): JSX.Element => {
-                          const isLoading = shouldShowLoading(plan.id);
-
-                          return (
-                            <Link
-                              href={`/${locale}/user/signup?plan=${plan.id}`}
-                              className="w-full"
-                              onClick={() => {
-                                // Set loading state when clicking the link
-                                if (isProcessing === null) {
-                                  setClickedPlan(plan.id);
-                                }
-                              }}
-                            >
-                              <Button
-                                className={`w-full ${
-                                  plan.highlighted
-                                    ? "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 text-white"
-                                    : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
-                                }`}
-                                variant={
-                                  plan.highlighted ? "default" : "outline"
-                                }
-                                size="lg"
-                                disabled={isLoading}
-                              >
-                                {isLoading ? (
-                                  <Div className="flex items-center">
-                                    <Loader className="mr-2 h-4 w-4 animate-spin" />
-                                    {t(
-                                      "app.story.pricing.creditPricing.buttons.processing",
-                                    )}
-                                  </Div>
-                                ) : (
-                                  getPlanCta(plan.id, t)
-                                )}
-                              </Button>
-                            </Link>
-                          );
-                        })()}
+                          </Link>
+                        );
+                      })()}
                 </CardFooter>
               </Card>
             </motion.div>

@@ -1,6 +1,9 @@
+
+import { translations as _componentsTranslations } from "../../_components/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  _components: _componentsTranslations,
   title: "Benutzerregistrierung",
   description: "Benutzerregistrierungs-Endpunkt",
   tag: "Authentifizierung",
@@ -329,56 +332,12 @@ export const translations: typeof enTranslations = {
   },
   email: {
     title: "Willkommen bei {{appName}}!",
-    subject: "Willkommen bei {{appName}} - Legen wir los!",
-    previewText: "Willkommen bei {{appName}}! Lassen Sie uns beginnen.",
+    subject: "Willkommen bei {{appName}}!",
+    previewText: "Willkommen bei {{appName}}! Starten Sie Ihr KI-Chat-Erlebnis.",
     welcomeMessage: "Willkommen bei {{appName}}!",
-    primaryAction: {
-      title: "Vervollständigen Sie Ihr Profil",
-      description: "Richten Sie Ihr Profil ein, um loszulegen",
-      benefits: {
-        strategy: "Strategische Planung",
-        setup: "Einfache Einrichtung",
-        questions: "Fragen beantworten",
-        flexible: "Flexible Optionen",
-      },
-      cta: "Profil vervollständigen",
-      timeframe: "Dauert etwa {{minutes}} Minuten",
-    },
-    firstStep: {
-      title: "Erster Schritt",
-      description: "Beginnen Sie mit Ihrem ersten Schritt",
-      note: "Wichtiger Hinweis",
-      timeframe: "Dauert etwa {{minutes}} Minuten",
-      cta: "Loslegen",
-    },
-    ourService: {
-      title: "Unser Service",
-      description: "Erfahren Sie mehr über unseren Service",
-      customContent: "Individueller Inhalt für Sie",
-      strategicPlanning: "Strategische Planung",
-      monthlyApproval: "Monatliche Genehmigung",
-      professionalManagement: "Professionelles Management",
-    },
-    afterProfile: {
-      title: "Nach Ihrem Profil",
-      description: "Was als nächstes passiert",
-      flexibility: "Flexible Optionen verfügbar",
-      payment: {
-        title: "Zahlungsoptionen",
-        description: "Wählen Sie Ihren Zahlungsplan",
-        benefits: {
-          immediate: "Sofortiger Zugang",
-          strategy: "Strategische Planung",
-          analytics: "Analytics-Dashboard",
-        },
-        cta: "Plan wählen",
-        timeframe: "Dauert etwa {{minutes}} Minuten",
-      },
-    },
-    needHelp: "Brauchen Sie Hilfe?",
-    supportMessage: "Unser Support-Team ist hier, um zu helfen",
-    contactSupport: "Support kontaktieren",
-    excited: "Wir freuen uns, Sie bei uns zu haben!",
+    description: "Sie sind jetzt bereit, mit KI zu chatten und unserem Community-Forum beizutreten.",
+    ctaTitle: "Loslegen",
+    ctaButton: "Zu Abonnement",
     signoff: "Mit freundlichen Grüßen,\nDas {{appName}} Team",
   },
 };

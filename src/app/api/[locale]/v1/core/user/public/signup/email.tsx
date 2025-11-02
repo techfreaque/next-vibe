@@ -22,7 +22,6 @@ import {
   type SignupPostRequestOutput,
   type SignupPostResponseOutput,
 } from "./definition";
-import { SignupType } from "./enum";
 
 // Constants for email templates
 const CONSULTATION_DURATION = {
@@ -65,10 +64,12 @@ function renderWelcomeEmailContent(
     >
       <Text
         style={{
-          fontSize: "16px",
+          fontSize: "18px",
           lineHeight: "1.6",
           color: "#374151",
-          marginBottom: "16px",
+          marginBottom: "20px",
+          textAlign: "center",
+          fontWeight: "600",
         }}
       >
         {t("app.api.v1.core.user.public.signup.email.welcomeMessage", {
@@ -76,7 +77,19 @@ function renderWelcomeEmailContent(
         })}
       </Text>
 
-      {/* Primary Action - Consultation Booking */}
+      <Text
+        style={{
+          fontSize: "16px",
+          lineHeight: "1.6",
+          color: "#374151",
+          marginBottom: "24px",
+          textAlign: "center",
+        }}
+      >
+        {t("app.api.v1.core.user.public.signup.email.description")}
+      </Text>
+
+      {/* CTA Section */}
       <Section
         style={{
           backgroundColor: "#eff6ff",
@@ -85,6 +98,7 @@ function renderWelcomeEmailContent(
           marginBottom: "24px",
           border: "2px solid #2563eb",
           boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+          textAlign: "center",
         }}
       >
         <Text
@@ -93,401 +107,27 @@ function renderWelcomeEmailContent(
             lineHeight: "1.6",
             color: "#1e40af",
             fontWeight: "700",
-            marginBottom: "12px",
-            textAlign: "center",
-          }}
-        >
-          {t("app.api.v1.core.user.public.signup.email.primaryAction.title")}
-        </Text>
-        <Text
-          style={{
-            fontSize: "16px",
-            lineHeight: "1.6",
-            color: "#1e40af",
-            marginBottom: "20px",
-            textAlign: "center",
-          }}
-        >
-          {t(
-            "app.api.v1.core.user.public.signup.email.primaryAction.description",
-          )}
-        </Text>
-
-        {/* Benefits list */}
-        <ul
-          style={{
-            color: "#1e40af",
-            paddingLeft: "20px",
-            marginBottom: "20px",
-            listStyle: "none",
-          }}
-        >
-          <li style={{ margin: "8px 0", paddingLeft: "0" }}>
-            {t(
-              "app.api.v1.core.user.public.signup.email.primaryAction.benefits.strategy",
-            )}
-          </li>
-          <li style={{ margin: "8px 0", paddingLeft: "0" }}>
-            {t(
-              "app.api.v1.core.user.public.signup.email.primaryAction.benefits.setup",
-            )}
-          </li>
-          <li style={{ margin: "8px 0", paddingLeft: "0" }}>
-            {t(
-              "app.api.v1.core.user.public.signup.email.primaryAction.benefits.questions",
-            )}
-          </li>
-          <li style={{ margin: "8px 0", paddingLeft: "0" }}>
-            {t(
-              "app.api.v1.core.user.public.signup.email.primaryAction.benefits.flexible",
-            )}
-          </li>
-        </ul>
-
-        <div style={{ textAlign: "center", marginBottom: "16px" }}>
-          <Button
-            href={`${baseUrl}/${locale}/`}
-            style={{
-              backgroundColor: "#2563eb",
-              borderRadius: "8px",
-              color: "#ffffff",
-              fontSize: "18px",
-              padding: "16px 32px",
-              textDecoration: "none",
-              fontWeight: "700",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            {t("app.api.v1.core.user.public.signup.email.primaryAction.cta")}
-          </Button>
-        </div>
-
-        <Text
-          style={{
-            fontSize: "14px",
-            lineHeight: "1.5",
-            color: "#1e40af",
-            textAlign: "center",
-            fontWeight: "600",
-          }}
-        >
-          {t(
-            "app.api.v1.core.user.public.signup.email.primaryAction.timeframe",
-            {
-              minDuration: CONSULTATION_DURATION.minDurationMinutes,
-              maxDuration: CONSULTATION_DURATION.maxDurationMinutes,
-            },
-          )}
-        </Text>
-      </Section>
-
-      {/* Optional Step - Business Profile */}
-      <Section
-        style={{
-          backgroundColor: "#f8fafc",
-          borderRadius: "8px",
-          padding: "20px",
-          marginBottom: "20px",
-          border: "1px solid #e2e8f0",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: "18px",
-            lineHeight: "1.6",
-            color: "#64748b",
-            fontWeight: "600",
-            marginBottom: "12px",
-          }}
-        >
-          {t("app.api.v1.core.user.public.signup.email.firstStep.title")}
-        </Text>
-        <Text
-          style={{
-            fontSize: "16px",
-            lineHeight: "1.6",
-            color: "#64748b",
             marginBottom: "16px",
           }}
         >
-          {t("app.api.v1.core.user.public.signup.email.firstStep.description")}
+          {t("app.api.v1.core.user.public.signup.email.ctaTitle")}
         </Text>
-        <Text
-          style={{
-            fontSize: "14px",
-            lineHeight: "1.5",
-            color: "#2563eb",
-            marginBottom: "16px",
-            fontWeight: "600",
-            backgroundColor: "#eff6ff",
-            padding: "12px",
-            borderRadius: "6px",
-            border: "1px solid #dbeafe",
-          }}
-        >
-          {t("app.api.v1.core.user.public.signup.email.firstStep.note")}
-        </Text>
-        <Text
-          style={{
-            fontSize: "14px",
-            lineHeight: "1.5",
-            color: "#64748b",
-            marginBottom: "16px",
-            fontStyle: "italic",
-          }}
-        >
-          {t("app.api.v1.core.user.public.signup.email.firstStep.timeframe", {
-            minutes: BUSINESS_FORM_TIME.completionTimeMinutes,
-          })}
-        </Text>
+
         <Button
-          href={`${baseUrl}/${locale}/`}
+          href={`${baseUrl}/${locale}/subscription`}
           style={{
-            backgroundColor: "transparent",
-            border: "2px solid #64748b",
-            borderRadius: "6px",
-            color: "#64748b",
-            fontSize: "16px",
-            padding: "12px 24px",
-            textDecoration: "none",
-            fontWeight: "600",
-          }}
-        >
-          {t("app.api.v1.core.user.public.signup.email.firstStep.cta")}
-        </Button>
-      </Section>
-
-      {/* What We Do Section */}
-      <Text
-        style={{
-          fontSize: "18px",
-          lineHeight: "1.6",
-          color: "#1f2937",
-          fontWeight: "600",
-          marginBottom: "16px",
-          marginTop: "24px",
-        }}
-      >
-        {t("app.api.v1.core.user.public.signup.email.ourService.title")}
-      </Text>
-
-      <Text
-        style={{
-          fontSize: "16px",
-          lineHeight: "1.6",
-          color: "#374151",
-          marginBottom: "16px",
-        }}
-      >
-        {t("app.api.v1.core.user.public.signup.email.ourService.description")}
-      </Text>
-
-      <ul
-        style={{
-          color: "#374151",
-          paddingLeft: "20px",
-          marginBottom: "24px",
-        }}
-      >
-        <li style={{ margin: "8px 0" }}>
-          {t(
-            "app.api.v1.core.user.public.signup.email.ourService.customContent",
-          )}
-        </li>
-        <li style={{ margin: "8px 0" }}>
-          {t(
-            "app.api.v1.core.user.public.signup.email.ourService.strategicPlanning",
-          )}
-        </li>
-        <li style={{ margin: "8px 0" }}>
-          {t(
-            "app.api.v1.core.user.public.signup.email.ourService.monthlyApproval",
-          )}
-        </li>
-        <li style={{ margin: "8px 0" }}>
-          {t(
-            "app.api.v1.core.user.public.signup.email.ourService.professionalManagement",
-          )}
-        </li>
-      </ul>
-
-      {/* After Profile Section */}
-      <Text
-        style={{
-          fontSize: "18px",
-          lineHeight: "1.6",
-          color: "#1f2937",
-          fontWeight: "600",
-          marginBottom: "16px",
-          marginTop: "24px",
-        }}
-      >
-        {t("app.api.v1.core.user.public.signup.email.afterProfile.title")}
-      </Text>
-
-      <Text
-        style={{
-          fontSize: "16px",
-          lineHeight: "1.6",
-          color: "#374151",
-          marginBottom: "24px",
-        }}
-      >
-        {t("app.api.v1.core.user.public.signup.email.afterProfile.description")}
-      </Text>
-
-      {/* Pricing Option */}
-      <Section
-        style={{
-          backgroundColor: "#f8fafc",
-          borderRadius: "8px",
-          padding: "20px",
-          marginBottom: "24px",
-          border: "1px solid #e2e8f0",
-        }}
-      >
-        <Text
-          style={{
+            backgroundColor: "#2563eb",
+            borderRadius: "8px",
+            color: "#ffffff",
             fontSize: "18px",
-            lineHeight: "1.6",
-            color: "#64748b",
-            fontWeight: "600",
-            marginBottom: "12px",
-          }}
-        >
-          {t(
-            "app.api.v1.core.user.public.signup.email.afterProfile.payment.title",
-          )}
-        </Text>
-        <Text
-          style={{
-            fontSize: "16px",
-            lineHeight: "1.6",
-            color: "#64748b",
-            marginBottom: "16px",
-          }}
-        >
-          {t(
-            "app.api.v1.core.user.public.signup.email.afterProfile.payment.description",
-          )}
-        </Text>
-        <ul
-          style={{
-            color: "#64748b",
-            paddingLeft: "20px",
-            marginBottom: "16px",
-          }}
-        >
-          <li style={{ margin: "8px 0" }}>
-            {t(
-              "app.api.v1.core.user.public.signup.email.afterProfile.payment.benefits.immediate",
-            )}
-          </li>
-          <li style={{ margin: "8px 0" }}>
-            {t(
-              "app.api.v1.core.user.public.signup.email.afterProfile.payment.benefits.strategy",
-            )}
-          </li>
-          <li style={{ margin: "8px 0" }}>
-            {t(
-              "app.api.v1.core.user.public.signup.email.afterProfile.payment.benefits.analytics",
-            )}
-          </li>
-        </ul>
-        <Section style={{ textAlign: "center", marginTop: "16px" }}>
-          <Button
-            href={`${baseUrl}/${locale}/`}
-            style={{
-              backgroundColor: "transparent",
-              border: "2px solid #64748b",
-              borderRadius: "6px",
-              color: "#64748b",
-              fontSize: "16px",
-              fontWeight: "600",
-              padding: "12px 24px",
-              textDecoration: "none",
-              display: "inline-block",
-            }}
-          >
-            {t(
-              "app.api.v1.core.user.public.signup.email.afterProfile.payment.cta",
-            )}
-          </Button>
-        </Section>
-        <Text
-          style={{
-            fontSize: "14px",
-            lineHeight: "1.5",
-            color: "#64748b",
-            textAlign: "center",
-            marginTop: "8px",
-          }}
-        >
-          {t(
-            "app.api.v1.core.user.public.signup.email.afterProfile.payment.timeframe",
-          )}
-        </Text>
-      </Section>
-
-      <Text
-        style={{
-          fontSize: "16px",
-          lineHeight: "1.6",
-          color: "#374151",
-          marginBottom: "24px",
-          textAlign: "center",
-          fontStyle: "italic",
-        }}
-      >
-        {t("app.api.v1.core.user.public.signup.email.afterProfile.flexibility")}
-      </Text>
-
-      {/* Support section */}
-      <Section
-        style={{
-          backgroundColor: "#fafafa",
-          borderRadius: "8px",
-          padding: "20px",
-          marginTop: "32px",
-          textAlign: "center",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: "18px",
-            lineHeight: "1.6",
-            color: "#1f2937",
-            fontWeight: "600",
-            marginBottom: "12px",
-          }}
-        >
-          {t("app.api.v1.core.user.public.signup.email.needHelp")}
-        </Text>
-        <Text
-          style={{
-            fontSize: "16px",
-            lineHeight: "1.6",
-            color: "#374151",
-            marginBottom: "16px",
-          }}
-        >
-          {t("app.api.v1.core.user.public.signup.email.supportMessage")}
-        </Text>
-        <Button
-          href={`${baseUrl}/${locale}/help`}
-          style={{
-            backgroundColor: "transparent",
-            border: "2px solid #6b7280",
-            borderRadius: "6px",
-            color: "#6b7280",
-            fontSize: "14px",
-            fontWeight: "500",
-            padding: "10px 20px",
+            padding: "16px 32px",
             textDecoration: "none",
+            fontWeight: "700",
+            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
             display: "inline-block",
           }}
         >
-          {t("app.api.v1.core.user.public.signup.email.contactSupport")}
+          {t("app.api.v1.core.user.public.signup.email.ctaButton")}
         </Button>
       </Section>
 
@@ -497,21 +137,8 @@ function renderWelcomeEmailContent(
           fontSize: "16px",
           lineHeight: "1.6",
           color: "#374151",
-          marginTop: "32px",
-          marginBottom: "16px",
+          marginTop: "24px",
           textAlign: "center",
-        }}
-      >
-        {t("app.api.v1.core.user.public.signup.email.excited")}
-      </Text>
-
-      <Text
-        style={{
-          fontSize: "16px",
-          lineHeight: "1.6",
-          color: "#374151",
-          textAlign: "center",
-          whiteSpace: "pre-line",
         }}
       >
         {t("app.api.v1.core.user.public.signup.email.signoff", {
@@ -737,50 +364,6 @@ function renderAdminNotificationEmailContent(
             )}
           </Text>
 
-          <div style={{ paddingLeft: "16px" }}>
-            {requestData.signupType.length > 0 && (
-              <Text
-                style={{
-                  fontSize: "14px",
-                  marginBottom: "6px",
-                  color: "#4b5563",
-                  lineHeight: "1.5",
-                }}
-              >
-                <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                  {t(
-                    "app.api.v1.core.user.public.signup.admin_notification.signup_type",
-                  )}
-                  :
-                </Text>{" "}
-                <span
-                  style={{
-                    backgroundColor: requestData.signupType.includes(
-                      SignupType.MEETING,
-                    )
-                      ? "#ecfdf5"
-                      : "#f0f9ff",
-                    color: requestData.signupType.includes(SignupType.MEETING)
-                      ? "#065f46"
-                      : "#0c4a6e",
-                    padding: "2px 8px",
-                    borderRadius: "4px",
-                    fontSize: "12px",
-                    fontWeight: "600",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  {requestData.signupType.includes(SignupType.MEETING)
-                    ? t(
-                      "app.api.v1.core.user.public.signup.admin_notification.consultation_first",
-                    )
-                    : t(
-                      "app.api.v1.core.user.public.signup.admin_notification.direct_signup",
-                    )}
-                </span>
-              </Text>
-            )}
-
             {
               requestData.subscribeToNewsletter !== undefined && (
                 <Text
@@ -822,7 +405,6 @@ function renderAdminNotificationEmailContent(
                 </Text>
               )
             }
-          </div>
         </div>
 
         {/* Signup Details */}
@@ -893,52 +475,6 @@ function renderAdminNotificationEmailContent(
             </Text>
           </div>
         </div>
-      </Section>
-
-      {/* Next Steps Section */}
-      <Section
-        style={{
-          backgroundColor: requestData.signupType.includes(SignupType.MEETING)
-            ? "#fff7ed"
-            : "#f0f9ff",
-          padding: "16px",
-          borderRadius: "8px",
-          marginBottom: "24px",
-          border: `1px solid ${requestData.signupType.includes(SignupType.MEETING) ? "#fed7aa" : "#bfdbfe"}`,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: "16px",
-            fontWeight: "600",
-            color: requestData.signupType.includes(SignupType.MEETING)
-              ? "#ea580c"
-              : "#2563eb",
-            marginBottom: "8px",
-          }}
-        >
-          {t(
-            "app.api.v1.core.user.public.signup.admin_notification.recommended_next_steps",
-          )}
-        </Text>
-
-        <Text
-          style={{
-            fontSize: "14px",
-            lineHeight: "1.6",
-            color: requestData.signupType.includes(SignupType.MEETING)
-              ? "#9a3412"
-              : "#1e40af",
-          }}
-        >
-          {requestData.signupType.includes(SignupType.MEETING)
-            ? t(
-              "app.api.v1.core.user.public.signup.admin_notification.consultation_recommendation",
-            )
-            : t(
-              "app.api.v1.core.user.public.signup.admin_notification.direct_recommendation",
-            )}
-        </Text>
       </Section>
 
       {/* Action Buttons */}
@@ -1017,7 +553,7 @@ export const renderAdminSignupNotification: EmailFunctionType<
       },
     ),
     jsx: renderAdminNotificationEmailContent(t, locale, user, {
-      signupType: [requestData.preferences.signupType],
+      signupType: [], // signupType removed from form, defaulting to empty array
       subscribeToNewsletter: requestData.consent?.subscribeToNewsletter,
     }),
   });

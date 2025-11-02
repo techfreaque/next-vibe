@@ -36,7 +36,7 @@ export function useSubscriptionCheckout(
  * Hook for subscription checkout with simplified interface
  * Provides a convenience wrapper around the main hook
  */
-export function useSimplifiedCheckout(logger: EndpointLogger): {
+export function useCheckout(logger: EndpointLogger): {
   createCheckout: (
     planId: SubscriptionPlanValue,
     billingInterval: BillingIntervalValue,

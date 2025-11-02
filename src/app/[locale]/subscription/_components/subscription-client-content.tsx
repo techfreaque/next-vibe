@@ -3,37 +3,47 @@
 import { motion } from "framer-motion";
 import {
   AlertCircle,
+  ArrowLeft,
   Calendar,
+  CheckCircle,
   Coins,
   CreditCard,
   History,
   Info,
   Sparkles,
   TrendingUp,
+  X,
   Zap,
 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "next-vibe/shared/utils";
+import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
+import { Link } from "next-vibe-ui/ui/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Container } from "next-vibe-ui/ui/container";
 import { Div } from "next-vibe-ui/ui/div";
+import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { Span } from "next-vibe-ui/ui/span";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
-import { Container } from "next-vibe-ui/ui/container";
 import { H1, H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { useTranslation } from "@/i18n/core/client";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { formatSimpleDate } from "@/i18n/core/localization-utils";
-
-import { productsRepository, ProductIds } from "@/app/api/[locale]/v1/core/products/repository-client";
-import { useSimplifiedCheckout } from "@/app/api/[locale]/v1/core/payment/checkout/hooks";
+import { modelOptions, modelProviders } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { useCreditPurchase } from "@/app/api/[locale]/v1/core/credits/hooks";
+import purchaseDefinitions from "@/app/api/[locale]/v1/core/credits/purchase/definition";
+import { useCheckout } from "@/app/api/[locale]/v1/core/payment/checkout/hooks";
+import { handleCheckoutRedirect } from "@/app/api/[locale]/v1/core/payment/utils/redirect";
+import { ProductIds, productsRepository } from "@/app/api/[locale]/v1/core/products/repository-client";
 import { BillingInterval, SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/i18n/core/client";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 /**
  * Credit Balance Interface
@@ -136,22 +146,61 @@ export function SubscriptionClientContent({
 }: SubscriptionClientContentProps): JSX.Element {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("overview");
-  const [packQuantity, setPackQuantity] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertType, setAlertType] = useState<"success" | "error">("success");
+  const [alertMessage, setAlertMessage] = useState("");
 
   // Get pricing from centralized products repository with proper locale
   const products = productsRepository.getProducts(locale);
   const SUBSCRIPTION_PRICE = products[ProductIds.SUBSCRIPTION].price;
+  const SUBSCRIPTION_CREDITS = products[ProductIds.SUBSCRIPTION].credits;
   const PACK_PRICE = products[ProductIds.CREDIT_PACK].price;
   const PACK_CREDITS = products[ProductIds.CREDIT_PACK].credits;
+  const FREE_CREDITS = products[ProductIds.FREE_TIER].credits;
 
   // Initialize hooks
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const { createCheckout, isPending: isSubscriptionPending } = useSimplifiedCheckout(logger);
+  const { createCheckout, isPending: isSubscriptionPending } = useCheckout(logger);
   const creditPurchaseEndpoint = useCreditPurchase(logger);
 
-  // Handle subscription purchase
+  // Handle URL params for payment success/cancel
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    const type = searchParams.get("type");
+
+    if (payment && type) {
+      if (payment === "success") {
+        setAlertType("success");
+        if (type === "subscription") {
+          setAlertMessage(t("app.subscription.subscription.payment.success.subscription"));
+        } else if (type === "credits") {
+          setAlertMessage(t("app.subscription.subscription.payment.success.credits"));
+        }
+        setShowAlert(true);
+      } else if (payment === "canceled") {
+        setAlertType("error");
+        if (type === "subscription") {
+          setAlertMessage(t("app.subscription.subscription.payment.canceled.subscription"));
+        } else if (type === "credits") {
+          setAlertMessage(t("app.subscription.subscription.payment.canceled.credits"));
+        }
+        setShowAlert(true);
+      }
+
+      // Clear URL params
+      const newUrl = window.location.pathname;
+      router.replace(newUrl);
+    }
+  }, [searchParams, router, t]);
+
+  /**
+   * Handle subscription purchase
+   * Creates checkout session and redirects to Stripe
+   */
   const handleSubscribe = async (): Promise<void> => {
     setIsProcessing(true);
     try {
@@ -160,29 +209,22 @@ export function SubscriptionClientContent({
         BillingInterval.MONTHLY,
       );
 
-      if (!result.success) {
+      // Handle redirect or show error
+      const redirected = handleCheckoutRedirect(result, (errorMessage) => {
         toast({
           title: t("app.common.error.title"),
-          description: result.message,
+          description: errorMessage,
           variant: "destructive",
         });
         setIsProcessing(false);
+      });
+
+      // If redirect failed, processing state is already reset in error callback
+      if (!redirected) {
         return;
       }
 
-      // Redirect to Stripe checkout
-      // The response structure is {success: true, data: {success: true, sessionId: ..., checkoutUrl: ...}}
-      const checkoutUrl = result.data?.checkoutUrl;
-      if (checkoutUrl) {
-        window.location.assign(checkoutUrl);
-      } else {
-        toast({
-          title: t("app.common.error.title"),
-          description: "No checkout URL received",
-          variant: "destructive",
-        });
-        setIsProcessing(false);
-      }
+      // If redirect succeeded, keep processing state (page will navigate away)
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Subscription purchase error:", error);
@@ -195,63 +237,91 @@ export function SubscriptionClientContent({
     }
   };
 
-  // Handle credit pack purchase
-  const handleBuyPack = async (): Promise<void> => {
-    setIsProcessing(true);
-    try {
-      if (!creditPurchaseEndpoint.create) {
-        toast({
-          title: t("app.common.error.title"),
-          description: t("app.common.error.description"),
-          variant: "destructive",
-        });
-        setIsProcessing(false);
-        return;
-      }
+  /**
+   * Handle credit pack form submission
+   * Wraps the form submission to handle Stripe redirect
+   */
+  const handleCreditPurchaseSubmit = (
+    event: React.FormEvent<HTMLFormElement> | undefined,
+  ): void => {
+    if (!creditPurchaseEndpoint.create) {
+      return;
+    }
 
-      // Set form values using reset to ensure form is properly initialized
-      creditPurchaseEndpoint.create.form.reset({
-        quantity: packQuantity,
-      });
-
-      // Submit form with onSuccess and onError callbacks
-      await creditPurchaseEndpoint.create.submitForm(undefined, {
-        onSuccess: ({ responseData }) => {
-          // Redirect to Stripe checkout
-          if (responseData.checkoutUrl) {
-            window.location.assign(responseData.checkoutUrl);
-          } else {
+    // Submit form with redirect handling in callbacks
+    void creditPurchaseEndpoint.create.submitForm(event, {
+      onSuccess: ({ responseData }) => {
+        // Handle redirect to Stripe checkout
+        handleCheckoutRedirect(
+          { success: true, data: responseData, message: "" },
+          (errorMessage) => {
             toast({
               title: t("app.common.error.title"),
-              description: t("app.common.error.description"),
+              description: errorMessage,
               variant: "destructive",
             });
-            setIsProcessing(false);
-          }
-        },
-        onError: ({ error }) => {
-          toast({
-            title: t("app.common.error.title"),
-            description: error.message,
-            variant: "destructive",
-          });
-          setIsProcessing(false);
-        },
-      });
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Credit pack purchase error:", error);
-      toast({
-        title: t("app.common.error.title"),
-        description: t("app.common.error.description"),
-        variant: "destructive",
-      });
-      setIsProcessing(false);
-    }
+          },
+        );
+      },
+      onError: ({ error }) => {
+        toast({
+          title: t("app.common.error.title"),
+          description: error.message ?? t("app.common.error.description"),
+          variant: "destructive",
+        });
+      },
+    });
   };
+
+
 
   return (
     <Container className="py-8 space-y-8">
+      {/* Header with Back Button */}
+      <div className="flex justify-start mb-6">
+        <Link
+          href={`/${locale}`}
+          className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("app.subscription.subscription.backToChat")}
+        </Link>
+      </div>
+
+      {/* Payment Status Alert */}
+      {showAlert && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Alert
+            variant={alertType === "success" ? "success" : "destructive"}
+            className="relative"
+          >
+            {alertType === "success" ? (
+              <CheckCircle className="h-4 w-4" />
+            ) : (
+              <AlertCircle className="h-4 w-4" />
+            )}
+            <AlertTitle>
+              {alertType === "success"
+                ? t("app.subscription.subscription.payment.success.title")
+                : t("app.subscription.subscription.payment.canceled.title")}
+            </AlertTitle>
+            <AlertDescription>{alertMessage}</AlertDescription>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-2 right-2 h-6 w-6 p-0"
+              onClick={() => setShowAlert(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </Alert>
+        </motion.div>
+      )}
+
       {/* Header Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -337,7 +407,10 @@ export function SubscriptionClientContent({
                   {initialCredits?.free ?? 0}
                 </Div>
                 <Div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                  {t("app.subscription.subscription.balance.free.description")}
+                  {t(
+                    "app.subscription.subscription.balance.free.description",
+                    { count: FREE_CREDITS }
+                  )}
                 </Div>
               </Div>
 
@@ -377,10 +450,10 @@ export function SubscriptionClientContent({
                     <Div className="p-2 rounded-lg bg-primary/10">
                       <CreditCard className="h-6 w-6 text-primary" />
                     </Div>
-                    Monthly Subscription
+                    {t("app.subscription.subscription.title")}
                   </CardTitle>
                   <CardDescription>
-                    Your active subscription plan
+                    {t("app.subscription.subscription.description")}
                   </CardDescription>
                 </Div>
                 <Badge className="bg-green-600 text-white">
@@ -392,7 +465,7 @@ export function SubscriptionClientContent({
               <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Div className="p-4 rounded-lg bg-muted/50 border">
                   <Div className="text-sm text-muted-foreground mb-1">
-                    Billing Interval
+                    {t("app.subscription.subscription.billingInterval")}
                   </Div>
                   <Div className="text-lg font-semibold capitalize">
                     {initialSubscription.billingInterval.toLowerCase()}
@@ -400,7 +473,7 @@ export function SubscriptionClientContent({
                 </Div>
                 <Div className="p-4 rounded-lg bg-muted/50 border">
                   <Div className="text-sm text-muted-foreground mb-1">
-                    Current Period Start
+                    {t("app.subscription.subscription.currentPeriodStart")}
                   </Div>
                   <Div className="text-lg font-semibold">
                     {formatDate(initialSubscription.currentPeriodStart, locale)}
@@ -408,12 +481,12 @@ export function SubscriptionClientContent({
                 </Div>
                 <Div className="p-4 rounded-lg bg-muted/50 border">
                   <Div className="text-sm text-muted-foreground mb-1">
-                    Next Billing Date
+                    {t("app.subscription.subscription.nextBillingDate")}
                   </Div>
                   <Div className="text-lg font-semibold">
                     {initialSubscription.currentPeriodEnd
                       ? formatDate(initialSubscription.currentPeriodEnd, locale)
-                      : "N/A"}
+                      : t("app.common.notAvailable")}
                   </Div>
                 </Div>
               </Div>
@@ -516,7 +589,7 @@ export function SubscriptionClientContent({
             </Card>
 
             {/* Cost Reference */}
-            <Card>
+            <Card className="mt-6">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Coins className="h-5 w-5" />
@@ -536,67 +609,45 @@ export function SubscriptionClientContent({
                         "app.subscription.subscription.overview.costs.models.title",
                       )}
                     </H4>
-                    <Div className="grid grid-cols-2 gap-2 text-sm">
-                      <Div className="flex justify-between p-2 rounded bg-muted/50">
-                        <Span>
-                          {t(
-                            "app.subscription.subscription.overview.costs.models.gpt4",
-                          )}
-                        </Span>
-                        <Span className="font-mono">
-                          {t(
-                            "app.subscription.subscription.overview.costs.models.cost",
-                            {
-                              count: 5,
-                            },
-                          )}
-                        </Span>
-                      </Div>
-                      <Div className="flex justify-between p-2 rounded bg-muted/50">
-                        <Span>
-                          {t(
-                            "app.subscription.subscription.overview.costs.models.claude",
-                          )}
-                        </Span>
-                        <Span className="font-mono">
-                          {t(
-                            "app.subscription.subscription.overview.costs.models.cost",
-                            {
-                              count: 4,
-                            },
-                          )}
-                        </Span>
-                      </Div>
-                      <Div className="flex justify-between p-2 rounded bg-muted/50">
-                        <Span>
-                          {t(
-                            "app.subscription.subscription.overview.costs.models.gpt35",
-                          )}
-                        </Span>
-                        <Span className="font-mono">
-                          {t(
-                            "app.subscription.subscription.overview.costs.models.cost",
-                            {
-                              count: 2,
-                            },
-                          )}
-                        </Span>
-                      </Div>
-                      <Div className="flex justify-between p-2 rounded bg-muted/50">
-                        <Span>
-                          {t(
-                            "app.subscription.subscription.overview.costs.models.llama",
-                          )}
-                        </Span>
-                        <Span className="font-mono">
-                          {t(
-                            "app.subscription.subscription.overview.costs.models.cost",
-                            {
-                              count: 2,
-                            },
-                          )}
-                        </Span>
-                      </Div>
+                    <Div className="space-y-4">
+                      {Object.entries(modelProviders).map(([providerId, provider]) => {
+                        const providerModels = modelOptions.filter(
+                          (model) => model.provider === providerId,
+                        );
+                        if (providerModels.length === 0) {
+                          return null;
+                        }
+                        return (
+                          <Div key={providerId}>
+                            <H4 className="font-semibold mb-2 flex items-center gap-2">
+                              {typeof provider.icon === "string" ? (
+                                <Span>{provider.icon}</Span>
+                              ) : (
+                                <provider.icon className="h-5 w-5" />
+                              )}
+                              {provider.name}
+                            </H4>
+                            <Div className="grid grid-cols-2 gap-2 text-sm">
+                              {providerModels.map((model) => (
+                                <Div
+                                  key={model.id}
+                                  className="flex justify-between p-2 rounded bg-muted/50"
+                                >
+                                  <Span>{model.name}</Span>
+                                  <Span className="font-mono">
+                                    {t(
+                                      "app.subscription.subscription.overview.costs.models.cost",
+                                      {
+                                        count: model.creditCost,
+                                      },
+                                    )}
+                                  </Span>
+                                </Div>
+                              ))}
+                            </Div>
+                          </Div>
+                        );
+                      })}
                     </Div>
                   </Div>
 
@@ -692,6 +743,7 @@ export function SubscriptionClientContent({
                     <Span>
                       {t(
                         "app.subscription.subscription.buy.subscription.features.credits",
+                        { count: SUBSCRIPTION_CREDITS }
                       )}
                     </Span>
                   </Div>
@@ -750,6 +802,7 @@ export function SubscriptionClientContent({
                     <Span>
                       {t(
                         "app.subscription.subscription.buy.pack.features.credits",
+                        { count: PACK_CREDITS }
                       )}
                     </Span>
                   </Div>
@@ -771,67 +824,48 @@ export function SubscriptionClientContent({
                   </Div>
                 </Div>
 
-                {/* Quantity Selector */}
-                <Div className="space-y-3">
-                  <label className="text-sm font-medium">
-                    {t("app.subscription.subscription.buy.pack.quantity")}
-                  </label>
-                  <Div className="flex items-center gap-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        setPackQuantity(Math.max(1, packQuantity - 1))
-                      }
-                      disabled={packQuantity <= 1}
-                    >
-                      -
-                    </Button>
-                    <Div className="flex-1 text-center">
-                      <Div className="text-lg font-semibold">
-                        {packQuantity}
-                      </Div>
-                      <Div className="text-xs text-muted-foreground">
-                        {t("app.subscription.subscription.buy.pack.total", {
-                          count: packQuantity * PACK_CREDITS,
-                        })}
-                      </Div>
+                {/* Quantity Selector Form - Only show for active subscribers */}
+                {creditPurchaseEndpoint.create && initialSubscription?.status === "active" && (
+                  <Form
+                    form={creditPurchaseEndpoint.create.form}
+                    onSubmit={handleCreditPurchaseSubmit}
+                    className="space-y-3"
+                  >
+                    <Div className="w-full">
+                      <EndpointFormField
+                        name="quantity"
+                        control={creditPurchaseEndpoint.create.form.control}
+                        endpointFields={purchaseDefinitions.POST.fields}
+                        theme={{
+                          style: "none",
+                          showAllRequired: false,
+                        }}
+                      />
                     </Div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        setPackQuantity(Math.min(10, packQuantity + 1))
-                      }
-                      disabled={packQuantity >= 10}
-                    >
-                      +
-                    </Button>
-                  </Div>
-                  <Div className="text-center text-sm text-muted-foreground">
-                    {t("app.subscription.subscription.buy.pack.totalPrice", {
-                      price: formatPrice(PACK_PRICE * packQuantity, locale),
-                    })}
-                  </Div>
-                </Div>
 
-                <Button
-                  className="w-full"
-                  size="lg"
-                  variant="outline"
-                  onClick={handleBuyPack}
-                  disabled={isProcessing || creditPurchaseEndpoint.create?.isSubmitting}
-                >
-                  {isProcessing || creditPurchaseEndpoint.create?.isSubmitting
-                    ? "Loading..."
-                    : t("app.subscription.subscription.buy.pack.button", {
-                      count: packQuantity,
-                      type:
-                        packQuantity === 1
-                          ? t("app.subscription.subscription.buy.pack.pack")
-                          : t("app.subscription.subscription.buy.pack.packs"),
-                    })}
-                </Button>
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      size="lg"
+                      variant="outline"
+                      disabled={creditPurchaseEndpoint.create.isSubmitting}
+                    >
+                      {creditPurchaseEndpoint.create.isSubmitting
+                        ? "Loading..."
+                        : t("app.subscription.subscription.buy.pack.button.submit")}
+                    </Button>
+                  </Form>
+                )}
+
+                {/* Message for non-subscribers */}
+                {(!initialSubscription || initialSubscription.status !== "active") && (
+                  <Div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                    <Div className="text-sm text-amber-700 dark:text-amber-300">
+                      <Info className="h-4 w-4 inline mr-2" />
+                      {t("app.subscription.subscription.buy.pack.requiresSubscription")}
+                    </Div>
+                  </Div>
+                )}
               </CardContent>
             </Card>
           </motion.div>

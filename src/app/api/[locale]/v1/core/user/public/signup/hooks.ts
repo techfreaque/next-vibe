@@ -1,39 +1,28 @@
 import { useRouter } from "next/navigation";
 import { useToast } from "next-vibe-ui//hooks/use-toast";
-import { useMemo } from "react";
+import { useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type {
-  FormAlertState,
-  InferApiQueryReturn,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
-import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/types";
-import {
-  useApiForm,
-  useApiQuery,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
+import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 
 import { authClientRepository } from "../../auth/repository-client";
 import { useUser } from "../../private/me/hooks";
 import signupEndpoints from "./definition";
-import { SignupType } from "./enum";
 
-type SignupFormReturn = ApiFormReturn<
-  typeof signupEndpoints.POST.TRequestOutput,
-  typeof signupEndpoints.POST.TResponseOutput,
-  typeof signupEndpoints.POST.TUrlVariablesOutput
-> & {
-  alert: FormAlertState | null;
+type SignupFormReturn = EndpointReturn<typeof signupEndpoints> & {
   logger: ReturnType<typeof createEndpointLogger>;
 };
 
 /**
- * Hook for registration functionality
- * @returns Registration form and submission handling with enhanced error typing
+ * Hook for registration functionality with email checking
+ * @returns Registration form, email checking, and submission handling with enhanced error typing
  */
-export function useRegister(): SignupFormReturn {
+export function useRegister(): SignupFormReturn & {
+  checkEmail: (email: string | null) => void;
+} {
   const { toast } = useToast();
   const router = useRouter();
   const { t, locale } = useTranslation();
@@ -52,9 +41,11 @@ export function useRegister(): SignupFormReturn {
     locale,
   );
 
-  const formResult = useApiForm(
-    signupEndpoints.POST,
-    logger,
+  // Email checking state
+  const [emailToCheck, setEmailToCheck] = useState<string | null>(null);
+
+  const endpointResult = useEndpoint(
+    signupEndpoints,
     {
       defaultValues: {
         personalInfo: {
@@ -66,9 +57,6 @@ export function useRegister(): SignupFormReturn {
           password: "",
           confirmPassword: "",
         },
-        preferences: {
-          signupType: SignupType.PRICING,
-        },
         consent: {
           acceptTerms: false,
           subscribeToNewsletter: false,
@@ -77,130 +65,57 @@ export function useRegister(): SignupFormReturn {
           leadId: undefined,
         },
       },
+      queryOptions: {
+        requestData: emailToCheck ? { email: emailToCheck } : undefined,
+        enabled: !!emailToCheck && emailToCheck.includes("@") && emailToCheck.includes("."),
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 60 * 5, // 5 minutes
+      },
       persistForm: false, // Disable persistence to avoid conflicts with old data structure
     },
-    {
-      onSuccess: async () => {
-        // Clear lead tracking data on successful signup
-        logger.info("app.api.v1.core.user.public.signup.success.processing");
-
-        const setTokenResponse = authClientRepository.setAuthStatus(logger);
-        if (!setTokenResponse.success) {
-          toast({
-            title: t("app.api.v1.core.user.public.signup.errors.title"),
-            description: t(
-              "app.api.v1.core.user.public.login.errors.token_save_failed",
-            ),
-            variant: "destructive",
-          });
-          return;
-        }
-
-        toast({
-          title: t("app.api.v1.core.user.public.signup.success.title"),
-          description: t(
-            "app.api.v1.core.user.public.signup.success.description",
-          ),
-          variant: "default",
-        });
-
-        // Redirect
-        if (
-          formResult.form.getValues("preferences.signupType") ===
-          SignupType.MEETING
-        ) {
-          router.push(`/${locale}/?step=consultation`);
-        } else {
-          router.push(`/${locale}/?step=pricing`);
-        }
-
-        // Force a refresh to update the UI with the new auth state
-        await refetch();
-        router.refresh();
-      },
-      onError: ({ error }) => {
-        toast({
-          title: t("app.api.v1.core.user.public.signup.errors.title"),
-          description: t(error.message, error.messageParams),
-          variant: "destructive",
-        });
-      },
-    },
+    logger,
   );
 
-  // Generate alert state from error/success states
-  const alert: FormAlertState | null = useMemo(() => {
-    // Check for success state first
-    if (formResult.response?.success) {
-      return {
-        variant: "success",
-        title: {
-          message: "app.api.v1.core.user.public.signup.success.title",
-        },
-        message: {
-          message: "app.api.v1.core.user.public.signup.success.description",
-        },
-      };
-    }
+  // Handle success callback for additional logic (token management, redirects)
+  if (endpointResult.create?.isSuccess) {
+    // Clear lead tracking data on successful signup
+    logger.info("app.api.v1.core.user.public.signup.success.processing");
 
-    // Check for form submission error
-    if (formResult.response?.success === false) {
-      return {
+    const setTokenResponse = authClientRepository.setAuthStatus(logger);
+    if (!setTokenResponse.success) {
+      toast({
+        title: t("app.api.v1.core.user.public.signup.errors.title"),
+        description: t(
+          "app.api.v1.core.user.public.login.errors.token_save_failed",
+        ),
         variant: "destructive",
-        title: {
-          message: "app.api.v1.core.user.public.signup.errors.title",
-        },
-        message: {
-          message: formResult.response.message,
-          messageParams: formResult.response.messageParams,
-        },
+      });
+      return {
+        ...endpointResult,
+        logger,
+        checkEmail: setEmailToCheck,
       };
     }
 
-    return null;
-  }, [formResult.response]);
+    // Show success message (alert is handled by useEndpoint)
+    toast({
+      title: t("app.api.v1.core.user.public.signup.success.title"),
+      description: t(
+        "app.api.v1.core.user.public.signup.success.description",
+      ),
+      variant: "default",
+    });
+
+    // Redirect
+    router.push(`/${locale}/subscription`);
+    // Force a refresh to update the UI with the new auth state
+    refetch();
+    router.refresh();
+  }
 
   return {
-    ...formResult,
-    alert,
+    ...endpointResult,
     logger,
+    checkEmail: setEmailToCheck,
   };
-}
-
-/**
- * Hook to check if an email is already registered
- * @param email - Email to check
- * @returns Query result with exists flag
- */
-export function useEmailCheck(
-  email?: string,
-): InferApiQueryReturn<typeof signupEndpoints.GET> {
-  const { toast } = useToast();
-  const { t, locale } = useTranslation();
-
-  // Initialize logger for client-side operations
-  const logger = createEndpointLogger(
-    (envClient.NODE_ENV as string) === "development",
-    Date.now(),
-    locale,
-  );
-
-  return useApiQuery({
-    endpoint: signupEndpoints.GET,
-    requestData: { email: email || "" },
-    logger,
-    options: {
-      // Don't refetch unnecessarily
-      refetchOnWindowFocus: false,
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      enabled: !!email && email.includes("@") && email.includes("."),
-      onError: ({ error }) => {
-        toast({
-          title: t("app.api.v1.core.user.public.signup.errors.title"),
-          description: t(error.message),
-          variant: "destructive",
-        });
-      },
-    },
-  });
 }

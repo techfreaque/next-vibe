@@ -53,9 +53,18 @@ export function useCreditHistory(
 
 /**
  * Hook for purchasing credit packs
+ * Provides full endpoint interface with form controls
  */
 export function useCreditPurchase(
   logger: EndpointLogger,
 ): EndpointReturn<typeof purchaseDefinitions> {
-  return useEndpoint(purchaseDefinitions, {}, logger);
+  return useEndpoint(
+    purchaseDefinitions,
+    {
+      defaultValues: {
+        quantity: 1,
+      },
+    },
+    logger,
+  );
 }

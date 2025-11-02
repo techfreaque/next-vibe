@@ -5,7 +5,7 @@
 
 import React from "react";
 
-import { getPricingPlansArray } from "@/app/[locale]/story/pricing/_components/pricing";
+import { getPricingPlansArray } from "@/app/api/[locale]/v1/core/products/repository-client";
 import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { formatCurrencyNoDecimals } from "@/i18n/core/localization-utils";
 import { getCountryFromLocale } from "@/i18n/core/translation-utils";

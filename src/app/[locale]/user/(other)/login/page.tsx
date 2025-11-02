@@ -14,7 +14,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
-import { LoginForm } from "./_components/login-form";
+import { LoginForm } from "@/app/api/[locale]/v1/core/user/public/login/_components/login-form";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;

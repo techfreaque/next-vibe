@@ -4,7 +4,7 @@
 const _true = true as boolean;
 const _false = false as boolean;
 
-export const enableDebugLogger = _true;
+export const enableDebugLogger = _false;
 export const debugCli = _false;
 export const debugCron = _false;
 export const debugMiddleware = _false;

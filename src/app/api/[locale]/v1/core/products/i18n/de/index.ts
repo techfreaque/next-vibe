@@ -14,11 +14,26 @@ export const translations: typeof enTranslations = {
   subscription: {
     name: "Unbegrenzter Plan",
     description: "Unbegrenzte Nachrichten für ernsthafte Nutzer",
+    longDescription: "Bester Wert für Power-User",
+    features: {
+      credits: "Unbegrenzte Nachrichten",
+      allModels: "Alle 40+ KI-Modelle",
+      allFeatures: "Alle Funktionen enthalten",
+      cancel: "Jederzeit kündbar",
+    },
   },
 
   // Credit pack product
   creditPack: {
     name: "Credit-Paket",
     description: "Bezahlen Sie nach Nutzung, läuft nie ab",
+    longDescription: "Perfekt für gelegentliche Nutzung",
+    features: {
+      credits: "500 Credits pro Paket",
+      allModels: "Alle KI-Modelle enthalten",
+      allFeatures: "Alle Funktionen enthalten",
+      multiple: "Mehrere Pakete kaufen",
+      permanent: "Credits laufen nie ab",
+    },
   },
 };

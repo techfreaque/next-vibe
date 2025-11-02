@@ -184,6 +184,10 @@ export const translations: typeof enTranslations = {
           title: "Konflikt",
           description: "Wystąpił konflikt zasobów",
         },
+        no_active_subscription: {
+          title: "Wymagane aktywne subskrypcja",
+          description: "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
+        },
       },
     },
   },

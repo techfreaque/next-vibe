@@ -4,6 +4,10 @@ export const translations: typeof enTranslations = {
   subscription: {
     title: "Kredyty",
     description: "Zarządzaj swoimi kredytami i subskrypcjami",
+    backToChat: "Powrót do czatu",
+    billingInterval: "Okres rozliczeniowy",
+    currentPeriodStart: "Początek bieżącego okresu",
+    nextBillingDate: "Następna data rozliczenia",
     balance: {
       title: "Saldo kredytów",
       description: "Twoje dostępne kredyty na rozmowy z AI",
@@ -14,12 +18,12 @@ export const translations: typeof enTranslations = {
         description: "Z subskrypcji",
       },
       permanent: {
-        title: "Stałe kredyty",
-        description: "Nigdy nie wygasają",
+        title: "Kredyty stałe",
+        description: "Kredyty kupione w pakietach nigdy nie wygasają",
       },
       free: {
-        title: "Darmowe kredyty",
-        description: "Kredyty próbne",
+        title: "Darmowe miesięczne kredyty",
+        description: "{{count}} darmowych kredytów miesięcznie dla wszystkich",
       },
     },
     overview: {
@@ -79,21 +83,24 @@ export const translations: typeof enTranslations = {
       },
       pack: {
         title: "Pakiety kredytów",
-        description: "Kup kredyty, które nigdy nie wygasają",
+        description: "Kup dodatkowe kredyty, które nigdy nie wygasają (wymaga aktywnego abonamentu)",
         badge: "Nigdy nie wygasa",
         perPack: "/pakiet",
         quantity: "Ilość",
         total: "{{count}} kredyty",
         features: {
-          credits: "{{count}} kredyty",
+          credits: "{{count}} kredytów na pakiet",
           permanent: "Nigdy nie wygasa",
           expiry: "Nigdy nie wygasa",
           bestFor: "Najlepsze dla okazjonalnego użytku",
         },
-        button: "Kup {{count}} {{type}}",
+        button: {
+          submit: "Kup pakiet kredytów",
+        },
         totalPrice: "Razem: {{price}}",
         pack: "Pakiet",
         packs: "Pakiety",
+        requiresSubscription: "Subskrybuj miesięczny plan, aby kupić dodatkowe pakiety kredytów.",
       },
     },
     history: {
@@ -113,14 +120,26 @@ export const translations: typeof enTranslations = {
         free_tier: "Darmowy poziom",
       },
     },
-    tabs: {
-      overview: "Przegląd",
-      buy: "Kup kredyty",
-      billing: "Rozliczenia",
-      history: "Historia",
-      plans: "Plany",
-    },
-  },
+     tabs: {
+       overview: "Przegląd",
+       buy: "Kup kredyty",
+       billing: "Rozliczenia",
+       history: "Historia",
+       plans: "Plany",
+     },
+     payment: {
+       success: {
+         title: "Płatność zakończona sukcesem",
+         subscription: "Twoja subskrypcja została pomyślnie aktywowana! Twoje kredyty będą dostępne wkrótce.",
+         credits: "Twój zakup pakietu kredytów zakończył się sukcesem! Twoje kredyty będą dostępne wkrótce.",
+       },
+       canceled: {
+         title: "Płatność anulowana",
+         subscription: "Twoja płatność za subskrypcję została anulowana. Możesz spróbować ponownie w dowolnym momencie.",
+         credits: "Twój zakup pakietu kredytów został anulowany. Możesz spróbować ponownie w dowolnym momencie.",
+       },
+     },
+   },
   meta: {
     subscription: {
       title: "Subskrypcja i kredyty",
@@ -133,6 +152,18 @@ export const translations: typeof enTranslations = {
         plans: "plany",
         pricing: "cennik",
       },
+    },
+  },
+  payment: {
+    success: {
+      title: "Płatność zakończona sukcesem",
+      subscription: "Twoja subskrypcja została pomyślnie aktywowana!",
+      credits: "Zakup pakietu kredytów zakończony sukcesem!",
+    },
+    canceled: {
+      title: "Płatność anulowana",
+      subscription: "Płatność za subskrypcję została anulowana.",
+      credits: "Zakup pakietu kredytów został anulowany.",
     },
   },
 };

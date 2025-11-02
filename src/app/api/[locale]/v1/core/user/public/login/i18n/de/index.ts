@@ -1,7 +1,11 @@
 import { translations as optionsTranslations } from "../../options/i18n/de";
 import type { translations as enTranslations } from "../en";
 
+import { translations as _componentsTranslations } from "../../_components/i18n/de";
+
+
 export const translations: typeof enTranslations = {
+  _components: _componentsTranslations,
   title: "Anmeldung",
   description: "Benutzeranmeldung Endpunkt",
   tag: "Authentifizierung",

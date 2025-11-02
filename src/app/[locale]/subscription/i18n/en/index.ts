@@ -1,7 +1,11 @@
 export const translations = {
   subscription: {
-    title: "Credits",
-    description: "Manage your credits and subscriptions",
+    title: "Monthly Subscription",
+    description: "Your active subscription plan",
+    backToChat: "Back to Chat",
+    billingInterval: "Billing Interval",
+    currentPeriodStart: "Current Period Start",
+    nextBillingDate: "Next Billing Date",
     balance: {
       title: "Credit Balance",
       description: "Your available credits for AI conversations",
@@ -11,14 +15,14 @@ export const translations = {
         title: "Expiring Credits",
         description: "From subscription",
       },
-      permanent: {
-        title: "Permanent Credits",
-        description: "Never expire",
-      },
-      free: {
-        title: "Free Credits",
-        description: "Trial credits",
-      },
+       permanent: {
+         title: "Permanent Credits",
+         description: "Credits purchased in packs never expire",
+       },
+       free: {
+         title: "Free Monthly Credits",
+         description: "{{count}} free credits per month for everyone",
+       },
     },
     overview: {
       howItWorks: {
@@ -27,17 +31,17 @@ export const translations = {
         expiring: {
           title: "Expiring Credits",
           description:
-            "Credits from monthly subscriptions expire at the end of each billing cycle. Use them before they expire!",
+ "Credits from monthly subscriptions expire at the end of each billing cycle. Use them before they expire!",
         },
         permanent: {
           title: "Permanent Credits",
           description:
-            "Credits purchased in packs never expire. Buy once, use anytime. Perfect for occasional users.",
+ "Credits purchased in packs never expire. Buy once, use anytime. Perfect for occasional users.",
         },
         free: {
-          title: "Free Credits",
+          title: "Free Monthly Credits",
           description:
-            "Everyone gets 20 free credits to try our service. Start chatting with AI immediately!",
+ "Everyone gets 20 free credits per month. Start chatting with AI immediately!",
         },
       },
       costs: {
@@ -66,7 +70,7 @@ export const translations = {
         badge: "Best Value",
         title: "Monthly Subscription",
         description:
-          "Get credits every month that expire at the end of your billing cycle",
+ "Get credits every month that expire at the end of your billing cycle",
         perMonth: "/month",
         features: {
           credits: "{{count}} credits per month",
@@ -75,23 +79,26 @@ export const translations = {
         },
         button: "Subscribe Now",
       },
-      pack: {
-        title: "Credit Packs",
-        description: "Buy credits that never expire",
+       pack: {
+         title: "Credit Packs",
+         description: "Buy additional credits that never expire (requires active subscription)",
         badge: "Never Expires",
         perPack: "/pack",
         quantity: "Quantity",
         total: "{{count}} credits",
         features: {
-          credits: "{{count}} credits",
+          credits: "{{count}} credits per pack",
           permanent: "Never expires",
           expiry: "Never expires",
           bestFor: "Best for occasional use",
         },
-        button: "Buy {{count}} {{type}}",
+        button: {
+          submit: "Buy Credit Pack",
+        },
         totalPrice: "Total: {{price}}",
         pack: "Pack",
         packs: "Packs",
+        requiresSubscription: "Subscribe to a monthly plan to purchase additional credit packs.",
       },
     },
     history: {
@@ -118,6 +125,18 @@ export const translations = {
       history: "History",
       plans: "Plans",
     },
+    payment: {
+      success: {
+        title: "Payment Successful",
+        subscription: "Your subscription has been activated successfully! Your credits will be available shortly.",
+        credits: "Your credit pack purchase was successful! Your credits will be available shortly.",
+      },
+      canceled: {
+        title: "Payment Canceled",
+        subscription: "Your subscription payment was canceled. You can try again anytime.",
+        credits: "Your credit pack purchase was canceled. You can try again anytime.",
+      },
+    },
   },
   meta: {
     subscription: {
@@ -131,6 +150,18 @@ export const translations = {
         plans: "plans",
         pricing: "pricing",
       },
+    },
+  },
+  payment: {
+    success: {
+      title: "Payment Successful",
+      subscription: "Your subscription has been activated successfully!",
+      credits: "Your credit pack purchase was successful!",
+    },
+    canceled: {
+      title: "Payment Canceled",
+      subscription: "Your subscription payment was canceled.",
+      credits: "Your credit pack purchase was canceled.",
     },
   },
 };

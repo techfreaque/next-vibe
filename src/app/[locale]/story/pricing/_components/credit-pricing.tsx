@@ -217,9 +217,7 @@ export default function CreditPricingSection({
                 </Span>
               </Div>
               <CardDescription className="mt-4 text-center">
-                {t("app.story.pricing.creditPricing.subscription.description", {
-                  credits: SUBSCRIPTION_CREDITS,
-                })}
+                {t("app.api.v1.core.products.subscription.longDescription")}
               </CardDescription>
 
               <Div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
@@ -240,12 +238,7 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
                   </Div>
                   <Span className="ml-3 text-sm">
-                    {t(
-                      "app.story.pricing.creditPricing.subscription.features.credits",
-                      {
-                        credits: SUBSCRIPTION_CREDITS,
-                      },
-                    )}
+                    {t("app.api.v1.core.products.subscription.features.credits")}
                   </Span>
                 </li>
                 <li className="flex items-start">
@@ -253,9 +246,7 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
                   </Div>
                   <Span className="ml-3 text-sm">
-                    {t(
-                      "app.story.pricing.creditPricing.subscription.features.allModels",
-                    )}
+                    {t("app.api.v1.core.products.subscription.features.allModels")}
                   </Span>
                 </li>
                 <li className="flex items-start">
@@ -263,9 +254,7 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
                   </Div>
                   <Span className="ml-3 text-sm">
-                    {t(
-                      "app.story.pricing.creditPricing.subscription.features.allFeatures",
-                    )}
+                    {t("app.api.v1.core.products.subscription.features.allFeatures")}
                   </Span>
                 </li>
                 <li className="flex items-start">
@@ -273,9 +262,7 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
                   </Div>
                   <Span className="ml-3 text-sm">
-                    {t(
-                      "app.story.pricing.creditPricing.subscription.features.cancel",
-                    )}
+                    {t("app.api.v1.core.products.subscription.features.cancel")}
                   </Span>
                 </li>
               </ul>
@@ -326,9 +313,7 @@ export default function CreditPricingSection({
                 </Span>
               </Div>
               <CardDescription className="mt-4 text-center">
-                {t("app.story.pricing.creditPricing.creditPack.description", {
-                  credits: PACK_CREDITS * packQuantity,
-                })}
+                {t("app.api.v1.core.products.creditPack.longDescription")}
               </CardDescription>
 
               <Div className="mt-4 space-y-3">
@@ -336,9 +321,7 @@ export default function CreditPricingSection({
                   <Div className="flex items-start gap-2">
                     <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
                     <P className="text-xs text-green-800 dark:text-green-200">
-                      {t(
-                        "app.story.pricing.creditPricing.creditPack.permanentInfo",
-                      )}
+                      {t("app.api.v1.core.products.creditPack.features.permanent")}
                     </P>
                   </Div>
                 </Div>
@@ -382,12 +365,7 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-purple-600 dark:text-purple-400" />
                   </Div>
                   <Span className="ml-3 text-sm">
-                    {t(
-                      "app.story.pricing.creditPricing.creditPack.features.credits",
-                      {
-                        credits: PACK_CREDITS * packQuantity,
-                      },
-                    )}
+                    {t("app.api.v1.core.products.creditPack.features.credits")}
                   </Span>
                 </li>
                 <li className="flex items-start">
@@ -395,9 +373,7 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-purple-600 dark:text-purple-400" />
                   </Div>
                   <Span className="ml-3 text-sm">
-                    {t(
-                      "app.story.pricing.creditPricing.creditPack.features.allModels",
-                    )}
+                    {t("app.api.v1.core.products.creditPack.features.allModels")}
                   </Span>
                 </li>
                 <li className="flex items-start">
@@ -405,9 +381,7 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-purple-600 dark:text-purple-400" />
                   </Div>
                   <Span className="ml-3 text-sm">
-                    {t(
-                      "app.story.pricing.creditPricing.creditPack.features.allFeatures",
-                    )}
+                    {t("app.api.v1.core.products.creditPack.features.allFeatures")}
                   </Span>
                 </li>
                 <li className="flex items-start">
@@ -415,9 +389,7 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-purple-600 dark:text-purple-400" />
                   </Div>
                   <Span className="ml-3 text-sm">
-                    {t(
-                      "app.story.pricing.creditPricing.creditPack.features.multiple",
-                    )}
+                    {t("app.api.v1.core.products.creditPack.features.multiple")}
                   </Span>
                 </li>
               </ul>

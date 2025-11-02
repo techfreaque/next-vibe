@@ -54,14 +54,18 @@ export default async function SubscriptionPage({
     logger,
   );
 
-  // Redirect if not authenticated
-  if (!userResponse?.success || !userResponse.data) {
-    redirect(`/${locale}/user/login?callbackUrl=/${locale}/subscription`);
+  // Allow public users to view the page, but they'll need to login to purchase
+  // Redirect only if explicitly needed (e.g., when trying to access user-specific data)
+  const isAuthenticated = userResponse?.success && userResponse.data;
+
+  // If not authenticated, redirect to login with callback
+  if (!isAuthenticated) {
+    redirect(`/${locale}/user/login?redirect=/${locale}/subscription`);
   }
 
   // Redirect if user has no leadId
   if (!userResponse.data.leadId) {
-    redirect(`/${locale}/user/login?callbackUrl=/${locale}/subscription`);
+    redirect(`/${locale}/user/login?redirect=/${locale}/subscription`);
   }
 
   // Fetch credit balance

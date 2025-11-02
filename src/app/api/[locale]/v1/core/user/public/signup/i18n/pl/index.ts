@@ -1,6 +1,9 @@
+
+import { translations as _componentsTranslations } from "../../_components/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  _components: _componentsTranslations,
   title: "Rejestracja Użytkownika",
   description: "Endpoint rejestracji użytkownika",
   tag: "Uwierzytelnianie",
@@ -328,56 +331,12 @@ export const translations: typeof enTranslations = {
   },
   email: {
     title: "Witamy w {{appName}}!",
-    subject: "Witamy w {{appName}} - Zaczynajmy!",
-    previewText: "Witamy w {{appName}}! Zacznijmy.",
+    subject: "Witamy w {{appName}}!",
+    previewText: "Witamy w {{appName}}! Rozpocznij swoje doświadczenie z czatem AI.",
     welcomeMessage: "Witamy w {{appName}}!",
-    primaryAction: {
-      title: "Uzupełnij swój profil",
-      description: "Skonfiguruj swój profil, aby rozpocząć",
-      benefits: {
-        strategy: "Planowanie strategiczne",
-        setup: "Łatwa konfiguracja",
-        questions: "Odpowiedz na pytania",
-        flexible: "Elastyczne opcje",
-      },
-      cta: "Uzupełnij profil",
-      timeframe: "Zajmuje około {{minutes}} minut",
-    },
-    firstStep: {
-      title: "Pierwszy krok",
-      description: "Zacznij od pierwszego kroku",
-      note: "Ważna uwaga",
-      timeframe: "Zajmuje około {{minutes}} minut",
-      cta: "Rozpocznij",
-    },
-    ourService: {
-      title: "Nasza usługa",
-      description: "Dowiedz się więcej o naszej usłudze",
-      customContent: "Treści dostosowane dla Ciebie",
-      strategicPlanning: "Planowanie strategiczne",
-      monthlyApproval: "Miesięczne zatwierdzenie",
-      professionalManagement: "Profesjonalne zarządzanie",
-    },
-    afterProfile: {
-      title: "Po uzupełnieniu profilu",
-      description: "Co się stanie dalej",
-      flexibility: "Dostępne elastyczne opcje",
-      payment: {
-        title: "Opcje płatności",
-        description: "Wybierz swój plan płatności",
-        benefits: {
-          immediate: "Natychmiastowy dostęp",
-          strategy: "Planowanie strategiczne",
-          analytics: "Panel analityczny",
-        },
-        cta: "Wybierz plan",
-        timeframe: "Zajmuje około {{minutes}} minut",
-      },
-    },
-    needHelp: "Potrzebujesz pomocy?",
-    supportMessage: "Nasz zespół wsparcia jest tutaj, aby pomóc",
-    contactSupport: "Skontaktuj się z pomocą techniczną",
-    excited: "Cieszymy się, że jesteś z nami!",
+    description: "Jesteś teraz gotowy, aby rozpocząć czat z AI i dołączyć do naszego forum społeczności.",
+    ctaTitle: "Rozpocznij",
+    ctaButton: "Przejdź do subskrypcji",
     signoff: "Z poważaniem,\nZespół {{appName}}",
   },
 };

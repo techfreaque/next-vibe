@@ -1,4 +1,8 @@
+
+import { translations as _componentsTranslations } from "../../_components/i18n/en";
+
 export const translations = {
+  _components: _componentsTranslations,
   title: "User Signup",
   description: "User registration endpoint",
   tag: "Authentication",
@@ -325,56 +329,12 @@ export const translations = {
   },
   email: {
     title: "Welcome to {{appName}}!",
-    subject: "Welcome to {{appName}} - Let's Get Started!",
-    previewText: "Welcome to {{appName}}! Let's get you started.",
+    subject: "Welcome to {{appName}}!",
+    previewText: "Welcome to {{appName}}! Start your AI chat experience.",
     welcomeMessage: "Welcome to {{appName}}!",
-    primaryAction: {
-      title: "Complete Your Profile",
-      description: "Set up your profile to get started",
-      benefits: {
-        strategy: "Strategic planning",
-        setup: "Easy setup",
-        questions: "Answer questions",
-        flexible: "Flexible options",
-      },
-      cta: "Complete Profile",
-      timeframe: "Takes about {{minutes}} minutes",
-    },
-    firstStep: {
-      title: "First Step",
-      description: "Get started with your first step",
-      note: "Important note",
-      timeframe: "Takes about {{minutes}} minutes",
-      cta: "Get Started",
-    },
-    ourService: {
-      title: "Our Service",
-      description: "Learn about our service",
-      customContent: "Custom content for you",
-      strategicPlanning: "Strategic planning",
-      monthlyApproval: "Monthly approval",
-      professionalManagement: "Professional management",
-    },
-    afterProfile: {
-      title: "After Your Profile",
-      description: "What happens next",
-      flexibility: "Flexible options available",
-      payment: {
-        title: "Payment Options",
-        description: "Choose your payment plan",
-        benefits: {
-          immediate: "Immediate access",
-          strategy: "Strategic planning",
-          analytics: "Analytics dashboard",
-        },
-        cta: "Choose Plan",
-        timeframe: "Takes about {{minutes}} minutes",
-      },
-    },
-    needHelp: "Need Help?",
-    supportMessage: "Our support team is here to help",
-    contactSupport: "Contact Support",
-    excited: "We're excited to have you!",
+    description: "You're now ready to start chatting with AI and joining our community forum.",
+    ctaTitle: "Get Started",
+    ctaButton: "Go to Subscription",
     signoff: "Best regards,\nThe {{appName}} Team",
   },
 };

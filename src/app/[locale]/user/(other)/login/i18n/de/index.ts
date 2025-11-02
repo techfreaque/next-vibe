@@ -1,8 +1,6 @@
-import { translations as componentsTranslations } from "../../_components/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  components: componentsTranslations,
   meta: {
     title: "Anmelden - Next Vibe",
     description: "Melden Sie sich bei Ihrem Next Vibe Konto an",

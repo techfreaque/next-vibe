@@ -1,16 +1,12 @@
 import { translations as componentsTranslations } from "../../_components/i18n/pl";
 import { translations as otherTranslations } from "../../(other)/i18n/pl";
-import { translations as authTranslations } from "../../auth/i18n/pl";
 import { translations as signupTranslations } from "../../signup/i18n/pl";
-import { translations as userTranslations } from "../../user/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  auth: authTranslations,
   components: componentsTranslations,
   other: otherTranslations,
   signup: signupTranslations,
-  user: userTranslations,
   common: {
     appName: "Next Vibe",
     backToHome: "Powrót do strony głównej",

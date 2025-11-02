@@ -12,7 +12,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import {
   getPricingPlansArray,
   type PricingPlan,
-} from "@/app/[locale]/story/pricing/_components/pricing";
+} from "@/app/api/[locale]/v1/core/products/repository-client";
 import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";

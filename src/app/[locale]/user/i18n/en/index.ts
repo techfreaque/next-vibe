@@ -1,15 +1,11 @@
 import { translations as componentsTranslations } from "../../_components/i18n/en";
 import { translations as otherTranslations } from "../../(other)/i18n/en";
-import { translations as authTranslations } from "../../auth/i18n/en";
 import { translations as signupTranslations } from "../../signup/i18n/en";
-import { translations as userTranslations } from "../../user/i18n/en";
 
 export const translations = {
-  auth: authTranslations,
   components: componentsTranslations,
   other: otherTranslations,
   signup: signupTranslations,
-  user: userTranslations,
   common: {
     appName: "Next Vibe",
     backToHome: "Back to Home",

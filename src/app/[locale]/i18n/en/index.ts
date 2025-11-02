@@ -25,6 +25,7 @@ export const translations = {
     active: "Active",
     filter: "Filter",
     refresh: "Refresh",
+    notAvailable: "N/A",
     weekday: {
       monday: "Monday",
       tuesday: "Tuesday",

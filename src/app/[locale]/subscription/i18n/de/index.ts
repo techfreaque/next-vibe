@@ -4,6 +4,10 @@ export const translations: typeof enTranslations = {
   subscription: {
     title: "Credits",
     description: "Verwalten Sie Ihre Credits und Abonnements",
+    backToChat: "Zurück zum Chat",
+    billingInterval: "Abrechnungsintervall",
+    currentPeriodStart: "Aktueller Zeitraum Start",
+    nextBillingDate: "Nächstes Abrechnungsdatum",
     balance: {
       title: "Credit-Guthaben",
       description: "Ihre verfügbaren Credits für KI-Gespräche",
@@ -15,11 +19,11 @@ export const translations: typeof enTranslations = {
       },
       permanent: {
         title: "Permanente Credits",
-        description: "Laufen nie ab",
+        description: "Credits, die in Paketen gekauft wurden, laufen nie ab",
       },
       free: {
-        title: "Kostenlose Credits",
-        description: "Test-Credits",
+        title: "Kostenlose monatliche Credits",
+        description: "{{count}} kostenlose Credits pro Monat für alle",
       },
     },
     overview: {
@@ -79,21 +83,24 @@ export const translations: typeof enTranslations = {
       },
       pack: {
         title: "Credit-Pakete",
-        description: "Kaufen Sie Credits, die nie ablaufen",
+        description: "Kaufen Sie zusätzliche Credits, die nie ablaufen (erfordert aktives Abonnement)",
         badge: "Läuft nie ab",
         perPack: "/Paket",
         quantity: "Menge",
         total: "{{count}} Credits",
         features: {
-          credits: "{{count}} Credits",
+          credits: "{{count}} Credits pro Paket",
           permanent: "Läuft nie ab",
           expiry: "Läuft nie ab",
           bestFor: "Am besten für gelegentliche Nutzung",
         },
-        button: "{{count}} {{type}} kaufen",
+        button: {
+          submit: "Credit Pack kaufen",
+        },
         totalPrice: "Gesamt: {{price}}",
         pack: "Paket",
         packs: "Pakete",
+        requiresSubscription: "Abonnieren Sie einen monatlichen Plan, um zusätzliche Credit Packs zu kaufen.",
       },
     },
     history: {
@@ -113,14 +120,26 @@ export const translations: typeof enTranslations = {
         free_tier: "Kostenlose Stufe",
       },
     },
-    tabs: {
-      overview: "Übersicht",
-      buy: "Credits kaufen",
-      billing: "Abrechnung",
-      history: "Verlauf",
-      plans: "Pläne",
-    },
-  },
+     tabs: {
+       overview: "Übersicht",
+       buy: "Credits kaufen",
+       billing: "Abrechnung",
+       history: "Verlauf",
+       plans: "Pläne",
+     },
+     payment: {
+       success: {
+         title: "Zahlung erfolgreich",
+         subscription: "Ihr Abonnement wurde erfolgreich aktiviert! Ihre Credits sind in Kürze verfügbar.",
+         credits: "Ihr Credit-Paket-Kauf war erfolgreich! Ihre Credits sind in Kürze verfügbar.",
+       },
+       canceled: {
+         title: "Zahlung abgebrochen",
+         subscription: "Ihre Abonnement-Zahlung wurde abgebrochen. Sie können es jederzeit erneut versuchen.",
+         credits: "Ihr Credit-Paket-Kauf wurde abgebrochen. Sie können es jederzeit erneut versuchen.",
+       },
+     },
+   },
   meta: {
     subscription: {
       title: "Abonnement & Credits",
@@ -133,6 +152,18 @@ export const translations: typeof enTranslations = {
         plans: "Pläne",
         pricing: "Preise",
       },
+    },
+  },
+  payment: {
+    success: {
+      title: "Zahlung erfolgreich",
+      subscription: "Ihr Abonnement wurde erfolgreich aktiviert!",
+      credits: "Ihr Credit Pack-Kauf war erfolgreich!",
+    },
+    canceled: {
+      title: "Zahlung abgebrochen",
+      subscription: "Ihre Abonnementzahlung wurde abgebrochen.",
+      credits: "Ihr Credit Pack-Kauf wurde abgebrochen.",
     },
   },
 };

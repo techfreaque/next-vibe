@@ -30,6 +30,7 @@ import { Calendar as CalendarComponent } from "../calendar";
 import { Checkbox } from "../checkbox";
 import { Input } from "../input";
 import { Label } from "../label";
+import { NumberInput } from "../number-input";
 import { PhoneField } from "../phone-field";
 import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 import { RadioGroup, RadioGroupItem } from "../radio-group";
@@ -88,9 +89,9 @@ function getFieldValidationState<T>(
 ): FieldValidationState {
   const hasValue = Boolean(
     fieldValue !== undefined &&
-      fieldValue !== null &&
-      fieldValue !== "" &&
-      (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
+    fieldValue !== null &&
+    fieldValue !== "" &&
+    (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
   );
 
   return {
@@ -332,23 +333,16 @@ function renderFieldInput<
 
     case "number":
       return (
-        <Input
+        <NumberInput
           name={field.name}
-          value={String(field.value || "")}
-          onChange={(e) => {
-            const value = e.target.value;
-            // Convert to number if it's a valid number, otherwise keep as string for validation
-            const numValue = value === "" ? "" : Number(value);
-            field.onChange(Number.isNaN(numValue as number) ? value : numValue);
-          }}
+          value={Number(field.value) || config.min || 1}
+          onChange={(value) => field.onChange(value)}
           onBlur={field.onBlur}
-          type="number"
           min={config.min}
           max={config.max}
           step={config.step}
-          placeholder={config.placeholder ? t(config.placeholder) : undefined}
           disabled={disabled || config.disabled}
-          className={cn(inputClassName, "h-10")}
+          className={inputClassName}
         />
       );
 
@@ -664,9 +658,9 @@ export interface EndpointFormFieldProps<
   TName extends Path<TFieldValues>,
   TFields extends EndpointFieldStructure = EndpointFieldStructure,
 > extends Omit<
-    EndpointFormFieldPropsType<TFieldValues, TName>,
-    "requiredFields"
-  > {
+  EndpointFormFieldPropsType<TFieldValues, TName>,
+  "requiredFields"
+> {
   schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
   endpointFields?: TFields; // Endpoint fields for auto-inference (from definition.POST.fields) - now fully typed
 }
@@ -706,7 +700,7 @@ export function EndpointFormField<
     // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for missing config
     throw new Error(
       `EndpointFormField: No config provided for field "${name}". ` +
-        `Either provide a config prop or pass endpointFields for auto-inference.`,
+      `Either provide a config prop or pass endpointFields for auto-inference.`,
     );
   }
 

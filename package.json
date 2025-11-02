@@ -15,7 +15,7 @@
     "start": "next start",
     "test": "vibe test",
     "check": "vibe check",
-    "lint": "vibe lint",
+    "lint": "vibe olint",
     "typecheck": "vibe typecheck",
     "mcp:test": "bunx @modelcontextprotocol/inspector vibe mcp",
     "native": "expo start",

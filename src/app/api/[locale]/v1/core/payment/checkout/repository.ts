@@ -116,8 +116,8 @@ export class SubscriptionCheckoutRepositoryImpl
           interval,
           country,
           locale,
-          successUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?canceled=true`,
+          successUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?payment=success&type=subscription&session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?payment=canceled&type=subscription`,
           metadata: {
             type: "subscription",
             userId: user.id,

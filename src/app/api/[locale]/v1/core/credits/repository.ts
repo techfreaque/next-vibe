@@ -151,8 +151,7 @@ export interface CreditRepositoryInterface {
  */
 class CreditRepository
   extends BaseCreditHandler
-  implements CreditRepositoryInterface
-{
+  implements CreditRepositoryInterface {
   async getBalance(
     identifier: CreditIdentifier,
     logger: EndpointLogger,
@@ -350,8 +349,9 @@ class CreditRepository
         );
       }
 
-      // If user has no subscription → return lead credits
+      // If user has no subscription → return combined user credits + lead credits
       if (creditType === CreditTypeIdentifier.LEAD_FREE && effectiveLeadId) {
+        // Get lead credits (free credits)
         const leadBalanceResult = await this.getLeadBalance(effectiveLeadId);
 
         if (!leadBalanceResult.success) {
@@ -360,11 +360,27 @@ class CreditRepository
 
         const leadBalance = leadBalanceResult.data;
 
-        // Format lead credits to match the expected response format
+        // Also check for permanent credits in userCredits table
+        const userCreditsResult = await this.getUserBalance(user.id);
+
+        if (!userCreditsResult.success) {
+          // If we can't get user credits, just return lead credits
+          return createSuccessResponse({
+            total: leadBalance,
+            expiring: 0,
+            permanent: 0,
+            free: leadBalance,
+            expiresAt: null,
+          });
+        }
+
+        const userCreditsBalance = userCreditsResult.data;
+
+        // Combine lead credits (free) with user permanent credits
         return createSuccessResponse({
-          total: leadBalance,
+          total: leadBalance + userCreditsBalance.permanent,
           expiring: 0,
-          permanent: 0,
+          permanent: userCreditsBalance.permanent,
           free: leadBalance,
           expiresAt: null,
         });

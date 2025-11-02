@@ -1,6 +1,8 @@
 import { translations as optionsTranslations } from "../../options/i18n/en";
+import { translations as _componentsTranslations } from "../../_components/i18n/en";
 
 export const translations = {
+  _components: _componentsTranslations,
   title: "Login",
   description: "User login endpoint",
   tag: "Authentication",

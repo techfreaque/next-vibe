@@ -3,9 +3,12 @@
  * Single source of truth for all pricing and product data across the platform
  */
 
+import type { JSX } from "react";
 import type { TranslationKey } from "@/i18n/core/static-types";
 import type { Countries, CountryLanguage, Currencies } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
+import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
+import type { SubscriptionPlanValue } from "@/app/api/[locale]/v1/core/subscription/enum";
 
 export type PaymentInterval = "month" | "year" | "one_time";
 
@@ -246,3 +249,171 @@ export class ProductsRepositoryImpl implements ProductsRepository {
 }
 
 export const productsRepository = new ProductsRepositoryImpl();
+
+/**
+ * ============================================================================
+ * PRICING PLAN INTERFACES AND HELPERS
+ * Replaces story/pricing/_components/pricing.tsx
+ * ============================================================================
+ */
+
+/**
+ * Pricing plan interface for UI display
+ * Contains all information needed to render pricing cards
+ */
+export interface PricingPlan {
+  id: SubscriptionPlanValue;
+  name: TranslationKey;
+  description: TranslationKey;
+  features: TranslationKey[];
+  premiumFeatures?: {
+    feature: TranslationKey;
+    className?: string;
+    icon: JSX.Element;
+  }[];
+  priceByCountry: {
+    [key in Countries]: {
+      monthly: number;
+      annual: number;
+      currency: Currencies;
+    };
+  };
+  pricing: TranslationKey;
+  cta: TranslationKey;
+  highlighted: boolean;
+  icon?: JSX.Element; // Optional - must be provided by client components
+  badge?: TranslationKey;
+}
+
+/**
+ * Get price for a specific plan, country, and billing interval
+ */
+export function getPlanPriceForCountry(
+  plan: PricingPlan,
+  country: Countries,
+  isAnnual: boolean,
+): number {
+  return isAnnual
+    ? plan.priceByCountry[country].annual
+    : plan.priceByCountry[country].monthly;
+}
+
+/**
+ * Calculate average savings percentage when choosing annual over monthly billing
+ */
+export function calculateSavingsPercent(locale: CountryLanguage): number {
+  const plans = getPricingPlansArray(locale);
+  const country = getCountryFromLocale(locale);
+  let totalSavingsPercent = 0;
+  let validPlansCount = 0;
+
+  for (const plan of plans) {
+    const monthlyPrice = plan.priceByCountry[country].monthly;
+    const annualMonthlyPrice = plan.priceByCountry[country].annual;
+
+    if (monthlyPrice > 0 && annualMonthlyPrice > 0) {
+      const savings = monthlyPrice - annualMonthlyPrice;
+      const savingsPercent = (savings / monthlyPrice) * 100;
+
+      totalSavingsPercent += savingsPercent;
+      validPlansCount++;
+    }
+  }
+
+  return validPlansCount === 0 ? 0 : Math.round(totalSavingsPercent / validPlansCount);
+}
+
+/**
+ * Build pricing plans with icon components
+ * Note: Icons are lazy-loaded to avoid circular dependencies
+ */
+function buildPricingPlans(locale: CountryLanguage, icon?: JSX.Element): Record<SubscriptionPlanValue, PricingPlan> {
+  const definitions = productsRepository.getProductDefinitions();
+  const subscriptionDef = definitions[ProductIds.SUBSCRIPTION];
+
+  // Helper to get price for specific country and interval
+  const getPrice = (country: Countries, interval: PaymentInterval): number => {
+    if (interval === "year" && subscriptionDef.yearlyPriceByCountry) {
+      return subscriptionDef.yearlyPriceByCountry[country];
+    }
+    return subscriptionDef.priceByCountry[country];
+  };
+
+  return {
+    [SubscriptionPlan.SUBSCRIPTION]: {
+      id: SubscriptionPlan.SUBSCRIPTION,
+      name: subscriptionDef.name,
+      description: subscriptionDef.description,
+      features: [
+        "app.story.pricing.plans.STARTER.features.messages" as const,
+        "app.story.pricing.plans.STARTER.features.models" as const,
+        "app.story.pricing.plans.STARTER.features.folders" as const,
+        "app.story.pricing.plans.STARTER.features.personas" as const,
+      ],
+      priceByCountry: {
+        DE: {
+          monthly: getPrice("DE", "month"),
+          annual: getPrice("DE", "year"),
+          currency: subscriptionDef.currency,
+        },
+        PL: {
+          monthly: getPrice("PL", "month"),
+          annual: getPrice("PL", "year"),
+          currency: subscriptionDef.currency,
+        },
+        GLOBAL: {
+          monthly: getPrice("GLOBAL", "month"),
+          annual: getPrice("GLOBAL", "year"),
+          currency: subscriptionDef.currency,
+        },
+      },
+      pricing: "app.story.pricing.plans.STARTER.price" as const,
+      cta: "app.story.pricing.plans.STARTER.cta" as const,
+      highlighted: false,
+      icon: icon,
+    },
+  };
+}
+
+/**
+ * Get all pricing plans for a locale as a record
+ */
+export function getPricingPlans(locale: CountryLanguage, icon?: JSX.Element): Record<SubscriptionPlanValue, PricingPlan> {
+  return buildPricingPlans(locale, icon);
+}
+
+/**
+ * Get specific plan details by ID
+ */
+export function getPlanDetails(planId: SubscriptionPlanValue, locale: CountryLanguage, icon?: JSX.Element): PricingPlan {
+  return getPricingPlans(locale, icon)[planId];
+}
+
+/**
+ * Get all pricing plans as an array
+ */
+export function getPricingPlansArray(locale: CountryLanguage, icon?: JSX.Element): PricingPlan[] {
+  return Object.values(getPricingPlans(locale, icon));
+}
+
+/**
+ * Pricing comparison feature interfaces
+ */
+export interface PricingFeature {
+  name: TranslationKey;
+  [SubscriptionPlan.SUBSCRIPTION]: boolean;
+}
+
+export interface PricingTextFeature {
+  name: TranslationKey;
+  type: "text";
+  [SubscriptionPlan.SUBSCRIPTION]: TranslationKey;
+}
+
+export type PricingComparisonFeature = PricingFeature | PricingTextFeature;
+
+/**
+ * Pricing comparison features data
+ * Currently empty - add features as needed
+ */
+export const pricingComparisonFeatures: PricingComparisonFeature[] = [];
