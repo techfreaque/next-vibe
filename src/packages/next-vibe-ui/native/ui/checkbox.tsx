@@ -1,35 +1,23 @@
 import * as CheckboxPrimitive from "@rn-primitives/checkbox";
+import { styled } from "nativewind";
 import * as React from "react";
 import { Platform } from "react-native";
 
-import type { WithClassName } from "../lib/types";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
 
-// Import cross-platform props interface from web
-export type { CheckboxBaseProps } from "next-vibe-ui/ui/checkbox";
 import type { CheckboxBaseProps } from "next-vibe-ui/ui/checkbox";
 
-// Native checkbox props that align with web interface
-export type CheckboxProps = CheckboxBaseProps;
-
-// Type-safe wrappers for primitives with className support
-const StyledCheckboxRoot = CheckboxPrimitive.Root as React.ForwardRefExoticComponent<
-  WithClassName<React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>> &
-    React.RefAttributes<React.ElementRef<typeof CheckboxPrimitive.Root>>
->;
-
-const StyledCheckboxIndicator = CheckboxPrimitive.Indicator as React.ForwardRefExoticComponent<
-  WithClassName<React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Indicator>> &
-    React.RefAttributes<React.ElementRef<typeof CheckboxPrimitive.Indicator>>
->;
+export type CheckboxProps = Omit<CheckboxBaseProps, 'defaultChecked' | 'value' | 'name' | 'required'>;
+const StyledCheckboxRoot = styled(CheckboxPrimitive.Root);
+const StyledCheckboxIndicator = styled(CheckboxPrimitive.Indicator);
 
 const Checkbox = React.forwardRef<
-  CheckboxPrimitive.RootRef,
+  React.ElementRef<typeof CheckboxPrimitive.Root>,
   CheckboxProps
->(({ className, checked, onCheckedChange, disabled, defaultChecked, value, name, required }, ref) => {
+>(({ className, checked, onCheckedChange, disabled }, ref) => {
   const isChecked = checked ?? false;
-  const handleCheckedChange = onCheckedChange ?? (() => {});
+  const handleCheckedChange = onCheckedChange ?? (() => undefined);
   const isDisabled = disabled ?? false;
 
   return (
@@ -45,12 +33,11 @@ const Checkbox = React.forwardRef<
       )}
     >
       <StyledCheckboxIndicator
-        className={cn("items-center justify-center h-full w-full")}
+        className={cn("flex items-center justify-center text-current")}
       >
         <Check
-          size={12}
-          strokeWidth={Platform.OS === "web" ? 2.5 : 3.5}
-          color="currentColor"
+          size={Platform.OS === "web" ? 16 : 12}
+          className="text-primary-foreground"
         />
       </StyledCheckboxIndicator>
     </StyledCheckboxRoot>

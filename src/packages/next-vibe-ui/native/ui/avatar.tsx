@@ -1,7 +1,7 @@
 import * as AvatarPrimitive from "@rn-primitives/avatar";
 import * as React from "react";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
 // Export cross-platform types for web
 export interface AvatarProps {

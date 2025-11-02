@@ -3,7 +3,7 @@
  * Handles all credit-related database operations
  */
 
-import { and, desc, eq, lt, sql } from "drizzle-orm";
+import { and, desc, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -180,15 +180,26 @@ class CreditRepository
 
   /**
    * Get user's current credit balance (internal)
+   * Includes both userCredits (subscription/permanent) and leadCredits (free monthly)
+   * Filters out expired credits
    */
   private async getUserBalance(
     userId: string,
   ): Promise<ResponseType<CreditBalance>> {
     try {
+      // Query credits, filtering out expired ones
       const credits = await db
         .select()
         .from(userCredits)
-        .where(eq(userCredits.userId, userId));
+        .where(
+          and(
+            eq(userCredits.userId, userId),
+            or(
+              isNull(userCredits.expiresAt),
+              gte(userCredits.expiresAt, new Date()),
+            ),
+          ),
+        );
 
       let total = 0;
       let expiring = 0;
@@ -211,6 +222,23 @@ class CreditRepository
           permanent += credit.amount;
         } else if (credit.type === "free") {
           free += credit.amount;
+        }
+      }
+
+      // Also include lead credits (free monthly credits) for subscribed users
+      // Get user's lead to fetch their free monthly credits
+      const [userLead] = await db
+        .select()
+        .from(userLeads)
+        .where(eq(userLeads.userId, userId))
+        .limit(1);
+
+      if (userLead) {
+        const leadBalanceResult = await this.getLeadBalance(userLead.leadId);
+        if (leadBalanceResult.success) {
+          const leadCredits = leadBalanceResult.data;
+          total += leadCredits;
+          free += leadCredits;
         }
       }
 
@@ -654,11 +682,20 @@ class CreditRepository
       }
 
       if (useUserCredits && identifier.userId) {
-        // Deduct from user credits (expiring first, then permanent)
+        // Deduct from user credits (expiring first, then permanent, then lead credits)
+        // Filter out expired credits
         const credits = await db
           .select()
           .from(userCredits)
-          .where(eq(userCredits.userId, identifier.userId))
+          .where(
+            and(
+              eq(userCredits.userId, identifier.userId),
+              or(
+                isNull(userCredits.expiresAt),
+                gte(userCredits.expiresAt, new Date()),
+              ),
+            ),
+          )
           .orderBy(
             sql`CASE WHEN type = 'subscription' THEN 1 WHEN type = 'free' THEN 2 ELSE 3 END`,
           );
@@ -681,6 +718,24 @@ class CreditRepository
           }
 
           remaining -= deduction;
+        }
+
+        // If still have remaining amount, deduct from lead credits (free monthly credits)
+        if (remaining > 0) {
+          const [leadCredit] = await db
+            .select()
+            .from(leadCredits)
+            .where(eq(leadCredits.leadId, identifier.leadId))
+            .limit(1);
+
+          if (leadCredit && leadCredit.amount > 0) {
+            const deduction = Math.min(leadCredit.amount, remaining);
+            await db
+              .update(leadCredits)
+              .set({ amount: sql`amount - ${deduction}`, updatedAt: new Date() })
+              .where(eq(leadCredits.id, leadCredit.id));
+            remaining -= deduction;
+          }
         }
 
         // Get new balance (identifier already has leadId)

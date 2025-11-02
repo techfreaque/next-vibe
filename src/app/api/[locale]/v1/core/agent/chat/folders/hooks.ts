@@ -32,7 +32,12 @@ export function useFoldersList(
         staleTime: 10 * 1000, // 10 seconds
       },
       formOptions: {
-        defaultValues: {},
+        defaultValues: {
+          folder: {
+            rootFolderId: "private",
+            name: "",
+          },
+        },
       },
     },
     logger,

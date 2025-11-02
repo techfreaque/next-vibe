@@ -8,13 +8,13 @@ export const translations: typeof enTranslations = {
       "Wybierz między miesięcznymi kredytami a jednorazowymi pakietami kredytów. Pełna przejrzystość kosztów dla wszystkich modeli AI i funkcji.",
 
     subscription: {
-      badge: "Najpopularniejsze",
+      badge: "Dostępne dla wszystkich",
       title: "Subskrypcja miesięczna",
       price: "€{{price}}",
       perMonth: "/miesiąc",
       description: "{{credits}} kredytów miesięcznie (wygasają co miesiąc)",
       expiryInfo:
-        "Kredyty wygasają na koniec każdego cyklu rozliczeniowego. Najlepsze dla regularnych użytkowników.",
+        "€10/miesiąc za 1000 kredytów. Przystępny dostęp do AI dla wszystkich!",
       features: {
         credits: "{{credits}} kredytów miesięcznie",
         allModels: "Dostęp do wszystkich modeli AI (darmowych i płatnych)",
@@ -25,12 +25,12 @@ export const translations: typeof enTranslations = {
     },
 
     creditPack: {
-      badge: "Nigdy nie wygasają",
+      badge: "Dla zaawansowanych",
       title: "Pakiet kredytów",
       price: "€{{price}}",
       description: "{{credits}} kredytów (nigdy nie wygasają)",
       permanentInfo:
-        "Kredyty nigdy nie wygasają! Kup raz, używaj w dowolnym momencie. Idealne dla okazjonalnych użytkowników.",
+        "Potrzebujesz więcej? €5 za 500 kredytów, które nigdy nie wygasają. Idealne dla zaawansowanych użytkowników potrzebujących dodatkowej pojemności.",
       quantityLabel: "Ilość (1-10 pakietów)",
       pricePerPack: "€{{price}} za {{credits}} kredytów",
       features: {

@@ -1,10 +1,9 @@
-/// <reference path="../../../../../nativewind-env.d.ts" />
-
 import * as ToggleGroupPrimitive from "@rn-primitives/toggle-group";
 import type { LucideIcon } from "lucide-react-native";
 import * as React from "react";
 
 import { cn } from "../lib/utils";
+import { styled } from "nativewind";
 import { TextClassContext } from "./text";
 import {
   toggleTextVariants,
@@ -18,6 +17,9 @@ import type {
 } from "../../web/ui/toggle-group";
 
 export type { ToggleGroupItemProps, ToggleGroupProps };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const StyledToggleGroupRoot = styled(ToggleGroupPrimitive.Root) as React.ComponentType<any>;
 
 const ToggleGroupContext = React.createContext<{
   size?: ToggleSize;
@@ -76,10 +78,9 @@ const ToggleGroup = React.forwardRef<
   return (
     <ToggleGroupContext.Provider value={{ variant, size }}>
       {type === "single" ? (
-        <ToggleGroupPrimitive.Root
+        <StyledToggleGroupRoot
           ref={ref}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NativeWind className is not in primitive types
-          {...({ className: mergedClassName } as any)}
+          className={mergedClassName}
           type="single"
           value={typeof value === "string" ? value : undefined}
           onValueChange={singleHandler}
@@ -93,12 +94,11 @@ const ToggleGroup = React.forwardRef<
           dir={dir}
         >
           {children}
-        </ToggleGroupPrimitive.Root>
+        </StyledToggleGroupRoot>
       ) : (
-        <ToggleGroupPrimitive.Root
+        <StyledToggleGroupRoot
           ref={ref}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NativeWind className is not in primitive types
-          {...({ className: mergedClassName } as any)}
+          className={mergedClassName}
           type="multiple"
           value={Array.isArray(value) ? value : []}
           onValueChange={multipleHandler}
@@ -110,7 +110,7 @@ const ToggleGroup = React.forwardRef<
           dir={dir}
         >
           {children}
-        </ToggleGroupPrimitive.Root>
+        </StyledToggleGroupRoot>
       )}
     </ToggleGroupContext.Provider>
   );

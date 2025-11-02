@@ -1,10 +1,8 @@
-/// <reference path="../../../../../nativewind-env.d.ts" />
 import * as React from "react";
 import type { TextInputProps } from "react-native";
 import { TextInput } from "react-native";
 
-// Import ALL types and variants from web (source of truth)
-import type { TextareaBaseProps, TextareaProps as WebTextareaProps } from "next-vibe-ui/ui/textarea";
+import type { TextareaProps as WebTextareaProps } from "next-vibe-ui/ui/textarea";
 
 import { cn } from "../lib/utils";
 import { Div } from "./div";
@@ -21,11 +19,12 @@ const Textarea = React.forwardRef<
       className,
       multiline = true,
       numberOfLines,
-      placeholderClassName,
+      placeholderClassName: _placeholderClassName,
       onChangeText,
       minRows = 4,
       editable,
       disabled,
+      style,
       ...props
     },
     ref,
@@ -46,11 +45,14 @@ const Textarea = React.forwardRef<
         )}>
         <TextInput
           ref={ref}
-          className={cn(
-            // TextInput handles: text color, size, flex - NO border/background (wrapper handles that)
-            "flex-1 text-base lg:text-sm native:text-lg native:leading-[1.25] text-foreground border-0",
-          )}
-          style={{ outlineWidth: 0 }} // Remove any default outline/border
+          style={[
+            {
+              outlineWidth: 0,
+              // TextInput handles: text color, size, flex - NO border/background (wrapper handles that)
+              flex: 1,
+            },
+            style,
+          ]}
           placeholderTextColor="rgb(var(--muted-foreground))"
           multiline={multiline}
           numberOfLines={lines}

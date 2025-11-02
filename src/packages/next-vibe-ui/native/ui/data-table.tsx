@@ -18,7 +18,7 @@ import { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { StyledAnimatedView } from "../lib/styled";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import {
   Table,
   TableBody,
@@ -29,7 +29,7 @@ import {
 } from "./table";
 
 // Cross-platform DataTable props
-export interface DataTableProps<TData, TValue = unknown> {
+export interface DataTableProps<TData, TValue = string> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onRowPress?: (row: Row<TData>) => void;
@@ -38,13 +38,14 @@ export interface DataTableProps<TData, TValue = unknown> {
   ListFooterComponent?: React.ComponentType;
   isRefreshing?: boolean;
   onRefresh?: () => void;
+  className?: string;
 }
 
 /**
  * @docs https://tanstack.com/table
  */
 
-export function DataTable<TData, TValue = unknown>({
+export function DataTable<TData, TValue = string>({
   columns,
   data,
   onRowPress,

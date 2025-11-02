@@ -10,7 +10,6 @@
  * The index.tsx wrapper handles converting this to work with Expo Router
  */
 
-import { Button } from "next-vibe-ui/ui/button";
 import {
   Card,
   CardContent,

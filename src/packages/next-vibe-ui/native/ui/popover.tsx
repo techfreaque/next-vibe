@@ -3,15 +3,12 @@ import * as React from "react";
 import { Platform, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 
 // Import all types from web (web is source of truth)
 import type {
   PopoverRootProps,
-  PopoverTriggerProps,
-  PopoverAnchorProps,
-  PopoverContentProps,
 } from "next-vibe-ui/ui/popover";
 
 const Popover = React.forwardRef<

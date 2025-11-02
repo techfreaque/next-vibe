@@ -297,12 +297,17 @@ export class WebAuthHandler extends BaseAuthHandler {
   async clearAuthToken(logger: EndpointLogger): Promise<ResponseType<void>> {
     try {
       logger.debug("Clearing auth token from cookies");
+      try {
 
-      const cookieStore = await cookies();
-      cookieStore.delete(AUTH_TOKEN_COOKIE_NAME);
-      cookieStore.delete(AUTH_STATUS_COOKIE_NAME);
-      // Note: We don't delete LEAD_ID_COOKIE_NAME on logout
-      // Lead ID persists across sessions for tracking purposes
+        const cookieStore = await cookies();
+        cookieStore.delete(AUTH_TOKEN_COOKIE_NAME);
+        cookieStore.delete(AUTH_STATUS_COOKIE_NAME);
+        // Note: We don't delete LEAD_ID_COOKIE_NAME on logout
+        // Lead ID persists across sessions for tracking purposes
+      } catch (error) {
+        // fails on page.tsx
+        logger.debug("Error clearing auth token", parseError(error));
+      }
 
       logger.debug("Auth token cleared from cookies");
       return createSuccessResponse(undefined);

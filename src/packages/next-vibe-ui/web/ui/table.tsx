@@ -37,120 +37,128 @@ export interface TableCellProps extends TableBaseProps {
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TableCaptionProps extends TableBaseProps {}
 
-const Table = React.forwardRef<
-  HTMLTableElement,
-  TableProps & React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
-    <table
-      ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
-      {...props}
-    />
-  </div>
-));
+function Table({
+  className,
+  ...props
+}: TableProps & React.HTMLAttributes<HTMLTableElement>): React.JSX.Element {
+  return (
+    <div className="relative w-full overflow-auto">
+      <table
+        className={cn("w-full caption-bottom text-sm", className)}
+        {...props}
+      />
+    </div>
+  );
+}
 Table.displayName = "Table";
 
-const TableHeader = React.forwardRef<
-  HTMLTableSectionElement,
-  TableHeaderProps & React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
-));
+function TableHeader({
+  className,
+  ...props
+}: TableHeaderProps & React.HTMLAttributes<HTMLTableSectionElement>): React.JSX.Element {
+  return <thead className={cn("[&_tr]:border-b", className)} {...props} />;
+}
 TableHeader.displayName = "TableHeader";
 
-const TableBody = React.forwardRef<
-  HTMLTableSectionElement,
-  TableBodyProps & React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <tbody
-    ref={ref}
-    className={cn("[&_tr:last-child]:border-0", className)}
-    {...props}
-  />
-));
+function TableBody({
+  className,
+  ...props
+}: TableBodyProps & React.HTMLAttributes<HTMLTableSectionElement>): React.JSX.Element {
+  return (
+    <tbody
+      className={cn("[&_tr:last-child]:border-0", className)}
+      {...props}
+    />
+  );
+}
 TableBody.displayName = "TableBody";
 
-const TableFooter = React.forwardRef<
-  HTMLTableSectionElement,
-  TableFooterProps & React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <tfoot
-    ref={ref}
-    className={cn(
-      "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
-      className,
-    )}
-    {...props}
-  />
-));
+function TableFooter({
+  className,
+  ...props
+}: TableFooterProps & React.HTMLAttributes<HTMLTableSectionElement>): React.JSX.Element {
+  return (
+    <tfoot
+      className={cn(
+        "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
 TableFooter.displayName = "TableFooter";
 
-const TableRow = React.forwardRef<
-  HTMLTableRowElement,
-  TableRowProps & React.HTMLAttributes<HTMLTableRowElement>
->(({ className, onPress, ...props }, ref) => (
-  <tr
-    ref={ref}
-    className={cn(
-      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
-      onPress && "cursor-pointer",
-      className,
-    )}
-    onClick={onPress}
-    onKeyDown={(e) => {
-      if (onPress && (e.key === "Enter" || e.key === " ")) {
-        e.preventDefault();
-        onPress();
-      }
-    }}
-    role={onPress ? "button" : undefined}
-    tabIndex={onPress ? 0 : undefined}
-    {...props}
-  />
-));
+function TableRow({
+  className,
+  onPress,
+  ...props
+}: TableRowProps & React.HTMLAttributes<HTMLTableRowElement>): React.JSX.Element {
+  return (
+    <tr
+      className={cn(
+        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+        onPress && "cursor-pointer",
+        className,
+      )}
+      onClick={onPress}
+      onKeyDown={(e) => {
+        if (onPress && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          onPress();
+        }
+      }}
+      role={onPress ? "button" : undefined}
+      tabIndex={onPress ? 0 : undefined}
+      {...props}
+    />
+  );
+}
 TableRow.displayName = "TableRow";
 
-const TableHead = React.forwardRef<
-  HTMLTableCellElement,
-  TableHeadProps & React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
-  <th
-    ref={ref}
-    className={cn(
-      "h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-      className,
-    )}
-    {...props}
-  />
-));
+function TableHead({
+  className,
+  ...props
+}: TableHeadProps & React.ThHTMLAttributes<HTMLTableCellElement>): React.JSX.Element {
+  return (
+    <th
+      className={cn(
+        "h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
 TableHead.displayName = "TableHead";
 
-const TableCell = React.forwardRef<
-  HTMLTableCellElement,
-  TableCellProps & React.TdHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
-  <td
-    ref={ref}
-    className={cn(
-      "p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-      className,
-    )}
-    {...props}
-  />
-));
+function TableCell({
+  className,
+  ...props
+}: TableCellProps & React.TdHTMLAttributes<HTMLTableCellElement>): React.JSX.Element {
+  return (
+    <td
+      className={cn(
+        "p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
 TableCell.displayName = "TableCell";
 
-const TableCaption = React.forwardRef<
-  HTMLTableCaptionElement,
-  TableCaptionProps & React.HTMLAttributes<HTMLTableCaptionElement>
->(({ className, ...props }, ref) => (
-  <caption
-    ref={ref}
-    className={cn("mt-4 text-sm text-muted-foreground", className)}
-    {...props}
-  />
-));
+function TableCaption({
+  className,
+  ...props
+}: TableCaptionProps & React.HTMLAttributes<HTMLTableCaptionElement>): React.JSX.Element {
+  return (
+    <caption
+      className={cn("mt-4 text-sm text-muted-foreground", className)}
+      {...props}
+    />
+  );
+}
 TableCaption.displayName = "TableCaption";
 
 export {

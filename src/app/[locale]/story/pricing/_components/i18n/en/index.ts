@@ -3,16 +3,16 @@ export const translations = {
     badge: "Simple Credit-Based Pricing",
     title: "Pay As You Go AI Chat",
     subtitle:
-      "Choose between monthly credits or one-time credit packs. Full cost transparency for all AI models and features.",
+ "Choose between monthly credits or one-time credit packs. Full cost transparency for all AI models and features.",
 
     subscription: {
-      badge: "Most Popular",
+      badge: "Accessible for Everyone",
       title: "Monthly Subscription",
       price: "€{{price}}",
       perMonth: "/month",
       description: "{{credits}} credits per month (expire monthly)",
       expiryInfo:
-        "Credits expire at the end of each billing cycle. Best for regular users.",
+ "€10/month for 1000 credits. Affordable AI access for everyone!",
       features: {
         credits: "{{credits}} credits monthly",
         allModels: "Access to all AI models (free and paid)",
@@ -23,12 +23,12 @@ export const translations = {
     },
 
     creditPack: {
-      badge: "Never Expire",
+      badge: "For Power Users",
       title: "Credit Pack",
       price: "€{{price}}",
       description: "{{credits}} credits (never expire)",
       permanentInfo:
-        "Credits never expire! Buy once, use anytime. Perfect for occasional users.",
+ "Need more? €5 for 500 credits that never expire. Perfect for power users needing extra capacity.",
       quantityLabel: "Quantity (1-10 packs)",
       pricePerPack: "€{{price}} per {{credits}} credits",
       features: {
@@ -74,7 +74,7 @@ export const translations = {
       card: {
         title: "Estimate Your Monthly Credits",
         description:
-          "Calculate how many credits you'll need based on your usage",
+ "Calculate how many credits you'll need based on your usage",
       },
       messagesLabel: "Messages per month",
       estimates: {
@@ -91,16 +91,16 @@ export const translations = {
         title: "Recommendation:",
         freeTier: "Start with the free tier (20 credits) to try the service!",
         subscription:
-          "The Monthly Subscription ({{credits}} credits) is perfect for your usage!",
+ "The Monthly Subscription ({{credits}} credits) is perfect for your usage!",
         additionalPacks:
-          "Consider buying {{packs}} Credit Pack(s) in addition to the subscription, or use free models more often.",
+ "Consider buying {{packs}} Credit Pack(s) in addition to the subscription, or use free models more often.",
       },
     },
 
     freeTier: {
       title: "Free Tier Available",
       description:
-        "Start with 20 free credits (tracked by IP/leadId). No credit card required. Many models are completely free!",
+ "Start with 20 free credits (tracked by IP/leadId). No credit card required. Many models are completely free!",
       button: "Start Free Now",
     },
   },

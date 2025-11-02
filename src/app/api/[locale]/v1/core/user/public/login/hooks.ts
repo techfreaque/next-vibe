@@ -14,15 +14,20 @@ import { useCallback, useMemo, useState } from "react";
 
 import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { EndpointReturn, FormAlertState } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
+import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
+import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-api-mutation-form";
 import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 import { authClientRepository } from "../../auth/repository-client";
 import { useUser } from "../../private/me/hooks";
 import loginEndpoints from "./definition";
+
 import { useLoginOptions } from "./options/hooks";
 import type { LoginOptions } from "./repository";
+
+// Types are now inferred from the endpoint
 
 /****************************
  * FORM HOOKS
@@ -38,6 +43,7 @@ type LoginFormReturn = EndpointReturn<typeof loginEndpoints> & {
   errorMessage: TranslationKey | null;
   isAccountLocked: boolean;
   loginOptions: LoginOptions;
+  alert: FormAlertState | null;
 };
 
 /**
@@ -130,96 +136,124 @@ export function useLogin(
     [handleEmailChange],
   );
 
-  const endpointResult = useEndpoint(
-    loginEndpoints,
-    {
-      defaultValues: {
-        credentials: {
-          email: "",
-          password: "",
-        },
-        options: {
-          rememberMe: false,
-        },
-      },
-      persistForm: false,
-    },
-    logger,
-  );
+  // Success callback for login
+  const handleLoginSuccess = useCallback(
+    async (data: {
+      requestData: unknown;
+      pathParams: unknown;
+      responseData: unknown;
+    }) => {
+      try {
+        logger.debug("app.api.v1.core.user.public.login.onSuccess.start");
 
-  // Handle success callback for additional logic (token management, redirects)
-  if (endpointResult.create?.isSuccess) {
-    try {
-      logger.debug("app.api.v1.core.user.public.login.onSuccess.start", {
-        data: endpointResult.create.response,
-      });
+        // Set the auth status to indicate successful login
+        // No need to clear first since the server has already set the httpOnly cookie
+        const tokenResult = authClientRepository.setAuthStatus(logger);
+        if (!tokenResult.success) {
+          logger.error("app.api.v1.core.user.public.login.token.save.failed");
+          toast({
+            title: t("app.api.v1.core.user.public.login.errors.title"),
+            description: t(
+              "app.api.v1.core.user.public.login.errors.token_save_failed",
+            ),
+            variant: "destructive",
+          });
+          return tokenResult;
+        }
+        logger.debug("app.api.v1.core.user.public.login.token.save.success");
 
-      // Set the auth status to indicate successful login
-      // No need to clear first since the server has already set the httpOnly cookie
-      const tokenResult = authClientRepository.setAuthStatus(logger);
-      if (!tokenResult.success) {
-        logger.error("app.api.v1.core.user.public.login.token.save.failed");
+        // Show success message (alert is handled by useEndpoint)
+        toast({
+          title: t("app.api.v1.core.user.public.login.success.title"),
+          description: t(
+            "app.api.v1.core.user.public.login.success.description",
+          ),
+          variant: "default",
+        });
+
+        // Get redirect info from URL
+        const redirectParam = new URL(window.location.href).searchParams.get(
+          "redirectTo",
+        );
+        const redirectTo: Route = (redirectParam ||
+          `/${locale}/`) satisfies Route;
+
+        // Set auth status to enable user query on the next page
+        const authStatusResult = authClientRepository.setAuthStatus(logger);
+        if (!authStatusResult.success) {
+          logger.error("user.auth.status.set.failed", {
+            message: authStatusResult.message,
+            errorCode: authStatusResult.errorType.errorCode,
+          });
+        }
+
+        // Navigate immediately - the new page will handle user data fetching
+        logger.debug("app.api.v1.core.user.public.login.redirect", {
+          redirectTo,
+        });
+        router.push(redirectTo);
+      } catch (error) {
+        logger.error(
+          "app.api.v1.core.user.public.login.process.failed",
+          parseError(error),
+        );
         toast({
           title: t("app.api.v1.core.user.public.login.errors.title"),
           description: t(
-            "app.api.v1.core.user.public.login.errors.token_save_failed",
+            "app.api.v1.core.user.public.login.errors.auth_error",
           ),
           variant: "destructive",
         });
-        return { ...endpointResult, emailForOptions, handleEmailChange, handleEmailFieldChange, errorMessage, isAccountLocked, loginOptions };
       }
-      logger.debug("app.api.v1.core.user.public.login.token.save.success");
+    },
+    [logger, toast, t, router, locale],
+  );
 
-      // Show success message (alert is handled by useEndpoint)
-      toast({
-        title: t("app.api.v1.core.user.public.login.success.title"),
-        description: t(
-          "app.api.v1.core.user.public.login.success.description",
-        ),
-        variant: "default",
-      });
-
-      // Get redirect info from URL
-      const redirectParam = new URL(window.location.href).searchParams.get(
-        "redirectTo",
-      );
-      const redirectTo: Route = (redirectParam ||
-        `/${locale}/`) satisfies Route;
-
-      // Set auth status to enable user query on the next page
-      const authStatusResult = authClientRepository.setAuthStatus(logger);
-      if (!authStatusResult.success) {
-        logger.error("user.auth.status.set.failed", {
-          message: authStatusResult.message,
-          errorCode: authStatusResult.errorType.errorCode,
-        });
+  // Error callback for login
+  const handleLoginError = useCallback(
+    async (data: {
+      error: unknown;
+      requestData: unknown;
+      pathParams: unknown;
+    }) => {
+      logger.error("app.api.v1.core.user.public.login.error", parseError(data.error));
+      // Extract error message if available
+      if (
+        data.error &&
+        typeof data.error === "object" &&
+        "message" in data.error
+      ) {
+        setErrorMessage(data.error.message as TranslationKey);
       }
+    },
+    [logger],
+  );
 
-      // Navigate immediately - the new page will handle user data fetching
-      logger.debug("app.api.v1.core.user.public.login.redirect", {
-        redirectTo,
-      });
-      router.push(redirectTo);
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.public.login.process.failed",
-        parseError(error),
-      );
-      toast({
-        title: t("app.api.v1.core.user.public.login.errors.title"),
-        description: t(
-          "app.api.v1.core.user.public.login.errors.auth_error",
-        ),
-        variant: "destructive",
-      });
-    }
-  }
-
-  // Handle error callback for setting error message
-  if (endpointResult.error) {
-    setErrorMessage(endpointResult.error.message);
-    // Toast is handled by useEndpoint alert
-  }
+  const endpointResult = useEndpoint(
+    loginEndpoints,
+    {
+      // Create options for login
+      create: {
+        formOptions: {
+          persistForm: false,
+          defaultValues: {
+            credentials: {
+              email: "",
+              password: "",
+            },
+            options: {
+              rememberMe: false,
+            },
+          },
+        },
+        mutationOptions: {
+          onSuccess: handleLoginSuccess,
+          onError: handleLoginError,
+        },
+      },
+    },
+    logger,
+  );
 
   // Generate alert state from error/success states and account locked state
   const alert = useMemo((): FormAlertState | null => {
@@ -252,5 +286,3 @@ export function useLogin(
     alert,
   };
 }
-
-export default useLogin;

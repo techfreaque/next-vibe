@@ -412,6 +412,12 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         case "invoice.paid":
           await this.handleInvoicePaymentSucceeded(event.data.object, logger);
           break;
+        case "customer.subscription.deleted":
+          await this.handleSubscriptionDeleted(event.data.object, logger);
+          break;
+        case "customer.subscription.updated":
+          await this.handleSubscriptionUpdated(event.data.object, logger);
+          break;
         default:
           logger.debug("Unhandled webhook event type", {
             eventType: event.type,
@@ -499,11 +505,23 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       // Payment module only records the event - business logic in subscription module
       const invoiceWithSubscription = invoice as Stripe.Invoice & {
         subscription?: string | Stripe.Subscription;
+        parent?: {
+          subscription_details?: {
+            subscription?: string;
+          };
+        };
       };
-      const subscriptionId =
-        typeof invoiceWithSubscription.subscription === "string"
-          ? invoiceWithSubscription.subscription
-          : invoiceWithSubscription.subscription?.id;
+
+      // Try to get subscription ID from invoice.subscription first (automatic invoices)
+      // Then try invoice.parent.subscription_details.subscription (manual invoices)
+      let subscriptionId: string | undefined;
+      if (typeof invoiceWithSubscription.subscription === "string") {
+        subscriptionId = invoiceWithSubscription.subscription;
+      } else if (invoiceWithSubscription.subscription?.id) {
+        subscriptionId = invoiceWithSubscription.subscription.id;
+      } else if (invoiceWithSubscription.parent?.subscription_details?.subscription) {
+        subscriptionId = invoiceWithSubscription.parent.subscription_details.subscription;
+      }
 
       if (!subscriptionId) {
         logger.debug("No subscription ID found in invoice - skipping subscription processing", {
@@ -559,6 +577,44 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       logger.error("Failed to process checkout session completed", {
         error: parseError(error),
         sessionId: session.id,
+      });
+    }
+  }
+
+  private async handleSubscriptionDeleted(
+    subscription: Stripe.Subscription,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      logger.debug("Subscription deleted - delegating to subscription module", {
+        subscriptionId: subscription.id,
+      });
+
+      const { subscriptionRepository } = await import("../subscription/repository");
+      await subscriptionRepository.handleSubscriptionCanceled(subscription.id, logger);
+    } catch (error) {
+      logger.error("Failed to process subscription deleted", {
+        error: parseError(error),
+        subscriptionId: subscription.id,
+      });
+    }
+  }
+
+  private async handleSubscriptionUpdated(
+    subscription: Stripe.Subscription,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      logger.debug("Subscription updated - delegating to subscription module", {
+        subscriptionId: subscription.id,
+      });
+
+      const { subscriptionRepository } = await import("../subscription/repository");
+      await subscriptionRepository.handleSubscriptionUpdated(subscription, logger);
+    } catch (error) {
+      logger.error("Failed to process subscription updated", {
+        error: parseError(error),
+        subscriptionId: subscription.id,
       });
     }
   }

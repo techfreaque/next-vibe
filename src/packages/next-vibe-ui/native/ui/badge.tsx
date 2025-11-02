@@ -1,12 +1,10 @@
-/// <reference path="../../../../../nativewind-env.d.ts" />
-
 import * as Slot from "@rn-primitives/slot";
 import { cva } from "class-variance-authority";
 import type * as React from "react";
 import { View } from "react-native";
 
-import type { BadgeProps, BadgeVariant } from "next-vibe-ui/ui/badge";
-import { cn } from "../lib/utils";
+import type { BadgeProps } from "next-vibe-ui/ui/badge";
+import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 
 const badgeVariants = cva(

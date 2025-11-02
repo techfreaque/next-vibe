@@ -11,15 +11,12 @@ import { resolve } from "node:path";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 
 import { parseError } from "../../../shared/utils/parse-error";
-import type {
-  OxlintConfig,
-  OxlintPrettierEslintConfig,
-} from "./types";
+import type { OxlintConfig, OxlintPrettierEslintConfig } from "./types";
 import { LINT_CONFIG_PATH } from "./repository";
 
 /**
  * Generate oxlint JSON config from TypeScript config
- * Note: Prettier config is now passed inline via CLI flags
+ * Also generates .oxfmtrc.json for the VSCode extension formatter
  */
 export async function generateOxlintConfig(
   logger: EndpointLogger,
@@ -31,6 +28,7 @@ export async function generateOxlintConfig(
 }> {
   try {
     const jsonConfigPath = resolve(cacheDir, ".oxlintrc.json");
+    const fmtConfigPath = resolve(cacheDir, ".oxfmtrc.json");
 
     logger.debug("Loading lint.config.ts", { path: LINT_CONFIG_PATH });
 
@@ -48,7 +46,7 @@ export async function generateOxlintConfig(
       };
     }
 
-    // Extract oxlint config (prettier is handled inline)
+    // Extract oxlint config
     const oxlintConfig: OxlintConfig = fullConfig.oxlint || fullConfig;
 
     // Convert to JSON with pretty formatting
@@ -58,6 +56,33 @@ export async function generateOxlintConfig(
     await fs.writeFile(jsonConfigPath, oxlintJsonContent, "utf8");
 
     logger.debug("Generated .oxlintrc.json", { path: jsonConfigPath });
+
+    // Generate .oxfmtrc.json for VSCode extension formatter in .tmp folder
+    logger.debug("Checking prettier config", {
+      hasPrettier: !!fullConfig.prettier,
+    });
+
+    if (fullConfig.prettier) {
+      const fmtConfig = {
+        semi: fullConfig.prettier.semi ?? true,
+        singleQuote: fullConfig.prettier.singleQuote ?? false,
+        trailingComma: fullConfig.prettier.trailingComma ?? "all",
+        tabWidth: fullConfig.prettier.tabWidth ?? 2,
+        useTabs: fullConfig.prettier.useTabs ?? false,
+        printWidth: fullConfig.prettier.printWidth ?? 80,
+        arrowParens: fullConfig.prettier.arrowParens ?? "always",
+        endOfLine: fullConfig.prettier.endOfLine ?? "lf",
+        bracketSpacing: fullConfig.prettier.bracketSpacing ?? true,
+        jsxSingleQuote: fullConfig.prettier.jsxSingleQuote ?? false,
+      };
+
+      const fmtJsonContent = JSON.stringify(fmtConfig, null, 2);
+      await fs.writeFile(fmtConfigPath, fmtJsonContent, "utf8");
+
+      logger.debug("Generated .oxfmtrc.json", { path: fmtConfigPath });
+    } else {
+      logger.warn("No prettier config found in lint.config.ts");
+    }
 
     return {
       success: true,

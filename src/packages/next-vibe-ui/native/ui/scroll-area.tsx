@@ -3,26 +3,22 @@
  * Wrapper around ScrollView with consistent styling
  */
 import React from "react";
-import type { ScrollViewProps } from "react-native";
 import { ScrollView } from "react-native";
+import { styled } from "nativewind";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import type { ScrollAreaProps } from "next-vibe-ui/ui/scroll-area";
 
 // Type-safe ScrollView with className support (NativeWind)
-const StyledScrollView = ScrollView as unknown as React.ForwardRefExoticComponent<
-  ScrollViewProps & { className?: string } & React.RefAttributes<ScrollView>
->;
+const StyledScrollView = styled(ScrollView);
 
-export const ScrollArea = React.forwardRef<ScrollView, ScrollAreaProps>(
-  function ScrollArea({ className, children }, ref) {
-    return (
-      <StyledScrollView ref={ref} className={cn("relative", className)}>
-        {children}
-      </StyledScrollView>
-    );
-  },
-);
+export function ScrollArea({ className, children }: ScrollAreaProps): React.JSX.Element {
+  return (
+    <StyledScrollView className={cn("relative", className)}>
+      {children}
+    </StyledScrollView>
+  );
+}
 
 ScrollArea.displayName = "ScrollArea";
 

@@ -1,24 +1,11 @@
 import * as React from "react";
-import type { ViewProps } from "react-native";
-import { Text, View } from "react-native";
-import { cn } from "../lib/utils";
+import { View } from "react-native";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import { Span } from "./span";
 import { TextClassContext } from "./text";
 
-// Define refs inline to avoid module resolution issues
-type ViewRef = React.ElementRef<typeof View>;
-type TextRef = React.ElementRef<typeof Text>;
-
-// Cross-platform types for native - import from web
-export type {
-  CardProps,
-  CardHeaderProps,
-  CardTitleProps,
-  CardDescriptionProps,
-  CardContentProps,
-  CardFooterProps,
-} from "next-vibe-ui/ui/card";
-
+// Import all public types from web version (web is source of truth)
 import type {
   CardProps,
   CardHeaderProps,
@@ -29,14 +16,11 @@ import type {
 } from "next-vibe-ui/ui/card";
 
 // Type-safe View with className support (NativeWind)
-const StyledView = View as unknown as React.ForwardRefExoticComponent<
-  ViewProps & { className?: string } & React.RefAttributes<View>
->;
+const StyledView = styled(View);
 
-const Card = React.forwardRef<ViewRef, CardProps>(
-  ({ className, children, ...props }, ref) => (
+function Card({ className, children }: CardProps): React.JSX.Element {
+  return (
     <StyledView
-      ref={ref}
       className={cn(
         "rounded-lg border border-border bg-card shadow-sm shadow-foreground/10",
         className,
@@ -44,26 +28,24 @@ const Card = React.forwardRef<ViewRef, CardProps>(
     >
       {children}
     </StyledView>
-  ),
-);
+  );
+}
 Card.displayName = "Card";
 
-const CardHeader = React.forwardRef<ViewRef, CardHeaderProps>(
-  ({ className, children, ...props }, ref) => (
+function CardHeader({ className, children }: CardHeaderProps): React.JSX.Element {
+  return (
     <StyledView
-      ref={ref}
       className={cn("flex flex-col space-y-1.5 p-6", className)}
     >
       {children}
     </StyledView>
-  ),
-);
+  );
+}
 CardHeader.displayName = "CardHeader";
 
-const CardTitle = React.forwardRef<TextRef, CardTitleProps>(
-  ({ className, children, ...props }, ref) => (
+function CardTitle({ className, children }: CardTitleProps): React.JSX.Element {
+  return (
     <Span
-      ref={ref}
       className={cn(
         "text-2xl text-card-foreground font-semibold leading-none tracking-tight",
         className,
@@ -71,43 +53,41 @@ const CardTitle = React.forwardRef<TextRef, CardTitleProps>(
     >
       {children}
     </Span>
-  ),
-);
+  );
+}
 CardTitle.displayName = "CardTitle";
 
-const CardDescription = React.forwardRef<TextRef, CardDescriptionProps>(
-  ({ className, children, ...props }, ref) => (
+function CardDescription({ className, children }: CardDescriptionProps): React.JSX.Element {
+  return (
     <Span
-      ref={ref}
       className={cn("text-sm text-muted-foreground", className)}
     >
       {children}
     </Span>
-  ),
-);
+  );
+}
 CardDescription.displayName = "CardDescription";
 
-const CardContent = React.forwardRef<ViewRef, CardContentProps>(
-  ({ className, children, ...props }, ref) => (
+function CardContent({ className, children }: CardContentProps): React.JSX.Element {
+  return (
     <TextClassContext.Provider value="text-card-foreground">
-      <StyledView ref={ref} className={cn("p-6 pt-0", className)}>
+      <StyledView className={cn("p-6 pt-0", className)}>
         {children}
       </StyledView>
     </TextClassContext.Provider>
-  ),
-);
+  );
+}
 CardContent.displayName = "CardContent";
 
-const CardFooter = React.forwardRef<ViewRef, CardFooterProps>(
-  ({ className, children, ...props }, ref) => (
+function CardFooter({ className, children }: CardFooterProps): React.JSX.Element {
+  return (
     <StyledView
-      ref={ref}
       className={cn("flex flex-row items-center p-6 pt-0", className)}
     >
       {children}
     </StyledView>
-  ),
-);
+  );
+}
 CardFooter.displayName = "CardFooter";
 
 export {

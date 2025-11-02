@@ -38,9 +38,6 @@ export function logTranslationError(
     case "missing":
       if (typeof process !== "undefined" && process.stderr) {
         process.stderr.write(`${prefix}Translation key not found: ${key}\n`);
-      } else {
-        // eslint-disable-next-line no-console
-        console.error(`${prefix}Translation key not found: ${key}`);
       }
       break;
     case "invalid_type":
@@ -48,22 +45,12 @@ export function logTranslationError(
         process.stderr.write(
           `${prefix}Translation key "${key}" has invalid type (expected string)\n`,
         );
-      } else {
-        // eslint-disable-next-line no-console
-        console.error(
-          `${prefix}Translation key "${key}" has invalid type (expected string)`,
-        );
       }
       break;
     case "fallback_missing":
       if (typeof process !== "undefined" && process.stderr) {
         process.stderr.write(
           `${prefix}Translation key not found in fallback language: ${key}\n`,
-        );
-      } else {
-        // eslint-disable-next-line no-console
-        console.error(
-          `${prefix}Translation key not found in fallback language: ${key}`,
         );
       }
       break;

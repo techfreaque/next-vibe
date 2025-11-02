@@ -21,7 +21,7 @@ import {
 
 import { UserRole } from "../../user-roles/enum";
 
-const loginDefinitions = createEndpoint({
+const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "user", "public", "login"],
   title: "app.api.v1.core.user.public.login.title",
@@ -111,8 +111,6 @@ const loginDefinitions = createEndpoint({
               fieldType: FieldDataType.BOOLEAN,
               label:
                 "app.api.v1.core.user.public.login.fields.rememberMe.label",
-              description:
-                "app.api.v1.core.user.public.login.fields.rememberMe.description",
               placeholder:
                 "app.api.v1.core.user.public.login.fields.rememberMe.placeholder",
               required: false,
@@ -415,14 +413,14 @@ const loginDefinitions = createEndpoint({
 
 // Extract types for use in other files
 export type LoginPostRequestInput =
-  typeof loginDefinitions.POST.types.RequestInput;
+  typeof POST.types.RequestInput;
 export type LoginPostRequestOutput =
-  typeof loginDefinitions.POST.types.RequestOutput;
+  typeof POST.types.RequestOutput;
 export type LoginPostResponseInput =
-  typeof loginDefinitions.POST.types.ResponseInput;
+  typeof POST.types.ResponseInput;
 export type LoginPostResponseOutput =
-  typeof loginDefinitions.POST.types.ResponseOutput;
+  typeof POST.types.ResponseOutput;
 
-const loginEndpoints = { POST: loginDefinitions };
+const loginEndpoints = { POST } as const;
 
 export default loginEndpoints;

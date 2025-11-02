@@ -1,9 +1,11 @@
 import { useRouter } from "next/navigation";
+import { parseError } from "next-vibe/shared/utils";
 import { useToast } from "next-vibe-ui//hooks/use-toast";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
+import type { UseEndpointOptions,
+EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
@@ -18,6 +20,7 @@ type SignupFormReturn = EndpointReturn<typeof signupEndpoints> & {
 
 /**
  * Hook for registration functionality with email checking
+ * Uses operation-specific options and success/error callbacks
  * @returns Registration form, email checking, and submission handling with enhanced error typing
  */
 export function useRegister(): SignupFormReturn & {
@@ -44,74 +47,96 @@ export function useRegister(): SignupFormReturn & {
   // Email checking state
   const [emailToCheck, setEmailToCheck] = useState<string | null>(null);
 
+  // Success callback for signup
+  const handleSignupSuccess = useCallback(
+    async (data: UseEndpointOptions<typeof signupEndpoints>["create"]["mutationOptions"]["onSuccess"]) => {
+      // Clear lead tracking data on successful signup
+      logger.info("app.api.v1.core.user.public.signup.success.processing");
+
+      const setTokenResponse = authClientRepository.setAuthStatus(logger);
+      if (!setTokenResponse.success) {
+        toast({
+          title: t("app.api.v1.core.user.public.signup.errors.title"),
+          description: t(
+            "app.api.v1.core.user.public.login.errors.token_save_failed",
+          ),
+          variant: "destructive",
+        });
+        return setTokenResponse;
+      }
+
+      // Show success message (alert is handled by useEndpoint)
+      toast({
+        title: t("app.api.v1.core.user.public.signup.success.title"),
+        description: t(
+          "app.api.v1.core.user.public.signup.success.description",
+        ),
+        variant: "default",
+      });
+
+      // Redirect
+      router.push(`/${locale}/subscription`);
+      // Force a refresh to update the UI with the new auth state
+      refetch();
+      router.refresh();
+    },
+    [logger, toast, t, router, locale, refetch],
+  );
+
+  // Error callback for signup
+  const handleSignupError = useCallback(
+    async (data: UseEndpointOptions<typeof signupEndpoints>["create"]["mutationOptions"]["onError"]) => {
+      logger.error("app.api.v1.core.user.public.signup.error", parseError(data.error));
+    },
+    [logger],
+  );
+
   const endpointResult = useEndpoint(
     signupEndpoints,
     {
-      defaultValues: {
-        personalInfo: {
-          privateName: "",
-          publicName: "",
-          email: "",
+      // Read options for email availability checking
+      read: {
+        queryOptions: {
+          enabled:
+            !!emailToCheck &&
+            emailToCheck.includes("@") &&
+            emailToCheck.includes("."),
+          refetchOnWindowFocus: false,
+          staleTime: 1000 * 60 * 5, // 5 minutes
         },
-        security: {
-          password: "",
-          confirmPassword: "",
+        initialState: emailToCheck ? { email: emailToCheck } : undefined,
+      },
+      // Create options for signup
+      create: {
+        formOptions: {
+          persistForm: false, // Disable persistence to avoid conflicts with old data structure
+          defaultValues: {
+            personalInfo: {
+              privateName: "",
+              publicName: "",
+              email: "",
+            },
+            security: {
+              password: "",
+              confirmPassword: "",
+            },
+            consent: {
+              acceptTerms: false,
+              subscribeToNewsletter: false,
+            },
+            advanced: {
+              leadId: undefined,
+            },
+          },
         },
-        consent: {
-          acceptTerms: false,
-          subscribeToNewsletter: false,
-        },
-        advanced: {
-          leadId: undefined,
+        mutationOptions: {
+          onSuccess: handleSignupSuccess,
+          onError: handleSignupError,
         },
       },
-      queryOptions: {
-        requestData: emailToCheck ? { email: emailToCheck } : undefined,
-        enabled: !!emailToCheck && emailToCheck.includes("@") && emailToCheck.includes("."),
-        refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 5, // 5 minutes
-      },
-      persistForm: false, // Disable persistence to avoid conflicts with old data structure
     },
     logger,
   );
-
-  // Handle success callback for additional logic (token management, redirects)
-  if (endpointResult.create?.isSuccess) {
-    // Clear lead tracking data on successful signup
-    logger.info("app.api.v1.core.user.public.signup.success.processing");
-
-    const setTokenResponse = authClientRepository.setAuthStatus(logger);
-    if (!setTokenResponse.success) {
-      toast({
-        title: t("app.api.v1.core.user.public.signup.errors.title"),
-        description: t(
-          "app.api.v1.core.user.public.login.errors.token_save_failed",
-        ),
-        variant: "destructive",
-      });
-      return {
-        ...endpointResult,
-        logger,
-        checkEmail: setEmailToCheck,
-      };
-    }
-
-    // Show success message (alert is handled by useEndpoint)
-    toast({
-      title: t("app.api.v1.core.user.public.signup.success.title"),
-      description: t(
-        "app.api.v1.core.user.public.signup.success.description",
-      ),
-      variant: "default",
-    });
-
-    // Redirect
-    router.push(`/${locale}/subscription`);
-    // Force a refresh to update the UI with the new auth state
-    refetch();
-    router.refresh();
-  }
 
   return {
     ...endpointResult,

@@ -6,7 +6,8 @@ import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { ChevronDown, Phone } from "./icons";
 
-import { cn } from "../lib/utils";
+import { useTranslation } from "@/i18n/core/client";
+import { cn } from "next-vibe/shared/utils/utils";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
@@ -24,11 +25,12 @@ export function PhoneField({
   placeholder = "Enter phone number",
   defaultCountry = "US",
   preferredCountries = [],
-  disabled = false,
-  className,
-  name,
+   disabled = false,
+   className,
+   name: _name,
 }: PhoneFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
 
   // Parse the current value to extract country and number
   const parsePhoneValue = (
@@ -131,7 +133,7 @@ export function PhoneField({
               {organizedCountries.preferred.length > 0 && (
                 <View className="border-b border-border">
                   <UIText className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase">
-                    Preferred
+                    {t("packages.nextVibeUi.native.ui.phoneField.preferred")}
                   </UIText>
                   {organizedCountries.preferred.map(renderCountryItem)}
                 </View>
@@ -139,7 +141,7 @@ export function PhoneField({
 
               <View>
                 <UIText className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase">
-                  All Countries
+                  {t("packages.nextVibeUi.native.ui.phoneField.allCountries")}
                 </UIText>
                 {organizedCountries.others.map(renderCountryItem)}
               </View>

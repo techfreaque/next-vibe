@@ -5,16 +5,16 @@ export const translations: typeof enTranslations = {
     badge: "Flexible Preisgestaltung",
     title: "Wählen Sie Ihren Plan",
     subtitle:
-      "Zahlen Sie nur für das, was Sie nutzen, oder wählen Sie unbegrenzt",
+      "Zahlen Sie nur für das, was Sie nutzen, oder abonnieren Sie für regelmäßige Nutzung",
     subscription: {
       badge: "Am beliebtesten",
-      title: "Unbegrenzt",
+      title: "Monatsabonnement",
       price: "€10",
       perMonth: "/Monat",
-      description: "Bestes Preis-Leistungs-Verhältnis für Power-User",
+      description: "Bestes Preis-Leistungs-Verhältnis für regelmäßige Nutzer",
       expiryInfo: "Monatlich abgerechnet, jederzeit kündbar",
       features: {
-        credits: "Unbegrenzte Nachrichten",
+        credits: "1000 Credits pro Monat",
         allModels: "Alle 40+ KI-Modelle",
         allFeatures: "Alle Funktionen enthalten",
         cancel: "Jederzeit kündbar",

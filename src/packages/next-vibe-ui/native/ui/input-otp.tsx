@@ -1,4 +1,3 @@
-/// <reference path="../../../../../nativewind-env.d.ts" />
 /**
  * InputOTP Component for React Native
  * Simple OTP input implementation using TextInput
@@ -8,7 +7,7 @@ import React, { createContext, useContext, useState } from "react";
 import type { TextInputProps } from "react-native";
 import { Text as RNText, TextInput, View } from "react-native";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
 // Import all public types from web version (web is source of truth)
 import type {

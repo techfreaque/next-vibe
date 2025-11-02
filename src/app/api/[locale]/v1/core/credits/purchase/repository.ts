@@ -89,7 +89,7 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
           userId,
         });
         return createErrorResponse(
-          "no_active_subscription",
+          "app.api.v1.core.agent.chat.credits.purchase.post.errors.no_active_subscription.title",
           ErrorResponseTypes.FORBIDDEN,
         );
       }
@@ -101,7 +101,7 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
           subscriptionStatus: subscription.status,
         });
         return createErrorResponse(
-          "no_active_subscription",
+          "app.api.v1.core.agent.chat.credits.purchase.post.errors.no_active_subscription.title",
           ErrorResponseTypes.FORBIDDEN,
         );
       }

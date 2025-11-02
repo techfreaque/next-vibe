@@ -5,7 +5,7 @@
 import type { ReactNode } from "react";
 import { View } from "react-native";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
 // Cross-platform container props
 export interface ContainerProps {

@@ -189,9 +189,8 @@ export const getPrimaryCountryForLanguage = (
 export function getCountryFromLocale(locale: CountryLanguage): Countries {
   const parts = locale.split("-");
   if (parts.length !== 2 || !parts[1]) {
-    throw new Error(
-      `Invalid locale format: "${locale}". Expected format: "language-COUNTRY" (e.g., "en-GLOBAL")`,
-    );
+    // Return a default value instead of throwing
+    return "GLOBAL" as Countries;
   }
   return parts[1] as Countries;
 }
@@ -202,9 +201,8 @@ export function getCountryFromLocale(locale: CountryLanguage): Countries {
 export function getLanguageFromLocale(locale: CountryLanguage): Languages {
   const parts = locale.split("-");
   if (parts.length !== 2 || !parts[0]) {
-    throw new Error(
-      `Invalid locale format: "${locale}". Expected format: "language-COUNTRY" (e.g., "en-GLOBAL")`,
-    );
+    // Return a default value instead of throwing
+    return "en" as Languages;
   }
   return parts[0] as Languages;
 }
@@ -218,9 +216,11 @@ export function getLanguageAndCountryFromLocale(locale: CountryLanguage): {
 } {
   const parts = locale.split("-");
   if (parts.length !== 2 || !parts[0] || !parts[1]) {
-    throw new Error(
-      `Invalid locale format: "${locale}". Expected format: "language-COUNTRY" (e.g., "en-GLOBAL")`,
-    );
+    // Return default values instead of throwing
+    return {
+      language: "en" as Languages,
+      country: "GLOBAL" as Countries,
+    };
   }
   return {
     language: parts[0] as Languages,

@@ -34,14 +34,10 @@ export function LoginForm({
   const logger = createEndpointLogger(true, Date.now(), locale);
 
   // Use the enhanced login hook that includes all form logic and state management
-  const {
-    form,
-    submitForm,
-    isSubmitting,
-    isAccountLocked,
-    loginOptions,
-    alert,
-  } = useLogin(initialLoginOptions, logger);
+  const loginResult = useLogin(initialLoginOptions, logger);
+
+  const { form, onSubmit, isSubmitting } = loginResult.create || {};
+  const { isAccountLocked, loginOptions, alert } = loginResult;
 
   return (
     <motion.div
@@ -54,7 +50,7 @@ export function LoginForm({
           {/* Show form alert if any */}
           {alert && <FormAlert alert={alert} className="mb-6" />}
 
-          <Form form={form} onSubmit={submitForm} className="space-y-6">
+          <Form form={form} onSubmit={onSubmit} className="space-y-6">
             <EndpointFormField
               name="credentials.email"
               control={form.control}
@@ -100,8 +96,6 @@ export function LoginForm({
                   type: "checkbox",
                   label:
                     "app.api.v1.core.user.public.login.fields.rememberMe.label",
-                  description:
-                    "app.api.v1.core.user.public.login.fields.rememberMe.description",
                 }}
               />
 

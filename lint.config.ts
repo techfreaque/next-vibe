@@ -457,7 +457,6 @@ export const oxlintConfig: OxlintConfig = {
     "to_migrate",
     "postgres_data",
     ".nyc_output",
-    "build",
     "*.min.js",
     "next-env.d.ts",
     "nativewind-env.d.ts",
@@ -467,14 +466,8 @@ export const oxlintConfig: OxlintConfig = {
     "**/*.test.tsx",
     "**/*.spec.ts",
     "**/*.spec.tsx",
-    // App-native demo/test pages (intentionally hardcoded strings)
-    "src/app-native/**",
     // System builder test files
     "src/app/api/[locale]/v1/core/system/builder/test-files/**",
-    // React Native UI stubs (not yet implemented)
-    "src/packages/next-vibe-ui/native/**",
-    // System unified-interface (system code, not user-facing)
-    "src/app/api/[locale]/v1/core/system/unified-interface/**",
   ],
 };
 

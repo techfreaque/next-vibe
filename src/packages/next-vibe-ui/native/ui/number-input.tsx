@@ -24,21 +24,17 @@ export interface NumberInputProps {
   name?: string;
 }
 
-export const NumberInput = forwardRef<RNTextInput, NumberInputProps>(
-  (
-    {
-      value = 1,
-      onChange,
-      onBlur,
-      min = 1,
-      max = 10,
-      step = 1,
-      disabled = false,
-      className,
-      name,
-    },
-    ref,
-  ): JSX.Element => {
+export function NumberInput({
+  value = 1,
+  onChange,
+  onBlur,
+  min = 1,
+  max = 10,
+  step = 1,
+  disabled = false,
+  className,
+  name: _name,
+}: NumberInputProps): React.JSX.Element {
     const handleDecrement = (): void => {
       const newValue = Math.max(min, (value || min) - step);
       onChange?.(newValue);
@@ -71,9 +67,8 @@ export const NumberInput = forwardRef<RNTextInput, NumberInputProps>(
         >
           <Minus size={16} />
         </Button>
-        <Input
-          ref={ref}
-          keyboardType="number-pad"
+      <Input
+          keyboardType="numeric"
           value={String(value)}
           onChangeText={handleInputChange}
           onBlur={onBlur}
@@ -90,8 +85,7 @@ export const NumberInput = forwardRef<RNTextInput, NumberInputProps>(
         </Button>
       </Div>
     );
-  },
-);
+}
 
 NumberInput.displayName = "NumberInput";
 

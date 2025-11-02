@@ -6,6 +6,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
+import type { ViewStyle } from "react-native";
 
 import type { SkeletonProps } from "next-vibe-ui/ui/skeleton";
 import { cn } from "../lib/utils";
@@ -28,9 +29,9 @@ function Skeleton({ className, style: customStyle, ...props }: SkeletonProps): R
 
   return (
     <Animated.View
-      style={[animStyle, customStyle as any]}
+      style={[animStyle, customStyle as ViewStyle]}
       className={cn("rounded-md bg-secondary dark:bg-muted", className)}
-      {...props as any}
+      {...props}
     />
   );
 }

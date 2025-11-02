@@ -227,8 +227,8 @@ export function useDeleteAccount(
   return useApiMutation(meEndpoints.DELETE, logger, {
     onSuccess: () => {
       toast({
-        title: t("app.user.user.account.delete.success.title"),
-        description: t("app.user.user.account.delete.success.description"),
+        title: t("app.api.v1.core.user.private.me.delete.success.title"),
+        description: t("app.api.v1.core.user.private.me.delete.success.description"),
         variant: "default",
       });
 
@@ -236,7 +236,7 @@ export function useDeleteAccount(
     },
     onError: ({ error }) => {
       toast({
-        title: t("app.user.user.account.delete.error.title"),
+        title: t("app.api.v1.core.user.private.me.delete.errors.unknown.title"),
         description: error.message,
         variant: "destructive",
       });

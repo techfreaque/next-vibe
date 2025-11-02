@@ -39,42 +39,136 @@ export { useApiQueryForm } from "./use-api-query-form";
 
 /**
  * Utility function to normalize options with smart defaults and full type safety
+ * Supports both new operation-specific options and legacy flat options
  */
 function normalizeOptions<T>(options: UseEndpointOptions<T> = {}): {
-  queryOptions: {
-    enabled: boolean;
-    requestData?: GetEndpointTypes<T> extends never
-      ? undefined
-      : GetEndpointTypes<T>["request"];
+  readOptions: {
+    formOptions: {
+      persistForm: boolean;
+      persistenceKey?: string;
+      autoSubmit?: boolean;
+      debounceMs?: number;
+    };
+    queryOptions: {
+      enabled: boolean;
+      urlPathParams?: EndpointUrlVariables<T>;
+      staleTime: number;
+      refetchOnWindowFocus: boolean;
+    };
     urlPathParams?: EndpointUrlVariables<T>;
-    staleTime: number;
-    refetchOnWindowFocus: boolean;
+    autoPrefillConfig: {
+      autoPrefill: boolean;
+      autoPrefillFromLocalStorage: boolean;
+      showUnsavedChangesAlert: boolean;
+      clearStorageAfterSubmit: boolean;
+    };
+    initialState?: GetEndpointTypes<T> extends never
+      ? undefined
+      : Partial<GetEndpointTypes<T>["request"]>;
   };
-  defaultValues?: PrimaryMutationTypes<T> extends never
-    ? undefined
-    : Partial<PrimaryMutationTypes<T>["request"]>;
+  createOptions: {
+    formOptions: {
+      persistForm: boolean;
+      persistenceKey?: string;
+      defaultValues?: PrimaryMutationTypes<T> extends never
+        ? undefined
+        : Partial<PrimaryMutationTypes<T>["request"]>;
+    };
+    mutationOptions: object;
+    urlPathParams?: EndpointUrlVariables<T>;
+    autoPrefillData?: PrimaryMutationTypes<T> extends never
+      ? undefined
+      : Partial<PrimaryMutationTypes<T>["request"]>;
+    initialState?: PrimaryMutationTypes<T> extends never
+      ? undefined
+      : Partial<PrimaryMutationTypes<T>["request"]>;
+  };
+  deleteOptions: {
+    mutationOptions: object;
+    urlPathParams?: EndpointUrlVariables<T>;
+  };
   autoPrefill: boolean;
 } {
-  // Merge top-level options with nested options, giving priority to top-level
-  const queryOptions = {
-    enabled: options.enabled ?? options.queryOptions?.enabled ?? true,
-    requestData: options.queryOptions?.requestData,
-    urlPathParams: options.urlPathParams ?? options.queryOptions?.urlPathParams,
+  // Support both new operation-specific options and legacy flat options
+  // Priority: new options > legacy nested options > legacy flat options
+
+  // Read options
+  const readQueryOptions = {
+    enabled:
+      options.read?.queryOptions?.enabled ??
+      options.enabled ??
+      options.queryOptions?.enabled ??
+      true,
+    urlPathParams:
+      options.read?.urlPathParams ??
+      options.urlPathParams ??
+      options.queryOptions?.urlPathParams,
     staleTime:
-      options.staleTime ?? options.queryOptions?.staleTime ?? 5 * 60 * 1000, // 5 minutes default
+      options.read?.queryOptions?.staleTime ??
+      options.staleTime ??
+      options.queryOptions?.staleTime ??
+      5 * 60 * 1000, // 5 minutes default
     refetchOnWindowFocus:
+      options.read?.queryOptions?.refetchOnWindowFocus ??
       options.refetchOnWindowFocus ??
       options.queryOptions?.refetchOnWindowFocus ??
       true,
   };
 
-  // Get default values from top-level or legacy formOptions with proper typing
-  const defaultValues =
-    options.defaultValues ?? options.formOptions?.defaultValues;
+  const readFormOptions = {
+    persistForm: options.read?.formOptions?.persistForm ?? false,
+    persistenceKey: options.read?.formOptions?.persistenceKey,
+    autoSubmit: options.read?.formOptions?.autoSubmit,
+    debounceMs: options.read?.formOptions?.debounceMs,
+  };
+
+  const autoPrefillConfig = {
+    autoPrefill: options.autoPrefill ?? true,
+    autoPrefillFromLocalStorage: false, // Always false - no local storage
+    showUnsavedChangesAlert: false, // Always false - no local storage
+    clearStorageAfterSubmit: false, // Always false - no local storage
+  };
+
+  // Create options
+  const createDefaultValues =
+    options.create?.formOptions?.defaultValues ??
+    options.defaultValues ??
+    options.formOptions?.defaultValues;
+
+  const createFormOptions = {
+    persistForm: options.create?.formOptions?.persistForm ?? false,
+    persistenceKey: options.create?.formOptions?.persistenceKey,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    defaultValues: createDefaultValues as any,
+  };
+
+  // Delete options
+  const deleteUrlPathParams =
+    options.delete?.urlPathParams ?? options.urlPathParams;
 
   return {
-    queryOptions,
-    defaultValues,
+    readOptions: {
+      formOptions: readFormOptions,
+      queryOptions: readQueryOptions,
+      urlPathParams: readQueryOptions.urlPathParams,
+      autoPrefillConfig,
+      initialState:
+        options.read?.initialState ?? options.filterOptions?.initialFilters,
+    },
+    createOptions: {
+      formOptions: createFormOptions,
+      mutationOptions: options.create?.mutationOptions ?? {},
+      urlPathParams:
+        options.create?.urlPathParams ??
+        options.urlPathParams ??
+        readQueryOptions.urlPathParams,
+      autoPrefillData: options.create?.autoPrefillData,
+      initialState: options.create?.initialState,
+    },
+    deleteOptions: {
+      mutationOptions: options.delete?.mutationOptions ?? {},
+      urlPathParams: deleteUrlPathParams,
+    },
     autoPrefill: options.autoPrefill ?? true,
   };
 }
@@ -104,23 +198,14 @@ export function useEndpoint<
   logger: EndpointLogger,
 ): EndpointReturn<T> {
   // Normalize options with smart defaults
-  const { queryOptions, defaultValues, autoPrefill } =
+  const { readOptions, createOptions, deleteOptions, autoPrefill } =
     normalizeOptions(options);
-
-  // Create autoPrefill configuration (simplified - no local storage)
-  const autoPrefillConfig = {
-    autoPrefill,
-    autoPrefillFromLocalStorage: false, // Always false - no local storage
-    showUnsavedChangesAlert: false, // Always false - no local storage
-    clearStorageAfterSubmit: false, // Always false - no local storage
-  };
 
   // Detect available methods and determine primary mutation method
   const availableMethods = useAvailableMethods(endpoints);
   const primaryMutationMethod = usePrimaryMutationMethod(availableMethods);
 
   // Extract endpoints
-
   const readEndpoint = endpoints.GET ?? null;
 
   const primaryEndpoint = primaryMutationMethod
@@ -129,15 +214,13 @@ export function useEndpoint<
 
   const deleteEndpoint = endpoints.DELETE ?? null;
 
-  // Use read hook for GET endpoints (list filtering not implemented yet)
+  // Use read hook for GET endpoints
   const read = useEndpointRead(readEndpoint, logger, {
-    formOptions: {
-      persistForm: false, // No local storage
-      persistenceKey: undefined,
-    },
-    queryOptions,
-    urlPathParams: queryOptions?.urlPathParams,
-    autoPrefillConfig,
+    formOptions: readOptions.formOptions,
+    queryOptions: readOptions.queryOptions,
+    urlPathParams: readOptions.urlPathParams,
+    autoPrefillConfig: readOptions.autoPrefillConfig,
+    initialState: readOptions.initialState,
   });
 
   // Use the appropriate operation based on endpoint type
@@ -154,29 +237,28 @@ export function useEndpoint<
     if (autoPrefillData) {
       return autoPrefillData;
     }
-    return defaultValues;
-  }, [autoPrefillData, defaultValues]);
+    return createOptions.formOptions?.defaultValues;
+  }, [autoPrefillData, createOptions.formOptions?.defaultValues]);
 
   const createOperation = useEndpointCreate(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     primaryEndpoint as any,
     logger,
     {
-      formOptions: {
-        persistForm: false, // No local storage
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        defaultValues: defaultValues as any,
-        persistenceKey: undefined,
-      },
-      mutationOptions: {},
-      urlPathParams: queryOptions?.urlPathParams,
-      autoPrefillData,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      formOptions: createOptions.formOptions as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mutationOptions: createOptions.mutationOptions as any,
+      urlPathParams: createOptions.urlPathParams,
+      autoPrefillData: autoPrefillData ?? createOptions.autoPrefillData,
+      initialState: createOptions.initialState,
     },
   );
 
   const deleteOperation = useEndpointDelete(deleteEndpoint, logger, {
-    mutationOptions: {},
-    urlPathParams: queryOptions?.urlPathParams,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mutationOptions: deleteOptions.mutationOptions as any,
+    urlPathParams: deleteOptions.urlPathParams,
   });
 
   const isLoading =
@@ -275,12 +357,9 @@ export function useEndpoint<
   return {
     alert,
     read: read ?? undefined,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     create: (create as any) ?? undefined,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete: (deleteOperation as any) ?? undefined,
     isLoading,
     error,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any;
+  } as EndpointReturn<T>;
 }

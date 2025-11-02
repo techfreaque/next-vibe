@@ -7,9 +7,10 @@ import type { ReactNode } from "react";
 import React from "react";
 import type { ScrollViewProps, ViewProps } from "react-native";
 import { ScrollView, View } from "react-native";
+import { styled } from "nativewind";
 
 import type { CarouselProps as WebCarouselProps } from "next-vibe-ui/ui/carousel";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
 // Native carousel uses subset of web props, with ScrollView native props
 export type CarouselProps = Pick<WebCarouselProps, "orientation"> & {
@@ -18,34 +19,32 @@ export type CarouselProps = Pick<WebCarouselProps, "orientation"> & {
 } & Omit<ScrollViewProps, "horizontal" | "children">;
 
 // Type-safe ScrollView with className support (NativeWind)
-const StyledScrollView = ScrollView as unknown as React.ForwardRefExoticComponent<
-  ScrollViewProps & { className?: string } & React.RefAttributes<ScrollView>
->;
+const StyledScrollView = styled(ScrollView);
 
 // Type-safe View with className support (NativeWind)
-const StyledView = View as unknown as React.ForwardRefExoticComponent<
-  ViewProps & { className?: string } & React.RefAttributes<View>
->;
+const StyledView = styled(View);
 
-export const Carousel = React.forwardRef<ScrollView, CarouselProps>(
-  ({ className, children, orientation = "horizontal", ...props }, ref) => {
-    return (
-      <StyledScrollView
-        ref={ref}
-        horizontal={orientation === "horizontal"}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        className={cn(
-          orientation === "horizontal" ? "flex flex-row" : "flex flex-col",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </StyledScrollView>
-    );
-  },
-);
+export function Carousel({
+  className,
+  children,
+  orientation = "horizontal",
+  ...props
+}: CarouselProps): React.JSX.Element {
+  return (
+    <StyledScrollView
+      horizontal={orientation === "horizontal"}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      className={cn(
+        orientation === "horizontal" ? "flex flex-row" : "flex flex-col",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </StyledScrollView>
+  );
+}
 
 Carousel.displayName = "Carousel";
 
@@ -55,15 +54,13 @@ export interface CarouselItemProps {
   className?: string;
 }
 
-export const CarouselItem = React.forwardRef<View, CarouselItemProps>(
-  ({ className, children }, ref) => {
-    return (
-      <StyledView ref={ref} className={cn("shrink-0", className)}>
-        {children}
-      </StyledView>
-    );
-  },
-);
+export function CarouselItem({ className, children }: CarouselItemProps): React.JSX.Element {
+  return (
+    <StyledView className={cn("shrink-0", className)}>
+      {children}
+    </StyledView>
+  );
+}
 
 CarouselItem.displayName = "CarouselItem";
 

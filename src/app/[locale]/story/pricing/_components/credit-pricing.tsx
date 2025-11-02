@@ -191,9 +191,6 @@ export default function CreditPricingSection({
         {/* Subscription Card */}
         <motion.div variants={item}>
           <Card className="flex flex-col h-full border-2 border-blue-500 shadow-xl relative hover:shadow-2xl hover:-translate-y-1 transition-all">
-            <Div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-              {t("app.story.pricing.creditPricing.subscription.badge")}
-            </Div>
             <CardHeader className="pt-8 pb-4">
               <Div className="mb-6">
                 <Div className="flex justify-center mb-3">

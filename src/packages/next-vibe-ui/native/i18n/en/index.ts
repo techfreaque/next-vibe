@@ -20,8 +20,9 @@ export const translations = {
       // Component has no user-facing strings
     },
     autocompleteField: {
-      stubWarning: "Using stub: AutocompleteField",
-      stubLabel: "AutocompleteField (stub)",
+      custom: "Custom",
+      noOptionsFound: "No options found",
+      use: "Use",
     },
     avatar: {
       // Component has no user-facing strings
@@ -30,8 +31,7 @@ export const translations = {
       // Component has no user-facing strings
     },
     breadcrumb: {
-      stubWarning: "Using stub: Breadcrumb",
-      stubLabel: "Breadcrumb (stub)",
+      navigation: "breadcrumb navigation",
     },
     button: {
       // Component has no user-facing strings
@@ -139,8 +139,8 @@ export const translations = {
       stubLabel: "Pagination (stub)",
     },
     phoneField: {
-      stubWarning: "Using stub: PhoneField",
-      stubLabel: "PhoneField (stub)",
+      preferred: "Preferred",
+      allCountries: "All Countries",
     },
     popover: {
       // Component has no user-facing strings

@@ -5,21 +5,19 @@
  */
 import type { ReactNode } from "react";
 import React from "react";
-import type { PressableProps, TextInputProps, ViewProps } from "react-native";
+import type { ViewProps } from "react-native";
 import { Pressable, Text as RNText, TextInput, View } from "react-native";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
 // Import all cross-platform type definitions from web (source of truth)
 import type {
   CommandProps,
   CommandInputProps,
   CommandListProps,
-  CommandEmptyProps,
   CommandGroupProps,
   CommandItemProps,
   CommandSeparatorProps,
-  CommandShortcutProps,
 } from "next-vibe-ui/ui/command";
 
 export const Command = React.forwardRef<View, CommandProps>(

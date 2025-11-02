@@ -4,13 +4,12 @@ import {
   Platform,
   type StyleProp,
   StyleSheet,
-  Text,
   type TextProps,
   View,
   type ViewStyle,
 } from "react-native";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
 import { ChevronDown } from "./icons/ChevronDown";
 import { ChevronRight } from "./icons/ChevronRight";
@@ -98,7 +97,7 @@ const ContextMenuSubTrigger = React.forwardRef<
   const Icon =
     Platform.OS === "web" ? ChevronRight : open ? ChevronUp : ChevronDown;
 
-  const renderChildren = () => {
+  const renderChildren = (): React.ReactNode => {
     if (typeof children === "function") {
       return (children as (props: { pressed: boolean }) => React.ReactNode)({ pressed: open });
     }
@@ -201,8 +200,8 @@ const ContextMenuItem = React.forwardRef<
   ContextMenuPrimitive.ItemRef,
   ContextMenuItemProps & ContextMenuPrimitive.ItemProps
 >(({ className, inset, ...props }, ref) => (
-  // eslint-disable-next-line i18next/no-literal-string
-  <TextClassContext.Provider value="select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground">
+   // eslint-disable-next-line i18n/no-literal-string
+   <TextClassContext.Provider value="select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground">
     <StyledContextMenuItem
       ref={ref}
       className={cn(
@@ -221,7 +220,7 @@ const ContextMenuCheckboxItem = React.forwardRef<
   ContextMenuPrimitive.CheckboxItemRef,
   ContextMenuCheckboxItemProps & ContextMenuPrimitive.CheckboxItemProps
 >(({ className, children, disabled, ...props }, ref) => {
-  const renderChildren = () => {
+  const renderChildren = (): React.ReactNode => {
     if (typeof children === "function") {
       return (children as (props: { pressed: boolean }) => React.ReactNode)({ pressed: false });
     }

@@ -7,6 +7,12 @@ import { Pressable, Text as RNText, View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
 import { cn } from "../lib/utils";
+
+const StyledAnimatedView = Animated.View as React.ComponentType<React.ComponentProps<typeof Animated.View> & { className?: string }>;
+const StyledText = RNText as React.ComponentType<React.ComponentProps<typeof RNText> & { className?: string }>;
+const StyledPressable = Pressable as React.ComponentType<React.ComponentProps<typeof Pressable> & { className?: string }>;
+const StyledView = View as React.ComponentType<React.ComponentProps<typeof View> & { className?: string }>;
+
 import type {
   ToastActionElement,
   ToastActionProps,
@@ -41,10 +47,8 @@ export function Toast({
     return null;
   }
 
-  const AnimatedView = Animated.View;
-
   return (
-    <AnimatedView
+    <StyledAnimatedView
       entering={FadeInUp}
       exiting={FadeOutUp}
       className={cn(
@@ -56,7 +60,7 @@ export function Toast({
       )}
     >
       {children}
-    </AnimatedView>
+    </StyledAnimatedView>
   );
 }
 
@@ -65,11 +69,11 @@ export function ToastTitle({
   className,
 }: ToastTitleProps): React.JSX.Element {
   return (
-    <RNText
+    <StyledText
       className={cn("font-semibold text-foreground", className)}
     >
       {children}
-    </RNText>
+    </StyledText>
   );
 }
 
@@ -78,29 +82,30 @@ export function ToastDescription({
   className,
 }: ToastDescriptionProps): React.JSX.Element {
   return (
-    <RNText
+    <StyledText
       className={cn("text-sm text-muted-foreground mt-1", className)}
     >
       {children}
-    </RNText>
+    </StyledText>
   );
 }
 
 export function ToastClose({
   className,
-}: ToastCloseProps & { onPress?: () => void }): React.JSX.Element {
+  accessibilityLabel = "Close",
+}: ToastCloseProps & { onPress?: () => void; accessibilityLabel?: string }): React.JSX.Element {
   return (
-    <Pressable
+    <StyledPressable
       className={cn("absolute top-2 right-2 p-1", className)}
       accessibilityRole="button"
-      accessibilityLabel="Close"
+      accessibilityLabel={accessibilityLabel}
     >
-      <RNText
+      <StyledText
         className="text-foreground"
       >
         ✕
-      </RNText>
-    </Pressable>
+      </StyledText>
+    </StyledPressable>
   );
 }
 
@@ -114,7 +119,7 @@ export function ToastViewport({
   className,
 }: ToastViewportProps): React.JSX.Element {
   return (
-    <View
+    <StyledView
       className={cn(
         "absolute top-0 left-0 right-0 p-4 pointer-events-none",
         className,
@@ -128,16 +133,16 @@ export function ToastAction({
   className,
 }: ToastActionProps & { onPress?: () => void }): React.JSX.Element {
   return (
-    <Pressable
+    <StyledPressable
       className={cn("mt-2 rounded px-3 py-2 bg-primary", className)}
       accessibilityRole="button"
     >
-      <RNText
+      <StyledText
         className="text-primary-foreground text-sm font-medium"
       >
         {children}
-      </RNText>
-    </Pressable>
+      </StyledText>
+    </StyledPressable>
   );
 }
 

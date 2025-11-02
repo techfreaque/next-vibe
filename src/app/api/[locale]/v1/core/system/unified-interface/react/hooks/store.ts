@@ -209,7 +209,7 @@ export interface ApiStore {
       string,
       Methods,
       TUserRoleValue,
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Generic endpoint constraint requires 'unknown' for flexible endpoint typing in query execution
+      // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Generic endpoint type parameter requires 'unknown' for flexible endpoint support
       unknown
     >,
   >(
@@ -393,12 +393,13 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     // This is determined by checking if the schema is undefinedSchema
     const isUndefinedSchema =
       endpoint.requestSchema.safeParse(undefined).success &&
-      !endpoint.requestSchema.safeParse({}).success;
+       !endpoint.requestSchema.safeParse({}).success;
 
     // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
+    const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
     const isEmptyObjectSchema =
-      endpoint.requestSchema instanceof z.ZodObject &&
-      Object.keys(endpoint.requestSchema.shape).length === 0;
+      requestSchema instanceof z.ZodObject &&
+      Object.keys((requestSchema as z.ZodObject<z.ZodRawShape>).shape || {}).length === 0;
 
     // If the schema expects undefined but we received an object, set requestData to undefined
     if (
@@ -1036,12 +1037,13 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     // This is determined by checking if the schema is undefinedSchema
     const isUndefinedSchema =
       endpoint.requestSchema.safeParse(undefined).success &&
-      !endpoint.requestSchema.safeParse({}).success;
+       !endpoint.requestSchema.safeParse({}).success;
 
     // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
+    const requestSchema = endpoint.requestSchema as z.ZodTypeAny;
     const isEmptyObjectSchema =
-      endpoint.requestSchema instanceof z.ZodObject &&
-      Object.keys(endpoint.requestSchema.shape).length === 0;
+      requestSchema instanceof z.ZodObject &&
+      Object.keys((requestSchema as z.ZodObject<z.ZodRawShape>).shape || {}).length === 0;
 
     // If the schema expects undefined but we received an object, set requestData to undefined
     if (
@@ -1629,9 +1631,10 @@ export const apiClient = {
       !endpoint.requestSchema.safeParse({}).success;
 
     // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
+    const requestSchema = endpoint.requestSchema as z.ZodTypeAny;
     const isEmptyObjectSchema =
-      endpoint.requestSchema instanceof z.ZodObject &&
-      Object.keys(endpoint.requestSchema.shape).length === 0;
+      requestSchema instanceof z.ZodObject &&
+      Object.keys((requestSchema as z.ZodObject<z.ZodRawShape>).shape || {}).length === 0;
 
     // If the schema expects undefined but we received an object, set data to undefined
     if (isUndefinedSchema && typeof data === "object" && data !== null) {

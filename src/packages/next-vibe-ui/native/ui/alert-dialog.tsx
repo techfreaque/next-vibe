@@ -24,10 +24,7 @@ interface AlertDialogOverlayWebProps {
   children?: React.ReactNode;
 }
 
-const AlertDialogOverlayWeb = React.forwardRef<
-  AlertDialogPrimitive.OverlayRef,
-  AlertDialogOverlayWebProps
->(({ className, children }, ref) => {
+const AlertDialogOverlayWeb = ({ className, children }: AlertDialogOverlayWebProps) => {
   const { open } = AlertDialogPrimitive.useRootContext();
   return (
     <AlertDialogPrimitive.Overlay
@@ -38,24 +35,18 @@ const AlertDialogOverlayWeb = React.forwardRef<
           : "web:animate-out web:fade-out-0",
         className,
       )}
-      ref={ref}
     >
       {children}
     </AlertDialogPrimitive.Overlay>
   );
-});
-
-AlertDialogOverlayWeb.displayName = "AlertDialogOverlayWeb";
+};
 
 interface AlertDialogOverlayNativeProps {
   className?: string;
   children?: React.ReactNode;
 }
 
-const AlertDialogOverlayNative = React.forwardRef<
-  AlertDialogPrimitive.OverlayRef,
-  AlertDialogOverlayNativeProps
->(({ className, children }, ref) => {
+const AlertDialogOverlayNative = ({ className, children }: AlertDialogOverlayNativeProps) => {
   return (
     <AlertDialogPrimitive.Overlay
       style={StyleSheet.absoluteFill}
@@ -64,7 +55,6 @@ const AlertDialogOverlayNative = React.forwardRef<
         className,
       )}
       asChild
-      ref={ref}
     >
       <Animated.View
         entering={FadeIn.duration(150)}
@@ -74,9 +64,7 @@ const AlertDialogOverlayNative = React.forwardRef<
       </Animated.View>
     </AlertDialogPrimitive.Overlay>
   );
-});
-
-AlertDialogOverlayNative.displayName = "AlertDialogOverlayNative";
+};
 
 const AlertDialogOverlay = Platform.select({
   web: AlertDialogOverlayWeb,

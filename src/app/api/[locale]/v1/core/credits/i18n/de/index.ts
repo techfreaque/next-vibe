@@ -95,6 +95,10 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Ressourcenkonflikt aufgetreten",
       },
+      no_active_subscription: {
+        title: "Aktives Abonnement erforderlich",
+        description: "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
+      },
     },
   },
   history: {
@@ -185,10 +189,6 @@ export const translations: typeof enTranslations = {
         conflict: {
           title: "Konflikt",
           description: "Ressourcenkonflikt aufgetreten",
-        },
-        no_active_subscription: {
-          title: "Aktives Abonnement erforderlich",
-          description: "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
         },
       },
     },

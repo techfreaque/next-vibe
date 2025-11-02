@@ -8,25 +8,25 @@ import React from "react";
 import type { ViewProps } from "react-native";
 import { View } from "react-native";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import type {
   ResizablePanelGroupProps,
   ResizablePanelProps,
   ResizableHandleProps,
 } from "next-vibe-ui/ui/resizable";
 
-// Type-safe View with className support (NativeWind)
-const StyledView = View as unknown as React.ForwardRefExoticComponent<
-  ViewProps & { className?: string } & React.RefAttributes<View>
->;
+import { styled } from "nativewind";
 
-export const ResizablePanelGroup = React.forwardRef<
-  View,
-  ResizablePanelGroupProps
->(function ResizablePanelGroup({ className, direction = "horizontal", children }, ref) {
+// Type-safe View with className support (NativeWind)
+const StyledView = styled(View);
+
+export function ResizablePanelGroup({
+  className,
+  direction = "horizontal",
+  children
+}: ResizablePanelGroupProps): React.JSX.Element {
   return (
     <StyledView
-      ref={ref}
       className={cn(
         "flex h-full w-full",
         direction === "vertical" ? "flex-col" : "flex-row",
@@ -36,19 +36,17 @@ export const ResizablePanelGroup = React.forwardRef<
       {children}
     </StyledView>
   );
-});
+}
 
 ResizablePanelGroup.displayName = "ResizablePanelGroup";
 
-export const ResizablePanel = React.forwardRef<View, ResizablePanelProps>(
-  function ResizablePanel({ className, children }, ref) {
-    return (
-      <StyledView ref={ref} className={cn("flex-1", className)}>
-        {children}
-      </StyledView>
-    );
-  },
-);
+export function ResizablePanel({ className, children }: ResizablePanelProps): React.JSX.Element {
+  return (
+    <StyledView className={cn("flex-1", className)}>
+      {children}
+    </StyledView>
+  );
+}
 
 ResizablePanel.displayName = "ResizablePanel";
 

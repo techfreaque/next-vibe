@@ -33,7 +33,7 @@ export function getUserAgent(): string {
  * Uses React Native Linking API
  */
 export function openUrl(url: string): void {
-  Linking.openURL(url).catch((err) => {
-    console.error("Failed to open URL:", err);
+  Linking.openURL(url).catch(() => {
+    // Silently handle URL opening failures
   });
 }

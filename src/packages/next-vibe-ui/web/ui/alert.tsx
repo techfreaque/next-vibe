@@ -26,7 +26,7 @@ const alertVariants = cva(
 // Cross-platform types for native import
 export type AlertVariant = "default" | "destructive" | "success" | "warning";
 
-export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface AlertProps {
   className?: string;
   variant?: AlertVariant;
   children?: React.ReactNode;
@@ -45,44 +45,31 @@ export interface AlertDescriptionProps {
   children?: React.ReactNode;
 }
 
-const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
-  ({ className, variant, icon: Icon, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      role="alert"
-      className={cn(alertVariants({ variant }), className)}
-      {...props}
-    >
-      {Icon && <Icon />}
-      {children}
-    </div>
-  ),
-);
-Alert.displayName = "Alert";
-
-const AlertTitle = React.forwardRef<HTMLParagraphElement, AlertTitleProps>(
-  ({ className, children, ...props }, ref) => (
-    <h5
-      ref={ref}
-      className={cn("mb-1 font-medium leading-none tracking-tight", className)}
-      {...props}
-    >
-      {children}
-    </h5>
-  ),
-);
-AlertTitle.displayName = "AlertTitle";
-
-const AlertDescription = React.forwardRef<
-  HTMLParagraphElement,
-  AlertDescriptionProps
->(({ className, ...props }, ref) => (
+const Alert = ({ className, variant, icon: Icon, children, ...props }: AlertProps): React.JSX.Element => (
   <div
-    ref={ref}
+    role="alert"
+    className={cn(alertVariants({ variant }), className)}
+    {...props}
+  >
+    {Icon && <Icon />}
+    {children}
+  </div>
+);
+
+const AlertTitle = ({ className, children, ...props }: AlertTitleProps): React.JSX.Element => (
+  <h5
+    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    {...props}
+  >
+    {children}
+  </h5>
+);
+
+const AlertDescription = ({ className, ...props }: AlertDescriptionProps): React.JSX.Element => (
+  <div
     className={cn("text-sm [&_p]:leading-relaxed", className)}
     {...props}
   />
-));
-AlertDescription.displayName = "AlertDescription";
+);
 
 export { Alert, AlertDescription, AlertTitle, alertVariants };

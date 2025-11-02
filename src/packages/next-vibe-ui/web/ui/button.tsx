@@ -1,9 +1,9 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
-import * as React from "react";
+import type { ReactNode, JSX } from "react";
 
-const buttonVariants = cva(
+export const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
@@ -35,66 +35,83 @@ const buttonVariants = cva(
   },
 );
 
-// Cross-platform types - exported for native
+
+export const buttonTextVariants = cva(
+  "web:whitespace-nowrap text-sm native:text-base font-medium text-foreground web:transition-colors",
+  {
+    variants: {
+      variant: {
+        default: "text-primary-foreground",
+        destructive: "text-destructive-foreground",
+        outline: "group-active:text-accent-foreground",
+        secondary:
+          "text-secondary-foreground group-active:text-secondary-foreground",
+        ghost: "group-active:text-accent-foreground",
+        link: "text-primary group-active:underline",
+      },
+      size: {
+        default: "",
+        sm: "",
+        lg: "native:text-lg",
+        icon: "",
+        unset: "",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+);
+
+
 export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
 export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
 
-// Platform-agnostic props that work on both web and native
-export interface ButtonProps {
+export interface BaseButtonProps {
+  suppressHydrationWarning?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;
   className?: string;
   disabled?: boolean;
-  children?: React.ReactNode;
-}
-
-// Web-specific props with full HTML attributes
-export interface BaseButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  suppressHydrationWarning?: boolean;
+  children?: ReactNode;
+  onClick?: () => void;
 }
 
 export interface AsChildButtonProps extends BaseButtonProps {
   asChild: true;
-  children?: React.JSX.Element | string;
+  children?: JSX.Element | string;
 }
 
 export interface RegularButtonProps extends BaseButtonProps {
   asChild?: false;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
-export type WebButtonProps = AsChildButtonProps | RegularButtonProps;
+export type ButtonProps = AsChildButtonProps | RegularButtonProps;
 
-const Button = React.forwardRef<HTMLButtonElement, WebButtonProps>(
-  (
-    {
-      className,
-      variant,
-      size,
-      asChild = false,
-      suppressHydrationWarning = false,
-      ...props
-    },
-    ref,
-  ) => {
-    const Comp = asChild ? Slot : "button";
-    return (
-      <Comp
-        {...(suppressHydrationWarning
-          ? { suppressHydrationWarning: true }
-          : {})}
-        className={cn(
-          buttonVariants({ variant, size, className }),
-          "cursor-pointer",
-        )}
-        ref={ref}
-        {...props}
-      />
-    );
-  },
-);
-Button.displayName = "Button";
-
-export { Button, buttonVariants };
+export function Button(
+  {
+    className,
+    variant,
+    size,
+    asChild = false,
+    suppressHydrationWarning = false,
+    ...props
+  }: ButtonProps,
+): JSX.Element {
+  const Comp = asChild ? Slot : "button";
+  return (
+    <Comp
+      {...(suppressHydrationWarning
+        ? { suppressHydrationWarning: true }
+        : {})}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        "cursor-pointer",
+      )}
+      ref={ref}
+      {...props}
+    />
+  );
+}

@@ -1,19 +1,19 @@
 import React from "react";
 import { ScrollView, Platform, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BodyProps } from "../../web/ui/body";
+import type { BodyProps } from "../../web/ui/body";
 import { styled } from "nativewind";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
 const StyledSafeArea = styled(SafeAreaView);
 const StyledScrollView = styled(ScrollView);
-const StyledContent = styled(View);
+const _StyledContent = styled(View);
 
 
 export default function Body({
   children,
   className,
-}: BodyProps) {
+}: BodyProps): React.JSX.Element {
   return (
     <StyledSafeArea className={cn("flex-1", className)}>
       <StyledScrollView

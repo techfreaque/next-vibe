@@ -29,19 +29,19 @@ export const translations = {
         title: "How Credits Work",
         description: "Understanding your credit system",
         expiring: {
-          title: "Expiring Credits",
+          title: "Monthly Subscription Credits",
           description:
- "Credits from monthly subscriptions expire at the end of each billing cycle. Use them before they expire!",
+ "€10/month gives you 1000 credits that expire at the end of each billing cycle. Accessible pricing for everyone!",
         },
         permanent: {
-          title: "Permanent Credits",
+          title: "Extra Credits for Power Users",
           description:
- "Credits purchased in packs never expire. Buy once, use anytime. Perfect for occasional users.",
+ "Need more? Buy credit packs (€5 for 500 credits) that never expire. Perfect for power users who need extra capacity.",
         },
         free: {
-          title: "Free Monthly Credits",
+          title: "Free Trial Credits",
           description:
- "Everyone gets 20 free credits per month. Start chatting with AI immediately!",
+ "Everyone gets 20 free credits to try our service. No credit card required!",
         },
       },
       costs: {
@@ -67,22 +67,22 @@ export const translations = {
     },
     buy: {
       subscription: {
-        badge: "Best Value",
+        badge: "Accessible for Everyone",
         title: "Monthly Subscription",
         description:
- "Get credits every month that expire at the end of your billing cycle",
+ "€10/month - Affordable AI access for everyone with 1000 credits monthly",
         perMonth: "/month",
         features: {
           credits: "{{count}} credits per month",
           expiry: "Credits expire monthly",
-          bestFor: "Best for regular users",
+          bestFor: "Accessible pricing for all users",
         },
         button: "Subscribe Now",
       },
        pack: {
          title: "Credit Packs",
-         description: "Buy additional credits that never expire (requires active subscription)",
-        badge: "Never Expires",
+         description: "Extra credits for power users (requires active subscription)",
+        badge: "For Power Users",
         perPack: "/pack",
         quantity: "Quantity",
         total: "{{count}} credits",
@@ -90,7 +90,7 @@ export const translations = {
           credits: "{{count}} credits per pack",
           permanent: "Never expires",
           expiry: "Never expires",
-          bestFor: "Best for occasional use",
+          bestFor: "For power users needing extra credits",
         },
         button: {
           submit: "Buy Credit Pack",

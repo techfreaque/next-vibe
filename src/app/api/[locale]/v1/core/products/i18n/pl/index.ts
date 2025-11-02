@@ -12,11 +12,11 @@ export const translations: typeof enTranslations = {
 
   // Subscription product
   subscription: {
-    name: "Plan nielimitowany",
-    description: "Nielimitowane wiadomości dla poważnych użytkowników",
-    longDescription: "Najlepsza wartość dla zaawansowanych użytkowników",
+    name: "Subskrypcja miesięczna",
+    description: "€10/miesiąc - Dostępne dla wszystkich",
+    longDescription: "Przystępny dostęp do AI z 1000 kredytów miesięcznie",
     features: {
-      credits: "Nielimitowane wiadomości",
+      credits: "1000 kredytów miesięcznie",
       allModels: "Wszystkie 40+ modeli AI",
       allFeatures: "Wszystkie funkcje włączone",
       cancel: "Anuluj w dowolnym momencie",
@@ -26,8 +26,8 @@ export const translations: typeof enTranslations = {
   // Credit pack product
   creditPack: {
     name: "Pakiet kredytów",
-    description: "Płać za to, czego używasz, nigdy nie wygasa",
-    longDescription: "Idealny do okazjonalnego użytku",
+    description: "Dodatkowe kredyty dla zaawansowanych użytkowników",
+    longDescription: "€5 za 500 kredytów, które nigdy nie wygasają",
     features: {
       credits: "500 kredytów na pakiet",
       allModels: "Wszystkie modele AI włączone",

@@ -8,13 +8,13 @@ export const translations: typeof enTranslations = {
       "Wählen Sie zwischen monatlichen Credits oder einmaligen Credit-Paketen. Volle Kostentransparenz für alle KI-Modelle und Funktionen.",
 
     subscription: {
-      badge: "Am beliebtesten",
+      badge: "Für alle zugänglich",
       title: "Monatsabonnement",
       price: "€{{price}}",
       perMonth: "/Monat",
       description: "{{credits}} Credits pro Monat (verfallen monatlich)",
       expiryInfo:
-        "Credits verfallen am Ende jedes Abrechnungszyklus. Ideal für regelmäßige Nutzer.",
+        "€10/Monat für 1000 Credits. Erschwinglicher KI-Zugang für alle!",
       features: {
         credits: "{{credits}} Credits monatlich",
         allModels:
@@ -26,12 +26,12 @@ export const translations: typeof enTranslations = {
     },
 
     creditPack: {
-      badge: "Verfallen nie",
+      badge: "Für Power-User",
       title: "Credit-Paket",
       price: "€{{price}}",
       description: "{{credits}} Credits (verfallen nie)",
       permanentInfo:
-        "Credits verfallen nie! Einmal kaufen, jederzeit nutzen. Perfekt für gelegentliche Nutzer.",
+        "Brauchen Sie mehr? €5 für 500 Credits, die nie ablaufen. Perfekt für Power-User, die zusätzliche Kapazität benötigen.",
       quantityLabel: "Anzahl (1-10 Pakete)",
       pricePerPack: "€{{price}} pro {{credits}} Credits",
       features: {

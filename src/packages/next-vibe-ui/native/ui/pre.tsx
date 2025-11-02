@@ -1,15 +1,13 @@
 import type { JSX } from "react";
 import * as React from "react";
-import type { TextProps } from "react-native";
 import { Text } from "react-native";
+import { styled } from "nativewind";
 
 import type { PreProps } from "next-vibe-ui/ui/pre";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
 // Type-safe Text with className support (NativeWind)
-const StyledText = Text as unknown as React.ForwardRefExoticComponent<
-  TextProps & { className?: string } & React.RefAttributes<Text>
->;
+const StyledText = styled(Text);
 
 export function Pre({ className, children, id }: PreProps): JSX.Element {
   return (

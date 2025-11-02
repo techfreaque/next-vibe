@@ -2,7 +2,7 @@ import * as MenubarPrimitive from "@rn-primitives/menubar";
 import * as React from "react";
 import { Platform, type TextProps, View } from "react-native";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
 // Import all types from web (web is source of truth)
 import type {
@@ -36,15 +36,11 @@ const MenubarSub = MenubarPrimitive.Sub;
 
 const MenubarRadioGroup = MenubarPrimitive.RadioGroup;
 
-const Menubar = React.forwardRef<
-  React.ElementRef<typeof MenubarPrimitive.Root>,
-  MenubarProps
->(({ className, children }, ref) => {
+function Menubar({ className, children }: MenubarProps): JSX.Element {
   const [value, setValue] = React.useState<string | undefined>(undefined);
 
   return (
     <MenubarPrimitive.Root
-      ref={ref}
       value={value}
       onValueChange={setValue}
       className={cn(
@@ -55,19 +51,15 @@ const Menubar = React.forwardRef<
       {children}
     </MenubarPrimitive.Root>
   );
-});
+}
 Menubar.displayName = MenubarPrimitive.Root.displayName;
 
-const MenubarTrigger = React.forwardRef<
-  React.ElementRef<typeof MenubarPrimitive.Trigger>,
-  MenubarTriggerProps
->(({ className, children }, ref) => {
+function MenubarTrigger({ className, children }: MenubarTriggerProps): JSX.Element {
   const { value } = MenubarPrimitive.useRootContext();
   const { value: itemValue } = MenubarPrimitive.useMenuContext();
 
   return (
     <MenubarPrimitive.Trigger
-      ref={ref}
       className={cn(
         "flex flex-row web:cursor-default web:select-none items-center rounded-sm px-3 py-1.5 text-sm native:h-10 native:px-5 native:py-0 font-medium web:outline-none web:focus:bg-accent active:bg-accent web:focus:text-accent-foreground",
         value === itemValue && "bg-accent text-accent-foreground",
@@ -77,13 +69,10 @@ const MenubarTrigger = React.forwardRef<
       {children}
     </MenubarPrimitive.Trigger>
   );
-});
+}
 MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName;
 
-const MenubarSubTrigger = React.forwardRef<
-  React.ElementRef<typeof MenubarPrimitive.SubTrigger>,
-  MenubarSubTriggerProps
->(({ className, inset, children }, ref) => {
+function MenubarSubTrigger({ className, inset, children }: MenubarSubTriggerProps): JSX.Element {
   const { open } = MenubarPrimitive.useSubContext();
   const Icon =
     Platform.OS === "web" ? ChevronRight : open ? ChevronUp : ChevronDown;
@@ -95,7 +84,6 @@ const MenubarSubTrigger = React.forwardRef<
       )}
     >
       <MenubarPrimitive.SubTrigger
-        ref={ref}
         className={cn(
           "flex flex-row web:cursor-default web:select-none items-center gap-2 web:focus:bg-accent active:bg-accent web:hover:bg-accent rounded-sm px-2 py-1.5 native:py-2 web:outline-none",
           open && "bg-accent",
@@ -110,17 +98,13 @@ const MenubarSubTrigger = React.forwardRef<
       </MenubarPrimitive.SubTrigger>
     </TextClassContext.Provider>
   );
-});
+}
 MenubarSubTrigger.displayName = MenubarPrimitive.SubTrigger.displayName;
 
-const MenubarSubContent = React.forwardRef<
-  React.ElementRef<typeof MenubarPrimitive.SubContent>,
-  MenubarSubContentProps
->(({ className, children }, ref) => {
+function MenubarSubContent({ className, children }: MenubarSubContentProps): JSX.Element {
   const { open } = MenubarPrimitive.useSubContext();
   return (
     <MenubarPrimitive.SubContent
-      ref={ref}
       className={cn(
         "z-50 min-w-[8rem] overflow-hidden rounded-md border mt-1 border-border bg-popover p-1 shadow-md shadow-foreground/5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         open
@@ -132,7 +116,7 @@ const MenubarSubContent = React.forwardRef<
       {children}
     </MenubarPrimitive.SubContent>
   );
-});
+}
 MenubarSubContent.displayName = MenubarPrimitive.SubContent.displayName;
 
 const MenubarContent = React.forwardRef<
@@ -167,7 +151,10 @@ const MenubarItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Item>,
   MenubarItemProps
 >(({ className, inset, children }, ref) => (
-  <TextClassContext.Provider value="select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground">
+   <TextClassContext.Provider
+     // eslint-disable-next-line i18n/no-literal-string
+     value="select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground"
+   >
     <MenubarPrimitive.Item
       ref={ref}
       className={cn(
@@ -185,7 +172,7 @@ MenubarItem.displayName = MenubarPrimitive.Item.displayName;
 const MenubarCheckboxItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.CheckboxItem>,
   MenubarCheckboxItemProps
->(({ className, children, checked = false, onCheckedChange = () => {} }, ref) => (
+>(({ className, children, checked = false, onCheckedChange = (() => {}) as (checked: boolean) => void }, ref) => (
   <MenubarPrimitive.CheckboxItem
     ref={ref}
     className={cn(

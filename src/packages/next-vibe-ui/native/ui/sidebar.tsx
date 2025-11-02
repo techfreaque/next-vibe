@@ -8,16 +8,15 @@ import type { PressableProps, ViewProps } from "react-native";
 import { Pressable, View } from "react-native";
 
 import type {
-  SidebarContentProps,
-  SidebarContextType,
-  SidebarFooterProps,
-  SidebarHeaderProps,
-  SidebarMenuItemProps,
   SidebarProps as WebSidebarProps,
   SidebarProviderProps,
   SidebarTriggerProps,
 } from "next-vibe-ui/ui/sidebar";
 import { cn } from "../lib/utils";
+import { styled } from "nativewind";
+
+const StyledView = styled(View);
+const StyledPressable = styled(Pressable);
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
@@ -43,7 +42,7 @@ export const Sidebar = React.forwardRef<View, NativeSidebarProps>(
         open,
         setOpen,
         openMobile: false,
-        setOpenMobile: () => {},
+        setOpenMobile: (() => {}) as (open: boolean) => void,
         isMobile: false,
         toggleSidebar: () => setOpen(!open),
       }),
@@ -52,19 +51,17 @@ export const Sidebar = React.forwardRef<View, NativeSidebarProps>(
 
     return (
       <SidebarContext.Provider value={contextValue}>
-        <View
+        <StyledView
           ref={ref}
-          {...({
-            className: cn(
-              "flex flex-col border-r border-border bg-background",
-              open ? "w-64" : "w-16",
-              className,
-            ),
-            ...props,
-          } as any)}
+          className={cn(
+            "flex flex-col border-r border-border bg-background",
+            open ? "w-64" : "w-16",
+            className,
+          )}
+          {...props}
         >
           {children}
-        </View>
+        </StyledView>
       </SidebarContext.Provider>
     );
   },
@@ -74,9 +71,9 @@ Sidebar.displayName = "Sidebar";
 
 export const SidebarHeader = React.forwardRef<View, SidebarHeaderProps & ViewProps>(
   ({ className, children, ...props }, ref) => (
-    <View ref={ref} className={cn("flex flex-col gap-2 p-4", className)} {...props as any}>
+    <StyledView ref={ref} className={cn("flex flex-col gap-2 p-4", className)} {...props}>
       {children}
-    </View>
+    </StyledView>
   ),
 );
 
@@ -84,9 +81,9 @@ SidebarHeader.displayName = "SidebarHeader";
 
 export const SidebarContent = React.forwardRef<View, SidebarContentProps & ViewProps>(
   ({ className, children, ...props }, ref) => (
-    <View ref={ref} className={cn("flex-1 overflow-y-auto", className)} {...props as any}>
+    <StyledView ref={ref} className={cn("flex-1 overflow-y-auto", className)} {...props}>
       {children}
-    </View>
+    </StyledView>
   ),
 );
 
@@ -94,9 +91,9 @@ SidebarContent.displayName = "SidebarContent";
 
 export const SidebarFooter = React.forwardRef<View, SidebarFooterProps & ViewProps>(
   ({ className, children, ...props }, ref) => (
-    <View ref={ref} className={cn("flex flex-col gap-2 p-4", className)} {...props as any}>
+    <StyledView ref={ref} className={cn("flex flex-col gap-2 p-4", className)} {...props}>
       {children}
-    </View>
+    </StyledView>
   ),
 );
 
@@ -108,17 +105,17 @@ export const SidebarMenuItem = React.forwardRef<
   React.ElementRef<typeof Pressable>,
   SidebarMenuItemProps & PressableProps
 >(({ className, children, onPress, ...props }, ref) => (
-  <Pressable
+  <StyledPressable
     ref={ref}
     onPress={onPress}
     className={cn(
       "flex flex-row items-center gap-2 rounded-md px-3 py-2 text-sm active:bg-accent active:text-accent-foreground",
       className,
     )}
-    {...props as any}
+    {...props}
   >
     {children}
-  </Pressable>
+  </StyledPressable>
 ));
 
 SidebarMenuItem.displayName = "SidebarMenuItem";
@@ -130,14 +127,14 @@ export const SidebarTrigger = React.forwardRef<
   const { toggleSidebar } = useSidebar();
 
   return (
-    <Pressable
+    <StyledPressable
       ref={ref}
       onPress={toggleSidebar}
       className={cn("flex items-center justify-center p-2", className)}
-      {...props as any}
+      {...props}
     >
       {children}
-    </Pressable>
+    </StyledPressable>
   );
 });
 

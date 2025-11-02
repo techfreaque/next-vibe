@@ -1,40 +1,26 @@
 import * as TabsPrimitive from "@rn-primitives/tabs";
+import { styled } from "nativewind";
 import * as React from "react";
 
 // Import cross-platform types from web (source of truth)
 import type {
-  TabsProps,
   TabsListProps,
   TabsTriggerProps,
   TabsContentProps,
 } from "next-vibe-ui/ui/tabs";
 
-import type { WithClassName } from "../lib/types";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 
 // Type-safe wrappers for primitives
-const StyledTabsList = TabsPrimitive.List as React.ForwardRefExoticComponent<
-  WithClassName<React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>> &
-    React.RefAttributes<React.ElementRef<typeof TabsPrimitive.List>>
->;
-const StyledTabsTrigger = TabsPrimitive.Trigger as React.ForwardRefExoticComponent<
-  WithClassName<React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>> &
-    React.RefAttributes<React.ElementRef<typeof TabsPrimitive.Trigger>>
->;
-const StyledTabsContent = TabsPrimitive.Content as React.ForwardRefExoticComponent<
-  WithClassName<React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>> &
-    React.RefAttributes<React.ElementRef<typeof TabsPrimitive.Content>>
->;
+const StyledTabsList = styled(TabsPrimitive.List);
+const StyledTabsTrigger = styled(TabsPrimitive.Trigger);
+const StyledTabsContent = styled(TabsPrimitive.Content);
 
 const Tabs = TabsPrimitive.Root;
 
-const TabsList = React.forwardRef<
-  TabsPrimitive.ListRef,
-  TabsListProps
->(({ className, children, ...props }, ref) => (
+const TabsList = ({ className, children, ...props }: TabsListProps): JSX.Element => (
   <StyledTabsList
-    ref={ref}
     className={cn(
       "web:inline-flex h-10 native:h-12 items-center justify-center rounded-md bg-muted p-1 native:px-1.5",
       className,
@@ -43,13 +29,10 @@ const TabsList = React.forwardRef<
   >
     {children}
   </StyledTabsList>
-));
+);
 TabsList.displayName = TabsPrimitive.List.displayName;
 
-const TabsTrigger = React.forwardRef<
-  TabsPrimitive.TriggerRef,
-  TabsTriggerProps
->(({ className, value, disabled, children, ...props }, ref) => {
+const TabsTrigger = ({ className, value, disabled, children, ...props }: TabsTriggerProps): JSX.Element => {
   const { value: selectedValue } = TabsPrimitive.useRootContext();
   return (
     <TextClassContext.Provider
@@ -59,7 +42,6 @@ const TabsTrigger = React.forwardRef<
       )}
     >
       <StyledTabsTrigger
-        ref={ref}
         value={value}
         disabled={disabled}
         className={cn(
@@ -75,15 +57,11 @@ const TabsTrigger = React.forwardRef<
       </StyledTabsTrigger>
     </TextClassContext.Provider>
   );
-});
+};
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
-const TabsContent = React.forwardRef<
-  TabsPrimitive.ContentRef,
-  TabsContentProps
->(({ className, value, children, ...props }, ref) => (
+const TabsContent = ({ className, value, children, ...props }: TabsContentProps): JSX.Element => (
   <StyledTabsContent
-    ref={ref}
     value={value}
     className={cn(
       "web:ring-offset-background web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
@@ -93,7 +71,7 @@ const TabsContent = React.forwardRef<
   >
     {children}
   </StyledTabsContent>
-));
+);
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 
 export { Tabs, TabsContent, TabsList, TabsTrigger };

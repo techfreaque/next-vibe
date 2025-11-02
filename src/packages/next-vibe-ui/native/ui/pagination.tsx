@@ -8,7 +8,7 @@ import { Pressable, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
 // Import all types from web (web is source of truth)
 import type {

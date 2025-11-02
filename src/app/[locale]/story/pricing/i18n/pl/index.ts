@@ -4,16 +4,16 @@ export const translations: typeof enTranslations = {
   creditPricing: {
     badge: "Elastyczne ceny",
     title: "Wybierz swój plan",
-    subtitle: "Płać tylko za to, czego używasz, lub wybierz nielimitowany",
+    subtitle: "Płać tylko za to, czego używasz, lub subskrybuj dla regularnego użytkowania",
     subscription: {
       badge: "Najpopularniejszy",
-      title: "Nielimitowany",
+      title: "Subskrypcja miesięczna",
       price: "€10",
       perMonth: "/miesiąc",
-      description: "Najlepsza wartość dla zaawansowanych użytkowników",
+      description: "Najlepsza wartość dla regularnych użytkowników",
       expiryInfo: "Rozliczane miesięcznie, anuluj w dowolnym momencie",
       features: {
-        credits: "Nielimitowane wiadomości",
+        credits: "1000 kredytów miesięcznie",
         allModels: "Wszystkie 40+ modeli AI",
         allFeatures: "Wszystkie funkcje wliczone",
         cancel: "Anuluj w dowolnym momencie",

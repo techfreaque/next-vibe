@@ -48,6 +48,13 @@ import {
   getPricingPlansArray,
 } from "@/app/api/[locale]/v1/core/products/repository-client";
 
+// Custom icon for STARTER plan
+const StarterIcon = (): JSX.Element => (
+  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/30">
+    <Star className="h-6 w-6" />
+  </div>
+);
+
 export default function PricingSection({
   locale,
   currentUser,
@@ -97,13 +104,6 @@ export default function PricingSection({
   const planHierarchy = {
     [SubscriptionPlan.SUBSCRIPTION]: 0,
   };
-
-  // Custom icon for STARTER plan
-  const StarterIcon = (): JSX.Element => (
-    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/30">
-      <Star className="h-6 w-6" />
-    </div>
-  );
 
   const getButtonAction = (
     planId: SubscriptionPlanValue,

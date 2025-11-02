@@ -22,7 +22,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { PasswordStrengthIndicator } from "../../_components/password-strength-indicator";
+import { PasswordStrengthIndicator } from "@/app/[locale]/user/_components/password-strength-indicator";
 
 interface SignUpFormProps {
   locale: CountryLanguage;
@@ -55,7 +55,9 @@ export default function SignUpForm({
   locale,
 }: SignUpFormProps): React.ReactElement {
   const { t } = simpleT(locale);
-  const { form, submitForm, isSubmitting, alert } = useRegister();
+  const signupResult = useRegister();
+  const { form, submitForm, isSubmitting } = signupResult.create || {};
+  const { alert } = signupResult;
 
   return (
     <motion.div

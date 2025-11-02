@@ -35,12 +35,10 @@ import React, { useEffect, useState } from "react";
 import { modelOptions, modelProviders } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { useCreditPurchase } from "@/app/api/[locale]/v1/core/credits/hooks";
 import purchaseDefinitions from "@/app/api/[locale]/v1/core/credits/purchase/definition";
-import { useCheckout } from "@/app/api/[locale]/v1/core/payment/checkout/hooks";
-import { handleCheckoutRedirect } from "@/app/api/[locale]/v1/core/payment/utils/redirect";
+import { useSubscriptionCheckout } from "@/app/api/[locale]/v1/core/payment/checkout/hooks";
 import { ProductIds, productsRepository } from "@/app/api/[locale]/v1/core/products/repository-client";
-import { BillingInterval, SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
+import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
@@ -145,11 +143,9 @@ export function SubscriptionClientContent({
   initialSubscription,
 }: SubscriptionClientContentProps): JSX.Element {
   const { t } = useTranslation();
-  const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("overview");
-  const [isProcessing, setIsProcessing] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<"success" | "error">("success");
   const [alertMessage, setAlertMessage] = useState("");
@@ -164,7 +160,7 @@ export function SubscriptionClientContent({
 
   // Initialize hooks
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const { createCheckout, isPending: isSubscriptionPending } = useCheckout(logger);
+  const subscriptionCheckoutEndpoint = useSubscriptionCheckout(logger);
   const creditPurchaseEndpoint = useCreditPurchase(logger);
 
   // Handle URL params for payment success/cancel
@@ -201,77 +197,22 @@ export function SubscriptionClientContent({
    * Handle subscription purchase
    * Creates checkout session and redirects to Stripe
    */
-  const handleSubscribe = async (): Promise<void> => {
-    setIsProcessing(true);
-    try {
-      const result = await createCheckout(
-        SubscriptionPlan.SUBSCRIPTION,
-        BillingInterval.MONTHLY,
-      );
-
-      // Handle redirect or show error
-      const redirected = handleCheckoutRedirect(result, (errorMessage) => {
-        toast({
-          title: t("app.common.error.title"),
-          description: errorMessage,
-          variant: "destructive",
-        });
-        setIsProcessing(false);
-      });
-
-      // If redirect failed, processing state is already reset in error callback
-      if (!redirected) {
-        return;
-      }
-
-      // If redirect succeeded, keep processing state (page will navigate away)
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Subscription purchase error:", error);
-      toast({
-        title: t("app.common.error.title"),
-        description: t("app.common.error.description"),
-        variant: "destructive",
-      });
-      setIsProcessing(false);
-    }
-  };
-
-  /**
-   * Handle credit pack form submission
-   * Wraps the form submission to handle Stripe redirect
-   */
-  const handleCreditPurchaseSubmit = (
-    event: React.FormEvent<HTMLFormElement> | undefined,
-  ): void => {
-    if (!creditPurchaseEndpoint.create) {
+  const handleSubscribe = (): void => {
+    if (!subscriptionCheckoutEndpoint.create) {
       return;
     }
 
-    // Submit form with redirect handling in callbacks
-    void creditPurchaseEndpoint.create.submitForm(event, {
-      onSuccess: ({ responseData }) => {
-        // Handle redirect to Stripe checkout
-        handleCheckoutRedirect(
-          { success: true, data: responseData, message: "" },
-          (errorMessage) => {
-            toast({
-              title: t("app.common.error.title"),
-              description: errorMessage,
-              variant: "destructive",
-            });
-          },
-        );
-      },
-      onError: ({ error }) => {
-        toast({
-          title: t("app.common.error.title"),
-          description: error.message ?? t("app.common.error.description"),
-          variant: "destructive",
-        });
-      },
+    // Set form values for subscription checkout
+    subscriptionCheckoutEndpoint.create.form.reset({
+      planId: SubscriptionPlan.SUBSCRIPTION,
+      billingInterval: BillingInterval.MONTHLY,
     });
+
+    // Submit form - redirect is handled by the hook's onSuccess callback
+    void subscriptionCheckoutEndpoint.create.submitForm(undefined);
   };
+
+
 
 
 
@@ -712,11 +653,6 @@ export function SubscriptionClientContent({
           >
             {/* Subscription Option */}
             <Card className="relative overflow-hidden border-2 border-primary">
-              <Div className="absolute top-4 right-4">
-                <Badge className="bg-primary">
-                  {t("app.subscription.subscription.buy.subscription.badge")}
-                </Badge>
-              </Div>
               <CardHeader>
                 <CardTitle className="text-2xl">
                   {t("app.subscription.subscription.buy.subscription.title")}
@@ -769,9 +705,9 @@ export function SubscriptionClientContent({
                   className="w-full"
                   size="lg"
                   onClick={handleSubscribe}
-                  disabled={isProcessing || isSubscriptionPending}
+                  disabled={subscriptionCheckoutEndpoint.create?.isSubmitting}
                 >
-                  {isProcessing || isSubscriptionPending
+                  {subscriptionCheckoutEndpoint.create?.isSubmitting
                     ? "Loading..."
                     : t("app.subscription.subscription.buy.subscription.button")}
                 </Button>
@@ -825,10 +761,10 @@ export function SubscriptionClientContent({
                 </Div>
 
                 {/* Quantity Selector Form - Only show for active subscribers */}
-                {creditPurchaseEndpoint.create && initialSubscription?.status === "active" && (
+                {creditPurchaseEndpoint.create && initialSubscription?.status === SubscriptionStatus.ACTIVE && (
                   <Form
                     form={creditPurchaseEndpoint.create.form}
-                    onSubmit={handleCreditPurchaseSubmit}
+                    onSubmit={creditPurchaseEndpoint.create.submitForm}
                     className="space-y-3"
                   >
                     <Div className="w-full">
@@ -858,7 +794,7 @@ export function SubscriptionClientContent({
                 )}
 
                 {/* Message for non-subscribers */}
-                {(!initialSubscription || initialSubscription.status !== "active") && (
+                {(!initialSubscription || initialSubscription.status !== SubscriptionStatus.ACTIVE) && (
                   <Div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
                     <Div className="text-sm text-amber-700 dark:text-amber-300">
                       <Info className="h-4 w-4 inline mr-2" />

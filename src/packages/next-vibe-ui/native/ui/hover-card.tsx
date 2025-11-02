@@ -1,11 +1,10 @@
-/// <reference path="../../../../../nativewind-env.d.ts" />
 import * as HoverCardPrimitive from "@rn-primitives/hover-card";
 import * as React from "react";
 import { Platform, StyleSheet } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
 import type { HoverCardContentProps as WebHoverCardContentProps } from "next-vibe-ui/ui/hover-card";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 
 const HoverCard = HoverCardPrimitive.Root;
@@ -18,10 +17,14 @@ type NativeHoverCardContentProps = WebHoverCardContentProps &
     disablePositioningStyle?: boolean;
   };
 
-const HoverCardContent = React.forwardRef<
-  HoverCardPrimitive.ContentRef,
-  NativeHoverCardContentProps
->(({ align = "center", sideOffset = 4, className, children, disablePositioningStyle, asChild }, ref) => {
+function HoverCardContent({
+  align = "center",
+  sideOffset = 4,
+  className,
+  children,
+  disablePositioningStyle,
+  asChild
+}: NativeHoverCardContentProps): JSX.Element {
   const { open } = HoverCardPrimitive.useRootContext();
   return (
     <HoverCardPrimitive.Portal>
@@ -35,7 +38,6 @@ const HoverCardContent = React.forwardRef<
             }
           >
             <HoverCardPrimitive.Content
-              ref={ref}
               align={align}
               sideOffset={sideOffset}
               disablePositioningStyle={disablePositioningStyle}
@@ -55,7 +57,7 @@ const HoverCardContent = React.forwardRef<
       </HoverCardPrimitive.Overlay>
     </HoverCardPrimitive.Portal>
   );
-});
+}
 HoverCardContent.displayName = HoverCardPrimitive.Content.displayName;
 
 export { HoverCard, HoverCardContent, HoverCardTrigger };

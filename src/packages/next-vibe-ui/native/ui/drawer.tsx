@@ -6,7 +6,7 @@ import React, { createContext, useContext, useState } from "react";
 import { Modal, Pressable, Text as RNText, View } from "react-native";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
 // Cross-platform type definitions for native
 export interface DrawerRootProps {

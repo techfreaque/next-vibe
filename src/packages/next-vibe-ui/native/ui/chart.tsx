@@ -4,22 +4,12 @@
  * Uses view containers that can be enhanced with react-native-svg/victory-native
  */
 import React from "react";
-import type { ReactNode } from "react";
-import type { ViewProps } from "react-native";
 import { View } from "react-native";
+import { styled } from "nativewind";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
-// Cross-platform type definitions - import from web to ensure exact match
-export type {
-  ThemeKeys,
-  ChartConfig,
-  ChartDataPoint,
-  PayloadItem,
-  ChartBaseProps,
-  ChartContainerBaseProps,
-} from "next-vibe-ui/ui/chart";
-
+// Import all public types from web version (web is source of truth)
 import type {
   ChartBaseProps,
   ChartContainerBaseProps,
@@ -27,26 +17,22 @@ import type {
 } from "next-vibe-ui/ui/chart";
 
 // Type-safe View with className support (NativeWind)
-const StyledView = View as unknown as React.ForwardRefExoticComponent<
-  ViewProps & { className?: string } & React.RefAttributes<View>
->;
+const StyledView = styled(View);
 
-export const Chart = React.forwardRef<View, ChartBaseProps>(
-  ({ className, children }, ref) => {
-    return (
-      <StyledView ref={ref} className={cn("flex flex-col gap-2", className)}>
-        {children}
-      </StyledView>
-    );
-  },
-);
+export function Chart({ className, children }: ChartBaseProps): React.JSX.Element {
+  return (
+    <StyledView className={cn("flex flex-col gap-2", className)}>
+      {children}
+    </StyledView>
+  );
+}
 
 Chart.displayName = "Chart";
 
 export function ChartContainer<TData extends ChartDataPoint = ChartDataPoint>({
   className,
   children,
-  config,
+  config: _config,
 }: ChartContainerBaseProps<TData>): React.JSX.Element {
   // Native implementation doesn't use the config for styling like web does
   // But we accept it to maintain interface consistency

@@ -2,16 +2,16 @@ export const translations = {
   creditPricing: {
     badge: "Flexible Pricing",
     title: "Choose Your Plan",
-    subtitle: "Pay only for what you use, or go unlimited",
+    subtitle: "Pay only for what you use, or subscribe for regular usage",
     subscription: {
       badge: "Most Popular",
-      title: "Unlimited",
+      title: "Monthly Subscription",
       price: "€10",
       perMonth: "/month",
-      description: "Best value for power users",
+      description: "Best value for regular users",
       expiryInfo: "Billed monthly, cancel anytime",
       features: {
-        credits: "Unlimited messages",
+        credits: "1000 credits per month",
         allModels: "All 40+ AI models",
         allFeatures: "All features included",
         cancel: "Cancel anytime",
@@ -43,7 +43,7 @@ export const translations = {
       card: {
         title: "Model Costs",
         description:
-          "See exactly how many credits each AI model costs per message",
+ "See exactly how many credits each AI model costs per message",
       },
       table: {
         provider: "Provider",
@@ -67,7 +67,7 @@ export const translations = {
       card: {
         title: "Estimate Your Usage",
         description:
-          "Calculate how many credits you'll need based on your usage",
+ "Calculate how many credits you'll need based on your usage",
       },
       messagesLabel: "Messages per month",
       estimates: {
@@ -84,15 +84,15 @@ export const translations = {
         title: "Our Recommendation",
         freeTier: "Start with our free tier to try out the platform!",
         subscription:
-          "Subscribe for unlimited messages (€10/month covers up to €{{credits}} in usage)",
+ "Subscribe for unlimited messages (€10/month covers up to €{{credits}} in usage)",
         additionalPacks:
-          "Subscribe + buy {{packs}} additional credit pack(s) for heavy usage",
+ "Subscribe + buy {{packs}} additional credit pack(s) for heavy usage",
       },
     },
     freeTier: {
       title: "Try It Free First!",
       description:
-        "Get 10 free messages per day to explore all our AI models. No credit card required.",
+ "Get 10 free messages per day to explore all our AI models. No credit card required.",
       button: "Start Free Trial",
     },
     buttons: {
@@ -119,7 +119,7 @@ export const translations = {
     orSeparator: "or",
     customSolutionText: "Need a custom solution?",
     tailoredPackageText:
-      "We can create a tailored package for your specific needs",
+ "We can create a tailored package for your specific needs",
     monthly: "Monthly",
     annually: "Annually",
     savePercent: "Save {{percent}}%",
@@ -145,10 +145,10 @@ export const translations = {
       description: "Best for professionals and small teams",
       cta: "Subscribe",
       features: [
-        "Unlimited messages",
-        "Access to all 40+ AI models",
-        "Advanced folder management",
-        "Priority support",
+ "Unlimited messages",
+ "Access to all 40+ AI models",
+ "Advanced folder management",
+ "Priority support",
       ],
     },
     PREMIUM: {
@@ -158,10 +158,10 @@ export const translations = {
       description: "Perfect for power users and growing teams",
       cta: "Subscribe",
       features: [
-        "Everything in Professional",
-        "Custom AI personas",
-        "Advanced analytics",
-        "Dedicated support",
+ "Everything in Professional",
+ "Custom AI personas",
+ "Advanced analytics",
+ "Dedicated support",
       ],
     },
     ENTERPRISE: {
@@ -171,10 +171,10 @@ export const translations = {
       description: "Tailored solutions for large organizations",
       cta: "Contact Sales",
       features: [
-        "Everything in Premium",
-        "Custom integrations",
-        "SLA guarantees",
-        "Dedicated account manager",
+ "Everything in Premium",
+ "Custom integrations",
+ "SLA guarantees",
+ "Dedicated account manager",
       ],
     },
   },
@@ -191,7 +191,7 @@ export const translations = {
     title: "Downgrade Plan",
     description: "Are you sure you want to downgrade your plan?",
     nextCycle:
-      "Changes will take effect at the end of your current billing cycle",
+ "Changes will take effect at the end of your current billing cycle",
   },
   subscriptionBanner: {
     status: {

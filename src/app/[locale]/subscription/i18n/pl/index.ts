@@ -31,19 +31,19 @@ export const translations: typeof enTranslations = {
         title: "Jak działają kredyty",
         description: "Zrozumienie systemu kredytów",
         expiring: {
-          title: "Wygasające kredyty",
+          title: "Kredyty z subskrypcji miesięcznej",
           description:
-            "Kredyty z miesięcznych subskrypcji wygasają na koniec każdego cyklu rozliczeniowego. Użyj ich, zanim wygasną!",
+            "€10/miesiąc daje 1000 kredytów, które wygasają na koniec każdego cyklu rozliczeniowego. Przystępne ceny dla wszystkich!",
         },
         permanent: {
-          title: "Stałe kredyty",
+          title: "Dodatkowe kredyty dla zaawansowanych użytkowników",
           description:
-            "Zakupione pakiety kredytów nigdy nie wygasają. Kup raz, używaj w dowolnym momencie. Idealne dla okazjonalnych użytkowników.",
+            "Potrzebujesz więcej? Kup pakiety kredytów (€5 za 500 kredytów), które nigdy nie wygasają. Idealne dla zaawansowanych użytkowników potrzebujących dodatkowej pojemności.",
         },
         free: {
-          title: "Darmowe kredyty",
+          title: "Darmowe kredyty testowe",
           description:
-            "Każdy otrzymuje 20 darmowych kredytów do wypróbowania naszej usługi. Zacznij rozmawiać z AI natychmiast!",
+            "Każdy otrzymuje 20 darmowych kredytów do wypróbowania naszej usługi. Nie wymaga karty kredytowej!",
         },
       },
       costs: {
@@ -69,22 +69,22 @@ export const translations: typeof enTranslations = {
     },
     buy: {
       subscription: {
-        badge: "Najlepsza wartość",
+        badge: "Dostępne dla wszystkich",
         title: "Subskrypcja miesięczna",
         description:
-          "Otrzymuj kredyty co miesiąc, które wygasają na koniec cyklu rozliczeniowego",
+          "€10/miesiąc - Przystępny dostęp do AI dla wszystkich z 1000 kredytów miesięcznie",
         perMonth: "/miesiąc",
         features: {
           credits: "{{count}} kredytów miesięcznie",
           expiry: "Kredyty wygasają co miesiąc",
-          bestFor: "Najlepsze dla regularnych użytkowników",
+          bestFor: "Przystępne ceny dla wszystkich użytkowników",
         },
         button: "Subskrybuj teraz",
       },
       pack: {
         title: "Pakiety kredytów",
-        description: "Kup dodatkowe kredyty, które nigdy nie wygasają (wymaga aktywnego abonamentu)",
-        badge: "Nigdy nie wygasa",
+        description: "Dodatkowe kredyty dla zaawansowanych użytkowników (wymaga aktywnej subskrypcji)",
+        badge: "Dla zaawansowanych",
         perPack: "/pakiet",
         quantity: "Ilość",
         total: "{{count}} kredyty",
@@ -92,7 +92,7 @@ export const translations: typeof enTranslations = {
           credits: "{{count}} kredytów na pakiet",
           permanent: "Nigdy nie wygasa",
           expiry: "Nigdy nie wygasa",
-          bestFor: "Najlepsze dla okazjonalnego użytku",
+          bestFor: "Dla zaawansowanych użytkowników potrzebujących dodatkowych kredytów",
         },
         button: {
           submit: "Kup pakiet kredytów",
@@ -120,26 +120,26 @@ export const translations: typeof enTranslations = {
         free_tier: "Darmowy poziom",
       },
     },
-     tabs: {
-       overview: "Przegląd",
-       buy: "Kup kredyty",
-       billing: "Rozliczenia",
-       history: "Historia",
-       plans: "Plany",
-     },
-     payment: {
-       success: {
-         title: "Płatność zakończona sukcesem",
-         subscription: "Twoja subskrypcja została pomyślnie aktywowana! Twoje kredyty będą dostępne wkrótce.",
-         credits: "Twój zakup pakietu kredytów zakończył się sukcesem! Twoje kredyty będą dostępne wkrótce.",
-       },
-       canceled: {
-         title: "Płatność anulowana",
-         subscription: "Twoja płatność za subskrypcję została anulowana. Możesz spróbować ponownie w dowolnym momencie.",
-         credits: "Twój zakup pakietu kredytów został anulowany. Możesz spróbować ponownie w dowolnym momencie.",
-       },
-     },
-   },
+    tabs: {
+      overview: "Przegląd",
+      buy: "Kup kredyty",
+      billing: "Rozliczenia",
+      history: "Historia",
+      plans: "Plany",
+    },
+    payment: {
+      success: {
+        title: "Płatność zakończona sukcesem",
+        subscription: "Twoja subskrypcja została pomyślnie aktywowana! Twoje kredyty będą dostępne wkrótce.",
+        credits: "Twój zakup pakietu kredytów zakończył się sukcesem! Twoje kredyty będą dostępne wkrótce.",
+      },
+      canceled: {
+        title: "Płatność anulowana",
+        subscription: "Twoja płatność za subskrypcję została anulowana. Możesz spróbować ponownie w dowolnym momencie.",
+        credits: "Twój zakup pakietu kredytów został anulowany. Możesz spróbować ponownie w dowolnym momencie.",
+      },
+    },
+  },
   meta: {
     subscription: {
       title: "Subskrypcja i kredyty",

@@ -6,9 +6,9 @@ import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 import { Check, ChevronDown, Search, X } from "./icons";
 
+import { useTranslation } from "@/i18n/core/client";
 import { cn } from "../lib/utils";
 import { Badge } from "./badge";
-import { Button } from "./button";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
@@ -32,11 +32,12 @@ export function AutocompleteField({
   allowCustom = true,
   disabled = false,
   className,
-  name,
+  name: _name,
 }: AutocompleteFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isCustomValue, setIsCustomValue] = useState(false);
+  const { t } = useTranslation();
 
   // Group options by category
   const groupedOptions = useMemo(() => {
@@ -127,11 +128,12 @@ export function AutocompleteField({
             )}
           >
             <View className="flex-1 flex-row items-center gap-2 min-w-0">
-              {isCustomValue && (
-                <Badge variant="secondary" className="text-xs">
-                  <UIText>Custom</UIText>
-                </Badge>
-              )}
+               {isCustomValue && (
+                 <Badge variant="secondary" className="text-xs">
+                   {/* eslint-disable-next-line i18n/no-literal-string */}
+                    <UIText>{t("packages.nextVibeUi.native.ui.autocompleteField.custom")}</UIText>
+                 </Badge>
+               )}
               <RNText
                 numberOfLines={1}
                 className={cn(
@@ -171,19 +173,21 @@ export function AutocompleteField({
             {/* Options list */}
             <ScrollView className="max-h-[300px]">
               {Object.keys(filteredGroups).length === 0 ? (
-                <View className="py-6 text-center">
-                  <UIText className="text-sm text-muted-foreground text-center">
-                    No options found
-                  </UIText>
+                 <View className="py-6 text-center">
+                   {/* eslint-disable-next-line i18n/no-literal-string */}
+                    <UIText className="text-sm text-muted-foreground text-center">
+                      {t("packages.nextVibeUi.native.ui.autocompleteField.noOptionsFound")}
+                    </UIText>
                   {allowCustom && searchValue && (
-                    <Pressable
-                      onPress={() => handleCustomValue(searchValue)}
-                      className="mt-2 items-center"
-                    >
-                      <UIText className="text-sm text-primary">
-                        Use "{searchValue}"
-                      </UIText>
-                    </Pressable>
+                     <Pressable
+                       onPress={() => handleCustomValue(searchValue)}
+                       className="mt-2 items-center"
+                     >
+                       {/* eslint-disable-next-line i18n/no-literal-string */}
+                        <UIText className="text-sm text-primary">
+                          {t("packages.nextVibeUi.native.ui.autocompleteField.use")} "{searchValue}"
+                        </UIText>
+                     </Pressable>
                   )}
                 </View>
               ) : (
@@ -214,12 +218,13 @@ export function AutocompleteField({
 
               {allowCustom && searchValue && Object.keys(filteredGroups).length > 0 && (
                 <View className="border-t border-border p-1">
-                  <Pressable
-                    onPress={() => handleCustomValue(searchValue)}
-                    className="flex-row items-center rounded-sm px-2 py-2 active:bg-accent"
-                  >
-                    <UIText className="text-base">Use "{searchValue}"</UIText>
-                  </Pressable>
+                   <Pressable
+                     onPress={() => handleCustomValue(searchValue)}
+                     className="flex-row items-center rounded-sm px-2 py-2 active:bg-accent"
+                   >
+                     {/* eslint-disable-next-line i18n/no-literal-string */}
+                     <UIText className="text-base">Use "{searchValue}"</UIText>
+                   </Pressable>
                 </View>
               )}
             </ScrollView>

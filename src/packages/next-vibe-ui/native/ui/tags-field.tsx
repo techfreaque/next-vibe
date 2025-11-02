@@ -10,6 +10,7 @@ import { Plus, X } from "./icons";
 // Import cross-platform types from web (source of truth)
 import type { TagOptionBase, TagsFieldPropsBase } from "next-vibe-ui/ui/tags-field";
 
+import { useTranslation } from "../../../../i18n/core/client";
 import { cn } from "../lib/utils";
 import { Badge } from "./badge";
 import { Input } from "./input";
@@ -29,8 +30,9 @@ export function TagsField({
   allowCustom = true,
   disabled = false,
   className,
-  name,
+  name: _name,
 }: TagsFieldProps): React.JSX.Element {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -190,7 +192,11 @@ export function TagsField({
                           className="flex-row items-center w-full h-8 px-2 rounded-sm active:bg-accent"
                         >
                           <Plus size={14} className="mr-2 text-foreground" />
-                          <UIText className="text-base">Add "{inputValue.trim()}"</UIText>
+                          <UIText className="text-base">
+                            {t("packages.nextVibeUi.web.common.addCustomValue", {
+                              value: inputValue.trim(),
+                            })}
+                          </UIText>
                         </Pressable>
                       </View>
                     )}

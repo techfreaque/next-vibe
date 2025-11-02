@@ -2,8 +2,6 @@
  * Breadcrumb Component for React Native
  * Navigation breadcrumb trail
  */
-/// <reference path="../../../../../nativewind-env.d.ts" />
-
 import * as Slot from "@rn-primitives/slot";
 import { ChevronRight } from "lucide-react-native";
 import React from "react";
@@ -20,54 +18,46 @@ import type {
   BreadcrumbProps,
   BreadcrumbSeparatorProps,
 } from "next-vibe-ui/ui/breadcrumb";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
-export const Breadcrumb = React.forwardRef<View, BreadcrumbProps>(
-  ({ className, children }, ref) => {
-    return (
-      <View
-        ref={ref}
-        accessibilityLabel="breadcrumb navigation"
-        className={className}
-      >
-        {children}
-      </View>
-    );
-  },
-);
+export function Breadcrumb({ className, children }: BreadcrumbProps): React.JSX.Element {
+  const { t } = useTranslation();
+  return (
+    <View
+      accessibilityLabel={t("packages.nextVibeUi.native.ui.breadcrumb.navigation")}
+      className={className}
+    >
+      {children}
+    </View>
+  );
+}
 
 Breadcrumb.displayName = "Breadcrumb";
 
-export const BreadcrumbList = React.forwardRef<View, BreadcrumbListProps>(
-  ({ className, children }, ref) => {
-    return (
-      <View
-        ref={ref}
-        className={cn(
-          "flex flex-row flex-wrap items-center gap-1.5 text-sm text-muted-foreground native:gap-2.5",
-          className,
-        )}
-      >
-        {children}
-      </View>
-    );
-  },
-);
+export function BreadcrumbList({ className, children }: BreadcrumbListProps): React.JSX.Element {
+  return (
+    <View
+      className={cn(
+        "flex flex-row flex-wrap items-center gap-1.5 text-sm text-muted-foreground native:gap-2.5",
+        className,
+      )}
+    >
+      {children}
+    </View>
+  );
+}
 
 BreadcrumbList.displayName = "BreadcrumbList";
 
-export const BreadcrumbItem = React.forwardRef<View, BreadcrumbItemProps>(
-  ({ className, children }, ref) => {
-    return (
-      <View
-        ref={ref}
-        className={cn("flex flex-row items-center gap-1.5", className)}
-      >
-        {children}
-      </View>
-    );
-  },
-);
+export function BreadcrumbItem({ className, children }: BreadcrumbItemProps): React.JSX.Element {
+  return (
+    <View
+      className={cn("flex flex-row items-center gap-1.5", className)}
+    >
+      {children}
+    </View>
+  );
+}
 
 BreadcrumbItem.displayName = "BreadcrumbItem";
 
@@ -75,10 +65,12 @@ type NativeBreadcrumbLinkProps = BreadcrumbLinkProps & {
   onPress?: () => void;
 };
 
-export const BreadcrumbLink = React.forwardRef<
-  React.ElementRef<typeof Pressable>,
-  NativeBreadcrumbLinkProps
->(({ asChild, className, children, onPress }, ref) => {
+export function BreadcrumbLink({
+  asChild,
+  className,
+  children,
+  onPress,
+}: NativeBreadcrumbLinkProps): React.JSX.Element {
   const combinedClassName = cn("transition-colors active:text-foreground", className);
   const content = typeof children === "string" ? (
     <RNText className="text-muted-foreground">{children}</RNText>
@@ -88,36 +80,32 @@ export const BreadcrumbLink = React.forwardRef<
 
   if (asChild) {
     return (
-      <Slot.Pressable ref={ref} onPress={onPress} className={combinedClassName}>
+      <Slot.Pressable onPress={onPress} className={combinedClassName}>
         {content}
       </Slot.Pressable>
     );
   }
 
   return (
-    <Pressable ref={ref} onPress={onPress} className={combinedClassName}>
+    <Pressable onPress={onPress} className={combinedClassName}>
       {content}
     </Pressable>
   );
-});
+}
 
 BreadcrumbLink.displayName = "BreadcrumbLink";
 
-export const BreadcrumbPage = React.forwardRef<RNText, BreadcrumbPageProps>(
-  ({ className, children }, ref) => {
-    return (
-      <RNText
-        ref={ref}
-        role="link"
-        aria-disabled={true}
-        aria-current="page"
-        className={cn("font-normal text-foreground", className)}
-      >
-        {children}
-      </RNText>
-    );
-  },
-);
+export function BreadcrumbPage({ className, children }: BreadcrumbPageProps): React.JSX.Element {
+  return (
+    <RNText
+      aria-disabled={true}
+      aria-current="page"
+      className={cn("font-normal text-foreground", className)}
+    >
+      {children}
+    </RNText>
+  );
+}
 
 BreadcrumbPage.displayName = "BreadcrumbPage";
 

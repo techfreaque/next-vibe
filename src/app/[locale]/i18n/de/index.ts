@@ -26,6 +26,7 @@ export const translations: typeof enTranslations = {
     active: "Aktiv",
     filter: "Filtern",
     refresh: "Aktualisieren",
+    notAvailable: "N/V",
     weekday: {
       monday: "Montag",
       tuesday: "Dienstag",

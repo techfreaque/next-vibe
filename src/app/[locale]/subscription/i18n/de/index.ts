@@ -31,19 +31,19 @@ export const translations: typeof enTranslations = {
         title: "Wie Credits funktionieren",
         description: "Verstehen Sie Ihr Credit-System",
         expiring: {
-          title: "Ablaufende Credits",
+          title: "Monatsabonnement-Credits",
           description:
-            "Credits aus monatlichen Abonnements laufen am Ende jedes Abrechnungszyklus ab. Nutzen Sie sie, bevor sie ablaufen!",
+            "€10/Monat gibt Ihnen 1000 Credits, die am Ende jedes Abrechnungszyklus ablaufen. Erschwingliche Preise für alle!",
         },
         permanent: {
-          title: "Permanente Credits",
+          title: "Zusätzliche Credits für Power-User",
           description:
-            "Gekaufte Credit-Pakete laufen nie ab. Einmal kaufen, jederzeit nutzen. Perfekt für gelegentliche Nutzer.",
+            "Brauchen Sie mehr? Kaufen Sie Credit-Pakete (€5 für 500 Credits), die nie ablaufen. Perfekt für Power-User, die zusätzliche Kapazität benötigen.",
         },
         free: {
-          title: "Kostenlose Credits",
+          title: "Kostenlose Test-Credits",
           description:
-            "Jeder erhält 20 kostenlose Credits zum Testen unseres Services. Starten Sie sofort mit KI-Chats!",
+            "Jeder erhält 20 kostenlose Credits zum Testen unseres Services. Keine Kreditkarte erforderlich!",
         },
       },
       costs: {
@@ -69,22 +69,22 @@ export const translations: typeof enTranslations = {
     },
     buy: {
       subscription: {
-        badge: "Bester Wert",
+        badge: "Für alle zugänglich",
         title: "Monatsabonnement",
         description:
-          "Erhalten Sie jeden Monat Credits, die am Ende Ihres Abrechnungszyklus ablaufen",
+          "€10/Monat - Erschwinglicher KI-Zugang für alle mit 1000 Credits monatlich",
         perMonth: "/Monat",
         features: {
           credits: "{{count}} Credits pro Monat",
           expiry: "Credits laufen monatlich ab",
-          bestFor: "Am besten für regelmäßige Nutzer",
+          bestFor: "Erschwingliche Preise für alle Nutzer",
         },
         button: "Jetzt abonnieren",
       },
       pack: {
         title: "Credit-Pakete",
-        description: "Kaufen Sie zusätzliche Credits, die nie ablaufen (erfordert aktives Abonnement)",
-        badge: "Läuft nie ab",
+        description: "Zusätzliche Credits für Power-User (erfordert aktives Abonnement)",
+        badge: "Für Power-User",
         perPack: "/Paket",
         quantity: "Menge",
         total: "{{count}} Credits",
@@ -92,7 +92,7 @@ export const translations: typeof enTranslations = {
           credits: "{{count}} Credits pro Paket",
           permanent: "Läuft nie ab",
           expiry: "Läuft nie ab",
-          bestFor: "Am besten für gelegentliche Nutzung",
+          bestFor: "Für Power-User, die zusätzliche Credits benötigen",
         },
         button: {
           submit: "Credit Pack kaufen",
@@ -120,26 +120,26 @@ export const translations: typeof enTranslations = {
         free_tier: "Kostenlose Stufe",
       },
     },
-     tabs: {
-       overview: "Übersicht",
-       buy: "Credits kaufen",
-       billing: "Abrechnung",
-       history: "Verlauf",
-       plans: "Pläne",
-     },
-     payment: {
-       success: {
-         title: "Zahlung erfolgreich",
-         subscription: "Ihr Abonnement wurde erfolgreich aktiviert! Ihre Credits sind in Kürze verfügbar.",
-         credits: "Ihr Credit-Paket-Kauf war erfolgreich! Ihre Credits sind in Kürze verfügbar.",
-       },
-       canceled: {
-         title: "Zahlung abgebrochen",
-         subscription: "Ihre Abonnement-Zahlung wurde abgebrochen. Sie können es jederzeit erneut versuchen.",
-         credits: "Ihr Credit-Paket-Kauf wurde abgebrochen. Sie können es jederzeit erneut versuchen.",
-       },
-     },
-   },
+    tabs: {
+      overview: "Übersicht",
+      buy: "Credits kaufen",
+      billing: "Abrechnung",
+      history: "Verlauf",
+      plans: "Pläne",
+    },
+    payment: {
+      success: {
+        title: "Zahlung erfolgreich",
+        subscription: "Ihr Abonnement wurde erfolgreich aktiviert! Ihre Credits sind in Kürze verfügbar.",
+        credits: "Ihr Credit-Paket-Kauf war erfolgreich! Ihre Credits sind in Kürze verfügbar.",
+      },
+      canceled: {
+        title: "Zahlung abgebrochen",
+        subscription: "Ihre Abonnement-Zahlung wurde abgebrochen. Sie können es jederzeit erneut versuchen.",
+        credits: "Ihr Credit-Paket-Kauf wurde abgebrochen. Sie können es jederzeit erneut versuchen.",
+      },
+    },
+  },
   meta: {
     subscription: {
       title: "Abonnement & Credits",

@@ -1,26 +1,21 @@
 import * as React from "react";
-import type { ViewProps } from "react-native";
 import { View } from "react-native";
+import { styled } from "nativewind";
 
 import type { SectionProps } from "next-vibe-ui/ui/section";
 
 // Type-safe View with className support (NativeWind)
-const StyledView = View as unknown as React.ForwardRefExoticComponent<
-  ViewProps & { className?: string } & React.RefAttributes<View>
->;
+const StyledView = styled(View);
 
 /**
  * Platform-agnostic Section component for native
  * On native, this is a View component (semantic sections don't exist in RN)
  * Provides consistent API across platforms
  */
-export const Section = React.forwardRef<View, SectionProps>(function Section(
-  { children, className, id },
-  ref,
-) {
+export function Section({ children, className, id }: SectionProps): React.JSX.Element {
   return (
-    <StyledView ref={ref} className={className} nativeID={id}>
+    <StyledView className={className} nativeID={id}>
       {children}
     </StyledView>
   );
-});
+}

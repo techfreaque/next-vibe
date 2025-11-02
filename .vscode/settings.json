@@ -1,7 +1,7 @@
 {
   "typescript.experimental.useTsgo": true,
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "explicit"
@@ -10,6 +10,8 @@
   "oxc.enable": true,
   "oxc.lint.run": "onSave",
   "oxc.configPath": ".tmp/.oxlintrc.json",
+  "oxc.fmt.configPath": ".tmp/.oxfmtrc.json",
+  "oxc.fmt.experimental": true,
   // Prettier configuration
   "prettier.enable": true,
   "prettier.requireConfig": true,
@@ -18,25 +20,25 @@
   "typescript.suggest.autoImports": true,
   "typescript.preferences.preferTypeOnlyAutoImports": true,
   "[typescript]": {
-    "editor.defaultFormatter": "TypeScriptTeam.native-preview",
+    "editor.defaultFormatter": "oxc.oxc-vscode",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "always"
     }
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "TypeScriptTeam.native-preview",
+    "editor.defaultFormatter": "oxc.oxc-vscode",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "always"
     }
   },
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "oxc.oxc-vscode",
     "editor.formatOnSave": true
   },
   "[javascriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "oxc.oxc-vscode",
     "editor.formatOnSave": true
   },
   "files.eol": "\n",

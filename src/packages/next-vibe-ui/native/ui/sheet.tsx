@@ -1,191 +1,168 @@
-/**
- * Sheet Component for React Native
- * Modal-based sheet implementation
- */
-import { X } from "lucide-react-native";
-import React, { createContext, useContext, useState } from "react";
-import { Modal, Pressable as RNPressable, Text as RNText, View as RNView } from "react-native";
-import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
+import * as DialogPrimitive from "@rn-primitives/dialog";
+import { cva, type VariantProps } from "class-variance-authority";
+import * as React from "react";
+import { Platform, StyleSheet, View } from "react-native";
+import Animated, { SlideInDown, SlideInLeft, SlideInRight, SlideInUp, SlideOutDown, SlideOutLeft, SlideOutRight, SlideOutUp } from "react-native-reanimated";
 
-import { useTranslation } from "@/i18n/core/client";
+import { cn } from "next-vibe/shared/utils/utils";
+import { X } from "./icons/X";
 
-import { StyledAnimatedView } from "../lib/styled";
-import type { PressablePropsWithClassName, TextPropsWithClassName, ViewPropsWithClassName } from "../lib/types";
-import { cn } from "../lib/utils";
-import type {
-  SheetCloseProps,
-  SheetContentProps,
-  SheetDescriptionProps,
-  SheetFooterProps,
-  SheetHeaderProps,
-  SheetRootProps,
-  SheetTitleProps,
-  SheetTriggerProps,
-} from "next-vibe-ui/ui/sheet";
-
-// Type-safe components with className support for NativeWind
-const View = RNView as React.ComponentType<ViewPropsWithClassName>;
-const Pressable = RNPressable as React.ComponentType<PressablePropsWithClassName>;
-const Text = RNText as React.ComponentType<TextPropsWithClassName>;
-
-interface SheetContextValue {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-}
-
-const SheetContext = createContext<SheetContextValue | undefined>(undefined);
-
-function useSheet(): SheetContextValue {
-  const context = useContext(SheetContext);
-  if (!context) {
-    // eslint-disable-next-line no-restricted-syntax -- Error handling for context
-    throw new Error("Sheet components must be used within Sheet");
-  }
-  return context;
-}
-
-export function Sheet({
-  children,
-  open: controlledOpen,
-  onOpenChange,
-}: SheetRootProps): React.JSX.Element {
-  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
-  const open = controlledOpen ?? uncontrolledOpen;
-  const setOpen = onOpenChange ?? setUncontrolledOpen;
-
-  return (
-    <SheetContext.Provider value={{ open, setOpen }}>
-      {children}
-    </SheetContext.Provider>
-  );
-}
-
-export function SheetTrigger({
-  children,
-  asChild,
-}: SheetTriggerProps): React.JSX.Element {
-  const { setOpen } = useSheet();
-
-  if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
-      onPress: () => {
-        setOpen(true);
-      },
-    } as never);
-  }
-
-  return (
-    <Pressable
-      onPress={() => {
-        setOpen(true);
-      }}
-    >
-      {children}
-    </Pressable>
-  );
-}
-
-export function SheetClose({
-  children,
-  asChild,
-}: SheetCloseProps): React.JSX.Element {
-  const { setOpen } = useSheet();
-
-  if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
-      onPress: () => {
-        setOpen(false);
-      },
-    } as never);
-  }
-
-  return (
-    <Pressable
-      onPress={() => {
-        setOpen(false);
-      }}
-    >
-      {children}
-    </Pressable>
-  );
-}
-
-// Portal is a no-op in native, but exported for compatibility
-export function SheetPortal({
-  children,
-}: {
+// Cross-platform type exports
+export interface SheetRootProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   children?: React.ReactNode;
-}): React.JSX.Element {
-  return <>{children}</>;
+  defaultOpen?: boolean;
+  modal?: boolean;
 }
 
-// Overlay is rendered as part of SheetContent in native
-export function SheetOverlay(): null {
-  return null;
+export interface SheetTriggerProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
 }
 
-export function SheetContent({
-  children,
-  className,
-  side = "right",
-}: SheetContentProps): React.JSX.Element {
-  const { open, setOpen } = useSheet();
-  const { t } = useTranslation();
+export interface SheetCloseProps {
+  asChild?: boolean;
+  children?: React.ReactNode;
+}
 
+export interface SheetPortalProps {
+  children?: React.ReactNode;
+  forceMount?: boolean;
+  container?: HTMLElement | null;
+}
+
+export interface SheetOverlayProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface SheetHeaderProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface SheetFooterProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface SheetTitleProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface SheetDescriptionProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+const Sheet = DialogPrimitive.Root;
+
+const SheetTrigger = DialogPrimitive.Trigger;
+
+const SheetClose = DialogPrimitive.Close;
+
+const SheetPortal = DialogPrimitive.Portal;
+
+function SheetOverlay({ className, ...props }: SheetOverlayProps): React.JSX.Element {
   return (
-    <Modal
-      visible={open}
-      transparent={true}
-      animationType="none"
-      onRequestClose={() => {
-        setOpen(false);
-      }}
-    >
-      <Pressable
-        className="flex-1 bg-black/80"
-        onPress={() => {
-          setOpen(false);
-        }}
-      >
-        <StyledAnimatedView
-          entering={SlideInRight}
-          exiting={SlideOutRight}
-          className={cn(
-            "absolute bg-background p-6 shadow-lg",
-            side === "right" &&
-              "right-0 top-0 bottom-0 w-3/4 max-w-sm border-l",
-            side === "left" && "left-0 top-0 bottom-0 w-3/4 max-w-sm border-r",
-            side === "top" && "top-0 left-0 right-0 border-b",
-            side === "bottom" && "bottom-0 left-0 right-0 border-t",
-            className,
-          )}
-        >
-          <Pressable
-            className="absolute right-4 top-4 rounded-sm opacity-70"
-            onPress={() => {
-              setOpen(false);
-            }}
-          >
-            <X size={16} color="currentColor" />
-            <Text className="sr-only">
-              {t("app.common.accessibility.srOnly.close")}
-            </Text>
-          </Pressable>
-          {children}
-        </StyledAnimatedView>
-      </Pressable>
-    </Modal>
+    <DialogPrimitive.Overlay
+      className={cn(
+        "bg-black/80 flex justify-center items-center p-2 absolute top-0 right-0 bottom-0 left-0",
+        className,
+      )}
+      style={Platform.OS !== "web" ? StyleSheet.absoluteFill : undefined}
+      {...props}
+    />
   );
 }
+SheetOverlay.displayName = "SheetOverlay";
 
-export function SheetHeader({
+const sheetVariants = cva(
+  "fixed z-50 gap-4 bg-background p-6 shadow-lg",
+  {
+    variants: {
+      side: {
+        top: "inset-x-0 top-0 border-b",
+        bottom: "inset-x-0 bottom-0 border-t",
+        left: "inset-y-0 left-0 h-full w-3/4 border-r",
+        right: "inset-y-0 right-0 h-full w-3/4 border-l",
+      },
+    },
+    defaultVariants: {
+      side: "right",
+    },
+  },
+);
+
+export interface SheetContentProps extends VariantProps<typeof sheetVariants> {
+  className?: string;
+  children?: React.ReactNode;
+  portalHost?: string;
+}
+
+function SheetContent({
+  side = "right",
   className,
   children,
-}: SheetHeaderProps): React.JSX.Element {
+  portalHost,
+  ...props
+}: SheetContentProps): JSX.Element {
+  const getEnteringAnimation = () => {
+    switch (side) {
+      case "top":
+        return SlideInUp;
+      case "bottom":
+        return SlideInDown;
+      case "left":
+        return SlideInLeft;
+      case "right":
+        return SlideInRight;
+      default:
+        return SlideInRight;
+    }
+  };
+
+  const getExitingAnimation = () => {
+    switch (side) {
+      case "top":
+        return SlideOutUp;
+      case "bottom":
+        return SlideOutDown;
+      case "left":
+        return SlideOutLeft;
+      case "right":
+        return SlideOutRight;
+      default:
+        return SlideOutRight;
+    }
+  };
+
+  return (
+    <DialogPrimitive.Portal hostName={portalHost}>
+      <SheetOverlay />
+      <Animated.View
+        className={cn(sheetVariants({ side }), className)}
+        entering={getEnteringAnimation()}
+        exiting={getExitingAnimation()}
+        {...props}
+      >
+        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 p-2">
+          <X size={16} />
+        </DialogPrimitive.Close>
+        {children}
+      </Animated.View>
+    </DialogPrimitive.Portal>
+  );
+}
+SheetContent.displayName = "SheetContent";
+
+function SheetHeader({ className, children }: SheetHeaderProps): JSX.Element {
   return (
     <View
       className={cn(
-        "flex flex-col gap-2 text-center native:text-left",
+        "flex flex-col space-y-2 text-center",
         className,
       )}
     >
@@ -193,17 +170,13 @@ export function SheetHeader({
     </View>
   );
 }
-
 SheetHeader.displayName = "SheetHeader";
 
-export function SheetFooter({
-  className,
-  children,
-}: SheetFooterProps): React.JSX.Element {
+function SheetFooter({ className, children }: SheetFooterProps): JSX.Element {
   return (
     <View
       className={cn(
-        "flex flex-col-reverse native:flex-row native:justify-end gap-2",
+        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
         className,
       )}
     >
@@ -211,31 +184,37 @@ export function SheetFooter({
     </View>
   );
 }
-
 SheetFooter.displayName = "SheetFooter";
 
-export function SheetTitle({
-  className,
-  children,
-}: SheetTitleProps): React.JSX.Element {
+function SheetTitle({ className, ...props }: SheetTitleProps): JSX.Element {
   return (
-    <Text className={cn("text-lg font-semibold text-foreground", className)}>
-      {children}
-    </Text>
+    <DialogPrimitive.Title
+      className={cn("text-lg font-semibold text-foreground", className)}
+      {...props}
+    />
   );
 }
-
 SheetTitle.displayName = "SheetTitle";
 
-export function SheetDescription({
-  className,
-  children,
-}: SheetDescriptionProps): React.JSX.Element {
+function SheetDescription({ className, ...props }: SheetDescriptionProps): JSX.Element {
   return (
-    <Text className={cn("text-sm text-muted-foreground", className)}>
-      {children}
-    </Text>
+    <DialogPrimitive.Description
+      className={cn("text-sm text-muted-foreground", className)}
+      {...props}
+    />
   );
 }
-
 SheetDescription.displayName = "SheetDescription";
+
+export {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetOverlay,
+  SheetPortal,
+  SheetTitle,
+  SheetTrigger,
+};

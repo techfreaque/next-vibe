@@ -1,10 +1,10 @@
 import * as TogglePrimitive from "@rn-primitives/toggle";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react-native";
 import * as React from "react";
 
-import { cn } from "../lib/utils";
-import type { WithClassName } from "../lib/types";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 import type {
   ToggleProps,
@@ -58,12 +58,14 @@ const toggleTextVariants = cva(
 
 export type { ToggleProps, ToggleSize, ToggleVariant };
 
+const StyledToggleRoot = styled(TogglePrimitive.Root);
+
 const Toggle = React.forwardRef<
   TogglePrimitive.RootRef,
-  WithClassName<TogglePrimitive.RootProps> & ToggleProps
->(({ className, variant, size, pressed, onPressedChange, children, ...props }, ref) => {
+  ToggleProps
+>(({ className, variant, size, pressed, onPressedChange, children, disabled }, ref) => {
   const isPressed = pressed ?? false;
-  const handlePressedChange = onPressedChange ?? (() => {});
+  const handlePressedChange = onPressedChange ?? (() => undefined);
   return (
     <TextClassContext.Provider
       value={cn(
@@ -71,23 +73,22 @@ const Toggle = React.forwardRef<
         isPressed
           ? "text-accent-foreground"
           : "web:group-hover:text-muted-foreground",
-        className,
       )}
     >
-      <TogglePrimitive.Root
+      <StyledToggleRoot
         ref={ref}
         pressed={isPressed}
         onPressedChange={handlePressedChange}
-        {...props}
+        disabled={disabled}
         className={cn(
           toggleVariants({ variant, size }),
-          props.disabled && "web:pointer-events-none opacity-50",
+          disabled && "web:pointer-events-none opacity-50",
           isPressed && "bg-accent",
           className,
         )}
       >
         {children}
-      </TogglePrimitive.Root>
+      </StyledToggleRoot>
     </TextClassContext.Provider>
   );
 });

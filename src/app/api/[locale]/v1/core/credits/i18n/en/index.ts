@@ -90,10 +90,14 @@ export const translations = {
         title: "Unsaved Changes",
         description: "You have unsaved changes",
       },
-      conflict: {
-        title: "Conflict",
-        description: "Resource conflict occurred",
-      },
+        conflict: {
+          title: "Conflict",
+          description: "Resource conflict occurred",
+        },
+        no_active_subscription: {
+          title: "Active Subscription Required",
+          description: "You must have an active subscription to purchase credit packs",
+        },
     },
   },
   history: {

@@ -32,7 +32,7 @@ import type {
   SubscriptionPutResponseOutput,
 } from "./definition";
 import type { BillingIntervalDB, SubscriptionPlanDB } from "./enum";
-import { SubscriptionStatus } from "./enum";
+import { SubscriptionPlan, SubscriptionStatus } from "./enum";
 
 /**
  * Subscription Repository Interface
@@ -345,7 +345,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
           },
         });
 
-      // Add subscription credits
+      // Add subscription credits with expiration date
       const { creditRepository } = await import("../credits/repository");
       const { productsRepository, ProductIds } = await import("../products/repository-client");
 
@@ -356,15 +356,21 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       if (productId) {
         const product = productsRepository.getProduct(productId, "en-GLOBAL");
+        const expiresAt = subscriptionResult.data.currentPeriodEnd
+          ? new Date(subscriptionResult.data.currentPeriodEnd)
+          : null;
+
         await creditRepository.addUserCredits(
           userId as string,
           product.credits,
           "subscription",
           logger,
+          expiresAt ?? undefined,
         );
         logger.debug("Added subscription credits", {
           userId,
           credits: product.credits,
+          expiresAt: expiresAt?.toISOString(),
         });
       }
 
@@ -385,7 +391,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
    * Called by payment repository when invoice.payment_succeeded webhook received
    */
   async handleInvoicePaymentSucceeded(
-    _invoice: Stripe.Invoice,
+    invoice: Stripe.Invoice,
     subscriptionId: string,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -418,6 +424,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         return;
       }
 
+      // Update subscription period
       await db
         .update(subscriptions)
         .set({
@@ -430,13 +437,165 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         })
         .where(eq(subscriptions.providerSubscriptionId, subscriptionId));
 
+      // Add monthly credits for renewal (skip if this is the first payment - handled by checkout)
+      // Check if this is a renewal by looking at billing_reason
+      const billingReason = (invoice as Stripe.Invoice & { billing_reason?: string }).billing_reason;
+
+      if (billingReason === "subscription_cycle" || billingReason === "subscription_update") {
+        // This is a renewal - add monthly credits with expiration
+        const { creditRepository } = await import("../credits/repository");
+        const { productsRepository, ProductIds } = await import("../products/repository-client");
+
+        const productId = subscription.planId === SubscriptionPlan.SUBSCRIPTION
+          ? ProductIds.SUBSCRIPTION
+          : null;
+
+        if (productId) {
+          const product = productsRepository.getProduct(productId, "en-GLOBAL");
+          const expiresAt = subscriptionResult.data.currentPeriodEnd
+            ? new Date(subscriptionResult.data.currentPeriodEnd)
+            : null;
+
+          await creditRepository.addUserCredits(
+            subscription.userId,
+            product.credits,
+            "subscription",
+            logger,
+            expiresAt ?? undefined,
+          );
+          logger.debug("Added renewal credits", {
+            userId: subscription.userId,
+            credits: product.credits,
+            expiresAt: expiresAt?.toISOString(),
+            billingReason,
+          });
+        }
+      }
+
       logger.debug("Invoice payment processed successfully", {
         subscriptionId,
+        billingReason,
       });
     } catch (error) {
       logger.error("Failed to process invoice payment", {
         error: parseError(error),
         subscriptionId,
+      });
+    }
+  }
+
+  /**
+   * Handle subscription cancellation
+   * Called when customer.subscription.deleted webhook is received
+   */
+  async handleSubscriptionCanceled(
+    subscriptionId: string,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const [subscription] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.providerSubscriptionId, subscriptionId))
+        .limit(1);
+
+      if (!subscription) {
+        logger.error("Subscription not found for cancellation", {
+          subscriptionId,
+        });
+        return;
+      }
+
+      // Mark subscription as canceled
+      await db
+        .update(subscriptions)
+        .set({
+          status: SubscriptionStatus.CANCELED,
+          updatedAt: new Date(),
+        })
+        .where(eq(subscriptions.providerSubscriptionId, subscriptionId));
+
+      logger.debug("Subscription canceled successfully", {
+        subscriptionId,
+        userId: subscription.userId,
+      });
+    } catch (error) {
+      logger.error("Failed to process subscription cancellation", {
+        error: parseError(error),
+        subscriptionId,
+      });
+    }
+  }
+
+  /**
+   * Handle subscription update
+   * Called when customer.subscription.updated webhook is received
+   */
+  async handleSubscriptionUpdated(
+    stripeSubscription: Stripe.Subscription,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const [subscription] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.providerSubscriptionId, stripeSubscription.id))
+        .limit(1);
+
+      if (!subscription) {
+        logger.error("Subscription not found for update", {
+          subscriptionId: stripeSubscription.id,
+        });
+        return;
+      }
+
+      // Map Stripe status to our status
+      let status: SubscriptionStatus;
+      switch (stripeSubscription.status) {
+        case "active":
+          status = SubscriptionStatus.ACTIVE;
+          break;
+        case "canceled":
+          status = SubscriptionStatus.CANCELED;
+          break;
+        case "past_due":
+        case "unpaid":
+          status = SubscriptionStatus.PAST_DUE;
+          break;
+        case "incomplete":
+        case "incomplete_expired":
+        case "trialing":
+        case "paused":
+        default:
+          status = SubscriptionStatus.ACTIVE; // Default to active for unknown states
+          break;
+      }
+
+      // Update subscription
+      await db
+        .update(subscriptions)
+        .set({
+          status,
+          cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+          currentPeriodStart: stripeSubscription.current_period_start
+            ? new Date(stripeSubscription.current_period_start * 1000)
+            : undefined,
+          currentPeriodEnd: stripeSubscription.current_period_end
+            ? new Date(stripeSubscription.current_period_end * 1000)
+            : undefined,
+          updatedAt: new Date(),
+        })
+        .where(eq(subscriptions.providerSubscriptionId, stripeSubscription.id));
+
+      logger.debug("Subscription updated successfully", {
+        subscriptionId: stripeSubscription.id,
+        status,
+        cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+      });
+    } catch (error) {
+      logger.error("Failed to process subscription update", {
+        error: parseError(error),
+        subscriptionId: stripeSubscription.id,
       });
     }
   }

@@ -11,7 +11,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { buttonVariants } from "./button";
 
 // Import all types from web (web is source of truth)
@@ -36,7 +36,7 @@ import { ChevronDown } from "./icons/ChevronDown";
 const NavigationMenu = React.forwardRef<
   NavigationMenuPrimitive.RootRef,
   NavigationMenuProps & Omit<NavigationMenuPrimitive.RootProps, keyof NavigationMenuProps>
->(({ className, children, value, onValueChange = () => {}, ...props }, ref) => (
+>(({ className, children, value, onValueChange = (() => {}) as (value: string | undefined) => void, ...props }, ref) => (
   <NavigationMenuPrimitive.Root
     ref={ref}
     value={value}

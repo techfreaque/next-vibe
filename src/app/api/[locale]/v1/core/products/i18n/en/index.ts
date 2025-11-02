@@ -10,11 +10,11 @@ export const translations = {
 
   // Subscription product
   subscription: {
-    name: "Unlimited Plan",
-    description: "Unlimited messages for serious users",
-    longDescription: "Best value for power users",
+    name: "Monthly Subscription",
+    description: "€10/month - Accessible for everyone",
+    longDescription: "Affordable AI access with 1000 credits monthly",
     features: {
-      credits: "Unlimited messages",
+      credits: "1000 credits per month",
       allModels: "All 40+ AI models",
       allFeatures: "All features included",
       cancel: "Cancel anytime",
@@ -24,8 +24,8 @@ export const translations = {
   // Credit pack product
   creditPack: {
     name: "Credit Pack",
-    description: "Pay as you go, never expires",
-    longDescription: "Perfect for occasional use",
+    description: "Extra credits for power users",
+    longDescription: "€5 for 500 credits that never expire",
     features: {
       credits: "500 credits per pack",
       allModels: "All AI models included",

@@ -31,52 +31,52 @@ import type {
 // The CreateApiEndpoint has a .types property with pre-computed type assertions
 export type ExtractEndpointTypes<T> = T extends { types: infer TTypes }
   ? TTypes extends {
-      RequestInput: infer TRequestInput;
-      RequestOutput: infer TRequestOutput;
-      ResponseInput: infer TResponseInput;
-      ResponseOutput: infer TResponseOutput;
-      UrlVariablesInput: infer TUrlVariablesInput;
-      UrlVariablesOutput: infer TUrlVariablesOutput;
-    }
-    ? {
-        request: TRequestOutput;
-        response: TResponseOutput;
-        urlPathParams: TUrlVariablesOutput;
-        requestInput: TRequestInput;
-        requestOutput: TRequestOutput;
-        responseInput: TResponseInput;
-        responseOutput: TResponseOutput;
-        urlPathParamsInput: TUrlVariablesInput;
-        urlPathParamsOutput: TUrlVariablesOutput;
-      }
-    : never
+    RequestInput: infer TRequestInput;
+    RequestOutput: infer TRequestOutput;
+    ResponseInput: infer TResponseInput;
+    ResponseOutput: infer TResponseOutput;
+    UrlVariablesInput: infer TUrlVariablesInput;
+    UrlVariablesOutput: infer TUrlVariablesOutput;
+  }
+  ? {
+    request: TRequestOutput;
+    response: TResponseOutput;
+    urlPathParams: TUrlVariablesOutput;
+    requestInput: TRequestInput;
+    requestOutput: TRequestOutput;
+    responseInput: TResponseInput;
+    responseOutput: TResponseOutput;
+    urlPathParamsInput: TUrlVariablesInput;
+    urlPathParamsOutput: TUrlVariablesOutput;
+  }
+  : never
   : never;
 
 // Extract types from endpoints map
 // Directly access .types property on T["GET"] to avoid any type loss
 export type GetEndpointTypes<T> = "GET" extends keyof T
   ? T["GET"] extends { types: infer TTypes }
-    ? TTypes extends {
-        RequestInput: infer TRequestInput;
-        RequestOutput: infer TRequestOutput;
-        ResponseInput: infer TResponseInput;
-        ResponseOutput: infer TResponseOutput;
-        UrlVariablesInput: infer TUrlVariablesInput;
-        UrlVariablesOutput: infer TUrlVariablesOutput;
-      }
-      ? {
-          request: TRequestOutput;
-          response: TResponseOutput;
-          urlPathParams: TUrlVariablesOutput;
-          requestInput: TRequestInput;
-          requestOutput: TRequestOutput;
-          responseInput: TResponseInput;
-          responseOutput: TResponseOutput;
-          urlPathParamsInput: TUrlVariablesInput;
-          urlPathParamsOutput: TUrlVariablesOutput;
-        }
-      : never
-    : never
+  ? TTypes extends {
+    RequestInput: infer TRequestInput;
+    RequestOutput: infer TRequestOutput;
+    ResponseInput: infer TResponseInput;
+    ResponseOutput: infer TResponseOutput;
+    UrlVariablesInput: infer TUrlVariablesInput;
+    UrlVariablesOutput: infer TUrlVariablesOutput;
+  }
+  ? {
+    request: TRequestOutput;
+    response: TResponseOutput;
+    urlPathParams: TUrlVariablesOutput;
+    requestInput: TRequestInput;
+    requestOutput: TRequestOutput;
+    responseInput: TResponseInput;
+    responseOutput: TResponseOutput;
+    urlPathParamsInput: TUrlVariablesInput;
+    urlPathParamsOutput: TUrlVariablesOutput;
+  }
+  : never
+  : never
   : never;
 
 export type PostEndpointTypes<T> = "POST" extends keyof T
@@ -98,56 +98,125 @@ export type DeleteEndpointTypes<T> = "DELETE" extends keyof T
 // Primary mutation type (prefer POST, then PUT, then PATCH, then DELETE)
 export type PrimaryMutationTypes<T> =
   PostEndpointTypes<T> extends never
-    ? PutEndpointTypes<T> extends never
-      ? PatchEndpointTypes<T> extends never
-        ? DeleteEndpointTypes<T> extends never
-          ? never
-          : DeleteEndpointTypes<T>
-        : PatchEndpointTypes<T>
-      : PutEndpointTypes<T>
-    : PostEndpointTypes<T>;
+  ? PutEndpointTypes<T> extends never
+  ? PatchEndpointTypes<T> extends never
+  ? DeleteEndpointTypes<T> extends never
+  ? never
+  : DeleteEndpointTypes<T>
+  : PatchEndpointTypes<T>
+  : PutEndpointTypes<T>
+  : PostEndpointTypes<T>;
 
 // Combined URL variables type - supports both GET and mutation endpoints
 // If GET exists, use its urlPathParams; otherwise use primary mutation's urlPathParams
 export type EndpointUrlVariables<T> =
   GetEndpointTypes<T> extends never
-    ? PrimaryMutationTypes<T> extends never
-      ? undefined
-      : PrimaryMutationTypes<T>["urlPathParams"]
-    : GetEndpointTypes<T>["urlPathParams"];
+  ? PrimaryMutationTypes<T> extends never
+  ? undefined
+  : PrimaryMutationTypes<T>["urlPathParams"]
+  : GetEndpointTypes<T>["urlPathParams"];
 
 // AutoPrefill data type - represents data from GET response that can prefill mutation request
 // When both GET and mutation endpoints exist, the GET response is used to prefill the mutation
 // This type represents the intersection: it must be assignable to mutation request
 export type AutoPrefillDataType<T> =
   GetEndpointTypes<T> extends never
-    ? undefined
-    : PrimaryMutationTypes<T> extends never
-      ? undefined
-      : GetEndpointTypes<T>["response"] extends PrimaryMutationTypes<T>["request"]
-        ? GetEndpointTypes<T>["response"]
-        : Partial<PrimaryMutationTypes<T>["request"]>;
+  ? undefined
+  : PrimaryMutationTypes<T> extends never
+  ? undefined
+  : GetEndpointTypes<T>["response"] extends PrimaryMutationTypes<T>["request"]
+  ? GetEndpointTypes<T>["response"]
+  : Partial<PrimaryMutationTypes<T>["request"]>;
 
-// Hook options interface with smart defaults and simple configuration
+// Hook options interface with operation-specific configuration
 export interface UseEndpointOptions<T> {
-  // URL parameters for endpoints that require them (supports both GET and mutation endpoints)
-  urlPathParams?: EndpointUrlVariables<T>;
+  /**
+   * Options for read (GET) operations
+   * Supports all options from useEndpointRead hook
+   */
+  read?: {
+    /** Form options for query forms (filtering, search, etc.) */
+    formOptions?: ApiQueryFormOptions<
+      GetEndpointTypes<T> extends never ? never : GetEndpointTypes<T>["request"]
+    >;
+    /** Query options for data fetching */
+    queryOptions?: ApiQueryOptions<
+      GetEndpointTypes<T> extends never ? never : GetEndpointTypes<T>["request"],
+      GetEndpointTypes<T> extends never ? never : GetEndpointTypes<T>["response"],
+      GetEndpointTypes<T> extends never
+      ? never
+      : GetEndpointTypes<T>["urlPathParams"]
+    >;
+    /** URL path parameters for the read endpoint */
+    urlPathParams?: GetEndpointTypes<T> extends never
+    ? undefined
+    : GetEndpointTypes<T>["urlPathParams"];
+    /** Auto-prefill configuration */
+    autoPrefillConfig?: AutoPrefillConfig;
+    /** Initial state for the form */
+    initialState?: GetEndpointTypes<T> extends never
+    ? undefined
+    : Partial<GetEndpointTypes<T>["request"]>;
+  };
 
-  // Query configuration
-  enabled?: boolean;
-  staleTime?: number;
-  refetchOnWindowFocus?: boolean;
-
-  // Form configuration
-  defaultValues?: PrimaryMutationTypes<T> extends never
+  /**
+   * Options for create/update (POST/PUT/PATCH) operations
+   * Supports all options from useEndpointCreate hook
+   */
+  create?: {
+    /** Form options for mutation forms */
+    formOptions?: ApiFormOptions<
+      PrimaryMutationTypes<T> extends never
+      ? never
+      : PrimaryMutationTypes<T>["request"]
+    >;
+    /** Mutation options for create/update operations */
+    mutationOptions?: ApiMutationOptions<
+      PrimaryMutationTypes<T> extends never
+      ? never
+      : PrimaryMutationTypes<T>["request"],
+      PrimaryMutationTypes<T> extends never
+      ? never
+      : PrimaryMutationTypes<T>["response"],
+      PrimaryMutationTypes<T> extends never
+      ? never
+      : PrimaryMutationTypes<T>["urlPathParams"]
+    >;
+    /** URL path parameters for the create endpoint */
+    urlPathParams?: PrimaryMutationTypes<T> extends never
+    ? undefined
+    : PrimaryMutationTypes<T>["urlPathParams"];
+    /** Data to auto-prefill the form with */
+    autoPrefillData?: PrimaryMutationTypes<T> extends never
     ? undefined
     : Partial<PrimaryMutationTypes<T>["request"]>;
+    /** Initial state for the form */
+    initialState?: PrimaryMutationTypes<T> extends never
+    ? undefined
+    : Partial<PrimaryMutationTypes<T>["request"]>;
+  };
 
-  // Filtering options (for LIST_FILTER endpoints)
-  filterOptions?: {
-    initialFilters?: GetEndpointTypes<T> extends never
-      ? undefined
-      : Partial<GetEndpointTypes<T>["request"]>;
+  /**
+   * Options for delete (DELETE) operations
+   * Supports all options from useEndpointDelete hook
+   */
+  delete?: {
+    /** Mutation options for delete operations */
+    mutationOptions?: ApiMutationOptions<
+      DeleteEndpointTypes<T> extends never
+      ? never
+      : DeleteEndpointTypes<T>["request"],
+      DeleteEndpointTypes<T> extends never
+      ? never
+      : DeleteEndpointTypes<T>["response"],
+      DeleteEndpointTypes<T> extends never
+      ? never
+      : DeleteEndpointTypes<T>["urlPathParams"]
+    >;
+    /** URL path parameters for the delete endpoint */
+    urlPathParams?: DeleteEndpointTypes<T> extends never
+    ? undefined
+    : DeleteEndpointTypes<T>["urlPathParams"];
   };
 
   /**
@@ -156,23 +225,48 @@ export interface UseEndpointOptions<T> {
    */
   autoPrefill?: boolean;
 
-  // Legacy nested options (for backward compatibility)
-  /** @deprecated Use top-level options instead */
+  // ============================================================================
+  // DEPRECATED OPTIONS - Use operation-specific options above instead
+  // ============================================================================
+
+  /** @deprecated Use read.urlPathParams, create.urlPathParams, or delete.urlPathParams instead */
+  urlPathParams?: EndpointUrlVariables<T>;
+
+  /** @deprecated Use read.queryOptions.enabled instead */
+  enabled?: boolean;
+  /** @deprecated Use read.queryOptions.staleTime instead */
+  staleTime?: number;
+  /** @deprecated Use read.queryOptions.refetchOnWindowFocus instead */
+  refetchOnWindowFocus?: boolean;
+
+  /** @deprecated Use create.formOptions.defaultValues instead */
+  defaultValues?: PrimaryMutationTypes<T> extends never
+  ? undefined
+  : Partial<PrimaryMutationTypes<T>["request"]>;
+
+  /** @deprecated Use read.initialState instead */
+  filterOptions?: {
+    initialFilters?: GetEndpointTypes<T> extends never
+    ? undefined
+    : Partial<GetEndpointTypes<T>["request"]>;
+  };
+
+  /** @deprecated Use read.queryOptions instead */
   queryOptions?: {
     enabled?: boolean;
     requestData?: GetEndpointTypes<T> extends never
-      ? undefined
-      : GetEndpointTypes<T>["request"];
+    ? undefined
+    : GetEndpointTypes<T>["request"];
     urlPathParams?: EndpointUrlVariables<T>;
     staleTime?: number;
     refetchOnWindowFocus?: boolean;
   };
 
-  /** @deprecated Use top-level defaultValues instead */
+  /** @deprecated Use create.formOptions instead */
   formOptions?: {
     defaultValues?: PrimaryMutationTypes<T> extends never
-      ? undefined
-      : Partial<PrimaryMutationTypes<T>["request"]>;
+    ? undefined
+    : PrimaryMutationTypes<T>["request"];
     persistForm?: boolean;
     persistenceKey?: string;
   };
@@ -200,83 +294,83 @@ export interface FormAlertState {
 // Create operation return type
 export type CreateOperationReturn<T> =
   PrimaryMutationTypes<T> extends never
-    ? undefined
-    : {
-        form: UseFormReturn<
-          PrimaryMutationTypes<T>["request"],
-          ZodType<
-            PrimaryMutationTypes<T>["request"],
-            ZodTypeDef,
-            PrimaryMutationTypes<T>["request"]
-          >
-        >;
-        /** The complete response including success/error state */
-        response: ResponseType<PrimaryMutationTypes<T>["response"]> | undefined;
+  ? undefined
+  : {
+    form: UseFormReturn<
+      PrimaryMutationTypes<T>["request"],
+      ZodType<
+        PrimaryMutationTypes<T>["request"],
+        ZodTypeDef,
+        PrimaryMutationTypes<T>["request"]
+      >
+    >;
+    /** The complete response including success/error state */
+    response: ResponseType<PrimaryMutationTypes<T>["response"]> | undefined;
 
-        // Backward compatibility properties
-        /** @deprecated Use response?.success === true instead */
-        isSuccess: boolean;
-        /** @deprecated Use response?.success === false ? response : null instead */
-        error: ErrorResponseType | null;
+    // Backward compatibility properties
+    /** @deprecated Use response?.success === true instead */
+    isSuccess: boolean;
+    /** @deprecated Use response?.success === false ? response : null instead */
+    error: ErrorResponseType | null;
 
-        values: Partial<PrimaryMutationTypes<T>["request"]>;
-        setValue: <K extends keyof PrimaryMutationTypes<T>["request"]>(
-          key: K,
-          value: PrimaryMutationTypes<T>["request"][K],
-        ) => void;
-        onSubmit: (e: FormEvent) => Promise<void>;
-        reset: () => void;
-        isSubmitting: boolean;
-        isDirty: boolean;
-        clearSavedForm: () => void;
-        /** @deprecated Use response property instead */
-        setErrorType: (error: ErrorResponseType | null) => void;
-      };
+    values: Partial<PrimaryMutationTypes<T>["request"]>;
+    setValue: <K extends keyof PrimaryMutationTypes<T>["request"]>(
+      key: K,
+      value: PrimaryMutationTypes<T>["request"][K],
+    ) => void;
+    onSubmit: (e: FormEvent) => Promise<void>;
+    reset: () => void;
+    isSubmitting: boolean;
+    isDirty: boolean;
+    clearSavedForm: () => void;
+    /** @deprecated Use response property instead */
+    setErrorType: (error: ErrorResponseType | null) => void;
+  };
 
 // Read operation return type
 export type ReadOperationReturn<T> =
   GetEndpointTypes<T> extends never
-    ? undefined
-    : {
-        form: UseFormReturn<
-          GetEndpointTypes<T>["request"],
-          ZodType<
-            GetEndpointTypes<T>["request"],
-            ZodTypeDef,
-            GetEndpointTypes<T>["request"]
-          >
-        >;
-        /** The complete response including success/error state */
-        response: ResponseType<GetEndpointTypes<T>["response"]> | undefined;
+  ? undefined
+  : {
+    form: UseFormReturn<
+      GetEndpointTypes<T>["request"],
+      ZodType<
+        GetEndpointTypes<T>["request"],
+        ZodTypeDef,
+        GetEndpointTypes<T>["request"]
+      >
+    >;
+    /** The complete response including success/error state */
+    response: ResponseType<GetEndpointTypes<T>["response"]> | undefined;
 
-        // Backward compatibility properties
-        /** @deprecated Use response.success and response.data instead */
-        data: GetEndpointTypes<T>["response"] | undefined;
-        /** @deprecated Use !response?.success instead */
-        isError: boolean;
-        /** @deprecated Use response?.success === false ? response : null instead */
-        error: ErrorResponseType | null;
-        /** @deprecated Use response?.success === true instead */
-        isSuccess: boolean;
-        /** @deprecated Use response?.success === true instead */
-        isSubmitSuccessful: boolean;
-        /** @deprecated Use response?.success === false ? response : undefined instead */
-        submitError: ErrorResponseType | undefined;
+    // Backward compatibility properties
+    /** @deprecated Use response.success and response.data instead */
+    data: GetEndpointTypes<T>["response"] | undefined;
+    /** @deprecated Use !response?.success instead */
+    isError: boolean;
+    /** @deprecated Use response?.success === false ? response : null instead */
+    error: ErrorResponseType | null;
+    /** @deprecated Use response?.success === true instead */
+    isSuccess: boolean;
+    /** @deprecated Use response?.success === true instead */
+    isSubmitSuccessful: boolean;
+    /** @deprecated Use response?.success === false ? response : undefined instead */
+    submitError: ErrorResponseType | undefined;
 
-        isLoading: boolean;
-        refetch: () => Promise<void>;
-        submitForm: SubmitFormFunction<
-          GetEndpointTypes<T>["request"],
-          GetEndpointTypes<T>["response"],
-          GetEndpointTypes<T>["urlPathParams"]
-        >;
-        isSubmitting: boolean;
-        clearSavedForm: () => void;
-        /** @deprecated Use response property instead */
-        setErrorType: (error: ErrorResponseType | null) => void;
-        isFetching: boolean;
-        status: "loading" | "success" | "error" | "idle";
-      };
+    isLoading: boolean;
+    refetch: () => Promise<void>;
+    submitForm: SubmitFormFunction<
+      GetEndpointTypes<T>["request"],
+      GetEndpointTypes<T>["response"],
+      GetEndpointTypes<T>["urlPathParams"]
+    >;
+    isSubmitting: boolean;
+    clearSavedForm: () => void;
+    /** @deprecated Use response property instead */
+    setErrorType: (error: ErrorResponseType | null) => void;
+    isFetching: boolean;
+    status: "loading" | "success" | "error" | "idle";
+  };
 
 // Delete operation return type
 export type DeleteOperationReturn<T> = T extends {
@@ -291,26 +385,26 @@ export type DeleteOperationReturn<T> = T extends {
   >;
 }
   ? {
-      /** The complete response including success/error state */
-      response:
-        | ResponseType<
-            ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-          >
-        | undefined;
+    /** The complete response including success/error state */
+    response:
+    | ResponseType<
+      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
+    >
+    | undefined;
 
-      // Backward compatibility properties
-      /** @deprecated Use response?.success === true instead */
-      isSuccess: boolean;
-      /** @deprecated Use response?.success === false ? response : null instead */
-      error: ErrorResponseType | null;
+    // Backward compatibility properties
+    /** @deprecated Use response?.success === true instead */
+    isSuccess: boolean;
+    /** @deprecated Use response?.success === false ? response : null instead */
+    error: ErrorResponseType | null;
 
-      submit: (
-        data?: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
-        >,
-      ) => Promise<void>;
-      isSubmitting: boolean;
-    }
+    submit: (
+      data?: ExtractOutput<
+        InferSchemaFromField<TFields, FieldUsage.RequestData>
+      >,
+    ) => Promise<void>;
+    isSubmitting: boolean;
+  }
   : undefined;
 
 // Main endpoint return interface
@@ -320,85 +414,85 @@ export type EndpointReturn<T> = Prettify<{
 
   // CRUD Operations
   read: GetEndpointTypes<T> extends never
-    ? undefined
-    : {
-        form: UseFormReturn<
-          GetEndpointTypes<T>["request"],
-          ZodType<
-            GetEndpointTypes<T>["request"],
-            ZodTypeDef,
-            GetEndpointTypes<T>["request"]
-          >
-        >;
-        /** The complete response including success/error state */
-        response: ResponseType<GetEndpointTypes<T>["response"]> | undefined;
+  ? undefined
+  : {
+    form: UseFormReturn<
+      GetEndpointTypes<T>["request"],
+      ZodType<
+        GetEndpointTypes<T>["request"],
+        ZodTypeDef,
+        GetEndpointTypes<T>["request"]
+      >
+    >;
+    /** The complete response including success/error state */
+    response: ResponseType<GetEndpointTypes<T>["response"]> | undefined;
 
-        // Backward compatibility properties
-        data: GetEndpointTypes<T>["response"] | undefined;
-        /** @deprecated Use !response?.success instead */
-        isError: boolean;
-        /** @deprecated Use response?.success === false ? response : null instead */
-        error: ErrorResponseType | null;
-        /** @deprecated Use response?.success === true instead */
-        isSuccess: boolean;
-        /** @deprecated Use response?.success === true instead */
-        isSubmitSuccessful: boolean;
-        /** @deprecated Use response?.success === false ? response : undefined instead */
-        submitError: ErrorResponseType | undefined;
+    // Backward compatibility properties
+    data: GetEndpointTypes<T>["response"] | undefined;
+    /** @deprecated Use !response?.success instead */
+    isError: boolean;
+    /** @deprecated Use response?.success === false ? response : null instead */
+    error: ErrorResponseType | null;
+    /** @deprecated Use response?.success === true instead */
+    isSuccess: boolean;
+    /** @deprecated Use response?.success === true instead */
+    isSubmitSuccessful: boolean;
+    /** @deprecated Use response?.success === false ? response : undefined instead */
+    submitError: ErrorResponseType | undefined;
 
-        isLoading: boolean;
-        refetch: () => Promise<void>;
-        submitForm: SubmitFormFunction<
-          GetEndpointTypes<T>["request"],
-          GetEndpointTypes<T>["response"],
-          GetEndpointTypes<T>["urlPathParams"]
-        >;
-        isSubmitting: boolean;
-        clearSavedForm: () => void;
-        /** @deprecated Use response property instead */
-        setErrorType: (error: ErrorResponseType | null) => void;
-        isFetching: boolean;
-        status: "loading" | "success" | "error" | "idle";
-      };
+    isLoading: boolean;
+    refetch: () => Promise<void>;
+    submitForm: SubmitFormFunction<
+      GetEndpointTypes<T>["request"],
+      GetEndpointTypes<T>["response"],
+      GetEndpointTypes<T>["urlPathParams"]
+    >;
+    isSubmitting: boolean;
+    clearSavedForm: () => void;
+    /** @deprecated Use response property instead */
+    setErrorType: (error: ErrorResponseType | null) => void;
+    isFetching: boolean;
+    status: "loading" | "success" | "error" | "idle";
+  };
 
   create: PrimaryMutationTypes<T> extends never
-    ? undefined
-    : {
-        form: UseFormReturn<
-          PrimaryMutationTypes<T>["request"],
-          ZodType<
-            PrimaryMutationTypes<T>["request"],
-            ZodTypeDef,
-            PrimaryMutationTypes<T>["request"]
-          >
-        >;
-        /** The complete response including success/error state */
-        response: ResponseType<PrimaryMutationTypes<T>["response"]> | undefined;
+  ? undefined
+  : {
+    form: UseFormReturn<
+      PrimaryMutationTypes<T>["request"],
+      ZodType<
+        PrimaryMutationTypes<T>["request"],
+        ZodTypeDef,
+        PrimaryMutationTypes<T>["request"]
+      >
+    >;
+    /** The complete response including success/error state */
+    response: ResponseType<PrimaryMutationTypes<T>["response"]> | undefined;
 
-        // Backward compatibility properties
-        /** @deprecated Use response?.success === true instead */
-        isSuccess: boolean;
-        /** @deprecated Use response?.success === false ? response : null instead */
-        error: ErrorResponseType | null;
+    // Backward compatibility properties
+    /** @deprecated Use response?.success === true instead */
+    isSuccess: boolean;
+    /** @deprecated Use response?.success === false ? response : null instead */
+    error: ErrorResponseType | null;
 
-        values: Partial<PrimaryMutationTypes<T>["request"]>;
-        setValue: <K extends keyof PrimaryMutationTypes<T>["request"]>(
-          key: K,
-          value: PrimaryMutationTypes<T>["request"][K],
-        ) => void;
-        onSubmit: (e: FormEvent | undefined) => Promise<void>;
-        reset: () => void;
-        isSubmitting: boolean;
-        isDirty: boolean;
-        submitForm: SubmitFormFunction<
-          PrimaryMutationTypes<T>["request"],
-          PrimaryMutationTypes<T>["response"],
-          PrimaryMutationTypes<T>["urlPathParams"]
-        >;
-        clearSavedForm: () => void;
-        /** @deprecated Use response property instead */
-        setErrorType: (error: ErrorResponseType | null) => void;
-      };
+    values: Partial<PrimaryMutationTypes<T>["request"]>;
+    setValue: <K extends keyof PrimaryMutationTypes<T>["request"]>(
+      key: K,
+      value: PrimaryMutationTypes<T>["request"][K],
+    ) => void;
+    onSubmit: (e: FormEvent | undefined) => Promise<void>;
+    reset: () => void;
+    isSubmitting: boolean;
+    isDirty: boolean;
+    submitForm: SubmitFormFunction<
+      PrimaryMutationTypes<T>["request"],
+      PrimaryMutationTypes<T>["response"],
+      PrimaryMutationTypes<T>["urlPathParams"]
+    >;
+    clearSavedForm: () => void;
+    /** @deprecated Use response property instead */
+    setErrorType: (error: ErrorResponseType | null) => void;
+  };
 
   delete: T extends {
     DELETE: CreateApiEndpoint<
@@ -411,28 +505,28 @@ export type EndpointReturn<T> = Prettify<{
       infer TFields
     >;
   }
-    ? {
-        /** The complete response including success/error state */
-        response:
-          | ResponseType<
-              ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-            >
-          | undefined;
+  ? {
+    /** The complete response including success/error state */
+    response:
+    | ResponseType<
+      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
+    >
+    | undefined;
 
-        // Backward compatibility properties
-        /** @deprecated Use response?.success === true instead */
-        isSuccess: boolean;
-        /** @deprecated Use response?.success === false ? response : null instead */
-        error: ErrorResponseType | null;
+    // Backward compatibility properties
+    /** @deprecated Use response?.success === true instead */
+    isSuccess: boolean;
+    /** @deprecated Use response?.success === false ? response : null instead */
+    error: ErrorResponseType | null;
 
-        submit: (
-          data?: ExtractOutput<
-            InferSchemaFromField<TFields, FieldUsage.RequestData>
-          >,
-        ) => Promise<void>;
-        isSubmitting: boolean;
-      }
-    : undefined;
+    submit: (
+      data?: ExtractOutput<
+        InferSchemaFromField<TFields, FieldUsage.RequestData>
+      >,
+    ) => Promise<void>;
+    isSubmitting: boolean;
+  }
+  : undefined;
 
   // Combined state
   /** @deprecated Use response property from individual operations instead */
@@ -445,26 +539,26 @@ export type EndpointReturn<T> = Prettify<{
 export interface UseEndpointCreateOptions<T> {
   formOptions?: ApiFormOptions<
     PrimaryMutationTypes<T> extends never
-      ? never
-      : PrimaryMutationTypes<T>["request"]
+    ? never
+    : PrimaryMutationTypes<T>["request"]
   >;
   mutationOptions?: ApiMutationOptions<
     PrimaryMutationTypes<T> extends never
-      ? never
-      : PrimaryMutationTypes<T>["request"],
+    ? never
+    : PrimaryMutationTypes<T>["request"],
     PrimaryMutationTypes<T> extends never
-      ? never
-      : PrimaryMutationTypes<T>["response"],
+    ? never
+    : PrimaryMutationTypes<T>["response"],
     PrimaryMutationTypes<T> extends never
-      ? never
-      : PrimaryMutationTypes<T>["urlPathParams"]
+    ? never
+    : PrimaryMutationTypes<T>["urlPathParams"]
   >;
   urlPathParams?: PrimaryMutationTypes<T> extends never
-    ? undefined
-    : PrimaryMutationTypes<T>["urlPathParams"];
+  ? undefined
+  : PrimaryMutationTypes<T>["urlPathParams"];
   autoPrefillData?: PrimaryMutationTypes<T> extends never
-    ? undefined
-    : Partial<PrimaryMutationTypes<T>["request"]>;
+  ? undefined
+  : Partial<PrimaryMutationTypes<T>["request"]>;
 }
 
 export interface UseEndpointReadOptions<T> {
@@ -475,29 +569,29 @@ export interface UseEndpointReadOptions<T> {
     GetEndpointTypes<T> extends never ? never : GetEndpointTypes<T>["request"],
     GetEndpointTypes<T> extends never ? never : GetEndpointTypes<T>["response"],
     GetEndpointTypes<T> extends never
-      ? never
-      : GetEndpointTypes<T>["urlPathParams"]
+    ? never
+    : GetEndpointTypes<T>["urlPathParams"]
   >;
   urlPathParams: GetEndpointTypes<T> extends never
-    ? undefined
-    : GetEndpointTypes<T>["urlPathParams"];
+  ? undefined
+  : GetEndpointTypes<T>["urlPathParams"];
 }
 
 export interface UseEndpointDeleteOptions<T> {
   mutationOptions?: ApiMutationOptions<
     DeleteEndpointTypes<T> extends never
-      ? never
-      : DeleteEndpointTypes<T>["request"],
+    ? never
+    : DeleteEndpointTypes<T>["request"],
     DeleteEndpointTypes<T> extends never
-      ? never
-      : DeleteEndpointTypes<T>["response"],
+    ? never
+    : DeleteEndpointTypes<T>["response"],
     DeleteEndpointTypes<T> extends never
-      ? never
-      : DeleteEndpointTypes<T>["urlPathParams"]
+    ? never
+    : DeleteEndpointTypes<T>["urlPathParams"]
   >;
   urlPathParams?: DeleteEndpointTypes<T> extends never
-    ? undefined
-    : DeleteEndpointTypes<T>["urlPathParams"];
+  ? undefined
+  : DeleteEndpointTypes<T>["urlPathParams"];
 }
 
 // Re-export the Infer types and hooks for easier access

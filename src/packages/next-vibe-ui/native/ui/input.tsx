@@ -1,9 +1,7 @@
-/// <reference path="../../../../../nativewind-env.d.ts" />
-import * as React from "react";
 import type { TextInputProps } from "react-native";
 import { TextInput } from "react-native";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
 // Import all public types from web version (web is source of truth)
 import type { InputProps as WebInputProps } from "next-vibe-ui/ui/input";
@@ -16,10 +14,7 @@ type NativeInputProps = Omit<WebInputProps, "onKeyPress"> &
     onKeyPress?: TextInputProps["onKeyPress"]; // Use native signature
   };
 
-const Input = React.forwardRef<
-  React.ElementRef<typeof TextInput>,
-  NativeInputProps
->(({ className, onChangeText, disabled, editable, ...props }, ref) => {
+export function Input({ className, onChangeText, disabled, editable, ...props }: NativeInputProps): React.JSX.Element {
   return (
     <Div
       className={cn(
@@ -30,21 +25,19 @@ const Input = React.forwardRef<
       )}
     >
       <TextInput
-        ref={ref}
         className={cn(
           // Input handles: text color, size, flex - NO border/background (wrapper handles that)
           "flex-1 text-base lg:text-sm native:text-lg native:leading-[1.25] text-foreground border-0",
         )}
         style={{ outlineWidth: 0 }} // Remove any default outline/border
         placeholderTextColor="rgb(var(--muted-foreground))"
+
         onChangeText={onChangeText}
-        editable={editable !== undefined ? editable : !disabled}
+        editable={editable ?? !disabled}
         {...props}
       />
     </Div>
   );
-});
-
-Input.displayName = "Input";
+}
 
 export { Input };

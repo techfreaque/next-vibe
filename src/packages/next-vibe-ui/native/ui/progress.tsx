@@ -11,7 +11,7 @@ import Animated, {
 
 import type { ProgressProps } from "next-vibe-ui/ui/progress";
 import type { ViewPropsWithClassName } from "../lib/types";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 
 // Type-safe View component with className support for NativeWind
 const View = RNView as React.ComponentType<ViewPropsWithClassName>;
