@@ -37,6 +37,7 @@ function createUserSeed(overrides?: Partial<NewUser>): NewUser {
     emailVerified: true,
     isActive: true,
     marketingConsent: false,
+    locale: "en-GLOBAL",
 
     ...overrides,
   };
@@ -121,6 +122,7 @@ export async function dev(
             privateName: user.privateName,
             publicName: user.publicName,
             email: user.email,
+            locale: user.locale,
             emailVerified: true,
             isActive: true,
             requireTwoFactor: false,
@@ -405,6 +407,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
             privateName: "",
             publicName: "",
             email: "",
+            locale: "en-GLOBAL",
             emailVerified: false,
             isActive: false,
             requireTwoFactor: false,
@@ -425,6 +428,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
           privateName: "",
           publicName: "",
           email: "",
+          locale: "en-GLOBAL",
           emailVerified: false,
           isActive: false,
           requireTwoFactor: false,

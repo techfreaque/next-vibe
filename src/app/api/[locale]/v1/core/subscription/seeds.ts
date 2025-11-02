@@ -43,9 +43,10 @@ function createLocalSubscriptionSeed(
     cancellationReason: null,
     trialStart: null,
     trialEnd: null,
-    stripeCustomerId: null,
-    stripeSubscriptionId: null,
-    stripePriceId: null,
+    provider: "stripe",
+    providerSubscriptionId: null,
+    providerPriceId: null,
+    providerProductId: null,
     createdAt: now,
     updatedAt: now,
     ...overrides,
@@ -143,8 +144,8 @@ export async function dev(
 
         // Get subscription credits from products repository
         const { productsRepository, ProductIds } = await import("../products/repository-client");
-        const subscription = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
-        const subscriptionCredits = subscription.credits;
+        const subscriptionProduct = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
+        const subscriptionCredits = subscriptionProduct.credits;
 
         const creditsResult = await creditRepository.addUserCredits(
           demoUser.id,

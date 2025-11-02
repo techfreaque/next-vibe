@@ -46,8 +46,8 @@ export const paymentTransactions = pgTable("payment_transactions", {
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  stripeSessionId: text("stripe_session_id"),
-  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  providerSessionId: text("provider_session_id"),
+  providerPaymentIntentId: text("provider_payment_intent_id"),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency", { enum: CurrencyDB }).notNull(),
   status: text("status", { enum: PaymentStatusDB })
@@ -73,7 +73,7 @@ export const paymentMethods = pgTable("payment_methods", {
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  stripePaymentMethodId: text("stripe_payment_method_id").notNull(),
+  providerPaymentMethodId: text("provider_payment_method_id").notNull(),
   type: text("type", { enum: PaymentMethodTypeDB }).notNull(),
   isDefault: boolean("is_default").notNull().default(false),
   last4: text("last4"),
@@ -90,7 +90,7 @@ export const paymentMethods = pgTable("payment_methods", {
  */
 export const paymentWebhooks = pgTable("payment_webhooks", {
   id: uuid("id").primaryKey().defaultRandom(),
-  stripeEventId: text("stripe_event_id").notNull().unique(),
+  providerEventId: text("provider_event_id").notNull().unique(),
   eventType: text("event_type").notNull(),
   processed: boolean("processed").notNull().default(false),
   data: jsonb("data").notNull(),
@@ -122,7 +122,7 @@ export const paymentRefunds = pgTable("payment_refunds", {
   transactionId: uuid("transaction_id")
     .notNull()
     .references(() => paymentTransactions.id, { onDelete: "cascade" }),
-  stripeRefundId: text("stripe_refund_id").notNull(),
+  providerRefundId: text("provider_refund_id").notNull(),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency", { enum: CurrencyDB }).notNull(),
   status: text("status", { enum: RefundStatusDB })
@@ -143,7 +143,7 @@ export const paymentInvoices = pgTable("payment_invoices", {
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  stripeInvoiceId: text("stripe_invoice_id").notNull(),
+  providerInvoiceId: text("provider_invoice_id").notNull(),
   invoiceNumber: text("invoice_number"),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency", { enum: CurrencyDB }).notNull(),
@@ -171,7 +171,7 @@ export const paymentDisputes = pgTable("payment_disputes", {
   transactionId: uuid("transaction_id")
     .notNull()
     .references(() => paymentTransactions.id, { onDelete: "cascade" }),
-  stripeDisputeId: text("stripe_dispute_id").notNull(),
+  providerDisputeId: text("provider_dispute_id").notNull(),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency", { enum: CurrencyDB }).notNull(),
   status: text("status", { enum: DisputeStatusDB }).notNull(),

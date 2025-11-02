@@ -29,6 +29,11 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import { productsRepository, ProductIds } from "@/app/api/[locale]/v1/core/products/repository-client";
+import { useSimplifiedCheckout } from "@/app/api/[locale]/v1/core/payment/checkout/hooks";
+import { useCreditPurchase } from "@/app/api/[locale]/v1/core/credits/hooks";
+import { BillingInterval, SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { useToast } from "@/hooks/use-toast";
 
 /**
  * Credit Balance Interface
@@ -54,6 +59,22 @@ interface CreditTransaction {
   createdAt: string;
 }
 
+/**
+ * Subscription Data Interface
+ */
+interface SubscriptionData {
+  id: string;
+  userId: string;
+  plan: string;
+  billingInterval: string;
+  status: string;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface SubscriptionClientContentProps {
   locale: CountryLanguage;
   initialCredits: CreditBalance | null;
@@ -61,6 +82,7 @@ interface SubscriptionClientContentProps {
     transactions: CreditTransaction[];
     totalCount: number;
   } | null;
+  initialSubscription: SubscriptionData | null;
 }
 
 const getTransactionTypeKey = (
@@ -110,16 +132,123 @@ export function SubscriptionClientContent({
   locale,
   initialCredits,
   initialHistory,
+  initialSubscription,
 }: SubscriptionClientContentProps): JSX.Element {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
   const [packQuantity, setPackQuantity] = useState(1);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Get pricing from centralized products repository with proper locale
   const products = productsRepository.getProducts(locale);
   const SUBSCRIPTION_PRICE = products[ProductIds.SUBSCRIPTION].price;
   const PACK_PRICE = products[ProductIds.CREDIT_PACK].price;
   const PACK_CREDITS = products[ProductIds.CREDIT_PACK].credits;
+
+  // Initialize hooks
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const { createCheckout, isPending: isSubscriptionPending } = useSimplifiedCheckout(logger);
+  const creditPurchaseEndpoint = useCreditPurchase(logger);
+
+  // Handle subscription purchase
+  const handleSubscribe = async (): Promise<void> => {
+    setIsProcessing(true);
+    try {
+      const result = await createCheckout(
+        SubscriptionPlan.SUBSCRIPTION,
+        BillingInterval.MONTHLY,
+      );
+
+      if (!result.success) {
+        toast({
+          title: t("app.common.error.title"),
+          description: result.message,
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+        return;
+      }
+
+      // Redirect to Stripe checkout
+      // The response structure is {success: true, data: {success: true, sessionId: ..., checkoutUrl: ...}}
+      const checkoutUrl = result.data?.checkoutUrl;
+      if (checkoutUrl) {
+        window.location.assign(checkoutUrl);
+      } else {
+        toast({
+          title: t("app.common.error.title"),
+          description: "No checkout URL received",
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Subscription purchase error:", error);
+      toast({
+        title: t("app.common.error.title"),
+        description: t("app.common.error.description"),
+        variant: "destructive",
+      });
+      setIsProcessing(false);
+    }
+  };
+
+  // Handle credit pack purchase
+  const handleBuyPack = async (): Promise<void> => {
+    setIsProcessing(true);
+    try {
+      if (!creditPurchaseEndpoint.create) {
+        toast({
+          title: t("app.common.error.title"),
+          description: t("app.common.error.description"),
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+        return;
+      }
+
+      // Set form values using reset to ensure form is properly initialized
+      creditPurchaseEndpoint.create.form.reset({
+        quantity: packQuantity,
+      });
+
+      // Submit form with onSuccess and onError callbacks
+      await creditPurchaseEndpoint.create.submitForm(undefined, {
+        onSuccess: ({ responseData }) => {
+          // Redirect to Stripe checkout
+          if (responseData.checkoutUrl) {
+            window.location.assign(responseData.checkoutUrl);
+          } else {
+            toast({
+              title: t("app.common.error.title"),
+              description: t("app.common.error.description"),
+              variant: "destructive",
+            });
+            setIsProcessing(false);
+          }
+        },
+        onError: ({ error }) => {
+          toast({
+            title: t("app.common.error.title"),
+            description: error.message,
+            variant: "destructive",
+          });
+          setIsProcessing(false);
+        },
+      });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Credit pack purchase error:", error);
+      toast({
+        title: t("app.common.error.title"),
+        description: t("app.common.error.description"),
+        variant: "destructive",
+      });
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <Container className="py-8 space-y-8">
@@ -232,6 +361,66 @@ export function SubscriptionClientContent({
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Subscription Status Card */}
+      {initialSubscription && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card className="border-2 border-primary">
+            <CardHeader>
+              <Div className="flex items-start justify-between">
+                <Div className="space-y-1">
+                  <CardTitle className="flex items-center gap-3">
+                    <Div className="p-2 rounded-lg bg-primary/10">
+                      <CreditCard className="h-6 w-6 text-primary" />
+                    </Div>
+                    Monthly Subscription
+                  </CardTitle>
+                  <CardDescription>
+                    Your active subscription plan
+                  </CardDescription>
+                </Div>
+                <Badge className="bg-green-600 text-white">
+                  {initialSubscription.status}
+                </Badge>
+              </Div>
+            </CardHeader>
+            <CardContent>
+              <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Div className="p-4 rounded-lg bg-muted/50 border">
+                  <Div className="text-sm text-muted-foreground mb-1">
+                    Billing Interval
+                  </Div>
+                  <Div className="text-lg font-semibold capitalize">
+                    {initialSubscription.billingInterval.toLowerCase()}
+                  </Div>
+                </Div>
+                <Div className="p-4 rounded-lg bg-muted/50 border">
+                  <Div className="text-sm text-muted-foreground mb-1">
+                    Current Period Start
+                  </Div>
+                  <Div className="text-lg font-semibold">
+                    {formatDate(initialSubscription.currentPeriodStart, locale)}
+                  </Div>
+                </Div>
+                <Div className="p-4 rounded-lg bg-muted/50 border">
+                  <Div className="text-sm text-muted-foreground mb-1">
+                    Next Billing Date
+                  </Div>
+                  <Div className="text-lg font-semibold">
+                    {initialSubscription.currentPeriodEnd
+                      ? formatDate(initialSubscription.currentPeriodEnd, locale)
+                      : "N/A"}
+                  </Div>
+                </Div>
+              </Div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Tabs Section */}
       <Tabs
@@ -524,8 +713,15 @@ export function SubscriptionClientContent({
                   </Div>
                 </Div>
 
-                <Button className="w-full" size="lg">
-                  {t("app.subscription.subscription.buy.subscription.button")}
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={handleSubscribe}
+                  disabled={isProcessing || isSubscriptionPending}
+                >
+                  {isProcessing || isSubscriptionPending
+                    ? "Loading..."
+                    : t("app.subscription.subscription.buy.subscription.button")}
                 </Button>
               </CardContent>
             </Card>
@@ -619,14 +815,22 @@ export function SubscriptionClientContent({
                   </Div>
                 </Div>
 
-                <Button className="w-full" size="lg" variant="outline">
-                  {t("app.subscription.subscription.buy.pack.button", {
-                    count: packQuantity,
-                    type:
-                      packQuantity === 1
-                        ? t("app.subscription.subscription.buy.pack.pack")
-                        : t("app.subscription.subscription.buy.pack.packs"),
-                  })}
+                <Button
+                  className="w-full"
+                  size="lg"
+                  variant="outline"
+                  onClick={handleBuyPack}
+                  disabled={isProcessing || creditPurchaseEndpoint.create?.isSubmitting}
+                >
+                  {isProcessing || creditPurchaseEndpoint.create?.isSubmitting
+                    ? "Loading..."
+                    : t("app.subscription.subscription.buy.pack.button", {
+                      count: packQuantity,
+                      type:
+                        packQuantity === 1
+                          ? t("app.subscription.subscription.buy.pack.pack")
+                          : t("app.subscription.subscription.buy.pack.packs"),
+                    })}
                 </Button>
               </CardContent>
             </Card>

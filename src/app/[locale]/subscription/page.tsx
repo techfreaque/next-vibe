@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { JSX } from "react";
 
 import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
+import { subscriptionRepository } from "@/app/api/[locale]/v1/core/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
@@ -47,9 +48,9 @@ export default async function SubscriptionPage({
   const logger = createEndpointLogger(false, Date.now(), locale);
   const userResponse = await userRepository.getUserByAuth(
     {
-      locale,
       detailLevel: UserDetailLevel.STANDARD,
     },
+    locale,
     logger,
   );
 
@@ -82,11 +83,21 @@ export default async function SubscriptionPage({
   );
   const history = historyResponse.success ? historyResponse.data : null;
 
+  // Fetch subscription data
+  const subscriptionResponse = await subscriptionRepository.getSubscription(
+    userResponse.data.id,
+    createEndpointLogger(false, Date.now(), locale),
+  );
+  const subscription = subscriptionResponse.success
+    ? subscriptionResponse.data
+    : null;
+
   return (
     <SubscriptionClientContent
       locale={locale}
       initialCredits={credits}
       initialHistory={history}
+      initialSubscription={subscription}
     />
   );
 }

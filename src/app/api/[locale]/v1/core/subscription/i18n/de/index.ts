@@ -1,4 +1,4 @@
-import { translations as checkoutTranslations } from "../../checkout/i18n/de";
+import { translations as checkoutTranslations } from "../../../payment/checkout/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -172,6 +172,8 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Datenkonflikt aufgetreten",
     },
+    use_checkout_flow:
+      "Bitte verwenden Sie den Checkout-Ablauf, um Abonnements zu kaufen",
     sync_failed:
       "Synchronisierung des Abonnements mit Datenbank fehlgeschlagen",
     database_error: "Datenbankfehler aufgetreten",

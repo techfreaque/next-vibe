@@ -61,12 +61,16 @@ export const insertUserSchema = createInsertSchema(users);
 /**
  * Type for user model
  */
-export type User = z.infer<typeof selectUserSchema>;
+export type User = z.infer<typeof selectUserSchema> & {
+  locale: CountryLanguage;
+};
 
 /**
  * Type for new user model
  */
-export type NewUser = z.infer<typeof insertUserSchema>;
+export type NewUser = z.infer<typeof insertUserSchema> & {
+  locale: CountryLanguage;
+};
 
 /**
  * User roles table schema

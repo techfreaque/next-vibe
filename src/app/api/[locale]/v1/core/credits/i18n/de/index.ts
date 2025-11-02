@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
+import { translations as purchaseTranslations } from "../../purchase/i18n/de";
 
 export const translations: typeof enTranslations = {
+  purchase: purchaseTranslations,
   enums: {
     creditType: {
       userSubscription: "Benutzer-Abonnement-Credits",
@@ -171,75 +173,6 @@ export const translations: typeof enTranslations = {
         server: {
           title: "Serverfehler",
           description: "Fehler beim Abrufen des Credit-Verlaufs",
-        },
-        unknown: {
-          title: "Unbekannter Fehler",
-          description: "Ein unerwarteter Fehler ist aufgetreten",
-        },
-        unsavedChanges: {
-          title: "Nicht gespeicherte Änderungen",
-          description: "Sie haben nicht gespeicherte Änderungen",
-        },
-        conflict: {
-          title: "Konflikt",
-          description: "Ressourcenkonflikt aufgetreten",
-        },
-      },
-    },
-  },
-  purchase: {
-    post: {
-      title: "Credits kaufen",
-      description: "Stripe-Checkout-Sitzung für Credit-Paket-Kauf erstellen",
-      container: {
-        title: "Credits kaufen",
-        description: "Credit-Pakete kaufen, um KI-Funktionen zu nutzen",
-      },
-      quantity: {
-        label: "Menge",
-        description: "Anzahl der zu kaufenden Credit-Pakete (1-10)",
-        placeholder: "Menge eingeben (1-10)",
-      },
-      checkoutUrl: {
-        content: "Checkout-URL",
-      },
-      sessionId: {
-        content: "Sitzungs-ID",
-      },
-      totalAmount: {
-        content: "Gesamtbetrag (Cent)",
-      },
-      totalCredits: {
-        content: "Gesamt-Credits",
-      },
-      success: {
-        title: "Checkout erstellt",
-        description: "Stripe-Checkout-Sitzung erfolgreich erstellt",
-      },
-      errors: {
-        validation: {
-          title: "Validierungsfehler",
-          description: "Ungültige Kaufmenge",
-        },
-        network: {
-          title: "Netzwerkfehler",
-          description: "Netzwerkverbindung fehlgeschlagen",
-        },
-        unauthorized: {
-          title: "Nicht autorisiert",
-          description: "Sie müssen angemeldet sein, um Credits zu kaufen",
-        },
-        forbidden: {
-          title: "Verboten",
-          description: "Sie haben keine Berechtigung, Credits zu kaufen",
-        },
-        notFound: {
-          title: "Nicht gefunden",
-          description: "Ressource nicht gefunden",
-        },
-        server: {
-          title: "Serverfehler",
-          description: "Fehler beim Erstellen der Checkout-Sitzung",
         },
         unknown: {
           title: "Unbekannter Fehler",

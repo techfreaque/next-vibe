@@ -23,6 +23,10 @@ import {
   UserRole,
   UserRoleOptions,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { CountriesArr,
+  LanguagesOptions,
+  LanguagesArr,
+  CountriesOptions } from "@/i18n/core/config";
 
 /**
  * Users Create Endpoint Definition
@@ -126,6 +130,31 @@ const { POST } = createEndpoint({
               .max(255, "usersErrors.validation.publicName.tooLong")
               .transform((val) => val.trim()),
           ),
+
+          country: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label: "app.api.v1.core.users.create.post.country.label",
+              description: "app.api.v1.core.users.create.post.country.description",
+              options: CountriesOptions,
+              layout: { columns: 6 },
+            },
+            z.enum(CountriesArr),
+          ),
+
+          language: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label: "app.api.v1.core.users.create.post.language.label",
+              description: "app.api.v1.core.users.create.post.language.description",
+              options: LanguagesOptions,
+              layout: { columns: 6 },
+            },
+            z.enum(LanguagesArr),
+          ),
+
         },
       ),
 
@@ -433,12 +462,15 @@ const { POST } = createEndpoint({
           password: "password123",
           privateName: "Customer Full Name",
           publicName: "Customer",
+          country: "GLOBAL",
+          language: "en",
         },
         adminSettings: {
           roles: [UserRole.CUSTOMER],
           emailVerified: false,
           isActive: true,
           leadId: null,
+          
         },
       },
     },

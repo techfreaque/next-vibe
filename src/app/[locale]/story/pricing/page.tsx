@@ -57,9 +57,9 @@ export default async function PricingPage({
   // Fetch user data
   const userResponse = await userRepository.getUserByAuth(
     {
-      locale,
       detailLevel: UserDetailLevel.COMPLETE,
     },
+    locale,
     logger,
   );
   const user = userResponse.success ? userResponse.data : undefined;

@@ -1235,9 +1235,9 @@ class AuthRepositoryImpl implements AuthRepository {
     // Check authentication
     const userResponse = await userRepository.getUserByAuth(
       {
-        locale,
         detailLevel: UserDetailLevel.COMPLETE,
       },
+      locale,
       logger,
     );
 

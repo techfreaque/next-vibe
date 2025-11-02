@@ -175,19 +175,6 @@ export const envSchema = envClientSchema.extend({
   LEADS_EMAIL_USER: z.string(),
   LEADS_EMAIL_PASS: z.string(),
 
-  // Stripe Price IDs for subscription plans
-  // DE (EUR) Region
-  STRIPE_STARTER_MONTHLY_DE_PRICE_ID: z.string(),
-  STRIPE_STARTER_YEARLY_DE_PRICE_ID: z.string(),
-
-  // PL (PLN) Region
-  STRIPE_STARTER_MONTHLY_PL_PRICE_ID: z.string(),
-  STRIPE_STARTER_YEARLY_PL_PRICE_ID: z.string(),
-
-  // GLOBAL (USD) Region
-  STRIPE_STARTER_MONTHLY_GLOBAL_PRICE_ID: z.string(),
-  STRIPE_STARTER_YEARLY_GLOBAL_PRICE_ID: z.string(),
-
   // Google Calendar integration (optional for development)
   GOOGLE_SERVICE_ACCOUNT_EMAIL: z.email(),
   GOOGLE_PRIVATE_KEY: z.string(),

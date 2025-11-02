@@ -50,6 +50,7 @@ export const standardUserSchema = z.object({
   email: z.email({ message: "validationErrors.user.profile.email_invalid" }),
   privateName: z.string(),
   publicName: z.string(),
+  locale: z.string() as z.ZodType<CountryLanguage>, // User's locale (e.g., "en-GLOBAL", "de-DE")
   isActive: z.boolean().nullable(),
   emailVerified: z.boolean().nullable(),
   requireTwoFactor: z.boolean().optional(),
@@ -58,7 +59,7 @@ export const standardUserSchema = z.object({
   createdAt: dateSchema,
   updatedAt: dateSchema,
 });
-export type StandardUserType = z.infer<typeof standardUserSchema>;
+export type StandardUserType = z.infer<typeof standardUserSchema>
 
 /**
  * Complete User Schema
@@ -84,7 +85,6 @@ export interface UserFetchOptions {
   includeInactive?: boolean;
   roles?: (typeof UserRoleValue)[keyof typeof UserRoleValue][];
   detailLevel?: UserDetailLevelType;
-  locale: CountryLanguage; // Required for lead creation in authentication
 }
 
 /**

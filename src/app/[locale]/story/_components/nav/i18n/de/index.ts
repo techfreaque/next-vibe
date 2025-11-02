@@ -23,24 +23,33 @@ export const translations: typeof enTranslations = {
   },
   home: "Startseite",
   pricing: "Preise",
+  features: "Funktionen",
+  forum: "Forum",
   contact: "Kontakt",
+  getStarted: "Kostenlos starten",
+  signIn: "Anmelden",
+  goToApp: "App öffnen",
   services: {
-    title: "Dienstleistungen",
+    title: "Plattform",
     features: {
       title: "Funktionen",
-      description: "Entdecken Sie unsere leistungsstarken Funktionen",
+      description: "KI-Chat + Forum-Funktionen",
     },
     process: {
-      title: "Unser Prozess",
-      description: "Wie wir mit Ihnen arbeiten",
+      title: "Wie es funktioniert",
+      description: "Starten Sie in 4 einfachen Schritten",
     },
-    premiumContent: {
-      title: "Premium-Inhalte",
-      description: "Zugang zu exklusiven Inhalten",
+    aiModels: {
+      title: "KI-Modelle",
+      description: "40+ unzensierte KI-Modelle",
     },
-    contact: {
-      title: "Kontakt",
-      description: "Nehmen Sie Kontakt mit unserem Team auf",
+    folders: {
+      title: "Privatsphäre-Level",
+      description: "Privat, Inkognito, Geteilt, Öffentlich",
+    },
+    personas: {
+      title: "KI-Personas",
+      description: "Benutzerdefinierte & Community-Personas",
     },
   },
   post: {

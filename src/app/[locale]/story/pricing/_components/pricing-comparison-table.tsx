@@ -15,6 +15,7 @@ import { useInView } from "react-intersection-observer";
 import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
 import type { PricingComparisonFeature, PricingTextFeature } from "./pricing";
 import {
@@ -97,7 +98,7 @@ export default function PricingComparison({
             {t("app.story.pricing.plans.annually")}{" "}
             <Span className="ml-1.5 text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2 py-0.5 rounded-full">
               {t("app.story.pricing.plans.savePercent", {
-                percent: calculateSavingsPercent(currentCountry.code),
+                percent: calculateSavingsPercent(locale),
               })}
             </Span>
           </Label>
@@ -129,7 +130,7 @@ export default function PricingComparison({
                       {t(plan.pricing, {
                         price: getPlanPriceForCountry(
                           plan,
-                          currentCountry.code,
+                          getCountryFromLocale(locale),
                           annual,
                         ),
                         currency: currentCountry.symbol,

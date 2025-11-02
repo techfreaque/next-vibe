@@ -1,7 +1,6 @@
 import {
   BarChart3,
   Bot,
-  Brush,
   Building,
   Folder,
   Home,

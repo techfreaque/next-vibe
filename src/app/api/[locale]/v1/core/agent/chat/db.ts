@@ -167,10 +167,6 @@ export interface MessageMetadata {
   widgetMetadata?: ToolCallWidgetMetadata;
   creditsUsed?: number;
 
-  // Legacy: toolCalls array (will be removed in favor of separate TOOL messages)
-  toolCalls?: ToolCall[];
-  toolCosts?: ToolCost[];
-
   // Attachments
   attachments?: {
     id: string;

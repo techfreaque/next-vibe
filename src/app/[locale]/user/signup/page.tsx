@@ -68,8 +68,12 @@ export default async function SignUpPage({
   const { t } = simpleT(locale);
 
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const user = await userRepository.getUserByAuth({ locale }, logger);
-  if (user.success) {
+  const user = await userRepository.getUserByAuth({}, 
+    locale,
+    logger,
+  );
+  // Only redirect if user is authenticated and not a public user
+  if (user.success && !user.data.isPublic) {
     redirect(`/${locale}/`);
   }
 

@@ -1,4 +1,4 @@
-import { translations as checkoutTranslations } from "../../checkout/i18n/en";
+import { translations as checkoutTranslations } from "../../../payment/checkout/i18n/en";
 
 export const translations = {
   // Import checkout translations
@@ -166,6 +166,7 @@ export const translations = {
       title: "Unsaved Changes",
       description: "You have unsaved changes",
     },
+    use_checkout_flow: "Please use the checkout flow to purchase subscriptions",
     conflict: {
       title: "Conflict",
       description: "Data conflict occurred",

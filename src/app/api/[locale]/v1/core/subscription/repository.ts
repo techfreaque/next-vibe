@@ -1,6 +1,6 @@
 /**
  * Subscription Repository
- * Implements repository pattern for subscription operations with Stripe integration
+ * Business logic for subscription operations - provider-agnostic
  */
 
 import "server-only";
@@ -20,8 +20,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { users } from "../user/db";
-import { stripe, STRIPE_PRICE_IDS } from "./checkout/repository";
+import { getPaymentProvider } from "../payment/providers";
 import type { NewSubscription } from "./db";
 import { subscriptions } from "./db";
 import type {
@@ -32,281 +31,18 @@ import type {
   SubscriptionPutRequestOutput,
   SubscriptionPutResponseOutput,
 } from "./definition";
-import type {
-  BillingIntervalValue,
-  SubscriptionPlanValue,
-  SubscriptionStatusValue,
-} from "./enum";
-import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
-
-/**
- * Helper function to extract country from locale
- */
-const getCountryFromLocale = (
-  locale: CountryLanguage,
-): keyof typeof STRIPE_PRICE_IDS => {
-  // Extract country part from locale (e.g., "en-GLOBAL" -> "GLOBAL", "de-DE" -> "DE")
-  const countryPart = locale.split("-")[1];
-
-  // Validate that the country is supported
-  if (countryPart && countryPart in STRIPE_PRICE_IDS) {
-    return countryPart as keyof typeof STRIPE_PRICE_IDS;
-  }
-
-  // Default to GLOBAL if country is not found or not supported
-  return "GLOBAL";
-};
-
-/**
- * Helper function to get Stripe price ID for a plan, billing interval, and region
- */
-const getStripePriceId = (
-  planId: SubscriptionPlanValue,
-  billingInterval: BillingIntervalValue,
-  country: keyof typeof STRIPE_PRICE_IDS,
-): string | undefined => {
-  const regionPrices = STRIPE_PRICE_IDS[country];
-
-  // Type-safe access to nested record structure
-  if (billingInterval === BillingInterval.MONTHLY) {
-    const monthlyPrices = regionPrices[BillingInterval.MONTHLY];
-    return monthlyPrices[planId as keyof typeof monthlyPrices];
-  } else if (billingInterval === BillingInterval.YEARLY) {
-    const yearlyPrices = regionPrices[BillingInterval.YEARLY];
-    return yearlyPrices[planId as keyof typeof yearlyPrices];
-  }
-
-  return undefined;
-};
-
-/**
- * Helper function to ensure user has a Stripe customer
- * Production-ready version that stores and reuses stripeCustomerId
- */
-const ensureStripeCustomer = async (
-  userId: string,
-  logger: EndpointLogger,
-): Promise<ResponseType<string>> => {
-  try {
-    // Get user from database
-    const user: (typeof users.$inferSelect)[] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
-
-    if (!user[0]) {
-      return createErrorResponse(
-        "app.api.v1.core.subscription.errors.user_not_found",
-        ErrorResponseTypes.NOT_FOUND,
-        { userId },
-      );
-    }
-
-    // If user already has a Stripe customer ID, return it
-    if (user[0].stripeCustomerId) {
-      return createSuccessResponse(user[0].stripeCustomerId);
-    }
-
-    // Create new Stripe customer
-    const customer = await stripe.customers.create({
-      email: user[0].email,
-      name: user[0].publicName,
-      metadata: {
-        userId: userId,
-      },
-    });
-
-    // Update user with Stripe customer ID
-    await db
-      .update(users)
-      .set({ stripeCustomerId: customer.id })
-      .where(eq(users.id, userId));
-
-    return createSuccessResponse(customer.id);
-  } catch (error) {
-    logger.error("Failed to ensure Stripe customer", {
-      error: parseError(error),
-      userId,
-    });
-    const parsedError = parseError(error);
-    return createErrorResponse(
-      "app.api.v1.core.subscription.errors.stripe_customer_creation_failed",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { error: parsedError.message, userId },
-    );
-  }
-};
-
-/**
- * Helper function to sync Stripe subscription with database
- */
-const syncStripeSubscription = async (
-  stripeSubscription: Stripe.Subscription,
-  userId: string,
-  logger: EndpointLogger,
-): Promise<ResponseType<SubscriptionPostResponseOutput>> => {
-  try {
-    // Extract plan from metadata with proper type checking
-    const planFromMetadata = extractPlanFromMetadata(
-      stripeSubscription.metadata,
-    );
-    const validatedPlanId =
-      planFromMetadata &&
-      Object.values(SubscriptionPlan).includes(
-        planFromMetadata as SubscriptionPlanValue,
-      )
-        ? (planFromMetadata as SubscriptionPlanValue)
-        : SubscriptionPlan.SUBSCRIPTION;
-
-    // Ensure stripeCustomerId is a string
-    const customerId =
-      typeof stripeSubscription.customer === "string"
-        ? stripeSubscription.customer
-        : stripeSubscription.customer.id;
-
-    const subscriptionData: NewSubscription = {
-      // Don't set id - let the database auto-generate a UUID
-      userId: userId,
-      stripeCustomerId: customerId,
-      stripeSubscriptionId: stripeSubscription.id,
-      stripePriceId: stripeSubscription.items.data[0]?.price.id || null,
-      status: mapStripeStatusToLocal(stripeSubscription.status),
-      planId: validatedPlanId,
-      billingInterval:
-        stripeSubscription.items.data[0]?.price.recurring?.interval === "year"
-          ? BillingInterval.YEARLY
-          : BillingInterval.MONTHLY,
-      currentPeriodStart: stripeSubscription.items.data[0]?.current_period_start
-        ? new Date(stripeSubscription.items.data[0].current_period_start * 1000)
-        : new Date(),
-      currentPeriodEnd: stripeSubscription.items.data[0]?.current_period_end
-        ? new Date(stripeSubscription.items.data[0].current_period_end * 1000)
-        : new Date(),
-      cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end || false,
-      canceledAt: stripeSubscription.canceled_at
-        ? new Date(stripeSubscription.canceled_at * 1000)
-        : null,
-      endedAt: stripeSubscription.ended_at
-        ? new Date(stripeSubscription.ended_at * 1000)
-        : null,
-      trialStart: stripeSubscription.trial_start
-        ? new Date(stripeSubscription.trial_start * 1000)
-        : null,
-      trialEnd: stripeSubscription.trial_end
-        ? new Date(stripeSubscription.trial_end * 1000)
-        : null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    // Upsert subscription in database
-    const result: (typeof subscriptions.$inferSelect)[] = await db
-      .insert(subscriptions)
-      .values(subscriptionData)
-      .onConflictDoUpdate({
-        target: subscriptions.stripeSubscriptionId,
-        set: {
-          status: subscriptionData.status,
-          planId: subscriptionData.planId,
-          billingInterval: subscriptionData.billingInterval,
-          currentPeriodStart: subscriptionData.currentPeriodStart,
-          currentPeriodEnd: subscriptionData.currentPeriodEnd,
-          cancelAtPeriodEnd: subscriptionData.cancelAtPeriodEnd,
-          canceledAt: subscriptionData.canceledAt,
-          endedAt: subscriptionData.endedAt,
-          trialStart: subscriptionData.trialStart,
-          trialEnd: subscriptionData.trialEnd,
-          stripeSubscriptionId: subscriptionData.stripeSubscriptionId,
-          stripePriceId: subscriptionData.stripePriceId,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-
-    const subscription: typeof subscriptions.$inferSelect = result[0];
-    return createSuccessResponse({
-      id: subscription.id,
-      userId: subscription.userId,
-      plan: subscription.planId,
-      billingInterval: subscription.billingInterval,
-      status: subscription.status,
-      currentPeriodStart:
-        subscription.currentPeriodStart?.toISOString() ||
-        new Date().toISOString(),
-      currentPeriodEnd:
-        subscription.currentPeriodEnd?.toISOString() ||
-        new Date().toISOString(),
-      cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-      createdAt: subscription.createdAt.toISOString(),
-      updatedAt: subscription.updatedAt.toISOString(),
-      message: "app.api.v1.core.subscription.sync.success",
-    });
-  } catch (error) {
-    logger.error("Failed to sync Stripe subscription", {
-      error: parseError(error),
-      subscriptionId: stripeSubscription.id,
-    });
-    return createErrorResponse(
-      "app.api.v1.core.subscription.errors.sync_failed",
-      ErrorResponseTypes.DATABASE_ERROR,
-      {
-        error: parseError(error).message,
-        subscriptionId: stripeSubscription.id,
-      },
-    );
-  }
-};
-
-/**
- * Helper function to map Stripe subscription status to local enum
- */
-const mapStripeStatusToLocal = (
-  stripeStatus: Stripe.Subscription.Status,
-): SubscriptionStatusValue => {
-  switch (stripeStatus) {
-    case "active":
-      return SubscriptionStatus.ACTIVE;
-    case "past_due":
-      return SubscriptionStatus.PAST_DUE;
-    case "canceled":
-    case "unpaid":
-      return SubscriptionStatus.CANCELED;
-    case "incomplete":
-    case "incomplete_expired":
-      return SubscriptionStatus.INCOMPLETE;
-    case "trialing":
-      return SubscriptionStatus.TRIALING;
-    case "paused":
-      return SubscriptionStatus.PAUSED;
-    default:
-      return SubscriptionStatus.INCOMPLETE;
-  }
-};
-
-/**
- * Helper function to extract plan ID from Stripe metadata
- */
-const extractPlanFromMetadata = (metadata: Stripe.Metadata): string | null => {
-  return metadata.planId || metadata.plan_id || null;
-};
+import type { BillingIntervalDB, SubscriptionPlanDB } from "./enum";
+import { SubscriptionStatus } from "./enum";
 
 /**
  * Subscription Repository Interface
- * Defines the contract for subscription data operations with Stripe integration
  */
 export interface SubscriptionRepository {
-  /**
-   * Get subscription by user ID
-   */
   getSubscription(
     userId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionGetResponseOutput>>;
 
-  /**
-   * Create a new subscription with Stripe integration
-   */
   createSubscription(
     data: SubscriptionPostRequestOutput,
     userId: string,
@@ -314,9 +50,6 @@ export interface SubscriptionRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionPostResponseOutput>>;
 
-  /**
-   * Update a subscription with Stripe integration
-   */
   updateSubscription(
     data: SubscriptionPutRequestOutput,
     userId: string,
@@ -324,49 +57,24 @@ export interface SubscriptionRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionPutResponseOutput>>;
 
-  /**
-   * Cancel a subscription with Stripe integration
-   */
   cancelSubscription(
     data: SubscriptionDeleteRequestOutput,
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean; message: string }>>;
-
-  /**
-   * Sync a Stripe subscription with the local database
-   * Used by webhook handlers to keep subscription data in sync
-   */
-  syncStripeSubscription(
-    stripeSubscription: Stripe.Subscription,
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseOutput>>;
-
-  /**
-   * Ensure Stripe customer exists for user
-   */
-  ensureStripeCustomer(
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<string>>;
 }
 
 /**
  * Subscription Repository Implementation
- * Uses Drizzle ORM for database operations
  */
 export class SubscriptionRepositoryImpl implements SubscriptionRepository {
-  /**
-   * Get subscription by user ID
-   */
   async getSubscription(
     userId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionGetResponseOutput>> {
     try {
-      const results: (typeof subscriptions.$inferSelect)[] = await db
+      const results = await db
         .select()
         .from(subscriptions)
         .where(eq(subscriptions.userId, userId))
@@ -381,7 +89,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       }
 
       const subscription = results[0];
-      const subscriptionData: SubscriptionGetResponseOutput = {
+      return createSuccessResponse({
         id: subscription.id,
         userId: subscription.userId,
         plan: subscription.planId,
@@ -396,82 +104,31 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
         createdAt: subscription.createdAt.toISOString(),
         updatedAt: subscription.updatedAt.toISOString(),
-      };
-
-      return createSuccessResponse(subscriptionData);
+      });
     } catch (error) {
       logger.error("Error getting subscription:", parseError(error));
-      const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.subscription.errors.database_error",
         ErrorResponseTypes.DATABASE_ERROR,
-        { error: parsedError.message },
+        { error: parseError(error).message },
       );
     }
   }
 
-  /**
-   * Create a new subscription with Stripe integration
-   */
   async createSubscription(
-    data: SubscriptionPostRequestOutput,
-    userId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
+    _data: SubscriptionPostRequestOutput,
+    _userId: string,
+    _locale: CountryLanguage,
+    _logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionPostResponseOutput>> {
-    try {
-      // Ensure user has a Stripe customer
-      const stripeCustomerResult = await ensureStripeCustomer(userId, logger);
-      if (!stripeCustomerResult.success) {
-        return stripeCustomerResult;
-      }
-      const stripeCustomerId = stripeCustomerResult.data;
-
-      // Get the Stripe price ID for the plan and billing interval
-      const country = getCountryFromLocale(locale);
-      const stripePriceId = getStripePriceId(
-        data.plan,
-        data.billingInterval,
-        country,
-      );
-
-      // Create Stripe subscription
-      const stripeSubscription = await stripe.subscriptions.create({
-        customer: stripeCustomerId,
-        items: [{ price: stripePriceId }],
-        metadata: {
-          userId: userId,
-          planId: data.plan,
-        },
-      });
-
-      // Sync the Stripe subscription with our database
-      const syncResult = await syncStripeSubscription(
-        stripeSubscription,
-        userId,
-        logger,
-      );
-
-      if (!syncResult.success) {
-        return syncResult;
-      }
-
-      // Return full subscription data from syncResult
-      return syncResult;
-    } catch (error) {
-      logger.error("Error creating subscription:", parseError(error));
-      const parsedError = parseError(error);
-      return createErrorResponse(
-        "app.api.v1.core.subscription.errors.create_crashed",
-        ErrorResponseTypes.DATABASE_ERROR,
-        { error: parsedError.message },
-      );
-    }
+    // This should be called from checkout flow after payment provider confirms
+    return createErrorResponse(
+      "app.api.v1.core.subscription.errors.use_checkout_flow",
+      ErrorResponseTypes.BAD_REQUEST,
+      {},
+    );
   }
 
-  /**
-   * Update a subscription with Stripe integration
-   */
   async updateSubscription(
     data: SubscriptionPutRequestOutput,
     userId: string,
@@ -479,13 +136,11 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionPutResponseOutput>> {
     try {
-      // Get current subscription
-      const currentSubscription: (typeof subscriptions.$inferSelect)[] =
-        await db
-          .select()
-          .from(subscriptions)
-          .where(eq(subscriptions.userId, userId))
-          .limit(1);
+      const currentSubscription = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.userId, userId))
+        .limit(1);
 
       if (!currentSubscription[0]) {
         return createErrorResponse(
@@ -494,66 +149,6 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         );
       }
 
-      const subscription = currentSubscription[0];
-
-      // If we have a Stripe subscription ID, update it in Stripe
-      if (
-        subscription.stripeSubscriptionId &&
-        (data.plan || data.billingInterval)
-      ) {
-        const country = getCountryFromLocale(locale);
-        const newPriceId = getStripePriceId(
-          data.plan || subscription.planId,
-          data.billingInterval || subscription.billingInterval,
-          country,
-        );
-
-        // Update Stripe subscription
-        const stripeSubscription = await stripe.subscriptions.update(
-          subscription.stripeSubscriptionId,
-          {
-            items: [
-              {
-                id: subscription.stripePriceId || undefined,
-                price: newPriceId,
-              },
-            ],
-            metadata: {
-              userId: userId,
-              planId: data.plan || subscription.planId,
-            },
-          },
-        );
-
-        // Sync the updated Stripe subscription with our database
-        const syncResult = await syncStripeSubscription(
-          stripeSubscription,
-          userId,
-          logger,
-        );
-        if (!syncResult.success) {
-          return syncResult;
-        }
-
-        // Transform POST response to PUT response format
-        const putResponse: SubscriptionPutResponseOutput = {
-          id: syncResult.data.id,
-          userId: syncResult.data.userId,
-          responsePlan: syncResult.data.plan,
-          responseBillingInterval: syncResult.data.billingInterval,
-          status: syncResult.data.status,
-          currentPeriodStart: syncResult.data.currentPeriodStart,
-          currentPeriodEnd: syncResult.data.currentPeriodEnd,
-          responseCancelAtPeriodEnd: syncResult.data.cancelAtPeriodEnd,
-          createdAt: syncResult.data.createdAt,
-          updatedAt: syncResult.data.updatedAt,
-          message: syncResult.data.message,
-        };
-
-        return createSuccessResponse(putResponse);
-      }
-
-      // Fallback to local update if no Stripe subscription
       const updateData: Partial<NewSubscription> = {
         updatedAt: new Date(),
       };
@@ -565,7 +160,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         updateData.billingInterval = data.billingInterval;
       }
 
-      const results: (typeof subscriptions.$inferSelect)[] = await db
+      const results = await db
         .update(subscriptions)
         .set(updateData)
         .where(eq(subscriptions.userId, userId))
@@ -579,7 +174,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       }
 
       const updatedSubscription = results[0];
-      const subscriptionData: SubscriptionPutResponseOutput = {
+      return createSuccessResponse({
         id: updatedSubscription.id,
         userId: updatedSubscription.userId,
         responsePlan: updatedSubscription.planId,
@@ -595,23 +190,17 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         createdAt: updatedSubscription.createdAt.toISOString(),
         updatedAt: updatedSubscription.updatedAt.toISOString(),
         message: "app.api.v1.core.subscription.update.success",
-      };
-
-      return createSuccessResponse(subscriptionData);
+      });
     } catch (error) {
       logger.error("Error updating subscription:", parseError(error));
-      const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.subscription.errors.database_error",
         ErrorResponseTypes.DATABASE_ERROR,
-        { error: parsedError.message },
+        { error: parseError(error).message },
       );
     }
   }
 
-  /**
-   * Cancel a subscription with Stripe integration
-   */
   async cancelSubscription(
     data: SubscriptionDeleteRequestOutput,
     userId: string,
@@ -621,13 +210,11 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     try {
       const { t } = simpleT(locale);
 
-      // Get current subscription
-      const currentSubscription: (typeof subscriptions.$inferSelect)[] =
-        await db
-          .select()
-          .from(subscriptions)
-          .where(eq(subscriptions.userId, userId))
-          .limit(1);
+      const currentSubscription = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.userId, userId))
+        .limit(1);
 
       if (!currentSubscription[0]) {
         return createErrorResponse(
@@ -638,55 +225,20 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       const subscription = currentSubscription[0];
 
-      // If we have a Stripe subscription ID, cancel it in Stripe
-      if (subscription.stripeSubscriptionId) {
-        if (data.cancelAtPeriodEnd) {
-          // Cancel at period end
-          const stripeSubscription = await stripe.subscriptions.update(
-            subscription.stripeSubscriptionId,
-            {
-              cancel_at_period_end: true,
-            },
-          );
+      // If has provider subscription ID, cancel with provider
+      if (subscription.providerSubscriptionId) {
+        const provider = getPaymentProvider(subscription.provider || "stripe");
+        const cancelResult = await provider.cancelSubscription(
+          subscription.providerSubscriptionId,
+          logger,
+        );
 
-          // Sync the updated Stripe subscription with our database
-          const syncResult = await syncStripeSubscription(
-            stripeSubscription,
-            userId,
-            logger,
-          );
-          if (!syncResult.success) {
-            return syncResult;
-          }
-
-          return createSuccessResponse({
-            success: true,
-            message: t("app.api.v1.core.subscription.cancel.success"),
-          });
-        } else {
-          // Cancel immediately
-          const stripeSubscription = await stripe.subscriptions.cancel(
-            subscription.stripeSubscriptionId,
-          );
-
-          // Sync the canceled Stripe subscription with our database
-          const syncResult = await syncStripeSubscription(
-            stripeSubscription,
-            userId,
-            logger,
-          );
-          if (!syncResult.success) {
-            return syncResult;
-          }
-
-          return createSuccessResponse({
-            success: true,
-            message: t("app.api.v1.core.subscription.cancel.success"),
-          });
+        if (!cancelResult.success) {
+          return cancelResult;
         }
       }
 
-      // Fallback to local cancellation if no Stripe subscription
+      // Update local database
       const updateData: Partial<NewSubscription> = {
         cancelAtPeriodEnd: data.cancelAtPeriodEnd,
         updatedAt: new Date(),
@@ -700,7 +252,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         updateData.endedAt = new Date();
       }
 
-      const results: (typeof subscriptions.$inferSelect)[] = await db
+      const results = await db
         .update(subscriptions)
         .set(updateData)
         .where(eq(subscriptions.userId, userId))
@@ -719,85 +271,175 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       });
     } catch (error) {
       logger.error("Error canceling subscription:", parseError(error));
-      const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.subscription.errors.cancel_failed",
         ErrorResponseTypes.DATABASE_ERROR,
-        { error: parsedError.message },
+        { error: parseError(error).message },
       );
     }
   }
 
   /**
-   * Sync a Stripe subscription with the local database
-   * Used by webhook handlers to keep subscription data in sync
+   * Handle subscription checkout webhook from payment provider
+   * Called by payment repository when checkout.session.completed webhook received
    */
-  async syncStripeSubscription(
-    stripeSubscription: Stripe.Subscription,
-    userId: string,
+  async handleSubscriptionCheckout(
+    session: Stripe.Checkout.Session,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseOutput>> {
-    return await syncStripeSubscription(stripeSubscription, userId, logger);
+  ): Promise<void> {
+    try {
+      const userId = session.metadata?.userId;
+      const planId = session.metadata?.planId;
+      const billingInterval = session.metadata?.billingInterval;
+      const providerSubscriptionId = session.subscription as string;
+
+      if (!userId || !planId || !billingInterval) {
+        logger.error("Missing required metadata in checkout session", {
+          sessionId: session.id,
+          userId,
+          planId,
+          billingInterval,
+        });
+        return;
+      }
+
+      const providerName = session.metadata?.provider || "stripe";
+      const provider = getPaymentProvider(providerName);
+      const subscriptionResult = await provider.retrieveSubscription(
+        providerSubscriptionId,
+        logger,
+      );
+
+      if (!subscriptionResult.success) {
+        logger.error("Failed to retrieve subscription from provider", {
+          providerSubscriptionId,
+          error: subscriptionResult.message,
+        });
+        return;
+      }
+
+      await db
+        .insert(subscriptions)
+        .values({
+          userId: userId as string,
+          planId: planId as (typeof SubscriptionPlanDB)[number],
+          billingInterval: billingInterval as (typeof BillingIntervalDB)[number],
+          status: SubscriptionStatus.ACTIVE,
+          provider: providerName,
+          providerSubscriptionId,
+          currentPeriodStart: new Date(),
+          currentPeriodEnd: subscriptionResult.data.currentPeriodEnd
+            ? new Date(subscriptionResult.data.currentPeriodEnd)
+            : null,
+        })
+        .onConflictDoUpdate({
+          target: subscriptions.userId,
+          set: {
+            status: SubscriptionStatus.ACTIVE,
+            providerSubscriptionId,
+            currentPeriodStart: new Date(),
+            currentPeriodEnd: subscriptionResult.data.currentPeriodEnd
+              ? new Date(subscriptionResult.data.currentPeriodEnd)
+              : null,
+            updatedAt: new Date(),
+          },
+        });
+
+      // Add subscription credits
+      const { creditRepository } = await import("../credits/repository");
+      const { productsRepository, ProductIds } = await import("../products/repository-client");
+
+      // Map subscription plan to product ID
+      const productId = planId === SubscriptionPlan.SUBSCRIPTION
+        ? ProductIds.SUBSCRIPTION
+        : null;
+
+      if (productId) {
+        const product = productsRepository.getProduct(productId, "en-GLOBAL");
+        await creditRepository.addUserCredits(
+          userId as string,
+          product.credits,
+          "subscription",
+          logger,
+        );
+        logger.debug("Added subscription credits", {
+          userId,
+          credits: product.credits,
+        });
+      }
+
+      logger.debug("Subscription checkout processed successfully", {
+        userId,
+        providerSubscriptionId,
+      });
+    } catch (error) {
+      logger.error("Failed to process subscription checkout", {
+        error: parseError(error),
+        sessionId: session.id,
+      });
+    }
   }
 
   /**
-   * Ensure Stripe customer exists for user
+   * Handle invoice payment succeeded webhook from payment provider
+   * Called by payment repository when invoice.payment_succeeded webhook received
    */
-  async ensureStripeCustomer(
-    userId: string,
+  async handleInvoicePaymentSucceeded(
+    _invoice: Stripe.Invoice,
+    subscriptionId: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<string>> {
+  ): Promise<void> {
     try {
-      // Get user from database
-      const user: (typeof users.$inferSelect)[] = await db
+      const [subscription] = await db
         .select()
-        .from(users)
-        .where(eq(users.id, userId))
+        .from(subscriptions)
+        .where(eq(subscriptions.providerSubscriptionId, subscriptionId))
         .limit(1);
 
-      if (!user[0]) {
-        return createErrorResponse(
-          "app.api.v1.core.subscription.errors.user_not_found",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId },
-        );
+      if (!subscription) {
+        logger.error("Subscription not found for invoice payment", {
+          subscriptionId,
+        });
+        return;
       }
 
-      // If user already has a Stripe customer ID, return it
-      if (user[0].stripeCustomerId) {
-        return createSuccessResponse(user[0].stripeCustomerId);
-      }
-
-      // Create new Stripe customer
-      const customer = await stripe.customers.create({
-        email: user[0].email,
-        name: user[0].publicName,
-        metadata: {
-          userId: userId,
-        },
-      });
-
-      // Update user with Stripe customer ID
-      await db
-        .update(users)
-        .set({ stripeCustomerId: customer.id })
-        .where(eq(users.id, userId));
-
-      return createSuccessResponse(customer.id);
-    } catch (error) {
-      logger.error("Failed to ensure Stripe customer", {
-        error: parseError(error),
-        userId,
-      });
-      const parsedError = parseError(error);
-      return createErrorResponse(
-        "app.api.v1.core.subscription.errors.stripe_customer_creation_failed",
-        ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        { userId, error: parsedError.message },
+      const providerName = subscription.provider || "stripe";
+      const provider = getPaymentProvider(providerName);
+      const subscriptionResult = await provider.retrieveSubscription(
+        subscriptionId,
+        logger,
       );
+
+      if (!subscriptionResult.success) {
+        logger.error("Failed to retrieve subscription from provider", {
+          subscriptionId,
+          error: subscriptionResult.message,
+        });
+        return;
+      }
+
+      await db
+        .update(subscriptions)
+        .set({
+          currentPeriodStart: new Date(),
+          currentPeriodEnd: subscriptionResult.data.currentPeriodEnd
+            ? new Date(subscriptionResult.data.currentPeriodEnd)
+            : undefined,
+          status: SubscriptionStatus.ACTIVE,
+          updatedAt: new Date(),
+        })
+        .where(eq(subscriptions.providerSubscriptionId, subscriptionId));
+
+      logger.debug("Invoice payment processed successfully", {
+        subscriptionId,
+      });
+    } catch (error) {
+      logger.error("Failed to process invoice payment", {
+        error: parseError(error),
+        subscriptionId,
+      });
     }
   }
 }
 
-// Export singleton instance of the repository
 export const subscriptionRepository = new SubscriptionRepositoryImpl();

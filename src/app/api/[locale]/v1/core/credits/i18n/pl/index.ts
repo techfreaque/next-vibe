@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
+import { translations as purchaseTranslations } from "../../purchase/i18n/pl";
 
 export const translations: typeof enTranslations = {
+  purchase: purchaseTranslations,
   enums: {
     creditType: {
       userSubscription: "Kredyty subskrypcji użytkownika",
@@ -169,75 +171,6 @@ export const translations: typeof enTranslations = {
         server: {
           title: "Błąd serwera",
           description: "Nie udało się pobrać historii kredytów",
-        },
-        unknown: {
-          title: "Nieznany błąd",
-          description: "Wystąpił nieoczekiwany błąd",
-        },
-        unsavedChanges: {
-          title: "Niezapisane zmiany",
-          description: "Masz niezapisane zmiany",
-        },
-        conflict: {
-          title: "Konflikt",
-          description: "Wystąpił konflikt zasobów",
-        },
-      },
-    },
-  },
-  purchase: {
-    post: {
-      title: "Kup kredyty",
-      description: "Utwórz sesję płatności Stripe dla zakupu pakietu kredytów",
-      container: {
-        title: "Kup kredyty",
-        description: "Kup pakiety kredytów, aby korzystać z funkcji AI",
-      },
-      quantity: {
-        label: "Ilość",
-        description: "Liczba pakietów kredytowych do zakupu (1-10)",
-        placeholder: "Wprowadź ilość (1-10)",
-      },
-      checkoutUrl: {
-        content: "URL płatności",
-      },
-      sessionId: {
-        content: "ID sesji",
-      },
-      totalAmount: {
-        content: "Łączna kwota (centy)",
-      },
-      totalCredits: {
-        content: "Łączne kredyty",
-      },
-      success: {
-        title: "Płatność utworzona",
-        description: "Sesja płatności Stripe utworzona pomyślnie",
-      },
-      errors: {
-        validation: {
-          title: "Błąd walidacji",
-          description: "Nieprawidłowa ilość zakupu",
-        },
-        network: {
-          title: "Błąd sieci",
-          description: "Połączenie sieciowe nie powiodło się",
-        },
-        unauthorized: {
-          title: "Nieautoryzowany",
-          description: "Musisz być zalogowany, aby kupić kredyty",
-        },
-        forbidden: {
-          title: "Zabronione",
-          description: "Nie masz uprawnień do zakupu kredytów",
-        },
-        notFound: {
-          title: "Nie znaleziono",
-          description: "Zasób nie znaleziony",
-        },
-        server: {
-          title: "Błąd serwera",
-          description: "Nie udało się utworzyć sesji płatności",
         },
         unknown: {
           title: "Nieznany błąd",

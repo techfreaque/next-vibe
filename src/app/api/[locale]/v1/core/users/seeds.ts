@@ -78,6 +78,8 @@ export async function dev(
           password: "DevPass123!",
           privateName: "Sarah Johnson",
           publicName: "Sarah J.",
+          country: "GLOBAL",
+          language: "en",
         },
         adminSettings: {
           isActive: true,
@@ -92,6 +94,8 @@ export async function dev(
           password: "DevPass123!",
           privateName: "Michael Chen",
           publicName: "Mike C.",
+          country: "GLOBAL",
+          language: "en",
         },
         adminSettings: {
           isActive: true,
@@ -106,6 +110,8 @@ export async function dev(
           password: "DevPass123!",
           privateName: "Emily Rodriguez",
           publicName: "Emily R.",
+          country: "GLOBAL",
+          language: "en",
         },
         adminSettings: {
           isActive: true,
@@ -215,6 +221,8 @@ export async function test(
         password: "TestPass123!",
         privateName: "Test Manager",
         publicName: "Test M.",
+        country: "GLOBAL",
+        language: "en",
       },
       adminSettings: {
         isActive: true,

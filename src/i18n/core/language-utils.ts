@@ -31,9 +31,9 @@ let instance: LanguageMapper | null = null;
 class LanguageMapper {
   private _uniqueLanguages:
     | [
-        langCode: Languages,
-        langInfo: { name: string; countries: CountryInfo[] },
-      ][]
+      langCode: Languages,
+      langInfo: { name: string; countries: CountryInfo[] },
+    ][]
     | null = null;
   private _languageGroupMap: LanguageGroupMap | null = null;
 
@@ -187,14 +187,26 @@ export const getPrimaryCountryForLanguage = (
  * Extract country code from locale string
  */
 export function getCountryFromLocale(locale: CountryLanguage): Countries {
-  return locale.split("-")[1] as Countries;
+  const parts = locale.split("-");
+  if (parts.length !== 2 || !parts[1]) {
+    throw new Error(
+      `Invalid locale format: "${locale}". Expected format: "language-COUNTRY" (e.g., "en-GLOBAL")`,
+    );
+  }
+  return parts[1] as Countries;
 }
 
 /**
  * Extract language code from locale string
  */
 export function getLanguageFromLocale(locale: CountryLanguage): Languages {
-  return locale.split("-")[0] as Languages;
+  const parts = locale.split("-");
+  if (parts.length !== 2 || !parts[0]) {
+    throw new Error(
+      `Invalid locale format: "${locale}". Expected format: "language-COUNTRY" (e.g., "en-GLOBAL")`,
+    );
+  }
+  return parts[0] as Languages;
 }
 
 /**
@@ -204,8 +216,21 @@ export function getLanguageAndCountryFromLocale(locale: CountryLanguage): {
   language: Languages;
   country: Countries;
 } {
+  const parts = locale.split("-");
+  if (parts.length !== 2 || !parts[0] || !parts[1]) {
+    throw new Error(
+      `Invalid locale format: "${locale}". Expected format: "language-COUNTRY" (e.g., "en-GLOBAL")`,
+    );
+  }
   return {
-    language: getLanguageFromLocale(locale),
-    country: getCountryFromLocale(locale),
+    language: parts[0] as Languages,
+    country: parts[1] as Countries,
   };
 }
+
+export function getLocaleFromLanguageAndCountry(
+  language: Languages,
+  country: Countries,
+): CountryLanguage {
+  return `${language}-${country}` as CountryLanguage;
+};

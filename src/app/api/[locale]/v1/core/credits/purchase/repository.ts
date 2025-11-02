@@ -1,9 +1,8 @@
 /**
  * Credit Purchase Repository
- * Handles Stripe checkout session creation for credit packs
+ * Handles payment provider checkout session creation for credit packs
  */
 
-import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -11,82 +10,18 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import Stripe from "stripe";
 
-import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
-import { users } from "@/app/api/[locale]/v1/core/user/db";
-import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
-import { productsRepository, ProductIds } from "../../products/repository-client";
+import { ProductIds } from "../../products/repository-client";
+import { getPaymentProvider } from "../../payment/providers";
 import type {
   CreditsPurchasePostRequestOutput,
   CreditsPurchasePostResponseOutput,
 } from "./definition";
-
-const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-09-30.clover",
-});
-
-/**
- * Ensure user has a Stripe customer ID
- */
-async function ensureStripeCustomer(
-  userId: string,
-  logger: EndpointLogger,
-): Promise<ResponseType<string>> {
-  try {
-    // Check if user already has a Stripe customer ID
-    const [user] = await db
-      .select({ stripeCustomerId: users.stripeCustomerId, email: users.email })
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
-
-    if (!user) {
-      return createErrorResponse(
-        "app.api.v1.core.agent.chat.credits.errors.userNotFound",
-        ErrorResponseTypes.NOT_FOUND,
-        { userId },
-      );
-    }
-
-    if (user.stripeCustomerId) {
-      return createSuccessResponse(user.stripeCustomerId);
-    }
-
-    // Create new Stripe customer
-    const customer = await stripe.customers.create({
-      email: user.email,
-      metadata: { userId },
-    });
-
-    // Update user with Stripe customer ID
-    await db
-      .update(users)
-      .set({ stripeCustomerId: customer.id })
-      .where(eq(users.id, userId));
-
-    logger.info("Created Stripe customer for user", {
-      userId,
-      customerId: customer.id,
-    });
-
-    return createSuccessResponse(customer.id);
-  } catch (error) {
-    logger.error("Failed to ensure Stripe customer", {
-      error: parseError(error),
-      userId,
-    });
-    return createErrorResponse(
-      "app.api.v1.core.agent.chat.credits.errors.stripeCustomerFailed",
-      ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      { error: parseError(error).message },
-    );
-  }
-}
 
 /**
  * Credit Purchase Repository Interface
@@ -105,7 +40,7 @@ export interface CreditPurchaseRepository {
  */
 export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
   /**
-   * Create a Stripe checkout session for credit pack purchase
+   * Create a payment provider checkout session for credit pack purchase
    */
   async createCheckoutSession(
     data: CreditsPurchasePostRequestOutput,
@@ -114,73 +49,112 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditsPurchasePostResponseOutput>> {
     try {
-      // Get pricing from centralized products repository with proper locale
-      const creditPack = productsRepository.getProduct(ProductIds.CREDIT_PACK, locale);
-      const PACK_CREDITS = creditPack.credits;
-      const PACK_PRICE_CENTS = creditPack.price * 100; // Convert EUR to cents
+      logger.debug("createCheckoutSession START", {
+        userId,
+        quantity: data.quantity,
+        locale,
+      });
 
-      // Ensure user has a Stripe customer
-      const customerResult = await ensureStripeCustomer(userId, logger);
+      const { userRepository } = await import("../../user/repository");
+      const { UserDetailLevel } = await import("../../user/enum");
+
+      logger.debug("About to get user by ID");
+
+      const userResult = await userRepository.getUserById(
+        userId,
+        UserDetailLevel.STANDARD,
+        locale,
+        logger,
+      );
+
+      logger.debug("User result", {
+        success: userResult.success,
+        hasData: !!userResult.data,
+      });
+
+      if (!userResult.success || !userResult.data) {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.credits.purchase.post.errors.notFound.title",
+          ErrorResponseTypes.NOT_FOUND,
+          { userId },
+        );
+      }
+
+      // Default to stripe provider
+      const provider = getPaymentProvider("stripe");
+
+      logger.debug("About to ensure customer");
+
+      // Ensure customer exists with provider
+      const customerResult = await provider.ensureCustomer(
+        userId,
+        userResult.data.email,
+        userResult.data.publicName,
+        logger,
+      );
+
+      logger.debug("Customer result", {
+        success: customerResult.success,
+        hasData: !!customerResult.data,
+      });
+
       if (!customerResult.success) {
         return customerResult;
       }
-      const stripeCustomerId = customerResult.data;
 
-      const totalCredits = PACK_CREDITS * data.quantity;
-      const totalAmount = PACK_PRICE_CENTS * data.quantity;
+      const country = getCountryFromLocale(locale);
 
-      logger.info("Creating credit pack checkout session", {
+      // Create checkout session using provider abstraction
+      logger.debug("About to create checkout session", {
         userId,
-        quantity: data.quantity,
-        totalCredits,
-        totalAmount,
+        productId: ProductIds.CREDIT_PACK,
+        interval: "one_time",
+        country,
+        customerId: customerResult.data.customerId,
       });
 
-      // Create Stripe checkout session for one-time payment
-      const session = await stripe.checkout.sessions.create({
-        customer: stripeCustomerId,
-        payment_method_types: ["card"],
-        mode: "payment", // One-time payment, not subscription
-        line_items: [
-          {
-            price_data: {
-              currency: "eur",
-              product_data: {
-                // eslint-disable-next-line i18next/no-literal-string
-                name: `${PACK_CREDITS.toString()} Credits Pack`,
-                // eslint-disable-next-line i18next/no-literal-string
-                description: `${data.quantity.toString()} × ${PACK_CREDITS.toString()} credits = ${totalCredits.toString()} total credits`,
-              },
-              unit_amount: PACK_PRICE_CENTS,
-            },
-            quantity: data.quantity,
-          },
-        ],
-        success_url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/chat?credits_purchase=success&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?credits_purchase=canceled`,
-        metadata: {
+      const session = await provider.createCheckoutSession(
+        {
           userId,
-          type: "credit_pack",
-          quantity: data.quantity.toString(),
-          totalCredits: totalCredits.toString(),
+          productId: ProductIds.CREDIT_PACK,
+          interval: "one_time",
+          country,
+          locale,
+          successUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/chat?credits_purchase=success&session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?credits_purchase=canceled`,
+          metadata: {
+            userId,
+            type: "credit_pack",
+            productId: ProductIds.CREDIT_PACK,
+            quantity: data.quantity.toString(),
+          },
         },
-        allow_promotion_codes: true,
-        billing_address_collection: "auto",
-        customer_update: {
-          address: "auto",
-        },
+        customerResult.data.customerId,
+        logger,
+      );
+
+      logger.debug("Checkout session result", {
+        success: session.success,
+        hasData: !!session.data,
       });
 
-      logger.info("Credit pack checkout session created", {
-        sessionId: session.id,
-        userId,
-        totalAmount,
-        totalCredits,
-      });
+      if (!session.success) {
+        logger.error("Checkout session creation failed", {
+          message: session.message,
+          type: session.type,
+        });
+        return session;
+      }
+
+      // Get product to calculate totals
+      const { productsRepository } = await import("../../products/repository-client");
+      const product = productsRepository.getProduct(ProductIds.CREDIT_PACK, locale, "one_time");
+      const totalAmount = product.price * data.quantity;
+      const totalCredits = product.credits * data.quantity;
 
       return createSuccessResponse({
-        checkoutUrl: session.url || "",
-        sessionId: session.id,
+        checkoutUrl: session.data.checkoutUrl,
+        sessionId: session.data.sessionId,
         totalAmount,
         totalCredits,
       });
@@ -191,7 +165,7 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
         quantity: data.quantity,
       });
       return createErrorResponse(
-        "app.api.v1.core.agent.chat.credits.errors.checkoutFailed",
+        "app.api.v1.core.agent.chat.credits.purchase.post.errors.server.title",
         ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         { error: parseError(error).message },
       );

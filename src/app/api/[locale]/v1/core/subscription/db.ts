@@ -32,6 +32,7 @@ export const subscriptions = pgTable("subscriptions", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id")
     .notNull()
+    .unique()
     .references(() => users.id, { onDelete: "cascade" }),
   status: text("status", { enum: SubscriptionStatusDB })
     .notNull()
@@ -57,10 +58,19 @@ export const subscriptions = pgTable("subscriptions", {
   trialStart: timestamp("trial_start", { withTimezone: true }),
   trialEnd: timestamp("trial_end", { withTimezone: true }),
 
-  // Stripe integration
-  stripeCustomerId: text("stripe_customer_id"),
-  stripeSubscriptionId: text("stripe_subscription_id").unique(),
-  stripePriceId: text("stripe_price_id"),
+  // Product reference (code-defined)
+  productId: text("product_id").notNull().default("subscription"),
+
+  // Subscription interval
+  interval: text("interval").notNull().default("month"),
+
+  // Payment provider info
+  provider: text("provider").notNull().default("stripe"),
+  providerSubscriptionId: text("provider_subscription_id").unique(),
+
+  // Provider-specific IDs (for managing recurring subscriptions)
+  providerPriceId: text("provider_price_id"),
+  providerProductId: text("provider_product_id"),
 
   // Metadata
   createdAt: timestamp("created_at", { withTimezone: true })

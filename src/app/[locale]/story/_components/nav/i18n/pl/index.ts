@@ -23,24 +23,33 @@ export const translations: typeof enTranslations = {
   },
   home: "Strona główna",
   pricing: "Cennik",
+  features: "Funkcje",
+  forum: "Forum",
   contact: "Kontakt",
+  getStarted: "Zacznij za darmo",
+  signIn: "Zaloguj się",
+  goToApp: "Otwórz aplikację",
   services: {
-    title: "Usługi",
+    title: "Platforma",
     features: {
       title: "Funkcje",
-      description: "Poznaj nasze potężne funkcje",
+      description: "Możliwości czatu AI + forum",
     },
     process: {
-      title: "Nasz proces",
-      description: "Jak z Tobą pracujemy",
+      title: "Jak to działa",
+      description: "Zacznij w 4 prostych krokach",
     },
-    premiumContent: {
-      title: "Treści premium",
-      description: "Dostęp do ekskluzywnych treści",
+    aiModels: {
+      title: "Modele AI",
+      description: "40+ niecenzurowanych modeli AI",
     },
-    contact: {
-      title: "Kontakt",
-      description: "Skontaktuj się z naszym zespołem",
+    folders: {
+      title: "Poziomy prywatności",
+      description: "Prywatne, Incognito, Współdzielone, Publiczne",
+    },
+    personas: {
+      title: "Persony AI",
+      description: "Własne i społecznościowe persony",
     },
   },
   post: {

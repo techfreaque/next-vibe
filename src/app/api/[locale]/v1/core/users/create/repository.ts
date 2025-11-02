@@ -65,6 +65,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
         password: hashedPassword,
         privateName: data.basicInfo.privateName,
         publicName: data.basicInfo.publicName,
+        locale,
         isActive: data.adminSettings?.isActive ?? true,
         emailVerified: data.adminSettings?.emailVerified ?? false,
         marketingConsent: false,

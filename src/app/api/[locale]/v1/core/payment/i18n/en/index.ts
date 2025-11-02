@@ -1,12 +1,17 @@
 import { translations as invoiceTranslations } from "../../invoice/i18n/en";
 import { translations as portalTranslations } from "../../portal/i18n/en";
 import { translations as refundTranslations } from "../../refund/i18n/en";
+import { translations as stripeProviderTranslations } from "../../providers/stripe/i18n/en";
 
 export const translations = {
   // Import sub-domain translations
   invoice: invoiceTranslations,
   portal: portalTranslations,
   refund: refundTranslations,
+  providers: {
+    stripe: stripeProviderTranslations,
+    nowpayments: "NOWPayments",
+  },
 
   // Main payment domain
   category: "Payment",
@@ -212,6 +217,10 @@ export const translations = {
       title: "Conflict",
       description: "Payment conflict detected",
     },
+    notImplemented: {
+      title: "Not Implemented",
+      description: "This payment provider feature is not yet implemented",
+    },
     customerCreationFailed: "Failed to create Stripe customer",
     customerNotFound: "Stripe customer not found",
   },
@@ -288,6 +297,7 @@ export const translations = {
   enums: {
     paymentProvider: {
       stripe: "Stripe",
+      nowpayments: "NOWPayments",
     },
     paymentStatus: {
       pending: "Pending",

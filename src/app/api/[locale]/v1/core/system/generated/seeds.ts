@@ -23,7 +23,7 @@ export async function getSeedModule(moduleName: string): Promise<EnvironmentSeed
     case "user":
       return (await import("../../user/seeds")) as EnvironmentSeeds;
     case "stripe":
-      return (await import("../../stripe/seeds")) as EnvironmentSeeds;
+      return (await import("../../payment/providers/stripe/seeds")) as EnvironmentSeeds;
     case "subscription":
       return (await import("../../subscription/seeds")) as EnvironmentSeeds;
     case "payment":

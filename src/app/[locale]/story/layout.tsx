@@ -26,9 +26,9 @@ export default async function SiteLayoutServer({
 
   const userResponse = await userRepository.getUserByAuth(
     {
-      locale,
       detailLevel: UserDetailLevel.STANDARD,
     },
+    locale,
     logger,
   );
 

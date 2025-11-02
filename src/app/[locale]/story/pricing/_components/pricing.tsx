@@ -3,10 +3,11 @@ import type { JSX } from "react";
 
 import type { SubscriptionPlanValue } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
-import type { Countries, Currencies } from "@/i18n/core/config";
+import type { Countries, CountryLanguage, Currencies } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { productsRepository, ProductIds } from "@/app/api/[locale]/v1/core/products/repository-client";
+import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
 // Custom icon components with enhanced styling
 const StarterIcon = (): JSX.Element => (
@@ -30,8 +31,9 @@ export function getPlanPriceForCountry(
  * Calculate the savings percentage when choosing annual over monthly billing
  * Returns the rounded percentage saved (average across all plans)
  */
-export function calculateSavingsPercent(country: Countries): number {
-  const plans = getPricingPlansArray();
+export function calculateSavingsPercent(locale: CountryLanguage): number {
+  const plans = getPricingPlansArray(locale);
+  const country = getCountryFromLocale(locale);
   let totalSavingsPercent = 0;
   let validPlansCount = 0;
 

@@ -73,7 +73,8 @@ export default async function LoginPage({
   // Check if user is already logged in using repository-first pattern
   // Allow both PUBLIC and CUSTOMER roles for login page
   const verifiedUserResponse = await userRepository.getUserByAuth(
-    { locale, roles: [UserRole.PUBLIC, UserRole.CUSTOMER] },
+    { roles: [UserRole.PUBLIC, UserRole.CUSTOMER] },
+    locale,
     logger,
   );
   // Redirect if already authenticated (not public)

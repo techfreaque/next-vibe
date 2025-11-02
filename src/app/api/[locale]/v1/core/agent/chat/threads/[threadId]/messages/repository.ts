@@ -129,55 +129,20 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
 
       // Map messages to include toolCalls from metadata and sequencing fields
       const mappedMessages = messages.map((msg) => {
-        // NEW ARCHITECTURE: For TOOL messages, construct toolCalls array from metadata
-        let toolCalls = null;
-        if (msg.role === "tool" && msg.metadata) {
-          // Check if metadata has toolCall object (new format)
-          if (msg.metadata.toolCall) {
-            const tc = msg.metadata.toolCall as {
-              toolName: string;
-              displayName: string;
-              icon?: string;
-              args: unknown;
-              result?: unknown;
-              error?: string;
-              executionTime?: number;
-              widgetMetadata?: unknown;
-              creditsUsed?: number;
-            };
-            toolCalls = [
-              {
-                toolName: tc.toolName || "",
-                displayName: tc.displayName || "",
-                icon: tc.icon,
-                args: tc.args,
-                result: tc.result,
-                error: tc.error,
-                executionTime: tc.executionTime,
-                widgetMetadata: tc.widgetMetadata,
-                creditsUsed: tc.creditsUsed,
-              },
-            ];
-          } else {
-            // Fallback: try to read from metadata directly (old format)
-            toolCalls = [
-              {
-                toolName: msg.metadata.toolName || "",
-                displayName: msg.metadata.displayName || "",
-                icon: msg.metadata.icon,
-                args: msg.metadata.args,
-                result: msg.metadata.result,
-                error: msg.metadata.error,
-                executionTime: msg.metadata.executionTime,
-                widgetMetadata: msg.metadata.widgetMetadata,
-                creditsUsed: msg.metadata.creditsUsed,
-              },
-            ];
-          }
-        } else if (msg.metadata?.toolCalls) {
-          // Legacy: toolCalls array in metadata (will be removed)
-          toolCalls = msg.metadata.toolCalls;
-        }
+        let toolCalls = [
+          {
+            toolName: msg.metadata?.toolName || "",
+            displayName: msg.metadata?.displayName || "",
+            icon: msg.metadata?.icon,
+            args: msg.metadata?.args,
+            result: msg.metadata?.result,
+            error: msg.metadata?.error,
+            executionTime: msg.metadata?.executionTime,
+            widgetMetadata: msg.metadata?.widgetMetadata,
+            creditsUsed: msg.metadata?.creditsUsed,
+          },
+        ];
+     
 
         return {
           ...msg,

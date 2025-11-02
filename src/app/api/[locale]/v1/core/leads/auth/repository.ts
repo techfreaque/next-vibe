@@ -221,6 +221,16 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         .from(userLeads)
         .where(eq(userLeads.userId, userId));
 
+      // Check if this specific link already exists
+      const existingLink = existingLeads.find((link) => link.leadId === leadId);
+      if (existingLink) {
+        logger.debug("app.api.v1.core.leads.auth.link.already.exists", {
+          leadId,
+          userId,
+        });
+        return createSuccessResponse(undefined);
+      }
+
       const isPrimary = existingLeads.length === 0;
 
       // Create the link

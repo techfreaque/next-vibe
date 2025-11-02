@@ -135,6 +135,7 @@ const { GET } = createEndpoint({
           email: "user@example.com",
           privateName: "John Doe",
           publicName: "JD",
+          locale: "en-GLOBAL" as const,
           userRoles: [
             {
               id: "role-id",
@@ -505,6 +506,7 @@ const { POST } = createEndpoint({
             email: "customer@example.com",
             privateName: "John Doe",
             publicName: "JD",
+            locale: "en-GLOBAL" as const,
             userRoles: [
               {
                 id: "role-id",
@@ -543,6 +545,7 @@ const { POST } = createEndpoint({
             email: "user@example.com",
             privateName: "John Doe",
             publicName: "JD",
+            locale: "en-GLOBAL" as const,
             userRoles: [],
             createdAt: "",
             updatedAt: "",

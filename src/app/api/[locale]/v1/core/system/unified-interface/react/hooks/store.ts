@@ -395,6 +395,11 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       endpoint.requestSchema.safeParse(undefined).success &&
       !endpoint.requestSchema.safeParse({}).success;
 
+    // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
+    const isEmptyObjectSchema =
+      endpoint.requestSchema instanceof z.ZodObject &&
+      Object.keys(endpoint.requestSchema.shape).length === 0;
+
     // If the schema expects undefined but we received an object, set requestData to undefined
     if (
       isUndefinedSchema &&
@@ -402,6 +407,11 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       requestData !== null
     ) {
       requestData = undefined as TEndpoint["TRequestOutput"];
+    }
+
+    // If the schema expects an empty object but we received undefined, set requestData to empty object
+    if (isEmptyObjectSchema && requestData === undefined) {
+      requestData = {} as TEndpoint["TRequestOutput"];
     }
 
     const queryId = get().getQueryId(
@@ -559,7 +569,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         isError: false,
         isSuccess: false,
         statusMessage:
-          "app.api.v1.core.system.unifiedInterface.react.store.status.loading_data" as const,
+          "app.api.v1.core.system.unifiedInterface.react.hooks.store.status.loading_data" as const,
         isCachedData: false,
         lastFetchTime: existingLastFetchTime ?? null,
         isLoading: true,
@@ -611,7 +621,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isLoadingFresh: false,
                   isCachedData: true,
                   statusMessage:
-                    "app.api.v1.core.system.unifiedInterface.react.store.status.cached_data" as const,
+                    "app.api.v1.core.system.unifiedInterface.react.hooks.store.status.cached_data" as const,
                   lastFetchTime: existingQuery.lastFetchTime ?? null,
                 },
               },
@@ -706,7 +716,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           // Create a proper error response
           const errorResponse = fail({
             message:
-              "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed",
+              "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.validation_failed",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { endpoint: endpoint.path.join("/") },
           });
@@ -731,7 +741,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 isLoadingFresh: false,
                 isCachedData: state.queries[queryId]?.isCachedData ?? false,
                 statusMessage:
-                  "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
+                  "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.validation_failed" as const,
                 lastFetchTime: Date.now(),
               },
             },
@@ -795,7 +805,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isError: true,
                   isSuccess: false,
                   statusMessage:
-                    "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed" as const,
+                    "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.request_failed" as const,
                   isLoadingFresh: false,
                   isCachedData: existingQuery?.isCachedData ?? false,
                   lastFetchTime: Date.now(),
@@ -838,7 +848,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 isLoadingFresh: false,
                 isCachedData: false,
                 statusMessage:
-                  "app.api.v1.core.system.unifiedInterface.react.store.status.success" as const,
+                  "app.api.v1.core.system.unifiedInterface.react.hooks.store.status.success" as const,
                 lastFetchTime: Date.now(),
               },
             },
@@ -891,7 +901,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isLoadingFresh: false,
                   isCachedData: state.queries[queryId]?.isCachedData ?? false,
                   statusMessage:
-                    "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
+                    "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.validation_failed" as const,
                   lastFetchTime: Date.now(),
                 },
               },
@@ -918,7 +928,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         // Create a properly typed error response with translation key
         const errorResponse = fail({
           message:
-            "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed",
+            "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.request_failed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: parseError(err).message,
@@ -946,7 +956,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               isLoadingFresh: false,
               isCachedData: state.queries[queryId]?.isCachedData ?? false,
               statusMessage:
-                "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed" as const,
+                "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.request_failed" as const,
               lastFetchTime: Date.now(),
             },
           },
@@ -992,7 +1002,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         ? error
         : fail({
           message:
-            "app.api.v1.core.system.unifiedInterface.react.store.errors.request_failed",
+            "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.request_failed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: parseError(error).message },
         });
@@ -1028,6 +1038,11 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       endpoint.requestSchema.safeParse(undefined).success &&
       !endpoint.requestSchema.safeParse({}).success;
 
+    // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
+    const isEmptyObjectSchema =
+      endpoint.requestSchema instanceof z.ZodObject &&
+      Object.keys(endpoint.requestSchema.shape).length === 0;
+
     // If the schema expects undefined but we received an object, set requestData to undefined
     if (
       isUndefinedSchema &&
@@ -1039,6 +1054,15 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         endpoint.path.join("/"),
       );
       requestData = undefined as TEndpoint["TRequestOutput"];
+    }
+
+    // If the schema expects an empty object but we received undefined, set requestData to empty object
+    if (isEmptyObjectSchema && requestData === undefined) {
+      logger.debug(
+        "Converting undefined to empty object for endpoint with empty object schema",
+        endpoint.path.join("/"),
+      );
+      requestData = {} as TEndpoint["TRequestOutput"];
     }
     const mutationId = get().getMutationId(endpoint);
 
@@ -1053,7 +1077,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           error: null,
           isSuccess: false,
           statusMessage:
-            "app.api.v1.core.system.unifiedInterface.react.store.status.mutation_pending" as const,
+            "app.api.v1.core.system.unifiedInterface.react.hooks.store.status.mutation_pending" as const,
           data: undefined,
         },
       },
@@ -1067,7 +1091,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         // Create a proper error response
         const errorResponse = fail({
           message:
-            "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed",
+            "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.validation_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { endpoint: endpoint.path.join("/") },
         });
@@ -1083,7 +1107,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               error: errorResponse,
               isSuccess: false,
               statusMessage:
-                "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
+                "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.validation_failed" as const,
               data: undefined,
             },
           },
@@ -1132,7 +1156,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               error: response,
               isSuccess: false,
               statusMessage:
-                "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed" as const,
+                "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.mutation_failed" as const,
               data: undefined,
             },
           },
@@ -1150,7 +1174,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         // Return error response with proper translation key
         return fail({
           message:
-            "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed",
+            "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.mutation_failed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: response.message,
@@ -1174,7 +1198,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             error: null,
             isSuccess: true,
             statusMessage:
-              "app.api.v1.core.system.unifiedInterface.react.store.status.mutation_success" as const,
+              "app.api.v1.core.system.unifiedInterface.react.hooks.store.status.mutation_success" as const,
             data: responseData as AnyData,
           },
         },
@@ -1206,7 +1230,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 error: onSuccessResult,
                 isSuccess: false,
                 statusMessage:
-                  "app.api.v1.core.system.unifiedInterface.react.store.errors.validation_failed" as const,
+                  "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.validation_failed" as const,
                 data: undefined,
               },
             },
@@ -1232,7 +1256,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         ? error
         : fail({
           message:
-            "app.api.v1.core.system.unifiedInterface.react.store.errors.mutation_failed",
+            "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.mutation_failed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: parseError(error).message },
         });
@@ -1248,7 +1272,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             error: errorResponse,
             isSuccess: false,
             statusMessage:
-              "app.api.v1.core.system.unifiedInterface.react.store.errors.unexpected_failure" as const,
+              "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.unexpected_failure" as const,
             data: undefined,
           },
         },
@@ -1266,7 +1290,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       // Return error response with proper translation key
       return fail({
         message:
-          "app.api.v1.core.system.unifiedInterface.react.store.errors.unexpected_failure",
+          "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.unexpected_failure",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: errorResponse.message,
@@ -1322,7 +1346,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const errorMessage = err instanceof Error ? err.message : String(err);
       return fail({
         message:
-          "app.api.v1.core.system.unifiedInterface.react.store.errors.refetch_failed",
+          "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.refetch_failed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: errorMessage,
@@ -1520,6 +1544,11 @@ export const apiClient = {
       requestSchema.safeParse(undefined).success &&
       !requestSchema.safeParse({}).success;
 
+    // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
+    const isEmptyObjectSchema =
+      requestSchema instanceof z.ZodObject &&
+      Object.keys(requestSchema.shape).length === 0;
+
     // If the schema expects undefined but we received an object, set requestData to undefined
     if (
       isUndefinedSchema &&
@@ -1531,6 +1560,15 @@ export const apiClient = {
         endpoint.path.join("/"),
       );
       requestData = undefined as TEndpoint["TRequestOutput"];
+    }
+
+    // If the schema expects an empty object but we received undefined, set requestData to empty object
+    if (isEmptyObjectSchema && requestData === undefined) {
+      logger.debug(
+        "Converting undefined to empty object for endpoint with empty object schema",
+        endpoint.path.join("/"),
+      );
+      requestData = {} as TEndpoint["TRequestOutput"];
     }
 
     const response = await useApiStore
@@ -1590,6 +1628,11 @@ export const apiClient = {
       endpoint.requestSchema.safeParse(undefined).success &&
       !endpoint.requestSchema.safeParse({}).success;
 
+    // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
+    const isEmptyObjectSchema =
+      endpoint.requestSchema instanceof z.ZodObject &&
+      Object.keys(endpoint.requestSchema.shape).length === 0;
+
     // If the schema expects undefined but we received an object, set data to undefined
     if (isUndefinedSchema && typeof data === "object" && data !== null) {
       logger.debug(
@@ -1597,6 +1640,15 @@ export const apiClient = {
         endpoint.path.join("/"),
       );
       data = undefined as TEndpoint["TRequestOutput"];
+    }
+
+    // If the schema expects an empty object but we received undefined, set data to empty object
+    if (isEmptyObjectSchema && data === undefined) {
+      logger.debug(
+        "Converting undefined to empty object for endpoint with empty object schema",
+        endpoint.path.join("/"),
+      );
+      data = {} as TEndpoint["TRequestOutput"];
     }
 
     const response = await useApiStore

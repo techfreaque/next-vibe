@@ -22,10 +22,10 @@ export default async function ChatPage({
   const logger = createEndpointLogger(true, Date.now(), locale);
   const userResponse = await userRepository.getUserByAuth(
     {
-      locale,
       detailLevel: UserDetailLevel.MINIMAL,
       roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
     },
+    locale,
     logger,
   );
 

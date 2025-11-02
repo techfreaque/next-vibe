@@ -24,7 +24,7 @@ import type { JSX } from "react";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { useSimplifiedCheckout } from "@/app/api/[locale]/v1/core/subscription/checkout/hooks";
+import { useSimplifiedCheckout } from "@/app/api/[locale]/v1/core/payment/checkout/hooks";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
 import type {
   BillingIntervalValue,
@@ -39,6 +39,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-
 import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import {
@@ -73,7 +74,7 @@ export default function PricingSection({
   useHomePageLink: boolean;
   hideFooterAndHeader: boolean;
 }): JSX.Element {
-  const { t, country, currentCountry } = useTranslation();
+  const { t, locale: currentLocale, currentCountry } = useTranslation();
   const { toast } = useToast();
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -351,7 +352,7 @@ export default function PricingSection({
           {t("app.story.pricing.plans.annually")}{" "}
           <Span className="ml-1.5 text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2 py-0.5 rounded-full">
             {t("app.story.pricing.plans.savePercent", {
-              percent: calculateSavingsPercent(country),
+              percent: calculateSavingsPercent(currentLocale),
             })}
           </Span>
         </Label>
@@ -364,7 +365,11 @@ export default function PricingSection({
         animate={inView ? "show" : "hidden"}
       >
         {getPricingPlansArray(locale).map((plan, index) => {
-          const pricing = getPlanPriceForCountry(plan, country, annual);
+          const pricing = getPlanPriceForCountry(
+            plan,
+            getCountryFromLocale(currentLocale),
+            annual,
+          );
           const action = getButtonAction(plan.id);
           const isCurrent = action === "current";
 

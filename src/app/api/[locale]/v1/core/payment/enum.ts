@@ -7,7 +7,7 @@ import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-int
 
 /**
  * Payment provider enum
- * Currently only Stripe is supported
+ * Supports Stripe and NOWPayments (crypto)
  */
 export const {
   enum: PaymentProvider,
@@ -15,6 +15,7 @@ export const {
   Value: PaymentProviderValue,
 } = createEnumOptions({
   STRIPE: "app.api.v1.core.payment.enums.paymentProvider.stripe",
+  NOWPAYMENTS: "app.api.v1.core.payment.enums.paymentProvider.nowpayments",
 });
 
 /**
@@ -153,7 +154,10 @@ export const {
 });
 
 // Create DB enum arrays for Drizzle
-export const PaymentProviderDB = [PaymentProvider.STRIPE] as const;
+export const PaymentProviderDB = [
+  PaymentProvider.STRIPE,
+  PaymentProvider.NOWPAYMENTS,
+] as const;
 
 export const PaymentStatusDB = [
   PaymentStatus.PENDING,

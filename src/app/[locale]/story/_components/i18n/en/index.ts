@@ -174,11 +174,11 @@ export const translations = {
     pricing: {
       free: {
         name: "Free Tier",
-        description: "Get started with 20 free credits - no card required",
-        credits: "20 free credits (one-time)",
+        description: "Get started with {{credits}} free credits - no card required",
+        credits: "{{credits}} free credits (one-time)",
         features: {
-          credits: "20 credits to start",
-          models: "Access to all 40+ AI models",
+          credits: "{{credits}} credits to start",
+          models: "Access to all {{modelCount}}+ AI models",
           folders: "All folder types (private, incognito, shared, public)",
           personas: "Use community personas",
           support: "Community support",
@@ -188,11 +188,11 @@ export const translations = {
       subscription: {
         name: "Unlimited Plan",
         description: "Unlimited messages for serious users",
-        price: "€10/month",
-        credits: "1,000 credits/month",
+        price: "{{price}}/month",
+        credits: "{{credits}} credits/month",
         features: {
           unlimited: "Unlimited AI conversations",
-          models: "All 40+ AI models",
+          models: "All {{modelCount}}+ AI models",
           folders: "All folder types",
           personas: "Create unlimited personas",
           priority: "Priority support",
@@ -204,12 +204,12 @@ export const translations = {
       creditPack: {
         name: "Credit Pack",
         description: "Pay as you go, never expires",
-        price: "€5",
-        credits: "500 credits",
+        price: "{{price}}",
+        credits: "{{credits}} credits",
         features: {
           payAsYouGo: "Pay only for what you use",
           neverExpires: "Credits never expire",
-          models: "All 40+ AI models",
+          models: "All {{modelCount}}+ AI models",
           folders: "All folder types",
           buyMore: "Buy more anytime",
         },
@@ -894,5 +894,37 @@ export const translations = {
         },
       },
     },
+  },
+  footer: {
+    tagline: "Chat with AI, Connect with Community",
+    privacyTagline: "Privacy-first AI chat with 40+ uncensored models",
+    platform: {
+      title: "Platform",
+      features: "Features",
+      pricing: "Pricing",
+      aiModels: "AI Models",
+      personas: "Personas",
+    },
+    product: {
+      title: "Product",
+      privateChats: "Private Chats",
+      incognitoMode: "Incognito Mode",
+      sharedFolders: "Shared Folders",
+      publicForum: "Public Forum",
+    },
+    company: {
+      title: "Company",
+      aboutUs: "About Us",
+      careers: "Careers",
+      imprint: "Legal Notice",
+      privacyPolicy: "Privacy Policy",
+      termsOfService: "Terms of Service",
+    },
+    legal: {
+      title: "Legal",
+    },
+    builtWith: "Built with",
+    framework: "NextVibe Framework",
+    copyright: "© {{year}} Unbottled.ai. All rights reserved.",
   },
 };

@@ -38,10 +38,10 @@ export default async function ThreadsPathPage({
   // Get authenticated user
   const userResponse = await userRepository.getUserByAuth(
     {
-      locale,
       detailLevel: UserDetailLevel.MINIMAL,
       roles: [UserRole.PUBLIC, UserRole.CUSTOMER],
     },
+    locale,
     logger,
   );
 

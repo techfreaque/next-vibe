@@ -104,7 +104,7 @@ export async function createTRPCContext<
   // Authenticate user using the existing auth system
   // Use getAuthMinimalUser which properly handles PUBLIC role with leadId creation
   let user: JwtPayloadType;
-  let userRoles: (typeof UserRoleValue)[] = [];
+  let userRoles: TUserRoleValue = [] as never as TUserRoleValue;
 
   try {
     // Try to get authenticated user first
@@ -126,7 +126,7 @@ export async function createTRPCContext<
           opts.logger,
         );
         if (authenticatedUser && !authenticatedUser.isPublic) {
-          userRoles = [UserRole.CUSTOMER];
+          userRoles = [UserRole.CUSTOMER] as never as TUserRoleValue;
 
           // Check for admin role
           const adminUser = await authRepository.getAuthMinimalUser(
@@ -135,7 +135,7 @@ export async function createTRPCContext<
             opts.logger,
           );
           if (adminUser && !adminUser.isPublic) {
-            userRoles.push(UserRole.ADMIN);
+            (userRoles as unknown as Array<typeof UserRoleValue>).push(UserRole.ADMIN);
           }
         }
       }
@@ -146,7 +146,7 @@ export async function createTRPCContext<
         { platform: "trpc", request: req, locale: opts.locale },
         opts.logger,
       );
-      userRoles = [UserRole.PUBLIC];
+      userRoles = [UserRole.PUBLIC] as never as TUserRoleValue;
     }
   } catch (error) {
     // Authentication failed - get public user with proper leadId
@@ -158,7 +158,7 @@ export async function createTRPCContext<
       { platform: "trpc", request: req, locale: opts.locale },
       opts.logger,
     );
-    userRoles = [UserRole.PUBLIC];
+    userRoles = [UserRole.PUBLIC] as never as TUserRoleValue;
   }
 
   return {

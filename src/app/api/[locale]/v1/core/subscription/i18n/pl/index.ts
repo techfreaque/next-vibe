@@ -1,4 +1,4 @@
-import { translations as checkoutTranslations } from "../../checkout/i18n/pl";
+import { translations as checkoutTranslations } from "../../../payment/checkout/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -171,6 +171,8 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Wystąpił konflikt danych",
     },
+    use_checkout_flow:
+      "Proszę użyć procesu płatności, aby kupić subskrypcję",
     sync_failed: "Nie udało się zsynchronizować subskrypcji z bazą danych",
     database_error: "Wystąpił błąd bazy danych",
     create_crashed: "Utworzenie subskrypcji nie powiodło się",

@@ -22,8 +22,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { leadAuthRepository } from "../leads/auth/repository";
 import { authRepository } from "./auth/repository";
-import type { NewUser, User } from "./db";
-import { insertUserSchema, users } from "./db";
+import type {
+  NewUser, User } from "./db";
+import { users } from "./db";
 import { UserDetailLevel } from "./enum";
 import type {
   CompleteUserType,
@@ -71,10 +72,11 @@ export interface UserRepository {
    */
   getUserByAuth<
     T extends
-      | typeof UserDetailLevel.MINIMAL
-      | ExtendedUserDetailLevel = typeof UserDetailLevel.MINIMAL,
+    | typeof UserDetailLevel.MINIMAL
+    | ExtendedUserDetailLevel = typeof UserDetailLevel.MINIMAL,
   >(
     options: Omit<UserFetchOptions, "detailLevel"> & { detailLevel?: T },
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserType<T>>>;
 
@@ -99,11 +101,6 @@ export interface UserRepository {
     excludeUserId: DbId,
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>>;
-
-  /**
-   * Create new user
-   */
-  create(data: NewUser, logger: EndpointLogger): Promise<ResponseType<User>>;
 
   /**
    * Create user with hashed password
@@ -180,10 +177,11 @@ export class BaseUserRepositoryImpl implements UserRepository {
    */
   async getUserByAuth<
     T extends
-      | typeof UserDetailLevel.MINIMAL
-      | ExtendedUserDetailLevel = typeof UserDetailLevel.MINIMAL,
+    | typeof UserDetailLevel.MINIMAL
+    | ExtendedUserDetailLevel = typeof UserDetailLevel.MINIMAL,
   >(
     options: Omit<UserFetchOptions, "detailLevel"> & { detailLevel?: T },
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserType<T>>> {
     try {
@@ -198,15 +196,6 @@ export class BaseUserRepositoryImpl implements UserRepository {
         roles: roles.map(String),
         detailLevel: String(detailLevel),
       });
-
-      // Locale is required for authentication
-      if (!options.locale) {
-        return createErrorResponse(
-          "app.api.v1.core.user.errors.locale_required",
-          ErrorResponseTypes.BAD_REQUEST,
-        );
-      }
-      const locale = options.locale;
 
       // Get the authenticated user
       const verifiedUser = await authRepository.getAuthMinimalUser(
@@ -248,7 +237,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       return (await this.getUserById(
         verifiedUser.id,
         detailLevel,
-        options.locale,
+        locale,
         logger,
       )) as ResponseType<UserType<T>>;
     } catch (error) {
@@ -316,6 +305,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         privateName: user.privateName,
         publicName: user.publicName,
         email: user.email,
+        locale: user.locale,
         emailVerified: user.emailVerified,
         isActive: user.isActive,
         requireTwoFactor: false,
@@ -535,6 +525,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
           privateName: user.privateName,
           publicName: user.publicName,
           email: user.email,
+          locale: user.locale,
           isActive: user.isActive,
           emailVerified: user.emailVerified,
           requireTwoFactor: false,
@@ -601,6 +592,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
           privateName: user.privateName,
           publicName: user.publicName,
           email: user.email,
+          locale: user.locale,
           isActive: user.isActive,
           emailVerified: user.emailVerified,
           isPublic: false,
@@ -673,45 +665,6 @@ export class BaseUserRepositoryImpl implements UserRepository {
   }
 
   /**
-   * Create a new user
-   */
-  async create(
-    data: NewUser,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<User>> {
-    try {
-      logger.debug("Creating user", { email: data.email });
-
-      // Check if email already exists
-      const emailExistsResponse = await this.emailExists(data.email, logger);
-      if (emailExistsResponse.success && emailExistsResponse.data) {
-        return createErrorResponse(
-          "app.api.v1.core.user.errors.email_already_in_use",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          { email: data.email },
-        );
-      }
-      const validatedData = insertUserSchema.parse(data);
-      const results = await db.insert(users).values(validatedData).returning();
-      if (results.length === 0) {
-        return createErrorResponse(
-          "app.api.v1.core.user.errors.creation_failed",
-          ErrorResponseTypes.DATABASE_ERROR,
-          { error: "app.api.v1.core.user.errors.no_data_returned" },
-        );
-      }
-      return createSuccessResponse(results[0] as User);
-    } catch (error) {
-      logger.error("Error creating user", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.user.errors.creation_failed",
-        ErrorResponseTypes.DATABASE_ERROR,
-        { email: data.email, error: parseError(error).message },
-      );
-    }
-  }
-
-  /**
    * Create a new user with hashed password
    */
   async createWithHashedPassword(
@@ -723,11 +676,11 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       const hashedPassword = await hashPassword(data.password);
 
-      const validatedData = insertUserSchema.parse({
+      const hashedData: NewUser = {
         ...data,
         password: hashedPassword,
-      });
-      const results = await db.insert(users).values(validatedData).returning();
+      }
+      const results = await db.insert(users).values(hashedData).returning();
       if (results.length === 0) {
         return createErrorResponse(
           "app.api.v1.core.user.errors.creation_failed",
@@ -745,6 +698,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         privateName: createdUser.privateName,
         publicName: createdUser.publicName,
         email: createdUser.email,
+        locale: createdUser.locale,
         emailVerified: createdUser.emailVerified,
         isActive: createdUser.isActive,
         requireTwoFactor: false,

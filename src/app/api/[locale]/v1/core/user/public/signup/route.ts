@@ -18,8 +18,14 @@ export const { GET, POST, tools } = endpointsHandler({
         ignoreErrors: true, // Don't fail signup if admin notification fails
       },
     ],
-    handler: async ({ data, user, locale, logger }) => {
-      return await signupRepository.registerUser(data, user, locale, logger);
+    handler: async ({ data, user, locale, logger, request }) => {
+      return await signupRepository.registerUser(
+        data,
+        user,
+        locale,
+        logger,
+        request,
+      );
     },
   },
   [Methods.GET]: {

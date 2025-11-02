@@ -5,6 +5,7 @@
 
 import "server-only";
 
+import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -14,13 +15,16 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
+import { leadAuthRepository } from "@/app/api/[locale]/v1/core/leads/auth/repository";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { authRepository } from "../../auth/repository";
 import type { JwtPayloadType } from "../../auth/types";
 import { UserDetailLevel } from "../../enum";
+import { sessionRepository } from "../../private/session/repository";
 import { userRepository } from "../../repository";
 import type { StandardUserType } from "../../types";
 import { UserRole, type UserRoleValue } from "../../user-roles/enum";
@@ -42,6 +46,7 @@ export interface SignupRepository {
    * @param user - User from JWT (public user for signup)
    * @param locale - User locale
    * @param logger - Logger instance for debugging and monitoring
+   * @param request - Next.js request object for platform detection
    * @returns Success or error result
    */
   registerUser(
@@ -49,6 +54,7 @@ export interface SignupRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    request: NextRequest,
   ): Promise<ResponseType<SignupPostResponseOutput>>;
 
   /**
@@ -77,6 +83,7 @@ export class SignupRepositoryImpl implements SignupRepository {
    * @param user - User from JWT (public user for signup)
    * @param locale - User locale
    * @param logger - Logger instance for debugging and monitoring
+   * @param request - Next.js request object for platform detection
    * @returns Success or error result
    */
   async registerUser(
@@ -84,6 +91,7 @@ export class SignupRepositoryImpl implements SignupRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    request: NextRequest,
   ): Promise<ResponseType<SignupPostResponseOutput>> {
     const { t } = simpleT(locale);
 
@@ -149,6 +157,69 @@ export class SignupRepositoryImpl implements SignupRepository {
         userId: userData.id,
         leadId: user.leadId,
       });
+
+      // Auto-login: Create session and store auth token
+      // Link leadId to user
+      await leadAuthRepository.linkLeadToUser(
+        user.leadId,
+        userData.id,
+        locale,
+        logger,
+      );
+
+      // Get primary leadId for user
+      const leadIdResult = await leadAuthRepository.getAuthenticatedUserLeadId(
+        userData.id,
+        user.leadId,
+        locale,
+        logger,
+      );
+
+      // Create JWT payload
+      const tokenPayload = {
+        id: userData.id,
+        leadId: leadIdResult.leadId,
+        isPublic: false as const,
+      };
+
+      // Sign JWT token
+      const tokenResponse = await authRepository.signJwt(tokenPayload, logger);
+      if (!tokenResponse.success) {
+        logger.error("Failed to sign JWT token after signup", {
+          userId: userData.id,
+        });
+        // Continue without auto-login - user can manually log in
+      } else {
+        // Create session in database (7 days default)
+        const sessionDurationSeconds = 7 * 24 * 60 * 60;
+        const expiresAt = new Date(Date.now() + sessionDurationSeconds * 1000);
+        const sessionData = {
+          userId: userData.id,
+          token: tokenResponse.data,
+          expiresAt,
+        };
+        await sessionRepository.create(sessionData);
+
+        // Store auth token using platform-specific handler
+        const storeResult = await authRepository.storeAuthTokenForPlatform(
+          tokenResponse.data,
+          userData.id,
+          leadIdResult.leadId,
+          request,
+          logger,
+        );
+        if (storeResult.success) {
+          logger.debug("Auth token stored successfully after signup", {
+            userId: userData.id,
+          });
+        } else {
+          logger.error(
+            "Error storing auth token after signup",
+            parseError(storeResult),
+          );
+          // Continue even if token storage fails
+        }
+      }
 
       return createSuccessResponse<SignupPostResponseOutput>({
         response: {
@@ -296,6 +367,7 @@ export class SignupRepositoryImpl implements SignupRepository {
         password,
         privateName,
         publicName,
+        locale,
       };
 
       // Create new user with generated ID

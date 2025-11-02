@@ -78,7 +78,6 @@ export default function CreditPricingSection({
   const SUBSCRIPTION_CREDITS = products[ProductIds.SUBSCRIPTION].credits;
   const PACK_PRICE = products[ProductIds.CREDIT_PACK].price;
   const PACK_CREDITS = products[ProductIds.CREDIT_PACK].credits;
-  const FREE_CREDITS = products[ProductIds.FREE_TIER].credits;
 
   const container = {
     hidden: { opacity: 0 },

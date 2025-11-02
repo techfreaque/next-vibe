@@ -218,7 +218,7 @@ const restrictedSyntaxRule: RuleModule = {
                 }
                 context.report({
                     node,
-                    message: getRestrictedSyntaxtMessage("throw")
+                    message: "Usage of 'throw' statements is not allowed. Use proper ResponseType<T> patterns instead."
                 });
             },
 

@@ -17,6 +17,7 @@ import {
   userLeads,
 } from "@/app/api/[locale]/v1/core/leads/db";
 import { LeadSource, LeadStatus } from "@/app/api/[locale]/v1/core/leads/enum";
+import type { CreditPackCheckoutSession } from "@/app/api/[locale]/v1/core/payment/providers/types";
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import { subscriptions } from "@/app/api/[locale]/v1/core/subscription/db";
 import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
@@ -115,6 +116,12 @@ export interface CreditRepositoryInterface {
 
   // Expire old subscription credits (cron job)
   expireCredits(): Promise<ResponseType<number>>;
+
+  // Handle credit pack purchase from webhook
+  handleCreditPackPurchase(
+    session: CreditPackCheckoutSession,
+    logger: EndpointLogger,
+  ): Promise<void>;
 
   // Get correct credit identifier based on subscription status
   getCreditIdentifierBySubscription(
@@ -647,15 +654,14 @@ class CreditRepository
           }
 
           const deduction = Math.min(credit.amount, remaining);
-          const newAmount = credit.amount - deduction;
 
-          if (newAmount > 0) {
+          if (deduction === credit.amount) {
+            await db.delete(userCredits).where(eq(userCredits.id, credit.id));
+          } else {
             await db
               .update(userCredits)
-              .set({ amount: newAmount, updatedAt: new Date() })
+              .set({ amount: sql`amount - ${deduction}`, updatedAt: new Date() })
               .where(eq(userCredits.id, credit.id));
-          } else {
-            await db.delete(userCredits).where(eq(userCredits.id, credit.id));
           }
 
           remaining -= deduction;
@@ -689,11 +695,12 @@ class CreditRepository
           );
         }
 
-        const newAmount = credit.amount - amount;
         await db
           .update(leadCredits)
-          .set({ amount: newAmount, updatedAt: new Date() })
+          .set({ amount: sql`amount - ${amount}`, updatedAt: new Date() })
           .where(eq(leadCredits.id, credit.id));
+
+        const newAmount = credit.amount - amount;
 
         // Create transaction record
         await db.insert(creditTransactions).values({
@@ -939,6 +946,51 @@ class CreditRepository
         cost,
       });
       return { success: false };
+    }
+  }
+
+  async handleCreditPackPurchase(
+    session: CreditPackCheckoutSession,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const userId = session.metadata?.userId;
+      const totalCredits = parseInt(session.metadata?.totalCredits || "0", 10);
+
+      if (!userId || !totalCredits) {
+        logger.error("Invalid credit pack metadata", {
+          sessionId: session.id,
+          metadata: session.metadata,
+        });
+        return;
+      }
+
+      const result = await this.addUserCredits(
+        userId,
+        totalCredits,
+        "permanent",
+        logger,
+        undefined,
+      );
+
+      if (!result.success) {
+        logger.error("Failed to add credits after purchase", {
+          sessionId: session.id,
+          userId,
+          totalCredits,
+        });
+      } else {
+        logger.info("Credits added successfully after purchase", {
+          sessionId: session.id,
+          userId,
+          totalCredits,
+        });
+      }
+    } catch (error) {
+      logger.error("Failed to handle credit pack purchase", {
+        error: parseError(error),
+        sessionId: session.id,
+      });
     }
   }
 }

@@ -713,6 +713,7 @@ export function useAIStream(
                         if (chatMessage) {
                           saveMessage(chatMessage);
                         }
+                        return Promise.resolve();
                       });
                     }).catch((error) => {
                       logger.error("Failed to update tool result in chat store", {
