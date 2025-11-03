@@ -81,15 +81,15 @@ services:
         condition: service_healthy
     networks:
       - app-network
-      - caddy
+      - caddy_internal
     labels:
-      caddy: ${NEXT_PUBLIC_APP_URL}
-      caddy.reverse_proxy: "{{upstreams 3000}}"
+      caddy_internal: ${NEXT_PUBLIC_APP_URL}
+      caddy_internal.reverse_proxy: "{{upstreams 3000}}"
 
 networks:
   app-network:
     driver: bridge
-  caddy:
+  caddy_internal:
     external: true
 
 volumes:

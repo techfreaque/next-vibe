@@ -137,7 +137,7 @@ const nextConfig: NextConfig = {
   distDir: ".next",
 
   // Enable standalone output for Docker production builds
-  output: "standalone",
+  // output: "standalone",
 } as NextConfig;
 
 export default nextConfig;

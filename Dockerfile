@@ -4,8 +4,8 @@
 FROM oven/bun:1.3.0-alpine AS base
 WORKDIR /app
 
-# Builder stage - combine deps and build for workspace support
-FROM base AS builder
+# Install Node.js for Next.js build compatibility
+RUN apk add --no-cache nodejs
 
 # Build args - accept all env vars
 ARG VIBE_CLI_USER_EMAIL
@@ -110,30 +110,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN bun install --frozen-lockfile --ignore-scripts
 
 # Build using vibe CLI
-RUN bun src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts build && \
-    echo "Build completed. Checking .next directory..." && \
-    ls -la .next/ && \
-    ls -la .next/standalone/ && \
-    ls -la .next/static/
-
-# Production stage
-FROM base AS runner
-WORKDIR /app
+RUN bun src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts build
 
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-
-# Create a non-root user
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
-
-# Copy necessary files
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Switch to non-root user
-USER nextjs
 
 # Expose port
 EXPOSE 3000
