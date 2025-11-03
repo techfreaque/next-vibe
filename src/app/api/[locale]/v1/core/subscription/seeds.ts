@@ -14,6 +14,7 @@ import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { creditRepository } from "../credits/repository";
+import { translations } from "@/config/i18n/en";
 import type { NewSubscription } from "./db";
 import { subscriptions } from "./db";
 import type { SubscriptionGetResponseOutput } from "./definition";
@@ -520,7 +521,7 @@ export async function prod(
 
     // Get admin user for subscription management
     const adminUserResponse = await userRepository.getUserByEmail(
-      "hi@socialmediaservice.center",
+      translations.emails.admin,
       UserDetailLevel.STANDARD,
       locale,
       logger,

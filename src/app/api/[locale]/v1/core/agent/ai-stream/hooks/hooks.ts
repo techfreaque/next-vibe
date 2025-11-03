@@ -206,24 +206,11 @@ export function useAIStream(
                   createdAt: new Date(),
                 });
 
-                // CRITICAL: Set the active thread immediately in the chat store
-                // This ensures subsequent messages use the correct threadId
-                // Import chat store dynamically to avoid circular dependencies
-                void import("../../chat/store")
-                  .then(({ useChatStore }) => {
-                    useChatStore.getState().setActiveThread(eventData.threadId);
-                    logger.info("[DEBUG] Set active thread in chat store", {
-                      threadId: eventData.threadId,
-                    });
-                    return;
-                  })
-                  .catch((error: Error) => {
-                    logger.error(
-                      "Failed to set active thread",
-                      parseError(error),
-                    );
-                    return;
-                  });
+                // CRITICAL: Do NOT set active thread here
+                // The onThreadCreated callback will trigger navigation to the new thread URL
+                // The URL sync effect in chat-interface.tsx will then set the active thread
+                // based on the new URL. This prevents race conditions where store updates
+                // before URL navigation completes, causing the wrong thread to be active.
 
                 // Save to localStorage if incognito mode
                 if (eventData.rootFolderId === "incognito") {
@@ -408,7 +395,7 @@ export function useAIStream(
                 // Get fresh state from store to avoid stale closure
                 let currentMessage =
                   useAIStreamStore.getState().streamingMessages[
-                  eventData.messageId
+                    eventData.messageId
                   ];
 
                 logger.info("[DEBUG] CONTENT_DELTA event received", {
@@ -422,9 +409,12 @@ export function useAIStream(
 
                 // If message doesn't exist yet, create it (race condition fix)
                 if (!currentMessage) {
-                  logger.warn("[DEBUG] CONTENT_DELTA received before MESSAGE_CREATED, creating placeholder", {
-                    messageId: eventData.messageId,
-                  });
+                  logger.warn(
+                    "[DEBUG] CONTENT_DELTA received before MESSAGE_CREATED, creating placeholder",
+                    {
+                      messageId: eventData.messageId,
+                    },
+                  );
 
                   // Create a placeholder message
                   store.addMessage({
@@ -442,7 +432,10 @@ export function useAIStream(
                   });
 
                   // Get the message we just created
-                  currentMessage = useAIStreamStore.getState().streamingMessages[eventData.messageId];
+                  currentMessage =
+                    useAIStreamStore.getState().streamingMessages[
+                      eventData.messageId
+                    ];
                 }
 
                 if (currentMessage && eventData.delta) {
@@ -458,7 +451,7 @@ export function useAIStream(
                       const { useChatStore } = await import("../../chat/store");
                       const chatThread =
                         useChatStore.getState().threads[
-                        currentMessage.threadId
+                          currentMessage.threadId
                         ];
                       const isIncognito =
                         chatThread?.rootFolderId === "incognito";
@@ -519,7 +512,7 @@ export function useAIStream(
                 // Get fresh state from store to avoid stale closure
                 const currentMessage =
                   useAIStreamStore.getState().streamingMessages[
-                  eventData.messageId
+                    eventData.messageId
                   ];
 
                 logger.info("[DEBUG] REASONING_DELTA event received", {
@@ -555,7 +548,7 @@ export function useAIStream(
                         // Save to localStorage for incognito mode
                         const chatThread =
                           useChatStore.getState().threads[
-                          currentMessage.threadId
+                            currentMessage.threadId
                           ];
                         const isIncognito =
                           chatThread?.rootFolderId === "incognito";
@@ -613,7 +606,7 @@ export function useAIStream(
                 // Mark reasoning message as complete
                 const currentMessage =
                   useAIStreamStore.getState().streamingMessages[
-                  eventData.messageId
+                    eventData.messageId
                   ];
                 if (currentMessage) {
                   // Update streaming store
@@ -655,10 +648,13 @@ export function useAIStream(
                 // TOOL_CALL event is redundant - MESSAGE_CREATED already creates the TOOL message
                 // Keep event for backward compatibility but don't process it
                 const eventData = event.data as ToolCallEventData;
-                logger.debug("Tool call event received (ignored in new architecture)", {
-                  messageId: eventData.messageId,
-                  toolName: eventData.toolName,
-                });
+                logger.debug(
+                  "Tool call event received (ignored in new architecture)",
+                  {
+                    messageId: eventData.messageId,
+                    toolName: eventData.toolName,
+                  },
+                );
 
                 options.onToolCall?.(eventData);
                 break;
@@ -667,23 +663,35 @@ export function useAIStream(
               case StreamEventType.TOOL_RESULT: {
                 // NEW ARCHITECTURE: Update TOOL message with result data
                 const eventData = event.data as ToolResultEventData;
-                logger.debug("Tool result event received - updating TOOL message", {
-                  messageId: eventData.messageId,
-                  toolName: eventData.toolName,
-                  hasResult: !!eventData.result,
-                  hasError: !!eventData.error,
-                  hasToolCall: !!eventData.toolCall,
-                });
+                logger.debug(
+                  "Tool result event received - updating TOOL message",
+                  {
+                    messageId: eventData.messageId,
+                    toolName: eventData.toolName,
+                    hasResult: !!eventData.result,
+                    hasError: !!eventData.error,
+                    hasToolCall: !!eventData.toolCall,
+                  },
+                );
 
                 // Update streaming message with tool call result
-                const currentMessage = useAIStreamStore.getState().streamingMessages[eventData.messageId];
+                const currentMessage =
+                  useAIStreamStore.getState().streamingMessages[
+                    eventData.messageId
+                  ];
                 if (currentMessage && eventData.toolCall) {
                   // Update the tool call with result
-                  store.updateMessageContent(eventData.messageId, currentMessage.content);
+                  store.updateMessageContent(
+                    eventData.messageId,
+                    currentMessage.content,
+                  );
 
                   // Update toolCalls array with result
-                  const updatedToolCalls = currentMessage.toolCalls?.map(tc =>
-                    tc.toolName === eventData.toolName ? eventData.toolCall! : tc
+                  const updatedToolCalls = currentMessage.toolCalls?.map(
+                    (tc) =>
+                      tc.toolName === eventData.toolName
+                        ? eventData.toolCall!
+                        : tc,
                   ) || [eventData.toolCall];
 
                   // Update message in stream store
@@ -698,28 +706,47 @@ export function useAIStream(
                   }));
 
                   // Update message in chat store if incognito
-                  const streamThread = useAIStreamStore.getState().threads[currentMessage.threadId];
-                  const isIncognitoFromStream = streamThread?.rootFolderId === "incognito";
+                  const streamThread =
+                    useAIStreamStore.getState().threads[
+                      currentMessage.threadId
+                    ];
+                  const isIncognitoFromStream =
+                    streamThread?.rootFolderId === "incognito";
 
                   if (isIncognitoFromStream) {
-                    void import("../../chat/store").then(({ useChatStore }) => {
-                      useChatStore.getState().updateMessage(eventData.messageId, {
-                        toolCalls: updatedToolCalls,
-                      });
+                    void import("../../chat/store")
+                      .then(({ useChatStore }) => {
+                        useChatStore
+                          .getState()
+                          .updateMessage(eventData.messageId, {
+                            toolCalls: updatedToolCalls,
+                          });
 
-                      // Also update localStorage
-                      return import("../../chat/incognito/storage").then(({ saveMessage }) => {
-                        const chatMessage = useChatStore.getState().messages[eventData.messageId];
-                        if (chatMessage) {
-                          saveMessage(chatMessage);
-                        }
-                        return Promise.resolve();
+                        // Also update localStorage
+                        return import("../../chat/incognito/storage").then(
+                          ({ saveMessage }) => {
+                            const chatMessage =
+                              useChatStore.getState().messages[
+                                eventData.messageId
+                              ];
+                            if (chatMessage) {
+                              saveMessage(chatMessage);
+                            }
+                            return Promise.resolve();
+                          },
+                        );
+                      })
+                      .catch((error) => {
+                        logger.error(
+                          "Failed to update tool result in chat store",
+                          {
+                            error:
+                              error instanceof Error
+                                ? error.message
+                                : String(error),
+                          },
+                        );
                       });
-                    }).catch((error) => {
-                      logger.error("Failed to update tool result in chat store", {
-                        error: error instanceof Error ? error.message : String(error),
-                      });
-                    });
                   }
 
                   logger.debug("Tool result updated in message", {
@@ -771,16 +798,10 @@ export function useAIStream(
                           const { saveMessage } = await import(
                             "../../chat/incognito/storage"
                           );
-                          logger.info(
-                            "[DEBUG] Saving incognito message",
-                            {
-                              messageId: message.messageId,
-                              contentPreview: eventData.content.substring(
-                                0,
-                                50,
-                              ),
-                            },
-                          );
+                          logger.info("[DEBUG] Saving incognito message", {
+                            messageId: message.messageId,
+                            contentPreview: eventData.content.substring(0, 50),
+                          });
                           const savedMessage = {
                             id: message.messageId,
                             threadId: message.threadId,
@@ -856,7 +877,8 @@ export function useAIStream(
 
                 // Create ERROR message in chat so users can see what went wrong
                 // Get the current thread ID from the active stream
-                const activeThreadId = store.threads[Object.keys(store.threads)[0]]?.threadId;
+                const activeThreadId =
+                  store.threads[Object.keys(store.threads)[0]]?.threadId;
 
                 if (activeThreadId) {
                   // Import chat store dynamically to avoid circular dependencies

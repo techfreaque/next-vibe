@@ -3,7 +3,6 @@ export const translations = {
     active: "Active",
     filter: "Filter",
     refresh: "Refresh",
-    appName: "unbottled.ai",
     weekday: {
       monday: "Monday",
       tuesday: "Tuesday",
@@ -13,21 +12,7 @@ export const translations = {
       saturday: "Saturday",
       sunday: "Sunday",
     },
-    company: {
-      name: "unbottled.ai",
-      legalForm: "GmbH (Limited Liability Company)",
-      registrationNumber: "CHE-123.456.789",
-      address: {
-        title: "Address",
-        street: "Musterstrasse 123",
-        city: "8000 Zürich",
-        country: "Switzerland",
-        addressIn1Line: "Musterstrasse 123, 8000 Zürich, Switzerland",
-      },
-      responsiblePerson: {
-        name: "Max Mustermann",
-      },
-    },
+
     selector: {
       country: "Country",
       language: "Language",
@@ -132,71 +117,71 @@ export const translations = {
   },
   meta: {
     home: {
-      title: "unbottled.ai - Uncensored AI Chat",
+      title: "{{appName}} - Uncensored AI Chat",
       category: "AI Chat Platform",
       description:
         "Experience truly uncensored AI conversations with 40+ models. No filters, no restrictions, just honest AI.",
-      imageAlt: "unbottled.ai - Uncensored AI Chat Platform",
+      imageAlt: "{{appName}} - Uncensored AI Chat Platform",
       keywords:
         "uncensored AI, AI chat, GPT-4, Claude, Gemini, AI models, no filters, honest AI, AI conversations",
     },
     aboutUs: {
-      title: "About Us - Unbottled.ai",
+      title: "About Us - {{appName}}",
       category: "About",
       description:
-        "Learn about Unbottled.ai's mission to provide uncensored AI conversations",
-      imageAlt: "About Unbottled.ai",
-      keywords: "about unbottled.ai, uncensored AI, AI mission, AI values",
-      ogTitle: "About Unbottled.ai - Uncensored AI Platform",
+        "Learn about {{appName}}'s mission to provide uncensored AI conversations",
+      imageAlt: "About {{appName}}",
+      keywords: "about {{appName}}, uncensored AI, AI mission, AI values",
+      ogTitle: "About {{appName}} - Uncensored AI Platform",
       ogDescription:
         "Discover our mission to democratize access to uncensored AI",
-      twitterTitle: "About Unbottled.ai",
+      twitterTitle: "About {{appName}}",
       twitterDescription:
         "Learn about our mission for uncensored AI conversations",
     },
     privacyPolicy: {
-      title: "Privacy Policy - Unbottled.ai",
+      title: "Privacy Policy - {{appName}}",
       category: "Legal",
       description:
-        "Learn how Unbottled.ai protects your privacy and handles your data",
+        "Learn how {{appName}} protects your privacy and handles your data",
       imageAlt: "Privacy Policy",
       keywords:
-        "privacy policy, data protection, user privacy, unbottled.ai privacy",
+        "privacy policy, data protection, user privacy, {{appName}} privacy",
     },
     termsOfService: {
-      title: "Terms of Service - Unbottled.ai",
+      title: "Terms of Service - {{appName}}",
       category: "Legal",
-      description: "Read the terms and conditions for using Unbottled.ai",
+      description: "Read the terms and conditions for using {{appName}}",
       imageAlt: "Terms of Service",
       keywords:
-        "terms of service, terms and conditions, user agreement, unbottled.ai terms",
+        "terms of service, terms and conditions, user agreement, {{appName}} terms",
     },
     imprint: {
-      title: "Legal Notice - Unbottled.ai",
+      title: "Legal Notice - {{appName}}",
       category: "Legal",
-      description: "Legal information and company details for Unbottled.ai",
+      description: "Legal information and company details for {{appName}}",
       imageAlt: "Legal Notice",
       keywords:
-        "imprint, legal notice, company information, unbottled.ai legal",
+        "imprint, legal notice, company information, {{appName}} legal",
     },
     careers: {
-      title: "Careers - Unbottled.ai",
+      title: "Careers - {{appName}}",
       category: "Careers",
       description: "Join our team and help build the future of uncensored AI",
-      imageAlt: "Careers at Unbottled.ai",
-      keywords: "careers, jobs, AI jobs, remote work, unbottled.ai careers",
+      imageAlt: "Careers at {{appName}}",
+      keywords: "careers, jobs, AI jobs, remote work, {{appName}} careers",
     },
     pricing: {
-      title: "Pricing - Unbottled.ai",
+      title: "Pricing - {{appName}}",
       category: "Pricing",
       description:
         "Affordable AI chat plans for everyone. Start free with 10 daily messages.",
       imageAlt: "Pricing Plans",
       keywords:
-        "pricing, plans, subscription, AI chat pricing, unbottled.ai pricing",
-      ogTitle: "Pricing Plans - Unbottled.ai",
+        "pricing, plans, subscription, AI chat pricing, {{appName}} pricing",
+      ogTitle: "Pricing Plans - {{appName}}",
       ogDescription: "Simple, transparent pricing for uncensored AI chat",
-      twitterTitle: "Pricing - Unbottled.ai",
+      twitterTitle: "Pricing - {{appName}}",
       twitterDescription: "Start free with 10 daily messages",
     },
     billing: {
@@ -227,13 +212,13 @@ export const translations = {
   },
   layout: {
     metadata: {
-      defaultTitle: "unbottled.ai - Uncensored AI Chat",
+      defaultTitle: "{{appName}} - Uncensored AI Chat",
       category: "AI Chat Platform",
       description:
         "Experience truly uncensored AI conversations with 40+ models. No filters, no restrictions, just honest AI.",
     },
     openGraph: {
-      imageAlt: "unbottled.ai - Uncensored AI Chat Platform",
+      imageAlt: "{{appName}} - Uncensored AI Chat Platform",
     },
     structuredData: {
       organization: {
@@ -241,9 +226,9 @@ export const translations = {
           organization: "Organization",
           contactPoint: "ContactPoint",
         },
-        name: "unbottled.ai",
+  
         contactPoint: {
-          telephone: "+1-555-0123",
+            telephone: "{{config.group.contact.telephone}}",
           contactType: "Customer Service",
         },
       },

@@ -122,23 +122,7 @@ export function EmailHeader({
               textAlign: "left",
             }}
           >
-            {t("app.api.v1.core.leads.campaigns.emails.common.logoPart1")}
-          </Span>
-          <Span
-            style={{
-              fontSize: "24px",
-              fontWeight: "700",
-              margin: "0",
-              background: "linear-gradient(to right, #06b6d4, #2563eb)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              lineHeight: "1",
-              letterSpacing: "-0.5px",
-              textAlign: "left",
-            }}
-          >
-            {t("app.api.v1.core.leads.campaigns.emails.common.logoPart2")}
+            {t("config.appName")}
           </Span>
         </Div>
         <Span

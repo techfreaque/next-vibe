@@ -1,6 +1,12 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "next-vibe-ui/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { H1 } from "next-vibe-ui/ui/typography";
 import { P } from "next-vibe-ui/ui/typography";
@@ -83,7 +89,7 @@ export function SuggestedPrompts({
           <button
             key={persona.id}
             onClick={(): void => handlePersonaSelect(persona)}
-            className={`px-3 sm:px-4 py-2 rounded-full transition-all flex items-center gap-2 text-sm sm:text-base ${
+            className={`px-3 sm:px-4 py-2 rounded-full transition-all flex items-center gap-2 text-sm sm:text-base cursor-pointer ${
               selectedPersona.id === persona.id
                 ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30"
                 : "hover:bg-accent border border-transparent"
@@ -99,7 +105,7 @@ export function SuggestedPrompts({
         {/* More button - opens modal */}
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
           <DialogTrigger asChild>
-            <button className="px-3 sm:px-4 py-2 rounded-full transition-all flex items-center gap-2 hover:bg-accent border border-transparent text-sm sm:text-base">
+            <button className="px-3 sm:px-4 py-2 rounded-full transition-all flex items-center gap-2 hover:bg-accent border border-transparent text-sm sm:text-base cursor-pointer">
               <MoreHorizontal className="h-4 w-4 sm:h-5 sm:w-5" />
               <Span className="font-medium hidden sm:inline">
                 {t("app.chat.suggestedPrompts.more")}
@@ -118,7 +124,7 @@ export function SuggestedPrompts({
                   <button
                     key={persona.id}
                     onClick={(): void => handlePersonaSelect(persona)}
-                    className={`p-4 rounded-lg border transition-all text-left ${
+                    className={`p-4 rounded-lg border transition-all text-left cursor-pointer ${
                       selectedPersona.id === persona.id
                         ? "border-purple-500 bg-purple-500/10"
                         : "border-border hover:border-purple-500/50 hover:bg-accent"

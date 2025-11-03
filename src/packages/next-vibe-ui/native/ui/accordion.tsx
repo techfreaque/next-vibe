@@ -24,6 +24,11 @@ import { cn } from "../lib/utils";
 import { ChevronDown } from "./icons/ChevronDown";
 import { TextClassContext } from "./text";
 
+/* eslint-disable i18next/no-literal-string -- CSS classNames */
+const TEXT_CLASS_TRIGGER = "native:text-lg font-medium web:group-hover:underline";
+const TEXT_CLASS_CONTENT = "native:text-lg";
+/* eslint-enable i18next/no-literal-string */
+
 function Accordion<T extends AccordionProps>(props: T): React.ReactElement {
   const { children, className, disabled } = props;
   const asChild = Platform.OS !== "web";
@@ -48,7 +53,7 @@ function Accordion<T extends AccordionProps>(props: T): React.ReactElement {
     );
   }
 
-  const [value, setValue] = React.useState(props.defaultValue || "");
+  const [_value, setValue] = React.useState(props.defaultValue || "");
   const handleValueChange = React.useCallback(
     (newValue: string | undefined) => {
       setValue(newValue || "");
@@ -133,8 +138,7 @@ const AccordionTrigger = ({ className, children }: AccordionTriggerProps): JSX.E
 
   return (
     <TextClassContext.Provider
-      // eslint-disable-next-line i18n/no-literal-string
-      value="native:text-lg font-medium web:group-hover:underline"
+      value={TEXT_CLASS_TRIGGER}
     >
       <AccordionPrimitive.Header className="flex">
         <AccordionPrimitive.Trigger asChild>
@@ -158,8 +162,7 @@ const AccordionContent = ({ className, children }: AccordionContentProps): JSX.E
   const { isExpanded } = AccordionPrimitive.useItemContext();
   return (
     <TextClassContext.Provider
-      // eslint-disable-next-line i18n/no-literal-string
-      value="native:text-lg"
+      value={TEXT_CLASS_CONTENT}
     >
       <AccordionPrimitive.Content
         className={cn(

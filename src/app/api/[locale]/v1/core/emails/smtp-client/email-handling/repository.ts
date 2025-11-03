@@ -175,7 +175,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                         "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.unknown_recipient",
                       ),
                       senderEmail: env.EMAIL_FROM_EMAIL,
-                      senderName: data.t("app.common.appName"),
+                      senderName: data.t("config.appName"),
                       type: EmailType.SYSTEM,
                       templateName: null,
                       status: EmailStatus.FAILED,

@@ -121,7 +121,7 @@ export function useEdenAISpeech({
         languageCode,
       });
 
-      // Set form values
+      // Set form values - set the nested object structure directly
       endpoint.create.form.setValue("fileUpload", { file: audioFile });
       endpoint.create.form.setValue("provider", "openai");
       endpoint.create.form.setValue("language", languageCode);
@@ -129,7 +129,13 @@ export function useEdenAISpeech({
       // Submit form with callbacks
       await endpoint.create.submitForm(undefined, {
         onSuccess: ({ responseData }) => {
-          if (responseData.response.success) {
+          logger.debug("STT: Response received", {
+            responseData: JSON.stringify(responseData),
+            hasResponse: !!responseData.response,
+            keys: Object.keys(responseData),
+          });
+
+          if (responseData.response?.success) {
             const transcribedText = responseData.response.text;
             logger.debug("STT: Transcription received successfully", {
               textLength: transcribedText.length,

@@ -1,13 +1,13 @@
 export const translations = {
   meta: {
-    title: "Login - Next Vibe",
-    description: "Sign in to your Next Vibe account",
+    title: "Login - {{appName}}",
+    description: "Sign in to your {{appName}} account",
     category: "Authentication",
-    imageAlt: "Next Vibe Login",
-    keywords: "login, sign in, authentication, next vibe",
-    ogTitle: "Login to Next Vibe",
-    ogDescription: "Access your Next Vibe account",
-    twitterTitle: "Login to Next Vibe",
+    imageAlt: "{{appName}} Login",
+    keywords: "login, sign in, authentication, {{appName}}",
+    ogTitle: "Login to {{appName}}",
+    ogDescription: "Access your {{appName}} account",
+    twitterTitle: "Login to {{appName}}",
     twitterDescription: "Sign in to your account",
   },
   auth: {

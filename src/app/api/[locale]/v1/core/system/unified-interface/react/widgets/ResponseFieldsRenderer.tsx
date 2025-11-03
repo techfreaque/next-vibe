@@ -151,7 +151,10 @@ function renderResponseField(
  * Fallback renderer for when no widget metadata is available
  * Shows JSON dump with warning
  */
-function renderFallback(result: ToolCallResult, locale: CountryLanguage): JSX.Element {
+function renderFallback(
+  result: ToolCallResult,
+  locale: CountryLanguage,
+): JSX.Element {
   const { t } = simpleT(locale);
 
   return (
@@ -160,10 +163,12 @@ function renderFallback(result: ToolCallResult, locale: CountryLanguage): JSX.El
         {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
         <Span>⚠️</Span>
         <Span>
-          {t("app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.messages.metadataNotAvailable")}
+          {t(
+            "app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.messages.metadataNotAvailable",
+          )}
         </Span>
       </Div>
-      <Pre className="text-xs bg-muted/50 border border-border/30 rounded-md p-3 overflow-x-auto">
+      <Pre className="text-xs bg-accent border border-border/30 rounded-md p-3 overflow-x-auto">
         {JSON.stringify(result, null, 2)}
       </Pre>
     </Div>
@@ -186,13 +191,19 @@ export function ResponseFieldsRenderer({
   if (!result) {
     return (
       <Div className="text-sm text-muted-foreground italic py-2">
-        {t("app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.messages.noResult")}
+        {t(
+          "app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.messages.noResult",
+        )}
       </Div>
     );
   }
 
   // Handle no widget metadata - fallback to JSON dump
-  if (!widgetMetadata || !widgetMetadata.responseFields || widgetMetadata.responseFields.length === 0) {
+  if (
+    !widgetMetadata ||
+    !widgetMetadata.responseFields ||
+    widgetMetadata.responseFields.length === 0
+  ) {
     return renderFallback(result, locale);
   }
 
@@ -205,4 +216,3 @@ export function ResponseFieldsRenderer({
     </Div>
   );
 }
-

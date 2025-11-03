@@ -54,11 +54,11 @@ function renderWelcomeEmailContent(
       t={t}
       locale={locale}
       title={t("app.api.v1.core.user.public.signup.email.title", {
-        appName: t("app.api.common.appName"),
+        appName: t("config.appName"),
         privateName: user.privateName,
       })}
       previewText={t("app.api.v1.core.user.public.signup.email.previewText", {
-        appName: t("app.api.common.appName"),
+        appName: t("config.appName"),
       })}
       tracking={tracking}
     >
@@ -73,7 +73,7 @@ function renderWelcomeEmailContent(
         }}
       >
         {t("app.api.v1.core.user.public.signup.email.welcomeMessage", {
-          appName: t("app.api.common.appName"),
+          appName: t("config.appName"),
         })}
       </Text>
 
@@ -142,7 +142,7 @@ function renderWelcomeEmailContent(
         }}
       >
         {t("app.api.v1.core.user.public.signup.email.signoff", {
-          appName: t("app.api.common.appName"),
+          appName: t("config.appName"),
         })}
       </Text>
     </EmailTemplate>
@@ -174,7 +174,7 @@ export const renderRegisterMail: EmailFunctionType<
     toEmail: user.email,
     toName: user.privateName,
     subject: t("app.api.v1.core.user.public.signup.email.subject", {
-      appName: t("app.api.common.appName"),
+      appName: t("config.appName"),
     }),
     jsx: renderWelcomeEmailContent(
       t,
@@ -218,7 +218,7 @@ function renderAdminNotificationEmailContent(
       previewText={t(
         "app.api.v1.core.user.public.signup.admin_notification.preview",
         {
-          appName: t("app.api.common.appName"),
+          appName: t("config.appName"),
         },
       )}
       tracking={tracking}
@@ -245,7 +245,7 @@ function renderAdminNotificationEmailContent(
         }}
       >
         {t("app.api.v1.core.user.public.signup.admin_notification.message", {
-          appName: t("app.api.common.appName"),
+          appName: t("config.appName"),
         })}
       </Text>
 
@@ -480,7 +480,7 @@ function renderAdminNotificationEmailContent(
       {/* Action Buttons */}
       <Section style={{ textAlign: "center", marginBottom: "32px" }}>
         <Button
-          href={`mailto:${user.email}?subject=Welcome to ${t("app.api.common.appName")} - Let's get started!`}
+          href={`mailto:${user.email}?subject=Welcome to ${t("config.appName")} - Let's get started!`}
           style={{
             backgroundColor: "#3b82f6",
             borderRadius: "8px",
@@ -512,7 +512,7 @@ function renderAdminNotificationEmailContent(
       >
         {
           t("app.api.v1.core.user.public.signup.admin_notification.footer", {
-            appName: t("app.api.common.appName"),
+            appName: t("config.appName"),
           })}
       </Text>
     </EmailTemplate>
@@ -545,7 +545,7 @@ export const renderAdminSignupNotification: EmailFunctionType<
 
   return createSuccessResponse({
     toEmail: contactClientRepository.getSupportEmail(locale),
-    toName: t("app.api.common.appName"),
+    toName: t("config.appName"),
     subject: t(
       "app.api.v1.core.user.public.signup.admin_notification.subject",
       {

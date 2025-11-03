@@ -62,7 +62,7 @@ export function MessageEditor({
           void editor.handleBranch();
         }}
         className={cn(
-          "p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+          "p-4 bg-card backdrop-blur",
           "border border-border rounded-lg shadow-lg",
           "w-full",
         )}

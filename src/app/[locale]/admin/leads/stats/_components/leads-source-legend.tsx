@@ -112,7 +112,7 @@ export function LeadsSourceLegend({
           {sources.map((source) => (
             <Div
               key={source.source}
-              className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 dark:hover:bg-muted/20 transition-colors"
+              className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent transition-colors"
             >
               <Div className="flex items-center gap-3">
                 <Div className="flex items-center gap-2">

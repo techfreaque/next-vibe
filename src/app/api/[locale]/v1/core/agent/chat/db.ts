@@ -157,6 +157,9 @@ export interface MessageMetadata {
   isStreaming?: boolean;
 
   // Tool call metadata (for TOOL messages)
+  // New format: toolCall object contains all tool call data
+  toolCall?: ToolCall;
+  // Old format: individual fields (kept for backwards compatibility)
   toolName?: string;
   displayName?: string;
   icon?: string;
@@ -196,7 +199,10 @@ export const chatFolders = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
 
     // Root folder (constant: private, shared, public, incognito)
-    rootFolderId: text("root_folder_id", { enum: RootFolderIdDB }).$type<DefaultFolderId>().notNull().default("private"),
+    rootFolderId: text("root_folder_id", { enum: RootFolderIdDB })
+      .$type<DefaultFolderId>()
+      .notNull()
+      .default("private"),
 
     // Folder details
     name: text("name").notNull(),

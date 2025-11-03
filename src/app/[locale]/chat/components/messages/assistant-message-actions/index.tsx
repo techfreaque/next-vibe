@@ -5,6 +5,8 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Bot, Loader2, Square, Trash2, Volume2 } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
+import { useAIStreamStore } from "@/app/api/[locale]/v1/core/agent/ai-stream/hooks/store";
+import textToSpeechDefinition from "@/app/api/[locale]/v1/core/agent/text-to-speech/definition";
 import { useTTSAudio } from "@/app/api/[locale]/v1/core/agent/text-to-speech/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -38,12 +40,22 @@ export function AssistantMessageActions({
   const { t } = simpleT(locale);
   const isTouch = useTouchDevice();
 
+  // Check if this message is currently streaming
+  const streamingMessage = useAIStreamStore(
+    (state) => state.streamingMessages[messageId],
+  );
+  const isMessageStreaming = streamingMessage?.isStreaming ?? false;
+
   const { isLoading, isPlaying, playAudio, stopAudio } = useTTSAudio({
     text: content,
     enabled: ttsAutoplay,
+    isStreaming: isMessageStreaming,
     locale,
     logger,
   });
+
+  // Get credit cost from definition
+  const ttsCreditCost = textToSpeechDefinition.POST.credits ?? 0;
 
   return (
     <Div
@@ -73,7 +85,7 @@ export function AssistantMessageActions({
         title={
           isPlaying
             ? t("app.chat.common.assistantMessageActions.stopAudio")
-            : t("app.chat.common.assistantMessageActions.playAudio")
+            : `${t("app.chat.common.assistantMessageActions.playAudio")} (+${ttsCreditCost})`
         }
         className={cn(isLoading && "animate-spin")}
       />

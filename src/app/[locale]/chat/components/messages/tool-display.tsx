@@ -18,6 +18,27 @@ interface ToolDisplayProps {
   locale: CountryLanguage;
   /** Whether the message has content after tool calls (affects default open state) */
   hasContent?: boolean;
+  /** Message ID for collapse state tracking */
+  messageId?: string;
+  /** Collapse state management callbacks */
+  collapseState?: {
+    isCollapsed: (
+      key: {
+        messageId: string;
+        sectionType: "thinking" | "tool";
+        sectionIndex: number;
+      },
+      autoCollapsed: boolean,
+    ) => boolean;
+    toggleCollapse: (
+      key: {
+        messageId: string;
+        sectionType: "thinking" | "tool";
+        sectionIndex: number;
+      },
+      currentState: boolean,
+    ) => void;
+  };
 }
 
 /**
@@ -45,6 +66,8 @@ export function ToolDisplay({
   toolCalls,
   locale,
   hasContent = false,
+  messageId,
+  collapseState,
 }: ToolDisplayProps): JSX.Element | null {
   if (!toolCalls || toolCalls.length === 0) {
     return null;
@@ -71,9 +94,11 @@ export function ToolDisplay({
           locale={locale}
           context={context}
           defaultOpen={defaultOpen}
+          messageId={messageId}
+          toolIndex={index}
+          collapseState={collapseState}
         />
       ))}
     </Div>
   );
 }
-

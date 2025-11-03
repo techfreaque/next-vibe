@@ -10,6 +10,7 @@ import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repo
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
+import { translations } from "@/config/i18n/en";
 
 import { ImprintClientInteraction } from "./_components/imprint-client-content";
 
@@ -28,7 +29,7 @@ export async function generateMetadata(
     path: "imprint",
     title: "app.meta.imprint.title",
     description: "app.meta.imprint.description",
-    image: "https://unbottled.ai/images/imprint-hero.jpg",
+    image: `${translations.websiteUrl}/images/imprint-hero.jpg`,
     category: "app.meta.imprint.category",
     imageAlt: "app.meta.imprint.imageAlt",
     keywords: ["app.meta.imprint.keywords"],
@@ -36,7 +37,7 @@ export async function generateMetadata(
       openGraph: {
         title: "app.meta.imprint.ogTitle",
         description: "app.meta.imprint.ogDescription",
-        url: `https://unbottled.ai/${locale}/imprint`,
+        url: `${translations.websiteUrl}/${locale}/imprint`,
         type: "website",
         images: [...previousImages],
       },
@@ -76,7 +77,9 @@ export default async function ImprintPage({
         <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-8">
           <Div className="prose dark:prose-invert max-w-none">
             <P className="lead text-lg">
-              {t("app.story._components.home.imprint.introduction")}
+              {t("app.story._components.home.imprint.introduction", {
+                appName: t("config.appName"),
+              })}
             </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
@@ -97,6 +100,9 @@ export default async function ImprintPage({
               <AlertDescription>
                 {t(
                   "app.story._components.home.imprint.sections.partnerships.content",
+                  {
+                    appName: t("config.appName"),
+                  },
                 )}
               </AlertDescription>
             </Alert>
@@ -113,20 +119,23 @@ export default async function ImprintPage({
             <P className="mt-2">
               {t(
                 "app.story._components.home.imprint.sections.companyInfo.description",
+                {
+                  appName: t("config.appName"),
+                },
               )}
             </P>
             <ul className="space-y-2 mt-4">
               <li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                <Span>{t("app.common.company.name")}</Span>
+                <Span>{t("config.group.name")}</Span>
               </li>
               <li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                <Span>{t("app.common.company.legalForm")}</Span>
+                <Span>{t("config.group.legalForm")}</Span>
               </li>
               <li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                <Span>{t("app.common.company.registrationNumber")}</Span>
+                <Span>{t("config.group.registrationNumber")}</Span>
               </li>
               {/* <li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
@@ -154,11 +163,11 @@ export default async function ImprintPage({
 
             <Div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
               <H3 className="font-medium text-lg mb-2">
-                {t("app.common.company.address.title")}
+                {t("config.group.address.title")}
               </H3>
-              <P>{t("app.common.company.address.street")}</P>
-              <P>{t("app.common.company.address.city")}</P>
-              <P>{t("app.common.company.address.country")}</P>
+              <P>{t("config.group.address.street")}</P>
+              <P>{t("config.group.address.city")}</P>
+              <P>{t("config.group.address.country")}</P>
               <P>{supportEmail}</P>
               {/* <P>{t("app.story._components.home.imprint.sections.contactInfo.communication.phone")}</P> */}
             </Div>
@@ -178,11 +187,9 @@ export default async function ImprintPage({
             </P>
             <Div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
               <P>
-                <strong>
-                  {t("app.common.company.responsiblePerson.name")}
-                </strong>
+                <strong>{t("config.group.responsiblePerson.name")}</strong>
               </P>
-              <P>{t("app.common.company.address.addressIn1Line")}</P>
+              <P>{t("config.group.address.addressIn1Line")}</P>
             </Div>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />

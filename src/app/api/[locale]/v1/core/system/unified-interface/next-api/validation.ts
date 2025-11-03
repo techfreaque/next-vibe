@@ -7,7 +7,10 @@ import "server-only";
 
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 import type { z } from "zod";
 
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
@@ -74,14 +77,14 @@ export async function validateNextRequestData<
     );
 
     if (!urlValidation.success) {
-      return {
-        success: false,
+      return fail({
         message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
         errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
         messageParams: {
           error: urlValidation.message,
         },
-      };
+        cause: urlValidation,
+      });
     }
 
     // Validate request data based on method
@@ -92,15 +95,15 @@ export async function validateNextRequestData<
         : await validatePostRequestData(endpoint, context.request, logger);
 
     if (!requestValidation.success) {
-      return {
-        success: false,
+      return fail({
         message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
         },
-      };
+        cause: requestValidation,
+      });
     }
 
     // Return validated data that handlers will receive

@@ -1,15 +1,4 @@
-import {
-  BarChart3,
-  Bot,
-  Building,
-  Folder,
-  Home,
-  Info,
-  MessageSquare,
-  Sparkles,
-  Tag,
-  Users,
-} from "next-vibe-ui/ui/icons";
+import { Building, Home, Info, Sparkles, Tag } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -21,28 +10,13 @@ import type {
 
 export type NavPaths =
   | ""
-  | "#pricing"
-  | "#features"
-  | "#process"
-  | "/about-us"
-  | "/careers"
-  | "/app/dashboard"
-  | "/"
-  | "/app/social"
-  | "/app/consultation"
+  | "/story#features"
   | "/subscription"
-  | "/app/analytics"
+  | "/story"
+  | "/story/about-us"
+  | "/story/careers"
   | "/help"
-  | "/admin"
-  | "/app/business-info"
-  | "/app/business-info/profile"
-  | "/app/business-info/business"
-  | "/app/business-info/brand"
-  | "/app/business-info/goals"
-  | "/app/business-info/audience"
-  | "/app/business-info/challenges"
-  | "/app/business-info/competitors"
-  | "/app/business-info/social";
+  | "/admin";
 
 export type NavItemType = NavSingleItemType | NavParentItemType;
 
@@ -81,47 +55,17 @@ export const navItems: NavItemType[] = [
   {
     icon: <Home className="h-4 w-4" />,
     title: "app.story._components.nav.home",
-    href: "",
+    href: "/story",
   },
   {
     icon: <Sparkles className="h-4 w-4" />,
     title: "app.story._components.nav.features",
-    href: "#features",
+    href: "/story#features",
   },
   {
     icon: <Tag className="h-4 w-4" />,
     title: "app.story._components.nav.pricing",
-    href: "#pricing",
-  },
-  {
-    title: "app.story._components.nav.services.title",
-    icon: <MessageSquare className="h-4 w-4" />,
-    children: [
-      {
-        icon: <Bot className="h-4 w-4" />,
-        title: "app.story._components.nav.services.aiModels.title",
-        description: "app.story._components.nav.services.aiModels.description",
-        href: "#features",
-      },
-      {
-        icon: <Folder className="h-4 w-4" />,
-        title: "app.story._components.nav.services.folders.title",
-        description: "app.story._components.nav.services.folders.description",
-        href: "#features",
-      },
-      {
-        icon: <Users className="h-4 w-4" />,
-        title: "app.story._components.nav.services.personas.title",
-        description: "app.story._components.nav.services.personas.description",
-        href: "#features",
-      },
-      {
-        icon: <BarChart3 className="h-4 w-4" />,
-        title: "app.story._components.nav.services.process.title",
-        description: "app.story._components.nav.services.process.description",
-        href: "#process",
-      },
-    ],
+    href: "/subscription",
   },
   {
     title: "app.story._components.nav.company",
@@ -131,13 +75,13 @@ export const navItems: NavItemType[] = [
         icon: <Info className="h-4 w-4" />,
         title: "app.story._components.nav.about.title",
         description: "app.story._components.nav.about.description",
-        href: "/about-us",
+        href: "/story/about-us",
       },
       {
         icon: <Building className="h-4 w-4" />,
         title: "app.story._components.nav.careers.title",
         description: "app.story._components.nav.careers.description",
-        href: "/careers",
+        href: "/story/careers",
       },
     ],
   },

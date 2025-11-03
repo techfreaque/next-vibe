@@ -86,6 +86,10 @@ export const translations: typeof enTranslations = {
         title: "Nieznany błąd",
         description: "Wystąpił nieoczekiwany błąd",
       },
+      noActiveSubscription: {
+        title: "Wymagane aktywne subskrypcja",
+        description: "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
+      },
       unsavedChanges: {
         title: "Niezapisane zmiany",
         description: "Masz niezapisane zmiany",

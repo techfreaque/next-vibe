@@ -65,7 +65,7 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
                 className="bg-transparent border-white text-white hover:bg-white/10"
                 asChild
               >
-                <Link href={`/${locale}#pricing`}>
+                <Link href={`/${locale}/story#pricing`}>
                   {t("app.story._components.home.cta.viewPlans")}
                 </Link>
               </Button>

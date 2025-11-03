@@ -24,6 +24,8 @@ export const translations = {
         stubWarning: "Using stub: Chart",
         stubLabel: "Chart (stub)",
       },
+      checkbox: {},
+      collapsible: {},
       command: {
         stubWarning: "Using stub: Command",
         stubLabel: "Command (stub)",

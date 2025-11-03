@@ -12,6 +12,10 @@ import type {
   TooltipTriggerProps,
 } from "../../web/ui/tooltip";
 
+/* eslint-disable i18next/no-literal-string -- CSS classNames */
+const TEXT_CLASS_CONTENT = "text-sm native:text-base text-popover-foreground";
+/* eslint-enable i18next/no-literal-string */
+
 export type {
   TooltipContentProps,
   TooltipProviderProps,
@@ -36,9 +40,7 @@ const TooltipContent = React.forwardRef<
         exiting={Platform.select({ web: undefined, default: FadeOut })}
       >
         <TextClassContext.Provider
-          value={
-            "text-sm native:text-base text-popover-foreground" // eslint-disable-next-line i18n/no-literal-string
-          }
+          value={TEXT_CLASS_CONTENT}
         >
           <TooltipPrimitive.Content
             ref={ref}

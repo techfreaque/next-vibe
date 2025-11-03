@@ -15,14 +15,14 @@ export const translations = {
         title: "Expiring Credits",
         description: "From subscription",
       },
-       permanent: {
-         title: "Permanent Credits",
-         description: "Credits purchased in packs never expire",
-       },
-       free: {
-         title: "Free Monthly Credits",
-         description: "{{count}} free credits per month for everyone",
-       },
+      permanent: {
+        title: "Permanent Credits",
+        description: "Credits purchased in packs never expire",
+      },
+      free: {
+        title: "Free Monthly Credits",
+        description: "{{count}} free credits per month for everyone",
+      },
     },
     overview: {
       howItWorks: {
@@ -31,17 +31,17 @@ export const translations = {
         expiring: {
           title: "Monthly Subscription Credits",
           description:
- "€10/month gives you 1000 credits that expire at the end of each billing cycle. Accessible pricing for everyone!",
+            "€10/month gives you 1000 credits that expire at the end of each billing cycle. Accessible pricing for everyone!",
         },
         permanent: {
           title: "Extra Credits for Power Users",
           description:
- "Need more? Buy credit packs (€5 for 500 credits) that never expire. Perfect for power users who need extra capacity.",
+            "Need more? Buy credit packs (€5 for 500 credits) that never expire. Perfect for power users who need extra capacity.",
         },
         free: {
           title: "Free Trial Credits",
           description:
- "Everyone gets 20 free credits to try our service. No credit card required!",
+            "Everyone gets 20 free credits to try our service. No credit card required!",
         },
       },
       costs: {
@@ -66,11 +66,16 @@ export const translations = {
       },
     },
     buy: {
+      signInRequired: {
+        title: "Sign In Required",
+        description:
+          "Please sign in or create an account to purchase credits and subscriptions.",
+      },
       subscription: {
         badge: "Accessible for Everyone",
         title: "Monthly Subscription",
         description:
- "€10/month - Affordable AI access for everyone with 1000 credits monthly",
+          "€10/month - Affordable AI access for everyone with 1000 credits monthly",
         perMonth: "/month",
         features: {
           credits: "{{count}} credits per month",
@@ -79,9 +84,10 @@ export const translations = {
         },
         button: "Subscribe Now",
       },
-       pack: {
-         title: "Credit Packs",
-         description: "Extra credits for power users (requires active subscription)",
+      pack: {
+        title: "Credit Packs",
+        description:
+          "Extra credits for power users (requires active subscription)",
         badge: "For Power Users",
         perPack: "/pack",
         quantity: "Quantity",
@@ -98,7 +104,8 @@ export const translations = {
         totalPrice: "Total: {{price}}",
         pack: "Pack",
         packs: "Packs",
-        requiresSubscription: "Subscribe to a monthly plan to purchase additional credit packs.",
+        requiresSubscription:
+          "Subscribe to a monthly plan to purchase additional credit packs.",
       },
     },
     history: {
@@ -128,13 +135,17 @@ export const translations = {
     payment: {
       success: {
         title: "Payment Successful",
-        subscription: "Your subscription has been activated successfully! Your credits will be available shortly.",
-        credits: "Your credit pack purchase was successful! Your credits will be available shortly.",
+        subscription:
+          "Your subscription has been activated successfully! Your credits will be available shortly.",
+        credits:
+          "Your credit pack purchase was successful! Your credits will be available shortly.",
       },
       canceled: {
         title: "Payment Canceled",
-        subscription: "Your subscription payment was canceled. You can try again anytime.",
-        credits: "Your credit pack purchase was canceled. You can try again anytime.",
+        subscription:
+          "Your subscription payment was canceled. You can try again anytime.",
+        credits:
+          "Your credit pack purchase was canceled. You can try again anytime.",
       },
     },
   },

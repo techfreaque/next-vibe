@@ -10,8 +10,10 @@ import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repo
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
+import { translations } from "@/config/i18n/en";
 
 import { PrivacyPolicyClientInteraction } from "./_components/privacy-policy-client-content";
+import { SupportButton } from "./_components/support-button";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -28,7 +30,7 @@ export async function generateMetadata(
     path: "privacy-policy",
     title: "app.meta.privacyPolicy.title",
     description: "app.meta.privacyPolicy.description",
-    image: "https://unbottled.ai/images/privacy-hero.jpg",
+    image: `${translations.websiteUrl}/images/privacy-hero.jpg`,
     category: "app.meta.privacyPolicy.category",
     imageAlt: "app.meta.privacyPolicy.imageAlt",
     keywords: ["app.meta.privacyPolicy.keywords"],
@@ -36,7 +38,7 @@ export async function generateMetadata(
       openGraph: {
         title: "app.meta.privacyPolicy.ogTitle",
         description: "app.meta.privacyPolicy.ogDescription",
-        url: `https://unbottled.ai/${locale}/privacy-policy`,
+        url: `${translations.websiteUrl}/${locale}/privacy-policy`,
         type: "website",
         images: [...previousImages],
       },
@@ -77,7 +79,7 @@ export default async function PrivacyPolicyPage({
           <Div className="prose dark:prose-invert max-w-none">
             <P className="lead text-lg">
               {t("app.story._components.home.privacyPolicy.introduction", {
-                appName: t("app.common.appName"),
+                appName: t("config.appName"),
               })}
             </P>
 
@@ -376,24 +378,9 @@ export default async function PrivacyPolicyPage({
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.privacyPolicy.sections.contact.title",
-              )}
+              {t("config.group.contact.title")}
             </H2>
-            <P>
-              {t(
-                "app.story._components.home.privacyPolicy.sections.contact.description",
-              )}{" "}
-              <button
-                onClick={() => {
-                  window.location.href = `mailto:${supportEmail}`;
-                }}
-                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors bg-transparent border-none p-0 cursor-pointer"
-              >
-                {supportEmail}
-              </button>
-              .
-            </P>
+            <SupportButton supportEmail={supportEmail} locale={locale} />
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 

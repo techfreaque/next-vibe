@@ -68,7 +68,7 @@ function WelcomeEmailContent({
       >
         {t("app.api.v1.core.users.create.email.users.welcome.introduction", {
           name: userData.responsePrivateName,
-          appName: t("app.common.appName"),
+          appName: t("config.appName"),
         })}
       </Text>
 
@@ -307,34 +307,30 @@ function AdminNotificationEmailContent({
           <Text style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.users.create.email.users.labels.created")}
           </Text>{" "}
-          {
-            new Date(userData.responseCreatedAt).toLocaleDateString(locale, {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-          }
+          {new Date(userData.responseCreatedAt).toLocaleDateString(locale, {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </Text>
 
-        {
-          userData.responseLeadId && (
-            <Text
-              style={{
-                fontSize: "14px",
-                marginBottom: "4px",
-                color: "#4b5563",
-              }}
-            >
-              <Text style={{ fontWeight: "700" }}>
-                {t("app.api.v1.core.users.create.email.users.labels.leadId")}
-              </Text>{" "}
-              {userData.responseLeadId}
-            </Text>
-          )
-        }
+        {userData.responseLeadId && (
+          <Text
+            style={{
+              fontSize: "14px",
+              marginBottom: "4px",
+              color: "#4b5563",
+            }}
+          >
+            <Text style={{ fontWeight: "700" }}>
+              {t("app.api.v1.core.users.create.email.users.labels.leadId")}
+            </Text>{" "}
+            {userData.responseLeadId}
+          </Text>
+        )}
       </Section>
 
       {/* Admin Action Button */}
@@ -379,7 +375,7 @@ export const renderWelcomeEmail: EmailFunctionType<
       toEmail: responseData.responseEmail,
       toName: responseData.responsePrivateName,
       subject: t("app.api.v1.core.users.create.email.users.welcome.subject", {
-        appName: t("app.common.appName"),
+        appName: t("config.appName"),
       }),
       jsx: WelcomeEmailContent({
         userData: responseData,
@@ -414,7 +410,7 @@ export const renderAdminNotificationEmail: EmailFunctionType<
 
     return createSuccessResponse({
       toEmail: "admin@example.com", // Replace with actual admin email
-      toName: t("app.common.appName"),
+      toName: t("config.appName"),
       subject: t("app.api.v1.core.users.create.email.users.admin.subject", {
         name: responseData.responsePrivateName,
       }),

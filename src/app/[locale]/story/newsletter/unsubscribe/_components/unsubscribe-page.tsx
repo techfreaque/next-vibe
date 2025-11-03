@@ -167,7 +167,7 @@ export function UnsubscribePage({
               <P className="text-sm text-gray-500 dark:text-gray-400">
                 {t("app.story.newsletter.unsubscribe.page.subscribeText")}{" "}
                 <Link
-                  href={`/${locale}/newsletter`}
+                  href={`/${locale}/story/newsletter`}
                   className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
                 >
                   {t("app.story.newsletter.unsubscribe.page.subscribeLink")}
@@ -240,7 +240,7 @@ export function UnsubscribePage({
           <Div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               onClick={() => {
-                window.location.href = `/${locale}/newsletter`;
+                window.location.href = `/${locale}/story/newsletter`;
               }}
               variant="outline"
               size="lg"
@@ -252,7 +252,7 @@ export function UnsubscribePage({
             </Button>
             <Button
               onClick={() => {
-                window.location.href = `/${locale}/help`;
+                window.location.href = `/${locale}/story/help`;
               }}
               variant="outline"
               size="lg"

@@ -8,16 +8,16 @@ export const translations: typeof enTranslations = {
   },
   meta: {
     contact: {
-      title: "Kontakt & Support - Unbottled.ai",
+      title: "Kontakt & Support - {{appName}}",
       description:
-        "Erhalten Sie Hilfe mit Unbottled.ai - unzensierte KI-Chat-Plattform. Kontaktieren Sie unser Support-Team.",
+        "Erhalten Sie Hilfe mit {{appName}} - unzensierte KI-Chat-Plattform. Kontaktieren Sie unser Support-Team.",
       category: "Support",
-      imageAlt: "Unbottled.ai Support",
-      keywords: "kontakt, support, hilfe, unbottled, ki chat, unterstützung",
-      ogTitle: "Unbottled.ai Support kontaktieren",
+      imageAlt: "{{appName}} Support",
+      keywords: "kontakt, support, hilfe, {{appName}}, ki chat, unterstützung",
+      ogTitle: "{{appName}} Support kontaktieren",
       ogDescription:
         "Erhalten Sie Hilfe für Ihre unzensierte KI-Chat-Erfahrung",
-      twitterTitle: "Unbottled.ai kontaktieren",
+      twitterTitle: "{{appName}} kontaktieren",
       twitterDescription: "Wenden Sie sich an unser Support-Team",
     },
   },
@@ -30,9 +30,9 @@ export const translations: typeof enTranslations = {
         title: "Häufig gestellte Fragen",
         questions: {
           q1: {
-            question: "Was ist Unbottled.ai?",
+            question: "Was ist {{appName}}?",
             answer:
-              "Unbottled.ai ist eine unzensierte KI-Chat-Plattform mit Zugang zu über 40 KI-Modellen. Wir kombinieren ehrliche KI-Gespräche mit erweiterten Funktionen wie Ordnerverwaltung, benutzerdefinierten Personas und Multi-Modell-Unterstützung.",
+              "{{appName}} ist eine unzensierte KI-Chat-Plattform mit Zugang zu über 40 KI-Modellen. Wir kombinieren ehrliche KI-Gespräche mit erweiterten Funktionen wie Ordnerverwaltung, benutzerdefinierten Personas und Multi-Modell-Unterstützung.",
           },
           q2: {
             question: "Welche Zahlungsmethoden akzeptieren Sie?",

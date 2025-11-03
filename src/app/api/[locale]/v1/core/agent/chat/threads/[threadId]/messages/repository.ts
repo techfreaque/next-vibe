@@ -19,7 +19,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { chatFolders, chatMessages, chatThreads } from "../../../db";
+import {
+  chatFolders,
+  chatMessages,
+  chatThreads,
+  type ToolCall,
+} from "../../../db";
 import { ChatMessageRole } from "../../../enum";
 import {
   canReadThread,
@@ -129,26 +134,49 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
 
       // Map messages to include toolCalls from metadata and sequencing fields
       const mappedMessages = messages.map((msg) => {
-        let toolCalls = [
-          {
-            toolName: msg.metadata?.toolName || "",
-            displayName: msg.metadata?.displayName || "",
-            icon: msg.metadata?.icon,
-            args: msg.metadata?.args,
-            result: msg.metadata?.result,
-            error: msg.metadata?.error,
-            executionTime: msg.metadata?.executionTime,
-            widgetMetadata: msg.metadata?.widgetMetadata,
-            creditsUsed: msg.metadata?.creditsUsed,
-          },
-        ];
-     
+        // Only extract toolCalls for TOOL role messages
+        let toolCalls: ToolCall[] | undefined = undefined;
+
+        if (msg.role === "tool" && msg.metadata) {
+          // Check if metadata has toolCall object (new format)
+          if (
+            msg.metadata.toolCall &&
+            typeof msg.metadata.toolCall === "object"
+          ) {
+            toolCalls = [msg.metadata.toolCall as ToolCall];
+          }
+          // Fallback: check if metadata has individual tool call fields (old format)
+          else if (msg.metadata.toolName) {
+            toolCalls = [
+              {
+                toolName: msg.metadata.toolName,
+                displayName: msg.metadata.displayName || msg.metadata.toolName,
+                icon: msg.metadata.icon,
+                args: msg.metadata.args || {},
+                result: msg.metadata.result,
+                error: msg.metadata.error,
+                executionTime: msg.metadata.executionTime,
+                widgetMetadata: msg.metadata.widgetMetadata,
+                creditsUsed: msg.metadata.creditsUsed,
+              },
+            ];
+          }
+        }
 
         return {
-          ...msg,
+          id: msg.id,
+          threadId: msg.threadId,
+          role: msg.role,
+          content: msg.content,
+          parentId: msg.parentId,
+          depth: msg.depth,
+          authorId: msg.authorId,
+          isAI: msg.isAI,
+          model: msg.model,
+          tokens: msg.tokens,
           sequenceId: msg.sequenceId ?? null,
           sequenceIndex: msg.sequenceIndex ?? 0,
-          toolCalls,
+          toolCalls: toolCalls ?? null,
           createdAt: msg.createdAt.toISOString(),
           updatedAt: msg.updatedAt.toISOString(),
         };

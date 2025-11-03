@@ -9,8 +9,6 @@
  * The index.tsx wrapper handles converting this to work with Expo Router
  */
 
-/* eslint-disable oxlint-plugin-i18n/no-literal-string -- Test page, translations not needed */
-
 import {
   Card,
   CardContent,
@@ -27,6 +25,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 interface HomePageProps {
   params: Promise<{
@@ -38,23 +37,24 @@ export default async function HomePage({
   params,
 }: HomePageProps): Promise<JSX.Element> {
   const { locale } = await params;
+  const { t } = simpleT(locale);
   return (
     <Div className="flex-1 p-6 bg-background">
       <Div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <Div className="text-center space-y-2">
-          <H1>Welcome to Next Vibe</H1>
-          <P className="text-muted-foreground">
-            A unified Next.js and React Native application {locale}
-          </P>
+          <H1>{t("app.native.page.welcome", { appName: t("config.appName") })}</H1>
+            <P className="text-muted-foreground">
+              {t("app.native.page.description")} {locale}
+            </P>
         </Div>
 
         {/* Locale Info Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Current Locale</CardTitle>
+            <CardTitle>{t("app.native.page.locale.title")}</CardTitle>
             <CardDescription>
-              Your current language and region settings
+              {t("app.native.page.locale.description")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -67,29 +67,28 @@ export default async function HomePage({
         {/* Features Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Platform Features</CardTitle>
+            <CardTitle>{t("app.native.page.features.title")}</CardTitle>
             <CardDescription>
-              This page works on both web and mobile
+              {t("app.native.page.features.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Div>
-              <H2 className="text-lg mb-2">✅ Unified Components</H2>
+              <H2 className="text-lg mb-2">{t("app.native.page.features.unified.title")}</H2>
               <P className="text-muted-foreground">
-                Using next-vibe-ui components that work seamlessly across
-                platforms
+                {t("app.native.page.features.unified.description")}
               </P>
             </Div>
             <Div>
-              <H2 className="text-lg mb-2">✅ Type Safety</H2>
+              <H2 className="text-lg mb-2">{t("app.native.page.features.types.title")}</H2>
               <P className="text-muted-foreground">
-                Full TypeScript support with proper type inference
+                {t("app.native.page.features.types.description")}
               </P>
             </Div>
             <Div>
-              <H2 className="text-lg mb-2">✅ Async Server Components</H2>
+              <H2 className="text-lg mb-2">{t("app.native.page.features.async.title")}</H2>
               <P className="text-muted-foreground">
-                Next.js 15 async page components work in React Native
+                {t("app.native.page.features.async.description")}
               </P>
             </Div>
           </CardContent>
@@ -97,17 +96,17 @@ export default async function HomePage({
             <Div>
               <Link href={`/${locale}/chat`} asChild>
                 {/* <Button className="w-full"> */}
-                <Span>Go to Chat</Span>
+                <Span>{t("app.native.page.links.chat")}</Span>
                 {/* </Button> */}
               </Link>
               <Link href={`/${locale}/help`} asChild>
                 {/* <Button className="w-full"> */}
-                <Span>Go to Help</Span>
+                <Span>{t("app.native.page.links.help")}</Span>
                 {/* </Button> */}
               </Link>
               <Link href={`/${locale}/story/about-us`} asChild>
                 {/* <Button className="w-full"> */}
-                <Span>Go to About Us</Span>
+                <Span>{t("app.native.page.links.about")}</Span>
                 {/* </Button> */}
               </Link>
             </Div>
@@ -117,21 +116,21 @@ export default async function HomePage({
         {/* Status Card */}
         <Card>
           <CardHeader>
-            <CardTitle>System Status</CardTitle>
+            <CardTitle>{t("app.native.page.status.title")}</CardTitle>
           </CardHeader>
           <CardContent>
             <Div className="space-y-2">
               <Div className="flex flex-row justify-between">
-                <Span className="text-muted-foreground">Platform:</Span>
-                <Span className="font-medium">Universal</Span>
+                <Span className="text-muted-foreground">{t("app.native.page.status.platform")}:</Span>
+                <Span className="font-medium">{t("app.native.page.status.universal")}</Span>
               </Div>
               <Div className="flex flex-row justify-between">
-                <Span className="text-muted-foreground">Routing:</Span>
-                <Span className="font-medium">File-based</Span>
+                <Span className="text-muted-foreground">{t("app.native.page.status.routing")}:</Span>
+                <Span className="font-medium">{t("app.native.page.status.filebased")}</Span>
               </Div>
               <Div className="flex flex-row justify-between">
-                <Span className="text-muted-foreground">Styling:</Span>
-                <Span className="font-medium">NativeWind</Span>
+                <Span className="text-muted-foreground">{t("app.native.page.status.styling")}:</Span>
+                <Span className="font-medium">{t("app.native.page.status.nativewind")}</Span>
               </Div>
             </Div>
           </CardContent>

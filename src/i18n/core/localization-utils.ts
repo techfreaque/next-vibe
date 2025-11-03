@@ -241,7 +241,7 @@ export function getCurrentTimeInTimezone(
 export function getDefaultTimezone(locale: CountryLanguage): string {
   const { t } = simpleT(locale);
   const country = getCountryFromLocale(locale);
-  const timezone = t(`i18n.core.timezone.${country}` as const);
+  const timezone = t(`config.timezone.${country}` as const);
   return timezone;
 }
 

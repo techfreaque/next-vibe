@@ -29,6 +29,11 @@ interface EdenAITTSResponse {
   [provider: string]: {
     audio_resource_url?: string;
     cost?: number;
+    error?: {
+      message?: string;
+      type?: string;
+    };
+    status?: string;
   };
 }
 
@@ -103,13 +108,13 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
           method: "POST",
           headers: {
             // eslint-disable-next-line i18next/no-literal-string
-            "Authorization": `Bearer ${env.EDEN_AI_API_KEY}`,
+            Authorization: `Bearer ${env.EDEN_AI_API_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             providers: data.provider,
             text: data.text,
-            language: data.language,
+            language: data.language.toLowerCase(),
             option: data.voice,
           }),
         },
@@ -138,6 +143,26 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
 
       // Extract audio URL from response
       const providerResult = responseData[data.provider];
+
+      // Check for provider-level errors
+      if (providerResult?.error || providerResult?.status === "fail") {
+        const errorMessage =
+          providerResult.error?.message || "Unknown provider error";
+        logger.error("Provider returned error", {
+          provider: data.provider,
+          error: errorMessage,
+          errorType: providerResult.error?.type,
+        });
+        return fail({
+          message:
+            "app.api.v1.core.agent.textToSpeech.post.errors.providerError",
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          messageParams: {
+            error: errorMessage,
+          },
+        });
+      }
+
       const audioResourceUrl = providerResult?.audio_resource_url;
 
       if (!audioResourceUrl) {

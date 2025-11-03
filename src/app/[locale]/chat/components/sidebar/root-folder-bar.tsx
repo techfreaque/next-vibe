@@ -127,7 +127,7 @@ export function RootFolderBar({
   );
 
   return (
-    <Div className="overflow-x-auto bg-background/50">
+    <Div className="overflow-x-auto">
       <Div className="flex items-center gap-1 px-3 py-2 min-w-max">
         <TooltipProvider delayDuration={300}>
           {rootFolders.map((folderConfig) => {

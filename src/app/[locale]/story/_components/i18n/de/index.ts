@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
       secondaryCta: "Forum durchsuchen",
       userAvatarAlt: "Benutzer-Avatar",
       satisfiedClients: "Schließen Sie sich 10.000+ zufriedenen Nutzern an",
-      imageAlt: "Unbottled.ai Chat-Oberfläche",
+      imageAlt: "{{appName}} Chat-Oberfläche",
       stats: {
         users: "10.000+ Nutzer",
         models: "40+ KI-Modelle",
@@ -39,59 +39,18 @@ export const translations: typeof enTranslations = {
           },
         },
       },
-      videoAlt: "Unbottled.ai Demo",
+      videoAlt: "{{appName}} Demo",
       scrollDown: "Scrollen zum Erkunden",
     },
     forumHero: {
       badge: "Willkommen in der Community",
       title: "Das KI-gestützte Community-Forum",
-      subtitle: "Stellen Sie Fragen, teilen Sie Ihr Wissen und vernetzen Sie sich mit anderen in der Welt der KI.",
-      description: "Erkunden Sie Diskussionen, erhalten Sie Hilfe und tragen Sie zur Zukunft der KI-Entwicklung bei.",
+      subtitle:
+        "Stellen Sie Fragen, teilen Sie Ihr Wissen und vernetzen Sie sich mit anderen in der Welt der KI.",
+      description:
+        "Erkunden Sie Diskussionen, erhalten Sie Hilfe und tragen Sie zur Zukunft der KI-Entwicklung bei.",
       cta: "Neuen Thread erstellen",
       secondaryCta: "Threads durchsuchen",
-    },
-    brands: {
-      title: "Unterstützt von führenden KI-Modellen",
-      brand1: {
-        name: "OpenAI",
-        className: "h-8",
-        logo: "/images/brands/openai.svg",
-        link: "https://openai.com",
-      },
-      brand2: {
-        name: "Anthropic",
-        className: "h-8",
-        logo: "/images/brands/anthropic.svg",
-        link: "https://anthropic.com",
-      },
-      brand3: {
-        name: "Google",
-        logo: "/images/brands/google.svg",
-        link: "https://google.com",
-      },
-      brand4: {
-        name: "Meta",
-        className: "h-8",
-        logo: "/images/brands/meta.svg",
-        link: "https://meta.com",
-      },
-      brand5: {
-        name: "Mistral",
-        className: "h-8",
-        logo: "/images/brands/mistral.svg",
-        link: "https://mistral.ai",
-      },
-      brand6: {
-        name: "Cohere",
-        className: "h-8",
-        logo: "/images/brands/cohere.svg",
-        link: "https://cohere.com",
-      },
-      brand7: {
-        name: "Perplexity",
-        logo: "/images/brands/perplexity.svg",
-        link: "https://perplexity.ai",
-      },
     },
     features: {
       title: "Alles für KI-Chat + Community",
@@ -167,6 +126,10 @@ export const translations: typeof enTranslations = {
       viewPlans: "Preispläne ansehen",
       noCredit: "Keine Kreditkarte erforderlich",
     },
+    pricingSection: {
+      title: "Einfache Preisgestaltung",
+      description: "Ein Plan für alle. Extra Credits für Power-User.",
+    },
     stats: {
       clients: "Aktive Nutzer",
       posts: "Gesendete Nachrichten",
@@ -175,7 +138,8 @@ export const translations: typeof enTranslations = {
     pricing: {
       free: {
         name: "Kostenlos",
-        description: "Starten Sie mit {{credits}} kostenlosen Credits - keine Kreditkarte erforderlich",
+        description:
+          "Starten Sie mit {{credits}} kostenlosen Credits - keine Kreditkarte erforderlich",
         credits: "{{credits}} kostenlose Credits (einmalig)",
         features: {
           credits: "{{credits}} Credits zum Start",
@@ -248,7 +212,7 @@ export const translations: typeof enTranslations = {
     process: {
       badge: "Unser Prozess",
       title: "Wie es funktioniert",
-      subtitle: "Starten Sie mit Unbottled.ai in 4 einfachen Schritten",
+      subtitle: "Starten Sie mit {{appName}} in 4 einfachen Schritten",
       readyTransform: "Bereit, Ihre KI-Chat-Erfahrung zu transformieren?",
       handleSocial: "Lassen Sie uns Ihre unzensierten KI-Gespräche verwalten",
       getStarted: "Jetzt starten",
@@ -301,7 +265,7 @@ export const translations: typeof enTranslations = {
     },
     about: {
       hero: {
-        title: "Über Unbottled.ai",
+        title: "Über {{appName}}",
         subtitle: "Ehrliche KI. Keine Zensur. Ihre Daten.",
         description:
           "Wir bauen die Zukunft des unzensierten KI-Chats, wo Sie echte Gespräche ohne Filter oder Einschränkungen führen können.",
@@ -314,7 +278,7 @@ export const translations: typeof enTranslations = {
       story: {
         title: "Unsere Geschichte",
         description:
-          "Unbottled.ai wurde aus Frustration über zensierte KI-Plattformen geschaffen. Wir wollten einen Ort schaffen, an dem Nutzer ehrliche Gespräche mit KI ohne willkürliche Einschränkungen führen können. Heute bedienen wir Tausende von Nutzern, die Meinungsfreiheit und Privatsphäre schätzen.",
+          "{{appName}} wurde aus Frustration über zensierte KI-Plattformen geschaffen. Wir wollten einen Ort schaffen, an dem Nutzer ehrliche Gespräche mit KI ohne willkürliche Einschränkungen führen können. Heute bedienen wir Tausende von Nutzern, die Meinungsfreiheit und Privatsphäre schätzen.",
       },
       values: {
         excellence: {
@@ -352,13 +316,13 @@ export const translations: typeof enTranslations = {
     },
     careers: {
       meta: {
-        title: "Karriere - Unbottled.ai",
+        title: "Karriere - {{appName}}",
         description:
           "Werden Sie Teil unseres Teams und helfen Sie, die Zukunft der unzensierten KI zu gestalten",
         category: "Karriere",
-        imageAlt: "Karriere bei Unbottled.ai",
+        imageAlt: "Karriere bei {{appName}}",
         keywords:
-          "karriere, jobs, KI-Jobs, remote-arbeit, unbottled.ai karriere",
+          "karriere, jobs, KI-Jobs, remote-arbeit, {{config.appName}} karriere",
       },
       title: "Werden Sie Teil unseres Teams",
       description:
@@ -442,7 +406,7 @@ export const translations: typeof enTranslations = {
           department: "Community",
           type: "Vollzeit",
           responsibilities: {
-            item1: "Die Unbottled.ai-Community aufbauen und engagieren",
+            item1: "Die {{appName}}-Community aufbauen und engagieren",
             item2: "Überzeugende Inhalte für soziale Medien erstellen",
             item3: "Diskussionen moderieren und Support bieten",
             item4: "Community-Events und Initiativen organisieren",
@@ -495,14 +459,14 @@ export const translations: typeof enTranslations = {
     },
     aboutUs: {
       backToHome: "Zurück zur Startseite",
-      title: "Über Unbottled.ai",
+      title: "Über {{appName}}",
       subtitle: "Pioniere unzensierter KI-Gespräche",
       description:
-        "Wir haben die Mission, den Zugang zu unzensierter KI zu demokratisieren. Gegründet im Jahr 2024, bietet Unbottled.ai eine Plattform, auf der Benutzer ehrliche, ungefilterte Gespräche mit den fortschrittlichsten KI-Modellen der Welt führen können.",
+        "Wir haben die Mission, den Zugang zu unzensierter KI zu demokratisieren. Gegründet im Jahr {{config.group.foundedYear}}, bietet {{appName}} eine Plattform, auf der Benutzer ehrliche, ungefilterte Gespräche mit den fortschrittlichsten KI-Modellen der Welt führen können.",
       values: {
         title: "Unsere Werte",
         description:
-          "Die Prinzipien, die alles leiten, was wir bei Unbottled.ai tun",
+          "Die Prinzipien, die alles leiten, was wir bei {{appName}} tun",
         excellence: {
           title: "Exzellenz",
           description:
@@ -556,7 +520,7 @@ export const translations: typeof enTranslations = {
       title: "Impressum",
       lastUpdated: "Zuletzt aktualisiert: Januar 2025",
       introduction:
-        "Dieses Impressum enthält gesetzlich vorgeschriebene Informationen über Unbottled.ai gemäß den geltenden Gesetzen.",
+        "Dieses Impressum enthält gesetzlich vorgeschriebene Informationen über {{appName}} gemäß den geltenden Gesetzen.",
       printButton: "Drucken",
       printAriaLabel: "Diese Seite drucken",
       sections: {
@@ -565,12 +529,12 @@ export const translations: typeof enTranslations = {
           description:
             "Informationen über unsere Geschäftspartnerschaften und Zugehörigkeiten.",
           content:
-            "Unbottled.ai unterhält Partnerschaften mit führenden KI-Anbietern, um unseren Nutzern den bestmöglichen Service zu bieten.",
+            "{{appName}} unterhält Partnerschaften mit führenden KI-Anbietern, um unseren Nutzern den bestmöglichen Service zu bieten.",
         },
         companyInfo: {
           title: "Unternehmensinformationen",
           description:
-            "Rechtliche Informationen über Unbottled.ai und unsere eingetragene Geschäftseinheit.",
+            "Rechtliche Informationen über {{appName}} und unsere eingetragene Geschäftseinheit.",
         },
         responsiblePerson: {
           title: "Verantwortliche Person",
@@ -582,7 +546,7 @@ export const translations: typeof enTranslations = {
           description:
             "So erreichen Sie uns für rechtliche und geschäftliche Anfragen.",
           communication: {
-            phone: "+1 (555) 123-4567",
+            phone: "{{config.group.contact.phone}}",
           },
         },
         disclaimer: {
@@ -616,7 +580,7 @@ export const translations: typeof enTranslations = {
       title: "Datenschutzerklärung",
       lastUpdated: "Zuletzt aktualisiert: Januar 2025",
       introduction:
-        "Bei Unbottled.ai nehmen wir Ihre Privatsphäre ernst. Diese Datenschutzerklärung erklärt, wie wir Ihre persönlichen Daten sammeln, verwenden und schützen, wenn Sie unsere unzensierte KI-Chat-Plattform nutzen.",
+        "Bei {{appName}} nehmen wir Ihre Privatsphäre ernst. Diese Datenschutzerklärung erklärt, wie wir Ihre persönlichen Daten sammeln, verwenden und schützen, wenn Sie unsere unzensierte KI-Chat-Plattform nutzen.",
       printButton: "Drucken",
       printAriaLabel: "Diese Seite drucken",
       sections: {
@@ -786,31 +750,25 @@ export const translations: typeof enTranslations = {
           description:
             "Unser Service kann Links zu Websites Dritter enthalten. Wir sind nicht verantwortlich für die Datenschutzpraktiken dieser externen Websites. Wir empfehlen Ihnen, deren Datenschutzerklärungen zu überprüfen.",
         },
-        contact: {
-          title: "Kontaktieren Sie uns",
-          description:
-            "Wenn Sie Fragen zu dieser Datenschutzerklärung oder unseren Datenpraktiken haben, kontaktieren Sie uns bitte unter:",
-          email: "privacy@unbottled.ai",
-        },
       },
     },
     termsOfService: {
       title: "Nutzungsbedingungen",
       lastUpdated: "Zuletzt aktualisiert: Januar 2025",
       introduction:
-        "Willkommen bei Unbottled.ai. Durch die Nutzung unserer unzensierten KI-Chat-Plattform stimmen Sie diesen Nutzungsbedingungen zu. Bitte lesen Sie sie sorgfältig durch.",
+        "Willkommen bei {{appName}}. Durch die Nutzung unserer unzensierten KI-Chat-Plattform stimmen Sie diesen Nutzungsbedingungen zu. Bitte lesen Sie sie sorgfältig durch.",
       printButton: "Drucken",
       printAriaLabel: "Diese Seite drucken",
       sections: {
         agreement: {
           title: "Zustimmung zu den Bedingungen",
           content:
-            "Durch den Zugriff auf oder die Nutzung von Unbottled.ai erklären Sie sich mit diesen Nutzungsbedingungen und allen geltenden Gesetzen und Vorschriften einverstanden. Wenn Sie mit einem dieser Bedingungen nicht einverstanden sind, ist Ihnen die Nutzung dieses Dienstes untersagt.",
+            "Durch den Zugriff auf oder die Nutzung von {{appName}} erklären Sie sich mit diesen Nutzungsbedingungen und allen geltenden Gesetzen und Vorschriften einverstanden. Wenn Sie mit einem dieser Bedingungen nicht einverstanden sind, ist Ihnen die Nutzung dieses Dienstes untersagt.",
         },
         description: {
           title: "Dienstbeschreibung",
           content:
-            "Unbottled.ai bietet Zugang zu unzensierten KI-Chat-Modellen verschiedener Anbieter. Wir bieten kostenlose und kostenpflichtige Tarife mit unterschiedlichen Funktionen und Nutzungslimits. Der Dienst wird 'wie besehen' ohne jegliche Garantien bereitgestellt.",
+            "{{appName}} bietet Zugang zu unzensierten KI-Chat-Modellen verschiedener Anbieter. Wir bieten kostenlose und kostenpflichtige Tarife mit unterschiedlichen Funktionen und Nutzungslimits. Der Dienst wird 'wie besehen' ohne jegliche Garantien bereitgestellt.",
         },
         subscriptions: {
           title: "Abonnements und Abrechnung",
@@ -865,7 +823,7 @@ export const translations: typeof enTranslations = {
         intellectualProperty: {
           title: "Geistiges Eigentum",
           content:
-            "Die Unbottled.ai-Plattform, einschließlich ihres Designs, ihrer Funktionen und ihres Codes, ist durch Gesetze zum Schutz des geistigen Eigentums geschützt. Sie dürfen unsere Plattform ohne Genehmigung nicht kopieren, ändern oder verbreiten.",
+            "Die {{appName}}-Plattform, einschließlich ihres Designs, ihrer Funktionen und ihres Codes, ist durch Gesetze zum Schutz des geistigen Eigentums geschützt. Sie dürfen unsere Plattform ohne Genehmigung nicht kopieren, ändern oder verbreiten.",
         },
         disclaimer: {
           title: "Haftungsausschluss für Garantien",
@@ -875,7 +833,7 @@ export const translations: typeof enTranslations = {
         limitation: {
           title: "Haftungsbeschränkung",
           content:
-            "Unbottled.ai haftet nicht für indirekte, zufällige, besondere oder Folgeschäden, die sich aus Ihrer Nutzung des Dienstes ergeben.",
+            "{{appName}} haftet nicht für indirekte, zufällige, besondere oder Folgeschäden, die sich aus Ihrer Nutzung des Dienstes ergeben.",
         },
         termination: {
           title: "Beendigung",
@@ -887,32 +845,28 @@ export const translations: typeof enTranslations = {
           content:
             "Wir können diese Nutzungsbedingungen von Zeit zu Zeit aktualisieren. Die fortgesetzte Nutzung des Dienstes nach Änderungen stellt die Annahme der neuen Bedingungen dar.",
         },
-        contact: {
-          title: "Kontakt",
-          content:
-            "Wenn Sie Fragen zu diesen Nutzungsbedingungen haben, kontaktieren Sie uns unter:",
-          email: "legal@unbottled.ai",
-        },
+
         indemnification: {
           title: "Schadloshaltung",
           content:
-            "Sie verpflichten sich, Unbottled.ai und seine verbundenen Unternehmen von allen Ansprüchen, Schäden oder Aufwendungen freizustellen, die sich aus Ihrer Nutzung des Dienstes oder Verletzung dieser Bedingungen ergeben.",
+            "Sie verpflichten sich, {{appName}} und seine verbundenen Unternehmen von allen Ansprüchen, Schäden oder Aufwendungen freizustellen, die sich aus Ihrer Nutzung des Dienstes oder Verletzung dieser Bedingungen ergeben.",
         },
         governingLaw: {
           title: "Anwendbares Recht",
           content:
-            "Diese Nutzungsbedingungen unterliegen den Gesetzen der Schweiz. Alle Streitigkeiten werden vor den Gerichten in Zürich, Schweiz, beigelegt.",
+            "Diese Nutzungsbedingungen unterliegen den Gesetzen der {{config.group.jurisdiction.country}}. Alle Streitigkeiten werden vor den Gerichten in {{config.group.jurisdiction.city}}, {{config.group.jurisdiction.country}}, beigelegt.",
         },
       },
     },
   },
   footer: {
     tagline: "Chatten Sie mit KI, Verbinden Sie sich mit der Community",
-    privacyTagline: "Datenschutzorientierter KI-Chat mit 40+ unzensierten Modellen",
+    privacyTagline:
+      "Datenschutzorientierter KI-Chat mit 40+ unzensierten Modellen",
     platform: {
       title: "Plattform",
       features: "Funktionen",
-      pricing: "Preise",
+      subscription: "Abonnement",
       aiModels: "KI-Modelle",
       personas: "Personas",
     },
@@ -935,7 +889,7 @@ export const translations: typeof enTranslations = {
       title: "Rechtliches",
     },
     builtWith: "Erstellt mit",
-    framework: "NextVibe Framework",
-    copyright: "© {{year}} Unbottled.ai. Alle Rechte vorbehalten.",
+    framework: "{{appName}} Framework",
+    copyright: "© {{year}} {{config.appName}}. Alle Rechte vorbehalten.",
   },
 };

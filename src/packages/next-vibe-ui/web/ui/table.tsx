@@ -55,7 +55,8 @@ Table.displayName = "Table";
 function TableHeader({
   className,
   ...props
-}: TableHeaderProps & React.HTMLAttributes<HTMLTableSectionElement>): React.JSX.Element {
+}: TableHeaderProps &
+  React.HTMLAttributes<HTMLTableSectionElement>): React.JSX.Element {
   return <thead className={cn("[&_tr]:border-b", className)} {...props} />;
 }
 TableHeader.displayName = "TableHeader";
@@ -63,12 +64,10 @@ TableHeader.displayName = "TableHeader";
 function TableBody({
   className,
   ...props
-}: TableBodyProps & React.HTMLAttributes<HTMLTableSectionElement>): React.JSX.Element {
+}: TableBodyProps &
+  React.HTMLAttributes<HTMLTableSectionElement>): React.JSX.Element {
   return (
-    <tbody
-      className={cn("[&_tr:last-child]:border-0", className)}
-      {...props}
-    />
+    <tbody className={cn("[&_tr:last-child]:border-0", className)} {...props} />
   );
 }
 TableBody.displayName = "TableBody";
@@ -76,11 +75,12 @@ TableBody.displayName = "TableBody";
 function TableFooter({
   className,
   ...props
-}: TableFooterProps & React.HTMLAttributes<HTMLTableSectionElement>): React.JSX.Element {
+}: TableFooterProps &
+  React.HTMLAttributes<HTMLTableSectionElement>): React.JSX.Element {
   return (
     <tfoot
       className={cn(
-        "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+        "border-t bg-accent font-medium [&>tr]:last:border-b-0",
         className,
       )}
       {...props}
@@ -93,11 +93,12 @@ function TableRow({
   className,
   onPress,
   ...props
-}: TableRowProps & React.HTMLAttributes<HTMLTableRowElement>): React.JSX.Element {
+}: TableRowProps &
+  React.HTMLAttributes<HTMLTableRowElement>): React.JSX.Element {
   return (
     <tr
       className={cn(
-        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+        "border-b transition-colors hover:bg-accent data-[state=selected]:bg-muted",
         onPress && "cursor-pointer",
         className,
       )}
@@ -119,7 +120,8 @@ TableRow.displayName = "TableRow";
 function TableHead({
   className,
   ...props
-}: TableHeadProps & React.ThHTMLAttributes<HTMLTableCellElement>): React.JSX.Element {
+}: TableHeadProps &
+  React.ThHTMLAttributes<HTMLTableCellElement>): React.JSX.Element {
   return (
     <th
       className={cn(
@@ -135,7 +137,8 @@ TableHead.displayName = "TableHead";
 function TableCell({
   className,
   ...props
-}: TableCellProps & React.TdHTMLAttributes<HTMLTableCellElement>): React.JSX.Element {
+}: TableCellProps &
+  React.TdHTMLAttributes<HTMLTableCellElement>): React.JSX.Element {
   return (
     <td
       className={cn(
@@ -151,7 +154,8 @@ TableCell.displayName = "TableCell";
 function TableCaption({
   className,
   ...props
-}: TableCaptionProps & React.HTMLAttributes<HTMLTableCaptionElement>): React.JSX.Element {
+}: TableCaptionProps &
+  React.HTMLAttributes<HTMLTableCaptionElement>): React.JSX.Element {
   return (
     <caption
       className={cn("mt-4 text-sm text-muted-foreground", className)}

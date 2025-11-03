@@ -15,6 +15,10 @@ const StyledSliderTrack = styled(SliderPrimitive.Track);
 const StyledSliderRange = styled(SliderPrimitive.Range);
 const StyledSliderThumb = styled(SliderPrimitive.Thumb);
 
+/* eslint-disable i18next/no-literal-string -- CSS classNames */
+const RANGE_CLASSNAME = "absolute h-full bg-primary";
+/* eslint-enable i18next/no-literal-string */
+
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   SliderProps
@@ -34,7 +38,7 @@ const Slider = React.forwardRef<
         className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20"
       >
         <StyledSliderRange
-          className={"absolute h-full bg-primary"}
+          className={RANGE_CLASSNAME}
         />
       </StyledSliderTrack>
       <StyledSliderThumb

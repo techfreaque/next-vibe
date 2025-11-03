@@ -268,7 +268,7 @@ export const renderAdminUnsubscribeNotificationMail: EmailFunctionType<
   try {
     return createSuccessResponse({
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("app.common.appName"),
+      toName: t("config.appName"),
       subject: t(
         "app.api.v1.core.newsletter.email.unsubscribe.admin_unsubscribe_notification.subject",
       ),

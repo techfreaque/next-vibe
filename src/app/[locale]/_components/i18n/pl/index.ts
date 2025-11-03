@@ -5,7 +5,6 @@ export const translations: typeof enTranslations = {
     active: "Aktywny",
     filter: "Filtruj",
     refresh: "Odśwież",
-    appName: "unbottled.ai",
     weekday: {
       monday: "Poniedziałek",
       tuesday: "Wtorek",
@@ -15,21 +14,7 @@ export const translations: typeof enTranslations = {
       saturday: "Sobota",
       sunday: "Niedziela",
     },
-    company: {
-      name: "unbottled.ai",
-      legalForm: "GmbH (Spółka z ograniczoną odpowiedzialnością)",
-      registrationNumber: "CHE-123.456.789",
-      address: {
-        title: "Adres",
-        street: "Musterstrasse 123",
-        city: "8000 Zurych",
-        country: "Szwajcaria",
-        addressIn1Line: "Musterstrasse 123, 8000 Zurych, Szwajcaria",
-      },
-      responsiblePerson: {
-        name: "Max Mustermann",
-      },
-    },
+
     selector: {
       country: "Kraj",
       language: "Język",
@@ -134,71 +119,71 @@ export const translations: typeof enTranslations = {
   },
   meta: {
     home: {
-      title: "unbottled.ai - Niecenzurowany czat AI",
+      title: "{{appName}} - Niecenzurowany czat AI",
       category: "Platforma czatu AI",
       description:
         "Doświadcz prawdziwie niecenzurowanych rozmów z AI z ponad 40 modelami. Bez filtrów, bez ograniczeń, tylko szczera AI.",
-      imageAlt: "unbottled.ai - Niecenzurowana platforma czatu AI",
+      imageAlt: "{{appName}} - Niecenzurowana platforma czatu AI",
       keywords:
         "niecenzurowana AI, czat AI, GPT-4, Claude, Gemini, modele AI, bez filtrów, szczera AI, rozmowy AI",
     },
     aboutUs: {
-      title: "O nas - Unbottled.ai",
+      title: "O nas - {{appName}}",
       category: "O nas",
       description:
-        "Dowiedz się o misji Unbottled.ai, aby zapewnić niecenzurowane rozmowy AI",
-      imageAlt: "O Unbottled.ai",
-      keywords: "o unbottled.ai, niecenzurowana AI, misja AI, wartości AI",
-      ogTitle: "O Unbottled.ai - Niecenzurowana platforma AI",
+        "Dowiedz się o misji {{appName}}, aby zapewnić niecenzurowane rozmowy AI",
+      imageAlt: "O {{appName}}",
+      keywords: "o {{appName}}, niecenzurowana AI, misja AI, wartości AI",
+      ogTitle: "O {{appName}} - Niecenzurowana platforma AI",
       ogDescription:
         "Odkryj naszą misję demokratyzacji dostępu do niecenzurowanej AI",
-      twitterTitle: "O Unbottled.ai",
+      twitterTitle: "O {{appName}}",
       twitterDescription:
         "Dowiedz się o naszej misji niecenzurowanych rozmów AI",
     },
     privacyPolicy: {
-      title: "Polityka prywatności - Unbottled.ai",
+      title: "Polityka prywatności - {{appName}}",
       category: "Prawne",
       description:
-        "Dowiedz się, jak Unbottled.ai chroni Twoją prywatność i obsługuje Twoje dane",
+        "Dowiedz się, jak {{appName}} chroni Twoją prywatność i obsługuje Twoje dane",
       imageAlt: "Polityka prywatności",
       keywords:
-        "polityka prywatności, ochrona danych, prywatność użytkownika, unbottled.ai prywatność",
+        "polityka prywatności, ochrona danych, prywatność użytkownika, {{appName}} prywatność",
     },
     termsOfService: {
-      title: "Warunki korzystania z usługi - Unbottled.ai",
+      title: "Warunki korzystania z usługi - {{appName}}",
       category: "Prawne",
-      description: "Przeczytaj warunki korzystania z Unbottled.ai",
+      description: "Przeczytaj warunki korzystania z {{appName}}",
       imageAlt: "Warunki korzystania z usługi",
       keywords:
-        "warunki korzystania z usługi, regulamin, umowa użytkownika, unbottled.ai warunki",
+        "warunki korzystania z usługi, regulamin, umowa użytkownika, {{appName}} warunki",
     },
     imprint: {
-      title: "Informacje prawne - Unbottled.ai",
+      title: "Informacje prawne - {{appName}}",
       category: "Prawne",
-      description: "Informacje prawne i dane firmy dla Unbottled.ai",
+      description: "Informacje prawne i dane firmy dla {{appName}}",
       imageAlt: "Informacje prawne",
-      keywords: "informacje prawne, dane firmy, unbottled.ai prawne",
+      keywords: "informacje prawne, dane firmy, {{appName}} prawne",
     },
     careers: {
-      title: "Kariera - Unbottled.ai",
+      title: "Kariera - {{appName}}",
       category: "Kariera",
       description:
         "Dołącz do naszego zespołu i pomóż budować przyszłość niecenzurowanej AI",
-      imageAlt: "Kariera w Unbottled.ai",
-      keywords: "kariera, praca, praca AI, praca zdalna, kariera unbottled.ai",
+      imageAlt: "Kariera w {{appName}}",
+      keywords: "kariera, praca, praca AI, praca zdalna, kariera {{appName}}",
     },
     pricing: {
-      title: "Cennik - Unbottled.ai",
+      title: "Cennik - {{appName}}",
       category: "Cennik",
       description:
         "Przystępne plany czatu AI dla wszystkich. Zacznij za darmo z 10 dziennymi wiadomościami.",
       imageAlt: "Plany cenowe",
       keywords:
-        "cennik, plany, subskrypcja, cennik czatu AI, cennik unbottled.ai",
-      ogTitle: "Plany cenowe - Unbottled.ai",
+        "cennik, plany, subskrypcja, cennik czatu AI, cennik {{appName}}",
+      ogTitle: "Plany cenowe - {{appName}}",
       ogDescription: "Proste, przejrzyste ceny dla niecenzurowanego czatu AI",
-      twitterTitle: "Cennik - Unbottled.ai",
+      twitterTitle: "Cennik - {{appName}}",
       twitterDescription: "Zacznij za darmo z 10 dziennymi wiadomościami",
     },
     billing: {
@@ -229,13 +214,13 @@ export const translations: typeof enTranslations = {
   },
   layout: {
     metadata: {
-      defaultTitle: "unbottled.ai - Niecenzurowany czat AI",
+      defaultTitle: "{{appName}} - Niecenzurowany czat AI",
       category: "Platforma czatu AI",
       description:
         "Doświadcz prawdziwie niecenzurowanych rozmów z AI z ponad 40 modelami. Bez filtrów, bez ograniczeń, tylko szczera AI.",
     },
     openGraph: {
-      imageAlt: "unbottled.ai - Niecenzurowana platforma czatu AI",
+      imageAlt: "{{appName}} - Niecenzurowana platforma czatu AI",
     },
     structuredData: {
       organization: {
@@ -243,9 +228,9 @@ export const translations: typeof enTranslations = {
           organization: "Organizacja",
           contactPoint: "Punkt kontaktowy",
         },
-        name: "unbottled.ai",
+  
         contactPoint: {
-          telephone: "+1-555-0123",
+            telephone: "{{config.group.contact.telephone}}",
           contactType: "Obsługa klienta",
         },
       },

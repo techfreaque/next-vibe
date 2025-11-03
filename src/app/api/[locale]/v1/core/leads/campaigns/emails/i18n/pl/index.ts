@@ -16,9 +16,9 @@ export const translations: typeof enTranslations = {
   emailJourneys: {
     components: {
       footer: {
-        copyright: "© 2024 NextVibe. Wszelkie prawa zastrzeżone.",
+        copyright: "© 2024 {{config.appName}}. Wszelkie prawa zastrzeżone.",
         helpText:
-          "Jeśli masz pytania, skontaktuj się z nami pod adresem support@nextvibe.com",
+          "Jeśli masz pytania, skontaktuj się z nami pod adresem {{config.emails.support}}",
         unsubscribeText: "Nie chcesz otrzymywać tych wiadomości?",
         unsubscribeLink: "Wypisz się",
       },

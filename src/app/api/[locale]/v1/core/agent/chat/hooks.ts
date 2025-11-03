@@ -686,19 +686,7 @@ export function useChat(
                 errorMessage: null,
                 edited: false,
                 tokens: null,
-                toolCalls: message.toolCalls
-                  ? message.toolCalls.map((tc) => ({
-                      toolName: tc.toolName,
-                      displayName: tc.displayName,
-                      icon: tc.icon,
-                      args: tc.args,
-                      result: tc.result,
-                      error: tc.error,
-                      executionTime: tc.executionTime,
-                      widgetMetadata: tc.widgetMetadata,
-                      creditsUsed: tc.creditsUsed,
-                    }))
-                  : null,
+                toolCalls: message.toolCalls,
                 upvotes: null,
                 downvotes: null,
                 sequenceId: message.sequenceId ?? null,
@@ -836,14 +824,13 @@ export function useChat(
                 subFolderId: data.subFolderId,
               });
 
-              // Set the active thread in the chat store
-              // This ensures subsequent messages use the correct threadId
-              chatStore.setActiveThread(data.threadId);
-              logger.debug("Chat: Set active thread after creation", {
-                threadId: data.threadId,
-              });
+              // CRITICAL: Do NOT set active thread here
+              // The navigation callback will update the URL, and the URL sync effect
+              // in chat-interface.tsx will set the active thread based on the new URL
+              // This prevents race conditions where store updates before URL navigation completes
 
-              // Call the callback if provided
+              // Call the navigation callback if provided
+              // This will navigate to the new thread URL
               if (onThreadCreated) {
                 onThreadCreated(
                   data.threadId,

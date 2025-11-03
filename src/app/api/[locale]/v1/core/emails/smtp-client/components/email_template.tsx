@@ -98,24 +98,24 @@ export function EmailTemplate({
                     letterSpacing: "-0.5px",
                     textAlign: "left",
                   }}
-                >
-                  {t("app.common.logoPart1")}
-                </Span>
-                <Span
-                  style={{
-                    fontSize: "24px",
-                    fontWeight: "700",
-                    margin: "0",
-                    background: "linear-gradient(to right, #06b6d4, #2563eb)", // Cyan to blue gradient like nav
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                    lineHeight: "1",
-                    letterSpacing: "-0.5px",
-                    textAlign: "left",
-                  }}
-                >
-                  {t("app.common.logoPart2")}
+                 >
+                   {t("config.logoPart1")}
+                 </Span>
+                 <Span
+                   style={{
+                     fontSize: "24px",
+                     fontWeight: "700",
+                     margin: "0",
+                     background: "linear-gradient(to right, #06b6d4, #2563eb)", // Cyan to blue gradient like nav
+                     WebkitBackgroundClip: "text",
+                     WebkitTextFillColor: "transparent",
+                     backgroundClip: "text",
+                     lineHeight: "1",
+                     letterSpacing: "-0.5px",
+                     textAlign: "left",
+                   }}
+                 >
+                   {t("config.logoPart2")}
                 </Span>
               </div>
 
@@ -220,7 +220,7 @@ export function EmailTemplate({
             >
               {t("app.api.v1.core.emails.footer.allRightsReserved", {
                 currentYear,
-                appName: `${t("app.common.logoPart1")} ${t("app.common.logoPart2")}`,
+                appName: `${t("config.logoPart1")} ${t("config.logoPart2")}`,
               })}
             </Span>
 
@@ -256,7 +256,7 @@ export function EmailTemplate({
                 "app.api.v1.core.emails.smtpClient.components.email.footer.copyright",
                 {
                   currentYear,
-                  appName: `${t("app.common.logoPart1")} ${t("app.common.logoPart2")}`,
+                  appName: `${t("config.logoPart1")} ${t("config.logoPart2")}`,
                 },
               )}
             </Span>

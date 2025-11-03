@@ -1,5 +1,7 @@
 import { translations as agentTranslations } from "../../agent/i18n/en";
+import { translations as browserTranslations } from "../../browser/i18n/en";
 import { translations as contactTranslations } from "../../contact/i18n/en";
+import { translations as creditsTranslations } from "../../credits/i18n/en";
 import { translations as emailsTranslations } from "../../emails/i18n/en";
 import { translations as importTranslations } from "../../import/i18n/en";
 import { translations as leadsTranslations } from "../../leads/i18n/en";
@@ -18,7 +20,9 @@ import { translations as usersTranslations } from "../../users/i18n/en";
 
 export const translations = {
   agent: agentTranslations,
+  browser: browserTranslations,
   contact: contactTranslations,
+  credits: creditsTranslations,
   emails: emailsTranslations,
   import: importTranslations,
   leads: leadsTranslations,

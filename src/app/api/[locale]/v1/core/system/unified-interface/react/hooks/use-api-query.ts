@@ -496,7 +496,7 @@ export function useApiQuery<
 
     // Add a safety timeout to reset the executing flag if the query hangs
     const safetyTimeoutId = setTimeout(() => {
-      logger.error(
+      logger.warn(
         "useApiQuery: Safety timeout triggered, resetting executing flag",
       );
       isExecutingRef.current = false;

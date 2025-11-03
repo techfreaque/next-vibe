@@ -77,7 +77,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
       <Form
         onSubmit={onSubmit}
         className={cn(
-          "p-3 sm:p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+          "p-3 sm:p-4 bg-card backdrop-blur",
           "border border-border rounded-t-lg",
           className,
         )}

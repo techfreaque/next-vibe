@@ -15,6 +15,10 @@ import type { SwitchBaseProps } from "next-vibe-ui/ui/switch";
 import { useColorScheme } from "../lib/useColorScheme";
 import { cn } from "next-vibe/shared/utils/utils";
 
+/* eslint-disable i18next/no-literal-string -- CSS classNames */
+const THUMB_CLASSNAME = "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0";
+/* eslint-enable i18next/no-literal-string */
+
 type NativeSwitchProps = SwitchBaseProps;
 
 const StyledAnimatedView = styled(Animated.View);
@@ -114,10 +118,7 @@ const SwitchNative = React.forwardRef<
       >
         <StyledAnimatedView style={animatedThumbStyle}>
           <StyledSwitchThumb
-            // eslint-disable-next-line i18n/no-literal-string
-            className={
-              "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0"
-            }
+            className={THUMB_CLASSNAME}
           />
         </StyledAnimatedView>
       </StyledSwitchRoot>

@@ -1,7 +1,7 @@
 export const translations = {
   emailPlaceholder: "Enter your email",
   page: {
-    title: "Stay Updated with Unbottled.ai",
+    title: "Stay Updated with {{appName}}",
     description: "Get the latest AI news, updates, and tips",
     subtitle: "Get the latest AI news and updates",
     heroDescription:

@@ -14,6 +14,7 @@ import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repo
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
+import { translations } from "@/config/i18n/en";
 
 interface JobType {
   title: string;
@@ -67,14 +68,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: "app.meta.careers.title",
     description: "app.meta.careers.description",
     category: "app.meta.careers.category",
-    image: "https://unbottled.ai/images/careers-hero.jpg",
+    image: `${translations.websiteUrl}/images/careers-hero.jpg`,
     imageAlt: "app.meta.careers.imageAlt",
     keywords: ["app.meta.careers.keywords"],
     additionalMetadata: {
       openGraph: {
         title: "app.meta.careers.ogTitle",
         description: "app.meta.careers.ogDescription",
-        url: `https://unbottled.ai/${locale}/careers/${jobId}`,
+        url: `${translations.websiteUrl}/${locale}/careers/${jobId}`,
         type: "website",
       },
       twitter: {
@@ -284,7 +285,7 @@ export default async function JobPostingPage({
             className="flex items-center gap-1"
             asChild
           >
-            <Link href={`/${locale}/careers`}>
+            <Link href={`/${locale}/story/careers`}>
               <ArrowLeft className="h-4 w-4" />
               <Span>
                 {t("app.story._components.home.careers.openPositions")}
@@ -556,7 +557,7 @@ export default async function JobPostingPage({
                           return (
                             <Link
                               key={key}
-                              href={`/${locale}/careers/${key}`}
+                              href={`/${locale}/story/careers/${key}`}
                               className="block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                             >
                               <H3 className="font-medium">{typedJob.title}</H3>

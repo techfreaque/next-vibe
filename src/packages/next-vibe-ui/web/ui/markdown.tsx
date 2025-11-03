@@ -21,6 +21,29 @@ const CODE_BLOCK_BG_COLOR = `rgb(${30} ${41} ${59})`; // Slate-800 background
 export interface MarkdownProps {
   content: string;
   className?: string;
+  /** Message ID for collapse state tracking */
+  messageId?: string;
+  /** Whether there's content after this message in the sequence */
+  hasContentAfter?: boolean;
+  /** Collapse state management callbacks */
+  collapseState?: {
+    isCollapsed: (
+      key: {
+        messageId: string;
+        sectionType: "thinking" | "tool";
+        sectionIndex: number;
+      },
+      autoCollapsed: boolean,
+    ) => boolean;
+    toggleCollapse: (
+      key: {
+        messageId: string;
+        sectionType: "thinking" | "tool";
+        sectionIndex: number;
+      },
+      currentState: boolean,
+    ) => void;
+  };
 }
 
 /**
@@ -66,7 +89,13 @@ function extractThinkingSections(content: string): {
   };
 }
 
-export function Markdown({ content, className }: MarkdownProps): JSX.Element {
+export function Markdown({
+  content,
+  className,
+  messageId,
+  hasContentAfter = false,
+  collapseState,
+}: MarkdownProps): JSX.Element {
   const { t } = useTranslation();
   const { thinkingSections, contentWithoutThinking, incompleteThinking } =
     extractThinkingSections(content);
@@ -77,8 +106,13 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
     ...(incompleteThinking ? [incompleteThinking] : []),
   ];
 
-  // Default expanded state: collapsed if there's content, expanded if only thinking
+  // Check if there's content in this message
   const hasContent = contentWithoutThinking.length > 0;
+
+  // Determine if thinking is still streaming (incomplete tag present)
+  const isStreaming = Boolean(incompleteThinking);
+
+  // Legacy state management for when collapseState is not provided
   const [expandedThinking, setExpandedThinking] = useState<Set<number>>(() => {
     if (!hasContent && allThinkingSections.length > 0) {
       // If no content yet, expand all thinking sections by default
@@ -87,7 +121,7 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
     return new Set();
   });
 
-  // Track if user has manually toggled any thinking section
+  // Track if user has manually toggled any thinking section (legacy)
   const [userToggledThinking, setUserToggledThinking] = useState(false);
 
   // Auto-collapse thinking sections when content arrives (only if user hasn't manually toggled)
@@ -99,16 +133,48 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
   }, [hasContent, userToggledThinking, allThinkingSections.length]);
 
   const toggleThinking = (index: number): void => {
-    setUserToggledThinking(true); // Mark that user has manually toggled
-    setExpandedThinking((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(index)) {
-        newSet.delete(index);
-      } else {
-        newSet.add(index);
-      }
-      return newSet;
-    });
+    if (collapseState && messageId) {
+      // Use centralized collapse state management
+      const key = {
+        messageId,
+        sectionType: "thinking" as const,
+        sectionIndex: index,
+      };
+      // Determine current state
+      const autoCollapsed = hasContent || hasContentAfter;
+      const currentState = collapseState.isCollapsed(key, autoCollapsed);
+      collapseState.toggleCollapse(key, currentState);
+    } else {
+      // Legacy: use local state
+      setUserToggledThinking(true);
+      setExpandedThinking((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(index)) {
+          newSet.delete(index);
+        } else {
+          newSet.add(index);
+        }
+        return newSet;
+      });
+    }
+  };
+
+  const isThinkingExpanded = (index: number): boolean => {
+    if (collapseState && messageId) {
+      // Use centralized collapse state management
+      const key = {
+        messageId,
+        sectionType: "thinking" as const,
+        sectionIndex: index,
+      };
+      // Auto-collapse if there's content in this message OR content after in sequence
+      // Keep expanded while streaming
+      const autoCollapsed = !isStreaming && (hasContent || hasContentAfter);
+      return !collapseState.isCollapsed(key, autoCollapsed);
+    } else {
+      // Legacy: use local state
+      return expandedThinking.has(index);
+    }
   };
 
   return (
@@ -117,7 +183,7 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
       {allThinkingSections.length > 0 && (
         <div className="mb-3 space-y-3">
           {allThinkingSections.map((thinking, index) => {
-            const isExpanded = expandedThinking.has(index);
+            const isExpanded = isThinkingExpanded(index);
             const isIncomplete =
               index === allThinkingSections.length - 1 && incompleteThinking;
             return (
@@ -126,16 +192,16 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
                 className={cn(
                   "rounded-lg border transition-all",
                   isExpanded
-                    ? "bg-purple-500/5 border-purple-500/30"
-                    : "bg-purple-500/10 border-purple-500/20 hover:border-purple-500/40",
+                    ? "bg-primary/5 border-primary/30"
+                    : "bg-primary/10 border-primary/20 hover:border-primary/40",
                 )}
               >
                 {/* Header - Always visible */}
                 <button
                   onClick={() => toggleThinking(index)}
                   className={cn(
-                    "w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-400",
-                    "hover:bg-purple-500/5 transition-colors rounded-lg",
+                    "w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-primary",
+                    "hover:bg-primary/5 transition-colors rounded-lg",
                   )}
                 >
                   <ChevronDown
@@ -149,15 +215,15 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
                     {t("packages.nextVibeUi.web.ui.markdown.thinking")}
                   </span>
                   {isIncomplete && (
-                    <div className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />
+                    <div className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                   )}
                 </button>
 
                 {/* Content - Collapsible */}
                 {isExpanded && (
                   <div className="px-3 pb-2">
-                    <div className="px-3 py-2 rounded-md bg-background/50 border border-border/50 text-sm">
-                      <div className="text-foreground/90 prose prose-sm dark:prose-invert max-w-none">
+                    <div className="px-3 py-2 rounded-md bg-card border border-border text-sm">
+                      <div className="text-foreground prose prose-sm dark:prose-invert max-w-none">
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm, remarkBreaks]}
                           components={{

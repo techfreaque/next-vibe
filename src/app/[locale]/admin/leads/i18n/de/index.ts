@@ -320,7 +320,7 @@ export const translations: typeof enTranslations = {
             phone: "+49-30-12345678",
             website: "https://acme-digital.de",
             notes:
-              "Interessiert an Premium Social Media Management Services. Potenzialstarker Kunde mit etabliertem Unternehmen.",
+              "Interessiert an Premium-Social-Media-Management-Services. Hochpotenzieller Kunde mit etabliertem Geschäft.",
           },
         },
       },

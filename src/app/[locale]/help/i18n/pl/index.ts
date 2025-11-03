@@ -8,15 +8,15 @@ export const translations: typeof enTranslations = {
   },
   meta: {
     contact: {
-      title: "Kontakt i wsparcie - Unbottled.ai",
+      title: "Kontakt i wsparcie - {{appName}}",
       description:
-        "Uzyskaj pomoc z Unbottled.ai - platforma czatu AI bez cenzury. Skontaktuj się z naszym zespołem wsparcia.",
+        "Uzyskaj pomoc z {{appName}} - platforma czatu AI bez cenzury. Skontaktuj się z naszym zespołem wsparcia.",
       category: "Wsparcie",
-      imageAlt: "Wsparcie Unbottled.ai",
-      keywords: "kontakt, wsparcie, pomoc, unbottled, czat ai, pomoc",
-      ogTitle: "Skontaktuj się z wsparciem Unbottled.ai",
+      imageAlt: "Wsparcie {{appName}}",
+      keywords: "kontakt, wsparcie, pomoc, {{appName}}, czat ai, pomoc",
+      ogTitle: "Skontaktuj się z wsparciem {{appName}}",
       ogDescription: "Uzyskaj pomoc w korzystaniu z czatu AI bez cenzury",
-      twitterTitle: "Skontaktuj się z Unbottled.ai",
+      twitterTitle: "Skontaktuj się z {{appName}}",
       twitterDescription: "Skontaktuj się z naszym zespołem wsparcia",
     },
   },
@@ -29,9 +29,9 @@ export const translations: typeof enTranslations = {
         title: "Najczęściej zadawane pytania",
         questions: {
           q1: {
-            question: "Czym jest Unbottled.ai?",
+            question: "Czym jest {{appName}}?",
             answer:
-              "Unbottled.ai to platforma czatu AI bez cenzury z dostępem do ponad 40 modeli AI. Łączymy szczere rozmowy z AI z zaawansowanymi funkcjami, takimi jak zarządzanie folderami, niestandardowe persony i obsługa wielu modeli.",
+              "{{appName}} to platforma czatu AI bez cenzury z dostępem do ponad 40 modeli AI. Łączymy szczere rozmowy z AI z zaawansowanymi funkcjami, takimi jak zarządzanie folderami, niestandardowe persony i obsługa wielu modeli.",
           },
           q2: {
             question: "Jakie metody płatności akceptujecie?",

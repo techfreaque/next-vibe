@@ -105,17 +105,30 @@ export function createHTTPErrorResponse({
   message,
   errorType,
   messageParams,
+  cause,
   logger,
 }: {
   message: TranslationKey;
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
   messageParams?: TParams;
+  cause?: ErrorResponseType;
   logger: EndpointLogger;
 }): NextResponse<ErrorResponseType> {
-  // Log the error
-  logger.error(
-    `API error response: ${message} (${errorType.errorCode} / ${errorType.errorKey})`,
-  );
+  // Log the error with cause chain
+  const errorChain: string[] = [
+    `${message} (${errorType.errorCode} / ${errorType.errorKey})`,
+  ];
+  let currentCause = cause;
+  while (currentCause && !currentCause.success) {
+    errorChain.push(
+      `  → ${currentCause.message} (${currentCause.errorType.errorCode})`,
+    );
+    currentCause = currentCause.cause;
+  }
+  logger.error(`API error response:\n${errorChain.join("\n")}`, {
+    messageParams,
+    causeChain: errorChain,
+  });
 
   // Validate error response format
   const validationResult = validateData(
@@ -123,6 +136,7 @@ export function createHTTPErrorResponse({
       message: message,
       errorType,
       messageParams,
+      cause,
     }),
     errorResponseSchema,
     logger,

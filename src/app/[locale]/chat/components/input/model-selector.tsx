@@ -27,7 +27,16 @@ interface ModelSelectorProps {
 const STORAGE_KEY = "chat-favorite-models";
 
 const DEFAULT_FAVORITES: ModelId[] = [
+  ModelId.UNCENSORED_LM_V1_1,
   ModelId.GPT_5_NANO,
+  ModelId.GPT_5_MINI,
+  ModelId.GPT_5,
+  ModelId.GPT_5_CODEX,
+  ModelId.GPT_OSS_120B,
+  ModelId.CLAUDE_HAIKU_4_5,
+  ModelId.CLAUDE_SONNET_4_5,
+  ModelId.GROK_4_FAST,
+  ModelId.GROK_4,
   ModelId.DEEPSEEK_V31,
   ModelId.GEMINI_FLASH_2_5_LITE,
 ];

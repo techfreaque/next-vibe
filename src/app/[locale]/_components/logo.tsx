@@ -28,19 +28,19 @@ export function Logo({
       <Image
         fetchPriority="high"
         src={logoWhite}
-        alt={t("app.common.appName")}
+        alt={t("config.appName")}
         width={250}
         height={80}
-        className={cn("hidden dark:block h-18 w-auto", className)}
+        className={cn("hidden dark:block h-8 w-auto", className)}
         priority
       />
       <Image
         fetchPriority="high"
         src={logoBlack}
-        alt={t("app.common.appName")}
+        alt={t("config.appName")}
         width={250}
         height={80}
-        className={cn("hidden light:block h-18 w-auto", className)}
+        className={cn("hidden light:block h-8 w-auto", className)}
         priority
       />
     </Link>

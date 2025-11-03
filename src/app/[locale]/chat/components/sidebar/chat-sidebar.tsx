@@ -50,6 +50,7 @@ import { NewFolderDialog } from "./new-folder-dialog";
 import { RootFolderBar } from "./root-folder-bar";
 import { ThreadList } from "./thread-list";
 import { UserMenu } from "./user-menu";
+import { type TFunction } from "@/i18n/core/static-types";
 
 interface ChatSidebarProps {
   chat: UseChatReturn;
@@ -151,6 +152,7 @@ export function ChatSidebar({
         : activeRootFolderId === DEFAULT_FOLDER_IDS.PUBLIC
           ? "purple"
           : "gray";
+  const isPublicRootFolder = activeRootFolderId === DEFAULT_FOLDER_IDS.PUBLIC;
 
   const handleSelectFolder = (folderId: string): void => {
     const rootFolderId = getRootFolderId(chat.folders, folderId);
@@ -212,53 +214,41 @@ export function ChatSidebar({
       />
       {/* New Chat Button */}
       <Div className="flex items-center gap-1 px-3 pb-2 min-w-max">
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Div className="w-full">
-                <Button
-                  onClick={() =>
-                    onCreateThread(activeFolderId || activeRootFolderId)
-                  }
-                  className={`w-full h-10 sm:h-9 ${getButtonColorClasses(rootFolderColor)}`}
-                  disabled={requiresAuth && !isAuthenticated}
-                >
-                  <MessageSquarePlus className="h-4 w-4 mr-2" />
-                  {t(getNewChatTranslationKey(activeRootFolderId))}
-                </Button>
-              </Div>
-            </TooltipTrigger>
-            {requiresAuth && !isAuthenticated && (
-              <TooltipContent side="bottom">
-                <P>{t("app.chat.common.loginRequired")}</P>
-              </TooltipContent>
-            )}
-          </Tooltip>
-        </TooltipProvider>
+        {isPublicRootFolder ? (
+          <></>
+        ) : (
+          <TooltipProvider delayDuration={300}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Div className="w-full">
+                  <Button
+                    onClick={() =>
+                      onCreateThread(activeFolderId || activeRootFolderId)
+                    }
+                    className={`w-full h-10 sm:h-9 ${getButtonColorClasses(rootFolderColor)}`}
+                    disabled={requiresAuth && !isAuthenticated}
+                  >
+                    <MessageSquarePlus className="h-4 w-4 mr-2" />
+                    {t(getNewChatTranslationKey(activeRootFolderId))}
+                  </Button>
+                </Div>
+              </TooltipTrigger>
+              {requiresAuth && !isAuthenticated && (
+                <TooltipContent side="bottom">
+                  <P>{t("app.chat.common.loginRequired")}</P>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+        )}
         {/* New Folder Button */}
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-11 w-11 hover:bg-accent"
-                onClick={() => setNewFolderDialogOpen(true)}
-                title={t(getNewFolderTranslationKey(activeRootFolderId))}
-                disabled={requiresAuth && !isAuthenticated}
-              >
-                <FolderPlus className="h-5 w-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <P>
-                {requiresAuth && !isAuthenticated
-                  ? t("app.chat.common.loginRequired")
-                  : t(getNewFolderTranslationKey(activeRootFolderId))}
-              </P>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <NewFolderButton
+          activeRootFolderId={activeRootFolderId}
+          requiresAuth={requiresAuth}
+          isAuthenticated={isAuthenticated}
+          setNewFolderDialogOpen={setNewFolderDialogOpen}
+          t={t}
+        />
       </Div>
       {/* Search Bar + Fullscreen Button */}
       <Div className="px-3 pb-3 flex gap-2  border-b border-border ">
@@ -373,14 +363,16 @@ export function ChatSidebar({
                 <Div className="space-y-1 text-sm">
                   <Div className="flex justify-between">
                     <Span className="text-muted-foreground">
-                      {t("app.chat.credits.total")}
+                      {t("app.chat.credits.total", { count: credits.total })}
                     </Span>
                     <Span className="font-medium">{credits.total}</Span>
                   </Div>
                   {credits.permanent > 0 && (
                     <Div className="flex justify-between">
                       <Span className="text-muted-foreground">
-                        {t("app.chat.credits.permanent")}
+                        {t("app.chat.credits.permanent", {
+                          count: credits.permanent,
+                        })}
                       </Span>
                       <Span>{credits.permanent}</Span>
                     </Div>
@@ -388,7 +380,9 @@ export function ChatSidebar({
                   {credits.expiring > 0 && (
                     <Div className="flex justify-between">
                       <Span className="text-muted-foreground">
-                        {t("app.chat.credits.expiring")}
+                        {t("app.chat.credits.expiring", {
+                          count: credits.expiring,
+                        })}
                       </Span>
                       <Span>{credits.expiring}</Span>
                     </Div>
@@ -396,7 +390,7 @@ export function ChatSidebar({
                   {credits.free > 0 && (
                     <Div className="flex justify-between">
                       <Span className="text-muted-foreground">
-                        {t("app.chat.credits.free")}
+                        {t("app.chat.credits.free", { count: credits.free })}
                       </Span>
                       <Span>{credits.free}</Span>
                     </Div>
@@ -469,5 +463,45 @@ export function ChatSidebar({
         locale={locale}
       />
     </Div>
+  );
+}
+
+function NewFolderButton({
+  activeRootFolderId,
+  requiresAuth,
+  isAuthenticated,
+  t,
+  setNewFolderDialogOpen,
+}: {
+  activeRootFolderId: string | null;
+  requiresAuth: boolean;
+  isAuthenticated: boolean;
+  t: TFunction;
+  setNewFolderDialogOpen: (open: boolean) => void;
+}): JSX.Element {
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-11 w-11 hover:bg-accent"
+            onClick={() => setNewFolderDialogOpen(true)}
+            title={t(getNewFolderTranslationKey(activeRootFolderId || DEFAULT_FOLDER_IDS.PRIVATE))}
+            disabled={requiresAuth && !isAuthenticated}
+          >
+            <FolderPlus className="h-5 w-5" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          <P>
+            {requiresAuth && !isAuthenticated
+              ? t("app.chat.common.loginRequired")
+              : t(getNewFolderTranslationKey(activeRootFolderId || DEFAULT_FOLDER_IDS.PRIVATE))}
+          </P>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

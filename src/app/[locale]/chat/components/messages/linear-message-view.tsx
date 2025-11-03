@@ -22,6 +22,7 @@ import { GroupedAssistantMessage } from "./grouped-assistant-message";
 import { MessageEditor } from "./message-editor";
 import { groupMessagesBySequence } from "./message-grouping";
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
+import { useCollapseState } from "./use-collapse-state";
 import { UserMessageBubble } from "./user-message-bubble";
 
 interface LinearMessageViewProps {
@@ -84,6 +85,9 @@ export function LinearMessageView({
   logger,
   rootFolderId = "general",
 }: LinearMessageViewProps): JSX.Element {
+  // Collapse state management for thinking/tool sections
+  const collapseState = useCollapseState();
+
   // Group messages by sequence for proper display
   const messageGroups = groupMessagesBySequence(messages);
 
@@ -217,6 +221,7 @@ export function LinearMessageView({
                         onDelete={onDeleteMessage}
                         showAuthor={true}
                         logger={logger}
+                        collapseState={collapseState}
                       />
                     )}
                   {message.role === "error" && (

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons";
-import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import { H1, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -10,12 +9,11 @@ import type { JSX } from "react";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { translations } from "@/config/i18n/en";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
 import SignUpForm from "@/app/api/[locale]/v1/core/user/public/signup/_components/sign-up-form";
-
-const clientCount = 10000;
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
 }
@@ -38,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: "app.user.signup.meta.ogTitle",
         description: "app.user.signup.meta.ogDescription",
-        url: `https://nextvibe.dev/${locale}/user/signup`,
+        url: `${translations.websiteUrl}/${locale}/user/signup`,
         type: "website",
         images: [
           {
@@ -68,10 +66,7 @@ export default async function SignUpPage({
   const { t } = simpleT(locale);
 
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const user = await userRepository.getUserByAuth({}, 
-    locale,
-    logger,
-  );
+  const user = await userRepository.getUserByAuth({}, locale, logger);
   // Only redirect if user is authenticated and not a public user
   if (user.success && !user.data.isPublic) {
     redirect(`/${locale}/`);
@@ -94,7 +89,9 @@ export default async function SignUpPage({
         <Div className="order-1 xl:order-2 text-center xl:text-left">
           <Div className="mb-8">
             <H1 className="text-3xl xl:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
-              {t("app.user.signup.auth.signup.title")}
+              {t("app.user.signup.auth.signup.title", {
+                appName: t("config.appName"),
+              })}
             </H1>
             <P className="text-gray-600 dark:text-gray-300 text-lg mb-6">
               {t("app.user.signup.auth.signup.subtitle")}
@@ -190,38 +187,6 @@ export default async function SignUpPage({
                   </Div>
                 </Div>
               </Div>
-            </Div>
-
-            <Div className="flex flex-col md:flex-row items-center justify-center xl:justify-start gap-4">
-              <Div className="flex -space-x-2">
-                <Image
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&auto=format&fit=crop&crop=face"
-                  width={40}
-                  height={40}
-                  alt={t("app.user.signup.auth.signup.avatarAlt")}
-                  className="rounded-full border-2 border-white dark:border-gray-800"
-                />
-                <Image
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&auto=format&fit=crop&crop=face"
-                  width={40}
-                  height={40}
-                  alt={t("app.user.signup.auth.signup.avatarAlt")}
-                  className="rounded-full border-2 border-white dark:border-gray-800"
-                />
-                <Image
-                  src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=40&h=40&auto=format&fit=crop&crop=face"
-                  width={40}
-                  height={40}
-                  alt={t("app.user.signup.auth.signup.avatarAlt")}
-                  className="rounded-full border-2 border-white dark:border-gray-800"
-                />
-              </Div>
-              <P className="text-sm text-gray-600 dark:text-gray-400">
-                {t("app.user.signup.auth.signup.userCount", {
-                  count: clientCount,
-                })}{" "}
-                {t("app.user.signup.auth.signup.trustText")}
-              </P>
             </Div>
           </Div>
         </Div>

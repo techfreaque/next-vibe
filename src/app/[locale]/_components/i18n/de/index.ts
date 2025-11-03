@@ -5,7 +5,6 @@ export const translations: typeof enTranslations = {
     active: "Aktiv",
     filter: "Filtern",
     refresh: "Aktualisieren",
-    appName: "unbottled.ai",
     weekday: {
       monday: "Montag",
       tuesday: "Dienstag",
@@ -15,21 +14,7 @@ export const translations: typeof enTranslations = {
       saturday: "Samstag",
       sunday: "Sonntag",
     },
-    company: {
-      name: "unbottled.ai",
-      legalForm: "GmbH (Gesellschaft mit beschränkter Haftung)",
-      registrationNumber: "CHE-123.456.789",
-      address: {
-        title: "Adresse",
-        street: "Musterstrasse 123",
-        city: "8000 Zürich",
-        country: "Schweiz",
-        addressIn1Line: "Musterstrasse 123, 8000 Zürich, Schweiz",
-      },
-      responsiblePerson: {
-        name: "Max Mustermann",
-      },
-    },
+
     selector: {
       country: "Land",
       language: "Sprache",
@@ -134,74 +119,74 @@ export const translations: typeof enTranslations = {
   },
   meta: {
     home: {
-      title: "unbottled.ai - Unzensierter KI-Chat",
+      title: "{{appName}} - Unzensierter KI-Chat",
       category: "KI-Chat-Plattform",
       description:
         "Erleben Sie wirklich unzensierte KI-Gespräche mit über 40 Modellen. Keine Filter, keine Einschränkungen, nur ehrliche KI.",
-      imageAlt: "unbottled.ai - Unzensierte KI-Chat-Plattform",
+      imageAlt: "{{appName}} - Unzensierte KI-Chat-Plattform",
       keywords:
         "unzensierte KI, KI-Chat, GPT-4, Claude, Gemini, KI-Modelle, keine Filter, ehrliche KI, KI-Gespräche",
     },
     aboutUs: {
-      title: "Über uns - Unbottled.ai",
+      title: "Über uns - {{appName}}",
       category: "Über uns",
       description:
-        "Erfahren Sie mehr über die Mission von Unbottled.ai, unzensierte KI-Gespräche bereitzustellen",
-      imageAlt: "Über Unbottled.ai",
-      keywords: "über unbottled.ai, unzensierte KI, KI-Mission, KI-Werte",
-      ogTitle: "Über Unbottled.ai - Unzensierte KI-Plattform",
+        "Erfahren Sie mehr über die Mission von {{appName}}, unzensierte KI-Gespräche bereitzustellen",
+      imageAlt: "Über {{appName}}",
+      keywords: "über {{appName}}, unzensierte KI, KI-Mission, KI-Werte",
+      ogTitle: "Über {{appName}} - Unzensierte KI-Plattform",
       ogDescription:
         "Entdecken Sie unsere Mission, den Zugang zu unzensierter KI zu demokratisieren",
-      twitterTitle: "Über Unbottled.ai",
+      twitterTitle: "Über {{appName}}",
       twitterDescription:
         "Erfahren Sie mehr über unsere Mission für unzensierte KI-Gespräche",
     },
     privacyPolicy: {
-      title: "Datenschutzerklärung - Unbottled.ai",
+      title: "Datenschutzerklärung - {{appName}}",
       category: "Rechtliches",
       description:
-        "Erfahren Sie, wie Unbottled.ai Ihre Privatsphäre schützt und Ihre Daten verarbeitet",
+        "Erfahren Sie, wie {{appName}} Ihre Privatsphäre schützt und Ihre Daten verarbeitet",
       imageAlt: "Datenschutzerklärung",
       keywords:
-        "datenschutzerklärung, datenschutz, benutzerprivatsphäre, unbottled.ai datenschutz",
+        "datenschutzerklärung, datenschutz, benutzerprivatsphäre, {{appName}} datenschutz",
     },
     termsOfService: {
-      title: "Nutzungsbedingungen - Unbottled.ai",
+      title: "Nutzungsbedingungen - {{appName}}",
       category: "Rechtliches",
       description:
-        "Lesen Sie die Geschäftsbedingungen für die Nutzung von Unbottled.ai",
+        "Lesen Sie die Geschäftsbedingungen für die Nutzung von {{appName}}",
       imageAlt: "Nutzungsbedingungen",
       keywords:
-        "nutzungsbedingungen, geschäftsbedingungen, benutzervereinbarung, unbottled.ai bedingungen",
+        "nutzungsbedingungen, geschäftsbedingungen, benutzervereinbarung, {{appName}} bedingungen",
     },
     imprint: {
-      title: "Impressum - Unbottled.ai",
+      title: "Impressum - {{appName}}",
       category: "Rechtliches",
       description:
-        "Rechtliche Informationen und Unternehmensdetails für Unbottled.ai",
+        "Rechtliche Informationen und Unternehmensdetails für {{appName}}",
       imageAlt: "Impressum",
       keywords:
-        "impressum, rechtliche hinweise, unternehmensinformationen, unbottled.ai rechtliches",
+        "impressum, rechtliche hinweise, unternehmensinformationen, {{appName}} rechtliches",
     },
     careers: {
-      title: "Karriere - Unbottled.ai",
+      title: "Karriere - {{appName}}",
       category: "Karriere",
       description:
         "Werden Sie Teil unseres Teams und helfen Sie, die Zukunft der unzensierten KI zu gestalten",
-      imageAlt: "Karriere bei Unbottled.ai",
-      keywords: "karriere, jobs, KI-Jobs, remote-arbeit, unbottled.ai karriere",
+      imageAlt: "Karriere bei {{appName}}",
+      keywords: "karriere, jobs, KI-Jobs, remote-arbeit, {{appName}} karriere",
     },
     pricing: {
-      title: "Preise - Unbottled.ai",
+      title: "Preise - {{appName}}",
       category: "Preise",
       description:
         "Erschwingliche KI-Chat-Pläne für jeden. Starten Sie kostenlos mit 10 täglichen Nachrichten.",
       imageAlt: "Preispläne",
       keywords:
-        "preise, pläne, abonnement, KI-chat-preise, unbottled.ai preise",
-      ogTitle: "Preispläne - Unbottled.ai",
+        "preise, pläne, abonnement, KI-chat-preise, {{appName}} preise",
+      ogTitle: "Preispläne - {{appName}}",
       ogDescription: "Einfache, transparente Preise für unzensierten KI-Chat",
-      twitterTitle: "Preise - Unbottled.ai",
+      twitterTitle: "Preise - {{appName}}",
       twitterDescription: "Kostenlos starten mit 10 täglichen Nachrichten",
     },
     billing: {
@@ -232,13 +217,13 @@ export const translations: typeof enTranslations = {
   },
   layout: {
     metadata: {
-      defaultTitle: "unbottled.ai - Unzensierter KI-Chat",
+      defaultTitle: "{{appName}} - Unzensierter KI-Chat",
       category: "KI-Chat-Plattform",
       description:
         "Erleben Sie wirklich unzensierte KI-Gespräche mit über 40 Modellen. Keine Filter, keine Einschränkungen, nur ehrliche KI.",
     },
     openGraph: {
-      imageAlt: "unbottled.ai - Unzensierte KI-Chat-Plattform",
+      imageAlt: "{{appName}} - Unzensierte KI-Chat-Plattform",
     },
     structuredData: {
       organization: {
@@ -246,9 +231,9 @@ export const translations: typeof enTranslations = {
           organization: "Organisation",
           contactPoint: "Kontaktstelle",
         },
-        name: "unbottled.ai",
+  
         contactPoint: {
-          telephone: "+1-555-0123",
+            telephone: "{{config.group.contact.telephone}}",
           contactType: "Kundenservice",
         },
       },

@@ -1,0 +1,258 @@
+import { motion } from "framer-motion";
+import { AlertCircle, Calendar, Info, Sparkles, TrendingUp, Zap } from "lucide-react";
+import { Link } from "next-vibe-ui/ui/link";
+import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { Span } from "next-vibe-ui/ui/span";
+import { useTranslation } from "@/i18n/core/client";
+import { useCreditPurchase } from "@/app/api/[locale]/v1/core/credits/hooks";
+import purchaseDefinitions from "@/app/api/[locale]/v1/core/credits/purchase/definition";
+import { useSubscriptionCheckout } from "@/app/api/[locale]/v1/core/payment/checkout/hooks";
+import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { SubscriptionData } from "./types";
+import { formatPrice } from "./types";
+
+interface BuyCreditsTabProps {
+  locale: CountryLanguage;
+  isAuthenticated: boolean;
+  initialSubscription: SubscriptionData | null;
+  subscriptionPrice: number;
+  subscriptionCredits: number;
+  packPrice: number;
+  packCredits: number;
+}
+
+export function BuyCreditsTab({
+  locale,
+  isAuthenticated,
+  initialSubscription,
+  subscriptionPrice,
+  subscriptionCredits,
+  packPrice,
+  packCredits,
+}: BuyCreditsTabProps) {
+  const { t } = useTranslation();
+
+  // Initialize hooks
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const subscriptionCheckoutEndpoint = useSubscriptionCheckout(logger);
+  const creditPurchaseEndpoint = useCreditPurchase(logger);
+
+  const handleSubscribe = (): void => {
+    if (!subscriptionCheckoutEndpoint.create) {
+      return;
+    }
+
+    // Set form values for subscription checkout
+    subscriptionCheckoutEndpoint.create.form.reset({
+      planId: SubscriptionPlan.SUBSCRIPTION,
+      billingInterval: BillingInterval.MONTHLY,
+    });
+
+    // Submit form - redirect is handled by the hook's onSuccess callback
+    void subscriptionCheckoutEndpoint.create.submitForm(undefined);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1 }}
+      className="grid grid-cols-1 md:grid-cols-2 gap-6"
+    >
+      {/* Subscription Option */}
+      <Card className="relative overflow-hidden border-2 border-primary">
+        <CardHeader>
+          <CardTitle className="text-2xl">
+            {t("app.subscription.subscription.buy.subscription.title")}
+          </CardTitle>
+          <CardDescription>
+            {t(
+              "app.subscription.subscription.buy.subscription.description",
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <Div className="space-y-2">
+            <Div className="text-4xl font-bold">
+              {formatPrice(subscriptionPrice, locale)}
+            </Div>
+            <Div className="text-sm text-muted-foreground">
+              {t(
+                "app.subscription.subscription.buy.subscription.perMonth",
+              )}
+            </Div>
+          </Div>
+
+          <Div className="space-y-3 text-sm">
+            <Div className="flex items-center gap-2">
+              <Zap className="h-4 w-4 text-primary" />
+              <Span>
+                {t(
+                  "app.subscription.subscription.buy.subscription.features.credits",
+                  { count: subscriptionCredits },
+                )}
+              </Span>
+            </Div>
+            <Div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-amber-600" />
+              <Span>
+                {t(
+                  "app.subscription.subscription.buy.subscription.features.expiry",
+                )}
+              </Span>
+            </Div>
+            <Div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-green-600" />
+              <Span>
+                {t(
+                  "app.subscription.subscription.buy.subscription.features.bestFor",
+                )}
+              </Span>
+            </Div>
+          </Div>
+
+          {!isAuthenticated ? (
+            <Div className="flex gap-2">
+              <Button
+                variant="ghost"
+                asChild
+                className="flex-1 hidden sm:flex"
+              >
+                <Link href={`/${locale}/user/login`}>
+                  {t("app.story._components.nav.user.login")}
+                </Link>
+              </Button>
+              <Button
+                asChild
+                className="flex-1 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+                size="lg"
+              >
+                <Link href={`/${locale}/user/signup`}>
+                  {t("app.story._components.nav.user.signup")}
+                </Link>
+              </Button>
+            </Div>
+          ) : (
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={handleSubscribe}
+              disabled={subscriptionCheckoutEndpoint.create?.isSubmitting}
+            >
+              {subscriptionCheckoutEndpoint.create?.isSubmitting
+                ? "Loading..."
+                : t(
+                    "app.subscription.subscription.buy.subscription.button",
+                  )}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Credit Pack Option */}
+      <Card className="relative overflow-hidden">
+        <CardHeader>
+          <CardTitle className="text-2xl">
+            {t("app.subscription.subscription.buy.pack.title")}
+          </CardTitle>
+          <CardDescription>
+            {t("app.subscription.subscription.buy.pack.description")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <Div className="space-y-2">
+            <Div className="text-4xl font-bold">
+              {formatPrice(packPrice, locale)}
+            </Div>
+            <Div className="text-sm text-muted-foreground">
+              {t("app.subscription.subscription.buy.pack.perPack")}
+            </Div>
+          </Div>
+
+          <Div className="space-y-3 text-sm">
+            <Div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-green-600" />
+              <Span>
+                {t(
+                  "app.subscription.subscription.buy.pack.features.credits",
+                  { count: packCredits },
+                )}
+              </Span>
+            </Div>
+            <Div className="flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-green-600" />
+              <Span>
+                {t(
+                  "app.subscription.subscription.buy.pack.features.expiry",
+                )}
+              </Span>
+            </Div>
+            <Div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-blue-600" />
+              <Span>
+                {t(
+                  "app.subscription.subscription.buy.pack.features.bestFor",
+                )}
+              </Span>
+            </Div>
+          </Div>
+
+          {/* Quantity Selector Form - Only show for active subscribers */}
+          {creditPurchaseEndpoint.create &&
+            initialSubscription?.status === SubscriptionStatus.ACTIVE && (
+              <Form
+                form={creditPurchaseEndpoint.create.form}
+                onSubmit={creditPurchaseEndpoint.create.submitForm}
+                className="space-y-3"
+              >
+                <Div className="w-full">
+                  <EndpointFormField
+                    name="quantity"
+                    control={creditPurchaseEndpoint.create.form.control}
+                    endpointFields={purchaseDefinitions.POST.fields}
+                    theme={{
+                      style: "none",
+                      showAllRequired: false,
+                    }}
+                  />
+                </Div>
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  variant="outline"
+                  disabled={creditPurchaseEndpoint.create.isSubmitting}
+                >
+                  {creditPurchaseEndpoint.create.isSubmitting
+                    ? "Loading..."
+                    : t(
+                        "app.subscription.subscription.buy.pack.button.submit",
+                      )}
+                </Button>
+              </Form>
+            )}
+
+          {/* Message for non-subscribers */}
+          {(!initialSubscription ||
+            initialSubscription.status !== SubscriptionStatus.ACTIVE) && (
+            <Div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+              <Div className="text-sm text-amber-700 dark:text-amber-300">
+                <Info className="h-4 w-4 inline mr-2" />
+                {t(
+                  "app.subscription.subscription.buy.pack.requiresSubscription",
+                )}
+              </Div>
+            </Div>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}

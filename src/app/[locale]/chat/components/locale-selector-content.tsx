@@ -57,7 +57,7 @@ export const LocaleSelectorContent: FC = () => {
         <TabsList className="grid grid-cols-2 mb-2">
           <TabsTrigger
             value="country"
-            className={`flex items-center gap-1 ${tabHover === "country" ? "bg-primary/10" : ""}`}
+            className={`flex items-center gap-1 cursor-pointer ${tabHover === "country" ? "bg-primary/10" : ""}`}
             onMouseEnter={() => setTabHover("country")}
             onMouseLeave={() => setTabHover(null)}
           >
@@ -66,7 +66,7 @@ export const LocaleSelectorContent: FC = () => {
           </TabsTrigger>
           <TabsTrigger
             value="language"
-            className={`flex items-center gap-1 ${tabHover === "language" ? "bg-primary/10" : ""}`}
+            className={`flex items-center gap-1 cursor-pointer ${tabHover === "language" ? "bg-primary/10" : ""}`}
             onMouseEnter={() => setTabHover("language")}
             onMouseLeave={() => setTabHover(null)}
           >
@@ -81,7 +81,7 @@ export const LocaleSelectorContent: FC = () => {
               <Button
                 key={countryItem.code}
                 variant="ghost"
-                className={`flex items-center justify-between w-full h-auto py-2 px-3 hover:bg-accent transition-colors ${
+                className={`flex items-center justify-between w-full h-auto py-2 px-3 hover:bg-accent transition-colors cursor-pointer ${
                   country === countryItem.code ? "bg-muted" : ""
                 }`}
                 onClick={() => {
@@ -111,7 +111,7 @@ export const LocaleSelectorContent: FC = () => {
               <Button
                 key={langCode}
                 variant="ghost"
-                className={`flex items-center justify-between w-full h-auto py-2 px-3 hover:bg-accent transition-colors ${
+                className={`flex items-center justify-between w-full h-auto py-2 px-3 hover:bg-accent transition-colors cursor-pointer ${
                   language === langCode ? "bg-muted" : ""
                 }`}
                 onClick={() => {

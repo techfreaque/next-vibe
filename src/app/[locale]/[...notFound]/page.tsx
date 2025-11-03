@@ -14,6 +14,7 @@ import type { JSX } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
+import { translations } from "@/config/i18n/en";
 
 import { NotFoundBackButton } from "./not-found-client";
 
@@ -33,7 +34,7 @@ export async function generateMetadata({
     title: "app.meta.notFound.title",
     category: "app.meta.notFound.category",
     description: "app.meta.notFound.description",
-    image: "https://unbottled.ai/images/not-found.jpg",
+    image: `${translations.websiteUrl}/images/not-found.jpg`,
     imageAlt: "app.meta.notFound.imageAlt",
     keywords: ["app.meta.notFound.keywords"],
   });

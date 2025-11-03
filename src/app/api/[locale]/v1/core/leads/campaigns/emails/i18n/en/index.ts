@@ -15,9 +15,9 @@ export const translations = {
   emailJourneys: {
     components: {
       footer: {
-        copyright: "© 2024 NextVibe. All rights reserved.",
+        copyright: "© 2024 {{appName}}. All rights reserved.",
         helpText:
-          "If you have any questions, please contact us at support@nextvibe.com",
+          "If you have any questions, please contact us at {{config.emails.support}}",
         unsubscribeText: "Don't want to receive these emails?",
         unsubscribeLink: "Unsubscribe",
       },

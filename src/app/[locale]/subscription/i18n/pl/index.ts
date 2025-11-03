@@ -68,6 +68,11 @@ export const translations: typeof enTranslations = {
       },
     },
     buy: {
+      signInRequired: {
+        title: "Wymagane logowanie",
+        description:
+          "Zaloguj się lub utwórz konto, aby kupić kredyty i subskrypcje.",
+      },
       subscription: {
         badge: "Dostępne dla wszystkich",
         title: "Subskrypcja miesięczna",
@@ -83,7 +88,8 @@ export const translations: typeof enTranslations = {
       },
       pack: {
         title: "Pakiety kredytów",
-        description: "Dodatkowe kredyty dla zaawansowanych użytkowników (wymaga aktywnej subskrypcji)",
+        description:
+          "Dodatkowe kredyty dla zaawansowanych użytkowników (wymaga aktywnej subskrypcji)",
         badge: "Dla zaawansowanych",
         perPack: "/pakiet",
         quantity: "Ilość",
@@ -92,7 +98,8 @@ export const translations: typeof enTranslations = {
           credits: "{{count}} kredytów na pakiet",
           permanent: "Nigdy nie wygasa",
           expiry: "Nigdy nie wygasa",
-          bestFor: "Dla zaawansowanych użytkowników potrzebujących dodatkowych kredytów",
+          bestFor:
+            "Dla zaawansowanych użytkowników potrzebujących dodatkowych kredytów",
         },
         button: {
           submit: "Kup pakiet kredytów",
@@ -100,7 +107,8 @@ export const translations: typeof enTranslations = {
         totalPrice: "Razem: {{price}}",
         pack: "Pakiet",
         packs: "Pakiety",
-        requiresSubscription: "Subskrybuj miesięczny plan, aby kupić dodatkowe pakiety kredytów.",
+        requiresSubscription:
+          "Subskrybuj miesięczny plan, aby kupić dodatkowe pakiety kredytów.",
       },
     },
     history: {
@@ -130,13 +138,17 @@ export const translations: typeof enTranslations = {
     payment: {
       success: {
         title: "Płatność zakończona sukcesem",
-        subscription: "Twoja subskrypcja została pomyślnie aktywowana! Twoje kredyty będą dostępne wkrótce.",
-        credits: "Twój zakup pakietu kredytów zakończył się sukcesem! Twoje kredyty będą dostępne wkrótce.",
+        subscription:
+          "Twoja subskrypcja została pomyślnie aktywowana! Twoje kredyty będą dostępne wkrótce.",
+        credits:
+          "Twój zakup pakietu kredytów zakończył się sukcesem! Twoje kredyty będą dostępne wkrótce.",
       },
       canceled: {
         title: "Płatność anulowana",
-        subscription: "Twoja płatność za subskrypcję została anulowana. Możesz spróbować ponownie w dowolnym momencie.",
-        credits: "Twój zakup pakietu kredytów został anulowany. Możesz spróbować ponownie w dowolnym momencie.",
+        subscription:
+          "Twoja płatność za subskrypcję została anulowana. Możesz spróbować ponownie w dowolnym momencie.",
+        credits:
+          "Twój zakup pakietu kredytów został anulowany. Możesz spróbować ponownie w dowolnym momencie.",
       },
     },
   },

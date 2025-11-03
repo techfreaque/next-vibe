@@ -62,7 +62,7 @@ export default async function EmailPreviewPage({
     {
       t,
       locale,
-      companyName: t("app.appName"),
+      companyName: t("config.appName"),
       companyEmail: contactClientRepository.getSupportEmail(locale),
     },
   );
@@ -238,7 +238,7 @@ export default async function EmailPreviewPage({
         journeyVariant={journeyVariant}
         stage={stage}
         emailPreview={emailPreview}
-        companyName={t("app.appName")}
+        companyName={t("config.appName")}
         companyEmail={contactClientRepository.getSupportEmail(locale)}
         locale={locale}
       />

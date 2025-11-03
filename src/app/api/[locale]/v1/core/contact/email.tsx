@@ -3,7 +3,13 @@
  * React Email templates for contact form submissions
  */
 
-import { Button, Hr, Link, Section, Text as Span } from "@react-email/components";
+import {
+  Button,
+  Hr,
+  Link,
+  Section,
+  Text as Span,
+} from "@react-email/components";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -123,22 +129,20 @@ function ContactEmailContent({
           </Link>
         </Span>
 
-        {
-          requestData.company && (
-            <Span
-              style={{
-                fontSize: "14px",
-                marginBottom: "4px",
-                color: "#4b5563",
-              }}
-            >
-              <Span style={{ fontWeight: "700" }}>
-                {t("app.api.v1.core.contact.email.company.company")}:
-              </Span>{" "}
-              {requestData.company}
-            </Span>
-          )
-        }
+        {requestData.company && (
+          <Span
+            style={{
+              fontSize: "14px",
+              marginBottom: "4px",
+              color: "#4b5563",
+            }}
+          >
+            <Span style={{ fontWeight: "700" }}>
+              {t("app.api.v1.core.contact.email.company.company")}:
+            </Span>{" "}
+            {requestData.company}
+          </Span>
+        )}
 
         <Span
           style={{
@@ -194,25 +198,23 @@ function ContactEmailContent({
       </Span>
 
       {/* Admin Button for Company Emails */}
-      {
-        isForCompany && (
-          <Section style={{ textAlign: "center", marginTop: "24px" }}>
-            <Button
-              href={`${env.NEXT_PUBLIC_APP_URL}/admin/contacts`}
-              style={{
-                backgroundColor: "#4f46e5",
-                borderRadius: "6px",
-                color: "#ffffff",
-                fontSize: "14px",
-                padding: "10px 20px",
-                textDecoration: "none",
-              }}
-            >
-              {t("app.api.v1.core.contact.email.company.viewDetails")}
-            </Button>
-          </Section>
-        )
-      }
+      {isForCompany && (
+        <Section style={{ textAlign: "center", marginTop: "24px" }}>
+          <Button
+            href={`${env.NEXT_PUBLIC_APP_URL}/admin/contacts`}
+            style={{
+              backgroundColor: "#4f46e5",
+              borderRadius: "6px",
+              color: "#ffffff",
+              fontSize: "14px",
+              padding: "10px 20px",
+              textDecoration: "none",
+            }}
+          >
+            {t("app.api.v1.core.contact.email.company.viewDetails")}
+          </Button>
+        </Section>
+      )}
     </EmailTemplate>
   );
 }
@@ -229,7 +231,7 @@ export const renderCompanyMail: EmailFunctionType<
   try {
     return createSuccessResponse({
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("app.common.appName"),
+      toName: t("config.appName"),
       subject: t("app.api.v1.core.contact.email.partner.subject", {
         subject: requestData.subject,
       }),
@@ -268,7 +270,7 @@ export const renderPartnerMail: EmailFunctionType<
         subject: requestData.subject,
       }),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
-      replyToName: t("app.common.appName"),
+      replyToName: t("config.appName"),
 
       jsx: ContactEmailContent({
         requestData,

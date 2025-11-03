@@ -4,6 +4,7 @@ import type { JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
+import { translations } from "@/config/i18n/en";
 
 /**
  * Generate metadata for the user pages with translations
@@ -19,14 +20,14 @@ export async function generateMetadata({
     title: "app.user.meta.profile.title",
     description: "app.user.meta.profile.description",
     category: "app.user.meta.profile.category",
-    image: "https://unbottled.ai/images/user-hero.jpg",
+    image: `${translations.websiteUrl}/images/user-hero.jpg`,
     imageAlt: "app.user.meta.profile.imageAlt",
     keywords: ["app.user.meta.profile.keywords"],
     additionalMetadata: {
       openGraph: {
         title: "app.user.meta.profile.ogTitle",
         description: "app.user.meta.profile.ogDescription",
-        url: `https://unbottled.ai/${locale}/user`,
+        url: `${translations.websiteUrl}/${locale}/user`,
         type: "website",
       },
       twitter: {

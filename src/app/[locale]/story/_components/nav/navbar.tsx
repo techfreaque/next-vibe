@@ -1,7 +1,12 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "next-vibe-ui/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "next-vibe-ui/ui/dropdown-menu";
 import { ChevronDown } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { P } from "next-vibe-ui/ui/typography";
@@ -103,7 +108,7 @@ export function Navbar({
                                       )}
                                     >
                                       {typeof badge === "string" &&
-                                        badge.includes(".")
+                                      badge.includes(".")
                                         ? t(badge, badgeTranslationPayload)
                                         : badge}
                                     </Span>
@@ -144,7 +149,7 @@ export function Navbar({
                                     )}
                                   >
                                     {typeof badge === "string" &&
-                                      badge.includes(".")
+                                    badge.includes(".")
                                       ? t(badge)
                                       : badge}
                                   </Span>

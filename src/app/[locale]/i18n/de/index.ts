@@ -21,7 +21,7 @@ export const translations: typeof enTranslations = {
   user: userTranslations,
   native: {
     page: {
-      welcome: "Willkommen bei Next Vibe",
+      welcome: "Willkommen bei {{appName}}",
       description: "Eine einheitliche Next.js und React Native Anwendung",
       locale: {
         title: "Aktuelle Sprache",
@@ -40,7 +40,7 @@ export const translations: typeof enTranslations = {
         },
         async: {
           title: "✅ Asynchrone Serverkomponenten",
-          description: "Next.js 15 asynchrone Seitenkomponenten funktionieren in React Native",
+          description: "Next.js 15 asynchrone Seitkomponenten funktionieren in React Native",
         },
       },
       links: {
@@ -60,9 +60,6 @@ export const translations: typeof enTranslations = {
     },
   },
   common: {
-    logoPart1: "Unbottled",
-    logoPart2: ".ai",
-    appName: "Unbottled.ai",
     active: "Aktiv",
     filter: "Filtern",
     refresh: "Aktualisieren",
@@ -75,22 +72,6 @@ export const translations: typeof enTranslations = {
       friday: "Freitag",
       saturday: "Samstag",
       sunday: "Sonntag",
-    },
-    company: {
-      name: "Unbottled.ai",
-      legalForm: "Gesellschaft mit beschränkter Haftung (GmbH)",
-      registrationNumber: "REG-2024-UNBOTTLED-AI",
-      address: {
-        title: "Adresse",
-        street: "123 AI Innovation Drive",
-        city: "San Francisco, CA 94105",
-        country: "Vereinigte Staaten",
-        addressIn1Line:
-          "123 AI Innovation Drive, San Francisco, CA 94105, Vereinigte Staaten",
-      },
-      responsiblePerson: {
-        name: "Geschäftsführer",
-      },
     },
     selector: {
       country: "Land",

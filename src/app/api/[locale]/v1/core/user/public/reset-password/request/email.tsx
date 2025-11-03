@@ -195,7 +195,7 @@ export const renderResetPasswordMail: EmailFunctionType<
     const token = tokenResponse.data;
     const passwordResetUrl = `${env.NEXT_PUBLIC_APP_URL}/${locale}/user/reset-password/${token}`;
 
-    const translatedAppName = t("app.api.common.appName");
+    const translatedAppName = t("config.appName");
 
     return createSuccessResponse({
       toEmail: requestData.emailInput.email,

@@ -17,6 +17,10 @@ import { ChevronUp } from "./icons/ChevronUp";
 import { Span } from "./span";
 import { TextClassContext } from "./text";
 
+/* eslint-disable i18next/no-literal-string -- CSS classNames */
+const TEXT_CLASS_ITEM = "select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground";
+/* eslint-enable i18next/no-literal-string */
+
 // Cross-platform type definitions for native
 export interface DropdownMenuSubTriggerProps {
   className?: string;
@@ -201,9 +205,7 @@ function DropdownMenuItem({
 }: DropdownMenuItemProps & DropdownMenuPrimitive.ItemProps): React.JSX.Element {
   return (
     <TextClassContext.Provider
-      value={
-        "select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground" // eslint-disable-next-line i18n/no-literal-string
-      }
+      value={TEXT_CLASS_ITEM}
     >
       <StyledDropdownMenuItem
         className={cn(

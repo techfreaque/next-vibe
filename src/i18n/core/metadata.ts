@@ -8,14 +8,14 @@ import type { TranslationKey } from "./static-types";
 
 export interface MetadataConfig {
   baseUrl: string;
-  twitterHandle: string;
-  defaultImage: string;
+  twitterHandle: TranslationKey;
+  defaultImage: TranslationKey;
   defaultImageAlt: TranslationKey;
 
   // Authors and publisher
-  authors: { name: string }[];
-  creator: string;
-  publisher: string;
+  authors: { name: TranslationKey }[];
+  creator: TranslationKey;
+  publisher: TranslationKey;
 
   // Verification
   verification: {
@@ -41,8 +41,8 @@ export interface MetadataConfig {
     index?: boolean;
     follow?: boolean;
     googleBot?: {
-      "index"?: boolean;
-      "follow"?: boolean;
+      index?: boolean;
+      follow?: boolean;
       "max-image-preview"?: "none" | "standard" | "large";
       "max-snippet"?: number;
     };
@@ -180,7 +180,7 @@ export function metadataGenerator(
       });
     });
   }
-  const appName = t("app.common.appName");
+  const appName = t("config.appName");
 
   // Get translated values using the provided translation keys
   const translatedTitle = t(options.title, { appName });

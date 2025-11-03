@@ -21,6 +21,8 @@ export const translations: typeof enTranslations = {
         stubWarning: "Verwende Stub: Carousel",
         stubLabel: "Carousel (Stub)",
       },
+      checkbox: {},
+      collapsible: {},
       chart: {
         stubWarning: "Verwende Stub: Chart",
         stubLabel: "Chart (Stub)",

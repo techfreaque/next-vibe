@@ -115,23 +115,23 @@ export function HumanEmailLayout({
                     lineHeight: "1",
                     letterSpacing: "-0.5px",
                   }}
-                >
-                  {t("app.common.logoPart1")}
-                </Span>
-                <Span
-                  style={{
-                    fontSize: "20px",
-                    fontWeight: "700",
-                    margin: "0",
-                    background: "linear-gradient(to right, #06b6d4, #2563eb)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                    lineHeight: "1",
+                 >
+                   {t("config.logoPart1")}
+                 </Span>
+                 <Span
+                   style={{
+                     fontSize: "20px",
+                     fontWeight: "700",
+                     margin: "0",
+                     background: "linear-gradient(to right, #06b6d4, #2563eb)",
+                     WebkitBackgroundClip: "text",
+                     WebkitTextFillColor: "transparent",
+                     backgroundClip: "text",
+                     lineHeight: "1",
                     letterSpacing: "-0.5px",
                   }}
                 >
-                  {t("app.common.logoPart2")}
+                  {t("config.logoPart2")}
                 </Span>
               </div>
               <Span

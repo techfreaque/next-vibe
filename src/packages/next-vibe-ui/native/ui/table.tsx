@@ -34,7 +34,10 @@ function Table({ className, ...props }: TableProps): React.JSX.Element {
 }
 Table.displayName = "Table";
 
-function TableHeader({ className, ...props }: TableHeaderProps): React.JSX.Element {
+function TableHeader({
+  className,
+  ...props
+}: TableHeaderProps): React.JSX.Element {
   return (
     <StyledTableHeader
       className={cn("border-border [&_tr]:border-b", className)}
@@ -44,7 +47,11 @@ function TableHeader({ className, ...props }: TableHeaderProps): React.JSX.Eleme
 }
 TableHeader.displayName = "TableHeader";
 
-function TableBody({ className, style, ...props }: TableBodyProps): React.JSX.Element {
+function TableBody({
+  className,
+  style,
+  ...props
+}: TableBodyProps): React.JSX.Element {
   return (
     <StyledTableBody
       className={cn(
@@ -58,21 +65,28 @@ function TableBody({ className, style, ...props }: TableBodyProps): React.JSX.El
 }
 TableBody.displayName = "TableBody";
 
-function TableFooter({ className, ...props }: TableFooterProps): React.JSX.Element {
+function TableFooter({
+  className,
+  ...props
+}: TableFooterProps): React.JSX.Element {
   return (
     <StyledTableFooter
-      className={cn("bg-muted/50 font-medium [&>tr]:last:border-b-0", className)}
+      className={cn("bg-accent font-medium [&>tr]:last:border-b-0", className)}
       {...props}
     />
   );
 }
 TableFooter.displayName = "TableFooter";
 
-function TableRow({ className, onPress, ...props }: TableRowProps): React.JSX.Element {
+function TableRow({
+  className,
+  onPress,
+  ...props
+}: TableRowProps): React.JSX.Element {
   return (
     <StyledTableRow
       className={cn(
-        "flex-row border-border border-b web:transition-colors web:hover:bg-muted/50 web:data-[state=selected]:bg-muted",
+        "flex-row border-border border-b web:transition-colors web:hover:bg-accent web:data-[state=selected]:bg-muted",
         className,
       )}
       onPress={onPress}
@@ -82,7 +96,11 @@ function TableRow({ className, onPress, ...props }: TableRowProps): React.JSX.El
 }
 TableRow.displayName = "TableRow";
 
-function TableHead({ className, style, ...props }: TableHeadProps): React.JSX.Element {
+function TableHead({
+  className,
+  style,
+  ...props
+}: TableHeadProps): React.JSX.Element {
   return (
     <TextClassContext.Provider value="text-muted-foreground">
       <StyledTableHead
@@ -98,10 +116,17 @@ function TableHead({ className, style, ...props }: TableHeadProps): React.JSX.El
 }
 TableHead.displayName = "TableHead";
 
-function TableCell({ className, style, ...props }: TableCellProps): React.JSX.Element {
+function TableCell({
+  className,
+  style,
+  ...props
+}: TableCellProps): React.JSX.Element {
   return (
     <StyledTableCell
-      className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
+      className={cn(
+        "p-4 align-middle [&:has([role=checkbox])]:pr-0",
+        className,
+      )}
       style={style as StyleProp<ViewStyle>}
       {...props}
     />

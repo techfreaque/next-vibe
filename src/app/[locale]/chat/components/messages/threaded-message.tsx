@@ -20,6 +20,7 @@ import type { JSX } from "react";
 import React, { useState } from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
+import { useAIStreamStore } from "@/app/api/[locale]/v1/core/agent/ai-stream/hooks/store";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { getPersonaName } from "@/app/api/[locale]/v1/core/agent/chat/personas/config";
 import { useTTSAudio } from "@/app/api/[locale]/v1/core/agent/text-to-speech/hooks";
@@ -35,15 +36,20 @@ import { getDirectReplies } from "../../lib/utils/thread-builder";
 import type { ChatMessage, ModelId } from "../../types";
 import { ErrorMessageBubble } from "./error-message-bubble";
 import { MessageEditor } from "./message-editor";
+
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
 import { ToolDisplay } from "./tool-display";
+import type { useCollapseState } from "./use-collapse-state";
 import { useMessageActions } from "./use-message-actions";
+import type { groupMessagesBySequence } from "./message-grouping";
 import { UserProfileCard } from "./user-profile-card";
 
 interface ThreadedMessageProps {
   message: ChatMessage;
+  messageGroup?: ReturnType<typeof groupMessagesBySequence>[0];
   replies: ChatMessage[];
   allMessages: ChatMessage[];
+  messageToGroupMap: Map<string, ReturnType<typeof groupMessagesBySequence>[0]>;
   depth: number;
   selectedModel: ModelId;
   selectedPersona: string;
@@ -59,12 +65,16 @@ interface ThreadedMessageProps {
   onPersonaChange?: (persona: string) => void;
   maxDepth?: number;
   rootFolderId?: string;
+  /** Collapse state management callbacks */
+  collapseState?: ReturnType<typeof useCollapseState>;
 }
 
 export function ThreadedMessage({
   message,
+  messageGroup,
   replies,
   allMessages,
+  messageToGroupMap,
   depth,
   selectedModel,
   selectedPersona,
@@ -72,6 +82,7 @@ export function ThreadedMessage({
   locale,
   logger,
   onDeleteMessage,
+  collapseState,
   onBranchMessage,
   onRetryMessage,
   onAnswerAsModel,
@@ -96,6 +107,19 @@ export function ThreadedMessage({
   // Detect touch device for proper action visibility
   const isTouch = useTouchDevice();
 
+  // Get all messages in the sequence (primary + continuations)
+  const allMessagesInSequence = messageGroup
+    ? [messageGroup.primary, ...messageGroup.continuations].toSorted(
+        (a, b) => (a.sequenceIndex ?? 0) - (b.sequenceIndex ?? 0),
+      )
+    : [message];
+
+  // Check if this message is currently streaming
+  const streamingMessage = useAIStreamStore(
+    (state) => state.streamingMessages[message.id],
+  );
+  const isMessageStreaming = streamingMessage?.isStreaming ?? false;
+
   // TTS support for assistant messages
   const {
     isLoading: isTTSLoading,
@@ -105,6 +129,7 @@ export function ThreadedMessage({
   } = useTTSAudio({
     text: message.content,
     enabled: message.role === "assistant" && ttsAutoplay,
+    isStreaming: isMessageStreaming,
     locale,
     logger,
   });
@@ -145,7 +170,7 @@ export function ThreadedMessage({
             className={cn(
               "absolute top-4 z-10",
               "h-5 w-5 rounded",
-              "bg-background/80 backdrop-blur-sm border border-border/60",
+              "bg-card backdrop-blur-sm border border-border/60",
               "flex items-center justify-center",
               "hover:bg-blue-500/10 hover:border-blue-500/40 transition-all",
               "text-muted-foreground hover:text-blue-400",
@@ -241,7 +266,7 @@ export function ThreadedMessage({
               <Div
                 className={cn(
                   "group/message p-4 rounded-lg",
-                  "bg-background/40 backdrop-blur-sm",
+                  "bg-muted backdrop-blur-sm",
                   "border border-border/30",
                   "hover:border-border/50 transition-all",
                   "relative",
@@ -249,7 +274,7 @@ export function ThreadedMessage({
               >
                 {/* Logo watermark for first message */}
                 {depth === 0 && !message.parentId && (
-                  <Div className="absolute top-3 right-3 pointer-events-none bg-background/60 backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10">
+                  <Div className="absolute top-3 right-3 pointer-events-none bg-card backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10">
                     <Logo
                       className="h-auto w-auto max-w-[120px] opacity-70"
                       locale={locale}
@@ -321,38 +346,68 @@ export function ThreadedMessage({
                   <Span>{message.createdAt.toLocaleString()}</Span>
                 </Div>
 
-                {/* Message content */}
+                {/* Message content - render all messages in sequence */}
                 <Div className="text-sm">
-                  {message.role === "assistant" ? (
-                    <Div
-                      className={cn(
-                        "prose prose-sm dark:prose-invert max-w-none",
-                        "prose-p:my-2 prose-p:leading-relaxed",
-                        "prose-code:text-blue-400 prose-code:bg-blue-950/40 prose-code:px-1 prose-code:rounded",
-                        "prose-pre:bg-black/60 prose-pre:border prose-pre:border-border/40 prose-pre:rounded-md",
-                        "prose-headings:text-foreground prose-headings:font-bold",
-                        "prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline",
-                      )}
-                    >
-                      {/* NEW ARCHITECTURE: Tool calls are separate TOOL messages now */}
-                      <Markdown content={message.content} />
-                    </Div>
-                  ) : message.role === "tool" ? (
-                    <Div>
-                      {/* NEW ARCHITECTURE: TOOL messages have toolCalls in metadata */}
-                      {message.toolCalls && message.toolCalls.length > 0 && (
+                  {allMessagesInSequence.map((msg, msgIndex) => {
+                    // Check if there's content after this message
+                    const hasContentAfter = allMessagesInSequence
+                      .slice(msgIndex + 1)
+                      .some((m) => m.content.trim().length > 0);
+
+                    // TOOL message
+                    if (msg.role === "tool" && msg.toolCalls) {
+                      return (
                         <ToolDisplay
-                          toolCalls={message.toolCalls}
+                          key={msg.id}
+                          toolCalls={msg.toolCalls}
                           locale={locale}
-                          hasContent={false}
+                          hasContent={hasContentAfter}
+                          messageId={msg.id}
+                          collapseState={collapseState}
                         />
-                      )}
-                    </Div>
-                  ) : (
-                    <Div className="whitespace-pre-wrap wrap-break-word text-foreground/95">
-                      {message.content}
-                    </Div>
-                  )}
+                      );
+                    }
+
+                    // Skip empty messages
+                    if (!msg.content.trim()) {
+                      return null;
+                    }
+
+                    return (
+                      <React.Fragment key={msg.id}>
+                        {msg.role === "assistant" ? (
+                          <Div
+                            className={cn(
+                              "prose prose-sm dark:prose-invert max-w-none",
+                              "prose-p:my-2 prose-p:leading-relaxed",
+                              "prose-code:text-blue-400 prose-code:bg-blue-950/40 prose-code:px-1 prose-code:rounded",
+                              "prose-pre:bg-black/60 prose-pre:border prose-pre:border-border/40 prose-pre:rounded-md",
+                              "prose-headings:text-foreground prose-headings:font-bold",
+                              "prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline",
+                              msgIndex > 0 && "mt-3",
+                            )}
+                          >
+                            {/* NEW ARCHITECTURE: Tool calls are separate TOOL messages now */}
+                            <Markdown
+                              content={msg.content}
+                              messageId={msg.id}
+                              hasContentAfter={hasContentAfter}
+                              collapseState={collapseState}
+                            />
+                          </Div>
+                        ) : (
+                          <Div
+                            className={cn(
+                              "whitespace-pre-wrap wrap-break-word text-foreground/95",
+                              msgIndex > 0 && "mt-3",
+                            )}
+                          >
+                            {msg.content}
+                          </Div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
                 </Div>
               </Div>
 
@@ -623,8 +678,10 @@ export function ThreadedMessage({
                 <ThreadedMessage
                   key={reply.id}
                   message={reply}
+                  messageGroup={messageToGroupMap.get(reply.id)}
                   replies={getDirectReplies(allMessages, reply.id)}
                   allMessages={allMessages}
+                  messageToGroupMap={messageToGroupMap}
                   depth={depth + 1}
                   selectedModel={selectedModel}
                   selectedPersona={selectedPersona}
@@ -632,6 +689,7 @@ export function ThreadedMessage({
                   locale={locale}
                   logger={logger}
                   onDeleteMessage={onDeleteMessage}
+                  collapseState={collapseState}
                   onBranchMessage={onBranchMessage}
                   onRetryMessage={onRetryMessage}
                   onAnswerAsModel={onAnswerAsModel}

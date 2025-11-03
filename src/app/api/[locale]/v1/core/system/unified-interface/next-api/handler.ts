@@ -26,6 +26,7 @@ import {
   createHTTPErrorResponse,
   createHTTPSuccessResponse,
 } from "../../unified-interface/react/next-endpoint-response";
+import { validateNextRequestData } from "../../unified-interface/react/next-validation";
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import { createEndpointLogger } from "../shared/logger/endpoint";
 import {
@@ -37,7 +38,6 @@ import type {
   ApiHandlerOptions,
   NextHandlerReturnType,
 } from "../shared/types/handler";
-import { validateNextRequestData } from "./validation";
 
 // Create email handling repository instance
 const emailHandlingRepository = new EmailHandlingRepositoryImpl();
@@ -114,6 +114,7 @@ export function createNextHandler<
           message: authResult.message,
           errorType: authResult.errorType,
           messageParams: authResult.messageParams,
+          cause: authResult.cause,
           logger,
         });
       }
@@ -131,16 +132,11 @@ export function createNextHandler<
       );
 
       if (!validationResult.success) {
-        logger.error(
-          `Validation error: ${validationResult.message} (${validationResult.messageParams
-            ? JSON.stringify(validationResult.messageParams)
-            : "No params"
-          })`,
-        );
         return createHTTPErrorResponse({
           message: validationResult.message,
           errorType: validationResult.errorType,
           messageParams: validationResult.messageParams,
+          cause: validationResult.cause,
           logger,
         });
       }
@@ -171,6 +167,7 @@ export function createNextHandler<
           message: result.message,
           errorType: result.errorType,
           messageParams: result.messageParams,
+          cause: result.cause,
           logger,
         });
       }

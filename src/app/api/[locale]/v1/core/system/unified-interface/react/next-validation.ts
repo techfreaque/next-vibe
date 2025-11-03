@@ -7,7 +7,11 @@ import "server-only";
 
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
@@ -87,21 +91,21 @@ export async function validateNextRequestData<
     const hasUrlParams = Object.keys(context.urlParameters || {}).length > 0;
     const urlValidation = hasUrlParams
       ? validateEndpointUrlParameters(
-        context.urlParameters,
-        endpoint.requestUrlPathParamsSchema,
-        logger,
-      )
+          context.urlParameters,
+          endpoint.requestUrlPathParamsSchema,
+          logger,
+        )
       : { success: true as const, data: undefined as TUrlVariablesOutput };
 
     if (!urlValidation.success) {
-      return {
-        success: false,
+      return fail({
         message: "app.api.v1.core.shared.errors.invalid_url_parameters",
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: urlValidation.message,
         },
-      };
+        cause: urlValidation,
+      });
     }
 
     // Validate request data based on method
@@ -125,15 +129,15 @@ export async function validateNextRequestData<
     }
 
     if (!requestValidation.success) {
-      return {
-        success: false,
+      return fail({
         message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
         },
-      };
+        cause: requestValidation,
+      });
     }
 
     // Return validated data that handlers will receive
@@ -394,22 +398,40 @@ async function validatePostRequestData<TRequestOutput>(
     }
 
     // Validate using schema - schema takes raw input and produces validated output
-    return validateEndpointRequestData(
+    const validationResult = validateEndpointRequestData(
       body,
       endpoint.requestSchema,
       logger,
     ) as ResponseType<TRequestOutput>;
+
+    if (!validationResult.success) {
+      logger.error("Request data validation failed", {
+        error: validationResult.message,
+        messageParams: validationResult.messageParams,
+      });
+      return fail({
+        message: "app.api.v1.core.shared.errors.invalid_request_data",
+        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+        messageParams: {
+          error: validationResult.message,
+        },
+        cause: validationResult,
+      });
+    }
+
+    return validationResult;
   } catch (error) {
-    return {
-      success: false,
+    const parsedError = parseError(error);
+    logger.error("Failed to parse request body", {
+      error: parsedError.message,
+      contentType: request.headers.get("content-type"),
+    });
+    return fail({
       message: "app.api.v1.core.shared.errors.invalid_request_data",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
-        error:
-          error instanceof Error
-            ? error.message
-            : "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_json_request_body",
+        error: parsedError.message,
       },
-    };
+    });
   }
 }

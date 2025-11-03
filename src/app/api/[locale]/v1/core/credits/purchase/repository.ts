@@ -78,30 +78,38 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
       const user = userResult.data;
 
       // Check if user has an active subscription before allowing credit pack purchase
-      const { subscriptionRepository } = await import("../../subscription/repository");
+      const { subscriptionRepository } = await import(
+        "../../subscription/repository"
+      );
       const subscriptionResult = await subscriptionRepository.getSubscription(
         userId,
         logger,
       );
 
       if (!subscriptionResult.success) {
-        logger.warn("Credit pack purchase attempted without active subscription", {
-          userId,
-        });
+        logger.warn(
+          "Credit pack purchase attempted without active subscription",
+          {
+            userId,
+          },
+        );
         return createErrorResponse(
-          "app.api.v1.core.agent.chat.credits.purchase.post.errors.no_active_subscription.title",
+          "app.api.v1.core.credits.purchase.post.errors.noActiveSubscription.title",
           ErrorResponseTypes.FORBIDDEN,
         );
       }
 
       const subscription = subscriptionResult.data;
       if (subscription.status !== "ACTIVE") {
-        logger.warn("Credit pack purchase attempted with inactive subscription", {
-          userId,
-          subscriptionStatus: subscription.status,
-        });
+        logger.warn(
+          "Credit pack purchase attempted with inactive subscription",
+          {
+            userId,
+            subscriptionStatus: subscription.status,
+          },
+        );
         return createErrorResponse(
-          "app.api.v1.core.agent.chat.credits.purchase.post.errors.no_active_subscription.title",
+          "app.api.v1.core.credits.purchase.post.errors.noActiveSubscription.title",
           ErrorResponseTypes.FORBIDDEN,
         );
       }
@@ -131,8 +139,14 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
       const country = getCountryFromLocale(locale);
 
       // Get product and calculate totals based on quantity
-      const { productsRepository } = await import("../../products/repository-client");
-      const product = productsRepository.getProduct(ProductIds.CREDIT_PACK, locale, "one_time");
+      const { productsRepository } = await import(
+        "../../products/repository-client"
+      );
+      const product = productsRepository.getProduct(
+        ProductIds.CREDIT_PACK,
+        locale,
+        "one_time",
+      );
       const totalAmount = product.price * data.quantity;
       const totalCredits = product.credits * data.quantity;
 

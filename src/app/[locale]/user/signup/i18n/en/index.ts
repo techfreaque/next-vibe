@@ -1,22 +1,22 @@
-
 export const translations = {
   meta: {
-    title: "Sign Up - Next Vibe",
+    title: "Sign Up - {{appName}}",
     description:
-      "Create your Next Vibe account and start building amazing applications",
+      "Create your {{appName}} account and start building amazing applications",
     category: "Authentication",
-    imageAlt: "Next Vibe Sign Up",
-    keywords: "signup, register, create account, next vibe",
-    ogTitle: "Sign Up for Next Vibe",
+    imageAlt: "{{appName}} Sign Up",
+    keywords: "signup, register, create account, {{appName}}",
+    ogTitle: "Sign Up for {{appName}}",
     ogDescription:
-      "Join Next Vibe and start building amazing applications today",
-    twitterTitle: "Sign Up for Next Vibe",
-    twitterDescription: "Create your account and start building with Next Vibe",
+      "Join {{appName}} and start building amazing applications today",
+    twitterTitle: "Sign Up for {{appName}}",
+    twitterDescription:
+      "Create your account and start building with {{appName}}",
   },
   auth: {
     signup: {
-      title: "Start Your Journey with Next Vibe",
-      subtitle: "Join thousands of developers building amazing applications",
+      title: "Start Your Journey with {{appName}}",
+      subtitle: "Join the community for uncensored AI conversations",
       createAccountButton: "Create Account",
       creatingAccount: "Creating Account...",
       alreadyHaveAccount: "Already have an account?",

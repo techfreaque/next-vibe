@@ -125,7 +125,7 @@ export default async function AboutUsPage({
         <Div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070')] bg-cover bg-center" />
         <Div className="container mx-auto px-4 py-24 relative z-10">
           <Link
-            href={`/${locale}/help`}
+            href={`/${locale}/story`}
             className="inline-flex items-center text-sm text-white/80 hover:text-white mb-8 transition-colors"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -134,13 +134,18 @@ export default async function AboutUsPage({
 
           <Div className="max-w-3xl">
             <H1 className="text-4xl md:text-5xl font-bold mb-6">
-              {t("app.story._components.home.aboutUs.title")}
+              {t("app.story._components.home.aboutUs.title", {
+                appName: t("config.appName"),
+              })}
             </H1>
             <P className="text-xl md:text-2xl opacity-90 mb-8">
               {t("app.story._components.home.aboutUs.subtitle")}
             </P>
             <P className="text-lg opacity-80">
-              {t("app.story._components.home.aboutUs.description")}
+              {t("app.story._components.home.aboutUs.description", {
+                appName: t("config.appName"),
+                config: { group: { foundedYear: 2024 } },
+              })}
             </P>
           </Div>
         </Div>
@@ -157,7 +162,9 @@ export default async function AboutUsPage({
               {t("app.story._components.home.aboutUs.mission.subtitle")}
             </P>
             <P className="text-lg text-muted-foreground leading-relaxed">
-              {t("app.story._components.home.aboutUs.mission.description")}
+              {t("app.story._components.home.aboutUs.mission.description", {
+                appName: t("config.appName"),
+              })}
             </P>
           </Div>
 
@@ -176,6 +183,9 @@ export default async function AboutUsPage({
                 <P className="text-muted-foreground leading-relaxed">
                   {t(
                     "app.story._components.home.aboutUs.mission.vision.description",
+                    {
+                      appName: t("config.appName"),
+                    },
                   )}
                 </P>
               </CardContent>
@@ -233,7 +243,7 @@ export default async function AboutUsPage({
             <Div className="absolute inset-0 bg-black/60 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
             <Div className="absolute bottom-8 left-8 right-8 text-white">
               <H3 className="text-2xl font-bold mb-2">
-                {t("app.common.logoPart1")} {t("app.common.logoPart2")}
+                {t("config.logoPart1")} {t("config.logoPart2")}
               </H3>
               <P className="text-lg opacity-90">
                 {t("app.story._components.home.hero.subtitle")}
@@ -249,7 +259,9 @@ export default async function AboutUsPage({
               {t("app.story._components.home.aboutUs.values.title")}
             </H2>
             <P className="text-lg text-muted-foreground">
-              {t("app.story._components.home.aboutUs.values.description")}
+              {t("app.story._components.home.aboutUs.values.description", {
+                appName: t("config.appName"),
+              })}
             </P>
           </Div>
 
@@ -279,7 +291,7 @@ export default async function AboutUsPage({
 
         <Div className="mt-12 text-center">
           <Button asChild size="lg">
-            <Link href={`/${locale}/help`}>
+            <Link href={`/${locale}/story/help`}>
               {t("app.story._components.home.aboutUs.contact.cta")}
             </Link>
           </Button>

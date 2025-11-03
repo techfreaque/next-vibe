@@ -8,6 +8,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { translations } from "@/config/i18n/en";
 
 import { UserDetailLevel } from "../../user/enum";
 import { userRepository } from "../../user/repository";
@@ -67,10 +68,10 @@ export async function dev(
     // Create sample email messages for development
     const emails = [
       createEmailSeed({
-        imapMessageId: "welcome-001@socialmediaservice.center",
-        subject: "Welcome to Social Media Service!",
-        senderEmail: "hello@socialmediaservice.center",
-        senderName: "Social Media Service",
+        imapMessageId: `welcome-001@${translations.appName}`,
+        subject: `Welcome to ${translations.appName}!`,
+        senderEmail: translations.emails.hello,
+        senderName: translations.appName,
         recipientEmail: "demo@example.com",
         recipientName: "Demo User",
         bodyText:
@@ -96,10 +97,10 @@ export async function dev(
         },
       }),
       createEmailSeed({
-        imapMessageId: "notification-002@socialmediaservice.center",
-        subject: "Your social media analytics report is ready",
-        senderEmail: "reports@socialmediaservice.center",
-        senderName: "Social Media Reports",
+        imapMessageId: `notification-002@${translations.appName}`,
+        subject: "Your AI chat analytics report is ready",
+        senderEmail: translations.emails.reports,
+        senderName: `${translations.appName} Reports`,
         recipientEmail: "admin@example.com",
         recipientName: "Admin User",
         bodyText:
@@ -128,10 +129,10 @@ export async function dev(
         },
       }),
       createEmailSeed({
-        imapMessageId: "support-003@socialmediaservice.center",
-        subject: "Re: Question about posting schedules",
-        senderEmail: "support@socialmediaservice.center",
-        senderName: "Support Team",
+        imapMessageId: `support-003@${translations.appName}`,
+        subject: "Re: Question about AI chat features",
+        senderEmail: translations.emails.support,
+        senderName: `${translations.appName} Support`,
         recipientEmail: "demo@example.com",
         recipientName: "Demo User",
         bodyText:
@@ -159,10 +160,10 @@ export async function dev(
         },
       }),
       createEmailSeed({
-        imapMessageId: "newsletter-004@socialmediaservice.center",
-        subject: "Social Media Tips & Trends - Weekly Newsletter",
-        senderEmail: "newsletter@socialmediaservice.center",
-        senderName: "Newsletter Team",
+        imapMessageId: `newsletter-004@${translations.appName}`,
+        subject: "AI Chat Tips & Updates - Weekly Newsletter",
+        senderEmail: translations.emails.newsletter,
+        senderName: `${translations.appName} Team`,
         recipientEmail: "demo@example.com",
         recipientName: "Demo User",
         bodyText:

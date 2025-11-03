@@ -15,14 +15,14 @@ import { envClient } from "./env-client";
 export const METADATA_CONFIG: MetadataConfig = {
   // Basic metadata
   baseUrl: envClient.NEXT_PUBLIC_APP_URL,
-  twitterHandle: "@socialmediaservice",
-  defaultImage: "https://socialmediaservice.center/images/social-share.jpg",
-  defaultImageAlt: "app.common.appName",
+  twitterHandle: "config.social.twitterHandle",
+  defaultImage: "config.websiteUrl",
+  defaultImageAlt: "config.appName",
 
   // Authors and publisher
-  authors: [{ name: "nextVibe Team" }],
-  creator: "nextVibe",
-  publisher: "nextVibe Inc.",
+  authors: [{ name: "config.group.name" }],
+  creator: "config.group.name",
+  publisher: "config.group.name",
 
   // Verification
   verification: {
@@ -30,7 +30,7 @@ export const METADATA_CONFIG: MetadataConfig = {
     yandex: "yandex-verification-code",
     yahoo: "yahoo-verification-code",
     other: {
-      me: ["support@socialmediaservice.center"],
+      me: ["config.emails.support"],
     },
   },
 
@@ -48,8 +48,8 @@ export const METADATA_CONFIG: MetadataConfig = {
     index: true,
     follow: true,
     googleBot: {
-      "index": true,
-      "follow": true,
+      index: true,
+      follow: true,
       "max-image-preview": "large",
       "max-snippet": -1,
     },

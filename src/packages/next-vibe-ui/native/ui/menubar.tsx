@@ -26,6 +26,10 @@ import { ChevronUp } from "./icons/ChevronUp";
 import { Span } from "./span";
 import { TextClassContext } from "./text";
 
+/* eslint-disable i18next/no-literal-string -- CSS classNames */
+const TEXT_CLASS_ITEM = "select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground";
+/* eslint-enable i18next/no-literal-string */
+
 const MenubarMenu = MenubarPrimitive.Menu;
 
 const MenubarGroup = MenubarPrimitive.Group;
@@ -167,8 +171,7 @@ function MenubarItem({
 }: MenubarItemProps): JSX.Element {
   return (
     <TextClassContext.Provider
-      // eslint-disable-next-line i18n/no-literal-string
-      value="select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground"
+      value={TEXT_CLASS_ITEM}
     >
       <MenubarPrimitive.Item
         className={cn(
@@ -190,8 +193,7 @@ function MenubarCheckboxItem({
   checked,
   onCheckedChange,
 }: MenubarCheckboxItemProps): JSX.Element {
-  // oxlint-disable-next-line explicit-function-return-type
-  const handleCheckedChange = onCheckedChange ?? (() => {});
+  const handleCheckedChange = onCheckedChange ?? ((() => undefined) as (checked: boolean) => void);
   return (
     <MenubarPrimitive.CheckboxItem
       className={cn(

@@ -86,18 +86,24 @@ export const translations = {
         title: "Unknown Error",
         description: "An unexpected error occurred",
       },
+      noActiveSubscription: {
+        title: "Active Subscription Required",
+        description:
+          "You must have an active subscription to purchase credit packs",
+      },
       unsavedChanges: {
         title: "Unsaved Changes",
         description: "You have unsaved changes",
       },
-        conflict: {
-          title: "Conflict",
-          description: "Resource conflict occurred",
-        },
-        no_active_subscription: {
-          title: "Active Subscription Required",
-          description: "You must have an active subscription to purchase credit packs",
-        },
+      conflict: {
+        title: "Conflict",
+        description: "Resource conflict occurred",
+      },
+      no_active_subscription: {
+        title: "Active Subscription Required",
+        description:
+          "You must have an active subscription to purchase credit packs",
+      },
     },
   },
   history: {
@@ -250,11 +256,16 @@ export const translations = {
         },
         unsavedChanges: {
           title: "Unsaved Changes",
-          description: "You have unsaved changes",
+          description: "You have unsaved Changes",
         },
         conflict: {
           title: "Conflict",
           description: "Resource conflict occurred",
+        },
+        noActiveSubscription: {
+          title: "Active Subscription Required",
+          description:
+            "You must have an active subscription to purchase credit packs",
         },
       },
     },

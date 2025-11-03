@@ -8,7 +8,11 @@ import "server-only";
 
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
@@ -81,10 +85,10 @@ export function validateCliRequestData<
     const urlValidation = isUrlParamsNever
       ? { success: true as const, data: undefined as z.output<TUrlSchema> }
       : validateEndpointUrlParameters(
-        context.urlParameters,
-        endpoint.requestUrlPathParamsSchema,
-        logger,
-      );
+          context.urlParameters,
+          endpoint.requestUrlPathParamsSchema,
+          logger,
+        );
     if (!urlValidation.success) {
       return {
         success: false,
@@ -193,20 +197,40 @@ export function validateGetRequestData<TSchema extends z.ZodTypeAny>(
     }
 
     // Types flow naturally through validateEndpointRequestData
-    return validateEndpointRequestData(
+    const validationResult = validateEndpointRequestData(
       queryData,
       endpoint.requestSchema,
       logger,
     );
+
+    if (!validationResult.success) {
+      logger.error("GET request validation failed", {
+        error: validationResult.message,
+        messageParams: validationResult.messageParams,
+      });
+      return fail({
+        message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
+        errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
+        messageParams: {
+          error: validationResult.message,
+        },
+        cause: validationResult,
+      });
+    }
+
+    return validationResult;
   } catch (error) {
+    const parsedError = parseError(error);
     logger.error("GET request validation error", {
-      error: error instanceof Error ? error.message : String(error),
+      error: parsedError.message,
     });
-    return {
-      success: false,
+    return fail({
       message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
       errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
-    };
+      messageParams: {
+        error: parsedError.message,
+      },
+    });
   }
 }
 
@@ -270,16 +294,40 @@ export async function validatePostRequestData<TSchema extends z.ZodTypeAny>(
     >;
 
     // Types flow naturally through validateEndpointRequestData
-    return validateEndpointRequestData(body, endpoint.requestSchema, logger);
+    const validationResult = validateEndpointRequestData(
+      body,
+      endpoint.requestSchema,
+      logger,
+    );
+
+    if (!validationResult.success) {
+      logger.error("POST request validation failed", {
+        error: validationResult.message,
+        messageParams: validationResult.messageParams,
+      });
+      return fail({
+        message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
+        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+        messageParams: {
+          error: validationResult.message,
+        },
+        cause: validationResult,
+      });
+    }
+
+    return validationResult;
   } catch (error) {
+    const parsedError = parseError(error);
     logger.error("POST request validation error", {
-      error: error instanceof Error ? error.message : String(error),
+      error: parsedError.message,
     });
-    return {
-      success: false,
+    return fail({
       message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-    };
+      messageParams: {
+        error: parsedError.message,
+      },
+    });
   }
 }
 
@@ -314,20 +362,20 @@ export async function validateNextRequestData<
     const urlValidation = isUrlParamsNever
       ? { success: true as const, data: undefined as z.output<TUrlSchema> }
       : validateEndpointUrlParameters(
-        context.urlParameters,
-        endpoint.requestUrlPathParamsSchema,
-        logger,
-      );
+          context.urlParameters,
+          endpoint.requestUrlPathParamsSchema,
+          logger,
+        );
     if (!urlValidation.success) {
-      return {
-        success: false,
+      return fail({
         message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
         errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
         messageParams: {
           error: urlValidation.message,
         },
-      };
+        cause: urlValidation,
+      });
     }
 
     // Validate request data based on method
@@ -337,12 +385,12 @@ export async function validateNextRequestData<
         : await validatePostRequestData(endpoint, context.request, logger);
 
     if (!requestValidation.success) {
-      return {
-        success: false,
+      return fail({
         message: requestValidation.message,
         errorType: requestValidation.errorType,
         messageParams: requestValidation.messageParams,
-      };
+        cause: requestValidation,
+      });
     }
 
     return {

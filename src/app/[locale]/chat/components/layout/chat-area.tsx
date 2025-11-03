@@ -89,7 +89,10 @@ export function ChatArea({
   rootFolderId = "general",
   logger,
 }: ChatAreaProps): JSX.Element {
-  const { t } = { t: (key: string, params?: Record<string, string | number>): string => _simpleT(locale, key as never, params) };
+  const { t } = {
+    t: (key: string, params?: Record<string, string | number>): string =>
+      _simpleT(locale, key as never, params),
+  };
   const inputContainerRef = useRef<HTMLDivElement>(null);
   const [inputHeight, setInputHeight] = useState<number>(
     LAYOUT.DEFAULT_INPUT_HEIGHT,
@@ -205,7 +208,7 @@ export function ChatArea({
               size="icon"
               onClick={handleScreenshotClick}
               disabled={isCapturingScreenshot}
-              className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9 disabled:opacity-50 disabled:cursor-not-allowed"
               title={
                 isCapturingScreenshot
                   ? t("app.chat.screenshot.capturing")
@@ -226,7 +229,7 @@ export function ChatArea({
       {viewMode === "linear" && messages.length > 0 && (
         <Div className="w-full h-0">
           <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15 space-y-5">
-            <Div className="max-w-[30%] h-[50px] flex bg-background/80 backdrop-blur-xl rounded-lg p-2 shadow-sm border border-border/20">
+            <Div className="max-w-[30%] h-[50px] flex bg-card backdrop-blur-xl rounded-lg p-2 shadow-sm border border-border/20">
               <Logo
                 locale={locale}
                 pathName=""

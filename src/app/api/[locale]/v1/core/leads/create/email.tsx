@@ -302,39 +302,35 @@ function AdminNotificationEmailContent({
             t("app.api.v1.core.leads.create.email.admin.newLead.notProvided")}
         </Span>
 
-        {
-          lead.contactDetails.phone && (
-            <Span
-              style={{
-                fontSize: "14px",
-                marginBottom: "8px",
-                color: "#4b5563",
-              }}
-            >
-              <Span style={{ fontWeight: "700" }}>
-                {t("app.api.v1.core.leads.create.email.admin.newLead.phone")}:
-              </Span>{" "}
-              {lead.contactDetails.phone}
-            </Span>
-          )
-        }
+        {lead.contactDetails.phone && (
+          <Span
+            style={{
+              fontSize: "14px",
+              marginBottom: "8px",
+              color: "#4b5563",
+            }}
+          >
+            <Span style={{ fontWeight: "700" }}>
+              {t("app.api.v1.core.leads.create.email.admin.newLead.phone")}:
+            </Span>{" "}
+            {lead.contactDetails.phone}
+          </Span>
+        )}
 
-        {
-          lead.contactDetails.website && (
-            <Span
-              style={{
-                fontSize: "14px",
-                marginBottom: "8px",
-                color: "#4b5563",
-              }}
-            >
-              <Span style={{ fontWeight: "700" }}>
-                {t("app.api.v1.core.leads.create.email.admin.newLead.website")}:
-              </Span>{" "}
-              {lead.contactDetails.website}
-            </Span>
-          )
-        }
+        {lead.contactDetails.website && (
+          <Span
+            style={{
+              fontSize: "14px",
+              marginBottom: "8px",
+              color: "#4b5563",
+            }}
+          >
+            <Span style={{ fontWeight: "700" }}>
+              {t("app.api.v1.core.leads.create.email.admin.newLead.website")}:
+            </Span>{" "}
+            {lead.contactDetails.website}
+          </Span>
+        )}
 
         <Span
           style={{
@@ -346,16 +342,14 @@ function AdminNotificationEmailContent({
           <Span style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.leads.create.email.admin.newLead.source")}:
           </Span>{" "}
-          {
-            lead.trackingInfo.source
-              ? t(
+          {lead.trackingInfo.source
+            ? t(
                 LeadSourceOptions.find(
                   (opt) => opt.value === lead.trackingInfo.source,
                 )?.label ??
-                "app.api.v1.core.leads.create.email.admin.newLead.notProvided",
+                  "app.api.v1.core.leads.create.email.admin.newLead.notProvided",
               )
-              : t("app.api.v1.core.leads.create.email.admin.newLead.notProvided")
-          }
+            : t("app.api.v1.core.leads.create.email.admin.newLead.notProvided")}
         </Span>
 
         <Span
@@ -368,46 +362,42 @@ function AdminNotificationEmailContent({
           <Span style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.leads.create.email.admin.newLead.status")}:
           </Span>{" "}
-          {
-            t(
-              LeadStatusOptions.find((opt) => opt.value === lead.summary.status)
-                ?.label ??
+          {t(
+            LeadStatusOptions.find((opt) => opt.value === lead.summary.status)
+              ?.label ??
               "app.api.v1.core.leads.create.email.admin.newLead.notProvided",
-            )
-          }
+          )}
         </Span>
 
-        {
-          lead.metadata.notes && (
-            <>
-              <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
-              <Span
-                style={{
-                  fontSize: "14px",
-                  fontWeight: "700",
-                  color: "#111827",
-                  marginBottom: "8px",
-                }}
-              >
-                {t("app.api.v1.core.leads.create.email.admin.newLead.notes")}:
-              </Span>
-              <Span
-                style={{
-                  fontSize: "14px",
-                  color: "#4b5563",
-                  whiteSpace: "pre-wrap",
-                  backgroundColor: "#ffffff",
-                  padding: "12px",
-                  borderRadius: "4px",
-                  border: "1px solid #e5e7eb",
-                }}
-              >
-                {lead.metadata.notes}
-              </Span>
-            </>
-          )
-        }
-      </Section >
+        {lead.metadata.notes && (
+          <>
+            <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
+            <Span
+              style={{
+                fontSize: "14px",
+                fontWeight: "700",
+                color: "#111827",
+                marginBottom: "8px",
+              }}
+            >
+              {t("app.api.v1.core.leads.create.email.admin.newLead.notes")}:
+            </Span>
+            <Span
+              style={{
+                fontSize: "14px",
+                color: "#4b5563",
+                whiteSpace: "pre-wrap",
+                backgroundColor: "#ffffff",
+                padding: "12px",
+                borderRadius: "4px",
+                border: "1px solid #e5e7eb",
+              }}
+            >
+              {lead.metadata.notes}
+            </Span>
+          </>
+        )}
+      </Section>
 
       {/* Admin Actions */}
       <Section style={{ textAlign: "center", marginTop: "24px" }}>
@@ -472,10 +462,10 @@ export const renderWelcomeMail: EmailFunctionType<
         responseData.lead.summary.businessName ||
         responseData.lead.summary.email,
       subject: t("app.api.v1.core.leads.create.email.welcome.subject", {
-        companyName: t("app.common.appName"),
+        companyName: t("config.appName"),
       }),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
-      replyToName: t("app.common.appName"),
+      replyToName: t("config.appName"),
 
       jsx: WelcomeEmailContent({
         lead: responseData.lead,
@@ -511,7 +501,7 @@ export const renderAdminNotificationMail: EmailFunctionType<
 
     return createSuccessResponse({
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("app.common.appName"),
+      toName: t("config.appName"),
       subject: t("app.api.v1.core.leads.create.email.admin.newLead.subject", {
         businessName:
           responseData.lead.summary.businessName ||

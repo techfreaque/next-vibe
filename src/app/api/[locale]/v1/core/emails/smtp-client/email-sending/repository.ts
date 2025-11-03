@@ -152,8 +152,7 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
               ? `${data.params.replyToName} <${data.params.replyToEmail}>`
               : undefined,
           unsubscribeUrl: data.params.unsubscribeUrl,
-          senderName:
-            data.params.senderName || data.params.t("app.common.appName"), // Default to app name if not provided
+          senderName: data.params.senderName || data.params.t("config.appName"), // Default to app name if not provided
           selectionCriteria,
           skipRateLimitCheck: data.params.skipRateLimitCheck,
           leadId: data.params.leadId,

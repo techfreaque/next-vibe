@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   emailPlaceholder: "Wprowadź swój e-mail",
   page: {
-    title: "Bądź na bieżąco z Unbottled.ai",
+    title: "Bądź na bieżąco z {{appName}}",
     description: "Otrzymuj najnowsze wiadomości AI, aktualizacje i wskazówki",
     subtitle: "Otrzymuj najnowsze wiadomości i aktualizacje AI",
     heroDescription:

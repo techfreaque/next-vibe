@@ -13,6 +13,7 @@ import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
+import { translations } from "@/config/i18n/en";
 
 import ResetPasswordConfirmForm from "./_components/reset-password-confirm-form";
 
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: "app.user.other.resetPassword.meta.passwordReset.title",
         description:
           "app.user.other.resetPassword.meta.passwordReset.description",
-        url: `https://nextvibe.dev/${locale}/reset-password`,
+        url: `${translations.websiteUrl}/${locale}/reset-password`,
         type: "website",
         images: [
           {

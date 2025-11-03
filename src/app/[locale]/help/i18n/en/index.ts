@@ -7,15 +7,15 @@ export const translations = {
   },
   meta: {
     contact: {
-      title: "Contact & Support - Unbottled.ai",
+      title: "Contact & Support - {{appName}}",
       description:
-        "Get help with Unbottled.ai - uncensored AI chat platform. Contact our support team for assistance.",
+        "Get help with {{appName}} - uncensored AI chat platform. Contact our support team for assistance.",
       category: "Support",
-      imageAlt: "Unbottled.ai Support",
-      keywords: "contact, support, help, unbottled, ai chat, assistance",
-      ogTitle: "Contact Unbottled.ai Support",
+      imageAlt: "{{appName}} Support",
+      keywords: "contact, support, help, {{appName}}, ai chat, assistance",
+      ogTitle: "Contact {{appName}} Support",
       ogDescription: "Get help with your uncensored AI chat experience",
-      twitterTitle: "Contact Unbottled.ai",
+      twitterTitle: "Contact {{appName}}",
       twitterDescription: "Reach out to our support team",
     },
   },
@@ -28,9 +28,9 @@ export const translations = {
         title: "Frequently Asked Questions",
         questions: {
           q1: {
-            question: "What is Unbottled.ai?",
+            question: "What is {{appName}}?",
             answer:
-              "Unbottled.ai is an uncensored AI chat platform with access to 40+ AI models. We combine honest AI conversations with advanced features like folder management, custom personas, and multi-model support.",
+              "{{appName}} is an uncensored AI chat platform with access to 40+ AI models. We combine honest AI conversations with advanced features like folder management, custom personas, and multi-model support.",
           },
           q2: {
             question: "What payment methods do you accept?",

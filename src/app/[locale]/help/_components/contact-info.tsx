@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Globe, Mail, MessageCircle, Twitter } from "next-vibe-ui/ui/icons";
 import { Div } from "next-vibe-ui/ui/div";
@@ -10,6 +10,7 @@ import type { JSX } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { Button } from "next-vibe-ui/ui/button";
+import { translations } from "@/config/i18n/en/index";
 
 interface ContactInfoProps {
   locale: CountryLanguage;
@@ -37,9 +38,7 @@ export default function ContactInfo({
           <Div>
             <Div className="flex items-start mb-2">
               <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
-              <H3 className="font-medium">
-                {t("app.help.components.pages.help.info.email")}
-              </H3>
+              <H3 className="font-medium">{t("config.emails.support")}</H3>
             </Div>
             <Button
               onClick={() => {
@@ -59,12 +58,12 @@ export default function ContactInfo({
               </H3>
             </Div>
             <Link
-              href="https://unbottled.ai"
+              href={translations.websiteUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 dark:text-blue-400 hover:underline ml-8"
             >
-              {t("app.help.components.pages.help.info.websiteUrl")}
+              {t("config.websiteUrl")}
             </Link>
           </Div>
         </Div>
@@ -87,7 +86,7 @@ export default function ContactInfo({
               {t("app.help.components.pages.help.info.discordDescription")}
             </P>
             <Link
-              href="https://discord.gg/unbottled"
+              href={t("config.social.discordInvite")}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 dark:text-blue-400 hover:underline ml-8"
@@ -109,7 +108,7 @@ export default function ContactInfo({
               rel="noopener noreferrer"
               className="text-blue-600 dark:text-blue-400 hover:underline ml-8"
             >
-              {t("app.help.components.pages.help.info.twitterHandle")}
+              {t("config.social.twitterHandle")}
             </Link>
           </Div>
         </Div>

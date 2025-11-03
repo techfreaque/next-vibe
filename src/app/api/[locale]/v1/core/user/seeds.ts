@@ -11,6 +11,7 @@ import { getCliUserEmail } from "@/app/api/[locale]/v1/core/system/unified-inter
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
+import { translations } from "@/config/i18n/en";
 
 import { leads, userLeads } from "../leads/db";
 import { LeadSource, LeadStatus } from "../leads/enum";
@@ -497,9 +498,9 @@ export async function prod(logger: EndpointLogger): Promise<void> {
 
   // Create admin user
   const adminUser = createUserSeed({
-    email: "hi@socialmediaservice.center",
+    email: translations.emails.admin,
     privateName: "Admin User",
-    publicName: "Social Media Service Center",
+    publicName: translations.appName,
   });
 
   // Create admin user with hashed password using the repository

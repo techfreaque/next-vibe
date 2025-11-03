@@ -79,7 +79,7 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="group" asChild>
-                <Link href={`/${locale}/public`}>
+                <Link href={`/${locale}/threads/public`}>
                   <ArrowDown className="mr-2 h-4 w-4 fill-blue-600 text-blue-600 group-hover:fill-blue-700 group-hover:text-blue-700" />
                   {t("app.story._components.home.hero.secondaryCta")}
                 </Link>

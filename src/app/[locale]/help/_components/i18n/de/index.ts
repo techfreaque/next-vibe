@@ -21,16 +21,12 @@ export const translations: typeof enTranslations = {
       },
       info: {
         title: "Kontaktinformationen",
-        email: "E-Mail",
-        supportEmail: "support@unbottled.ai",
         community: "Community",
         discord: "Treten Sie unserem Discord bei",
         discordDescription:
           "Erhalten Sie Hilfe von unserer Community und unserem Team",
         twitter: "Folgen Sie uns auf Twitter",
-        twitterHandle: "@unbottled_ai",
         website: "Webseite",
-        websiteUrl: "unbottled.ai",
       },
     },
   },

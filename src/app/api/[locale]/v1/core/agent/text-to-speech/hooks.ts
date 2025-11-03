@@ -14,11 +14,13 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { updateCreditBalanceForTTS } from "./credit-updater";
 import textToSpeechDefinitions from "./definition";
 
 interface UseTTSAudioOptions {
   text: string;
   enabled: boolean;
+  isStreaming?: boolean; // If true, wait for streaming to complete before auto-playing
   locale: CountryLanguage;
   onError?: (error: string) => void;
   logger: EndpointLogger;
@@ -34,7 +36,8 @@ interface UseTTSAudioReturn {
 
 export function useTTSAudio({
   text,
-  enabled,
+  enabled: _enabled,
+  isStreaming: _isStreaming = false,
   locale,
   onError,
   logger,
@@ -46,7 +49,7 @@ export function useTTSAudio({
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const hasPlayedRef = useRef(false);
+  const _hasPlayedRef = useRef(false);
   const isProcessingRef = useRef(false);
 
   // Use endpoint for type-safe API calls
@@ -134,6 +137,9 @@ export function useTTSAudio({
             urlLength: audioDataUrl.length,
           });
 
+          // Optimistically update credit balance in UI
+          updateCreditBalanceForTTS(logger);
+
           // Create audio element
           const audio = new Audio(audioDataUrl);
           audioRef.current = audio;
@@ -193,13 +199,19 @@ export function useTTSAudio({
     }
   }, [text, audioUrl, endpoint, logger, t, onError]);
 
-  // Auto-play on mount if enabled
-  useEffect(() => {
-    if (enabled && !hasPlayedRef.current && text.trim()) {
-      hasPlayedRef.current = true;
-      void playAudio();
-    }
-  }, [enabled, text, playAudio]);
+  // Auto-play when streaming completes if enabled
+  // TODO: Re-enable auto TTS after fixing timing and UX issues
+  // useEffect(() => {
+  //   // Only auto-play if:
+  //   // 1. Auto-play is enabled
+  //   // 2. We haven't played yet
+  //   // 3. There's text to play
+  //   // 4. Streaming is complete (isStreaming is false)
+  //   if (enabled && !hasPlayedRef.current && text.trim() && !isStreaming) {
+  //     hasPlayedRef.current = true;
+  //     void playAudio();
+  //   }
+  // }, [enabled, text, isStreaming, playAudio]);
 
   // Cleanup on unmount
   useEffect(() => {

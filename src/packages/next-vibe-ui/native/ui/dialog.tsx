@@ -6,6 +6,9 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { cn } from "../lib/utils";
 import { X } from "./icons/X";
 
+// CSS className for close button
+const CLOSE_BUTTON_CLASSNAME = "absolute right-4 top-4 p-0.5 web:group rounded-sm opacity-70 web:ring-offset-background web:transition-opacity web:hover:opacity-100 web:focus:outline-none web:focus:ring-2 web:focus:ring-ring web:focus:ring-offset-2 web:disabled:pointer-events-none";
+
 // Cross-platform type definitions
 export interface DialogRootProps {
   open?: boolean;
@@ -146,10 +149,7 @@ function DialogContent({
         >
           {children}
           <DialogPrimitive.Close
-            // eslint-disable-next-line i18n/no-literal-string
-            className={
-              "absolute right-4 top-4 p-0.5 web:group rounded-sm opacity-70 web:ring-offset-background web:transition-opacity web:hover:opacity-100 web:focus:outline-none web:focus:ring-2 web:focus:ring-ring web:focus:ring-offset-2 web:disabled:pointer-events-none"
-            }
+            className={CLOSE_BUTTON_CLASSNAME}
           >
             <X
               size={Platform.OS === "web" ? 16 : 18}

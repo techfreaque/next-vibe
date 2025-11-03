@@ -24,6 +24,25 @@ interface GroupedAssistantMessageProps {
   onDelete?: (messageId: string) => void;
   showAuthor?: boolean;
   logger: EndpointLogger;
+  /** Collapse state management callbacks */
+  collapseState?: {
+    isCollapsed: (
+      key: {
+        messageId: string;
+        sectionType: "thinking" | "tool";
+        sectionIndex: number;
+      },
+      autoCollapsed: boolean,
+    ) => boolean;
+    toggleCollapse: (
+      key: {
+        messageId: string;
+        sectionType: "thinking" | "tool";
+        sectionIndex: number;
+      },
+      currentState: boolean,
+    ) => void;
+  };
 }
 
 /**
@@ -39,6 +58,7 @@ export function GroupedAssistantMessage({
   onDelete,
   showAuthor = false,
   logger,
+  collapseState,
 }: GroupedAssistantMessageProps): JSX.Element {
   const { t } = simpleT(locale);
   const { primary, continuations } = group;
@@ -108,6 +128,8 @@ export function GroupedAssistantMessage({
                   toolCalls={message.toolCalls}
                   locale={locale}
                   hasContent={hasContentAfter}
+                  messageId={message.id}
+                  collapseState={collapseState}
                 />
               );
             }
@@ -117,12 +139,12 @@ export function GroupedAssistantMessage({
               return (
                 <Div
                   key={message.id}
-                  className="mb-3 last:mb-0 p-3 border border-red-500/60 bg-red-500/10 rounded-md"
+                  className="mb-3 last:mb-0 p-3 border border-destructive/60 bg-destructive/10 rounded-md"
                 >
-                  <Div className="text-red-400 font-medium mb-1">
+                  <Div className="text-destructive font-medium mb-1">
                     {t("app.chat.messages.error")}
                   </Div>
-                  <Div className="text-foreground/90">{message.content}</Div>
+                  <Div className="text-foreground">{message.content}</Div>
                 </Div>
               );
             }
@@ -132,7 +154,12 @@ export function GroupedAssistantMessage({
               // NEW ARCHITECTURE: Markdown component handles <think> tags
               return (
                 <Div key={message.id} className="mb-3 last:mb-0">
-                  <Markdown content={message.content} />
+                  <Markdown
+                    content={message.content}
+                    messageId={message.id}
+                    hasContentAfter={hasContentAfter}
+                    collapseState={collapseState}
+                  />
                 </Div>
               );
             }
@@ -144,9 +171,9 @@ export function GroupedAssistantMessage({
           {/* Show streaming placeholder when no content yet */}
           {isStreaming && (
             <Div className="flex items-center gap-2 text-muted-foreground">
-              <Div className="animate-pulse h-2 w-2 bg-blue-400 rounded-full" />
-              <Div className="animate-pulse h-2 w-2 bg-blue-400 rounded-full animation-delay-150" />
-              <Div className="animate-pulse h-2 w-2 bg-blue-400 rounded-full animation-delay-300" />
+              <Div className="animate-pulse h-2 w-2 bg-primary rounded-full" />
+              <Div className="animate-pulse h-2 w-2 bg-primary rounded-full animation-delay-150" />
+              <Div className="animate-pulse h-2 w-2 bg-primary rounded-full animation-delay-300" />
             </Div>
           )}
         </Div>

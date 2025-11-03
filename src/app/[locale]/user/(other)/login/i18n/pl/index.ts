@@ -2,14 +2,14 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Zaloguj się - Next Vibe",
-    description: "Zaloguj się do swojego konta Next Vibe",
+    title: "Zaloguj się - {{appName}}",
+    description: "Zaloguj się do swojego konta {{appName}}",
     category: "Uwierzytelnianie",
-    imageAlt: "Logowanie Next Vibe",
-    keywords: "logowanie, zaloguj się, uwierzytelnianie, next vibe",
-    ogTitle: "Zaloguj się do Next Vibe",
-    ogDescription: "Uzyskaj dostęp do swojego konta Next Vibe",
-    twitterTitle: "Zaloguj się do Next Vibe",
+    imageAlt: "Logowanie {{appName}}",
+    keywords: "logowanie, zaloguj się, uwierzytelnianie, {{appName}}",
+    ogTitle: "Zaloguj się do {{appName}}",
+    ogDescription: "Uzyskaj dostęp do swojego konta {{appName}}",
+    twitterTitle: "Zaloguj się do {{appName}}",
     twitterDescription: "Zaloguj się do swojego konta",
   },
   auth: {

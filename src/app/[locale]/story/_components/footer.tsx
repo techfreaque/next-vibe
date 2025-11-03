@@ -44,13 +44,17 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
             <P className="text-sm text-gray-600 dark:text-gray-400 max-w-xs">
               {t("app.story._components.footer.privacyTagline")}
             </P>
-        
           </Div>
 
           {/* Platform Links */}
           <Div>
-            <H3 className="font-semibold text-sm mb-4">{t("app.story._components.footer.platform.title")}</H3>
-            <Div role="list" className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+            <H3 className="font-semibold text-sm mb-4">
+              {t("app.story._components.footer.platform.title")}
+            </H3>
+            <Div
+              role="list"
+              className="space-y-3 text-sm text-gray-600 dark:text-gray-400"
+            >
               <Div role="listitem">
                 <Link
                   href={`/${locale}/story#features`}
@@ -62,16 +66,16 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
               </Div>
               <Div role="listitem">
                 <Link
-                  href={`/${locale}/story#pricing`}
+                  href={`/${locale}/subscription`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <Tag className="h-4 w-4" />
-                  {t("app.story._components.footer.platform.pricing")}
+                  {t("app.story._components.footer.platform.subscription")}
                 </Link>
               </Div>
               <Div role="listitem">
                 <Link
-                  href={`/${locale}/story#features`}
+                  href={`/${locale}/story#model-costs`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <Bot className="h-4 w-4" />
@@ -92,8 +96,13 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
 
           {/* Product Links */}
           <Div>
-            <H3 className="font-semibold text-sm mb-4">{t("app.story._components.footer.product.title")}</H3>
-            <Div role="list" className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+            <H3 className="font-semibold text-sm mb-4">
+              {t("app.story._components.footer.product.title")}
+            </H3>
+            <Div
+              role="list"
+              className="space-y-3 text-sm text-gray-600 dark:text-gray-400"
+            >
               <Div role="listitem">
                 <Link
                   href={`/${locale}/story#features`}
@@ -123,7 +132,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
               </Div>
               <Div role="listitem">
                 <Link
-                  href={`/${locale}/public`}
+                  href={`/${locale}/threads/public`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <MessageSquare className="h-4 w-4" />
@@ -135,8 +144,13 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
 
           {/* Company Links */}
           <Div>
-            <H3 className="font-semibold text-sm mb-4">{t("app.story._components.footer.company.title")}</H3>
-            <Div role="list" className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+            <H3 className="font-semibold text-sm mb-4">
+              {t("app.story._components.footer.company.title")}
+            </H3>
+            <Div
+              role="list"
+              className="space-y-3 text-sm text-gray-600 dark:text-gray-400"
+            >
               <Div role="listitem">
                 <Link
                   href={`/${locale}/story/about-us`}
@@ -160,8 +174,13 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
 
           {/* Legal Links */}
           <Div>
-            <H3 className="font-semibold text-sm mb-4">{t("app.story._components.footer.legal.title")}</H3>
-            <Div role="list" className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+            <H3 className="font-semibold text-sm mb-4">
+              {t("app.story._components.footer.legal.title")}
+            </H3>
+            <Div
+              role="list"
+              className="space-y-3 text-sm text-gray-600 dark:text-gray-400"
+            >
               <Div role="listitem">
                 <Link
                   href={`/${locale}/story/privacy-policy`}
@@ -196,7 +215,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
           <P className="text-sm text-gray-600 dark:text-gray-400">
             {t("app.story._components.footer.copyright", {
               year: currentYear,
-              appName: t("app.common.company.name"),
+              config: { appName: t("config.appName") },
             })}
           </P>
           <Div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -204,8 +223,10 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
             <Link
               href="https://github.com/techfreaque/next-vibe"
               className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              {t("app.story._components.footer.framework")}
+              {t("config.framework")}
             </Link>
           </Div>
         </Div>

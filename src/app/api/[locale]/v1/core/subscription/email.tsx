@@ -100,11 +100,11 @@ function renderSubscriptionSuccessEmailContent(
       t={t}
       locale={locale}
       title={t("app.api.v1.core.subscription.email.success.title", {
-        appName: t("app.common.appName"),
+        appName: t("config.appName"),
         firstName: user.firstName,
       })}
       previewText={t("app.api.v1.core.subscription.email.success.previewText", {
-        appName: t("app.common.appName"),
+        appName: t("config.appName"),
         planName,
       })}
       tracking={tracking}
@@ -133,7 +133,7 @@ function renderSubscriptionSuccessEmailContent(
         }}
       >
         {t("app.api.v1.core.subscription.email.success.description", {
-          appName: t("app.common.appName"),
+          appName: t("config.appName"),
         })}
       </Span>
 
@@ -266,7 +266,7 @@ function renderSubscriptionSuccessEmailContent(
         }}
       >
         {t("app.api.v1.core.subscription.email.success.footer.signoff", {
-          appName: t("app.common.appName"),
+          appName: t("config.appName"),
         })}
       </Span>
     </EmailTemplate>
@@ -296,7 +296,7 @@ function renderAdminSubscriptionNotificationEmailContent(
       previewText={t(
         "app.api.v1.core.subscription.email.admin_notification.preview",
         {
-          appName: t("app.common.appName"),
+          appName: t("config.appName"),
         },
       )}
       tracking={tracking}
@@ -323,7 +323,7 @@ function renderAdminSubscriptionNotificationEmailContent(
         }}
       >
         {t("app.api.v1.core.subscription.email.admin_notification.message", {
-          appName: t("app.common.appName"),
+          appName: t("config.appName"),
         })}
       </Span>
 
@@ -480,7 +480,7 @@ function renderAdminSubscriptionNotificationEmailContent(
         }}
       >
         {t("app.api.v1.core.subscription.email.admin_notification.footer", {
-          appName: t("app.common.appName"),
+          appName: t("config.appName"),
         })}
       </Span>
     </EmailTemplate>
@@ -513,7 +513,7 @@ export const renderSubscriptionSuccessEmail = ({
       toEmail: user.email,
       toName: user.firstName,
       subject: t("app.api.v1.core.subscription.email.success.subject", {
-        appName: t("app.common.appName"),
+        appName: t("config.appName"),
         planName,
       }),
       jsx: renderSubscriptionSuccessEmailContent(
@@ -555,7 +555,7 @@ export const renderAdminSubscriptionNotification = ({
     success: true,
     data: {
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("app.common.appName"),
+      toName: t("config.appName"),
       subject: t(
         "app.api.v1.core.subscription.email.admin_notification.subject",
         {

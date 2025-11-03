@@ -15,15 +15,14 @@ class ApiError extends Error {
     translationKey: TranslationKey;
   }) {
     super(options.translationKey);
-    // eslint-disable-next-line i18next/no-literal-string
-    this.name = "ApiError";
+    this.name = "ApiError" as const;
     this.errorType = options.errorType;
     this.messageParams = options.messageParams;
     this.translationKey = options.translationKey;
   }
 }
 
-// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic error input type for error parsing utility
+// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Error parsing utility requires 'unknown' to handle any error input type
 type ErrorCheckInput = unknown;
 
 /**
@@ -46,7 +45,7 @@ export function isErrorResponseType(
  * Possible error input types for error checking and parsing
  */
 
-// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic error input type for error parsing utility
+// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Error parsing utility requires 'unknown' to handle any error input type
 type ParseableError = unknown;
 
 /**
@@ -85,11 +84,7 @@ export function parseError(error: ParseableError): Error {
 
   // Handle other objects
   if (typeof error === "object" && error !== null) {
-    try {
-      return new Error(JSON.stringify(error));
-    } catch {
-      return new Error("errors.unknown");
-    }
+    return new Error("An unknown error occurred");
   }
 
   // Handle string errors
@@ -99,14 +94,22 @@ export function parseError(error: ParseableError): Error {
 
   // Handle objects with message property
   if (typeof error === "object" && error !== null && "message" in error) {
-    const errorObj = error as { message: string };
-    return new Error(errorObj.message);
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Error parsing requires type assertion for object property access
+    const errorObj = error as Record<string, unknown>;
+    const message = errorObj.message;
+    if (typeof message === "string") {
+      return new Error(message);
+    }
   }
 
   // Handle objects with error property
   if (typeof error === "object" && error !== null && "error" in error) {
-    const errorObj = error as { error: string };
-    return new Error(errorObj.error);
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Error parsing requires type assertion for object property access
+    const errorObj = error as Record<string, unknown>;
+    const errorMessage = errorObj.error;
+    if (typeof errorMessage === "string") {
+      return new Error(errorMessage);
+    }
   }
 
   // Handle null/undefined
@@ -115,7 +118,7 @@ export function parseError(error: ParseableError): Error {
   }
 
   // Default case
-  return new Error("errors.unknown");
+  return new Error("An unknown error occurred");
 }
 
 /**

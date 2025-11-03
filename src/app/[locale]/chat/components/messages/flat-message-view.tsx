@@ -28,8 +28,10 @@ import {
 import { formatPostNumber, getPostNumber } from "../../lib/utils/post-numbers";
 import type { ChatMessage, ChatThread, ModelId } from "../../types";
 import { MessageEditor } from "./message-editor";
+import { groupMessagesBySequence } from "./message-grouping";
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
 import { ToolDisplay } from "./tool-display";
+import { useCollapseState } from "./use-collapse-state";
 import { useMessageActions } from "./use-message-actions";
 
 interface FlatMessageViewProps {
@@ -124,7 +126,7 @@ function renderContentWithReferences(
             onMessageClick?.(messageId);
           }
         }}
-        className="text-blue-400 hover:text-blue-300 hover:underline cursor-pointer"
+        className="text-primary hover:text-primary/80 hover:underline cursor-pointer"
       >
         {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
         {`>>${postNumber}`}
@@ -185,7 +187,7 @@ function MessagePreview({
         <Span
           className={cn(
             "font-semibold",
-            isUser ? "text-green-400" : "text-blue-400",
+            isUser ? "text-foreground" : "text-primary",
           )}
         >
           {isUser
@@ -282,7 +284,7 @@ function UserIdHoverCard({
               onClick={(): void => {
                 onPostClick?.(postShortId);
               }}
-              className="w-full text-left p-2 rounded hover:bg-accent/50 transition-colors"
+              className="w-full text-left p-2 rounded hover:bg-accent transition-colors"
             >
               <Div className="text-xs text-muted-foreground mb-1">
                 {/* eslint-disable-next-line i18next/no-literal-string -- Technical post number and separator */}
@@ -310,6 +312,7 @@ interface FlatMessageProps {
   postNumberMap: Record<string, number>;
   postNumberToMessageId: Record<number, string>;
   messages: ChatMessage[];
+  messageGroup?: ReturnType<typeof groupMessagesBySequence>[0];
   personas: Record<string, { id: string; name: string; icon: string }>;
   selectedModel: ModelId;
   selectedPersona: string;
@@ -335,6 +338,8 @@ interface FlatMessageProps {
   onPersonaChange?: (persona: string) => void;
   onInsertQuote?: () => void;
   rootFolderId?: string;
+  /** Collapse state management callbacks */
+  collapseState?: ReturnType<typeof useCollapseState>;
 }
 
 function FlatMessage({
@@ -343,6 +348,7 @@ function FlatMessage({
   postNumberMap,
   postNumberToMessageId,
   messages,
+  messageGroup,
   personas,
   selectedModel,
   selectedPersona,
@@ -361,10 +367,18 @@ function FlatMessage({
   onPersonaChange,
   onInsertQuote,
   rootFolderId = "general",
+  collapseState,
 }: FlatMessageProps): JSX.Element {
   const { t } = simpleT(locale);
 
   // TTS support for assistant messages is handled by the message action buttons
+
+  // Get all messages in the sequence (primary + continuations)
+  const allMessagesInSequence = messageGroup
+    ? [messageGroup.primary, ...messageGroup.continuations].toSorted(
+        (a, b) => (a.sequenceIndex ?? 0) - (b.sequenceIndex ?? 0),
+      )
+    : [message];
 
   // User ID logic
   const userId =
@@ -417,7 +431,7 @@ function FlatMessage({
     >
       {/* Logo watermark for first message */}
       {postNum === 1 && (
-        <Div className="absolute top-3 right-3 pointer-events-none bg-background/60 backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10">
+        <Div className="absolute top-3 right-3 pointer-events-none bg-card backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10">
           <Logo
             className="h-auto w-auto max-w-[100px] opacity-70"
             locale={locale}
@@ -432,7 +446,7 @@ function FlatMessage({
         <Span
           className={cn(
             "font-bold text-sm flex items-center gap-1.5",
-            isUser ? "text-green-400" : "text-blue-400",
+            isUser ? "text-foreground" : "text-primary",
           )}
         >
           {/* Show model icon for AI messages */}
@@ -484,7 +498,7 @@ function FlatMessage({
 
         {/* Post Number */}
         <button
-          className="text-blue-400 hover:text-blue-300 text-xs font-semibold cursor-pointer hover:underline"
+          className="text-primary hover:text-primary/80 text-xs font-semibold cursor-pointer hover:underline"
           onClick={(): void => {
             void navigator.clipboard.writeText(`>>${postNum}`);
           }}
@@ -495,7 +509,7 @@ function FlatMessage({
 
         {/* Reply count badge */}
         {replyCount > 0 && (
-          <Span className="px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 text-xs font-bold border border-blue-500/30">
+          <Span className="px-2 py-0.5 rounded-full bg-primary/15 text-primary text-xs font-bold border border-primary/30">
             {replyCount} {replyCount === 1 ? "reply" : "replies"}
           </Span>
         )}
@@ -504,7 +518,7 @@ function FlatMessage({
 
         {references.length > 0 && (
           // eslint-disable-next-line i18next/no-literal-string -- Technical arrow symbol for reply indicator
-          <Span className="text-blue-400/60 text-xs">▶</Span>
+          <Span className="text-primary/60 text-xs">▶</Span>
         )}
       </Div>
 
@@ -537,7 +551,7 @@ function FlatMessage({
                 onMouseLeave={(): void => {
                   onSetHoveredRef(null, null);
                 }}
-                className="text-blue-400 hover:text-blue-300 hover:underline font-semibold"
+                className="text-primary hover:text-primary/80 hover:underline font-semibold"
               >
                 {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
                 {`>>${parentPostNum}`}
@@ -556,17 +570,17 @@ function FlatMessage({
             onBranch={
               onBranchMessage
                 ? (id, content): Promise<void> =>
-                  messageActions.handleBranchEdit(
-                    id,
-                    content,
-                    onBranchMessage,
-                  )
+                    messageActions.handleBranchEdit(
+                      id,
+                      content,
+                      onBranchMessage,
+                    )
                 : async (): Promise<void> => {
-                  logger.warn(
-                    "FlatMessageView",
-                    "Branch operation not available - onBranchMessage handler not provided",
-                  );
-                }
+                    logger.warn(
+                      "FlatMessageView",
+                      "Branch operation not available - onBranchMessage handler not provided",
+                    );
+                  }
             }
             onCancel={messageActions.cancelAction}
             onModelChange={onModelChange}
@@ -617,10 +631,10 @@ function FlatMessage({
             "text-sm leading-relaxed",
             "p-3",
             "rounded border transition-all duration-150",
-            "border-red-500/60 bg-red-500/10",
+            "border-destructive/60 bg-destructive/10",
           )}
         >
-          <Div className="whitespace-pre-wrap wrap-break-word text-red-400 font-medium">
+          <Div className="whitespace-pre-wrap wrap-break-word text-destructive font-medium">
             {message.content}
           </Div>
         </Div>
@@ -641,6 +655,8 @@ function FlatMessage({
               toolCalls={message.toolCalls}
               locale={locale}
               hasContent={false}
+              messageId={message.id}
+              collapseState={collapseState}
             />
           )}
         </Div>
@@ -655,37 +671,81 @@ function FlatMessage({
               : "border-border/30 hover:border-border/50",
           )}
         >
-          {isAssistant ? (
-            <Div
-              className={cn(
-                "prose prose-sm dark:prose-invert max-w-none",
-                "prose-p:my-2 prose-p:leading-relaxed",
-                "prose-code:text-blue-400 prose-code:bg-blue-950/40 prose-code:px-1 prose-code:rounded",
-                "prose-pre:bg-black/60 prose-pre:border prose-pre:border-border/40 prose-pre:rounded-md",
-                "prose-headings:text-foreground prose-headings:font-bold",
-                "prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline",
-              )}
-            >
-              {/* NEW ARCHITECTURE: Tool calls are separate TOOL messages now */}
-              <Markdown content={message.content} />
-            </Div>
-          ) : (
-            <Div className="whitespace-pre-wrap wrap-break-word text-foreground/95">
-              {renderContentWithReferences(
-                message.content,
-                postNumberToMessageId,
-                (msgId): void => {
-                  const targetPostNum = postNumberMap[msgId];
+          {/* Render all messages in sequence */}
+          {allMessagesInSequence.map((msg, msgIndex) => {
+            // Check if there's content after this message
+            const hasContentAfter = allMessagesInSequence
+              .slice(msgIndex + 1)
+              .some((m) => m.content.trim().length > 0);
 
-                  const element = document.getElementById(`${targetPostNum}`);
-                  element?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                  });
-                },
-              )}
-            </Div>
-          )}
+            // TOOL message
+            if (msg.role === "tool" && msg.toolCalls) {
+              return (
+                <ToolDisplay
+                  key={msg.id}
+                  toolCalls={msg.toolCalls}
+                  locale={locale}
+                  hasContent={hasContentAfter}
+                  messageId={msg.id}
+                  collapseState={collapseState}
+                />
+              );
+            }
+
+            // Skip empty messages
+            if (!msg.content.trim()) {
+              return null;
+            }
+
+            return (
+              <React.Fragment key={msg.id}>
+                {isAssistant ? (
+                  <Div
+                    className={cn(
+                      "prose prose-sm dark:prose-invert max-w-none",
+                      "prose-p:my-2 prose-p:leading-relaxed",
+                      "prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:rounded",
+                      "prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:rounded-md",
+                      "prose-headings:text-foreground prose-headings:font-bold",
+                      "prose-a:text-primary prose-a:no-underline hover:prose-a:underline",
+                      msgIndex > 0 && "mt-3",
+                    )}
+                  >
+                    {/* NEW ARCHITECTURE: Tool calls are separate TOOL messages now */}
+                    <Markdown
+                      content={msg.content}
+                      messageId={msg.id}
+                      hasContentAfter={hasContentAfter}
+                      collapseState={collapseState}
+                    />
+                  </Div>
+                ) : (
+                  <Div
+                    className={cn(
+                      "whitespace-pre-wrap wrap-break-word text-foreground/95",
+                      msgIndex > 0 && "mt-3",
+                    )}
+                  >
+                    {renderContentWithReferences(
+                      msg.content,
+                      postNumberToMessageId,
+                      (msgId): void => {
+                        const targetPostNum = postNumberMap[msgId];
+
+                        const element = document.getElementById(
+                          `${targetPostNum}`,
+                        );
+                        element?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center",
+                        });
+                      },
+                    )}
+                  </Div>
+                )}
+              </React.Fragment>
+            );
+          })}
         </Div>
       )}
 
@@ -758,7 +818,7 @@ function FlatMessage({
                 onMouseLeave={(): void => {
                   onSetHoveredRef(null, null);
                 }}
-                className="text-blue-400 hover:text-blue-300 hover:underline font-semibold"
+                className="text-primary hover:text-primary/80 hover:underline font-semibold"
               >
                 {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
                 {`>>${replyPostNum}`}
@@ -785,7 +845,7 @@ function FlatMessage({
             {onBranchMessage && (
               <button
                 onClick={(): void => messageActions.startEdit(message.id)}
-                className="text-blue-400 hover:text-blue-300 hover:underline transition-colors"
+                className="text-primary hover:text-primary/80 hover:underline transition-colors"
                 title={t("app.chat.flatView.actions.replyToMessage")}
               >
                 [{t("app.chat.flatView.actions.reply")}]
@@ -798,7 +858,7 @@ function FlatMessage({
                 onClick={(): void => {
                   messageActions.startEdit(message.id);
                 }}
-                className="text-green-400 hover:text-green-300 hover:underline transition-colors"
+                className="text-foreground hover:text-foreground/80 hover:underline transition-colors"
                 title={t("app.chat.flatView.actions.editMessage")}
               >
                 [{t("app.chat.flatView.actions.edit")}]
@@ -811,7 +871,7 @@ function FlatMessage({
                 onClick={(): void => {
                   messageActions.startRetry(message.id);
                 }}
-                className="text-yellow-400 hover:text-yellow-300 hover:underline transition-colors"
+                className="text-foreground hover:text-foreground/80 hover:underline transition-colors"
                 title={t("app.chat.flatView.actions.retryWithDifferent")}
               >
                 [{t("app.chat.flatView.actions.retry")}]
@@ -824,7 +884,7 @@ function FlatMessage({
                 onClick={(): void => {
                   messageActions.startAnswer(message.id);
                 }}
-                className="text-purple-400 hover:text-purple-300 hover:underline transition-colors"
+                className="text-primary hover:text-primary/80 hover:underline transition-colors"
                 title={
                   isAssistant
                     ? t("app.chat.threadedView.actions.respondToAI")
@@ -839,7 +899,7 @@ function FlatMessage({
             {onInsertQuote && (
               <button
                 onClick={onInsertQuote}
-                className="text-blue-400 hover:text-blue-300 hover:underline transition-colors"
+                className="text-primary hover:text-primary/80 hover:underline transition-colors"
                 title={t("app.chat.flatView.actions.insertQuote")}
               >
                 [{t("app.chat.flatView.actions.insertQuote")}]
@@ -863,7 +923,7 @@ function FlatMessage({
                 onClick={(): void => {
                   onDeleteMessage(message.id);
                 }}
-                className="px-2 py-1 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all"
+                className="px-2 py-1 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive/80 transition-all"
                 title={t("app.chat.flatView.actions.deleteMessage")}
               >
                 [{t("app.chat.flatView.actions.delete")}]
@@ -906,8 +966,23 @@ export function FlatMessageView({
   // Use message actions hook for edit/retry/answer states
   const messageActions = useMessageActions(logger);
 
+  // Collapse state management for thinking/tool sections
+  const collapseState = useCollapseState();
+
   // Detect touch device for proper action visibility
   const isTouch = useTouchDevice();
+
+  // Group messages by sequence for proper display
+  const messageGroups = groupMessagesBySequence(messages);
+
+  // Create a map of message IDs to their groups for quick lookup
+  const messageToGroupMap = new Map<string, (typeof messageGroups)[0]>();
+  for (const group of messageGroups) {
+    messageToGroupMap.set(group.primary.id, group);
+    for (const continuation of group.continuations) {
+      messageToGroupMap.set(continuation.id, group);
+    }
+  }
 
   // Build post number maps
   const messageIds = messages.map((m) => m.id);
@@ -953,42 +1028,55 @@ export function FlatMessageView({
         />
       )}
 
-      {messages.map((message, index) => (
-        <FlatMessage
-          key={message.id}
-          message={message}
-          index={index}
-          postNum={postNumberMap[message.id]}
-          postNumberMap={postNumberMap}
-          postNumberToMessageId={postNumberToMessageId}
-          messages={messages}
-          personas={personas}
-          selectedModel={selectedModel}
-          selectedPersona={selectedPersona}
-          ttsAutoplay={ttsAutoplay}
-          locale={locale}
-          logger={logger}
-          messageActions={messageActions}
-          isTouch={isTouch}
-          hoveredRef={hoveredRef}
-          onSetHoveredRef={(ref, pos) => {
-            setHoveredRef(ref);
-            setPreviewPosition(pos);
-          }}
-          onSetHoveredUserId={(userId, pos) => {
-            setHoveredUserId(userId);
-            setUserIdPosition(pos);
-          }}
-          onBranchMessage={onBranchMessage}
-          onRetryMessage={onRetryMessage}
-          onAnswerAsModel={onAnswerAsModel}
-          onDeleteMessage={onDeleteMessage}
-          onModelChange={onModelChange}
-          onPersonaChange={onPersonaChange}
-          onInsertQuote={_onInsertQuote}
-          rootFolderId={rootFolderId}
-        />
-      ))}
+      {messages.map((message, index) => {
+        // Check if this is a continuation message (part of a sequence but not the primary)
+        const group = messageToGroupMap.get(message.id);
+        const isContinuation = group && group.primary.id !== message.id;
+
+        // Skip rendering continuation messages - they'll be rendered with their primary
+        if (isContinuation) {
+          return null;
+        }
+
+        return (
+          <FlatMessage
+            key={message.id}
+            message={message}
+            index={index}
+            postNum={postNumberMap[message.id]}
+            postNumberMap={postNumberMap}
+            postNumberToMessageId={postNumberToMessageId}
+            messages={messages}
+            messageGroup={group}
+            personas={personas}
+            selectedModel={selectedModel}
+            selectedPersona={selectedPersona}
+            ttsAutoplay={ttsAutoplay}
+            locale={locale}
+            logger={logger}
+            messageActions={messageActions}
+            isTouch={isTouch}
+            hoveredRef={hoveredRef}
+            onSetHoveredRef={(ref, pos) => {
+              setHoveredRef(ref);
+              setPreviewPosition(pos);
+            }}
+            onSetHoveredUserId={(userId, pos) => {
+              setHoveredUserId(userId);
+              setUserIdPosition(pos);
+            }}
+            onBranchMessage={onBranchMessage}
+            onRetryMessage={onRetryMessage}
+            onAnswerAsModel={onAnswerAsModel}
+            onDeleteMessage={onDeleteMessage}
+            onModelChange={onModelChange}
+            onPersonaChange={onPersonaChange}
+            onInsertQuote={_onInsertQuote}
+            rootFolderId={rootFolderId}
+            collapseState={collapseState}
+          />
+        );
+      })}
     </Div>
   );
 }

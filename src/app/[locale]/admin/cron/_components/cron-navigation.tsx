@@ -73,7 +73,7 @@ export function CronNavigation({
                       "h-auto p-4 flex flex-col items-start space-y-2 w-full",
                       isActive
                         ? "bg-primary text-primary-foreground"
-                        : "hover:bg-muted/50",
+                        : "hover:bg-accent",
                     )}
                   >
                     <Div className="flex items-center space-x-2 w-full">

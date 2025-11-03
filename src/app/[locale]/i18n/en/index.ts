@@ -20,7 +20,7 @@ export const translations = {
   user: userTranslations,
   native: {
     page: {
-      welcome: "Welcome to Next Vibe",
+      welcome: "Welcome to {{appName}}",
       description: "A unified Next.js and React Native application",
       locale: {
         title: "Current Locale",
@@ -59,9 +59,6 @@ export const translations = {
     },
   },
   common: {
-    logoPart1: "Unbottled",
-    logoPart2: ".ai",
-    appName: "Unbottled.ai",
     active: "Active",
     filter: "Filter",
     refresh: "Refresh",
@@ -74,22 +71,6 @@ export const translations = {
       friday: "Friday",
       saturday: "Saturday",
       sunday: "Sunday",
-    },
-    company: {
-      name: "Unbottled.ai",
-      legalForm: "Limited Liability Company (LLC)",
-      registrationNumber: "REG-2024-UNBOTTLED-AI",
-      address: {
-        title: "Address",
-        street: "123 AI Innovation Drive",
-        city: "San Francisco, CA 94105",
-        country: "United States",
-        addressIn1Line:
-          "123 AI Innovation Drive, San Francisco, CA 94105, United States",
-      },
-      responsiblePerson: {
-        name: "Chief Executive Officer",
-      },
     },
     selector: {
       country: "Country",

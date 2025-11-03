@@ -21,7 +21,7 @@ export const translations: typeof enTranslations = {
   user: userTranslations,
   native: {
     page: {
-      welcome: "Witamy w Next Vibe",
+      welcome: "Witamy w {{appName}}",
       description: "Zunifikowana aplikacja Next.js i React Native",
       locale: {
         title: "Aktualny język",
@@ -29,18 +29,22 @@ export const translations: typeof enTranslations = {
       },
       features: {
         title: "Funkcje platformy",
-        description: "Ta strona działa zarówno w internecie, jak i na urządzeniach mobilnych",
+        description:
+          "Ta strona działa zarówno w internecie, jak i na urządzeniach mobilnych",
         unified: {
           title: "✅ Zunifikowane komponenty",
-          description: "Używanie komponentów next-vibe-ui, które działają płynnie na wszystkich platformach",
+          description:
+            "Używanie komponentów next-vibe-ui, które działają płynnie na wszystkich platformach",
         },
         types: {
           title: "✅ Bezpieczeństwo typów",
-          description: "Pełne wsparcie TypeScript z prawidłową inferencją typów",
+          description:
+            "Pełne wsparcie TypeScript z prawidłową inferencją typów",
         },
         async: {
           title: "✅ Asynchroniczne komponenty serwera",
-          description: "Asynchroniczne komponenty stron Next.js 15 działają w React Native",
+          description:
+            "Asynchroniczne komponenty stron Next.js 15 działają w React Native",
         },
       },
       links: {
@@ -60,9 +64,6 @@ export const translations: typeof enTranslations = {
     },
   },
   common: {
-    logoPart1: "Unbottled",
-    logoPart2: ".ai",
-    appName: "Unbottled.ai",
     active: "Aktywny",
     filter: "Filtruj",
     refresh: "Odśwież",
@@ -75,22 +76,6 @@ export const translations: typeof enTranslations = {
       friday: "Piątek",
       saturday: "Sobota",
       sunday: "Niedziela",
-    },
-    company: {
-      name: "Unbottled.ai",
-      legalForm: "Spółka z ograniczoną odpowiedzialnością (Sp. z o.o.)",
-      registrationNumber: "REG-2024-UNBOTTLED-AI",
-      address: {
-        title: "Adres",
-        street: "123 AI Innovation Drive",
-        city: "San Francisco, CA 94105",
-        country: "Stany Zjednoczone",
-        addressIn1Line:
-          "123 AI Innovation Drive, San Francisco, CA 94105, Stany Zjednoczone",
-      },
-      responsiblePerson: {
-        name: "Dyrektor Generalny",
-      },
     },
     selector: {
       country: "Kraj",

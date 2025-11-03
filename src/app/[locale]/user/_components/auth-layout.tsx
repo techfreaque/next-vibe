@@ -21,7 +21,7 @@ export function AuthLayout({
   locale,
 }: AuthLayoutProps): JSX.Element {
   const { t } = simpleT(locale);
-  const appName = t("app.user.common.appName");
+  const appName = t("config.appName");
   const year = new Date().getFullYear();
   return (
     <Div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8">

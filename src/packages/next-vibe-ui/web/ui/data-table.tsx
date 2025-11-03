@@ -107,7 +107,7 @@ export function DataTable<TData, TValue = string>({
                       }
                     : undefined
                 }
-                className={cn(index % 2 && "bg-muted/50")}
+                className={cn(index % 2 && "bg-accent")}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

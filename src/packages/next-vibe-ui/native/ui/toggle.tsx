@@ -65,7 +65,7 @@ const Toggle = React.forwardRef<
   ToggleProps
 >(({ className, variant, size, pressed, onPressedChange, children, disabled }, ref): React.ReactElement => {
   const isPressed = pressed ?? false;
-  const handlePressedChange = onPressedChange ?? (() => undefined);
+  const handlePressedChange = onPressedChange ?? ((_pressed: boolean): void => undefined);
   return (
     <TextClassContext.Provider
       value={cn(

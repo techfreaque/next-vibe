@@ -2,22 +2,22 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Registrieren - Next Vibe",
+    title: "Registrieren - {{appName}}",
     description:
-      "Erstellen Sie Ihr Next Vibe Konto und beginnen Sie mit dem Aufbau erstaunlicher Anwendungen",
+      "Erstellen Sie Ihr {{appName}} Konto und beginnen Sie mit dem Aufbau erstaunlicher Anwendungen",
     category: "Authentifizierung",
-    imageAlt: "Next Vibe Registrierung",
-    keywords: "registrieren, anmelden, konto erstellen, next vibe",
-    ogTitle: "Registrieren Sie sich für Next Vibe",
+    imageAlt: "{{appName}} Registrierung",
+    keywords: "registrieren, anmelden, konto erstellen, {{appName}}",
+    ogTitle: "Registrieren Sie sich für {{appName}}",
     ogDescription:
-      "Treten Sie Next Vibe bei und beginnen Sie noch heute mit dem Aufbau erstaunlicher Anwendungen",
-    twitterTitle: "Registrieren Sie sich für Next Vibe",
+      "Treten Sie {{appName}} bei und beginnen Sie noch heute mit dem Aufbau erstaunlicher Anwendungen",
+    twitterTitle: "Registrieren Sie sich für {{appName}}",
     twitterDescription:
-      "Erstellen Sie Ihr Konto und beginnen Sie mit Next Vibe zu bauen",
+      "Erstellen Sie Ihr Konto und beginnen Sie mit {{appName}} zu bauen",
   },
   auth: {
     signup: {
-      title: "Beginnen Sie Ihre Reise mit Next Vibe",
+      title: "Beginnen Sie Ihre Reise mit {{appName}}",
       subtitle:
         "Schließen Sie sich Tausenden von Entwicklern an, die erstaunliche Anwendungen erstellen",
       createAccountButton: "Konto erstellen",

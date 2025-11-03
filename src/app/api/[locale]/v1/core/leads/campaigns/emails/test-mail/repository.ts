@@ -116,7 +116,7 @@ class TestEmailRepository {
         {
           t,
           locale: emailLocale,
-          companyName: t("app.appName"),
+          companyName: t("config.appName"),
           companyEmail: contactClientRepository.getSupportEmail(emailLocale),
           campaignId: "test-campaign-id",
           baseUrl: env.NEXT_PUBLIC_APP_URL,
@@ -160,7 +160,7 @@ class TestEmailRepository {
             html,
             replyTo: contactClientRepository.getSupportEmail(emailLocale),
             unsubscribeUrl,
-            senderName: t("app.common.appName"),
+            senderName: t("config.appName"),
             selectionCriteria,
           },
           user,

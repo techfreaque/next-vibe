@@ -215,8 +215,8 @@ function ThreadItem({
   // Get all folders for the move menu - only folders from the same root folder
   const allFolders = chat
     ? Object.values(chat.folders).filter(
-      (folder) => folder.rootFolderId === thread.rootFolderId,
-    )
+        (folder) => folder.rootFolderId === thread.rootFolderId,
+      )
     : [];
   const currentFolderId = thread.folderId;
 
@@ -272,7 +272,6 @@ function ThreadItem({
             onBlur={handleSaveEdit}
             onKeyDown={handleKeyDown}
             className="w-full px-2 py-1 text-sm bg-background border border-border rounded"
-            
             onClick={(e) => e.stopPropagation()}
           />
         </Div>
@@ -344,13 +343,19 @@ function ThreadItem({
               onClick={(e) => e.stopPropagation()}
               onCloseAutoFocus={(e) => e.preventDefault()}
             >
-              <DropdownMenuItem onSelect={handleEdit}>
+              <DropdownMenuItem
+                onSelect={handleEdit}
+                className="cursor-pointer"
+              >
                 <Edit2 className="h-4 w-4 mr-2" />
                 {t("app.chat.actions.rename")}
               </DropdownMenuItem>
 
               {onPinThread && (
-                <DropdownMenuItem onSelect={handlePinToggle}>
+                <DropdownMenuItem
+                  onSelect={handlePinToggle}
+                  className="cursor-pointer"
+                >
                   {thread.pinned ? (
                     <>
                       <PinOff className="h-4 w-4 mr-2" />
@@ -366,7 +371,10 @@ function ThreadItem({
               )}
 
               {onArchiveThread && (
-                <DropdownMenuItem onSelect={handleArchiveToggle}>
+                <DropdownMenuItem
+                  onSelect={handleArchiveToggle}
+                  className="cursor-pointer"
+                >
                   {thread.archived ? (
                     <>
                       <ArchiveRestore className="h-4 w-4 mr-2" />
@@ -382,7 +390,10 @@ function ThreadItem({
               )}
 
               {onUpdatePermissions && (
-                <DropdownMenuItem onSelect={handleManagePermissions}>
+                <DropdownMenuItem
+                  onSelect={handleManagePermissions}
+                  className="cursor-pointer"
+                >
                   <Shield className="h-4 w-4 mr-2" />
                   {t("app.chat.folderList.managePermissions")}
                 </DropdownMenuItem>
@@ -392,7 +403,7 @@ function ThreadItem({
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
+                    <DropdownMenuSubTrigger className="cursor-pointer">
                       <FolderInput className="h-4 w-4 mr-2" />
                       {t("app.chat.actions.moveToFolder")}
                     </DropdownMenuSubTrigger>
@@ -401,6 +412,7 @@ function ThreadItem({
                       {currentFolderId !== null && (
                         <DropdownMenuItem
                           onSelect={() => handleMoveToFolder(null)}
+                          className="cursor-pointer"
                         >
                           {((): JSX.Element => {
                             const UnfiledIcon = getIconComponent("folder");
@@ -425,6 +437,7 @@ function ThreadItem({
                               key={folder.id}
                               onSelect={() => handleMoveToFolder(folder.id)}
                               disabled={currentFolderId === folder.id}
+                              className="cursor-pointer"
                             >
                               <FolderIcon className="h-4 w-4 mr-2" />
                               {folder.name}
@@ -446,7 +459,7 @@ function ThreadItem({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onSelect={handleDeleteClick}
-                className="text-destructive"
+                className="text-destructive cursor-pointer"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 {t("app.chat.common.delete")}

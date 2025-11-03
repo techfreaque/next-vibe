@@ -52,7 +52,7 @@ function WelcomeEmailContent({
     undefined, // no campaignId for transactional emails
   );
 
-  const appName = t("app.common.appName");
+  const appName = t("config.appName");
 
   return (
     <EmailTemplate
@@ -73,8 +73,8 @@ function WelcomeEmailContent({
       >
         {requestData.name
           ? t("app.api.v1.core.newsletter.email.welcome.greeting_with_name", {
-            name: requestData.name,
-          })
+              name: requestData.name,
+            })
           : t("app.api.v1.core.newsletter.email.welcome.greeting")}
       </Span>
 
@@ -339,7 +339,7 @@ export const renderAdminNotificationMail: EmailFunctionType<
   try {
     return createSuccessResponse({
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("app.common.appName"),
+      toName: t("config.appName"),
       subject: t("app.api.v1.core.newsletter.email.admin_notification.subject"),
       jsx: AdminNotificationEmailContent({
         requestData,

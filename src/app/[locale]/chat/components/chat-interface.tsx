@@ -273,11 +273,18 @@ export function ChatInterface({
   }, [logger]);
 
   // Parse URL path to determine root folder, sub folder, and thread
+  // CRITICAL: This must be the single source of truth for all IDs
+  // All other state (activeThreadId, currentRootFolderId, currentSubFolderId) must derive from this
   const { initialRootFolderId, initialSubFolderId, initialThreadId } =
     React.useMemo(() => {
       // If urlPath is provided, parse it
       if (urlPath && urlPath.length > 0) {
-        return parseChatUrl(urlPath);
+        const parsed = parseChatUrl(urlPath);
+        logger.debug("Chat: Parsed URL path", {
+          urlPath,
+          parsed,
+        });
+        return parsed;
       }
 
       // Fallback to deprecated props - parse them properly
@@ -298,7 +305,7 @@ export function ChatInterface({
         initialSubFolderId: null,
         initialThreadId: deprecatedThreadId,
       };
-    }, [urlPath, deprecatedFolderId, deprecatedThreadId]);
+    }, [urlPath, deprecatedFolderId, deprecatedThreadId, logger]);
 
   // Redirect public users to incognito if they try to access PRIVATE or SHARED folders
   // PUBLIC users can access PUBLIC and INCOGNITO folders
@@ -325,16 +332,31 @@ export function ChatInterface({
     }
   }, [isAuthenticated, initialRootFolderId, locale, router, logger]);
 
-  // Handle "new" thread case - don't set active thread, let user start fresh
+  // Track last synced values to prevent infinite loops
+  // Initialize to undefined so first mount always triggers sync
+  const lastSyncedThreadIdRef = useRef<string | null | undefined>(undefined);
+  const lastSyncedRootFolderIdRef = useRef<string | undefined>(undefined);
+  const lastSyncedSubFolderIdRef = useRef<string | null | undefined>(undefined);
+
+  // CRITICAL: Sync activeThreadId with URL - URL is the ONLY source of truth
+  // This ensures that when URL changes (via navigation), the active thread updates
   useEffect(() => {
-    if (initialThreadId && !isNewThread(initialThreadId)) {
-      setActiveThread(initialThreadId);
-    } else if (initialThreadId && isNewThread(initialThreadId)) {
-      // Clear active thread for new chat
-      setActiveThread(null);
+    const urlThreadId =
+      initialThreadId && !isNewThread(initialThreadId) ? initialThreadId : null;
+
+    // Compare against the actual initialThreadId (including "new"), not the computed urlThreadId
+    // This ensures we detect navigation to "new" page
+    if (lastSyncedThreadIdRef.current !== initialThreadId) {
+      logger.debug("Chat: Syncing activeThreadId with URL", {
+        urlThreadId,
+        previousSyncedValue: lastSyncedThreadIdRef.current,
+        initialThreadId,
+        isNew: initialThreadId ? isNewThread(initialThreadId) : false,
+      });
+      lastSyncedThreadIdRef.current = initialThreadId;
+      setActiveThread(urlThreadId);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialThreadId]);
+  }, [initialThreadId, setActiveThread, logger]);
 
   // DISABLED: This effect was causing issues with new thread navigation
   // The onThreadCreated callback in sendMessage already handles setting the active thread
@@ -389,10 +411,11 @@ export function ChatInterface({
       const url = buildThreadUrl(locale, threadId, threads);
       router.push(url);
 
-      // Also update the active thread in state
-      setActiveThread(threadId);
+      // CRITICAL: Do NOT manually set active thread here
+      // Let the URL sync effect handle it to maintain URL as source of truth
+      // The effect will detect the URL change and update the store
     },
-    [threads, locale, router, setActiveThread],
+    [threads, locale, router],
   );
 
   // Handle new thread creation with navigation
@@ -401,27 +424,55 @@ export function ChatInterface({
       // Navigate to /threads/[folderId]/new
       // Don't create thread yet - will be created on first message
       const url = buildNewThreadUrl(locale, folderId, chat.folders);
+
+      // CRITICAL: Update store IMMEDIATELY before navigation
+      // This ensures that if user sends message quickly, it uses correct context
+
+      // Clear active thread so new thread is created instead of branching
+      setActiveThread(null);
+
+      // Update folder context based on the folderId
+      if (!folderId) {
+        // No folder specified, default to private
+        setCurrentFolder(DEFAULT_FOLDER_IDS.PRIVATE, null);
+      } else if (isDefaultFolderId(folderId)) {
+        // Root folder
+        setCurrentFolder(folderId, null);
+      } else {
+        // Subfolder - need to get root folder ID
+        const folder = chat.folders[folderId];
+        if (folder) {
+          setCurrentFolder(folder.rootFolderId, folderId);
+        } else {
+          // Fallback if folder not found
+          setCurrentFolder(DEFAULT_FOLDER_IDS.PRIVATE, null);
+        }
+      }
+
       router.push(url);
     },
-    [locale, router, chat.folders],
+    [locale, router, chat.folders, setActiveThread, setCurrentFolder],
   );
 
-  // Set current folder for draft storage based on URL or active thread
+  // CRITICAL: Sync currentFolder with URL - URL is the source of truth
+  // This ensures that when URL changes (via navigation), the folder context updates
   useEffect(() => {
-    // Priority: URL params > active thread's folder
-    const rootId =
-      initialRootFolderId || activeThread?.rootFolderId || "private";
-    const subId = initialSubFolderId || activeThread?.folderId || null;
-
-    setCurrentFolder(rootId, subId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    initialRootFolderId,
-    initialSubFolderId,
-    activeThread?.rootFolderId,
-    activeThread?.folderId,
-    // setCurrentFolder is stable, don't include to prevent infinite loops
-  ]);
+    // Only update if URL changed (not if store changed)
+    if (
+      lastSyncedRootFolderIdRef.current !== initialRootFolderId ||
+      lastSyncedSubFolderIdRef.current !== initialSubFolderId
+    ) {
+      logger.debug("Chat: Syncing folder context with URL", {
+        urlRootFolderId: initialRootFolderId,
+        urlSubFolderId: initialSubFolderId,
+        previousUrlRootFolderId: lastSyncedRootFolderIdRef.current,
+        previousUrlSubFolderId: lastSyncedSubFolderIdRef.current,
+      });
+      lastSyncedRootFolderIdRef.current = initialRootFolderId;
+      lastSyncedSubFolderIdRef.current = initialSubFolderId;
+      setCurrentFolder(initialRootFolderId, initialSubFolderId);
+    }
+  }, [initialRootFolderId, initialSubFolderId, setCurrentFolder, logger]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {

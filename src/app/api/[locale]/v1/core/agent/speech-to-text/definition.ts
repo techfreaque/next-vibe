@@ -80,7 +80,6 @@ const { POST } = createEndpoint({
                 (file) => {
                   const allowedTypes = [
                     "audio/",
-                    "video/",
                     "application/octet-stream",
                   ];
                   return allowedTypes.some((type) =>

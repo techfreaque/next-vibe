@@ -10,6 +10,7 @@ import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repo
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
+import { translations } from "@/config/i18n/en";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: "app.meta.careers.ogTitle",
         description: "app.meta.careers.ogDescription",
-        url: `https://unbottled.ai/${locale}/careers`,
+        url: `${translations.websiteUrl}/${locale}/careers`,
         type: "website",
       },
       twitter: {
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     path: "careers",
     category: "app.meta.careers.category",
-    image: "https://unbottled.ai/images/careers-hero.jpg",
+    image: `${translations.websiteUrl}/images/careers-hero.jpg`,
     imageAlt: "app.meta.careers.imageAlt",
     keywords: ["app.meta.careers.keywords"],
   });
@@ -117,7 +118,7 @@ export default async function CareersPage({
 
           <P className="text-xl text-gray-700 dark:text-gray-300 mb-8">
             {t("app.story._components.home.careers.description", {
-              appName: t("app.common.appName"),
+              appName: t("config.appName"),
             })}
           </P>
 
@@ -270,7 +271,7 @@ export default async function CareersPage({
                   </Div>
                   <Div className="flex space-x-3">
                     <Button className="flex-1" asChild>
-                      <Link href={`/${locale}/careers/${position.id}`}>
+                      <Link href={`/${locale}/story/careers/${position.id}`}>
                         {t(
                           "app.story._components.home.careers.jobDetail.moreDetails",
                         )}
@@ -297,7 +298,9 @@ export default async function CareersPage({
               {t("app.story._components.home.careers.explorePositions")}
             </P>
             <Button size="lg" asChild>
-              <Link href={`/${locale}/help`}>{t("app.story._components.nav.contact")}</Link>
+              <Link href={`/${locale}/story/help`}>
+                {t("app.story._components.nav.contact")}
+              </Link>
             </Button>
           </section>
         </Div>

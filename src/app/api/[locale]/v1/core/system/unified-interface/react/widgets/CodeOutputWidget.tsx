@@ -78,7 +78,7 @@ export function CodeOutputWidget({
       )}
       style={style}
     >
-      <Div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-2">
+      <Div className="flex items-center justify-between border-b border-border bg-accent px-4 py-2">
         <Span className="font-mono text-xs uppercase text-muted-foreground">
           {language}
         </Span>

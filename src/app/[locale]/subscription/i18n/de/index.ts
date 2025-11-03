@@ -68,6 +68,11 @@ export const translations: typeof enTranslations = {
       },
     },
     buy: {
+      signInRequired: {
+        title: "Anmeldung erforderlich",
+        description:
+          "Bitte melden Sie sich an oder erstellen Sie ein Konto, um Credits und Abonnements zu kaufen.",
+      },
       subscription: {
         badge: "Für alle zugänglich",
         title: "Monatsabonnement",
@@ -83,7 +88,8 @@ export const translations: typeof enTranslations = {
       },
       pack: {
         title: "Credit-Pakete",
-        description: "Zusätzliche Credits für Power-User (erfordert aktives Abonnement)",
+        description:
+          "Zusätzliche Credits für Power-User (erfordert aktives Abonnement)",
         badge: "Für Power-User",
         perPack: "/Paket",
         quantity: "Menge",
@@ -100,7 +106,8 @@ export const translations: typeof enTranslations = {
         totalPrice: "Gesamt: {{price}}",
         pack: "Paket",
         packs: "Pakete",
-        requiresSubscription: "Abonnieren Sie einen monatlichen Plan, um zusätzliche Credit Packs zu kaufen.",
+        requiresSubscription:
+          "Abonnieren Sie einen monatlichen Plan, um zusätzliche Credit Packs zu kaufen.",
       },
     },
     history: {
@@ -130,13 +137,17 @@ export const translations: typeof enTranslations = {
     payment: {
       success: {
         title: "Zahlung erfolgreich",
-        subscription: "Ihr Abonnement wurde erfolgreich aktiviert! Ihre Credits sind in Kürze verfügbar.",
-        credits: "Ihr Credit-Paket-Kauf war erfolgreich! Ihre Credits sind in Kürze verfügbar.",
+        subscription:
+          "Ihr Abonnement wurde erfolgreich aktiviert! Ihre Credits sind in Kürze verfügbar.",
+        credits:
+          "Ihr Credit-Paket-Kauf war erfolgreich! Ihre Credits sind in Kürze verfügbar.",
       },
       canceled: {
         title: "Zahlung abgebrochen",
-        subscription: "Ihre Abonnement-Zahlung wurde abgebrochen. Sie können es jederzeit erneut versuchen.",
-        credits: "Ihr Credit-Paket-Kauf wurde abgebrochen. Sie können es jederzeit erneut versuchen.",
+        subscription:
+          "Ihre Abonnement-Zahlung wurde abgebrochen. Sie können es jederzeit erneut versuchen.",
+        credits:
+          "Ihr Credit-Paket-Kauf wurde abgebrochen. Sie können es jederzeit erneut versuchen.",
       },
     },
   },

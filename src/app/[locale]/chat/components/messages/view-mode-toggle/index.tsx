@@ -33,7 +33,7 @@ export function ViewModeToggle({
         size="icon"
         onClick={() => onChange("linear")}
         className={cn(
-          "bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9",
+          "bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9",
           mode === "linear" && "bg-primary/10 text-primary hover:bg-primary/20",
         )}
         title={t("app.chat.common.viewModeToggle.linearView")}
@@ -45,7 +45,7 @@ export function ViewModeToggle({
         size="icon"
         onClick={() => onChange("threaded")}
         className={cn(
-          "bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9",
+          "bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9",
           mode === "threaded" &&
             "bg-primary/10 text-primary hover:bg-primary/20",
         )}
@@ -59,7 +59,7 @@ export function ViewModeToggle({
         size="icon"
         onClick={() => onChange("flat")}
         className={cn(
-          "bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9",
+          "bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9",
           mode === "flat" && "bg-primary/10 text-primary hover:bg-primary/20",
         )}
         title={t("app.chat.common.viewModeToggle.flatView")}

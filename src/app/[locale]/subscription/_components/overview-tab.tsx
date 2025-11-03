@@ -1,0 +1,202 @@
+import { motion } from "framer-motion";
+import { Calendar, Coins, Info, Sparkles, Zap } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { H4, P } from "next-vibe-ui/ui/typography";
+import { Span } from "next-vibe-ui/ui/span";
+import { useTranslation } from "@/i18n/core/client";
+import {
+  modelOptions,
+  modelProviders,
+} from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
+
+export function OverviewTab() {
+  const { t } = useTranslation();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1 }}
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Info className="h-5 w-5" />
+            {t("app.subscription.subscription.overview.howItWorks.title")}
+          </CardTitle>
+          <CardDescription>
+            {t("app.subscription.subscription.overview.howItWorks.description")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Div className="space-y-3">
+            <Div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+              <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5" />
+              <Div>
+                <P className="font-medium text-amber-900 dark:text-amber-100">
+                  {t(
+                    "app.subscription.subscription.overview.howItWorks.expiring.title",
+                  )}
+                </P>
+                <P className="text-sm text-amber-700 dark:text-amber-300">
+                  {t(
+                    "app.subscription.subscription.overview.howItWorks.expiring.description",
+                  )}
+                </P>
+              </Div>
+            </Div>
+
+            <Div className="flex items-start gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
+              <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />
+              <Div>
+                <P className="font-medium text-green-900 dark:text-green-100">
+                  {t(
+                    "app.subscription.subscription.overview.howItWorks.permanent.title",
+                  )}
+                </P>
+                <P className="text-sm text-green-700 dark:text-green-300">
+                  {t(
+                    "app.subscription.subscription.overview.howItWorks.permanent.description",
+                  )}
+                </P>
+              </Div>
+            </Div>
+
+            <Div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+              <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+              <Div>
+                <P className="font-medium text-blue-900 dark:text-blue-100">
+                  {t(
+                    "app.subscription.subscription.overview.howItWorks.free.title",
+                  )}
+                </P>
+                <P className="text-sm text-blue-700 dark:text-blue-300">
+                  {t(
+                    "app.subscription.subscription.overview.howItWorks.free.description",
+                  )}
+                </P>
+              </Div>
+            </Div>
+          </Div>
+        </CardContent>
+      </Card>
+
+      {/* Cost Reference */}
+      <Card className="mt-6" id="model-costs">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Coins className="h-5 w-5" />
+            {t("app.subscription.subscription.overview.costs.title")}
+          </CardTitle>
+          <CardDescription>
+            {t("app.subscription.subscription.overview.costs.description")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Div className="space-y-4">
+            <Div>
+              <H4 className="font-semibold mb-2">
+                {t("app.subscription.subscription.overview.costs.models.title")}
+              </H4>
+              <Div className="space-y-4">
+                {Object.entries(modelProviders).map(
+                  ([providerId, provider]) => {
+                    const providerModels = modelOptions.filter(
+                      (model) => model.provider === providerId,
+                    );
+                    if (providerModels.length === 0) {
+                      return null;
+                    }
+                    return (
+                      <Div key={providerId}>
+                        <H4 className="font-semibold mb-2 flex items-center gap-2">
+                          {typeof provider.icon === "string" ? (
+                            <Span>{provider.icon}</Span>
+                          ) : (
+                            <provider.icon className="h-5 w-5" />
+                          )}
+                          {provider.name}
+                        </H4>
+                        <Div className="grid grid-cols-2 gap-2 text-sm">
+                          {providerModels.map((model) => (
+                            <Div
+                              key={model.id}
+                              className="flex justify-between p-2 rounded bg-accent"
+                            >
+                              <Span>{model.name}</Span>
+                              <Span className="font-mono">
+                                {t(
+                                  "app.subscription.subscription.overview.costs.models.cost",
+                                  {
+                                    count: model.creditCost,
+                                  },
+                                )}
+                              </Span>
+                            </Div>
+                          ))}
+                        </Div>
+                      </Div>
+                    );
+                  },
+                )}
+              </Div>
+            </Div>
+
+            <Div>
+              <H4 className="font-semibold mb-2">
+                {t(
+                  "app.subscription.subscription.overview.costs.features.title",
+                )}
+              </H4>
+              <Div className="grid grid-cols-2 gap-2 text-sm">
+                <Div className="flex justify-between p-2 rounded bg-accent">
+                  <Span>
+                    {t(
+                      "app.subscription.subscription.overview.costs.features.search",
+                    )}
+                  </Span>
+                  <Span className="font-mono">
+                    {t(
+                      "app.subscription.subscription.overview.costs.features.searchCost",
+                    )}
+                  </Span>
+                </Div>
+                <Div className="flex justify-between p-2 rounded bg-accent">
+                  <Span>
+                    {t(
+                      "app.subscription.subscription.overview.costs.features.tts",
+                    )}
+                  </Span>
+                  <Span className="font-mono">
+                    {t(
+                      "app.subscription.subscription.overview.costs.features.audioCost",
+                    )}
+                  </Span>
+                </Div>
+                <Div className="flex justify-between p-2 rounded bg-accent">
+                  <Span>
+                    {t(
+                      "app.subscription.subscription.overview.costs.features.stt",
+                    )}
+                  </Span>
+                  <Span className="font-mono">
+                    {t(
+                      "app.subscription.subscription.overview.costs.features.audioCost",
+                    )}
+                  </Span>
+                </Div>
+              </Div>
+            </Div>
+          </Div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}

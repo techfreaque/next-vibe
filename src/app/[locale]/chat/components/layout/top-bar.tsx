@@ -2,7 +2,16 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "next-vibe-ui/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "next-vibe-ui/ui/dropdown-menu";
 import { Span } from "next-vibe-ui/ui/span";
 import {
   Menu,
@@ -62,13 +71,13 @@ export function TopBar({
   }, []);
 
   return (
-    <Div className="absolute top-4 left-4 z-51 flex gap-1">
+    <Div className="absolute top-4 left-4 z-51 flex gap-1 ">
       {/* Menu Button */}
       <Button
         variant="ghost"
         size="icon"
         onClick={onToggleSidebar}
-        className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9"
+        className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
         title={t("app.chat.common.toggleSidebar")}
       >
         <Menu className="h-5 w-5" />
@@ -80,7 +89,7 @@ export function TopBar({
           <Button
             variant="ghost"
             size="icon"
-            className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9"
+            className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
             title={t("app.chat.common.settings")}
           >
             <Settings className="h-5 w-5" />
@@ -88,7 +97,7 @@ export function TopBar({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-56">
           {/* Theme Toggle */}
-          <DropdownMenuItem onClick={onToggleTheme}>
+          <DropdownMenuItem onClick={onToggleTheme} className="cursor-pointer">
             {theme === "dark" ? (
               <>
                 <Sun className="h-4 w-4 mr-2" />
@@ -103,7 +112,10 @@ export function TopBar({
           </DropdownMenuItem>
 
           {/* TTS Autoplay Toggle */}
-          <DropdownMenuItem onClick={onToggleTTSAutoplay}>
+          <DropdownMenuItem
+            onClick={onToggleTTSAutoplay}
+            className="cursor-pointer"
+          >
             {ttsAutoplay ? (
               <>
                 <VolumeX className="h-4 w-4 mr-2" />
@@ -121,7 +133,7 @@ export function TopBar({
 
           {/* Locale Selector */}
           <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
+            <DropdownMenuSubTrigger className="cursor-pointer">
               <Span className="mr-2">{currentCountry.flag}</Span>
               <Span>{currentCountry.name}</Span>
             </DropdownMenuSubTrigger>
@@ -139,7 +151,7 @@ export function TopBar({
             variant="ghost"
             size="icon"
             onClick={onNavigateToThreads || onOpenSearch}
-            className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9"
+            className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
             title={t("app.chat.common.search")}
           >
             <Search className="h-5 w-5" />
@@ -149,7 +161,7 @@ export function TopBar({
             variant="ghost"
             size="icon"
             onClick={onNewChat}
-            className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9"
+            className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
             title={t("app.chat.common.newChat")}
           >
             <MessageSquarePlus className="h-5 w-5" />

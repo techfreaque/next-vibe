@@ -1,59 +1,3 @@
-/**
- * Native Form Components
- * Production-ready implementation with 100% feature parity with web version
- *
- * TYPE SAFETY: This file imports ALL types from the web version to ensure
- * both platforms use the EXACT same type interfaces. Implementation differs
- * (native uses View/Text instead of div/p), but the public API is identical.
- *
- * PLATFORM DIFFERENCES:
- * 1. Form Container:
- *    - Web: <form> HTML element with onSubmit event handling
- *    - Native: <View> component (React Native has no form element)
- *
- * 2. Form Submission:
- *    - Web: Uses form's onSubmit prop to handle submission via form event
- *    - Native: onSubmit prop is accepted for type compatibility but not used.
- *      Instead, submission is triggered by button onPress handlers calling
- *      endpoint methods directly (e.g., endpoint.create.onSubmit())
- *
- * 3. Components:
- *    - Web: div, p, label HTML elements
- *    - Native: Div (View), P (Text), Label components
- *
- * FEATURES (100% parity with web):
- * ✅ react-hook-form integration (FormProvider, Controller, useFormContext)
- * ✅ All form components: Form, FormField, FormItem, FormLabel, FormControl,
- *    FormDescription, FormMessage
- * ✅ Error handling and validation
- * ✅ Accessibility (nativeID for ARIA equivalents)
- * ✅ useFormField hook for form state access
- *
- * USAGE EXAMPLE:
- * ```tsx
- * <Form form={endpoint.create.form} onSubmit={endpoint.create.onSubmit}>
- *   <FormField
- *     control={endpoint.create.form.control}
- *     name="email"
- *     render={({ field }) => (
- *       <FormItem>
- *         <FormLabel>Email</FormLabel>
- *         <FormControl>
- *           <Input {...field} />
- *         </FormControl>
- *         <FormDescription>Enter your email address</FormDescription>
- *         <FormMessage />
- *       </FormItem>
- *     )}
- *   />
- *   <Button onPress={() => endpoint.create.onSubmit()}>Submit</Button>
- * </Form>
- * ```
- *
- * NOTE: On native, the Button's onPress calls the endpoint method directly
- * rather than relying on form submission events.
- */
-
 "use client";
 
 import { Slot } from "@radix-ui/react-slot";
@@ -111,9 +55,9 @@ function Form<TRequest extends FieldValues>(
   return <View className={cn(props.className)}>{props.children}</View>;
 }
 
-const FormFieldContext = React.createContext<
-  FormFieldContextValue | undefined
->(undefined);
+const FormFieldContext = React.createContext<FormFieldContextValue | undefined>(
+  undefined,
+);
 
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
@@ -168,19 +112,15 @@ const useFormField = (): UseFormFieldReturn => {
  * Type compatibility: FormItemProps is HTMLAttributes on web, but we need
  * ViewProps on native. We pick only the compatible props (className, children, etc.)
  */
-const FormItem = React.forwardRef<
-  React.ElementRef<typeof Div>,
-  Pick<FormItemProps, "className" | "children">
->(({ className, ...props }, ref) => {
+const FormItem = ({ className, ...props }: FormItemProps): JSX.Element => {
   const id = React.useId();
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <Div ref={ref} className={cn("space-y-2", className)} {...props} />
+      <Div className={cn("space-y-2", className)} {...props} />
     </FormItemContext.Provider>
   );
-});
-FormItem.displayName = "FormItem";
+};
 
 /**
  * FormLabel - Native implementation using Label component

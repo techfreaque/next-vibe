@@ -109,7 +109,7 @@ function SheetContent({
   portalHost,
   ...props
 }: SheetContentProps): React.ReactElement {
-  const getEnteringAnimation = () => {
+  const getEnteringAnimation = (): typeof SlideInUp => {
     switch (side) {
       case "top":
         return SlideInUp;
@@ -124,7 +124,7 @@ function SheetContent({
     }
   };
 
-  const getExitingAnimation = () => {
+  const getExitingAnimation = (): typeof SlideOutUp => {
     switch (side) {
       case "top":
         return SlideOutUp;

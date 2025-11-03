@@ -1,4 +1,3 @@
-
 import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
@@ -65,6 +64,11 @@ export const translations: typeof enTranslations = {
       conflict: {
         title: "Konflikt",
         description: "Wystąpił konflikt zasobów",
+      },
+      noActiveSubscription: {
+        title: "Wymagana aktywna subskrypcja",
+        description:
+          "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
       },
     },
   },

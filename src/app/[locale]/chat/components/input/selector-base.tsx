@@ -276,7 +276,7 @@ export function SelectorBase<T extends string = string>({
                   variant={groupMode === "provider" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setGroupMode("provider")}
-                  className="h-7 text-xs px-3"
+                  className="h-7 text-xs px-3 cursor-pointer"
                 >
                   {providerLabel}
                 </Button>
@@ -285,7 +285,7 @@ export function SelectorBase<T extends string = string>({
                   variant={groupMode === "utility" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setGroupMode("utility")}
-                  className="h-7 text-xs px-3"
+                  className="h-7 text-xs px-3 cursor-pointer"
                 >
                   {utilityLabel}
                 </Button>
@@ -299,7 +299,7 @@ export function SelectorBase<T extends string = string>({
                     variant={sortOrder === "asc" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => setSortOrder("asc")}
-                    className="h-7 text-xs px-3"
+                    className="h-7 text-xs px-3 cursor-pointer"
                   >
                     {t("app.chat.selectorBase.sortAZ")}
                   </Button>
@@ -308,7 +308,7 @@ export function SelectorBase<T extends string = string>({
                     variant={sortOrder === "desc" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => setSortOrder("desc")}
-                    className="h-7 text-xs px-3"
+                    className="h-7 text-xs px-3 cursor-pointer"
                   >
                     {t("app.chat.selectorBase.sortZA")}
                   </Button>
@@ -328,7 +328,7 @@ export function SelectorBase<T extends string = string>({
                       onClick={() => handleSelect(option.id)}
                       title={option.tooltip || option.name}
                       className={cn(
-                        "w-full flex items-center gap-3 px-3 sm:px-3.5 py-3 sm:py-2.5 rounded-lg hover:bg-accent active:bg-accent/80 transition-colors text-left group min-h-[52px] sm:min-h-[44px] touch-manipulation",
+                        "w-full flex items-center gap-3 px-3 sm:px-3.5 py-3 sm:py-2.5 rounded-lg hover:bg-accent active:bg-accent/80 transition-colors text-left group min-h-[52px] sm:min-h-[44px] touch-manipulation cursor-pointer",
                         value === option.id && "bg-accent",
                       )}
                     >
@@ -405,7 +405,7 @@ export function SelectorBase<T extends string = string>({
                           onClick={() => handleSelect(option.id)}
                           title={option.tooltip || option.name}
                           className={cn(
-                            "relative flex flex-col items-center gap-2 p-3 sm:p-2.5 rounded-lg border-2 hover:border-primary active:scale-98 transition-all text-center group min-h-[80px] sm:min-h-[72px] touch-manipulation",
+                            "relative flex flex-col items-center gap-2 p-3 sm:p-2.5 rounded-lg border-2 hover:border-primary active:scale-98 transition-all text-center group min-h-[80px] sm:min-h-[72px] touch-manipulation cursor-pointer",
                             value === option.id
                               ? "border-primary bg-accent"
                               : "border-transparent bg-accent/50",
@@ -482,7 +482,7 @@ export function SelectorBase<T extends string = string>({
                           onClick={() => handleSelect(option.id)}
                           title={option.tooltip || option.name}
                           className={cn(
-                            "relative flex flex-col items-center gap-2 p-3 sm:p-2.5 rounded-lg border-2 hover:border-primary active:scale-98 transition-all text-center group min-h-[80px] sm:min-h-[72px] touch-manipulation",
+                            "relative flex flex-col items-center gap-2 p-3 sm:p-2.5 rounded-lg border-2 hover:border-primary active:scale-98 transition-all text-center group min-h-[80px] sm:min-h-[72px] touch-manipulation cursor-pointer",
                             value === option.id
                               ? "border-primary bg-accent"
                               : "border-transparent bg-accent/50",

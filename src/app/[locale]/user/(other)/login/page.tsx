@@ -13,6 +13,7 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
+import { translations } from "@/config/i18n/en";
 
 import { LoginForm } from "@/app/api/[locale]/v1/core/user/public/login/_components/login-form";
 
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: "app.user.other.login.meta.ogTitle",
         description: "app.user.other.login.meta.ogDescription",
-        url: `https://nextvibe.dev/${locale}/login`,
+        url: `${translations.websiteUrl}/${locale}/login`,
         type: "website",
         images: [
           {

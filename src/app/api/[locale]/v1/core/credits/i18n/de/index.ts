@@ -87,6 +87,10 @@ export const translations: typeof enTranslations = {
         title: "Unbekannter Fehler",
         description: "Ein unerwarteter Fehler ist aufgetreten",
       },
+      noActiveSubscription: {
+        title: "Aktives Abonnement erforderlich",
+        description: "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
+      },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
         description: "Sie haben nicht gespeicherte Änderungen",

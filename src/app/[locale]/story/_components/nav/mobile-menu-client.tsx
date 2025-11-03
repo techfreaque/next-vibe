@@ -187,11 +187,11 @@ export function MobileMenuClient({
                               return (
                                 <Link
                                   key={childItem.title}
-                                  href={`/${locale}${childItem.href}`}
+                                  href={`/${locale}/story${childItem.href}`}
                                   className={cn(
                                     "text-base flex items-center py-1 hover:text-primary transition-colors",
                                     isChildActive &&
-                                    "text-primary font-semibold",
+                                      "text-primary font-semibold",
                                   )}
                                   onClick={toggleMenu}
                                 >
@@ -262,7 +262,7 @@ export function MobileMenuClient({
                     return (
                       <Link
                         key={item.title}
-                        href={`/${locale}${item.href}`}
+                        href={`/${locale}/story${item.href}`}
                         className={cn(
                           "flex text-base font-medium hover:text-primary transition-colors py-2",
                           isActive && "text-primary font-semibold",

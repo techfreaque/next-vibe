@@ -7,11 +7,11 @@ export const translations: typeof enTranslations = {
   token: tokenTranslations,
   meta: {
     passwordReset: {
-      title: "Passwort zurücksetzen - Next Vibe",
-      description: "Setzen Sie Ihr Next Vibe Kontopasswort zurück",
+      title: "Passwort zurücksetzen - {{appName}}",
+      description: "Setzen Sie Ihr {{appName}} Kontopasswort zurück",
       category: "Authentifizierung",
       imageAlt: "Passwort zurücksetzen",
-      keywords: "passwort zurücksetzen, passwort vergessen, next vibe",
+      keywords: "passwort zurücksetzen, passwort vergessen, {{appName}}",
     },
   },
   auth: {

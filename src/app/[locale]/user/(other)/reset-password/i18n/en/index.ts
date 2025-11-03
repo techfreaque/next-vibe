@@ -6,11 +6,11 @@ export const translations = {
   token: tokenTranslations,
   meta: {
     passwordReset: {
-      title: "Reset Password - Next Vibe",
-      description: "Reset your Next Vibe account password",
+      title: "Reset Password - {{appName}}",
+      description: "Reset your {{appName}} account password",
       category: "Authentication",
       imageAlt: "Password Reset",
-      keywords: "reset password, forgot password, next vibe",
+      keywords: "reset password, forgot password, {{appName}}",
     },
   },
   auth: {

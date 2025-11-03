@@ -23,15 +23,23 @@ export interface ProductDefinition {
   name: TranslationKey;
   description: TranslationKey;
   priceByCountry: {
-    [key in Countries]: number;
+    [key in Countries]: {
+      price: number;
+      currency: Currencies;
+    };
   };
   yearlyPriceByCountry?: {
-    [key in Countries]: number;
+    [key in Countries]: {
+      price: number;
+      currency: Currencies;
+    };
   };
   oneTimePriceByCountry?: {
-    [key in Countries]: number;
+    [key in Countries]: {
+      price: number;
+      currency: Currencies;
+    };
   };
-  currency: Currencies;
   isSubscription: boolean;
   allowedIntervals: PaymentInterval[];
   credits: number;
@@ -72,11 +80,10 @@ const productDefinitions = {
     name: "app.api.v1.core.products.free.name" as const,
     description: "app.api.v1.core.products.free.description" as const,
     priceByCountry: {
-      DE: 0,
-      PL: 0,
-      GLOBAL: 0,
+      DE: { price: 0, currency: "EUR" },
+      PL: { price: 0, currency: "PLN" },
+      GLOBAL: { price: 0, currency: "USD" },
     },
-    currency: "EUR" as const,
     credits: 20,
     isSubscription: true,
     allowedIntervals: ["month" as const],
@@ -86,21 +93,20 @@ const productDefinitions = {
     name: "app.api.v1.core.products.subscription.name" as const,
     description: "app.api.v1.core.products.subscription.description" as const,
     priceByCountry: {
-      DE: 10,
-      PL: 10,
-      GLOBAL: 10,
+      DE: { price: 10, currency: "EUR" },
+      PL: { price: 10, currency: "PLN" },
+      GLOBAL: { price: 10, currency: "USD" },
     },
     yearlyPriceByCountry: {
-      DE: 100,
-      PL: 100,
-      GLOBAL: 100,
+      DE: { price: 100, currency: "EUR" },
+      PL: { price: 100, currency: "PLN" },
+      GLOBAL: { price: 100, currency: "USD" },
     },
     oneTimePriceByCountry: {
-      DE: 15,
-      PL: 15,
-      GLOBAL: 15,
+      DE: { price: 15, currency: "EUR" },
+      PL: { price: 15, currency: "PLN" },
+      GLOBAL: { price: 15, currency: "USD" },
     },
-    currency: "EUR" as const,
     credits: 1000,
     isSubscription: true,
     allowedIntervals: ["month" as const, "year" as const, "one_time" as const],
@@ -110,16 +116,15 @@ const productDefinitions = {
     name: "app.api.v1.core.products.creditPack.name" as const,
     description: "app.api.v1.core.products.creditPack.description" as const,
     priceByCountry: {
-      DE: 5,
-      PL: 5,
-      GLOBAL: 5,
+      DE: { price: 5, currency: "EUR" },
+      PL: { price: 5, currency: "PLN" },
+      GLOBAL: { price: 5, currency: "USD" },
     },
     oneTimePriceByCountry: {
-      DE: 5,
-      PL: 5,
-      GLOBAL: 5,
+      DE: { price: 5, currency: "EUR" },
+      PL: { price: 5, currency: "PLN" },
+      GLOBAL: { price: 5, currency: "USD" },
     },
-    currency: "EUR" as const,
     credits: 500,
     isSubscription: false,
     allowedIntervals: ["one_time" as const],
@@ -181,25 +186,25 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     const country = getCountryFromLocale(locale);
     const definition = productDefinitions[productId];
 
-    // Get price based on interval
-    let price: number;
+    // Get price and currency based on interval and country
+    let priceData: { price: number; currency: Currencies };
     if (interval === "year" && "yearlyPriceByCountry" in definition) {
-      price = definition.yearlyPriceByCountry[country];
+      priceData = definition.yearlyPriceByCountry[country];
     } else if (
       interval === "one_time" &&
       "oneTimePriceByCountry" in definition
     ) {
-      price = definition.oneTimePriceByCountry[country];
+      priceData = definition.oneTimePriceByCountry[country];
     } else {
-      price = definition.priceByCountry[country];
+      priceData = definition.priceByCountry[country];
     }
 
     return {
       id: productId,
       name: definition.name,
       description: definition.description,
-      price,
-      currency: definition.currency,
+      price: priceData.price,
+      currency: priceData.currency,
       isSubscription: definition.isSubscription,
       allowedIntervals: definition.allowedIntervals,
       credits: definition.credits,
@@ -226,6 +231,279 @@ export class ProductsRepositoryImpl implements ProductsRepository {
       ),
       [ProductIds.CREDIT_PACK]: this.getProduct(ProductIds.CREDIT_PACK, locale),
     };
+  }
+
+  /**
+   * Get a specific product with translated strings
+   * Single source of truth for all product display text
+   */
+  getTranslatedProduct(
+    productId: ProductIds,
+    locale: CountryLanguage,
+    interval: PaymentInterval = "month",
+  ): TranslatedProduct {
+    const product = this.getProduct(productId, locale, interval);
+    const [language] = locale.split("-") as ["en" | "de" | "pl", string];
+
+    // Get translated strings based on product ID and language
+    const translations = this.getProductTranslations(
+      productId,
+      language,
+      product,
+    );
+
+    return {
+      ...product,
+      name: translations.name,
+      description: translations.description,
+      longDescription: translations.longDescription,
+      features: translations.features,
+    };
+  }
+
+  /**
+   * Get all products with translated strings for a specific locale
+   */
+  getTranslatedProducts(
+    locale: CountryLanguage,
+  ): Record<ProductIds, TranslatedProduct> {
+    return {
+      [ProductIds.FREE_TIER]: this.getTranslatedProduct(
+        ProductIds.FREE_TIER,
+        locale,
+      ),
+      [ProductIds.SUBSCRIPTION]: this.getTranslatedProduct(
+        ProductIds.SUBSCRIPTION,
+        locale,
+      ),
+      [ProductIds.CREDIT_PACK]: this.getTranslatedProduct(
+        ProductIds.CREDIT_PACK,
+        locale,
+      ),
+    };
+  }
+
+  /**
+   * Get hardcoded translations for a product
+   * This is the single source of truth for product text in all languages
+   */
+  private getProductTranslations(
+    productId: ProductIds,
+    language: "en" | "de" | "pl",
+    product: Product,
+  ): {
+    name: string;
+    description: string;
+    longDescription?: string;
+    features?: string[];
+  } {
+    const { price, currency, credits } = product;
+    const currencySymbol =
+      currency === "EUR" ? "€" : currency === "PLN" ? "zł" : "$";
+
+    switch (productId) {
+      case ProductIds.FREE_TIER:
+        return this.getFreeTierTranslations(language, credits);
+
+      case ProductIds.SUBSCRIPTION:
+        return this.getSubscriptionTranslations(
+          language,
+          price,
+          currencySymbol,
+          credits,
+        );
+
+      case ProductIds.CREDIT_PACK:
+        return this.getCreditPackTranslations(
+          language,
+          price,
+          currencySymbol,
+          credits,
+        );
+
+      default:
+        // Fallback to English
+        return {
+          name: "Unknown Product",
+          description: "Product information not available",
+        };
+    }
+  }
+
+  /**
+   * Free Tier translations
+   */
+  private getFreeTierTranslations(
+    language: "en" | "de" | "pl",
+    credits: number,
+  ): {
+    name: string;
+    description: string;
+    longDescription?: string;
+    features?: string[];
+  } {
+    switch (language) {
+      case "de":
+        return {
+          name: "Kostenlos",
+          description:
+            "Starten Sie mit kostenlosen Credits - keine Karte erforderlich",
+          longDescription: `${credits} kostenlose Credits zum Ausprobieren`,
+          features: [
+            `${credits} Credits zum Start`,
+            "Zugriff auf alle 40+ KI-Modelle",
+            "Alle Ordnertypen (privat, inkognito, geteilt, öffentlich)",
+            "Community-Personas verwenden",
+            "Community-Support",
+          ],
+        };
+
+      case "pl":
+        return {
+          name: "Darmowy plan",
+          description: "Zacznij z darmowymi kredytami - bez karty kredytowej",
+          longDescription: `${credits} darmowych kredytów do wypróbowania`,
+          features: [
+            `${credits} kredytów na start`,
+            "Dostęp do wszystkich 40+ modeli AI",
+            "Wszystkie typy folderów (prywatne, incognito, współdzielone, publiczne)",
+            "Korzystanie z person społeczności",
+            "Wsparcie społeczności",
+          ],
+        };
+
+      default: // en
+        return {
+          name: "Free Tier",
+          description: "Get started with free credits - no card required",
+          longDescription: `${credits} free credits to try out`,
+          features: [
+            `${credits} credits to start`,
+            "Access to all 40+ AI models",
+            "All folder types (private, incognito, shared, public)",
+            "Use community personas",
+            "Community support",
+          ],
+        };
+    }
+  }
+
+  /**
+   * Subscription translations
+   */
+  private getSubscriptionTranslations(
+    language: "en" | "de" | "pl",
+    price: number,
+    currencySymbol: string,
+    credits: number,
+  ): {
+    name: string;
+    description: string;
+    longDescription?: string;
+    features?: string[];
+  } {
+    switch (language) {
+      case "de":
+        return {
+          name: "Monatsabonnement",
+          description: `${currencySymbol}${price}/Monat - Für alle zugänglich`,
+          longDescription: `Erschwinglicher KI-Zugang mit ${credits} Credits monatlich`,
+          features: [
+            `${credits} Credits pro Monat`,
+            "Alle 40+ KI-Modelle",
+            "Alle Funktionen enthalten",
+            "Jederzeit kündbar",
+            "Credits laufen monatlich ab",
+          ],
+        };
+
+      case "pl":
+        return {
+          name: "Subskrypcja miesięczna",
+          description: `${currencySymbol}${price}/miesiąc - Dostępne dla wszystkich`,
+          longDescription: `Przystępny dostęp do AI z ${credits} kredytów miesięcznie`,
+          features: [
+            `${credits} kredytów miesięcznie`,
+            "Wszystkie 40+ modeli AI",
+            "Wszystkie funkcje włączone",
+            "Anuluj w dowolnym momencie",
+            "Kredyty wygasają co miesiąc",
+          ],
+        };
+
+      default: // en
+        return {
+          name: "Monthly Subscription",
+          description: `${currencySymbol}${price}/month - Accessible for everyone`,
+          longDescription: `Affordable AI access with ${credits} credits monthly`,
+          features: [
+            `${credits} credits per month`,
+            "All 40+ AI models",
+            "All features included",
+            "Cancel anytime",
+            "Credits expire monthly",
+          ],
+        };
+    }
+  }
+
+  /**
+   * Credit Pack translations
+   */
+  private getCreditPackTranslations(
+    language: "en" | "de" | "pl",
+    price: number,
+    currencySymbol: string,
+    credits: number,
+  ): {
+    name: string;
+    description: string;
+    longDescription?: string;
+    features?: string[];
+  } {
+    switch (language) {
+      case "de":
+        return {
+          name: "Credit-Paket",
+          description: "Zusätzliche Credits für Power-User",
+          longDescription: `${currencySymbol}${price} für ${credits} Credits, die nie ablaufen`,
+          features: [
+            `${credits} Credits pro Paket`,
+            "Alle KI-Modelle enthalten",
+            "Alle Funktionen enthalten",
+            "Mehrere Pakete kaufen",
+            "Credits laufen nie ab",
+          ],
+        };
+
+      case "pl":
+        return {
+          name: "Pakiet kredytów",
+          description: "Dodatkowe kredyty dla zaawansowanych użytkowników",
+          longDescription: `${currencySymbol}${price} za ${credits} kredytów, które nigdy nie wygasają`,
+          features: [
+            `${credits} kredytów na pakiet`,
+            "Wszystkie modele AI włączone",
+            "Wszystkie funkcje włączone",
+            "Kup wiele pakietów",
+            "Kredyty nigdy nie wygasają",
+          ],
+        };
+
+      default: // en
+        return {
+          name: "Credit Pack",
+          description: "Extra credits for power users",
+          longDescription: `${currencySymbol}${price} for ${credits} credits that never expire`,
+          features: [
+            `${credits} credits per pack`,
+            "All AI models included",
+            "All features included",
+            "Buy multiple packs",
+            "Credits never expire",
+          ],
+        };
+    }
   }
 
   /**
@@ -352,8 +630,11 @@ function buildPricingPlans(
   const definitions = productsRepository.getProductDefinitions();
   const subscriptionDef = definitions[ProductIds.SUBSCRIPTION];
 
-  // Helper to get price for specific country and interval
-  const getPrice = (country: Countries, interval: PaymentInterval): number => {
+  // Helper to get price and currency for specific country and interval
+  const getPriceData = (
+    country: Countries,
+    interval: PaymentInterval,
+  ): { price: number; currency: Currencies } => {
     if (interval === "year" && subscriptionDef.yearlyPriceByCountry) {
       return subscriptionDef.yearlyPriceByCountry[country];
     }
@@ -366,30 +647,30 @@ function buildPricingPlans(
       name: subscriptionDef.name,
       description: subscriptionDef.description,
       features: [
-        "app.story.pricing.plans.STARTER.features.messages" as const,
-        "app.story.pricing.plans.STARTER.features.models" as const,
-        "app.story.pricing.plans.STARTER.features.folders" as const,
-        "app.story.pricing.plans.STARTER.features.personas" as const,
+        "app.story.pricing.plans.STARTER.features.messages" as TranslationKey,
+        "app.story.pricing.plans.STARTER.features.models" as TranslationKey,
+        "app.story.pricing.plans.STARTER.features.folders" as TranslationKey,
+        "app.story.pricing.plans.STARTER.features.personas" as TranslationKey,
       ],
       priceByCountry: {
         DE: {
-          monthly: getPrice("DE", "month"),
-          annual: getPrice("DE", "year"),
-          currency: subscriptionDef.currency,
+          monthly: getPriceData("DE", "month").price,
+          annual: getPriceData("DE", "year").price,
+          currency: getPriceData("DE", "month").currency,
         },
         PL: {
-          monthly: getPrice("PL", "month"),
-          annual: getPrice("PL", "year"),
-          currency: subscriptionDef.currency,
+          monthly: getPriceData("PL", "month").price,
+          annual: getPriceData("PL", "year").price,
+          currency: getPriceData("PL", "month").currency,
         },
         GLOBAL: {
-          monthly: getPrice("GLOBAL", "month"),
-          annual: getPrice("GLOBAL", "year"),
-          currency: subscriptionDef.currency,
+          monthly: getPriceData("GLOBAL", "month").price,
+          annual: getPriceData("GLOBAL", "year").price,
+          currency: getPriceData("GLOBAL", "month").currency,
         },
       },
-      pricing: "app.story.pricing.plans.STARTER.price" as const,
-      cta: "app.story.pricing.plans.STARTER.cta" as const,
+      pricing: "app.story.pricing.plans.STARTER.price" as TranslationKey,
+      cta: "app.story.pricing.plans.STARTER.cta" as TranslationKey,
       highlighted: false,
       icon: icon,
     },

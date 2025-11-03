@@ -13,6 +13,7 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
+import { translations } from "@/config/i18n/en/index";
 
 import { RootProviders } from "./layout-shared";
 
@@ -44,7 +45,7 @@ export async function generateMetadata({
     title: "app.layout.metadata.defaultTitle",
     category: "app.layout.metadata.category",
     description: "app.layout.metadata.description",
-    image: "https://unbottled.ai/og-image.jpg",
+    image: `${translations.websiteUrl}/og-image.jpg`,
     imageAlt: "app.layout.openGraph.imageAlt",
     keywords: ["app.meta.home.keywords"],
   });
@@ -65,14 +66,14 @@ export default async function RootLayoutServer({
   const structuredData = {
     "@context": "https://schema.org",
     "@type": t("app.layout.structuredData.organization.types.organization"),
-    "name": t("app.layout.structuredData.organization.name"),
-    "url": "https://unbottled.ai",
-    "logo": "https://unbottled.ai/logo.png",
+    "name": t("config.group.name"),
+    "url": translations.websiteUrl,
+    "logo": `${translations.websiteUrl}/logo.png`,
     "sameAs": [
-      "https://facebook.com/socialmediaservice",
-      "https://twitter.com/socialmediaservice",
-      "https://instagram.com/socialmediaservice",
-      "https://linkedin.com/company/socialmediaservice",
+      t("config.social.facebookUrl"),
+      t("config.social.twitterUrl"),
+      t("config.social.instagramUrl"),
+      t("config.social.linkedinUrl"),
     ],
     "contactPoint": {
       "@type": t("app.layout.structuredData.organization.types.contactPoint"),

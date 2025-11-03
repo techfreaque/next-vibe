@@ -97,14 +97,18 @@ export default async function ContactPage({
             {t("app.help.pages.help.faq.title")}
           </H2>
           <Div className="grid md:grid-cols-2 gap-8">
-            <Div>
-              <H3 className="text-lg font-semibold mb-2">
-                {t("app.help.pages.help.faq.questions.q1.question")}
-              </H3>
-              <P className="text-gray-600 dark:text-gray-300">
-                {t("app.help.pages.help.faq.questions.q1.answer")}
-              </P>
-            </Div>
+             <Div>
+               <H3 className="text-lg font-semibold mb-2">
+                 {t("app.help.pages.help.faq.questions.q1.question", {
+                   appName: t("config.appName"),
+                 })}
+               </H3>
+               <P className="text-gray-600 dark:text-gray-300">
+                 {t("app.help.pages.help.faq.questions.q1.answer", {
+                   appName: t("config.appName"),
+                 })}
+               </P>
+             </Div>
             <Div>
               <H3 className="text-lg font-semibold mb-2">
                 {t("app.help.pages.help.faq.questions.q2.question")}

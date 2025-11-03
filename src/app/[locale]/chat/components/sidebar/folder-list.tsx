@@ -340,7 +340,8 @@ function FolderItem({
   const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
   const [moveDialogOpen, setMoveDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [permissionsDialogOpen, setPermissionsDialogOpen] = React.useState(false);
+  const [permissionsDialogOpen, setPermissionsDialogOpen] =
+    React.useState(false);
 
   const threadsInFolder = useMemo(() => {
     return Object.values(chat.threads)
@@ -563,22 +564,36 @@ function FolderItem({
             onCloseAutoFocus={(e) => e.preventDefault()}
           >
             {/* All folders can be reordered and have subfolders */}
-            <DropdownMenuItem onSelect={handleMoveUp} disabled={!canMoveUp}>
+            <DropdownMenuItem
+              onSelect={handleMoveUp}
+              disabled={!canMoveUp}
+              className="cursor-pointer"
+            >
               <ArrowUp className="h-4 w-4 mr-2" />
               {t("app.chat.folderList.moveUp")}
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={handleMoveDown} disabled={!canMoveDown}>
+            <DropdownMenuItem
+              onSelect={handleMoveDown}
+              disabled={!canMoveDown}
+              className="cursor-pointer"
+            >
               <ArrowDown className="h-4 w-4 mr-2" />
               {t("app.chat.folderList.moveDown")}
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={handleCreateSubfolder}>
+            <DropdownMenuItem
+              onSelect={handleCreateSubfolder}
+              className="cursor-pointer"
+            >
               <FolderPlus className="h-4 w-4 mr-2" />
               {t("app.chat.folderList.newSubfolder")}
             </DropdownMenuItem>
 
             {/* Permissions only for PUBLIC root folder */}
             {folder.rootFolderId === "public" && (
-              <DropdownMenuItem onSelect={handleManagePermissions}>
+              <DropdownMenuItem
+                onSelect={handleManagePermissions}
+                className="cursor-pointer"
+              >
                 <Shield className="h-4 w-4 mr-2" />
                 {t("app.chat.folderList.managePermissions")}
               </DropdownMenuItem>
@@ -587,17 +602,23 @@ function FolderItem({
             {/* Only custom folders can be renamed, moved, and deleted */}
             {!isDefault && (
               <>
-                <DropdownMenuItem onSelect={handleRenameFolder}>
+                <DropdownMenuItem
+                  onSelect={handleRenameFolder}
+                  className="cursor-pointer"
+                >
                   <Edit className="h-4 w-4 mr-2" />
                   {t("app.chat.folderList.renameFolder")}
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={handleMoveToFolder}>
+                <DropdownMenuItem
+                  onSelect={handleMoveToFolder}
+                  className="cursor-pointer"
+                >
                   <FolderInput className="h-4 w-4 mr-2" />
                   {t("app.chat.folderList.moveToFolder")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={handleDeleteClick}
-                  className="text-destructive"
+                  className="text-destructive cursor-pointer"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   {t("app.chat.folderList.deleteFolder")}
@@ -751,12 +772,12 @@ function FolderItem({
             <AlertDialogDescription>
               {threadsInFolder.length > 0
                 ? t("app.chat.folderList.deleteDialog.descriptionWithThreads", {
-                  folderName: folderDisplayName,
-                  count: threadsInFolder.length,
-                })
+                    folderName: folderDisplayName,
+                    count: threadsInFolder.length,
+                  })
                 : t("app.chat.folderList.deleteDialog.description", {
-                  folderName: folderDisplayName,
-                })}
+                    folderName: folderDisplayName,
+                  })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -10,8 +10,10 @@ import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repo
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
+import { translations } from "@/config/i18n/en";
 
 import { TermsClientInteraction } from "./_components/terms-client-content";
+import { TermsContactButton } from "./_components/terms-contact-button";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -28,7 +30,7 @@ export async function generateMetadata(
     path: "terms-of-service",
     title: "app.meta.termsOfService.title",
     description: "app.meta.termsOfService.description",
-    image: "https://unbottled.ai/images/terms-hero.jpg",
+    image: `${translations.websiteUrl}/images/terms-hero.jpg`,
     imageAlt: "app.meta.termsOfService.imageAlt",
     keywords: ["app.meta.termsOfService.keywords"],
     category: "app.meta.termsOfService.category",
@@ -36,7 +38,7 @@ export async function generateMetadata(
       openGraph: {
         title: "app.meta.termsOfService.ogTitle",
         description: "app.meta.termsOfService.ogDescription",
-        url: `https://unbottled.ai/${locale}/terms-of-service`,
+        url: `${translations.websiteUrl}/${locale}/terms-of-service`,
         type: "website",
         images: [...previousImages],
       },
@@ -54,7 +56,7 @@ export default async function TermsOfServicePage({
 }: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
-  const appName = t("app.common.appName");
+  const appName = t("config.appName");
   const supportEmail = contactClientRepository.getSupportEmail(locale);
 
   return (
@@ -93,6 +95,9 @@ export default async function TermsOfServicePage({
             <P className="mt-2">
               {t(
                 "app.story._components.home.termsOfService.sections.agreement.content",
+                {
+                  appName: t("config.appName"),
+                },
               )}
             </P>
 
@@ -324,7 +329,8 @@ export default async function TermsOfServicePage({
               {t(
                 "app.story._components.home.termsOfService.sections.governingLaw.content",
                 {
-                  jurisdiction: t("app.common.company.address.country"),
+                  jurisdictionCountry: t("config.group.jurisdiction.country"),
+                  jurisdictionCity: t("config.group.jurisdiction.city"),
                 },
               )}
             </P>
@@ -332,24 +338,9 @@ export default async function TermsOfServicePage({
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t(
-                "app.story._components.home.termsOfService.sections.contact.title",
-              )}
+              {t("config.group.contact.title")}
             </H2>
-            <P className="mt-2">
-              {t(
-                "app.story._components.home.termsOfService.sections.contact.content",
-              )}{" "}
-              <button
-                onClick={() => {
-                  window.location.href = `mailto:${supportEmail}`;
-                }}
-                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors bg-transparent border-none p-0 cursor-pointer"
-              >
-                {supportEmail}
-              </button>
-              .
-            </P>
+            <TermsContactButton supportEmail={supportEmail} locale={locale} />
           </Div>
         </Div>
 

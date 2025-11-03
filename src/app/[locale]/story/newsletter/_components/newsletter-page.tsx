@@ -209,7 +209,7 @@ export function NewsletterPage({
               <P className="text-sm text-gray-500 dark:text-gray-400">
                 {t("app.story.newsletter.page.unsubscribeText")}{" "}
                 <Link
-                  href={`/${locale}/newsletter/unsubscribe`}
+                  href={`/${locale}/story/newsletter/unsubscribe`}
                   className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
                 >
                   {t("app.story.newsletter.page.unsubscribeLink")}

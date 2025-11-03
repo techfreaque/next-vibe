@@ -15,7 +15,7 @@ export const translations = {
       secondaryCta: "Browse Forum",
       userAvatarAlt: "User avatar",
       satisfiedClients: "Join 10,000+ satisfied users",
-      imageAlt: "Unbottled.ai Chat + Forum Interface",
+      imageAlt: "{{appName}} Chat + Forum Interface",
       stats: {
         users: "10,000+ Users",
         models: "40+ AI Models",
@@ -38,59 +38,18 @@ export const translations = {
           },
         },
       },
-      videoAlt: "Unbottled.ai Demo",
+      videoAlt: "{{appName}} Demo",
       scrollDown: "Scroll to explore",
     },
     forumHero: {
       badge: "Welcome to the Community",
       title: "The AI-Powered Community Forum",
-      subtitle: "Ask questions, share your knowledge, and connect with others in the world of AI.",
-      description: "Explore discussions, get help, and contribute to the future of AI development.",
+      subtitle:
+        "Ask questions, share your knowledge, and connect with others in the world of AI.",
+      description:
+        "Explore discussions, get help, and contribute to the future of AI development.",
       cta: "Create New Thread",
       secondaryCta: "Browse Threads",
-    },
-    brands: {
-      title: "Powered by Leading AI Models",
-      brand1: {
-        name: "OpenAI",
-        className: "h-8",
-        logo: "/images/brands/openai.svg",
-        link: "https://openai.com",
-      },
-      brand2: {
-        name: "Anthropic",
-        className: "h-8",
-        logo: "/images/brands/anthropic.svg",
-        link: "https://anthropic.com",
-      },
-      brand3: {
-        name: "Google",
-        logo: "/images/brands/google.svg",
-        link: "https://google.com",
-      },
-      brand4: {
-        name: "Meta",
-        className: "h-8",
-        logo: "/images/brands/meta.svg",
-        link: "https://meta.com",
-      },
-      brand5: {
-        name: "Mistral",
-        className: "h-8",
-        logo: "/images/brands/mistral.svg",
-        link: "https://mistral.ai",
-      },
-      brand6: {
-        name: "Cohere",
-        className: "h-8",
-        logo: "/images/brands/cohere.svg",
-        link: "https://cohere.com",
-      },
-      brand7: {
-        name: "Perplexity",
-        logo: "/images/brands/perplexity.svg",
-        link: "https://perplexity.ai",
-      },
     },
     features: {
       title: "Everything You Need for AI Chat + Community",
@@ -166,6 +125,10 @@ export const translations = {
       viewPlans: "View Pricing Plans",
       noCredit: "No credit card required",
     },
+    pricingSection: {
+      title: "Simple Pricing",
+      description: "One plan for everyone. Extra credits for power users.",
+    },
     stats: {
       clients: "Active Users",
       posts: "Messages Sent",
@@ -174,7 +137,8 @@ export const translations = {
     pricing: {
       free: {
         name: "Free Tier",
-        description: "Get started with {{credits}} free credits - no card required",
+        description:
+          "Get started with {{credits}} free credits - no card required",
         credits: "{{credits}} free credits (one-time)",
         features: {
           credits: "{{credits}} credits to start",
@@ -247,7 +211,8 @@ export const translations = {
     process: {
       badge: "How It Works",
       title: "Get Started in 4 Simple Steps",
-      subtitle: "From private AI chats to public forum discussions - all in one platform",
+      subtitle:
+        "From private AI chats to public forum discussions - all in one platform",
       readyTransform: "Ready to experience AI chat + community?",
       handleSocial: "Your privacy, your choice",
       getStarted: "Get Started Today",
@@ -300,7 +265,7 @@ export const translations = {
     },
     about: {
       hero: {
-        title: "About Unbottled.ai",
+        title: "About {{appName}}",
         subtitle: "AI Chat + Community Forum. Your Privacy. Your Choice.",
         description:
           "We're building a platform that combines private AI conversations with community forum discussions. Choose your privacy level, chat with 40+ AI models, and connect with our community.",
@@ -313,7 +278,7 @@ export const translations = {
       story: {
         title: "Our Story",
         description:
-          "Unbottled.ai was created to solve two problems: censored AI platforms and fragmented chat experiences. We built a single platform where you can have private AI chats, collaborate with teams, and participate in public forum discussions. Today, thousands of users enjoy complete privacy control while accessing 40+ uncensored AI models.",
+          "{{appName}} was created to solve two problems: censored AI platforms and fragmented chat experiences. We built a single platform where you can have private AI chats, collaborate with teams, and participate in public forum discussions. Today, thousands of users enjoy complete privacy control while accessing 40+ uncensored AI models.",
       },
       values: {
         excellence: {
@@ -350,11 +315,11 @@ export const translations = {
     },
     careers: {
       meta: {
-        title: "Careers - Unbottled.ai",
+        title: "Careers - {{appName}}",
         description: "Join our team and help build the future of uncensored AI",
         category: "Careers",
-        imageAlt: "Careers at Unbottled.ai",
-        keywords: "careers, jobs, AI jobs, remote work, unbottled.ai careers",
+        imageAlt: "Careers at {{appName}}",
+        keywords: "careers, jobs, AI jobs, remote work, {{appName}} careers",
       },
       title: "Join Our Team",
       description:
@@ -437,7 +402,7 @@ export const translations = {
           department: "Community",
           type: "Full-time",
           responsibilities: {
-            item1: "Build and engage the Unbottled.ai community",
+            item1: "Build and engage the {{appName}} community",
             item2: "Create compelling content for social media",
             item3: "Moderate discussions and provide support",
             item4: "Organize community events and initiatives",
@@ -490,14 +455,14 @@ export const translations = {
     },
     aboutUs: {
       backToHome: "Back to Home",
-      title: "About Unbottled.ai",
+      title: "About {{appName}}",
       subtitle: "Pioneering Uncensored AI Conversations",
       description:
-        "We're on a mission to democratize access to uncensored AI. Founded in 2024, Unbottled.ai provides a platform where users can have honest, unfiltered conversations with the world's most advanced AI models.",
+        "We're on a mission to democratize access to uncensored AI. Founded in {{config.group.foundedYear}}, {{appName}} provides a platform where users can have honest, unfiltered conversations with the world's most advanced AI models.",
       values: {
         title: "Our Values",
         description:
-          "The principles that guide everything we do at Unbottled.ai",
+          "The principles that guide everything we do at {{appName}}",
         excellence: {
           title: "Excellence",
           description:
@@ -550,7 +515,7 @@ export const translations = {
       title: "Legal Notice",
       lastUpdated: "Last updated: January 2025",
       introduction:
-        "This imprint provides legally required information about Unbottled.ai in accordance with applicable laws.",
+        "This imprint provides legally required information about {{appName}} in accordance with applicable laws.",
       printButton: "Print",
       printAriaLabel: "Print this page",
       sections: {
@@ -559,12 +524,12 @@ export const translations = {
           description:
             "Information about our business partnerships and affiliations.",
           content:
-            "Unbottled.ai maintains partnerships with leading AI providers to deliver the best possible service to our users.",
+            "{{appName}} maintains partnerships with leading AI providers to deliver the best possible service to our users.",
         },
         companyInfo: {
           title: "Company Information",
           description:
-            "Legal information about Unbottled.ai and our registered business entity.",
+            "Legal information about {{appName}} and our registered business entity.",
         },
         responsiblePerson: {
           title: "Responsible Person",
@@ -575,7 +540,7 @@ export const translations = {
           title: "Contact Information",
           description: "How to reach us for legal and business inquiries.",
           communication: {
-            phone: "+1 (555) 123-4567",
+            phone: "{{config.group.contact.phone}}",
           },
         },
         disclaimer: {
@@ -609,7 +574,7 @@ export const translations = {
       title: "Privacy Policy",
       lastUpdated: "Last updated: January 2025",
       introduction:
-        "At Unbottled.ai, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information when you use our uncensored AI chat platform.",
+        "At {{appName}}, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information when you use our uncensored AI chat platform.",
       printButton: "Print",
       printAriaLabel: "Print this page",
       sections: {
@@ -775,31 +740,25 @@ export const translations = {
           description:
             "Our service may contain links to third-party websites. We are not responsible for the privacy practices of these external sites. We encourage you to review their privacy policies.",
         },
-        contact: {
-          title: "Contact Us",
-          description:
-            "If you have questions about this Privacy Policy or our data practices, please contact us at:",
-          email: "privacy@unbottled.ai",
-        },
       },
     },
     termsOfService: {
       title: "Terms of Service",
       lastUpdated: "Last updated: January 2025",
       introduction:
-        "Welcome to Unbottled.ai. By using our uncensored AI chat platform, you agree to these Terms of Service. Please read them carefully.",
+        "Welcome to {{appName}}. By using our uncensored AI chat platform, you agree to these Terms of Service. Please read them carefully.",
       printButton: "Print",
       printAriaLabel: "Print this page",
       sections: {
         agreement: {
           title: "Agreement to Terms",
           content:
-            "By accessing or using Unbottled.ai, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using this service.",
+            "By accessing or using {{appName}}, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using this service.",
         },
         description: {
           title: "Service Description",
           content:
-            "Unbottled.ai provides access to uncensored AI chat models from various providers. We offer free and paid tiers with different features and usage limits. The service is provided 'as is' without warranties of any kind.",
+            "{{appName}} provides access to uncensored AI chat models from various providers. We offer free and paid tiers with different features and usage limits. The service is provided 'as is' without warranties of any kind.",
         },
         subscriptions: {
           title: "Subscriptions and Billing",
@@ -854,7 +813,7 @@ export const translations = {
         intellectualProperty: {
           title: "Intellectual Property",
           content:
-            "The Unbottled.ai platform, including its design, features, and code, is protected by intellectual property laws. You may not copy, modify, or distribute our platform without permission.",
+            "The {{appName}} platform, including its design, features, and code, is protected by intellectual property laws. You may not copy, modify, or distribute our platform without permission.",
         },
         disclaimer: {
           title: "Disclaimer of Warranties",
@@ -864,7 +823,7 @@ export const translations = {
         limitation: {
           title: "Limitation of Liability",
           content:
-            "Unbottled.ai shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service.",
+            "{{appName}} shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service.",
         },
         termination: {
           title: "Termination",
@@ -876,21 +835,16 @@ export const translations = {
           content:
             "We may update these Terms of Service from time to time. Continued use of the service after changes constitutes acceptance of the new terms.",
         },
-        contact: {
-          title: "Contact",
-          content:
-            "If you have questions about these Terms of Service, contact us at:",
-          email: "legal@unbottled.ai",
-        },
+
         indemnification: {
           title: "Indemnification",
           content:
-            "You agree to indemnify and hold harmless Unbottled.ai and its affiliates from any claims, damages, or expenses arising from your use of the service or violation of these terms.",
+            "You agree to indemnify and hold harmless {{appName}} and its affiliates from any claims, damages, or expenses arising from your use of the service or violation of these terms.",
         },
         governingLaw: {
           title: "Governing Law",
           content:
-            "These Terms of Service shall be governed by and construed in accordance with the laws of Switzerland. Any disputes shall be resolved in the courts of Zurich, Switzerland.",
+            "These Terms of Service shall be governed by and construed in accordance with the laws of {{jurisdictionCountry}}. Any disputes shall be resolved in the courts of {{jurisdictionCity}}, {{jurisdictionCountry}}.",
         },
       },
     },
@@ -901,7 +855,7 @@ export const translations = {
     platform: {
       title: "Platform",
       features: "Features",
-      pricing: "Pricing",
+      subscription: "Subscription",
       aiModels: "AI Models",
       personas: "Personas",
     },
@@ -924,7 +878,7 @@ export const translations = {
       title: "Legal",
     },
     builtWith: "Built with",
-    framework: "NextVibe Framework",
-    copyright: "© {{year}} Unbottled.ai. All rights reserved.",
+    framework: "{{appName}} Framework",
+    copyright: "© {{year}} {{config.appName}}. All rights reserved.",
   },
 };

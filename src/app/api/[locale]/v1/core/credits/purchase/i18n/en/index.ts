@@ -64,6 +64,11 @@ export const translations = {
         title: "Conflict",
         description: "Resource conflict occurred",
       },
+      noActiveSubscription: {
+        title: "Active Subscription Required",
+        description:
+          "You must have an active subscription to purchase credit packs",
+      },
     },
   },
   errors: {

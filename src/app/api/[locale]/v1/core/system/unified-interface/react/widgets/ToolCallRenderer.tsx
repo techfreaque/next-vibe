@@ -43,6 +43,29 @@ interface ToolCallRendererProps {
   locale: CountryLanguage;
   context: WidgetRenderContext;
   defaultOpen?: boolean;
+  /** Message ID for collapse state tracking */
+  messageId?: string;
+  /** Index of this tool call in the sequence */
+  toolIndex?: number;
+  /** Collapse state management callbacks */
+  collapseState?: {
+    isCollapsed: (
+      key: {
+        messageId: string;
+        sectionType: "thinking" | "tool";
+        sectionIndex: number;
+      },
+      autoCollapsed: boolean,
+    ) => boolean;
+    toggleCollapse: (
+      key: {
+        messageId: string;
+        sectionType: "thinking" | "tool";
+        sectionIndex: number;
+      },
+      currentState: boolean,
+    ) => void;
+  };
 }
 
 /**
@@ -54,16 +77,54 @@ export function ToolCallRenderer({
   locale,
   context,
   defaultOpen = false,
+  messageId,
+  toolIndex = 0,
+  collapseState,
 }: ToolCallRendererProps): JSX.Element {
   const { t } = simpleT(locale);
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  const [isRequestOpen, setIsRequestOpen] = useState(false);
-  const [isResponseOpen, setIsResponseOpen] = useState(true);
 
   // Determine tool call state
   const hasResult = Boolean(toolCall.result);
   const hasError = Boolean(toolCall.error);
   const isLoading = !hasResult && !hasError;
+
+  // Determine collapse state
+  const getIsOpen = (): boolean => {
+    if (collapseState && messageId !== undefined) {
+      // Use centralized collapse state management
+      const key = {
+        messageId,
+        sectionType: "tool" as const,
+        sectionIndex: toolIndex,
+      };
+      // Auto-collapse based on defaultOpen (which is determined by hasContentAfter)
+      const autoCollapsed = !defaultOpen;
+      return !collapseState.isCollapsed(key, autoCollapsed);
+    }
+    // Legacy: use defaultOpen
+    return defaultOpen;
+  };
+
+  const [isOpen, setIsOpen] = useState(getIsOpen);
+  const [isRequestOpen, setIsRequestOpen] = useState(false);
+  const [isResponseOpen, setIsResponseOpen] = useState(true);
+
+  // Handle toggle with collapse state management
+  const handleToggle = (newState: boolean): void => {
+    if (collapseState && messageId !== undefined) {
+      const key = {
+        messageId,
+        sectionType: "tool" as const,
+        sectionIndex: toolIndex,
+      };
+      const autoCollapsed = !defaultOpen;
+      const currentState = !collapseState.isCollapsed(key, autoCollapsed);
+      collapseState.toggleCollapse(key, currentState);
+      setIsOpen(newState);
+    } else {
+      setIsOpen(newState);
+    }
+  };
 
   // Get display name
   const displayName = toolCall.displayName || toolCall.toolName;
@@ -76,17 +137,17 @@ export function ToolCallRenderer({
   return (
     <Div
       className={cn(
-        "rounded-lg border border-border/50 bg-muted/30 overflow-hidden",
+        "rounded-lg border border-border/50 bg-muted overflow-hidden",
         "transition-all duration-200",
       )}
     >
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <Collapsible open={isOpen} onOpenChange={handleToggle}>
         {/* Header */}
         <CollapsibleTrigger asChild>
           <Div
             className={cn(
               "flex items-center justify-between p-3 cursor-pointer",
-              "hover:bg-muted/50 transition-colors",
+              "hover:bg-accent transition-colors",
             )}
           >
             <Div className="flex items-center gap-2">
@@ -122,17 +183,23 @@ export function ToolCallRenderer({
             <Div className="flex items-center gap-2">
               {hasError && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
-                  {t("app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.status.error")}
+                  {t(
+                    "app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.status.error",
+                  )}
                 </Span>
               )}
               {isLoading && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
-                  {t("app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.status.executing")}
+                  {t(
+                    "app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.status.executing",
+                  )}
                 </Span>
               )}
               {hasResult && !hasError && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
-                  {t("app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.status.complete")}
+                  {t(
+                    "app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.status.complete",
+                  )}
                 </Span>
               )}
             </Div>
@@ -157,7 +224,9 @@ export function ToolCallRenderer({
                         <ChevronRight className="h-3 w-3 text-muted-foreground" />
                       )}
                       <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        {t("app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.sections.request")}
+                        {t(
+                          "app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.sections.request",
+                        )}
                       </Span>
                     </Div>
                   </CollapsibleTrigger>
@@ -178,7 +247,11 @@ export function ToolCallRenderer({
             {isLoading && (
               <Div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <Span>{t("app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.messages.executingTool")}</Span>
+                <Span>
+                  {t(
+                    "app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.messages.executingTool",
+                  )}
+                </Span>
               </Div>
             )}
 
@@ -187,7 +260,9 @@ export function ToolCallRenderer({
               <Div className="rounded-md bg-destructive/10 border border-destructive/20 p-3">
                 <Div className="flex items-start gap-2">
                   <Span className="text-destructive text-sm font-medium">
-                    {t("app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.messages.errorLabel")}
+                    {t(
+                      "app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.messages.errorLabel",
+                    )}
                   </Span>
                   <Span className="text-destructive text-sm">
                     {toolCall.error}
@@ -211,7 +286,9 @@ export function ToolCallRenderer({
                         <ChevronRight className="h-3 w-3 text-muted-foreground" />
                       )}
                       <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        {t("app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.sections.response")}
+                        {t(
+                          "app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.sections.response",
+                        )}
                       </Span>
                     </Div>
                   </CollapsibleTrigger>
@@ -234,4 +311,3 @@ export function ToolCallRenderer({
     </Div>
   );
 }
-

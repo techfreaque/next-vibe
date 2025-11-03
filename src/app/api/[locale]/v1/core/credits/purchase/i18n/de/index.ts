@@ -1,4 +1,3 @@
-
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -67,6 +66,11 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Ressourcenkonflikt aufgetreten",
       },
+      noActiveSubscription: {
+        title: "Aktives Abonnement erforderlich",
+        description:
+          "Sie müssen ein aktives Abonnement haben, um Credit-Pakete zu kaufen",
+      },
     },
   },
   errors: {
@@ -76,7 +80,8 @@ export const translations: typeof enTranslations = {
     },
     checkoutFailed: {
       title: "Checkout fehlgeschlagen",
-      description: "Checkout-Sitzung für Credit-Kauf konnte nicht erstellt werden",
+      description:
+        "Checkout-Sitzung für Credit-Kauf konnte nicht erstellt werden",
     },
   },
 };
