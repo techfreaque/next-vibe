@@ -8,7 +8,10 @@ import { Check } from "./icons/Check";
 
 import type { CheckboxBaseProps } from "next-vibe-ui/ui/checkbox";
 
-export type CheckboxProps = Omit<CheckboxBaseProps, 'defaultChecked' | 'value' | 'name' | 'required'>;
+export type CheckboxProps = Omit<
+  CheckboxBaseProps,
+  "defaultChecked" | "value" | "name" | "required"
+>;
 const StyledCheckboxRoot = styled(CheckboxPrimitive.Root);
 const StyledCheckboxIndicator = styled(CheckboxPrimitive.Indicator);
 
@@ -17,6 +20,7 @@ const Checkbox = React.forwardRef<
   CheckboxProps
 >(({ className, checked, onCheckedChange, disabled }, ref) => {
   const isChecked = checked ?? false;
+  // oxlint-disable-next-line explicit-function-return-type
   const handleCheckedChange = onCheckedChange ?? (() => undefined);
   const isDisabled = disabled ?? false;
 

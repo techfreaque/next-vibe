@@ -13,8 +13,14 @@ import type { ChangeEvent } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { EndpointReturn, FormAlertState } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
-import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/types";
+import type {
+  EndpointReturn,
+  FormAlertState,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
+import type {
+  ApiInferMutationOptions,
+  ApiFormReturn,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-api-mutation-form";
 import { useTranslation } from "@/i18n/core/client";
@@ -137,12 +143,10 @@ export function useLogin(
   );
 
   // Success callback for login
-  const handleLoginSuccess = useCallback(
-    async (data: {
-      requestData: unknown;
-      pathParams: unknown;
-      responseData: unknown;
-    }) => {
+  const handleLoginSuccess: ApiInferMutationOptions<
+    typeof loginEndpoints.POST
+  >["onSuccess"] = useCallback(
+    async (data) => {
       try {
         logger.debug("app.api.v1.core.user.public.login.onSuccess.start");
 
@@ -199,9 +203,7 @@ export function useLogin(
         );
         toast({
           title: t("app.api.v1.core.user.public.login.errors.title"),
-          description: t(
-            "app.api.v1.core.user.public.login.errors.auth_error",
-          ),
+          description: t("app.api.v1.core.user.public.login.errors.auth_error"),
           variant: "destructive",
         });
       }
@@ -210,20 +212,16 @@ export function useLogin(
   );
 
   // Error callback for login
-  const handleLoginError = useCallback(
-    async (data: {
-      error: unknown;
-      requestData: unknown;
-      pathParams: unknown;
-    }) => {
-      logger.error("app.api.v1.core.user.public.login.error", parseError(data.error));
-      // Extract error message if available
-      if (
-        data.error &&
-        typeof data.error === "object" &&
-        "message" in data.error
-      ) {
-        setErrorMessage(data.error.message as TranslationKey);
+  const handleLoginError: ApiInferMutationOptions<
+    typeof loginEndpoints.POST
+  >["onError"] = useCallback(
+    async (data) => {
+      logger.error(
+        "app.api.v1.core.user.public.login.error",
+        parseError(data.error),
+      );
+      if (data.error?.message) {
+        setErrorMessage(data.error.message);
       }
     },
     [logger],

@@ -108,7 +108,7 @@ function SheetContent({
   children,
   portalHost,
   ...props
-}: SheetContentProps): JSX.Element {
+}: SheetContentProps): React.ReactElement {
   const getEnteringAnimation = () => {
     switch (side) {
       case "top":
@@ -158,7 +158,7 @@ function SheetContent({
 }
 SheetContent.displayName = "SheetContent";
 
-function SheetHeader({ className, children }: SheetHeaderProps): JSX.Element {
+function SheetHeader({ className, children }: SheetHeaderProps): React.ReactElement {
   return (
     <View
       className={cn(
@@ -172,7 +172,7 @@ function SheetHeader({ className, children }: SheetHeaderProps): JSX.Element {
 }
 SheetHeader.displayName = "SheetHeader";
 
-function SheetFooter({ className, children }: SheetFooterProps): JSX.Element {
+function SheetFooter({ className, children }: SheetFooterProps): React.ReactElement {
   return (
     <View
       className={cn(
@@ -186,7 +186,7 @@ function SheetFooter({ className, children }: SheetFooterProps): JSX.Element {
 }
 SheetFooter.displayName = "SheetFooter";
 
-function SheetTitle({ className, ...props }: SheetTitleProps): JSX.Element {
+function SheetTitle({ className, ...props }: SheetTitleProps): React.ReactElement {
   return (
     <DialogPrimitive.Title
       className={cn("text-lg font-semibold text-foreground", className)}
@@ -196,7 +196,7 @@ function SheetTitle({ className, ...props }: SheetTitleProps): JSX.Element {
 }
 SheetTitle.displayName = "SheetTitle";
 
-function SheetDescription({ className, ...props }: SheetDescriptionProps): JSX.Element {
+function SheetDescription({ className, ...props }: SheetDescriptionProps): React.ReactElement {
   return (
     <DialogPrimitive.Description
       className={cn("text-sm text-muted-foreground", className)}

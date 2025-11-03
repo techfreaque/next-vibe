@@ -21,12 +21,13 @@ export function ThemeToggle({
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      onClick={() => {
+        setTheme(resolvedTheme === "dark" ? "light" : "dark");
+      }}
       className="my-auto transition-colors hover:text-blue-600 dark:hover:text-blue-400"
       suppressHydrationWarning
       aria-label={

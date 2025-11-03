@@ -4,9 +4,6 @@
  */
 
 import { Minus, Plus } from "lucide-react-native";
-import type { JSX } from "react";
-import { forwardRef } from "react";
-import type { TextInput as RNTextInput } from "react-native";
 
 import { Button } from "./button";
 import { Div } from "./div";

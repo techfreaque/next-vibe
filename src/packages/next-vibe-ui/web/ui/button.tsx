@@ -2,6 +2,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
 import type { ReactNode, JSX } from "react";
+import React from "react";
 
 export const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -35,7 +36,6 @@ export const buttonVariants = cva(
   },
 );
 
-
 export const buttonTextVariants = cva(
   "web:whitespace-nowrap text-sm native:text-base font-medium text-foreground web:transition-colors",
   {
@@ -64,7 +64,6 @@ export const buttonTextVariants = cva(
   },
 );
 
-
 export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
 export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
 
@@ -75,7 +74,10 @@ export interface BaseButtonProps {
   className?: string;
   disabled?: boolean;
   children?: ReactNode;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  type?: "button" | "submit" | "reset";
+  title?: string;
+  role?: React.ComponentPropsWithoutRef<"button">["role"];
 }
 
 export interface AsChildButtonProps extends BaseButtonProps {
@@ -90,27 +92,22 @@ export interface RegularButtonProps extends BaseButtonProps {
 
 export type ButtonProps = AsChildButtonProps | RegularButtonProps;
 
-export function Button(
-  {
-    className,
-    variant,
-    size,
-    asChild = false,
-    suppressHydrationWarning = false,
-    ...props
-  }: ButtonProps,
-): JSX.Element {
+export function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  suppressHydrationWarning = false,
+  ...props
+}: ButtonProps): JSX.Element {
   const Comp = asChild ? Slot : "button";
   return (
     <Comp
-      {...(suppressHydrationWarning
-        ? { suppressHydrationWarning: true }
-        : {})}
+      {...(suppressHydrationWarning ? { suppressHydrationWarning: true } : {})}
       className={cn(
         buttonVariants({ variant, size, className }),
         "cursor-pointer",
       )}
-      ref={ref}
       {...props}
     />
   );

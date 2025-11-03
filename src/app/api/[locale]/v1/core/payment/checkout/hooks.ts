@@ -23,8 +23,14 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import { useTranslation } from "@/i18n/core/client";
 
 import { handleCheckoutRedirect } from "../utils/redirect";
-import type { BillingIntervalValue, SubscriptionPlanValue } from "../../subscription/enum";
-import type { CheckoutResponseOutput } from "./definition";
+import type {
+  BillingIntervalValue,
+  SubscriptionPlanValue,
+} from "../../subscription/enum";
+import type {
+  CheckoutRequestOutput,
+  CheckoutResponseOutput,
+} from "./definition";
 import checkoutEndpoints from "./definition";
 
 /**
@@ -40,16 +46,16 @@ export function useSubscriptionCheckout(
   // Success callback for subscription checkout
   const handleCheckoutSuccess = useCallback(
     async (data: {
-      requestData: unknown;
-      pathParams: unknown;
-      responseData: unknown;
+      requestData: CheckoutRequestOutput;
+      pathParams: Record<string, never>;
+      responseData: CheckoutResponseOutput;
     }) => {
       try {
         logger.debug("app.api.v1.core.payment.checkout.onSuccess.start");
 
         // Handle redirect to Stripe checkout
         const redirected = handleCheckoutRedirect(
-          { success: true, data: data.responseData, message: "Success" },
+          { success: true, data: data.responseData },
           (errorMessage) => {
             logger.error("app.api.v1.core.payment.checkout.redirect.failed", {
               error: errorMessage,
@@ -83,9 +89,9 @@ export function useSubscriptionCheckout(
   // Error callback for subscription checkout
   const handleCheckoutError = useCallback(
     async (data: {
-      error: unknown;
-      requestData: unknown;
-      pathParams: unknown;
+      error: ErrorResponseType;
+      requestData: CheckoutRequestOutput;
+      pathParams: Record<string, never>;
     }) => {
       logger.error(
         "app.api.v1.core.payment.checkout.error",
@@ -123,8 +129,8 @@ export function useSubscriptionCheckout(
  */
 export function useCheckout(logger: EndpointLogger): {
   createCheckout: (
-    planId: SubscriptionPlanValue,
-    billingInterval: BillingIntervalValue,
+    planId: typeof SubscriptionPlanValue,
+    billingInterval: typeof BillingIntervalValue,
     metadata?: Record<string, string>,
   ) => Promise<ResponseType<CheckoutResponseOutput>>;
   isPending: boolean;
@@ -133,8 +139,8 @@ export function useCheckout(logger: EndpointLogger): {
   const endpoint = useSubscriptionCheckout(logger);
 
   const createCheckout = async (
-    planId: SubscriptionPlanValue,
-    billingInterval: BillingIntervalValue,
+    planId: typeof SubscriptionPlanValue,
+    billingInterval: typeof BillingIntervalValue,
     metadata?: Record<string, string>,
   ): Promise<ResponseType<CheckoutResponseOutput>> => {
     if (!endpoint.create) {
@@ -159,7 +165,6 @@ export function useCheckout(logger: EndpointLogger): {
             resolve({
               success: true,
               data: responseData,
-              message: "app.api.v1.core.subscription.checkout.success",
             });
           },
           onError: ({ error }) => {
@@ -200,5 +205,6 @@ export function useCheckout(logger: EndpointLogger): {
   };
 }
 
-export type SubscriptionCheckoutEndpointReturn =
-  EndpointReturn<typeof checkoutEndpoints>;
+export type SubscriptionCheckoutEndpointReturn = EndpointReturn<
+  typeof checkoutEndpoints
+>;

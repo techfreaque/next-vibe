@@ -38,6 +38,7 @@ import {
   useChatStore,
 } from "./store";
 import { GET as threadsGetEndpoint } from "./threads/definition";
+import { useTheme } from "next-themes";
 
 // Re-export types for convenience
 export type { ChatFolder, ChatMessage, ChatThread };
@@ -181,6 +182,8 @@ export function useChat(
   // Get store actions (these don't need selectors as they don't change)
   const chatStore = useChatStore();
   const streamStore = useAIStreamStore();
+
+  const { setTheme: setNextTheme } = useTheme();
 
   // Hydrate settings from localStorage after mount (avoid hydration mismatch)
   useEffect(() => {
@@ -496,9 +499,10 @@ export function useChat(
 
   const setTheme = useCallback(
     (newTheme: "light" | "dark") => {
+      setNextTheme(newTheme);
       chatStore.updateSettings({ theme: newTheme });
     },
-    [chatStore],
+    [chatStore, setNextTheme],
   );
 
   const setViewMode = useCallback(
@@ -566,7 +570,7 @@ export function useChat(
           existingMsg.content !== streamMsg.content ||
           existingMsg.tokens !== (streamMsg.totalTokens || null) ||
           JSON.stringify(existingMsg.toolCalls) !==
-          JSON.stringify(streamMsg.toolCalls || null);
+            JSON.stringify(streamMsg.toolCalls || null);
 
         if (needsUpdate) {
           chatStore.updateMessage(streamMsg.messageId, {
@@ -684,16 +688,16 @@ export function useChat(
                 tokens: null,
                 toolCalls: message.toolCalls
                   ? message.toolCalls.map((tc) => ({
-                    toolName: tc.toolName,
-                    displayName: tc.displayName,
-                    icon: tc.icon,
-                    args: tc.args,
-                    result: tc.result,
-                    error: tc.error,
-                    executionTime: tc.executionTime,
-                    widgetMetadata: tc.widgetMetadata,
-                    creditsUsed: tc.creditsUsed,
-                  }))
+                      toolName: tc.toolName,
+                      displayName: tc.displayName,
+                      icon: tc.icon,
+                      args: tc.args,
+                      result: tc.result,
+                      error: tc.error,
+                      executionTime: tc.executionTime,
+                      widgetMetadata: tc.widgetMetadata,
+                      creditsUsed: tc.creditsUsed,
+                    }))
                   : null,
                 upvotes: null,
                 downvotes: null,
@@ -752,7 +756,9 @@ export function useChat(
         // Get the last message in the thread to use as parent
         // This ensures new messages continue the conversation instead of creating branches
         let parentMessageId: string | null = null;
-        let messageHistory: Array<{ role: "user" | "assistant" | "system"; content: string }> | undefined;
+        let messageHistory:
+          | Array<{ role: "user" | "assistant" | "system"; content: string }>
+          | undefined;
 
         if (threadIdToUse) {
           // For incognito mode, get messages from localStorage
@@ -781,11 +787,16 @@ export function useChat(
             // CRITICAL FIX: For incognito mode, build complete message history
             // The backend doesn't have database access for incognito, so we must send all messages
             // IMPORTANT: Filter out TOOL messages as they have role="tool" which is not accepted by AI
-            if (chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+            if (
+              chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO
+            ) {
               messageHistory = threadMessages
                 .filter((msg) => msg.role !== "tool") // Exclude TOOL messages
                 .map((msg) => ({
-                  role: msg.role.toLowerCase() as "user" | "assistant" | "system",
+                  role: msg.role.toLowerCase() as
+                    | "user"
+                    | "assistant"
+                    | "system",
                   content: msg.content,
                 }));
               logger.debug("Chat: Built message history for incognito mode", {
@@ -886,7 +897,9 @@ export function useChat(
 
       try {
         // Build message history for incognito mode
-        let messageHistory: Array<{ role: "user" | "assistant" | "system"; content: string }> | undefined;
+        let messageHistory:
+          | Array<{ role: "user" | "assistant" | "system"; content: string }>
+          | undefined;
 
         if (chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
           // Get all messages in the thread up to (not including) the message being retried
@@ -895,7 +908,9 @@ export function useChat(
             .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
           // Find the message being retried
-          const messageIndex = threadMessages.findIndex((msg) => msg.id === messageId);
+          const messageIndex = threadMessages.findIndex(
+            (msg) => msg.id === messageId,
+          );
 
           if (messageIndex !== -1 && messageIndex > 0) {
             // Include all messages up to (but not including) the message being retried
@@ -969,10 +984,12 @@ export function useChat(
 
       try {
         // For incognito mode, build message history up to the parent of the message being branched from
-        let messageHistory: Array<{
-          role: "user" | "assistant" | "system";
-          content: string;
-        }> | undefined;
+        let messageHistory:
+          | Array<{
+              role: "user" | "assistant" | "system";
+              content: string;
+            }>
+          | undefined;
 
         // Determine the correct parentId for the new branch
         // For branching, we want to create a sibling of the source message
@@ -998,7 +1015,10 @@ export function useChat(
               messageHistory = contextMessages
                 .filter((msg) => msg.role !== "tool") // Exclude TOOL messages
                 .map((msg) => ({
-                  role: msg.role.toLowerCase() as "user" | "assistant" | "system",
+                  role: msg.role.toLowerCase() as
+                    | "user"
+                    | "assistant"
+                    | "system",
                   content: msg.content,
                 }));
             }
@@ -1061,7 +1081,9 @@ export function useChat(
 
       try {
         // For incognito mode, build message history from localStorage
-        let messageHistory: Array<{ role: "user" | "assistant" | "system"; content: string }> | undefined;
+        let messageHistory:
+          | Array<{ role: "user" | "assistant" | "system"; content: string }>
+          | undefined;
 
         if (chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
           // Get all messages in the thread up to and including the parent message
@@ -1070,7 +1092,9 @@ export function useChat(
             .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
           // Find the index of the parent message
-          const parentIndex = threadMessages.findIndex((msg) => msg.id === messageId);
+          const parentIndex = threadMessages.findIndex(
+            (msg) => msg.id === messageId,
+          );
 
           if (parentIndex !== -1) {
             // Include all messages up to and including the parent
@@ -1565,9 +1589,9 @@ export function useChat(
             .json()
             // eslint-disable-next-line no-restricted-syntax
             .catch(() => ({}))) as Record<
-              string,
-              string | number | boolean | null
-            >;
+            string,
+            string | number | boolean | null
+          >;
           logger.error("Chat: Failed to create folder", {
             status: response.status,
             error: parseError(errorData).message,

@@ -4,7 +4,7 @@
  *
  * Endpoints found: 146
  * Total paths (with aliases): 260
- * Generated at: 2025-11-02T18:52:31.697Z
+ * Generated at: 2025-11-03T08:57:18.002Z
  */
 
 /* eslint-disable prettier/prettier */
@@ -363,6 +363,10 @@ export async function getEndpoint(path: string): Promise<ApiSection | null> {
       return (await import("@/app/api/[locale]/v1/core/system/db/utils/docker-operations/definition")).default;
     case "docker-utils":
       return (await import("@/app/api/[locale]/v1/core/system/db/utils/docker-operations/definition")).default;
+    case "el":
+      return (await import("@/app/api/[locale]/v1/core/system/check/lint/definition")).default;
+    case "elint":
+      return (await import("@/app/api/[locale]/v1/core/system/check/lint/definition")).default;
     case "ga":
       return (await import("@/app/api/[locale]/v1/core/system/generators/generate-all/definition")).default;
     case "generate-all":
@@ -402,11 +406,11 @@ export async function getEndpoint(path: string): Promise<ApiSection | null> {
     case "install":
       return (await import("@/app/api/[locale]/v1/core/system/unified-interface/cli/setup/install/definition")).default;
     case "l":
-      return (await import("@/app/api/[locale]/v1/core/system/check/lint/definition")).default;
+      return (await import("@/app/api/[locale]/v1/core/system/check/oxlint/definition")).default;
     case "leads-import":
       return (await import("@/app/api/[locale]/v1/core/leads/import/definition")).default;
     case "lint":
-      return (await import("@/app/api/[locale]/v1/core/system/check/lint/definition")).default;
+      return (await import("@/app/api/[locale]/v1/core/system/check/oxlint/definition")).default;
     case "list":
       return (await import("@/app/api/[locale]/v1/core/system/help/list/definition")).default;
     case "ls":
@@ -441,10 +445,6 @@ export async function getEndpoint(path: string): Promise<ApiSection | null> {
       return (await import("@/app/api/[locale]/v1/core/newsletter/unsubscribe/definition")).default;
     case "newsletter:status":
       return (await import("@/app/api/[locale]/v1/core/newsletter/status/definition")).default;
-    case "ol":
-      return (await import("@/app/api/[locale]/v1/core/system/check/oxlint/definition")).default;
-    case "olint":
-      return (await import("@/app/api/[locale]/v1/core/system/check/oxlint/definition")).default;
     case "ping":
       return (await import("@/app/api/[locale]/v1/core/system/db/ping/definition")).default;
     case "pulse:status":
@@ -721,6 +721,8 @@ export function getAllEndpointPaths(): string[] {
     "dev",
     "docker",
     "docker-utils",
+    "el",
+    "elint",
     "ga",
     "generate-all",
     "generate:expo",
@@ -760,8 +762,6 @@ export function getAllEndpointPaths(): string[] {
     "newsletter-subscribe",
     "newsletter-unsubscribe",
     "newsletter:status",
-    "ol",
-    "olint",
     "ping",
     "pulse:status",
     "record-engagement",

@@ -30,7 +30,7 @@ const { POST } = createEndpoint({
   category: "app.api.v1.core.system.check.lint.category",
   tags: ["app.api.v1.core.system.check.lint.tag"],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
-  aliases: ["lint", "l"],
+  aliases: ["elint", "el"],
 
   cli: {
     firstCliArgKey: "path",

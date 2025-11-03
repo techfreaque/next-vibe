@@ -47,15 +47,23 @@ export interface AccordionContentProps {
 
 const Accordion = AccordionPrimitive.Root;
 
-const AccordionItem = ({ className, ...props }: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>) => (
-  <AccordionPrimitive.Item
-    className={cn("border-b", className)}
-    {...props}
-  />
+const AccordionItem = ({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<
+  typeof AccordionPrimitive.Item
+>): React.JSX.Element => (
+  <AccordionPrimitive.Item className={cn("border-b", className)} {...props} />
 );
 AccordionItem.displayName = "AccordionItem";
 
-const AccordionTrigger = ({ className, children, ...props }: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>) => (
+const AccordionTrigger = ({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<
+  typeof AccordionPrimitive.Trigger
+>): React.JSX.Element => (
   <AccordionPrimitive.Header className="flex">
     <AccordionPrimitive.Trigger
       className={cn(
@@ -71,7 +79,12 @@ const AccordionTrigger = ({ className, children, ...props }: React.ComponentProp
 );
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
-const AccordionContent = ({ className, ...props }: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>) => (
+const AccordionContent = ({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<
+  typeof AccordionPrimitive.Content
+>): React.JSX.Element => (
   <AccordionPrimitive.Content
     className={cn(
       "overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",

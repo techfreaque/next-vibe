@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Storage } from "next-vibe-ui/ui/storage";
 
 // Simple logger for storage errors
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
 const logStorageError = (operation: string, error: unknown): void => {
   // __DEV__ is a React Native global variable that exists at runtime
   if (typeof (globalThis as { __DEV__?: boolean }).__DEV__ !== "undefined" && (globalThis as { __DEV__?: boolean }).__DEV__) {

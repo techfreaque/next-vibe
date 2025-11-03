@@ -4,7 +4,7 @@
  *
  * Routes found: 147
  * Total paths (with aliases): 261
- * Generated at: 2025-11-02T18:52:31.698Z
+ * Generated at: 2025-11-03T08:57:18.003Z
  */
 
 /* eslint-disable prettier/prettier */
@@ -907,6 +907,16 @@ export async function getRouteHandler(path: string): Promise<RouteModule | null>
         () => import("@/app/api/[locale]/v1/core/system/db/utils/docker-operations/route"),
         "docker-utils"
       );
+    case "el":
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/check/lint/route"),
+        "el"
+      );
+    case "elint":
+      return await loadRouteModule(
+        () => import("@/app/api/[locale]/v1/core/system/check/lint/route"),
+        "elint"
+      );
     case "ga":
       return await loadRouteModule(
         () => import("@/app/api/[locale]/v1/core/system/generators/generate-all/route"),
@@ -1004,7 +1014,7 @@ export async function getRouteHandler(path: string): Promise<RouteModule | null>
       );
     case "l":
       return await loadRouteModule(
-        () => import("@/app/api/[locale]/v1/core/system/check/lint/route"),
+        () => import("@/app/api/[locale]/v1/core/system/check/oxlint/route"),
         "l"
       );
     case "leads-import":
@@ -1014,7 +1024,7 @@ export async function getRouteHandler(path: string): Promise<RouteModule | null>
       );
     case "lint":
       return await loadRouteModule(
-        () => import("@/app/api/[locale]/v1/core/system/check/lint/route"),
+        () => import("@/app/api/[locale]/v1/core/system/check/oxlint/route"),
         "lint"
       );
     case "list":
@@ -1101,16 +1111,6 @@ export async function getRouteHandler(path: string): Promise<RouteModule | null>
       return await loadRouteModule(
         () => import("@/app/api/[locale]/v1/core/newsletter/status/route"),
         "newsletter:status"
-      );
-    case "ol":
-      return await loadRouteModule(
-        () => import("@/app/api/[locale]/v1/core/system/check/oxlint/route"),
-        "ol"
-      );
-    case "olint":
-      return await loadRouteModule(
-        () => import("@/app/api/[locale]/v1/core/system/check/oxlint/route"),
-        "olint"
       );
     case "ping":
       return await loadRouteModule(
@@ -1530,6 +1530,8 @@ export function getAllRoutePaths(): string[] {
     "dev",
     "docker",
     "docker-utils",
+    "el",
+    "elint",
     "ga",
     "generate-all",
     "generate:expo",
@@ -1569,8 +1571,6 @@ export function getAllRoutePaths(): string[] {
     "newsletter-subscribe",
     "newsletter-unsubscribe",
     "newsletter:status",
-    "ol",
-    "olint",
     "ping",
     "pulse:status",
     "record-engagement",

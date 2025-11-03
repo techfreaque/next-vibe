@@ -69,12 +69,12 @@ export default function PricingSection({
   currentUser: CompleteUserType | undefined;
   currentSubscription: SubscriptionGetResponseOutput | null;
   onPlanSelect?: (
-    planId: SubscriptionPlanValue,
+    planId: typeof SubscriptionPlanValue,
     billingInterval: BillingIntervalValue,
     action: "upgrade" | "downgrade",
   ) => void;
   onDowngrade?: (
-    planId: SubscriptionPlanValue,
+    planId: typeof SubscriptionPlanValue,
     billingInterval: BillingIntervalValue,
   ) => void;
   isProcessing: boolean | null;
@@ -106,7 +106,7 @@ export default function PricingSection({
   };
 
   const getButtonAction = (
-    planId: SubscriptionPlanValue,
+    planId: typeof SubscriptionPlanValue,
   ): "upgrade" | "downgrade" | "current" => {
     if (!currentPlanId || !isActive) {
       return "upgrade";
@@ -124,7 +124,7 @@ export default function PricingSection({
     return "current";
   };
 
-  const getButtonText = (planId: SubscriptionPlanValue): string => {
+  const getButtonText = (planId: typeof SubscriptionPlanValue): string => {
     const action = getButtonAction(planId);
 
     switch (action) {
@@ -142,7 +142,7 @@ export default function PricingSection({
   };
 
   // Helper function to determine if a button should show loading spinner
-  const shouldShowLoading = (planId: SubscriptionPlanValue): boolean => {
+  const shouldShowLoading = (planId: typeof SubscriptionPlanValue): boolean => {
     // Show loading if isProcessing is true (all buttons)
     if (isProcessing === true) {
       return true;
@@ -162,7 +162,7 @@ export default function PricingSection({
   };
 
   const handlePlanSelect = async (
-    planId: SubscriptionPlanValue,
+    planId: typeof SubscriptionPlanValue,
   ): Promise<void> => {
     const action = getButtonAction(planId);
     const billingInterval = annual
@@ -696,7 +696,7 @@ export default function PricingSection({
   );
 }
 
-function getPlanCta(planId: SubscriptionPlanValue, t: TFunction): string {
+function getPlanCta(planId: typeof SubscriptionPlanValue, t: TFunction): string {
   switch (planId) {
     case SubscriptionPlan.SUBSCRIPTION:
       return t("app.story.pricing.plans.STARTER.cta");

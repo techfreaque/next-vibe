@@ -357,7 +357,9 @@ export function useEndpoint<
   return {
     alert,
     read: read ?? undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     create: (create as any) ?? undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete: (deleteOperation as any) ?? undefined,
     isLoading,
     error,

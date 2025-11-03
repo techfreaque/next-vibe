@@ -39,5 +39,3 @@ export function Input({ className, onChangeText, disabled, editable, ...props }:
     </Div>
   );
 }
-
-export { Input };

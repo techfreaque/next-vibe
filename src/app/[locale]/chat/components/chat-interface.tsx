@@ -528,7 +528,9 @@ export function ChatInterface({
           theme={theme}
           currentCountry={currentCountry}
           onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
-          onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onToggleTheme={() => {
+            setTheme(theme === "dark" ? "light" : "dark");
+          }}
           onToggleTTSAutoplay={() => setTTSAutoplay(!ttsAutoplay)}
           ttsAutoplay={ttsAutoplay}
           onOpenSearch={() => {

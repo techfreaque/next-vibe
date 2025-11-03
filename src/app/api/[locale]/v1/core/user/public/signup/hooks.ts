@@ -4,8 +4,11 @@ import { useToast } from "next-vibe-ui//hooks/use-toast";
 import { useCallback, useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { UseEndpointOptions,
-EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
+import type {
+  UseEndpointMutationOptions,
+  UseEndpointOptions,
+  EndpointReturn,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
@@ -13,6 +16,7 @@ import { useTranslation } from "@/i18n/core/client";
 import { authClientRepository } from "../../auth/repository-client";
 import { useUser } from "../../private/me/hooks";
 import signupEndpoints from "./definition";
+import { type ApiInferMutationOptions } from "../../../system/unified-interface/react/hooks/types";
 
 type SignupFormReturn = EndpointReturn<typeof signupEndpoints> & {
   logger: ReturnType<typeof createEndpointLogger>;
@@ -48,8 +52,10 @@ export function useRegister(): SignupFormReturn & {
   const [emailToCheck, setEmailToCheck] = useState<string | null>(null);
 
   // Success callback for signup
-  const handleSignupSuccess = useCallback(
-    async (data: UseEndpointOptions<typeof signupEndpoints>["create"]["mutationOptions"]["onSuccess"]) => {
+  const handleSignupSuccess: ApiInferMutationOptions<
+    typeof signupEndpoints.POST
+  >["onSuccess"] = useCallback(
+    async (data) => {
       // Clear lead tracking data on successful signup
       logger.info("app.api.v1.core.user.public.signup.success.processing");
 
@@ -84,9 +90,14 @@ export function useRegister(): SignupFormReturn & {
   );
 
   // Error callback for signup
-  const handleSignupError = useCallback(
-    async (data: UseEndpointOptions<typeof signupEndpoints>["create"]["mutationOptions"]["onError"]) => {
-      logger.error("app.api.v1.core.user.public.signup.error", parseError(data.error));
+  const handleSignupError: ApiInferMutationOptions<
+    typeof signupEndpoints.POST
+  >["onError"] = useCallback(
+    async (data) => {
+      logger.error(
+        "app.api.v1.core.user.public.signup.error",
+        parseError(data.error),
+      );
     },
     [logger],
   );

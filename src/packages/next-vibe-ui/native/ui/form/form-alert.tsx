@@ -20,7 +20,6 @@ import { Alert, AlertDescription, AlertTitle } from "../alert";
 // Import all public types from web version (web is source of truth)
 import type {
   FormAlertProps,
-  FormAlertState,
 } from "../../../web/ui/form/form-alert";
 
 /**

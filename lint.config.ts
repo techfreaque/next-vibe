@@ -312,6 +312,7 @@ export const oxlintConfig: OxlintConfig = {
             "transform",
             "gradientTransform",
             "gradientUnits",
+            "cn",
             "cx",
             "cy",
             "r",

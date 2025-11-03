@@ -7,11 +7,13 @@
     "source.organizeImports": "explicit"
   },
   // Oxlint configuration
+  "oxc.trace.server": "verbose",
   "oxc.enable": true,
   "oxc.lint.run": "onSave",
   "oxc.configPath": ".tmp/.oxlintrc.json",
   "oxc.fmt.configPath": ".tmp/.oxfmtrc.json",
   "oxc.fmt.experimental": true,
+  "oxc.typeAware": true,
   // Prettier configuration
   "prettier.enable": true,
   "prettier.requireConfig": true,

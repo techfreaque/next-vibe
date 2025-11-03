@@ -9,8 +9,12 @@ import { Pressable, View } from "react-native";
 
 import type {
   SidebarProps as WebSidebarProps,
-  SidebarProviderProps,
   SidebarTriggerProps,
+  SidebarHeaderProps,
+  SidebarContentProps,
+  SidebarFooterProps,
+  SidebarMenuItemProps,
+  SidebarContextType,
 } from "next-vibe-ui/ui/sidebar";
 import { cn } from "../lib/utils";
 import { styled } from "nativewind";
@@ -32,40 +36,36 @@ export function useSidebar(): SidebarContextType {
 // Native sidebar props combine web props with ViewProps
 type NativeSidebarProps = WebSidebarProps & ViewProps & { defaultOpen?: boolean };
 
-export const Sidebar = React.forwardRef<View, NativeSidebarProps>(
-  ({ className, children, defaultOpen = true, ...props }, ref) => {
-    const [open, setOpen] = useState(defaultOpen);
+export function Sidebar({ className, children, defaultOpen = true, ...props }: NativeSidebarProps): React.ReactElement {
+  const [open, setOpen] = useState(defaultOpen);
 
-    const contextValue = useMemo<SidebarContextType>(
-      () => ({
-        state: open ? "expanded" : "collapsed",
-        open,
-        setOpen,
-        openMobile: false,
-        setOpenMobile: (() => {}) as (open: boolean) => void,
-        isMobile: false,
-        toggleSidebar: () => setOpen(!open),
-      }),
-      [open],
-    );
+  const contextValue = useMemo<SidebarContextType>(
+    () => ({
+      state: open ? "expanded" : "collapsed",
+      open,
+      setOpen,
+      openMobile: false,
+      setOpenMobile: (() => undefined) as (open: boolean) => void,
+      isMobile: false,
+      toggleSidebar: (): void => setOpen(!open),
+    }),
+    [open],
+  );
 
-    return (
-      <SidebarContext.Provider value={contextValue}>
-        <StyledView
-          ref={ref}
-          className={cn(
-            "flex flex-col border-r border-border bg-background",
-            open ? "w-64" : "w-16",
-            className,
-          )}
-          {...props}
-        >
-          {children}
-        </StyledView>
-      </SidebarContext.Provider>
-    );
-  },
-);
+  return (
+    <SidebarContext.Provider value={contextValue}>
+      <StyledView
+        className={cn(
+          "flex h-full w-64 flex-col border-r border-border bg-background",
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </StyledView>
+    </SidebarContext.Provider>
+  );
+}
 
 Sidebar.displayName = "Sidebar";
 
@@ -123,7 +123,7 @@ SidebarMenuItem.displayName = "SidebarMenuItem";
 export const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Pressable>,
   SidebarTriggerProps & PressableProps
->(({ className, children, onClick, ...props }, ref) => {
+>(({ className, children, onClick: _onClick, ...props }, ref) => {
   const { toggleSidebar } = useSidebar();
 
   return (

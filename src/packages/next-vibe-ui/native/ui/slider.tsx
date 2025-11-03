@@ -34,7 +34,6 @@ const Slider = React.forwardRef<
         className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20"
       >
         <StyledSliderRange
-          // eslint-disable-next-line i18n/no-literal-string
           className={"absolute h-full bg-primary"}
         />
       </StyledSliderTrack>

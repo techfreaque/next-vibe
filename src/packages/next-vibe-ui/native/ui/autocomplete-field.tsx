@@ -130,7 +130,6 @@ export function AutocompleteField({
             <View className="flex-1 flex-row items-center gap-2 min-w-0">
                {isCustomValue && (
                  <Badge variant="secondary" className="text-xs">
-                   {/* eslint-disable-next-line i18n/no-literal-string */}
                     <UIText>{t("packages.nextVibeUi.native.ui.autocompleteField.custom")}</UIText>
                  </Badge>
                )}
@@ -174,7 +173,6 @@ export function AutocompleteField({
             <ScrollView className="max-h-[300px]">
               {Object.keys(filteredGroups).length === 0 ? (
                  <View className="py-6 text-center">
-                   {/* eslint-disable-next-line i18n/no-literal-string */}
                     <UIText className="text-sm text-muted-foreground text-center">
                       {t("packages.nextVibeUi.native.ui.autocompleteField.noOptionsFound")}
                     </UIText>
@@ -183,10 +181,9 @@ export function AutocompleteField({
                        onPress={() => handleCustomValue(searchValue)}
                        className="mt-2 items-center"
                      >
-                       {/* eslint-disable-next-line i18n/no-literal-string */}
-                        <UIText className="text-sm text-primary">
-                          {t("packages.nextVibeUi.native.ui.autocompleteField.use")} "{searchValue}"
-                        </UIText>
+                         <UIText className="text-sm text-primary">
+                           {t("packages.nextVibeUi.native.ui.autocompleteField.use", { value: searchValue })}
+                         </UIText>
                      </Pressable>
                   )}
                 </View>
@@ -222,8 +219,9 @@ export function AutocompleteField({
                      onPress={() => handleCustomValue(searchValue)}
                      className="flex-row items-center rounded-sm px-2 py-2 active:bg-accent"
                    >
-                     {/* eslint-disable-next-line i18n/no-literal-string */}
-                     <UIText className="text-base">Use "{searchValue}"</UIText>
+                       <UIText className="text-base">
+                         {t("packages.nextVibeUi.native.ui.autocompleteField.use", { value: searchValue })}
+                       </UIText>
                    </Pressable>
                 </View>
               )}

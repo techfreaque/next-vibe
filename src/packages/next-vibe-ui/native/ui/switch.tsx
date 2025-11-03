@@ -31,8 +31,8 @@ const SwitchWeb = React.forwardRef<
   });
   return (
     <StyledSwitchRoot
-      // eslint-disable-next-line i18n/no-literal-string
-      className={cn(
+    className={cn(
+        // eslint-disable-next-line i18n/no-literal-string
         "peer flex-row h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed",
         isChecked ? "bg-primary" : "bg-input",
         disabled && "opacity-50",

@@ -4,7 +4,7 @@ import * as React from "react";
 import { cn } from "next-vibe/shared/utils/utils";
 
 // Import all public types from web version (web is source of truth)
-import type { LabelBaseProps, LabelProps } from "../../web/ui/label";
+import type { LabelProps } from "../../web/ui/label";
 
 // Native label props extend web props with native-specific properties
 type NativeLabelProps = LabelProps & {
@@ -22,7 +22,8 @@ const Label = React.forwardRef<
 
   return (
     <LabelPrimitive.Root>
-      <LabelPrimitive.Text ref={ref} className={textClassName} {...props} />
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      <LabelPrimitive.Text ref={ref} className={textClassName} {...(props as any)} />
     </LabelPrimitive.Root>
   );
 });

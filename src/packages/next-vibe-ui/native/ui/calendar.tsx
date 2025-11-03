@@ -5,6 +5,7 @@
  */
 import React from "react";
 import { Text as RNText, View } from "react-native";
+import type { ViewProps } from "react-native";
 import { styled } from "nativewind";
 
 import type { CalendarBaseProps } from "next-vibe-ui/ui/calendar";
@@ -17,9 +18,6 @@ export type CalendarProps = CalendarBaseProps & Omit<ViewProps, 'children'> & {
 
 // Type-safe View with className support (NativeWind)
 const StyledView = styled(View);
-
-// Type-safe Text with className support (NativeWind)
-const StyledText = styled(RNText);
 
 // Type-safe Text with className support (NativeWind)
 // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax

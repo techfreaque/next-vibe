@@ -1,5 +1,6 @@
 import * as AccordionPrimitive from "@rn-primitives/accordion";
 import * as React from "react";
+import type { JSX } from "react";
 import { Platform, Pressable, View } from "react-native";
 import Animated, {
   Extrapolation,
@@ -80,7 +81,12 @@ function Accordion<T extends AccordionProps>(props: T): React.ReactElement {
 
 Accordion.displayName = AccordionPrimitive.Root.displayName;
 
-const AccordionItem = ({ className, value, children, disabled }: AccordionItemProps) => {
+const AccordionItem = ({
+  className,
+  value,
+  children,
+  disabled,
+}: AccordionItemProps): JSX.Element => {
   return (
     <Animated.View
       className="overflow-hidden"
@@ -98,7 +104,7 @@ const AccordionItem = ({ className, value, children, disabled }: AccordionItemPr
 };
 AccordionItem.displayName = AccordionPrimitive.Item.displayName;
 
-const AccordionTrigger = ({ className, children }: AccordionTriggerProps) => {
+const AccordionTrigger = ({ className, children }: AccordionTriggerProps): JSX.Element => {
   const { isExpanded } = AccordionPrimitive.useItemContext();
 
   const progress = useDerivedValue(() =>
@@ -145,13 +151,16 @@ const AccordionTrigger = ({ className, children }: AccordionTriggerProps) => {
       </AccordionPrimitive.Header>
     </TextClassContext.Provider>
   );
-});
+};
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
-const AccordionContent = ({ className, children }: AccordionContentProps) => {
+const AccordionContent = ({ className, children }: AccordionContentProps): JSX.Element => {
   const { isExpanded } = AccordionPrimitive.useItemContext();
   return (
-    <TextClassContext.Provider value="native:text-lg">
+    <TextClassContext.Provider
+      // eslint-disable-next-line i18n/no-literal-string
+      value="native:text-lg"
+    >
       <AccordionPrimitive.Content
         className={cn(
           "overflow-hidden text-sm web:transition-all",
@@ -166,14 +175,17 @@ const AccordionContent = ({ className, children }: AccordionContentProps) => {
       </AccordionPrimitive.Content>
     </TextClassContext.Provider>
   );
-});
+};
 
 interface InnerContentProps {
   children: React.ReactNode;
   className?: string;
 }
 
-function InnerContent({ children, className }: InnerContentProps): React.JSX.Element {
+function InnerContent({
+  children,
+  className,
+}: InnerContentProps): React.JSX.Element {
   if (Platform.OS === "web") {
     return <View className={cn("pb-4", className)}>{children}</View>;
   }

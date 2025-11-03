@@ -2,11 +2,11 @@
 
 @plugin 'tailwindcss-animate';
 
-/* you can use dark: or light: prefixes in tailwind <3 */
-@variant dark (.dark &);
-@variant light (&:where(:not(.dark *)));
+
+@custom-variant light (:where(:not(.dark) :is(&)), :where(:not(.dark) :is(& *)));
 
 @theme {
+  /* Tailwind v4 uses color-mix() automatically for opacity modifiers */
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
 
@@ -88,17 +88,6 @@
   [cmdk-item]:not([data-disabled]) {
     pointer-events: auto;
     cursor: pointer;
-  }
-
-  /* Gradient fallbacks for Apple devices */
-  .text-shadow-sm {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  }
-
-  .text-shadow-lg {
-    text-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.5),
-      0 0 8px rgba(0, 0, 0, 0.25);
   }
 
   /* Fallback for gradient text when bg-clip-text fails */

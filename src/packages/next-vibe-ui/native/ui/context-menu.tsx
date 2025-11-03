@@ -200,8 +200,10 @@ const ContextMenuItem = React.forwardRef<
   ContextMenuPrimitive.ItemRef,
   ContextMenuItemProps & ContextMenuPrimitive.ItemProps
 >(({ className, inset, ...props }, ref) => (
-   // eslint-disable-next-line i18n/no-literal-string
-   <TextClassContext.Provider value="select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground">
+    <TextClassContext.Provider
+      // eslint-disable-next-line i18n/no-literal-string
+      value="select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground"
+    >
     <StyledContextMenuItem
       ref={ref}
       className={cn(

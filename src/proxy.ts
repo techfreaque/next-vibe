@@ -33,7 +33,7 @@ const allSupportedLocales: CountryLanguage[] = [
 /**
  * Middleware implementation
  */
-export async function middleware(request: NextRequest): Promise<NextResponse> {
+export async function proxy(request: NextRequest): Promise<NextResponse> {
   return await composedMiddleware(request);
 }
 

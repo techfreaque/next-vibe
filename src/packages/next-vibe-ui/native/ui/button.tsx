@@ -1,12 +1,8 @@
 import { Pressable, Text as RNText } from "react-native";
 
-import type {
-  ButtonProps } from "next-vibe-ui/ui/button";
-import {
-  buttonTextVariants,
-  buttonVariants } from "next-vibe-ui/ui/button";
+import type { ButtonProps } from "next-vibe-ui/ui/button";
+import { buttonTextVariants, buttonVariants } from "next-vibe-ui/ui/button";
 import { cn } from "next-vibe/shared/utils/utils";
-
 
 function Button({
   className,
@@ -23,7 +19,7 @@ function Button({
       // oxlint-disable-next-line prefer-tag-over-role
       role="button"
       disabled={disabled}
-      onPress={onClick}
+      onPress={onClick as () => void}
       className={cn(
         disabled && "opacity-50 web:pointer-events-none",
         buttonVariants({ variant, size, className }),

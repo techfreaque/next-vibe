@@ -31,7 +31,11 @@ import type {
   SubscriptionPutRequestOutput,
   SubscriptionPutResponseOutput,
 } from "./definition";
-import type { BillingIntervalDB, SubscriptionPlanDB } from "./enum";
+import type {
+  SubscriptionStatusValue,
+  BillingIntervalDB,
+  SubscriptionPlanDB,
+} from "./enum";
 import { SubscriptionPlan, SubscriptionStatus } from "./enum";
 
 /**
@@ -323,7 +327,8 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         .values({
           userId: userId as string,
           planId: planId as (typeof SubscriptionPlanDB)[number],
-          billingInterval: billingInterval as (typeof BillingIntervalDB)[number],
+          billingInterval:
+            billingInterval as (typeof BillingIntervalDB)[number],
           status: SubscriptionStatus.ACTIVE,
           provider: providerName,
           providerSubscriptionId,
@@ -347,12 +352,15 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       // Add subscription credits with expiration date
       const { creditRepository } = await import("../credits/repository");
-      const { productsRepository, ProductIds } = await import("../products/repository-client");
+      const { productsRepository, ProductIds } = await import(
+        "../products/repository-client"
+      );
 
       // Map subscription plan to product ID
-      const productId = planId === SubscriptionPlan.SUBSCRIPTION
-        ? ProductIds.SUBSCRIPTION
-        : null;
+      const productId =
+        planId === SubscriptionPlan.SUBSCRIPTION
+          ? ProductIds.SUBSCRIPTION
+          : null;
 
       if (productId) {
         const product = productsRepository.getProduct(productId, "en-GLOBAL");
@@ -439,16 +447,24 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       // Add monthly credits for renewal (skip if this is the first payment - handled by checkout)
       // Check if this is a renewal by looking at billing_reason
-      const billingReason = (invoice as Stripe.Invoice & { billing_reason?: string }).billing_reason;
+      const billingReason = (
+        invoice as Stripe.Invoice & { billing_reason?: string }
+      ).billing_reason;
 
-      if (billingReason === "subscription_cycle" || billingReason === "subscription_update") {
+      if (
+        billingReason === "subscription_cycle" ||
+        billingReason === "subscription_update"
+      ) {
         // This is a renewal - add monthly credits with expiration
         const { creditRepository } = await import("../credits/repository");
-        const { productsRepository, ProductIds } = await import("../products/repository-client");
+        const { productsRepository, ProductIds } = await import(
+          "../products/repository-client"
+        );
 
-        const productId = subscription.planId === SubscriptionPlan.SUBSCRIPTION
-          ? ProductIds.SUBSCRIPTION
-          : null;
+        const productId =
+          subscription.planId === SubscriptionPlan.SUBSCRIPTION
+            ? ProductIds.SUBSCRIPTION
+            : null;
 
         if (productId) {
           const product = productsRepository.getProduct(productId, "en-GLOBAL");
@@ -550,7 +566,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       }
 
       // Map Stripe status to our status
-      let status: SubscriptionStatus;
+      let status: typeof SubscriptionStatusValue;
       switch (stripeSubscription.status) {
         case "active":
           status = SubscriptionStatus.ACTIVE;

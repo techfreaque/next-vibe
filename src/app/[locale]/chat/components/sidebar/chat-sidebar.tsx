@@ -217,13 +217,14 @@ export function ChatSidebar({
             <TooltipTrigger asChild>
               <Div className="w-full">
                 <Button
-                  onClick={() => onCreateThread(activeFolderId || activeRootFolderId)}
+                  onClick={() =>
+                    onCreateThread(activeFolderId || activeRootFolderId)
+                  }
                   className={`w-full h-10 sm:h-9 ${getButtonColorClasses(rootFolderColor)}`}
                   disabled={requiresAuth && !isAuthenticated}
-                ><Span>
-                    <MessageSquarePlus className="h-4 w-4 mr-2" />
-                    {t(getNewChatTranslationKey(activeRootFolderId))}
-                  </Span>
+                >
+                  <MessageSquarePlus className="h-4 w-4 mr-2" />
+                  {t(getNewChatTranslationKey(activeRootFolderId))}
                 </Button>
               </Div>
             </TooltipTrigger>

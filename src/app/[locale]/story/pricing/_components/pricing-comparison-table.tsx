@@ -17,7 +17,10 @@ import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
-import type { PricingComparisonFeature, PricingTextFeature } from "@/app/api/[locale]/v1/core/products/repository-client";
+import type {
+  PricingComparisonFeature,
+  PricingTextFeature,
+} from "@/app/api/[locale]/v1/core/products/repository-client";
 import {
   calculateSavingsPercent,
   getPlanPriceForCountry,
@@ -165,6 +168,8 @@ export default function PricingComparison({
                           switch (plan.id) {
                             case SubscriptionPlan.SUBSCRIPTION:
                               return t("app.story.pricing.plans.STARTER.cta");
+                            default:
+                              return "";
                           }
                         })()}
                       </Button>

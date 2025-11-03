@@ -21,7 +21,6 @@ import { cn } from "../lib/utils";
 import { styled } from "nativewind";
 import {
   BottomSheet,
-  BottomSheetCloseTrigger,
   BottomSheetContent,
   BottomSheetOpenTrigger,
   BottomSheetView,
@@ -43,12 +42,11 @@ import {
   SelectValue,
 } from "./select";
 import { Switch } from "./switch";
-import { Text } from "./text";
+
 import { Textarea } from "./textarea";
 import { Span } from "./span";
 
 const StyledView = styled(View);
-const StyledLabel = styled(Label);
 
 const Form = FormProvider;
 
@@ -102,6 +100,7 @@ const useFormField = (): UseFormFieldReturn => {
   const fieldState = getFieldState(fieldContext.name, formState);
 
   if (!fieldContext) {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     throw new Error("useFormField should be used within <FormField>");
   }
 
@@ -321,10 +320,6 @@ function FormCheckbox({
     formMessageNativeID,
   } = useFormField();
 
-  function handleOnLabelPress(): void {
-    onChange?.(!value);
-  }
-
   const formItemClassName = "px-1";
   const viewClassName = "flex-row gap-3 items-center";
 
@@ -380,7 +375,6 @@ function FormDatePicker({
   const buttonClassName = "flex-row gap-3 justify-start px-3 relative";
   const clearButtonClassName = "absolute right-0 active:opacity-70 native:pr-3";
   const bottomSheetViewClassName = "pt-2";
-  const viewClassName = "pb-2 pt-4";
 
   return (
     <FormItem>

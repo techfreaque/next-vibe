@@ -18,6 +18,46 @@ export const translations = {
   subscription: subscriptionTranslations,
   track: trackTranslations,
   user: userTranslations,
+  native: {
+    page: {
+      welcome: "Welcome to Next Vibe",
+      description: "A unified Next.js and React Native application",
+      locale: {
+        title: "Current Locale",
+        description: "Your current language and region settings",
+      },
+      features: {
+        title: "Platform Features",
+        description: "This page works on both web and mobile",
+        unified: {
+          title: "✅ Unified Components",
+          description: "Using next-vibe-ui components that work seamlessly across platforms",
+        },
+        types: {
+          title: "✅ Type Safety",
+          description: "Full TypeScript support with proper type inference",
+        },
+        async: {
+          title: "✅ Async Server Components",
+          description: "Next.js 15 async page components work in React Native",
+        },
+      },
+      links: {
+        chat: "Go to Chat",
+        help: "Go to Help",
+        about: "Go to About Us",
+      },
+      status: {
+        title: "System Status",
+        platform: "Platform",
+        universal: "Universal",
+        routing: "Routing",
+        filebased: "File-based",
+        styling: "Styling",
+        nativewind: "NativeWind",
+      },
+    },
+  },
   common: {
     logoPart1: "Unbottled",
     logoPart2: ".ai",

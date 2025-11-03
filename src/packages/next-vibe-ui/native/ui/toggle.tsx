@@ -63,7 +63,7 @@ const StyledToggleRoot = styled(TogglePrimitive.Root);
 const Toggle = React.forwardRef<
   TogglePrimitive.RootRef,
   ToggleProps
->(({ className, variant, size, pressed, onPressedChange, children, disabled }, ref) => {
+>(({ className, variant, size, pressed, onPressedChange, children, disabled }, ref): React.ReactElement => {
   const isPressed = pressed ?? false;
   const handlePressedChange = onPressedChange ?? (() => undefined);
   return (

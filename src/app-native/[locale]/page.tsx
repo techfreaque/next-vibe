@@ -1,4 +1,3 @@
-/* eslint-disable i18next/no-literal-string */
 /**
  * Next.js-style page component for React Native compatibility testing
  *
@@ -9,6 +8,8 @@
  *
  * The index.tsx wrapper handles converting this to work with Expo Router
  */
+
+/* eslint-disable oxlint-plugin-i18n/no-literal-string -- Test page, translations not needed */
 
 import {
   Card,
@@ -94,22 +95,22 @@ export default async function HomePage({
           </CardContent>
           <CardFooter>
             <Div>
-            <Link href={`/${locale}/chat`} asChild>
-              {/* <Button className="w-full"> */}
+              <Link href={`/${locale}/chat`} asChild>
+                {/* <Button className="w-full"> */}
                 <Span>Go to Chat</Span>
-              {/* </Button> */}
-            </Link>
-            <Link href={`/${locale}/help`} asChild>
-              {/* <Button className="w-full"> */}
+                {/* </Button> */}
+              </Link>
+              <Link href={`/${locale}/help`} asChild>
+                {/* <Button className="w-full"> */}
                 <Span>Go to Help</Span>
-              {/* </Button> */}
-            </Link>
-            <Link href={`/${locale}/story/about-us`} asChild>
-              {/* <Button className="w-full"> */}
+                {/* </Button> */}
+              </Link>
+              <Link href={`/${locale}/story/about-us`} asChild>
+                {/* <Button className="w-full"> */}
                 <Span>Go to About Us</Span>
-              {/* </Button> */}
-            </Link>
-            </Div> 
+                {/* </Button> */}
+              </Link>
+            </Div>
           </CardFooter>
         </Card>
 

@@ -24,7 +24,7 @@ interface AlertDialogOverlayWebProps {
   children?: React.ReactNode;
 }
 
-const AlertDialogOverlayWeb = ({ className, children }: AlertDialogOverlayWebProps) => {
+const AlertDialogOverlayWeb = ({ className, children }: AlertDialogOverlayWebProps): React.ReactNode => {
   const { open } = AlertDialogPrimitive.useRootContext();
   return (
     <AlertDialogPrimitive.Overlay
@@ -46,7 +46,7 @@ interface AlertDialogOverlayNativeProps {
   children?: React.ReactNode;
 }
 
-const AlertDialogOverlayNative = ({ className, children }: AlertDialogOverlayNativeProps) => {
+const AlertDialogOverlayNative = ({ className, children }: AlertDialogOverlayNativeProps): React.ReactNode => {
   return (
     <AlertDialogPrimitive.Overlay
       style={StyleSheet.absoluteFill}

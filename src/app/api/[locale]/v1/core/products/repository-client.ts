@@ -5,7 +5,11 @@
 
 import type { JSX } from "react";
 import type { TranslationKey } from "@/i18n/core/static-types";
-import type { Countries, CountryLanguage, Currencies } from "@/i18n/core/config";
+import type {
+  Countries,
+  CountryLanguage,
+  Currencies,
+} from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
 import type { SubscriptionPlanValue } from "@/app/api/[locale]/v1/core/subscription/enum";
@@ -181,7 +185,10 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     let price: number;
     if (interval === "year" && "yearlyPriceByCountry" in definition) {
       price = definition.yearlyPriceByCountry[country];
-    } else if (interval === "one_time" && "oneTimePriceByCountry" in definition) {
+    } else if (
+      interval === "one_time" &&
+      "oneTimePriceByCountry" in definition
+    ) {
       price = definition.oneTimePriceByCountry[country];
     } else {
       price = definition.priceByCountry[country];
@@ -198,8 +205,12 @@ export class ProductsRepositoryImpl implements ProductsRepository {
       credits: definition.credits,
       country,
       status: definition.status || "active",
-      deprecatedAt: ("deprecatedAt" in definition ? definition.deprecatedAt : undefined) as Date | undefined,
-      replacedBy: ("replacedBy" in definition ? definition.replacedBy : undefined) as ProductIds | undefined,
+      deprecatedAt: ("deprecatedAt" in definition
+        ? definition.deprecatedAt
+        : undefined) as Date | undefined,
+      replacedBy: ("replacedBy" in definition
+        ? definition.replacedBy
+        : undefined) as ProductIds | undefined,
     };
   }
 
@@ -209,7 +220,10 @@ export class ProductsRepositoryImpl implements ProductsRepository {
   getProducts(locale: CountryLanguage): Record<ProductIds, Product> {
     return {
       [ProductIds.FREE_TIER]: this.getProduct(ProductIds.FREE_TIER, locale),
-      [ProductIds.SUBSCRIPTION]: this.getProduct(ProductIds.SUBSCRIPTION, locale),
+      [ProductIds.SUBSCRIPTION]: this.getProduct(
+        ProductIds.SUBSCRIPTION,
+        locale,
+      ),
       [ProductIds.CREDIT_PACK]: this.getProduct(ProductIds.CREDIT_PACK, locale),
     };
   }
@@ -236,7 +250,9 @@ export class ProductsRepositoryImpl implements ProductsRepository {
    */
   getReplacementProduct(productId: ProductIds): ProductIds | null {
     const definition = productDefinitions[productId];
-    const replacedBy = ("replacedBy" in definition ? definition.replacedBy : undefined) as ProductIds | undefined;
+    const replacedBy = (
+      "replacedBy" in definition ? definition.replacedBy : undefined
+    ) as ProductIds | undefined;
     return replacedBy || null;
   }
 
@@ -262,7 +278,7 @@ export const productsRepository = new ProductsRepositoryImpl();
  * Contains all information needed to render pricing cards
  */
 export interface PricingPlan {
-  id: SubscriptionPlanValue;
+  id: typeof SubscriptionPlanValue;
   name: TranslationKey;
   description: TranslationKey;
   features: TranslationKey[];
@@ -320,14 +336,19 @@ export function calculateSavingsPercent(locale: CountryLanguage): number {
     }
   }
 
-  return validPlansCount === 0 ? 0 : Math.round(totalSavingsPercent / validPlansCount);
+  return validPlansCount === 0
+    ? 0
+    : Math.round(totalSavingsPercent / validPlansCount);
 }
 
 /**
  * Build pricing plans with icon components
  * Note: Icons are lazy-loaded to avoid circular dependencies
  */
-function buildPricingPlans(locale: CountryLanguage, icon?: JSX.Element): Record<SubscriptionPlanValue, PricingPlan> {
+function buildPricingPlans(
+  locale: CountryLanguage,
+  icon?: JSX.Element,
+): Record<typeof SubscriptionPlanValue, PricingPlan> {
   const definitions = productsRepository.getProductDefinitions();
   const subscriptionDef = definitions[ProductIds.SUBSCRIPTION];
 
@@ -378,21 +399,31 @@ function buildPricingPlans(locale: CountryLanguage, icon?: JSX.Element): Record<
 /**
  * Get all pricing plans for a locale as a record
  */
-export function getPricingPlans(locale: CountryLanguage, icon?: JSX.Element): Record<SubscriptionPlanValue, PricingPlan> {
+export function getPricingPlans(
+  locale: CountryLanguage,
+  icon?: JSX.Element,
+): Record<typeof SubscriptionPlanValue, PricingPlan> {
   return buildPricingPlans(locale, icon);
 }
 
 /**
  * Get specific plan details by ID
  */
-export function getPlanDetails(planId: SubscriptionPlanValue, locale: CountryLanguage, icon?: JSX.Element): PricingPlan {
+export function getPlanDetails(
+  planId: typeof SubscriptionPlanValue,
+  locale: CountryLanguage,
+  icon?: JSX.Element,
+): PricingPlan {
   return getPricingPlans(locale, icon)[planId];
 }
 
 /**
  * Get all pricing plans as an array
  */
-export function getPricingPlansArray(locale: CountryLanguage, icon?: JSX.Element): PricingPlan[] {
+export function getPricingPlansArray(
+  locale: CountryLanguage,
+  icon?: JSX.Element,
+): PricingPlan[] {
   return Object.values(getPricingPlans(locale, icon));
 }
 

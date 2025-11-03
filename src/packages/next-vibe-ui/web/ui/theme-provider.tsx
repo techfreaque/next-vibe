@@ -15,15 +15,17 @@ export function ThemeProvider({
   children,
   defaultTheme = "system",
   storageKey = "theme",
+  attribute = "class",
   ...props
-}: ThemeProviderProps & Omit<NextThemesProviderProps, keyof ThemeProviderProps>): JSX.Element {
+}: ThemeProviderProps &
+  Omit<NextThemesProviderProps, keyof ThemeProviderProps>): JSX.Element {
   return (
     <NextThemesProvider
-      attribute="class"
       defaultTheme={defaultTheme}
       enableSystem={true}
       disableTransitionOnChange={true} // Disable transitions to prevent flashing
       storageKey={storageKey}
+      attribute={attribute}
       {...props}
     >
       {children}

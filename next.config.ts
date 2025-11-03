@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
+    turbopackFileSystemCacheForDev: true,
   },
 
   // Conditionally enable Turbopack
@@ -62,9 +63,6 @@ const nextConfig: NextConfig = {
       }
     : undefined,
 
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -111,7 +109,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["socket.io", "socket.io-client"],
 
   // Ensure WebSocket routes are properly handled
-   
+
   async rewrites() {
     return [
       {

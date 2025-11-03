@@ -35,16 +35,16 @@ export type InferApiFormReturn<T> =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >
-  ? T extends {
-    types: {
-      RequestOutput: infer TRequestOutput;
-      ResponseOutput: infer TResponseOutput;
-      UrlVariablesOutput: infer TUrlVariablesOutput;
-    };
-  }
-  ? ApiFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
-  : never
-  : never;
+    ? T extends {
+        types: {
+          RequestOutput: infer TRequestOutput;
+          ResponseOutput: infer TResponseOutput;
+          UrlVariablesOutput: infer TUrlVariablesOutput;
+        };
+      }
+      ? ApiFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
+      : never
+    : never;
 
 /**
  * Extract types from an CreateApiEndpoint for ApiQueryReturn
@@ -58,10 +58,10 @@ export type InferApiQueryReturn<T> =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >
-  ? T extends { types: { ResponseOutput: infer TResponseOutput } }
-  ? ApiQueryReturn<TResponseOutput>
-  : never
-  : never;
+    ? T extends { types: { ResponseOutput: infer TResponseOutput } }
+      ? ApiQueryReturn<TResponseOutput>
+      : never
+    : never;
 
 /**
  * Extract types from an CreateApiEndpoint for ApiQueryFormReturn
@@ -75,16 +75,16 @@ export type InferApiQueryFormReturn<T> =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >
-  ? T extends {
-    types: {
-      RequestOutput: infer TRequestOutput;
-      ResponseOutput: infer TResponseOutput;
-      UrlVariablesOutput: infer TUrlVariablesOutput;
-    };
-  }
-  ? ApiQueryFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
-  : never
-  : never;
+    ? T extends {
+        types: {
+          RequestOutput: infer TRequestOutput;
+          ResponseOutput: infer TResponseOutput;
+          UrlVariablesOutput: infer TUrlVariablesOutput;
+        };
+      }
+      ? ApiQueryFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
+      : never
+    : never;
 
 /**
  * Extract types from an CreateApiEndpoint for EnhancedMutationResult
@@ -98,20 +98,20 @@ export type InferEnhancedMutationResult<T> =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >
-  ? T extends {
-    types: {
-      RequestOutput: infer TRequestOutput;
-      ResponseOutput: infer TResponseOutput;
-      UrlVariablesOutput: infer TUrlVariablesOutput;
-    };
-  }
-  ? EnhancedMutationResult<
-    TResponseOutput,
-    TRequestOutput,
-    TUrlVariablesOutput
-  >
-  : never
-  : never;
+    ? T extends {
+        types: {
+          RequestOutput: infer TRequestOutput;
+          ResponseOutput: infer TResponseOutput;
+          UrlVariablesOutput: infer TUrlVariablesOutput;
+        };
+      }
+      ? EnhancedMutationResult<
+          TResponseOutput,
+          TRequestOutput,
+          TUrlVariablesOutput
+        >
+      : never
+    : never;
 
 /**
  * Enhanced query result with additional loading state info
@@ -195,6 +195,20 @@ export interface ApiMutationOptions<TRequest, TResponse, TUrlVariables> {
   invalidateQueries?: string[]; // List of queries to invalidate after mutation
 }
 
+export type ApiInferMutationOptions<
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
+  >,
+> = ApiMutationOptions<
+  TEndpoint["TRequestOutput"],
+  TEndpoint["TResponseOutput"],
+  TEndpoint["TUrlVariablesOutput"]
+>;
+
 /**
  * Type for the API query form options
  */
@@ -249,12 +263,11 @@ export type ApiFormOptions<TRequest extends FieldValues> =
     persistenceKey?: string;
   };
 
-export interface ApiFormReturn<
-  TRequest,
-  TResponse,
-  TUrlVariables,
-> {
-  form: UseFormReturn<TRequest extends FieldValues ? TRequest : FieldValues, z.ZodTypeAny>;
+export interface ApiFormReturn<TRequest, TResponse, TUrlVariables> {
+  form: UseFormReturn<
+    TRequest extends FieldValues ? TRequest : FieldValues,
+    z.ZodTypeAny
+  >;
 
   /** The complete response including success/error state */
   response: ResponseType<TResponse> | undefined;

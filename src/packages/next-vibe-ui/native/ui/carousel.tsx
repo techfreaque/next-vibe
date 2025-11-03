@@ -5,7 +5,7 @@
  */
 import type { ReactNode } from "react";
 import React from "react";
-import type { ScrollViewProps, ViewProps } from "react-native";
+import type { ScrollViewProps } from "react-native";
 import { ScrollView, View } from "react-native";
 import { styled } from "nativewind";
 

@@ -6,6 +6,7 @@
 "use client";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { useToast } from "next-vibe-ui//hooks/use-toast";
 import { useCallback } from "react";
 
@@ -17,7 +18,10 @@ import { useTranslation } from "@/i18n/core/client";
 
 import definitions from "./definition";
 import historyDefinitions from "./history/definition";
-import purchaseDefinitions from "./purchase/definition";
+import purchaseDefinitions, {
+  type CreditsPurchasePostRequestOutput,
+  type CreditsPurchasePostResponseOutput,
+} from "./purchase/definition";
 
 /**
  * Hook for fetching current user's credit balance
@@ -70,9 +74,9 @@ export function useCreditPurchase(
   // Success callback for credit purchase
   const handlePurchaseSuccess = useCallback(
     async (data: {
-      requestData: unknown;
-      pathParams: unknown;
-      responseData: unknown;
+      requestData: CreditsPurchasePostRequestOutput;
+      pathParams: Record<string, never>;
+      responseData: CreditsPurchasePostResponseOutput;
     }) => {
       try {
         logger.debug("app.api.v1.core.credits.purchase.onSuccess.start");
@@ -113,9 +117,9 @@ export function useCreditPurchase(
   // Error callback for credit purchase
   const handlePurchaseError = useCallback(
     async (data: {
-      error: unknown;
-      requestData: unknown;
-      pathParams: unknown;
+      error: ErrorResponseType;
+      requestData: CreditsPurchasePostRequestOutput;
+      pathParams: Record<string, never>;
     }) => {
       logger.error(
         "app.api.v1.core.credits.purchase.error",

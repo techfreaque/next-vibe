@@ -16,13 +16,13 @@ type NativeRadioGroupItemProps = WithClassName<RadioGroupItemBaseProps>;
 const RadioGroup = React.forwardRef<
   RadioGroupPrimitive.RootRef,
   NativeRadioGroupProps & { children?: React.ReactNode } & React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
->(function RadioGroup({ className, value, onValueChange, disabled, name, required, defaultValue, children, ...props }, ref) {
+>(function RadioGroup({ className, value, onValueChange, disabled, name: _name, required: _required, defaultValue: _defaultValue, children, ...props }, ref) {
   return (
     <RadioGroupPrimitive.Root
       ref={ref}
       className={cn("web:grid gap-2", className)}
       value={value}
-      onValueChange={onValueChange ?? (() => {}) as (value: string) => void}
+      onValueChange={onValueChange ?? (() => undefined) as (value: string) => void}
       disabled={disabled}
       {...props}
     >

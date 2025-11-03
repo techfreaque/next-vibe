@@ -5,7 +5,6 @@
  */
 import { GripVertical } from "lucide-react-native";
 import React from "react";
-import type { ViewProps } from "react-native";
 import { View } from "react-native";
 
 import { cn } from "next-vibe/shared/utils/utils";

@@ -310,16 +310,16 @@ const Sidebar = React.forwardRef<
 );
 Sidebar.displayName = "Sidebar";
 
-const SidebarTrigger = React.forwardRef<
-  React.ElementRef<typeof Button>,
-  React.ComponentProps<typeof Button>
->(({ className, onClick, ...props }, ref) => {
+const SidebarTrigger = ({
+  className,
+  onClick,
+  ...props
+}: SidebarTriggerProps): React.JSX.Element => {
   const { toggleSidebar } = useSidebar();
   const { t } = useTranslation();
 
   return (
     <Button
-      ref={ref}
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
@@ -338,7 +338,7 @@ const SidebarTrigger = React.forwardRef<
       </>
     </Button>
   );
-});
+};
 SidebarTrigger.displayName = "SidebarTrigger";
 
 const SidebarRail = React.forwardRef<
