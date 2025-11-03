@@ -375,11 +375,7 @@ exec bun "${vibeTsPath}" "$@"
     } = {},
   ): Promise<string> {
     return await new Promise((resolve, reject) => {
-      // Use npx for npm commands to avoid shell issues
-      const actualCommand = command === "npm" ? "npx" : command;
-      const actualArgs = command === "npm" ? ["npm", ...args] : args;
-
-      const childProcess = spawn(actualCommand, actualArgs, {
+      const childProcess = spawn(command, args, {
         cwd: options.cwd || process.cwd(),
         stdio: options.verbose ? "inherit" : "pipe",
         shell: false, // Disable shell to avoid security warnings

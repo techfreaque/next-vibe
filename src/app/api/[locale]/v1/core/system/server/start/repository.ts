@@ -347,7 +347,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
       // Set up signal handlers for graceful shutdown
       const handleShutdown = (signal: string): void => {
-        process.stdout.write(`\n🛑 Received ${signal}, shutting down gracefully...\n`);
+        process.stdout.write(
+          `\n🛑 Received ${signal}, shutting down gracefully...\n`,
+        );
         this.stopAllProcesses();
         process.stdout.write("✅ All processes stopped. Goodbye! 👋\n");
         process.exit(0);
@@ -375,7 +377,10 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           if (this.nextServerProcess?.killed) {
             logger.warn("Next.js server process died, attempting restart...");
             this.startNextServer(port, logger).catch((error) => {
-              logger.error("Failed to restart Next.js server", parseError(error));
+              logger.error(
+                "Failed to restart Next.js server",
+                parseError(error),
+              );
             });
           }
         }
@@ -415,10 +420,10 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       try {
         logger.info("Starting Next.js production server", { port });
 
-        // Spawn Next.js production server
+        // Spawn Next.js production server using bun
         const nextProcess = spawn(
-          "npx",
-          ["next", "start", "--port", port.toString()],
+          "bun",
+          ["run", "next", "start", "--port", port.toString()],
           {
             stdio: ["pipe", "pipe", "pipe"],
             env: {

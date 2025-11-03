@@ -4,8 +4,8 @@
 
 export const TYPECHECK_PATTERNS = {
   TSC_COMMAND:
-    'NODE_OPTIONS="--max-old-space-size=32768 --max-semi-space-size=1024" npx tsc ',
-  TSGO_COMMAND: "npx tsgo ",
+    'NODE_OPTIONS="--max-old-space-size=32768 --max-semi-space-size=1024" bunx tsc ',
+  TSGO_COMMAND: "bunx tsgo ",
   ERROR_TS: "error TS",
   WARNING_KEYWORD: "warning",
   TS_EXTENSION: ".ts",

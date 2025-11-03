@@ -703,7 +703,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     // Use spawn for parallel execution
     const { spawn } = await import("node:child_process");
     const stdout = await new Promise<string>((resolve, reject) => {
-      const child = spawn("npx", args, {
+      const child = spawn("bunx", args, {
         cwd: process.cwd(),
         stdio: ["ignore", "pipe", "pipe"],
         shell: false,

@@ -778,7 +778,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     // Use spawn for parallel execution
     const { spawn } = await import("node:child_process");
     const stdout = await new Promise<string>((resolve, reject) => {
-      const child = spawn("npx", args, {
+      const child = spawn("bunx", args, {
         cwd: process.cwd(),
         stdio: ["ignore", "pipe", "pipe"],
         shell: false,
@@ -1012,7 +1012,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       /* eslint-enable i18next/no-literal-string */
 
       const child = spawn(
-        "npx",
+        "bunx",
         ["prettier", "--check", "--log-level", "error", ...configArgs, ...files],
         {
           cwd: process.cwd(),
@@ -1094,7 +1094,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
 
     return await new Promise((resolve, reject) => {
       const child = spawn(
-        "npx",
+        "bunx",
         [
           "prettier",
           "--write",

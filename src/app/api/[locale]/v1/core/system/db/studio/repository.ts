@@ -45,7 +45,7 @@ export class StudioRepositoryImpl implements StudioRepositoryInterface {
 
       // Launch drizzle-kit studio
       const studioProcess = spawn(
-        "npx",
+        "bunx",
         ["drizzle-kit", "studio", "--port", port.toString()],
         {
           stdio: "inherit",

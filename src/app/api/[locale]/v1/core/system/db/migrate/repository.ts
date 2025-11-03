@@ -150,7 +150,7 @@ export class DatabaseMigrationRepositoryImpl
   } {
     const { t } = simpleT(locale);
     try {
-      const result = spawnSync("npx", ["drizzle-kit", "generate"], {
+      const result = spawnSync("bunx", ["drizzle-kit", "generate"], {
         encoding: "utf8",
         cwd: process.cwd(),
       });

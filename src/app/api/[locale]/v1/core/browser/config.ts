@@ -23,7 +23,7 @@ export interface ChromeMCPConfig {
  * Optimized for headless Chromium with Wayland support
  */
 export const chromeMCPConfig: ChromeMCPConfig = {
-  command: "npx",
+  command: "bunx",
   args: [
     "chrome-devtools-mcp@latest",
     "--executablePath=/usr/bin/chromium",
