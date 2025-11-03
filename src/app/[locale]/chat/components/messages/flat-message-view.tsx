@@ -431,12 +431,8 @@ function FlatMessage({
     >
       {/* Logo watermark for first message */}
       {postNum === 1 && (
-        <Div className="absolute top-3 right-3 pointer-events-none bg-card backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10">
-          <Logo
-            className="h-auto w-auto max-w-[100px] opacity-70"
-            locale={locale}
-            pathName="/"
-          />
+        <Div className="absolute top-3 right-3 pointer-events-none bg-card backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10 opacity-70">
+          <Logo locale={locale} pathName="/" size="h-6" />
         </Div>
       )}
 

@@ -6,6 +6,11 @@ import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
+import {
+  ProductIds,
+  productsRepository,
+  TOTAL_MODEL_COUNT,
+} from "@/app/api/[locale]/v1/core/products/repository-client";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
@@ -64,6 +69,24 @@ export default async function ContactPage({
   const user = userResponse.success ? userResponse.data : undefined;
   const supportEmail = contactClientRepository.getSupportEmail(locale);
 
+  // Get pricing data
+  const freeTier = productsRepository.getProduct(ProductIds.FREE_TIER, locale);
+  const subscription = productsRepository.getProduct(
+    ProductIds.SUBSCRIPTION,
+    locale,
+  );
+  const creditPack = productsRepository.getProduct(
+    ProductIds.CREDIT_PACK,
+    locale,
+  );
+
+  const formatPrice = (amount: number, currency: string): string => {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+    }).format(amount);
+  };
+
   return (
     <Div
       role="main"
@@ -97,24 +120,33 @@ export default async function ContactPage({
             {t("app.help.pages.help.faq.title")}
           </H2>
           <Div className="grid md:grid-cols-2 gap-8">
-             <Div>
-               <H3 className="text-lg font-semibold mb-2">
-                 {t("app.help.pages.help.faq.questions.q1.question", {
-                   appName: t("config.appName"),
-                 })}
-               </H3>
-               <P className="text-gray-600 dark:text-gray-300">
-                 {t("app.help.pages.help.faq.questions.q1.answer", {
-                   appName: t("config.appName"),
-                 })}
-               </P>
-             </Div>
+            <Div>
+              <H3 className="text-lg font-semibold mb-2">
+                {t("app.help.pages.help.faq.questions.q1.question", {
+                  appName: t("config.appName"),
+                })}
+              </H3>
+              <P className="text-gray-600 dark:text-gray-300">
+                {t("app.help.pages.help.faq.questions.q1.answer", {
+                  appName: t("config.appName"),
+                  modelCount: TOTAL_MODEL_COUNT,
+                })}
+              </P>
+            </Div>
             <Div>
               <H3 className="text-lg font-semibold mb-2">
                 {t("app.help.pages.help.faq.questions.q2.question")}
               </H3>
               <P className="text-gray-600 dark:text-gray-300">
-                {t("app.help.pages.help.faq.questions.q2.answer")}
+                {t("app.help.pages.help.faq.questions.q2.answer", {
+                  subPrice: formatPrice(
+                    subscription.price,
+                    subscription.currency,
+                  ),
+                  subCredits: subscription.credits,
+                  packPrice: formatPrice(creditPack.price, creditPack.currency),
+                  packCredits: creditPack.credits,
+                })}
               </P>
             </Div>
             <Div>
@@ -122,7 +154,15 @@ export default async function ContactPage({
                 {t("app.help.pages.help.faq.questions.q3.question")}
               </H3>
               <P className="text-gray-600 dark:text-gray-300">
-                {t("app.help.pages.help.faq.questions.q3.answer")}
+                {t("app.help.pages.help.faq.questions.q3.answer", {
+                  freeCredits: freeTier.credits,
+                  subPrice: formatPrice(
+                    subscription.price,
+                    subscription.currency,
+                  ),
+                  packPrice: formatPrice(creditPack.price, creditPack.currency),
+                  packCredits: creditPack.credits,
+                })}
               </P>
             </Div>
             <Div>

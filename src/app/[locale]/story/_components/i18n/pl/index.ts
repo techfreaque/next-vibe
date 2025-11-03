@@ -95,7 +95,7 @@ export const translations: typeof enTranslations = {
       adCampaigns: {
         title: "Elastyczne ceny",
         description:
-          "Darmowy plan: 10 wiadomości/dzień. Nieograniczony: €10/miesiąc. Pakiety kredytów: €5. Akceptujemy płatności krypto i kartą.",
+          "Darmowy plan: {{freeCredits}} kredytów/miesiąc. Nieograniczony: {{subCurrency}}{{subPrice}}/miesiąc. Pakiety kredytów: {{packCurrency}}{{packPrice}}. Akceptujemy płatności krypto i kartą.",
       },
       dataAnalysis: {
         title: "Zaawansowane analizy",
@@ -259,7 +259,7 @@ export const translations: typeof enTranslations = {
         analysisOptimization: {
           title: "Uaktualnij, gdy będziesz gotowy",
           description:
-            "Uzyskaj nieograniczony dostęp za €10/miesiąc lub kup pakiety kredytowe za €5. Płać kartą lub kryptowalutą.",
+            "Uzyskaj nieograniczony dostęp za {{subCurrency}}{{subPrice}}/miesiąc lub kup pakiety kredytowe za {{packCurrency}}{{packPrice}}. Płać kartą lub kryptowalutą.",
           tags: {
             performanceMetrics: "Plan nielimitowany",
             strategyRefinement: "Pakiety kredytowe",
@@ -773,7 +773,7 @@ export const translations: typeof enTranslations = {
           plans: {
             title: "Plany subskrypcji",
             content:
-              "Oferujemy plany Darmowy (10 wiadomości/dzień), Pakiety kredytowe (€5) i Nielimitowany (€10/miesiąc). Plany Enterprise są dostępne z niestandardowymi cenami.",
+              "Oferujemy plany Darmowy (20 kredytów/miesiąc), Pakiety kredytów (€5/500 kredytów) i Unlimited (€10/miesiąc).",
           },
           billing: {
             title: "Rozliczenia",

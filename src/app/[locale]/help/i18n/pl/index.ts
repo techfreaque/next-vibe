@@ -31,17 +31,17 @@ export const translations: typeof enTranslations = {
           q1: {
             question: "Czym jest {{appName}}?",
             answer:
-              "{{appName}} to platforma czatu AI bez cenzury z dostępem do ponad 40 modeli AI. Łączymy szczere rozmowy z AI z zaawansowanymi funkcjami, takimi jak zarządzanie folderami, niestandardowe persony i obsługa wielu modeli.",
+              "{{appName}} to platforma czatu AI bez cenzury z dostępem do {{modelCount}} modeli AI. Łączymy szczere rozmowy z AI z zaawansowanymi funkcjami, takimi jak zarządzanie folderami, niestandardowe persony i obsługa wielu modeli.",
           },
           q2: {
             question: "Jakie metody płatności akceptujecie?",
             answer:
-              "Akceptujemy karty kredytowe przez Stripe oraz płatności kryptowalutowe (Bitcoin, Ethereum, stablecoiny) przez NowPayments. Wybierz między subskrypcją €10/miesiąc lub pakietami kredytowymi €5.",
+              "Akceptujemy karty kredytowe przez Stripe oraz płatności kryptowalutowe (Bitcoin, Ethereum, stablecoiny) przez NowPayments. Wybierz między subskrypcją {{subPrice}}/miesiąc ({{subCredits}} kredytów/miesiąc) lub pakietami kredytowymi {{packPrice}} ({{packCredits}} kredytów każdy, wymaga subskrypcji).",
           },
           q3: {
             question: "Jak działa system kredytów?",
             answer:
-              "Darmowi użytkownicy otrzymują 10 wiadomości/dzień. Płatni użytkownicy mogą wybrać nieograniczoną subskrypcję (€10/miesiąc) lub pakiety kredytowe pay-as-you-go (€5). Kredyty nigdy nie wygasają i działają ze wszystkimi modelami AI.",
+              "Darmowi użytkownicy otrzymują {{freeCredits}} kredytów/miesiąc. Płatni użytkownicy mogą wybrać nieograniczoną subskrypcję ({{subPrice}}/miesiąc) lub pakiety kredytowe pay-as-you-go ({{packPrice}} za {{packCredits}} kredytów). Kredyty nigdy nie wygasają i działają ze wszystkimi 40+ modelami AI.",
           },
           q4: {
             question: "Czy moje dane są prywatne i bezpieczne?",

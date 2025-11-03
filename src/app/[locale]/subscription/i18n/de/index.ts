@@ -2,20 +2,21 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   subscription: {
-    title: "Credits",
-    description: "Verwalten Sie Ihre Credits und Abonnements",
+    title: "Credits & Abonnement",
+    description: "Verwalten Sie Ihre Credits und monatliches Abonnement",
     backToChat: "Zurück zum Chat",
     billingInterval: "Abrechnungsintervall",
     currentPeriodStart: "Aktueller Zeitraum Start",
     nextBillingDate: "Nächstes Abrechnungsdatum",
     balance: {
       title: "Credit-Guthaben",
-      description: "Ihre verfügbaren Credits für KI-Gespräche",
+      description:
+        "Ihre verfügbaren Credits für KI-Gespräche mit {{modelCount}} Modellen",
       total: "Credits",
       nextExpiration: "Nächster Ablauf: {{date}}",
       expiring: {
-        title: "Ablaufende Credits",
-        description: "Aus Abonnement",
+        title: "Abonnement-Credits",
+        description: "Aus monatlichem Abonnement (1000 Credits/Monat)",
       },
       permanent: {
         title: "Permanente Credits",
@@ -29,16 +30,17 @@ export const translations: typeof enTranslations = {
     overview: {
       howItWorks: {
         title: "Wie Credits funktionieren",
-        description: "Verstehen Sie Ihr Credit-System",
+        description:
+          "Abonnieren Sie für {{subCredits}} monatliche Credits und kaufen Sie zusätzliche Pakete bei Bedarf",
         expiring: {
-          title: "Monatsabonnement-Credits",
+          title: "Monatsabonnement",
           description:
-            "€10/Monat gibt Ihnen 1000 Credits, die am Ende jedes Abrechnungszyklus ablaufen. Erschwingliche Preise für alle!",
+            "{{subPrice}}/Monat - {{subCredits}} Credits pro Monat mit allen {{modelCount}} KI-Modellen. Perfekt für regelmäßige Nutzer!",
         },
         permanent: {
-          title: "Zusätzliche Credits für Power-User",
+          title: "Zusätzliche Credit-Pakete",
           description:
-            "Brauchen Sie mehr? Kaufen Sie Credit-Pakete (€5 für 500 Credits), die nie ablaufen. Perfekt für Power-User, die zusätzliche Kapazität benötigen.",
+            "{{packPrice}} für {{packCredits}} Credits - Benötigen Sie mehr als {{subCredits}} Credits? Kaufen Sie zusätzliche Pakete, die nie ablaufen. Erfordert aktives Abonnement.",
         },
         free: {
           title: "Kostenlose Test-Credits",
@@ -77,12 +79,12 @@ export const translations: typeof enTranslations = {
         badge: "Für alle zugänglich",
         title: "Monatsabonnement",
         description:
-          "€10/Monat - Erschwinglicher KI-Zugang für alle mit 1000 Credits monatlich",
+          "{{subPrice}}/Monat - {{subCredits}} Credits pro Monat mit allen {{modelCount}} KI-Modellen",
         perMonth: "/Monat",
         features: {
           credits: "{{count}} Credits pro Monat",
-          expiry: "Credits laufen monatlich ab",
-          bestFor: "Erschwingliche Preise für alle Nutzer",
+          expiry: "Zugriff auf alle {{modelCount}} KI-Modelle",
+          bestFor: "Perfekt für regelmäßige KI-Nutzer",
         },
         button: "Jetzt abonnieren",
       },
@@ -107,7 +109,7 @@ export const translations: typeof enTranslations = {
         pack: "Paket",
         packs: "Pakete",
         requiresSubscription:
-          "Abonnieren Sie einen monatlichen Plan, um zusätzliche Credit Packs zu kaufen.",
+          "Credit-Pakete erfordern ein aktives Abonnement. Abonnieren Sie, um monatliche Credits zu erhalten und die Möglichkeit freizuschalten, Credit-Pakete zu kaufen!",
       },
     },
     history: {

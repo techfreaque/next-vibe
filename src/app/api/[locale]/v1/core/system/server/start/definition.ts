@@ -173,10 +173,14 @@ const { POST } = createEndpoint({
         skipNextCommand: false,
         port: 3000,
       },
+      withMigrations: {
+        skipPre: false,
+        skipNextCommand: false,
+        port: 3000,
+      },
       skipPreTasks: {
         skipPre: true,
         skipNextCommand: false,
-        port: 8080,
       },
       skipNext: {
         skipPre: false,
@@ -198,6 +202,10 @@ const { POST } = createEndpoint({
           "app.api.v1.core.system.server.start.post.fields.output.title",
       },
       withPort: {
+        responseMessage:
+          "app.api.v1.core.system.server.start.post.fields.output.title",
+      },
+      withMigrations: {
         responseMessage:
           "app.api.v1.core.system.server.start.post.fields.output.title",
       },

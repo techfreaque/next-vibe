@@ -30,17 +30,17 @@ export const translations = {
           q1: {
             question: "What is {{appName}}?",
             answer:
-              "{{appName}} is an uncensored AI chat platform with access to 40+ AI models. We combine honest AI conversations with advanced features like folder management, custom personas, and multi-model support.",
+              "{{appName}} is an uncensored AI chat platform with access to {{modelCount}} AI models. We combine honest AI conversations with advanced features like folder management, custom personas, and multi-model support.",
           },
           q2: {
             question: "What payment methods do you accept?",
             answer:
-              "We accept credit cards via Stripe and cryptocurrency payments (Bitcoin, Ethereum, stablecoins) via NowPayments. Choose between €10/month subscription or €5 credit packs.",
+              "We accept credit cards via Stripe and cryptocurrency payments (Bitcoin, Ethereum, stablecoins) via NowPayments. Choose between {{subPrice}}/month subscription ({{subCredits}} credits/month) or {{packPrice}} credit packs ({{packCredits}} credits each, requires subscription).",
           },
           q3: {
             question: "How does the credit system work?",
             answer:
-              "Free users get 10 messages/day. Paid users can choose unlimited subscription (€10/month) or pay-as-you-go credit packs (€5). Credits never expire and work across all AI models.",
+              "Free users get {{freeCredits}} credits/month. Paid users can choose unlimited subscription ({{subPrice}}/month) or pay-as-you-go credit packs ({{packPrice}} for {{packCredits}} credits). Credits never expire and work across all 40+ AI models.",
           },
           q4: {
             question: "Is my data private and secure?",

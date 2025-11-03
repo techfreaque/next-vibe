@@ -1,8 +1,21 @@
 import { motion } from "framer-motion";
-import { AlertCircle, Calendar, Info, Sparkles, TrendingUp, Zap } from "lucide-react";
+import {
+  AlertCircle,
+  Calendar,
+  Info,
+  Sparkles,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
 import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
@@ -11,11 +24,16 @@ import { useTranslation } from "@/i18n/core/client";
 import { useCreditPurchase } from "@/app/api/[locale]/v1/core/credits/hooks";
 import purchaseDefinitions from "@/app/api/[locale]/v1/core/credits/purchase/definition";
 import { useSubscriptionCheckout } from "@/app/api/[locale]/v1/core/payment/checkout/hooks";
-import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
+import {
+  BillingInterval,
+  SubscriptionPlan,
+  SubscriptionStatus,
+} from "@/app/api/[locale]/v1/core/subscription/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { SubscriptionData } from "./types";
 import { formatPrice } from "./types";
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/v1/core/products/repository-client";
 
 interface BuyCreditsTabProps {
   locale: CountryLanguage;
@@ -72,20 +90,20 @@ export function BuyCreditsTab({
             {t("app.subscription.subscription.buy.subscription.title")}
           </CardTitle>
           <CardDescription>
-            {t(
-              "app.subscription.subscription.buy.subscription.description",
-            )}
+            {t("app.subscription.subscription.buy.subscription.description", {
+              subPrice: formatPrice(subscriptionPrice, locale),
+              subCredits: subscriptionCredits,
+              modelCount: TOTAL_MODEL_COUNT,
+            })}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <Div className="space-y-2">
+          <Div className="flex items-baseline gap-1">
             <Div className="text-4xl font-bold">
               {formatPrice(subscriptionPrice, locale)}
             </Div>
             <Div className="text-sm text-muted-foreground">
-              {t(
-                "app.subscription.subscription.buy.subscription.perMonth",
-              )}
+              {t("app.subscription.subscription.buy.subscription.perMonth")}
             </Div>
           </Div>
 
@@ -104,6 +122,7 @@ export function BuyCreditsTab({
               <Span>
                 {t(
                   "app.subscription.subscription.buy.subscription.features.expiry",
+                  { modelCount: TOTAL_MODEL_COUNT },
                 )}
               </Span>
             </Div>
@@ -119,11 +138,7 @@ export function BuyCreditsTab({
 
           {!isAuthenticated ? (
             <Div className="flex gap-2">
-              <Button
-                variant="ghost"
-                asChild
-                className="flex-1 hidden sm:flex"
-              >
+              <Button variant="ghost" asChild className="flex-1 hidden sm:flex">
                 <Link href={`/${locale}/user/login`}>
                   {t("app.story._components.nav.user.login")}
                 </Link>
@@ -147,9 +162,7 @@ export function BuyCreditsTab({
             >
               {subscriptionCheckoutEndpoint.create?.isSubmitting
                 ? "Loading..."
-                : t(
-                    "app.subscription.subscription.buy.subscription.button",
-                  )}
+                : t("app.subscription.subscription.buy.subscription.button")}
             </Button>
           )}
         </CardContent>
@@ -166,7 +179,7 @@ export function BuyCreditsTab({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <Div className="space-y-2">
+          <Div className="flex items-baseline gap-1">
             <Div className="text-4xl font-bold">
               {formatPrice(packPrice, locale)}
             </Div>
@@ -179,26 +192,21 @@ export function BuyCreditsTab({
             <Div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-green-600" />
               <Span>
-                {t(
-                  "app.subscription.subscription.buy.pack.features.credits",
-                  { count: packCredits },
-                )}
+                {t("app.subscription.subscription.buy.pack.features.credits", {
+                  count: packCredits,
+                })}
               </Span>
             </Div>
             <Div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-green-600" />
               <Span>
-                {t(
-                  "app.subscription.subscription.buy.pack.features.expiry",
-                )}
+                {t("app.subscription.subscription.buy.pack.features.expiry")}
               </Span>
             </Div>
             <Div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-blue-600" />
               <Span>
-                {t(
-                  "app.subscription.subscription.buy.pack.features.bestFor",
-                )}
+                {t("app.subscription.subscription.buy.pack.features.bestFor")}
               </Span>
             </Div>
           </Div>
@@ -232,9 +240,7 @@ export function BuyCreditsTab({
                 >
                   {creditPurchaseEndpoint.create.isSubmitting
                     ? "Loading..."
-                    : t(
-                        "app.subscription.subscription.buy.pack.button.submit",
-                      )}
+                    : t("app.subscription.subscription.buy.pack.button.submit")}
                 </Button>
               </Form>
             )}

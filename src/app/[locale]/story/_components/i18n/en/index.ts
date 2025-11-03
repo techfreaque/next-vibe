@@ -94,7 +94,7 @@ export const translations = {
       adCampaigns: {
         title: "Flexible Pricing",
         description:
-          "Free tier: 10 messages/day. Unlimited plan: €10/month. Credit packs: €5. Crypto or card payments accepted.",
+          "Free tier: 20 credits/month. Unlimited plan: €10/month. Credit packs: €5. Crypto or card payments accepted.",
       },
       dataAnalysis: {
         title: "Advanced Analytics",
@@ -220,14 +220,15 @@ export const translations = {
         strategyDevelopment: {
           title: "1. Sign Up Free",
           description:
-            "Create your account in seconds. No credit card required. Start with 10 free messages per day across all 40+ AI models.",
+            "Create your account in seconds. No credit card required. Start with {{freeCredits}} free credits per month across all 40+ AI models.",
           tags: {
             audienceAnalysis: "Quick Setup",
             competitorResearch: "No Credit Card",
           },
           insights: {
             title: "Free Forever",
-            description: "10 messages daily, all models, all folder types",
+            description:
+              "{{freeCredits}} credits monthly, all models, all folder types",
           },
         },
         contentCreation: {
@@ -255,7 +256,7 @@ export const translations = {
         analysisOptimization: {
           title: "4. Upgrade When Ready",
           description:
-            "Free tier forever, or unlock unlimited for €10/month. Buy credit packs for €5. Pay with card or crypto. No hidden fees.",
+            "Free tier forever, or unlock unlimited for {{subCurrency}}{{subPrice}}/month. Buy credit packs for {{packCurrency}}{{packPrice}}. Pay with card or crypto. No hidden fees.",
           tags: {
             performanceMetrics: "Unlimited Plan",
             strategyRefinement: "Flexible Pricing",
@@ -765,7 +766,7 @@ export const translations = {
           plans: {
             title: "Subscription Plans",
             content:
-              "We offer Free (10 messages/day), Credit Packs (€5), and Unlimited (€10/month) plans. Enterprise plans are available with custom pricing.",
+              "We offer Free (20 credits/month), Credit Packs (€5/500 credits), and Unlimited (€10/month) plans.",
           },
           billing: {
             title: "Billing",

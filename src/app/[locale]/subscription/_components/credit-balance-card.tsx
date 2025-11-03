@@ -1,12 +1,19 @@
 import { motion } from "framer-motion";
 import { AlertCircle, Calendar, Coins, Sparkles, Zap } from "lucide-react";
 import { Badge } from "next-vibe-ui/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { CreditBalance } from "./types";
 import { formatDate } from "./types";
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/v1/core/products/repository-client";
 
 interface CreditBalanceCardProps {
   locale: CountryLanguage;
@@ -14,7 +21,11 @@ interface CreditBalanceCardProps {
   freeCredits: number;
 }
 
-export function CreditBalanceCard({ locale, initialCredits, freeCredits }: CreditBalanceCardProps) {
+export function CreditBalanceCard({
+  locale,
+  initialCredits,
+  freeCredits,
+}: CreditBalanceCardProps) {
   const { t } = useTranslation();
 
   return (
@@ -34,7 +45,9 @@ export function CreditBalanceCard({ locale, initialCredits, freeCredits }: Credi
                 {t("app.subscription.subscription.balance.title")}
               </CardTitle>
               <CardDescription>
-                {t("app.subscription.subscription.balance.description")}
+                {t("app.subscription.subscription.balance.description", {
+                  modelCount: TOTAL_MODEL_COUNT,
+                })}
               </CardDescription>
             </Div>
             <Badge className="text-lg font-bold px-4 py-2">

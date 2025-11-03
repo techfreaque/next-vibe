@@ -12,7 +12,7 @@
     "postinstall": "bun src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts setup --force || echo 'Vibe setup failed - run manually if needed'",
     "dev": "vibe dev",
     "build": "vibe build",
-    "start": "next start",
+    "start": "vibe start",
     "test": "vibe test",
     "check": "vibe check",
     "lint": "vibe lint",

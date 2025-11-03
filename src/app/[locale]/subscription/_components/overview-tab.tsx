@@ -15,9 +15,33 @@ import {
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
+import type { CountryLanguage } from "@/i18n/core/types";
+import { formatPrice } from "./types";
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/v1/core/products/repository-client";
 
-export function OverviewTab() {
+interface OverviewTabProps {
+  locale: CountryLanguage;
+  subscriptionPrice: number;
+  subscriptionCredits: number;
+  packPrice: number;
+  packCredits: number;
+  freeCredits: number;
+}
+
+export function OverviewTab({
+  locale,
+  subscriptionPrice,
+  subscriptionCredits,
+  packPrice,
+  packCredits,
+  freeCredits,
+}: OverviewTabProps): JSX.Element {
   const { t } = useTranslation();
+
+  // Format currency for display
+  const currency = "EUR";
+  const formattedSubPrice = formatPrice(subscriptionPrice, locale);
+  const formattedPackPrice = formatPrice(packPrice, locale);
 
   return (
     <motion.div
@@ -32,7 +56,12 @@ export function OverviewTab() {
             {t("app.subscription.subscription.overview.howItWorks.title")}
           </CardTitle>
           <CardDescription>
-            {t("app.subscription.subscription.overview.howItWorks.description")}
+            {t(
+              "app.subscription.subscription.overview.howItWorks.description",
+              {
+                subCredits: subscriptionCredits,
+              },
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -48,6 +77,11 @@ export function OverviewTab() {
                 <P className="text-sm text-amber-700 dark:text-amber-300">
                   {t(
                     "app.subscription.subscription.overview.howItWorks.expiring.description",
+                    {
+                      subPrice: formatPrice(subscriptionPrice, locale),
+                      subCredits: subscriptionCredits,
+                      modelCount: TOTAL_MODEL_COUNT,
+                    },
                   )}
                 </P>
               </Div>
@@ -64,6 +98,11 @@ export function OverviewTab() {
                 <P className="text-sm text-green-700 dark:text-green-300">
                   {t(
                     "app.subscription.subscription.overview.howItWorks.permanent.description",
+                    {
+                      packPrice: formatPrice(packPrice, locale),
+                      packCredits,
+                      subCredits: subscriptionCredits,
+                    },
                   )}
                 </P>
               </Div>
@@ -80,6 +119,7 @@ export function OverviewTab() {
                 <P className="text-sm text-blue-700 dark:text-blue-300">
                   {t(
                     "app.subscription.subscription.overview.howItWorks.free.description",
+                    { count: freeCredits },
                   )}
                 </P>
               </Div>

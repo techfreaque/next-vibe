@@ -95,7 +95,7 @@ export const translations: typeof enTranslations = {
       adCampaigns: {
         title: "Flexible Preisgestaltung",
         description:
-          "Kostenlos: 10 Nachrichten/Tag. Unbegrenzt: €10/Monat. Guthaben-Pakete: €5. Krypto- oder Kartenzahlungen akzeptiert.",
+          "Kostenlos: 20 Credits/Monat. Unbegrenzt: €10/Monat. Guthaben-Pakete: €5. Krypto- oder Kartenzahlungen akzeptiert.",
       },
       dataAnalysis: {
         title: "Erweiterte Analysen",
@@ -255,7 +255,7 @@ export const translations: typeof enTranslations = {
         analysisOptimization: {
           title: "Upgraden Sie, wenn Sie bereit sind",
           description:
-            "Erhalten Sie unbegrenzten Zugang für €10/Monat oder kaufen Sie Guthaben-Pakete für €5. Bezahlen Sie mit Karte oder Krypto.",
+            "Erhalten Sie unbegrenzten Zugang für {{subCurrency}}{{subPrice}}/Monat oder kaufen Sie Guthaben-Pakete für {{packCurrency}}{{packPrice}}. Bezahlen Sie mit Karte oder Krypto.",
           tags: {
             performanceMetrics: "Unbegrenzter Plan",
             strategyRefinement: "Guthaben-Pakete",
@@ -775,7 +775,7 @@ export const translations: typeof enTranslations = {
           plans: {
             title: "Abonnement-Pläne",
             content:
-              "Wir bieten Kostenlos (10 Nachrichten/Tag), Guthaben-Pakete (€5) und Unbegrenzt (€10/Monat) Pläne an. Enterprise-Pläne sind mit individueller Preisgestaltung verfügbar.",
+              "Wir bieten Kostenlos ({{freeCredits}} Credits/Monat), Guthaben-Pakete ({{packCurrency}}{{packPrice}}/{{packCredits}} Credits) und Unbegrenzt ({{subCurrency}}{{subPrice}}/Monat) Pläne an.",
           },
           billing: {
             title: "Abrechnung",

@@ -152,10 +152,10 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         // Build Next.js application with proper NODE_ENV
         output.push(MESSAGES.BUILDING_NEXTJS);
 
-        // Run Next.js build command
-        const { execSync } = await import("child_process");
+        // Run Next.js build command using bun (works in both dev and Docker)
+        const { execSync } = await import("node:child_process");
         try {
-          execSync("npx next build", {
+          execSync("bunx next build", {
             stdio: "inherit",
             cwd: process.cwd(),
             env: {

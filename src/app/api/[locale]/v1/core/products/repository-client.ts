@@ -13,6 +13,13 @@ import type {
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
 import type { SubscriptionPlanValue } from "@/app/api/[locale]/v1/core/subscription/enum";
+import { modelOptions } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
+
+/**
+ * Total number of AI models available
+ * Dynamically calculated from modelOptions array
+ */
+export const TOTAL_MODEL_COUNT = modelOptions.length;
 
 export type PaymentInterval = "month" | "year" | "one_time";
 
@@ -102,14 +109,9 @@ const productDefinitions = {
       PL: { price: 100, currency: "PLN" },
       GLOBAL: { price: 100, currency: "USD" },
     },
-    oneTimePriceByCountry: {
-      DE: { price: 15, currency: "EUR" },
-      PL: { price: 15, currency: "PLN" },
-      GLOBAL: { price: 15, currency: "USD" },
-    },
     credits: 1000,
     isSubscription: true,
-    allowedIntervals: ["month" as const, "year" as const, "one_time" as const],
+    allowedIntervals: ["month" as const, "year" as const],
     status: "active" as const,
   },
   credit_pack: {
@@ -169,6 +171,15 @@ export interface ProductsRepository {
    * Get raw product definitions (internal use only)
    */
   getProductDefinitions(): Record<ProductIds, ProductDefinition>;
+
+  /**
+   * Get a summary of all products in a single sentence
+   * Single source of truth for product summary text
+   */
+  getProductsSummary(
+    locale: CountryLanguage,
+    t: (key: string, params?: Record<string, string | number>) => string,
+  ): string;
 }
 
 /**
@@ -234,279 +245,6 @@ export class ProductsRepositoryImpl implements ProductsRepository {
   }
 
   /**
-   * Get a specific product with translated strings
-   * Single source of truth for all product display text
-   */
-  getTranslatedProduct(
-    productId: ProductIds,
-    locale: CountryLanguage,
-    interval: PaymentInterval = "month",
-  ): TranslatedProduct {
-    const product = this.getProduct(productId, locale, interval);
-    const [language] = locale.split("-") as ["en" | "de" | "pl", string];
-
-    // Get translated strings based on product ID and language
-    const translations = this.getProductTranslations(
-      productId,
-      language,
-      product,
-    );
-
-    return {
-      ...product,
-      name: translations.name,
-      description: translations.description,
-      longDescription: translations.longDescription,
-      features: translations.features,
-    };
-  }
-
-  /**
-   * Get all products with translated strings for a specific locale
-   */
-  getTranslatedProducts(
-    locale: CountryLanguage,
-  ): Record<ProductIds, TranslatedProduct> {
-    return {
-      [ProductIds.FREE_TIER]: this.getTranslatedProduct(
-        ProductIds.FREE_TIER,
-        locale,
-      ),
-      [ProductIds.SUBSCRIPTION]: this.getTranslatedProduct(
-        ProductIds.SUBSCRIPTION,
-        locale,
-      ),
-      [ProductIds.CREDIT_PACK]: this.getTranslatedProduct(
-        ProductIds.CREDIT_PACK,
-        locale,
-      ),
-    };
-  }
-
-  /**
-   * Get hardcoded translations for a product
-   * This is the single source of truth for product text in all languages
-   */
-  private getProductTranslations(
-    productId: ProductIds,
-    language: "en" | "de" | "pl",
-    product: Product,
-  ): {
-    name: string;
-    description: string;
-    longDescription?: string;
-    features?: string[];
-  } {
-    const { price, currency, credits } = product;
-    const currencySymbol =
-      currency === "EUR" ? "€" : currency === "PLN" ? "zł" : "$";
-
-    switch (productId) {
-      case ProductIds.FREE_TIER:
-        return this.getFreeTierTranslations(language, credits);
-
-      case ProductIds.SUBSCRIPTION:
-        return this.getSubscriptionTranslations(
-          language,
-          price,
-          currencySymbol,
-          credits,
-        );
-
-      case ProductIds.CREDIT_PACK:
-        return this.getCreditPackTranslations(
-          language,
-          price,
-          currencySymbol,
-          credits,
-        );
-
-      default:
-        // Fallback to English
-        return {
-          name: "Unknown Product",
-          description: "Product information not available",
-        };
-    }
-  }
-
-  /**
-   * Free Tier translations
-   */
-  private getFreeTierTranslations(
-    language: "en" | "de" | "pl",
-    credits: number,
-  ): {
-    name: string;
-    description: string;
-    longDescription?: string;
-    features?: string[];
-  } {
-    switch (language) {
-      case "de":
-        return {
-          name: "Kostenlos",
-          description:
-            "Starten Sie mit kostenlosen Credits - keine Karte erforderlich",
-          longDescription: `${credits} kostenlose Credits zum Ausprobieren`,
-          features: [
-            `${credits} Credits zum Start`,
-            "Zugriff auf alle 40+ KI-Modelle",
-            "Alle Ordnertypen (privat, inkognito, geteilt, öffentlich)",
-            "Community-Personas verwenden",
-            "Community-Support",
-          ],
-        };
-
-      case "pl":
-        return {
-          name: "Darmowy plan",
-          description: "Zacznij z darmowymi kredytami - bez karty kredytowej",
-          longDescription: `${credits} darmowych kredytów do wypróbowania`,
-          features: [
-            `${credits} kredytów na start`,
-            "Dostęp do wszystkich 40+ modeli AI",
-            "Wszystkie typy folderów (prywatne, incognito, współdzielone, publiczne)",
-            "Korzystanie z person społeczności",
-            "Wsparcie społeczności",
-          ],
-        };
-
-      default: // en
-        return {
-          name: "Free Tier",
-          description: "Get started with free credits - no card required",
-          longDescription: `${credits} free credits to try out`,
-          features: [
-            `${credits} credits to start`,
-            "Access to all 40+ AI models",
-            "All folder types (private, incognito, shared, public)",
-            "Use community personas",
-            "Community support",
-          ],
-        };
-    }
-  }
-
-  /**
-   * Subscription translations
-   */
-  private getSubscriptionTranslations(
-    language: "en" | "de" | "pl",
-    price: number,
-    currencySymbol: string,
-    credits: number,
-  ): {
-    name: string;
-    description: string;
-    longDescription?: string;
-    features?: string[];
-  } {
-    switch (language) {
-      case "de":
-        return {
-          name: "Monatsabonnement",
-          description: `${currencySymbol}${price}/Monat - Für alle zugänglich`,
-          longDescription: `Erschwinglicher KI-Zugang mit ${credits} Credits monatlich`,
-          features: [
-            `${credits} Credits pro Monat`,
-            "Alle 40+ KI-Modelle",
-            "Alle Funktionen enthalten",
-            "Jederzeit kündbar",
-            "Credits laufen monatlich ab",
-          ],
-        };
-
-      case "pl":
-        return {
-          name: "Subskrypcja miesięczna",
-          description: `${currencySymbol}${price}/miesiąc - Dostępne dla wszystkich`,
-          longDescription: `Przystępny dostęp do AI z ${credits} kredytów miesięcznie`,
-          features: [
-            `${credits} kredytów miesięcznie`,
-            "Wszystkie 40+ modeli AI",
-            "Wszystkie funkcje włączone",
-            "Anuluj w dowolnym momencie",
-            "Kredyty wygasają co miesiąc",
-          ],
-        };
-
-      default: // en
-        return {
-          name: "Monthly Subscription",
-          description: `${currencySymbol}${price}/month - Accessible for everyone`,
-          longDescription: `Affordable AI access with ${credits} credits monthly`,
-          features: [
-            `${credits} credits per month`,
-            "All 40+ AI models",
-            "All features included",
-            "Cancel anytime",
-            "Credits expire monthly",
-          ],
-        };
-    }
-  }
-
-  /**
-   * Credit Pack translations
-   */
-  private getCreditPackTranslations(
-    language: "en" | "de" | "pl",
-    price: number,
-    currencySymbol: string,
-    credits: number,
-  ): {
-    name: string;
-    description: string;
-    longDescription?: string;
-    features?: string[];
-  } {
-    switch (language) {
-      case "de":
-        return {
-          name: "Credit-Paket",
-          description: "Zusätzliche Credits für Power-User",
-          longDescription: `${currencySymbol}${price} für ${credits} Credits, die nie ablaufen`,
-          features: [
-            `${credits} Credits pro Paket`,
-            "Alle KI-Modelle enthalten",
-            "Alle Funktionen enthalten",
-            "Mehrere Pakete kaufen",
-            "Credits laufen nie ab",
-          ],
-        };
-
-      case "pl":
-        return {
-          name: "Pakiet kredytów",
-          description: "Dodatkowe kredyty dla zaawansowanych użytkowników",
-          longDescription: `${currencySymbol}${price} za ${credits} kredytów, które nigdy nie wygasają`,
-          features: [
-            `${credits} kredytów na pakiet`,
-            "Wszystkie modele AI włączone",
-            "Wszystkie funkcje włączone",
-            "Kup wiele pakietów",
-            "Kredyty nigdy nie wygasają",
-          ],
-        };
-
-      default: // en
-        return {
-          name: "Credit Pack",
-          description: "Extra credits for power users",
-          longDescription: `${currencySymbol}${price} for ${credits} credits that never expire`,
-          features: [
-            `${credits} credits per pack`,
-            "All AI models included",
-            "All features included",
-            "Buy multiple packs",
-            "Credits never expire",
-          ],
-        };
-    }
-  }
-
-  /**
    * Check if a product can be purchased (not deprecated)
    */
   canPurchase(productId: ProductIds): boolean {
@@ -539,6 +277,41 @@ export class ProductsRepositoryImpl implements ProductsRepository {
    */
   getProductDefinitions(): Record<ProductIds, ProductDefinition> {
     return productDefinitions;
+  }
+
+  /**
+   * Get a summary of all products in a single sentence
+   * Single source of truth for product summary text
+   * Example: "We offer Free (20 credits/month), Credit Packs (€5/500 credits), and Unlimited (€10/month) plans."
+   */
+  getProductsSummary(
+    locale: CountryLanguage,
+    t: (key: string, params?: Record<string, string | number>) => string,
+  ): string {
+    const country = getCountryFromLocale(locale);
+
+    const freeTier = productDefinitions[ProductIds.FREE_TIER];
+    const subscription = productDefinitions[ProductIds.SUBSCRIPTION];
+    const creditPack = productDefinitions[ProductIds.CREDIT_PACK];
+
+    const subPrice = subscription.priceByCountry[country].price;
+    const subCurrency = subscription.priceByCountry[country].currency;
+    const packPrice = creditPack.priceByCountry[country].price;
+    const packCurrency = creditPack.priceByCountry[country].currency;
+
+    const subCurrencySymbol =
+      subCurrency === "EUR" ? "€" : subCurrency === "PLN" ? "zł" : "$";
+    const packCurrencySymbol =
+      packCurrency === "EUR" ? "€" : packCurrency === "PLN" ? "zł" : "$";
+
+    return t("app.api.v1.core.products.summary", {
+      freeCredits: freeTier.credits,
+      packCurrency: packCurrencySymbol,
+      packPrice: packPrice,
+      packCredits: creditPack.credits,
+      subCurrency: subCurrencySymbol,
+      subPrice: subPrice,
+    });
   }
 }
 

@@ -74,23 +74,25 @@ export function MessageEditor({
             value={editor.content}
             onChange={(e): void => editor.setContent(e.target.value)}
             onKeyDown={editor.handleKeyDown}
-            placeholder={t("app.chat.messageEditor.placeholder")}
+            placeholder=""
             disabled={editor.isLoading}
-            className="px-0"
+            className="px-0 text-base"
             variant="ghost"
             rows={3}
           />
 
-          {/* Hint Text - Shows when textarea is empty */}
+          {/* Hint Text - Shows when textarea is empty - Hidden on mobile */}
           {!editor.content && (
-            <Div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground">
+            <Div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden sm:block">
+              {t("app.chat.input.keyboardShortcuts.press")}{" "}
               <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
-                ⌘/Ctrl+Enter
+                {t("app.chat.input.keyboardShortcuts.enter")}
               </kbd>{" "}
-              {t("app.chat.messageEditor.hint.branch")}{" "}
-              {/* eslint-disable-next-line i18next/no-literal-string -- Keyboard shortcuts are technical UI elements */}
-              <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Esc</kbd>{" "}
-              {t("app.chat.messageEditor.hint.cancel")}
+              {t("app.chat.messageEditor.hint.branch")},{" "}
+              <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+                {t("app.chat.input.keyboardShortcuts.shiftEnter")}
+              </kbd>{" "}
+              {t("app.chat.input.keyboardShortcuts.forNewLine")}
             </Div>
           )}
         </Div>
@@ -156,7 +158,7 @@ export function MessageEditor({
               disabled={editor.isLoading}
               size="sm"
               variant="ghost"
-              className="flex-shrink-0 h-9"
+              className="shrink-0 h-9"
               title={t("app.chat.messageEditor.titles.cancel")}
             >
               <X className="h-3.5 w-3.5 mr-2" />

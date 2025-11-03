@@ -170,12 +170,7 @@ export function TopBar({
       )}
       {(!sidebarCollapsed || Object.keys(messages).length === 0) && (
         <Div className="flex-1 flex justify-center">
-          <Logo
-            locale={locale}
-            pathName=""
-            className="w-[150px] h-auto"
-            linkClassName="my-auto flex"
-          />
+          <Logo locale={locale} pathName="" size="h-8" />
         </Div>
       )}
     </Div>

@@ -131,7 +131,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.system.server.build.post.fields.skipProdMigrations.description",
         },
-        z.boolean().default(false),
+        z.boolean().default(true),
       ),
 
       skipProdSeeding: requestDataField(
@@ -143,7 +143,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.system.server.build.post.fields.skipProdSeeding.description",
         },
-        z.boolean().default(false),
+        z.boolean().default(true),
       ),
 
       runProdDatabase: requestDataField(
@@ -155,7 +155,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.system.server.build.post.fields.runProdDatabase.description",
         },
-        z.boolean().default(true),
+        z.boolean().default(false),
       ),
 
       // === RESPONSE FIELDS ===
@@ -263,6 +263,17 @@ const { POST } = createEndpoint({
         force: false,
         skipEndpoints: false,
         skipSeeds: false,
+        skipProdMigrations: true,
+        skipProdSeeding: true,
+        runProdDatabase: false,
+      },
+      withMigrations: {
+        package: false,
+        skipNextCommand: false,
+        skipGeneration: false,
+        force: false,
+        skipEndpoints: false,
+        skipSeeds: false,
         skipProdMigrations: false,
         skipProdSeeding: false,
         runProdDatabase: true,
@@ -281,6 +292,12 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
+        success: true,
+        output:
+          "✅ Application build completed successfully\n🚀 Your application is ready for production deployment!",
+        duration: 30000,
+      },
+      withMigrations: {
         success: true,
         output:
           "✅ Application build completed successfully\n📦 Running production migrations...\n🌱 Running production seeding...\n🎉 Production database operations completed successfully\n🚀 Your application is ready for production deployment!",

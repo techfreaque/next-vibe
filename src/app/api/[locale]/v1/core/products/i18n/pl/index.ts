@@ -4,6 +4,10 @@ export const translations: typeof enTranslations = {
   // Product category
   category: "Produkty",
 
+  // Product summary (single source of truth)
+  summary:
+    "Oferujemy plany Darmowy ({{freeCredits}} kredytów/miesiąc), Subskrypcja miesięczna ({{subCurrency}}{{subPrice}}/miesiąc za {{subCredits}} kredytów) i Pakiety kredytów ({{packCurrency}}{{packPrice}} za {{packCredits}} kredytów, wymaga subskrypcji).",
+
   // Free tier product
   free: {
     name: "Darmowy plan",
@@ -13,11 +17,13 @@ export const translations: typeof enTranslations = {
   // Subscription product
   subscription: {
     name: "Subskrypcja miesięczna",
-    description: "€10/miesiąc - Dostępne dla wszystkich",
-    longDescription: "Przystępny dostęp do AI z 1000 kredytów miesięcznie",
+    description:
+      "{{subCredits}} kredytów miesięcznie ze wszystkimi {{modelCount}} modelami AI",
+    longDescription:
+      "Miesięczna subskrypcja z {{subCredits}} kredytów dla wszystkich {{modelCount}} niecenzurowanych modeli AI",
     features: {
-      credits: "1000 kredytów miesięcznie",
-      allModels: "Wszystkie 40+ modeli AI",
+      credits: "{{subCredits}} kredytów miesięcznie",
+      allModels: "Wszystkie {{modelCount}} modeli AI",
       allFeatures: "Wszystkie funkcje włączone",
       cancel: "Anuluj w dowolnym momencie",
     },
@@ -26,11 +32,12 @@ export const translations: typeof enTranslations = {
   // Credit pack product
   creditPack: {
     name: "Pakiet kredytów",
-    description: "Dodatkowe kredyty dla zaawansowanych użytkowników",
-    longDescription: "€5 za 500 kredytów, które nigdy nie wygasają",
+    description: "Dodatkowe kredyty dla subskrybentów - nigdy nie wygasają",
+    longDescription:
+      "Kup dodatkowe pakiety kredytów, gdy potrzebujesz więcej niż miesięczne {{subCredits}} kredytów. Wymaga aktywnej subskrypcji.",
     features: {
-      credits: "500 kredytów na pakiet",
-      allModels: "Wszystkie modele AI włączone",
+      credits: "{{packCredits}} kredytów na pakiet",
+      allModels: "Wszystkie {{modelCount}} modeli AI włączone",
       allFeatures: "Wszystkie funkcje włączone",
       multiple: "Kup wiele pakietów",
       permanent: "Kredyty nigdy nie wygasają",

@@ -97,13 +97,15 @@ export function useMessageEditor({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent): void => {
-      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      // Enter without Shift = submit (branch)
+      if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         void handleBranch();
       } else if (e.key === "Escape") {
         e.preventDefault();
         onCancel();
       }
+      // Shift+Enter = new line (default textarea behavior, no need to handle)
     },
     [handleBranch, onCancel],
   );

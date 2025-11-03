@@ -151,7 +151,14 @@ export function SubscriptionClientContent({
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
-          <OverviewTab />
+          <OverviewTab
+            locale={locale}
+            subscriptionPrice={SUBSCRIPTION_PRICE}
+            subscriptionCredits={SUBSCRIPTION_CREDITS}
+            packPrice={PACK_PRICE}
+            packCredits={PACK_CREDITS}
+            freeCredits={FREE_CREDITS}
+          />
         </TabsContent>
 
         {/* Buy Credits Tab */}

@@ -2,20 +2,21 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   subscription: {
-    title: "Kredyty",
-    description: "Zarządzaj swoimi kredytami i subskrypcjami",
+    title: "Kredyty i Subskrypcja",
+    description: "Zarządzaj swoimi kredytami i miesięczną subskrypcją",
     backToChat: "Powrót do czatu",
     billingInterval: "Okres rozliczeniowy",
     currentPeriodStart: "Początek bieżącego okresu",
     nextBillingDate: "Następna data rozliczenia",
     balance: {
       title: "Saldo kredytów",
-      description: "Twoje dostępne kredyty na rozmowy z AI",
+      description:
+        "Twoje dostępne kredyty na rozmowy z AI z {{modelCount}} modelami",
       total: "kredyty",
       nextExpiration: "Następne wygaśnięcie: {{date}}",
       expiring: {
-        title: "Wygasające kredyty",
-        description: "Z subskrypcji",
+        title: "Kredyty subskrypcyjne",
+        description: "Z miesięcznej subskrypcji (1000 kredytów/miesiąc)",
       },
       permanent: {
         title: "Kredyty stałe",
@@ -29,16 +30,17 @@ export const translations: typeof enTranslations = {
     overview: {
       howItWorks: {
         title: "Jak działają kredyty",
-        description: "Zrozumienie systemu kredytów",
+        description:
+          "Subskrybuj dla {{subCredits}} miesięcznych kredytów i kupuj dodatkowe pakiety w razie potrzeby",
         expiring: {
-          title: "Kredyty z subskrypcji miesięcznej",
+          title: "Subskrypcja miesięczna",
           description:
-            "€10/miesiąc daje 1000 kredytów, które wygasają na koniec każdego cyklu rozliczeniowego. Przystępne ceny dla wszystkich!",
+            "{{subPrice}}/miesiąc - {{subCredits}} kredytów miesięcznie ze wszystkimi {{modelCount}} modelami AI. Idealne dla regularnych użytkowników!",
         },
         permanent: {
-          title: "Dodatkowe kredyty dla zaawansowanych użytkowników",
+          title: "Dodatkowe pakiety kredytów",
           description:
-            "Potrzebujesz więcej? Kup pakiety kredytów (€5 za 500 kredytów), które nigdy nie wygasają. Idealne dla zaawansowanych użytkowników potrzebujących dodatkowej pojemności.",
+            "{{packPrice}} za {{packCredits}} kredytów - Potrzebujesz więcej niż {{subCredits}} kredytów? Kup dodatkowe pakiety, które nigdy nie wygasają. Wymaga aktywnej subskrypcji.",
         },
         free: {
           title: "Darmowe kredyty testowe",
@@ -77,12 +79,12 @@ export const translations: typeof enTranslations = {
         badge: "Dostępne dla wszystkich",
         title: "Subskrypcja miesięczna",
         description:
-          "€10/miesiąc - Przystępny dostęp do AI dla wszystkich z 1000 kredytów miesięcznie",
+          "{{subPrice}}/miesiąc - {{subCredits}} kredytów miesięcznie ze wszystkimi {{modelCount}} modelami AI",
         perMonth: "/miesiąc",
         features: {
           credits: "{{count}} kredytów miesięcznie",
-          expiry: "Kredyty wygasają co miesiąc",
-          bestFor: "Przystępne ceny dla wszystkich użytkowników",
+          expiry: "Dostęp do wszystkich {{modelCount}} modeli AI",
+          bestFor: "Idealne dla regularnych użytkowników AI",
         },
         button: "Subskrybuj teraz",
       },
@@ -108,7 +110,7 @@ export const translations: typeof enTranslations = {
         pack: "Pakiet",
         packs: "Pakiety",
         requiresSubscription:
-          "Subskrybuj miesięczny plan, aby kupić dodatkowe pakiety kredytów.",
+          "Pakiety kredytów wymagają aktywnej subskrypcji. Subskrybuj, aby otrzymać miesięczne kredyty i odblokować możliwość kupowania pakietów kredytów!",
       },
     },
     history: {

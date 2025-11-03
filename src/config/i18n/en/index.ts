@@ -57,25 +57,4 @@ export const translations = {
     DE: "Europe/Berlin",
     GLOBAL: "UTC",
   },
-  pricing: {
-    free: {
-      messagesPerDay: 10,
-      price: 0,
-    },
-    unlimited: {
-      price: 10,
-      creditsPerMonth: 1000,
-    },
-    creditPack: {
-      price: 5,
-      credits: 500,
-    },
-    freeCredits: 20,
-    creditCosts: {
-      search: 1,
-      audio: 2,
-      tts: 1,
-      stt: 1,
-    },
-  },
 };

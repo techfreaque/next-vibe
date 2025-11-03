@@ -32,17 +32,17 @@ export const translations: typeof enTranslations = {
           q1: {
             question: "Was ist {{appName}}?",
             answer:
-              "{{appName}} ist eine unzensierte KI-Chat-Plattform mit Zugang zu über 40 KI-Modellen. Wir kombinieren ehrliche KI-Gespräche mit erweiterten Funktionen wie Ordnerverwaltung, benutzerdefinierten Personas und Multi-Modell-Unterstützung.",
+              "{{appName}} ist eine unzensierte KI-Chat-Plattform mit Zugang zu {{modelCount}} KI-Modellen. Wir kombinieren ehrliche KI-Gespräche mit erweiterten Funktionen wie Ordnerverwaltung, benutzerdefinierten Personas und Multi-Modell-Unterstützung.",
           },
           q2: {
             question: "Welche Zahlungsmethoden akzeptieren Sie?",
             answer:
-              "Wir akzeptieren Kreditkarten über Stripe und Kryptowährungszahlungen (Bitcoin, Ethereum, Stablecoins) über NowPayments. Wählen Sie zwischen €10/Monat Abonnement oder €5 Guthaben-Paketen.",
+              "Wir akzeptieren Kreditkarten über Stripe und Kryptowährungszahlungen (Bitcoin, Ethereum, Stablecoins) über NowPayments. Wählen Sie zwischen {{subPrice}}/Monat Abonnement ({{subCredits}} Credits/Monat) oder {{packPrice}} Guthaben-Paketen ({{packCredits}} Credits pro Paket, erfordert Abonnement).",
           },
           q3: {
             question: "Wie funktioniert das Guthabensystem?",
             answer:
-              "Kostenlose Benutzer erhalten 10 Nachrichten/Tag. Bezahlte Benutzer können zwischen unbegrenztem Abonnement (€10/Monat) oder Pay-as-you-go Guthaben-Paketen (€5) wählen. Guthaben verfallen nie und funktionieren mit allen KI-Modellen.",
+              "Kostenlose Benutzer erhalten {{freeCredits}} Credits/Monat. Bezahlte Benutzer können zwischen unbegrenztem Abonnement ({{subPrice}}/Monat) oder Pay-as-you-go Guthaben-Paketen ({{packPrice}} für {{packCredits}} Credits) wählen. Guthaben verfallen nie und funktionieren mit allen 40+ KI-Modellen.",
           },
           q4: {
             question: "Sind meine Daten privat und sicher?",
