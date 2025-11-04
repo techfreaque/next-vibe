@@ -433,7 +433,7 @@ export function ChatSidebar({
               {t("app.chat.credits.navigation.subscription")}
             </Button>
           </Link>
-          <Link href={`/${locale}/story/about-us`}>
+          <Link href={`/${locale}/story`}>
             <Button
               variant="ghost"
               size="sm"
@@ -488,7 +488,11 @@ function NewFolderButton({
             size="icon"
             className="h-11 w-11 hover:bg-accent"
             onClick={() => setNewFolderDialogOpen(true)}
-            title={t(getNewFolderTranslationKey(activeRootFolderId || DEFAULT_FOLDER_IDS.PRIVATE))}
+            title={t(
+              getNewFolderTranslationKey(
+                activeRootFolderId || DEFAULT_FOLDER_IDS.PRIVATE,
+              ),
+            )}
             disabled={requiresAuth && !isAuthenticated}
           >
             <FolderPlus className="h-5 w-5" />
@@ -498,7 +502,11 @@ function NewFolderButton({
           <P>
             {requiresAuth && !isAuthenticated
               ? t("app.chat.common.loginRequired")
-              : t(getNewFolderTranslationKey(activeRootFolderId || DEFAULT_FOLDER_IDS.PRIVATE))}
+              : t(
+                  getNewFolderTranslationKey(
+                    activeRootFolderId || DEFAULT_FOLDER_IDS.PRIVATE,
+                  ),
+                )}
           </P>
         </TooltipContent>
       </Tooltip>

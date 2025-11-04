@@ -58,45 +58,53 @@ type Equal<X, Y> =
 /**
  * TEST 1: Single PUBLIC role should infer JWTPublicPayloadType
  */
-type Test1 = InferJwtPayloadTypeFromRoles<readonly ["PUBLIC"]>;
+type Test1 = InferJwtPayloadTypeFromRoles<readonly [typeof UserRole.PUBLIC]>;
 type Test1Check = Expect<Equal<Test1, JWTPublicPayloadType>>;
 
 /**
  * TEST 2: Single ADMIN role should infer JwtPrivatePayloadType
  */
-type Test2 = InferJwtPayloadTypeFromRoles<readonly ["ADMIN"]>;
+type Test2 = InferJwtPayloadTypeFromRoles<readonly [typeof UserRole.ADMIN]>;
 type Test2Check = Expect<Equal<Test2, JwtPrivatePayloadType>>;
 
 /**
  * TEST 3: Single CUSTOMER role should infer JwtPrivatePayloadType
  */
-type Test3 = InferJwtPayloadTypeFromRoles<readonly ["CUSTOMER"]>;
+type Test3 = InferJwtPayloadTypeFromRoles<readonly [typeof UserRole.CUSTOMER]>;
 type Test3Check = Expect<Equal<Test3, JwtPrivatePayloadType>>;
 
 /**
  * TEST 4: Multiple roles with PUBLIC should infer union type
  */
-type Test4 = InferJwtPayloadTypeFromRoles<readonly ["PUBLIC", "ADMIN"]>;
+type Test4 = InferJwtPayloadTypeFromRoles<
+  readonly [typeof UserRole.PUBLIC, typeof UserRole.ADMIN]
+>;
 type Test4Check = Expect<Equal<Test4, JwtPayloadType>>;
 
 /**
  * TEST 5: Multiple roles without PUBLIC should infer JwtPrivatePayloadType
  */
-type Test5 = InferJwtPayloadTypeFromRoles<readonly ["ADMIN", "CUSTOMER"]>;
+type Test5 = InferJwtPayloadTypeFromRoles<
+  readonly [typeof UserRole.ADMIN, typeof UserRole.CUSTOMER]
+>;
 type Test5Check = Expect<Equal<Test5, JwtPrivatePayloadType>>;
 
 /**
  * TEST 6: Mixed roles (PUBLIC + others) should infer union type
  */
 type Test6 = InferJwtPayloadTypeFromRoles<
-  readonly ["ADMIN", "PUBLIC", "CUSTOMER"]
+  readonly [
+    typeof UserRole.ADMIN,
+    typeof UserRole.PUBLIC,
+    typeof UserRole.CUSTOMER,
+  ]
 >;
 type Test6Check = Expect<Equal<Test6, JwtPayloadType>>;
 
 /**
  * TEST 7: Single CLI_OFF role should infer JwtPrivatePayloadType
  */
-type Test7 = InferJwtPayloadTypeFromRoles<readonly ["CLI_OFF"]>;
+type Test7 = InferJwtPayloadTypeFromRoles<readonly [typeof UserRole.CLI_OFF]>;
 type Test7Check = Expect<Equal<Test7, JwtPrivatePayloadType>>;
 
 // Export a dummy value to make this a valid module
@@ -159,11 +167,15 @@ const testAdminEndpoint = createEndpoint({
 type PublicEndpointRoles = (typeof testPublicEndpoint.GET)["allowedRoles"];
 type AdminEndpointRoles = (typeof testAdminEndpoint.GET)["allowedRoles"];
 
-// These should be readonly ["PUBLIC"] and readonly ["ADMIN"] respectively
-type PublicRolesCheck = PublicEndpointRoles extends readonly ["PUBLIC"]
+// These should be readonly [typeof UserRole.PUBLIC] and readonly [typeof UserRole.ADMIN] respectively
+type PublicRolesCheck = PublicEndpointRoles extends readonly [
+  typeof UserRole.PUBLIC,
+]
   ? true
   : false;
-type AdminRolesCheck = AdminEndpointRoles extends readonly ["ADMIN"]
+type AdminRolesCheck = AdminEndpointRoles extends readonly [
+  typeof UserRole.ADMIN,
+]
   ? true
   : false;
 
@@ -656,3 +668,330 @@ type ImapStep30_ComponentData =
 
 type ImapStep30_AccountsIsArray =
   ImapStep30_ComponentData extends Array<Record<string, never>> ? true : false;
+
+/**
+ * HANDLER TYPE INFERENCE TESTS
+ * Test that handler functions receive the correct user type based on endpoint roles
+ */
+
+// Test endpoint with PUBLIC-only role
+const testPublicOnlyEndpoint = createEndpoint({
+  method: Methods.POST,
+  path: ["test", "public-only"],
+  title: "test" as any,
+  description: "test" as any,
+  category: "test" as any,
+  tags: [],
+  allowedRoles: [UserRole.PUBLIC] as const,
+  fields: objectField(
+    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
+    {},
+    {},
+  ),
+  errorTypes: {} as Record<
+    string,
+    { title: TranslationKey; description: TranslationKey }
+  >,
+  successTypes: {} as { title: TranslationKey; description: TranslationKey },
+  examples: {
+    requests: undefined,
+    urlPathParams: undefined,
+    responses: undefined,
+  },
+});
+
+// Test endpoint with ADMIN-only role
+const testAdminOnlyEndpoint = createEndpoint({
+  method: Methods.POST,
+  path: ["test", "admin-only"],
+  title: "test" as any,
+  description: "test" as any,
+  category: "test" as any,
+  tags: [],
+  allowedRoles: [UserRole.ADMIN] as const,
+  fields: objectField(
+    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
+    {},
+    {},
+  ),
+  errorTypes: {} as Record<
+    string,
+    { title: TranslationKey; description: TranslationKey }
+  >,
+  successTypes: {} as { title: TranslationKey; description: TranslationKey },
+  examples: {
+    requests: undefined,
+    urlPathParams: undefined,
+    responses: undefined,
+  },
+});
+
+// Test endpoint with mixed roles (PUBLIC + ADMIN)
+const testMixedRolesEndpoint = createEndpoint({
+  method: Methods.POST,
+  path: ["test", "mixed-roles"],
+  title: "test" as any,
+  description: "test" as any,
+  category: "test" as any,
+  tags: [],
+  allowedRoles: [UserRole.PUBLIC, UserRole.ADMIN] as const,
+  fields: objectField(
+    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
+    {},
+    {},
+  ),
+  errorTypes: {} as Record<
+    string,
+    { title: TranslationKey; description: TranslationKey }
+  >,
+  successTypes: {} as { title: TranslationKey; description: TranslationKey },
+  examples: {
+    requests: undefined,
+    urlPathParams: undefined,
+    responses: undefined,
+  },
+});
+
+// Extract allowedRoles types to verify they're preserved correctly
+type PublicOnlyRoles = (typeof testPublicOnlyEndpoint.POST)["allowedRoles"];
+type AdminOnlyRoles = (typeof testAdminOnlyEndpoint.POST)["allowedRoles"];
+type MixedRoles = (typeof testMixedRolesEndpoint.POST)["allowedRoles"];
+
+// Verify roles are exact tuple types, not widened arrays
+type PublicOnlyRolesExact = Expect<
+  Equal<PublicOnlyRoles, readonly [typeof UserRole.PUBLIC]>
+>;
+type AdminOnlyRolesExact = Expect<
+  Equal<AdminOnlyRoles, readonly [typeof UserRole.ADMIN]>
+>;
+type MixedRolesExact = Expect<
+  Equal<MixedRoles, readonly [typeof UserRole.PUBLIC, typeof UserRole.ADMIN]>
+>;
+
+// Test InferJwtPayloadTypeFromRoles with exact endpoint roles
+type PublicOnlyUserType = InferJwtPayloadTypeFromRoles<PublicOnlyRoles>;
+type AdminOnlyUserType = InferJwtPayloadTypeFromRoles<AdminOnlyRoles>;
+type MixedRolesUserType = InferJwtPayloadTypeFromRoles<MixedRoles>;
+
+// Verify inferred user types are correct
+type PublicOnlyUserTypeCheck = Expect<
+  Equal<PublicOnlyUserType, JWTPublicPayloadType>
+>;
+type AdminOnlyUserTypeCheck = Expect<
+  Equal<AdminOnlyUserType, JwtPrivatePayloadType>
+>;
+type MixedRolesUserTypeCheck = Expect<
+  Equal<MixedRolesUserType, JwtPayloadType>
+>;
+
+// Test that handler props receive the correct user type
+import type { ApiHandlerProps } from "../../types/handler";
+
+// Simulate handler props for PUBLIC-only endpoint
+type PublicOnlyHandlerProps = ApiHandlerProps<
+  Record<string, never>,
+  Record<string, never>,
+  PublicOnlyRoles
+>;
+
+// Simulate handler props for ADMIN-only endpoint
+type AdminOnlyHandlerProps = ApiHandlerProps<
+  Record<string, never>,
+  Record<string, never>,
+  AdminOnlyRoles
+>;
+
+// Simulate handler props for mixed roles endpoint
+type MixedRolesHandlerProps = ApiHandlerProps<
+  Record<string, never>,
+  Record<string, never>,
+  MixedRoles
+>;
+
+// Extract user types from handler props
+type PublicOnlyHandlerUserType = PublicOnlyHandlerProps["user"];
+type AdminOnlyHandlerUserType = AdminOnlyHandlerProps["user"];
+type MixedRolesHandlerUserType = MixedRolesHandlerProps["user"];
+
+// Verify handler receives correct user types
+type PublicOnlyHandlerUserTypeCheck = Expect<
+  Equal<PublicOnlyHandlerUserType, JWTPublicPayloadType>
+>;
+type AdminOnlyHandlerUserTypeCheck = Expect<
+  Equal<AdminOnlyHandlerUserType, JwtPrivatePayloadType>
+>;
+type MixedRolesHandlerUserTypeCheck = Expect<
+  Equal<MixedRolesHandlerUserType, JwtPayloadType>
+>;
+
+// Test that PUBLIC-only user type has correct properties
+type PublicUserHasLeadId = "leadId" extends keyof JWTPublicPayloadType
+  ? true
+  : false;
+type PublicUserHasIsPublic = "isPublic" extends keyof JWTPublicPayloadType
+  ? true
+  : false;
+// Public user has id?: never, which means id property exists but cannot be assigned
+// The actual type is never | undefined (optional never), so we check it's not string
+type PublicUserIdType = JWTPublicPayloadType["id"];
+type PublicUserIdIsNotString = PublicUserIdType extends string ? false : true;
+
+type PublicUserPropsCheck1 = Expect<Equal<PublicUserHasLeadId, true>>;
+type PublicUserPropsCheck2 = Expect<Equal<PublicUserHasIsPublic, true>>;
+type PublicUserPropsCheck3 = Expect<Equal<PublicUserIdIsNotString, true>>;
+
+// Test that PRIVATE user type has correct properties
+type PrivateUserHasId = "id" extends keyof JwtPrivatePayloadType ? true : false;
+type PrivateUserHasLeadId = "leadId" extends keyof JwtPrivatePayloadType
+  ? true
+  : false;
+type PrivateUserHasIsPublic = "isPublic" extends keyof JwtPrivatePayloadType
+  ? true
+  : false;
+
+type PrivateUserPropsCheck1 = Expect<Equal<PrivateUserHasId, true>>;
+type PrivateUserPropsCheck2 = Expect<Equal<PrivateUserHasLeadId, true>>;
+type PrivateUserPropsCheck3 = Expect<Equal<PrivateUserHasIsPublic, true>>;
+
+// Test discriminated union narrowing
+type NarrowPublicUser<T extends JwtPayloadType> = T extends {
+  isPublic: true;
+}
+  ? T
+  : never;
+type NarrowPrivateUser<T extends JwtPayloadType> = T extends {
+  isPublic: false;
+}
+  ? T
+  : never;
+
+type NarrowedPublic = NarrowPublicUser<JwtPayloadType>;
+type NarrowedPrivate = NarrowPrivateUser<JwtPayloadType>;
+
+type NarrowedPublicCheck = Expect<Equal<NarrowedPublic, JWTPublicPayloadType>>;
+type NarrowedPrivateCheck = Expect<
+  Equal<NarrowedPrivate, JwtPrivatePayloadType>
+>;
+
+/**
+ * ENDPOINTS HANDLER TYPE INFERENCE TEST
+ * Test that endpointsHandler properly infers handler parameter types
+ */
+
+// Import the actual endpointsHandler to test real-world usage
+import type { EndpointHandlerConfig } from "../../types/handler";
+
+// Create test endpoint definitions (simulating what's in definition.ts files)
+const testPublicOnlyDefinitions = {
+  POST: testPublicOnlyEndpoint.POST,
+} as const;
+const testAdminOnlyDefinitions = { POST: testAdminOnlyEndpoint.POST } as const;
+const testMixedRolesDefinitions = {
+  POST: testMixedRolesEndpoint.POST,
+} as const;
+
+// Test EndpointHandlerConfig type extracts correct handler types
+type PublicOnlyConfig = EndpointHandlerConfig<typeof testPublicOnlyDefinitions>;
+type AdminOnlyConfig = EndpointHandlerConfig<typeof testAdminOnlyDefinitions>;
+type MixedRolesConfig = EndpointHandlerConfig<typeof testMixedRolesDefinitions>;
+
+// Extract the POST handler config type
+type PublicOnlyPostConfig = PublicOnlyConfig[Methods.POST];
+type AdminOnlyPostConfig = AdminOnlyConfig[Methods.POST];
+type MixedRolesPostConfig = MixedRolesConfig[Methods.POST];
+
+// Verify POST config is not never (exists)
+type PublicOnlyPostConfigExists = PublicOnlyPostConfig extends never
+  ? false
+  : true;
+type AdminOnlyPostConfigExists = AdminOnlyPostConfig extends never
+  ? false
+  : true;
+type MixedRolesPostConfigExists = MixedRolesPostConfig extends never
+  ? false
+  : true;
+
+type PublicOnlyPostConfigExistsCheck = Expect<
+  Equal<PublicOnlyPostConfigExists, true>
+>;
+type AdminOnlyPostConfigExistsCheck = Expect<
+  Equal<AdminOnlyPostConfigExists, true>
+>;
+type MixedRolesPostConfigExistsCheck = Expect<
+  Equal<MixedRolesPostConfigExists, true>
+>;
+
+// Extract handler function type from config
+type PublicOnlyHandlerFn = PublicOnlyPostConfig extends {
+  handler: infer H;
+}
+  ? H
+  : never;
+type AdminOnlyHandlerFn = AdminOnlyPostConfig extends { handler: infer H }
+  ? H
+  : never;
+type MixedRolesHandlerFn = MixedRolesPostConfig extends { handler: infer H }
+  ? H
+  : never;
+
+// Verify handler functions are not never
+type PublicOnlyHandlerFnExists = PublicOnlyHandlerFn extends never
+  ? false
+  : true;
+type AdminOnlyHandlerFnExists = AdminOnlyHandlerFn extends never ? false : true;
+type MixedRolesHandlerFnExists = MixedRolesHandlerFn extends never
+  ? false
+  : true;
+
+type PublicOnlyHandlerFnExistsCheck = Expect<
+  Equal<PublicOnlyHandlerFnExists, true>
+>;
+type AdminOnlyHandlerFnExistsCheck = Expect<
+  Equal<AdminOnlyHandlerFnExists, true>
+>;
+type MixedRolesHandlerFnExistsCheck = Expect<
+  Equal<MixedRolesHandlerFnExists, true>
+>;
+
+// Extract the parameter type from handler function
+type PublicOnlyHandlerParams = PublicOnlyHandlerFn extends (
+  props: infer P,
+) => any
+  ? P
+  : never;
+type AdminOnlyHandlerParams = AdminOnlyHandlerFn extends (props: infer P) => any
+  ? P
+  : never;
+type MixedRolesHandlerParams = MixedRolesHandlerFn extends (
+  props: infer P,
+) => any
+  ? P
+  : never;
+
+// Extract user type from handler params
+type PublicOnlyHandlerUserFromParams = PublicOnlyHandlerParams extends {
+  user: infer U;
+}
+  ? U
+  : never;
+type AdminOnlyHandlerUserFromParams = AdminOnlyHandlerParams extends {
+  user: infer U;
+}
+  ? U
+  : never;
+type MixedRolesHandlerUserFromParams = MixedRolesHandlerParams extends {
+  user: infer U;
+}
+  ? U
+  : never;
+
+// CRITICAL TEST: Verify handler receives correct user type
+type PublicOnlyHandlerUserFromParamsCheck = Expect<
+  Equal<PublicOnlyHandlerUserFromParams, JWTPublicPayloadType>
+>;
+type AdminOnlyHandlerUserFromParamsCheck = Expect<
+  Equal<AdminOnlyHandlerUserFromParams, JwtPrivatePayloadType>
+>;
+type MixedRolesHandlerUserFromParamsCheck = Expect<
+  Equal<MixedRolesHandlerUserFromParams, JwtPayloadType>
+>;

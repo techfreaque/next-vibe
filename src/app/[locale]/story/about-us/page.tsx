@@ -144,7 +144,7 @@ export default async function AboutUsPage({
             <P className="text-lg opacity-80">
               {t("app.story._components.home.aboutUs.description", {
                 appName: t("config.appName"),
-                config: { group: { foundedYear: 2024 } },
+                foundedYear: 2024,
               })}
             </P>
           </Div>
@@ -243,7 +243,7 @@ export default async function AboutUsPage({
             <Div className="absolute inset-0 bg-black/60 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
             <Div className="absolute bottom-8 left-8 right-8 text-white">
               <H3 className="text-2xl font-bold mb-2">
-                {t("config.logoPart1")} {t("config.logoPart2")}
+                {t("config.appName")}
               </H3>
               <P className="text-lg opacity-90">
                 {t("app.story._components.home.hero.subtitle")}

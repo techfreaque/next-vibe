@@ -389,7 +389,7 @@ const { PATCH } = createEndpoint({
           info: {
             id: "550e8400-e29b-41d4-a716-446655440000",
             fileName: "app.api.v1.core.leads.csv",
-            status: "PROCESSING" as const,
+            status: CsvImportJobStatus.PROCESSING,
           },
           progress: {
             totalRows: 1000,

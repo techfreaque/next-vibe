@@ -345,7 +345,7 @@ function AdminNotificationEmailContent({
           {lead.trackingInfo.source
             ? t(
                 LeadSourceOptions.find(
-                  (opt) => opt.value === lead.trackingInfo.source,
+                  (opt) => opt.label === lead.trackingInfo.source,
                 )?.label ??
                   "app.api.v1.core.leads.create.email.admin.newLead.notProvided",
               )
@@ -363,7 +363,7 @@ function AdminNotificationEmailContent({
             {t("app.api.v1.core.leads.create.email.admin.newLead.status")}:
           </Span>{" "}
           {t(
-            LeadStatusOptions.find((opt) => opt.value === lead.summary.status)
+            LeadStatusOptions.find((opt) => opt.label === lead.summary.status)
               ?.label ??
               "app.api.v1.core.leads.create.email.admin.newLead.notProvided",
           )}

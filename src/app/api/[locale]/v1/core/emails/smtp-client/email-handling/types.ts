@@ -16,6 +16,11 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types"
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import type {
+  EmailCampaignStageValues,
+  EmailJourneyVariantValues,
+} from "@/app/api/[locale]/v1/core/leads/enum";
+
 import type { EmailType } from "../../messages/enum";
 import type { CampaignType } from "../enum";
 import type { SmtpSelectionCriteria } from "../sending/types";
@@ -34,9 +39,8 @@ export interface EmailTemplateReturnType {
   replyToName?: string;
   // Campaign context for proper SMTP selection and metadata
   campaignType?: (typeof CampaignType)[keyof typeof CampaignType];
-  // Using string instead of specific enum types to avoid circular dependency with leads module
-  emailJourneyVariant?: string;
-  emailCampaignStage?: string;
+  emailJourneyVariant?: typeof EmailJourneyVariantValues;
+  emailCampaignStage?: typeof EmailCampaignStageValues;
   // Email metadata
   templateName?: string;
   emailType?: (typeof EmailType)[keyof typeof EmailType];

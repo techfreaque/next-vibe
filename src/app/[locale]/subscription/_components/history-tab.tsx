@@ -7,6 +7,8 @@ import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
 import { cn } from "next-vibe/shared/utils";
+import type { JSX } from "react";
+
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { CreditTransaction } from "./types";
@@ -20,7 +22,7 @@ interface HistoryTabProps {
   } | null;
 }
 
-export function HistoryTab({ locale, initialHistory }: HistoryTabProps) {
+export function HistoryTab({ locale, initialHistory }: HistoryTabProps): JSX.Element {
   const { t } = useTranslation();
 
   return (

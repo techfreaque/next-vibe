@@ -89,9 +89,9 @@ function getFieldValidationState<T>(
 ): FieldValidationState {
   const hasValue = Boolean(
     fieldValue !== undefined &&
-    fieldValue !== null &&
-    fieldValue !== "" &&
-    (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
+      fieldValue !== null &&
+      fieldValue !== "" &&
+      (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
   );
 
   return {
@@ -515,7 +515,6 @@ function renderFieldInput<
                 }
                 return false;
               }}
-              
             />
           </PopoverContent>
         </Popover>
@@ -564,10 +563,9 @@ function renderFieldInput<
       // Extract placeholder to avoid complex union type error
       let phonePlaceholder: TranslationKey;
       if (config.placeholder !== undefined) {
-        phonePlaceholder = config.placeholder as TranslationKey;
+        phonePlaceholder = config.placeholder;
       } else {
-        phonePlaceholder =
-          "packages.nextVibeUi.web.common.enterPhoneNumber" as TranslationKey;
+        phonePlaceholder = "packages.nextVibeUi.web.common.enterPhoneNumber";
       }
       return (
         <PhoneField
@@ -658,9 +656,9 @@ export interface EndpointFormFieldProps<
   TName extends Path<TFieldValues>,
   TFields extends EndpointFieldStructure = EndpointFieldStructure,
 > extends Omit<
-  EndpointFormFieldPropsType<TFieldValues, TName>,
-  "requiredFields"
-> {
+    EndpointFormFieldPropsType<TFieldValues, TName>,
+    "requiredFields"
+  > {
   schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
   endpointFields?: TFields; // Endpoint fields for auto-inference (from definition.POST.fields) - now fully typed
 }
@@ -700,7 +698,7 @@ export function EndpointFormField<
     // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for missing config
     throw new Error(
       `EndpointFormField: No config provided for field "${name}". ` +
-      `Either provide a config prop or pass endpointFields for auto-inference.`,
+        `Either provide a config prop or pass endpointFields for auto-inference.`,
     );
   }
 

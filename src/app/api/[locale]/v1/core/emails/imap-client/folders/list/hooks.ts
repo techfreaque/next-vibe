@@ -9,6 +9,7 @@ import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-i
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
+import { ImapFolderSortField, SortOrder } from "../../enum";
 import definitions from "./definition";
 
 /**
@@ -26,8 +27,8 @@ export function useImapFoldersList(
           accountId,
           page: 1,
           limit: 20,
-          sortBy: ["NAME"] as const,
-          sortOrder: ["ASC"] as const,
+          sortBy: [ImapFolderSortField.NAME],
+          sortOrder: [SortOrder.ASC],
         },
       },
     },

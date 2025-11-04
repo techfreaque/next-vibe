@@ -9,6 +9,11 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import type { IndividualCronTaskType } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/task/[id]/definition";
+import {
+  CronTaskPriority,
+  CronTaskStatus,
+  TaskCategory,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
 import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -40,9 +45,9 @@ export default async function CronTaskEditPage({
     version: 1,
     schedule: "0 * * * *", // eslint-disable-line i18next/no-literal-string -- Stub data
     enabled: true,
-    priority: "MEDIUM",
-    status: "PENDING",
-    category: "SYSTEM",
+    priority: CronTaskPriority.MEDIUM,
+    status: CronTaskStatus.PENDING,
+    category: TaskCategory.SYSTEM,
     timeout: 3600,
     retries: 3,
     lastRun: undefined,

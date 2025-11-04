@@ -970,7 +970,7 @@ class CreditRepository
         );
 
         if (identifierResult.success && identifierResult.data) {
-          if (identifierResult.data.creditType === "USER_SUBSCRIPTION") {
+          if (identifierResult.data.creditType === CreditTypeIdentifier.USER_SUBSCRIPTION) {
             creditIdentifier = { leadId: user.leadId, userId: user.id };
           } else {
             creditIdentifier = { leadId: user.leadId };

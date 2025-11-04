@@ -147,18 +147,17 @@ export const {
  * Campaign Type
  * Defines the type of campaign for SMTP mapping
  */
-const campaignTypeEnum = createEnumOptions({
+export const {
+  enum: CampaignType,
+  options: CampaignTypeOptions,
+  Value: CampaignTypeValue,
+} = createEnumOptions({
   LEAD_CAMPAIGN: "app.api.v1.core.emails.enums.smtpCampaignType.leadCampaign",
   NEWSLETTER: "app.api.v1.core.emails.enums.smtpCampaignType.newsletter",
   TRANSACTIONAL: "app.api.v1.core.emails.enums.smtpCampaignType.transactional",
   NOTIFICATION: "app.api.v1.core.emails.enums.smtpCampaignType.notification",
   SYSTEM: "app.api.v1.core.emails.enums.smtpCampaignType.system",
 });
-
-export const { enum: CampaignType, options: CampaignTypeOptions } =
-  campaignTypeEnum;
-
-export type CampaignTypeValue = typeof campaignTypeEnum.Value;
 
 /**
  * Campaign Type Filter

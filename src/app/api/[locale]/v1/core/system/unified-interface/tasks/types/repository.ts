@@ -25,7 +25,11 @@ import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "../../../../user/auth/types";
-import type { CronTaskPriority, TaskCategory } from "../enum";
+import type {
+  TaskCategoryValue,
+  CronTaskPriority,
+  TaskCategory,
+} from "../enum";
 import type {
   TaskTypesRequestOutput,
   TaskTypesResponseOutput,
@@ -221,7 +225,7 @@ export interface TaskRunner {
   type: "task-runner";
   name: string;
   description: string;
-  category: (typeof TaskCategory)[keyof typeof TaskCategory];
+  category: typeof TaskCategoryValue;
   enabled: boolean;
   priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
   run: (props: {

@@ -11,7 +11,10 @@ import type { z } from "zod";
 import type { TranslationKey } from "@/i18n/core/static-types";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
-import type { UserRoleValue } from "../../../../../user/user-roles/enum";
+import {
+  UserRole,
+  type UserRoleValue,
+} from "../../../../../user/user-roles/enum";
 import type { DiscoveredEndpointMetadata } from "../types/registry";
 
 /**
@@ -19,9 +22,9 @@ import type { DiscoveredEndpointMetadata } from "../types/registry";
  * Matches the structure of CreateApiEndpoint but with optional fields
  */
 interface SimpleEndpointDefinition {
-  title?: string;
-  description?: string;
-  category?: string;
+  title?: TranslationKey;
+  description?: TranslationKey;
+  category?: TranslationKey;
   tags?: readonly string[];
   allowedRoles?: readonly (typeof UserRoleValue)[];
   requestSchema?: z.ZodTypeAny;
@@ -42,8 +45,8 @@ interface SimpleEndpointDefinition {
  */
 interface NestedEndpoints {
   [key: string]:
-  | NestedEndpoints
-  | Partial<Record<Methods, SimpleEndpointDefinition>>;
+    | NestedEndpoints
+    | Partial<Record<Methods, SimpleEndpointDefinition>>;
 }
 
 /**
@@ -116,18 +119,23 @@ export function convertEndpointsToMetadata(
               routePath,
               definitionPath,
               method,
-              title: (typeof methodDef.title === "string" ? methodDef.title : undefined) as TranslationKey | undefined,
-              description: (typeof methodDef.description === "string"
+              title:
+                typeof methodDef.title === "string"
+                  ? methodDef.title
+                  : undefined,
+              description:
+                typeof methodDef.description === "string"
                   ? methodDef.description
-                  : undefined) as TranslationKey | undefined,
-              category: (typeof methodDef.category === "string"
+                  : undefined,
+              category:
+                typeof methodDef.category === "string"
                   ? methodDef.category
-                  : undefined) as TranslationKey | undefined,
+                  : undefined,
               tags: Array.isArray(methodDef.tags) ? methodDef.tags : [],
               allowedRoles: Array.isArray(methodDef.allowedRoles)
                 ? (methodDef.allowedRoles as readonly (typeof UserRoleValue)[])
                 : [],
-              requiresAuth: !methodDef.allowedRoles?.includes("PUBLIC"),
+              requiresAuth: !methodDef.allowedRoles?.includes(UserRole.PUBLIC),
               requestSchema: methodDef.requestSchema,
               responseSchema: methodDef.responseSchema,
               credits:

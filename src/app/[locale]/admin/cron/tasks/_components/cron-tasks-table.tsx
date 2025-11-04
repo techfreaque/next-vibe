@@ -24,6 +24,7 @@ import { H3, P } from "next-vibe-ui/ui/typography";
 import React, { useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { CronTaskStatus } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
 import type { CronTaskResponseType } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/tasks/definition";
 import {
   useCronTaskEndpoint,
@@ -183,42 +184,42 @@ export function CronTasksTable({
 
     // Use the status field from the task
     switch (task.status) {
-      case "RUNNING":
+      case CronTaskStatus.RUNNING:
         return (
           <Badge variant="default" className="bg-blue-500">
             {t("app.admin.cron.table.statusBadge.running")}
           </Badge>
         );
-      case "COMPLETED":
+      case CronTaskStatus.COMPLETED:
         return (
           <Badge variant="default" className="bg-green-500">
             {t("app.admin.cron.table.statusBadge.completed")}
           </Badge>
         );
-      case "FAILED":
-      case "ERROR":
-      case "TIMEOUT":
+      case CronTaskStatus.FAILED:
+      case CronTaskStatus.ERROR:
+      case CronTaskStatus.TIMEOUT:
         return (
           <Badge variant="destructive">
             {t("app.admin.cron.table.statusBadge.failed")}
           </Badge>
         );
-      case "PENDING":
-      case "SCHEDULED":
+      case CronTaskStatus.PENDING:
+      case CronTaskStatus.SCHEDULED:
         return (
           <Badge variant="outline">
             {t("app.admin.cron.table.statusBadge.pending")}
           </Badge>
         );
-      case "CANCELLED":
-      case "STOPPED":
-      case "SKIPPED":
+      case CronTaskStatus.CANCELLED:
+      case CronTaskStatus.STOPPED:
+      case CronTaskStatus.SKIPPED:
         return (
           <Badge variant="secondary">
             {t("app.admin.cron.table.statusBadge.cancelled")}
           </Badge>
         );
-      case "BLOCKED":
+      case CronTaskStatus.BLOCKED:
         return (
           <Badge variant="outline" className="bg-yellow-100">
             {t("app.admin.cron.table.statusBadge.blocked")}

@@ -12,7 +12,10 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 import { simpleT } from "@/i18n/core/shared";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import {
+  UserRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {
   DiscoveredEndpoint,
@@ -172,12 +175,12 @@ export function endpointToMetadata(
     routePath: endpoint.routePath,
     definitionPath: endpoint.definitionPath,
     method: definition.method,
-    title: (title || undefined) as TranslationKey | undefined,
-    description: (description || undefined) as TranslationKey | undefined,
-    category: (category || undefined) as TranslationKey | undefined,
+    title: title || undefined,
+    description: description || undefined,
+    category: category || undefined,
     tags: Array.isArray(tags) ? tags : [],
     allowedRoles: definition.allowedRoles,
-    requiresAuth: !definition.allowedRoles.includes("PUBLIC"),
+    requiresAuth: !definition.allowedRoles.includes(UserRole.PUBLIC),
     requestSchema: definition.requestSchema,
     responseSchema: definition.responseSchema,
     credits: typeof credits === "number" ? credits : undefined,

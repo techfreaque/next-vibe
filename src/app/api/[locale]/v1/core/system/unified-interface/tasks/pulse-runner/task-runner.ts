@@ -8,7 +8,10 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { TaskCategory } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
+import {
+  CronTaskPriority,
+  TaskCategory,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -25,7 +28,7 @@ const pulseTaskRunner: TaskRunner = {
     "app.api.v1.core.system.unifiedInterface.tasks.pulseRunner.description",
   category: TaskCategory.SYSTEM,
   enabled: true,
-  priority: "HIGH",
+  priority: CronTaskPriority.HIGH,
 
   async run(props: {
     signal: AbortSignal;

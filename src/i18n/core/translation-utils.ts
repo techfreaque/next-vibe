@@ -175,32 +175,6 @@ export function getTranslationValue<K extends TranslationKey>(
 }
 
 /**
- * Flatten nested object into dot notation
- * e.g., { config: { group: { foundedYear: 2024 } } } => { "config.group.foundedYear": 2024 }
- */
-function flattenParams(
-  params: Record<string, unknown>,
-  prefix = "",
-): Record<string, string> {
-  const flattened: Record<string, string> = {};
-
-  for (const [key, value] of Object.entries(params)) {
-    const newKey = prefix ? `${prefix}.${key}` : key;
-
-    if (value !== null && typeof value === "object" && !Array.isArray(value)) {
-      Object.assign(
-        flattened,
-        flattenParams(value as Record<string, unknown>, newKey),
-      );
-    } else {
-      flattened[newKey] = String(value);
-    }
-  }
-
-  return flattened;
-}
-
-/**
  * Process translation value and handle parameters
  */
 export function processTranslationValue<K extends TranslationKey>(
@@ -218,9 +192,7 @@ export function processTranslationValue<K extends TranslationKey>(
   if (typeof value === "string") {
     let translationValue: string = value;
     if (params) {
-      // Flatten nested parameters to support dot notation like {{config.group.foundedYear}}
-      const flattenedParams = flattenParams(params);
-      Object.entries(flattenedParams).forEach(([paramKey, paramValue]) => {
+      Object.entries(params).forEach(([paramKey, paramValue]) => {
         translationValue = translationValue.replace(
           new RegExp(`{{${paramKey}}}`, "g"),
           String(paramValue),

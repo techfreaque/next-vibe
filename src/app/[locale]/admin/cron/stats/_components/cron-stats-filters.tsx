@@ -175,7 +175,7 @@ export function CronStatsFilters({
           placeholder: "app.admin.cron.stats.filters.selectTaskStatus",
           options: Object.values(CronTaskStatusFilter).map((status) => ({
             value: status,
-            label: `app.admin.cron.stats.filters.status.${status}`,
+            label: status,
           })),
         }}
       />
@@ -189,7 +189,7 @@ export function CronStatsFilters({
           placeholder: "app.admin.cron.stats.filters.selectTaskPriority",
           options: Object.values(CronTaskPriorityFilter).map((priority) => ({
             value: priority,
-            label: `app.admin.cron.stats.filters.priority.${priority}`,
+            label: priority,
           })),
         }}
       />
@@ -203,7 +203,7 @@ export function CronStatsFilters({
           placeholder: "app.admin.cron.stats.filters.selectHealthStatus",
           options: Object.values(PulseHealthStatus).map((status) => ({
             value: status,
-            label: `app.admin.cron.stats.filters.health.${status}`,
+            label: status,
           })),
         }}
       />

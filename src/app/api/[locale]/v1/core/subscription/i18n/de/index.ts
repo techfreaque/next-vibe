@@ -248,6 +248,7 @@ export const translations: typeof enTranslations = {
   // Enum translations
   enums: {
     plan: {
+      subscription: "Abonnement",
       starter: "Starter",
       professional: "Professional",
       premium: "Premium",

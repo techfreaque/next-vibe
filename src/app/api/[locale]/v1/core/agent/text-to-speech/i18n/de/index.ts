@@ -80,6 +80,7 @@ export const translations = {
       noText: "Kein Text angegeben",
       noAudioUrl: "Keine Audio-URL vom Anbieter erhalten",
       audioFetchFailed: "Fehler beim Abrufen der Audiodatei",
+      providerError: "Anbieterfehler: {error}",
       internalError: "Interner Serverfehler",
     },
     success: {

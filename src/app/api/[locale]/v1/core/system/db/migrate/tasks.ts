@@ -4,6 +4,10 @@
  * MIGRATED TO NEW UNIFIED FORMAT
  */
 
+import {
+  CronTaskPriority,
+  TaskCategory,
+} from "../../unified-interface/tasks/enum";
 import type { Task } from "../../unified-interface/tasks/types/repository";
 
 /**
@@ -17,9 +21,9 @@ const dbMigrationHealthCheckTask: Task = {
   description: "Check for pending migrations and migration status",
   // eslint-disable-next-line i18next/no-literal-string
   schedule: "0 */6 * * *", // Every 6 hours
-  category: "DATABASE",
+  category: TaskCategory.DATABASE,
   enabled: true,
-  priority: "MEDIUM",
+  priority: CronTaskPriority.MEDIUM,
   timeout: 300000, // 5 minutes
 
   run: async () => {
@@ -45,9 +49,9 @@ const autoMigrationRunnerTask: Task = {
   description: "Automatically run pending migrations in development",
   // eslint-disable-next-line i18next/no-literal-string
   schedule: "*/30 * * * *", // Every 30 minutes
-  category: "DATABASE",
+  category: TaskCategory.DATABASE,
   enabled: false, // Disabled by default for safety
-  priority: "LOW",
+  priority: CronTaskPriority.LOW,
   timeout: 600000, // 10 minutes
 
   run: async () => {
@@ -71,9 +75,9 @@ const migrationBackupMonitorTask: Task = {
   name: "migration-backup-monitor",
   // eslint-disable-next-line i18next/no-literal-string
   description: "Monitor migration backups and cleanup old backups",
-  category: "MAINTENANCE",
+  category: TaskCategory.MAINTENANCE,
   enabled: false, // Disabled by default
-  priority: "LOW",
+  priority: CronTaskPriority.LOW,
 
   run: async ({ signal }) => {
     const checkInterval = 3600000; // 1 hour

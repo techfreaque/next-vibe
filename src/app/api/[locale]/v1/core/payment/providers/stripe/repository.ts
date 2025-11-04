@@ -12,7 +12,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import Stripe from "stripe";
-import type { Stripe as StripeTypes } from "stripe";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
@@ -212,7 +211,7 @@ export class StripeProvider implements PaymentProvider {
 
   async retrieveSubscription(subscriptionId: string, logger: EndpointLogger) {
     try {
-      const subscription: StripeTypes.Subscription = await this.stripe.subscriptions.retrieve(
+      const subscription = await this.stripe.subscriptions.retrieve(
         subscriptionId,
       );
 

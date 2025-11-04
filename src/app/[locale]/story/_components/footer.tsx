@@ -215,7 +215,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
           <P className="text-sm text-gray-600 dark:text-gray-400">
             {t("app.story._components.footer.copyright", {
               year: currentYear,
-              config: { appName: t("config.appName") },
+              appName: t("config.appName"),
             })}
           </P>
           <Div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">

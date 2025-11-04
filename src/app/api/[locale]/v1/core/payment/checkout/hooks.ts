@@ -23,6 +23,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import { useTranslation } from "@/i18n/core/client";
 
 import { handleCheckoutRedirect } from "../utils/redirect";
+import {
+  BillingInterval,
+  SubscriptionPlan,
+} from "../../subscription/enum";
 import type {
   BillingIntervalValue,
   SubscriptionPlanValue,
@@ -109,8 +113,8 @@ export function useSubscriptionCheckout(
         formOptions: {
           persistForm: false,
           defaultValues: {
-            planId: "SUBSCRIPTION",
-            billingInterval: "MONTHLY",
+            planId: SubscriptionPlan.SUBSCRIPTION,
+            billingInterval: BillingInterval.MONTHLY,
           },
         },
         mutationOptions: {

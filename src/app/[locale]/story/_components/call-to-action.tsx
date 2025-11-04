@@ -55,7 +55,7 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
                 asChild
               >
                 <Link href={`/${locale}/user/signup`}>
-                  {t("app.story._components.home.cta.button")}
+                  {t("app.story._components.home.cta.signUp")}
                 </Link>
               </Button>
 
@@ -65,15 +65,11 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
                 className="bg-transparent border-white text-white hover:bg-white/10"
                 asChild
               >
-                <Link href={`/${locale}/story#pricing`}>
+                <Link href={`/${locale}/subscription`}>
                   {t("app.story._components.home.cta.viewPlans")}
                 </Link>
               </Button>
             </Div>
-
-            <P className="text-sm mt-6 text-blue-100">
-              {t("app.story._components.home.cta.noCredit")}
-            </P>
           </Div>
         </Div>
       </motion.div>

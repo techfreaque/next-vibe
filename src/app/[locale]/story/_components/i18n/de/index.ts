@@ -122,9 +122,7 @@ export const translations: typeof enTranslations = {
       title: "Bereit, der KI + Community-Plattform beizutreten?",
       subtitle:
         "Chatten Sie privat mit 40+ KI-Modellen. Nehmen Sie an öffentlichen Forum-Diskussionen teil. Wählen Sie Ihr Privatsphäre-Level. Starten Sie heute kostenlos.",
-      button: "Kostenlos starten",
       viewPlans: "Preispläne ansehen",
-      noCredit: "Keine Kreditkarte erforderlich",
     },
     pricingSection: {
       title: "Einfache Preisgestaltung",
@@ -462,7 +460,7 @@ export const translations: typeof enTranslations = {
       title: "Über {{appName}}",
       subtitle: "Pioniere unzensierter KI-Gespräche",
       description:
-        "Wir haben die Mission, den Zugang zu unzensierter KI zu demokratisieren. Gegründet im Jahr {{config.group.foundedYear}}, bietet {{appName}} eine Plattform, auf der Benutzer ehrliche, ungefilterte Gespräche mit den fortschrittlichsten KI-Modellen der Welt führen können.",
+        "Wir haben die Mission, den Zugang zu unzensierter KI zu demokratisieren. Gegründet im Jahr {{foundedYear}}, bietet {{appName}} eine Plattform, auf der Benutzer ehrliche, ungefilterte Gespräche mit den fortschrittlichsten KI-Modellen der Welt führen können.",
       values: {
         title: "Unsere Werte",
         description:

@@ -15,6 +15,7 @@ import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error"
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { PulseHealthStatus } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
 import {
   pulseExecutions,
   pulseHealth,
@@ -448,7 +449,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         // Create initial health record
         await this.createHealthRecord(
           {
-            status: success ? "HEALTHY" : "WARNING",
+            status: success ? PulseHealthStatus.HEALTHY : PulseHealthStatus.WARNING,
             lastPulseAt: new Date(),
             consecutiveFailures: success ? 0 : 1,
             avgExecutionTimeMs: executionTimeMs,
@@ -484,7 +485,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
             totalExecutions: newTotalExecutions,
             totalSuccesses: newTotalSuccesses,
             totalFailures: newTotalFailures,
-            status: success ? "HEALTHY" : "WARNING",
+            status: success ? PulseHealthStatus.HEALTHY : PulseHealthStatus.WARNING,
           },
           {} as EndpointLogger,
         );

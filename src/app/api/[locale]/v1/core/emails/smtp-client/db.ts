@@ -103,13 +103,13 @@ export const smtpAccounts = pgTable(
 
     // Multi-select selection criteria fields (moved from nested object to top-level)
     campaignTypes: jsonb("campaign_types")
-      .$type<(keyof typeof CampaignType)[]>()
+      .$type<(typeof CampaignType)[keyof typeof CampaignType][]>()
       .default([]),
     emailJourneyVariants: jsonb("email_journey_variants")
-      .$type<(keyof typeof EmailJourneyVariant)[]>()
+      .$type<(typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant][]>()
       .default([]),
     emailCampaignStages: jsonb("email_campaign_stages")
-      .$type<(keyof typeof EmailCampaignStage)[]>()
+      .$type<(typeof EmailCampaignStage)[keyof typeof EmailCampaignStage][]>()
       .default([]),
     countries: jsonb("countries").$type<Countries[]>().default([]),
     languages: jsonb("languages").$type<Languages[]>().default([]),

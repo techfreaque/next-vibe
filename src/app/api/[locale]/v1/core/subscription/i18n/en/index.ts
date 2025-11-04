@@ -243,6 +243,7 @@ export const translations = {
   // Enum translations
   enums: {
     plan: {
+      subscription: "Subscription",
       starter: "Starter",
       professional: "Professional",
       premium: "Premium",

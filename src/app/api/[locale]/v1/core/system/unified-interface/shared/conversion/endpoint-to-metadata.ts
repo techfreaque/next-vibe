@@ -11,6 +11,7 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 import { simpleT } from "@/i18n/core/shared";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {
@@ -165,7 +166,7 @@ export function endpointToBaseMetadata(
     method: endpoint.definition.method,
     routePath: endpoint.routePath,
     allowedRoles: endpoint.definition.allowedRoles,
-    requiresAuth: !endpoint.definition.allowedRoles.includes("PUBLIC"),
+    requiresAuth: !endpoint.definition.allowedRoles.includes(UserRole.PUBLIC),
     requestSchema: endpoint.definition.requestSchema,
   };
 }
@@ -203,7 +204,7 @@ export function endpointToMetadata(
     category: category,
     tags: Array.isArray(tags) ? tags : [],
     allowedRoles: definition.allowedRoles,
-    requiresAuth: !definition.allowedRoles.includes("PUBLIC"),
+    requiresAuth: !definition.allowedRoles.includes(UserRole.PUBLIC),
     requestSchema: definition.requestSchema,
     responseSchema: definition.responseSchema,
     credits: typeof credits === "number" ? credits : undefined,
@@ -233,7 +234,7 @@ export function extractAllowedRoles(
  */
 export function requiresAuth(endpoint: DiscoveredEndpoint): boolean {
   const roles = extractAllowedRoles(endpoint);
-  return !roles.includes("PUBLIC");
+  return !roles.includes(UserRole.PUBLIC);
 }
 
 /**
@@ -316,20 +317,20 @@ export function isEnabledForPlatform(
 ): boolean {
   const roles = extractAllowedRoles(endpoint);
 
-  let optOutRole: "CLI_OFF" | "AI_TOOL_OFF" | "WEB_OFF";
+  let optOutRole: typeof UserRole.CLI_OFF | typeof UserRole.AI_TOOL_OFF | typeof UserRole.WEB_OFF;
   switch (platform) {
     case "CLI":
-      optOutRole = "CLI_OFF";
+      optOutRole = UserRole.CLI_OFF;
       break;
     case "AI":
-      optOutRole = "AI_TOOL_OFF";
+      optOutRole = UserRole.AI_TOOL_OFF;
       break;
     case "WEB":
-      optOutRole = "WEB_OFF";
+      optOutRole = UserRole.WEB_OFF;
       break;
     case "MCP":
       // MCP uses CLI_OFF for now since there's no MCP_OFF role yet
-      optOutRole = "CLI_OFF";
+      optOutRole = UserRole.CLI_OFF;
       break;
   }
 

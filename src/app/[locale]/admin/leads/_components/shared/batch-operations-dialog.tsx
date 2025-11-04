@@ -32,6 +32,7 @@ import {
 import type React from "react";
 
 import type {
+LeadStatusValues,
   EmailCampaignStage,
   LeadSource,
   LeadStatus,
@@ -58,7 +59,7 @@ interface BatchOperationsDialogProps {
       | null;
   }>;
   updates?: {
-    status?: (typeof LeadStatus)[keyof typeof LeadStatus];
+    status?: typeof LeadStatusValues;
     currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
     source?: (typeof LeadSource)[keyof typeof LeadSource];
     notes?: string;
@@ -115,21 +116,21 @@ export function BatchOperationsDialog({
             {updates.status && (
               <Badge variant="outline">
                 {t("app.admin.leads.leads.admin.batch.change_status", {
-                  status: t(updates.status as TranslationKey),
+                  status: t(updates.status),
                 })}
               </Badge>
             )}
             {updates.currentCampaignStage && (
               <Badge variant="outline">
                 {t("app.admin.leads.leads.admin.batch.change_stage", {
-                  stage: t(updates.currentCampaignStage as TranslationKey),
+                  stage: t(updates.currentCampaignStage),
                 })}
               </Badge>
             )}
             {updates.source && (
               <Badge variant="outline">
                 {t("app.admin.leads.leads.admin.batch.change_source", {
-                  source: t(updates.source as TranslationKey),
+                  source: t(updates.source),
                 })}
               </Badge>
             )}
@@ -163,14 +164,12 @@ export function BatchOperationsDialog({
                 </TableCell>
                 <TableCell>{lead.email}</TableCell>
                 <TableCell>
-                  <Badge variant="outline">
-                    {t(lead.currentStatus as TranslationKey)}
-                  </Badge>
+                  <Badge variant="outline">{t(lead.currentStatus)}</Badge>
                 </TableCell>
                 <TableCell>
                   {lead.currentCampaignStage ? (
                     <Badge variant="outline">
-                      {t(lead.currentCampaignStage as TranslationKey)}
+                      {t(lead.currentCampaignStage)}
                     </Badge>
                   ) : (
                     <Span className="text-muted-foreground">

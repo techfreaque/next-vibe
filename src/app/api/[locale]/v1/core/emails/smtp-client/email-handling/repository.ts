@@ -97,23 +97,8 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                     senderName: templateData.senderName,
                     // Pass through campaign context from template
                     campaignType: templateData.campaignType,
-                    // Convert string to enum type - template uses string to avoid circular dependency
-                    emailJourneyVariant: templateData.emailJourneyVariant
-                      ? (templateData.emailJourneyVariant as
-                          | "PERSONAL_APPROACH"
-                          | "PERSONAL_RESULTS"
-                          | "RESULTS_FOCUSED")
-                      : null,
-                    emailCampaignStage: templateData.emailCampaignStage
-                      ? (templateData.emailCampaignStage as
-                          | "INITIAL"
-                          | "FOLLOWUP_1"
-                          | "FOLLOWUP_2"
-                          | "FOLLOWUP_3"
-                          | "NURTURE"
-                          | "REACTIVATION"
-                          | "NOT_STARTED")
-                      : null,
+                    emailJourneyVariant: templateData.emailJourneyVariant ?? null,
+                    emailCampaignStage: templateData.emailCampaignStage ?? null,
                     // Pass through email metadata
                     replyToEmail: templateData.replyToEmail,
                     replyToName: templateData.replyToName,

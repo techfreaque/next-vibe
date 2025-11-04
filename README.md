@@ -5,9 +5,9 @@
 NextVibe is the spiritual successor to WordPress for the AI coding age. A revolutionary Next.js framework that combines 100% type-safety, recursive API architecture, and first-class AI tooling to create the ultimate development experience for both humans and AI coding assistants.
 
 [![License: GPL-3.0](https://img.shields.io/badge/Framework-GPL--3.0-blue.svg)](LICENSE)
-[![License: MIT](https://img.shields.io/badge/App-MIT-green.svg)](LICENSE-MIT)
+[![License: MIT](https://img.shields.io/badge/App-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7_/_TSGO-blue)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://react.dev/)
 
 > **Fork it. Own it. Extend it.** Like shadcn/ui but for your entire business logic + UI stack.
@@ -123,9 +123,9 @@ Write your endpoint once, get everything:
 
 ```typescript
 // definition.ts - The single source of truth
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
-import { Methods, WidgetType, FieldDataType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import { objectField, requestDataField, responseField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { Methods, WidgetType, FieldDataType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import { objectField, requestDataField, responseField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 
 const { POST } = createEndpoint({
   method: Methods.POST,
@@ -260,7 +260,7 @@ export const users = pgTable("users", {
 });
 
 // Migrations are auto-generated
-vibe migrate:generate
+vibe migrate --generate
 vibe migrate
 ```
 
@@ -323,15 +323,19 @@ export const creditExpirationTask: Task = {
 
 ### 9. **React + React Native (Same Code)**
 
-**Write once, run everywhere** (Milestone 3 - In Progress):
+**Write once, run everywhere** (Milestone 3 - Planned):
 
 ```typescript
 // page.tsx - Works on Web AND Native
 import { Button } from "next-vibe-ui/web/ui/button";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useLogin } from "@/app/api/[locale]/v1/core/user/public/login/hooks";
+import { useTranslation } from "@/i18n/core/client";
 
 export default function LoginPage() {
-  const { form, submitForm, mutation } = useLogin();
+  const { locale } = useTranslation();
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const { form, submitForm, mutation } = useLogin({}, logger);
 
   return (
     <Div className="flex-1 items-center">
@@ -352,11 +356,11 @@ export default function LoginPage() {
 
 **On Native:**
 
-- Framework automatically resolves to `next-vibe-ui/native/ui/...`
+- Framework automatically resolves to `next-vibe-ui/ui/...`
 - `<Div>` → React Native View (via NativeWind)
 - Same Tailwind classes work!
 
-**Framework handles all platform differences automatically.**
+**Framework will handle all platform differences automatically once React Native support is complete (Milestone 3 - Planned).**
 
 ### 10. **Extensive ESLint Rules for AI**
 
@@ -388,12 +392,13 @@ Force AI to follow patterns:
 
 Comprehensive documentation in `./docs/`:
 
-- **[Endpoint Anatomy](./docs/ENDPOINT_ANATOMY.md)** - What goes in each endpoint folder
-- **[Recursive API Folders](./docs/RECURSIVE_API_FOLDERS.md)** - How folder structure maps to routes
-- **[Client Hooks](./docs/CLIENT_HOOKS.md)** - Using endpoints from React/React Native
-- **[i18n Structure Rules](./docs/I18N_STRUCTURE_RULES.md)** - Type-safe translation system
-- **[Logger Patterns](./docs/LOGGER_PATTERNS.md)** - Proper logging across the stack
-- **[React Native Roadmap](./docs/REACT_NATIVE_ROADMAP.md)** - Cross-platform development
+- **[Endpoint Anatomy](./docs/core-concepts/endpoint-anatomy.md)** - What goes in each endpoint folder
+- **[Recursive API Folders](./docs/core-concepts/recursive-api-folders.md)** - How folder structure maps to routes
+- **[Client Hooks](./docs/development/client-hooks.md)** - Using endpoints from React/React Native
+- **[i18n Structure Rules](./docs/development/i18n-structure-rules.md)** - Type-safe translation system
+- **[Logger Patterns](./docs/development/logger-patterns.md)** - Proper logging across the stack
+- **[Testing Guide](./docs/development/testing-guide.md)** - Writing and running tests
+- **[React Native Roadmap](./docs/roadmap/milestone-3-react-native.md)** - Cross-platform development
 
 ---
 
@@ -466,9 +471,9 @@ cd src/app/api/[locale]/v1/core/products/create
 ```typescript
 // definition.ts
 import { z } from "zod";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
-import { Methods, WidgetType, FieldDataType, LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import { objectField, requestDataField, responseField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { Methods, WidgetType, FieldDataType, LayoutType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import { objectField, requestDataField, responseField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 const { POST } = createEndpoint({
@@ -507,8 +512,8 @@ export default { POST };
 // repository.ts
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { JWTPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { JWTPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 export class ProductRepository {
@@ -537,8 +542,8 @@ export const productRepository = new ProductRepository();
 
 ```typescript
 // route.ts
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
 import definitions from "./definition";
 import { productRepository } from "./repository";
 
@@ -556,10 +561,14 @@ export const { POST, tools } = endpointsHandler({
 **React Component:**
 
 ```typescript
-import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation-form";
+import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-api-mutation-form";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import definitions from "@/app/api/[locale]/v1/core/products/create/definition";
+import { useTranslation } from "@/i18n/core/client";
 
 function CreateProduct() {
+  const { locale } = useTranslation();
+  const logger = createEndpointLogger(false, Date.now(), locale);
   const { form, submitForm, mutation } = useApiForm(definitions.POST, logger);
 
   return (
@@ -619,10 +628,10 @@ vibe start            # Start production server
 ### Database
 
 ```bash
-vibe migrate:generate   # Generate migration from schema changes
+vibe migrate --generate # Generate migration from schema changes
 vibe migrate            # Run pending migrations
 vibe migrate:prod       # Run migrations in production
-vibe seed-db --env=dev  # Seed database with dev data
+vibe seed               # Seed database with dev data
 vibe studio             # Open Drizzle Studio (DB GUI)
 ```
 
@@ -872,9 +881,9 @@ cp -r src/app/api/[locale]/v1/core/user/public/login \
 
 ### 3. **Read the Docs**
 
-- [Endpoint Anatomy](./docs/ENDPOINT_ANATOMY.md) - Start here
-- [Recursive API Folders](./docs/RECURSIVE_API_FOLDERS.md) - Understand the structure
-- [Client Hooks](./docs/CLIENT_HOOKS.md) - Use in React
+- [Endpoint Anatomy](./docs/core-concepts/endpoint-anatomy.md) - Start here
+- [Recursive API Folders](./docs/core-concepts/recursive-api-folders.md) - Understand the structure
+- [Client Hooks](./docs/development/client-hooks.md) - Use in React
 
 ### 4. **Run Vibe Check**
 
@@ -965,7 +974,7 @@ AI: git add . && git commit -m "Add user suspension endpoint"
 
 ### Commercial Application Built in This Repository
 
-**[Unbottled.ai](./docs/unbottle.ai/UNBOTTLED_AI.md)** is a full-featured AI chat platform built in this same codebase:
+**[Unbottled.ai](./docs/examples/unbottled-ai/UNBOTTLED_AI.md)** is a full-featured AI chat platform built in this same codebase:
 
 - **Same Repository** - Unbottled.ai and NextVibe share this codebase
 - **Reference Implementation** - Demonstrates NextVibe's production capabilities
@@ -995,7 +1004,7 @@ AI: git add . && git commit -m "Add user suspension endpoint"
 
 **Simple licensing:** Only `core/` folder is GPL-3.0. Everything else is MIT (except logo/name).
 
-**See [docs/unbottle.ai/UNBOTTLED_AI.md](./docs/unbottle.ai/UNBOTTLED_AI.md) for full details.**
+**See [docs/examples/unbottled-ai/UNBOTTLED_AI.md](./docs/examples/unbottled-ai/UNBOTTLED_AI.md) for full details.**
 
 ---
 
@@ -1062,6 +1071,8 @@ We welcome contributions! NextVibe is built to be forked and extended.
 - Write tests for new features
 - Update documentation
 - Run `vibe check` before committing
+
+See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for detailed guidelines.
 
 ---
 
@@ -1135,7 +1146,7 @@ All logic (client and server) lives in `src/app/api/` subfolders. The `src/app/[
 
 **Simple rule:** Only `core/` folder is GPL-3.0. Everything else is MIT (except logo/name).
 
-See [LICENSE](LICENSE) for full MIT details and [src/packages/LICENSE](src/packages/LICENSE) for GPL-3.0 details.
+See [LICENSE](LICENSE) for MIT license details and [src/packages/LICENSE](src/packages/LICENSE) for GPL-3.0 details.
 
 ---
 
@@ -1170,8 +1181,8 @@ NextVibe stands on the shoulders of giants:
 ## 📞 Support & Community
 
 - **Documentation**: [./docs/](./docs/)
-- **Issues**: [GitHub Issues](https://github.com/yourusername/next-vibe/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/next-vibe/discussions)
+- **Issues**: [GitHub Issues](https://github.com/techfreaque/next-vibe/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/techfreaque/next-vibe/discussions)
 - **Email**: <max@tfq.at>
 
 ---
@@ -1210,7 +1221,7 @@ Fork it. Build with it. Share your creations.
 - [Getting Started](#-quick-start)
 - [Revolutionary Features](#-revolutionary-features)
 - [Documentation](./docs/)
-- [Example: Unbottled.ai](./docs/unbottle.ai/UNBOTTLED_AI.md)
+- [Example: Unbottled.ai](./docs/examples/unbottled-ai/UNBOTTLED_AI.md)
 - [Vibe CLI](#%EF%B8%8F-vibe-cli)
 - [Contributing](#-contributing)
 - [License](#-license)

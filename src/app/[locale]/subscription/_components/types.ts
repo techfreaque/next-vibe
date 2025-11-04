@@ -1,5 +1,7 @@
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
+import { languageConfig } from "@/i18n";
+import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
 /**
  * Credit Balance Interface
@@ -76,7 +78,10 @@ export const getTransactionTypeKey = (
   }
 };
 
-export const formatDate = (date: string | Date, locale: CountryLanguage): string => {
+export const formatDate = (
+  date: string | Date,
+  locale: CountryLanguage,
+): string => {
   try {
     const dateObject = new Date(date);
     return formatSimpleDate(dateObject, locale);
@@ -85,9 +90,14 @@ export const formatDate = (date: string | Date, locale: CountryLanguage): string
   }
 };
 
-export const formatPrice = (amount: number, locale: CountryLanguage): string => {
+export const formatPrice = (
+  amount: number,
+  locale: CountryLanguage,
+): string => {
+  const country = getCountryFromLocale(locale);
+  const currency = languageConfig.mappings.currencyByCountry[country];
   return new Intl.NumberFormat(locale, {
     style: "currency",
-    currency: "EUR",
+    currency,
   }).format(amount);
 };

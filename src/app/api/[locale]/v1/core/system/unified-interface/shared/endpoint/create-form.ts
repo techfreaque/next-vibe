@@ -10,7 +10,10 @@
 
 import { z } from "zod";
 
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import {
+  UserRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { type CreateApiEndpoint } from "../endpoint/create";
@@ -677,7 +680,7 @@ export function createFormEndpoint<
 
   // Helper function for authentication check
   const requiresAuthentication = (): boolean => {
-    return !config.allowedRoles.includes("PUBLIC");
+    return !config.allowedRoles.includes(UserRole.PUBLIC);
   };
 
   // Create GET endpoint with method-specific type inference

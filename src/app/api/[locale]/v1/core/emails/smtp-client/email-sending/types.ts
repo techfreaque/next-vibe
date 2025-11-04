@@ -11,8 +11,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type {
-  EmailCampaignStage,
-  EmailJourneyVariant,
+  EmailCampaignStageValues,
+  EmailJourneyVariantValues,
 } from "../../../leads/enum";
 import type { CampaignType } from "../enum";
 import type { SmtpSelectionCriteria, SmtpSendResult } from "../sending/types";
@@ -36,12 +36,8 @@ export interface SendEmailParams {
 
   // Campaign context for SMTP selection
   campaignType?: (typeof CampaignType)[keyof typeof CampaignType];
-  emailJourneyVariant?:
-    | (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
-    | null;
-  emailCampaignStage?:
-    | (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
-    | null;
+  emailJourneyVariant?: typeof EmailJourneyVariantValues | null;
+  emailCampaignStage?: typeof EmailCampaignStageValues | null;
 
   // Email metadata
   replyToEmail?: string;

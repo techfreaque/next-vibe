@@ -3,6 +3,10 @@
  * Tasks for database reset functionality
  */
 
+import {
+  CronTaskPriority,
+  TaskCategory,
+} from "../../unified-interface/tasks/enum";
 import type { Task } from "../../unified-interface/tasks/types/repository";
 
 /**
@@ -16,9 +20,9 @@ const dbResetSafetyCheckTask: Task = {
   description: "Monitor for accidental database resets in production",
   // eslint-disable-next-line i18next/no-literal-string
   schedule: "0 */12 * * *", // Every 12 hours
-  category: "SYSTEM",
+  category: TaskCategory.SYSTEM,
   enabled: true,
-  priority: "HIGH",
+  priority: CronTaskPriority.HIGH,
 
   run: async () => {
     // Safety check implementation
@@ -43,9 +47,9 @@ const devDbAutoResetTask: Task = {
   description: "Automatically reset development database on schedule",
   // eslint-disable-next-line i18next/no-literal-string
   schedule: "0 6 * * 1", // Every Monday at 6 AM
-  category: "DEVELOPMENT",
+  category: TaskCategory.DEVELOPMENT,
   enabled: false, // Disabled by default
-  priority: "LOW",
+  priority: CronTaskPriority.LOW,
 
   run: async () => {
     // Auto reset implementation
@@ -68,9 +72,9 @@ const dbBackupVerificationTask: Task = {
   name: "db-backup-verification",
   // eslint-disable-next-line i18next/no-literal-string
   description: "Verify database backups before allowing resets",
-  category: "MAINTENANCE",
+  category: TaskCategory.MAINTENANCE,
   enabled: false, // Disabled by default
-  priority: "HIGH",
+  priority: CronTaskPriority.HIGH,
 
   run: async ({ signal }) => {
     const checkInterval = 1800000; // 30 minutes

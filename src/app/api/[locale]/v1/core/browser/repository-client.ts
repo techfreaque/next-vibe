@@ -6,9 +6,8 @@
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { BrowserRequestInput, BrowserResponseOutput } from "./definition";
+import type { BrowserToolValue } from "./enum";
 import { BrowserTool } from "./enum";
-
-type BrowserToolType = typeof BrowserTool[keyof typeof BrowserTool];
 
 /**
  * Browser Repository Client Interface
@@ -23,15 +22,15 @@ interface BrowserRepositoryClient {
    * @returns Promise with execution result
    */
   executeTool(
-    tool: BrowserToolType,
+    tool: typeof BrowserToolValue,
     args?: string,
-    locale?: CountryLanguage
+    locale?: CountryLanguage,
   ): Promise<BrowserResponseOutput>;
 
   /**
    * Get available browser tools
    */
-  getAvailableTools(): BrowserToolType[];
+  getAvailableTools(): (typeof BrowserToolValue)[];
 
   /**
    * Validate tool arguments
@@ -39,7 +38,10 @@ interface BrowserRepositoryClient {
    * @param args - JSON string arguments
    * @returns Validation result
    */
-  validateArguments(tool: BrowserToolType, args?: string): { valid: boolean; error?: string };
+  validateArguments(
+    tool: typeof BrowserToolValue,
+    args?: string,
+  ): { valid: boolean; error?: string };
 }
 
 /**
@@ -53,9 +55,9 @@ class BrowserRepositoryClientImpl implements BrowserRepositoryClient {
    * Execute a Chrome DevTools MCP tool
    */
   async executeTool(
-    tool: BrowserToolType,
+    tool: typeof BrowserToolValue,
     args?: string,
-    locale: CountryLanguage = "en-GLOBAL"
+    locale: CountryLanguage = "en-GLOBAL",
   ): Promise<BrowserResponseOutput> {
     const url = `${this.baseUrl}/${locale}/v1/core/browser`;
 
@@ -88,7 +90,7 @@ class BrowserRepositoryClientImpl implements BrowserRepositoryClient {
   /**
    * Get available browser tools
    */
-  getAvailableTools(): BrowserToolType[] {
+  getAvailableTools(): (typeof BrowserToolValue)[] {
     return [
       BrowserTool.CLICK,
       BrowserTool.DRAG,
@@ -122,13 +124,16 @@ class BrowserRepositoryClientImpl implements BrowserRepositoryClient {
   /**
    * Validate tool arguments
    */
-  validateArguments(tool: BrowserToolType, args?: string): { valid: boolean; error?: string } {
+  validateArguments(
+    tool: typeof BrowserToolValue,
+    args?: string,
+  ): { valid: boolean; error?: string } {
     if (!args) {
       // Some tools don't require arguments
-      const toolsWithoutRequiredArgs: BrowserToolType[] = [
-        "LIST_PAGES",
-        "LIST_NETWORK_REQUESTS",
-        "LIST_CONSOLE_MESSAGES",
+      const toolsWithoutRequiredArgs: (typeof BrowserToolValue)[] = [
+        BrowserTool.LIST_PAGES,
+        BrowserTool.LIST_NETWORK_REQUESTS,
+        BrowserTool.LIST_CONSOLE_MESSAGES,
       ];
 
       if (toolsWithoutRequiredArgs.includes(tool)) {
@@ -145,20 +150,29 @@ class BrowserRepositoryClientImpl implements BrowserRepositoryClient {
       switch (tool) {
         case BrowserTool.NAVIGATE_PAGE:
           if (!parsed.url || typeof parsed.url !== "string") {
-            return { valid: false, error: "URL is required and must be a string" };
+            return {
+              valid: false,
+              error: "URL is required and must be a string",
+            };
           }
           break;
 
         case BrowserTool.CLICK:
         case BrowserTool.HOVER:
           if (!parsed.selector || typeof parsed.selector !== "string") {
-            return { valid: false, error: "Selector is required and must be a string" };
+            return {
+              valid: false,
+              error: "Selector is required and must be a string",
+            };
           }
           break;
 
         case BrowserTool.FILL:
           if (!parsed.selector || typeof parsed.selector !== "string") {
-            return { valid: false, error: "Selector is required and must be a string" };
+            return {
+              valid: false,
+              error: "Selector is required and must be a string",
+            };
           }
           if (!parsed.value) {
             return { valid: false, error: "Value is required" };
@@ -167,12 +181,18 @@ class BrowserRepositoryClientImpl implements BrowserRepositoryClient {
 
         case BrowserTool.EVALUATE_SCRIPT:
           if (!parsed.expression || typeof parsed.expression !== "string") {
-            return { valid: false, error: "Expression is required and must be a string" };
+            return {
+              valid: false,
+              error: "Expression is required and must be a string",
+            };
           }
           break;
 
         case BrowserTool.TAKE_SCREENSHOT:
-          if (parsed.format && !["png", "jpeg", "webp"].includes(parsed.format)) {
+          if (
+            parsed.format &&
+            !["png", "jpeg", "webp"].includes(parsed.format)
+          ) {
             return { valid: false, error: "Format must be png, jpeg, or webp" };
           }
           break;

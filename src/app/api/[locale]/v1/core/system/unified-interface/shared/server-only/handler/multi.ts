@@ -1,3 +1,5 @@
+import "server-only";
+
 /**
  * Endpoint Handler Implementation
  * Main function for creating type-safe multi-method handlers
@@ -54,12 +56,23 @@ export function endpointsHandler<const T>(
   const handlers: HandlerEntry<keyof T & Methods>[] = [];
 
   for (const method of availableMethods) {
-    const endpoint = definitions[method] as CreateApiEndpoint<
-      string,
-      Methods,
-      readonly (typeof UserRoleValue)[],
-      Record<string, string | number | boolean | null>
-    >;
+    // Preserve exact endpoint type for proper role inference
+    // Use type assertion that maintains the specific allowedRoles tuple type
+    const endpoint = definitions[
+      method
+    ] as T[typeof method] extends CreateApiEndpoint<
+      infer TExampleKey extends string,
+      infer TMethod extends Methods,
+      infer TUserRoleValue extends readonly (typeof UserRoleValue)[],
+      infer TFields
+    >
+      ? CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>
+      : CreateApiEndpoint<
+          string,
+          Methods,
+          readonly (typeof UserRoleValue)[],
+          Record<string, string | number | boolean | null>
+        >;
     const methodConfig = methodConfigs[method];
 
     if (!endpoint || !methodConfig) {
@@ -73,17 +86,19 @@ export function endpointsHandler<const T>(
       handler: methodConfig.handler,
       email: methodConfig.email
         ? {
-          afterHandlerEmails: methodConfig.email,
-        }
+            afterHandlerEmails: methodConfig.email,
+          }
         : undefined,
       sms: methodConfig.sms
         ? {
-          afterHandlerSms: methodConfig.sms,
-        }
+            afterHandlerSms: methodConfig.sms,
+          }
         : undefined,
     });
 
-    handlers.push({ method, handler } as unknown as HandlerEntry<typeof method>);
+    handlers.push({ method, handler } as unknown as HandlerEntry<
+      typeof method
+    >);
   }
 
   // Build result from handlers with proper type preservation

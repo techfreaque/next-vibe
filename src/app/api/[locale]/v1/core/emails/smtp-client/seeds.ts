@@ -6,14 +6,16 @@
 import { eq } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
+import {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+} from "@/app/api/[locale]/v1/core/leads/enum";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import { env } from "@/config/env";
 import { Countries, Languages } from "@/i18n/core/config";
 
-// EmailJourneyVariant and EmailCampaignStage are defined as string arrays for seeding
-// to avoid cross-repository dependencies
 import { type NewSmtpAccount, smtpAccounts } from "./db";
 import {
   CampaignType,
@@ -133,17 +135,17 @@ function getSmtpAccount2Config(logger: EndpointLogger): NewSmtpAccount | null {
     totalEmailsSent: 0,
     campaignTypes: [CampaignType.LEAD_CAMPAIGN],
     emailJourneyVariants: [
-      "PERSONAL_APPROACH",
-      "RESULTS_FOCUSED",
-      "PERSONAL_RESULTS",
+      EmailJourneyVariant.PERSONAL_APPROACH,
+      EmailJourneyVariant.RESULTS_FOCUSED,
+      EmailJourneyVariant.PERSONAL_RESULTS,
     ],
     emailCampaignStages: [
-      "INITIAL",
-      "FOLLOWUP_1",
-      "FOLLOWUP_2",
-      "FOLLOWUP_3",
-      "NURTURE",
-      "REACTIVATION",
+      EmailCampaignStage.INITIAL,
+      EmailCampaignStage.FOLLOWUP_1,
+      EmailCampaignStage.FOLLOWUP_2,
+      EmailCampaignStage.FOLLOWUP_3,
+      EmailCampaignStage.NURTURE,
+      EmailCampaignStage.REACTIVATION,
     ],
     countries: [Countries.GLOBAL, Countries.DE, Countries.PL],
     languages: [Languages.EN, Languages.DE, Languages.PL],

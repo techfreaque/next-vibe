@@ -1,6 +1,8 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
+import type { JSX } from "react";
+
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -9,7 +11,7 @@ interface SubscriptionHeaderProps {
   isAuthenticated: boolean;
 }
 
-export function SubscriptionHeader({ locale, isAuthenticated }: SubscriptionHeaderProps) {
+export function SubscriptionHeader({ locale, isAuthenticated }: SubscriptionHeaderProps): JSX.Element {
   const { t } = useTranslation();
 
   return (

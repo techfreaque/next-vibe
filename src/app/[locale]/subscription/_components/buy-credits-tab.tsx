@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
+import type { JSX } from "react";
 import {
   Card,
   CardContent,
@@ -53,7 +54,7 @@ export function BuyCreditsTab({
   subscriptionCredits,
   packPrice,
   packCredits,
-}: BuyCreditsTabProps) {
+}: BuyCreditsTabProps): JSX.Element {
   const { t } = useTranslation();
 
   // Initialize hooks

@@ -504,6 +504,23 @@ class AuthRepositoryImpl implements AuthRepository {
     requiredRoles: TRoles,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
+    // Check if endpoint only allows PUBLIC role (no authenticated users allowed)
+    const onlyPublicAllowed =
+      requiredRoles.length === 1 && requiredRoles.includes(UserRole.PUBLIC);
+
+    if (onlyPublicAllowed) {
+      // Endpoint only allows public users - authenticated users should not access this
+      logger.debug(
+        "Endpoint only allows PUBLIC role, rejecting authenticated user",
+        {
+          userId,
+          leadId,
+          requiredRoles: [...requiredRoles] as string[],
+        },
+      );
+      return createPublicUser<TRoles>(leadId);
+    }
+
     // Customer role is allowed for any authenticated user
     if (requiredRoles.includes(UserRole.CUSTOMER)) {
       return createPrivateUser<TRoles>(userId, leadId);
@@ -526,8 +543,8 @@ class AuthRepositoryImpl implements AuthRepository {
         if (requiredRoles.includes(UserRole.CUSTOMER)) {
           return createPrivateUser<TRoles>(userId, leadId);
         }
-        // If PUBLIC role is in required roles, return authenticated user
-        // (authenticated users can access PUBLIC endpoints)
+        // If PUBLIC role is in required roles (mixed with other roles), return authenticated user
+        // (authenticated users can access PUBLIC endpoints when mixed with other roles)
         if (requiredRoles.includes(UserRole.PUBLIC)) {
           return createPrivateUser<TRoles>(userId, leadId);
         }
@@ -554,11 +571,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
       // User doesn't have required roles
       // If CUSTOMER role is in required roles, we already handled it above
-      // If PUBLIC role is in required roles, the user is still authenticated
+      // If PUBLIC role is in required roles (mixed with other roles), the user is still authenticated
       // so we should return the authenticated user, not downgrade to public
       if (requiredRoles.includes(UserRole.PUBLIC)) {
         // User is authenticated but doesn't have the specific role
-        // However, since PUBLIC is allowed, we can return the authenticated user
+        // However, since PUBLIC is allowed (mixed with other roles), we can return the authenticated user
         // as they have at least CUSTOMER role (all authenticated users have CUSTOMER)
         return createPrivateUser<TRoles>(userId, leadId);
       }
@@ -579,7 +596,7 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorCheckingUserAuth",
         parseError(error),
       );
-      // If there's an error but PUBLIC is allowed, return authenticated user
+      // If there's an error but PUBLIC is allowed (mixed with other roles), return authenticated user
       if (requiredRoles.includes(UserRole.PUBLIC)) {
         return createPrivateUser<TRoles>(userId, leadId);
       }
@@ -1017,7 +1034,8 @@ class AuthRepositoryImpl implements AuthRepository {
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles> | null> {
-    const user = await this.getAuthMinimalUser([...roles], context, logger);
+    // Don't spread roles - preserve readonly tuple type for proper type inference
+    const user = await this.getAuthMinimalUser(roles, context, logger);
     return user as InferUserType<TRoles> | null;
   }
 
@@ -1197,7 +1215,11 @@ class AuthRepositoryImpl implements AuthRepository {
    * @returns The user ID if available, null otherwise
    */
   extractUserId(payload: JwtPrivatePayloadType): string | null {
-    if (!payload.isPublic && "id" in payload && typeof payload.id === "string") {
+    if (
+      !payload.isPublic &&
+      "id" in payload &&
+      typeof payload.id === "string"
+    ) {
       return payload.id;
     }
     return null;

@@ -46,10 +46,7 @@ import type {
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
 } from "@/app/api/[locale]/v1/core/user/auth/types";
-import {
-  type UserRole,
-  type UserRoleValue,
-} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -74,6 +71,7 @@ import type { TrpcHandlerReturnType } from "../../trpc/types";
 import type { CreateApiEndpoint } from "../endpoint/create";
 import type { EndpointLogger } from "../logger/endpoint";
 import type { Methods } from "./enums";
+import { type UserRole } from "../../../../user/db";
 
 // Re-export MCP types for convenience
 export type {
@@ -189,20 +187,20 @@ export interface RouteModule<
       readonly [K in Methods]?: TEndpoint;
     };
     readonly cli?:
-    | CliHandlerReturnType<
-      ExtractRequestOutput<TEndpoint>,
-      ExtractResponseOutput<TEndpoint>,
-      ExtractUrlVariablesOutput<TEndpoint>,
-      ExtractAllowedRoles<TEndpoint>
-    >
-    | {
-      readonly [key: string]: CliHandlerReturnType<
-        ExtractRequestOutput<TEndpoint>,
-        ExtractResponseOutput<TEndpoint>,
-        ExtractUrlVariablesOutput<TEndpoint>,
-        ExtractAllowedRoles<TEndpoint>
-      >;
-    };
+      | CliHandlerReturnType<
+          ExtractRequestOutput<TEndpoint>,
+          ExtractResponseOutput<TEndpoint>,
+          ExtractUrlVariablesOutput<TEndpoint>,
+          ExtractAllowedRoles<TEndpoint>
+        >
+      | {
+          readonly [key: string]: CliHandlerReturnType<
+            ExtractRequestOutput<TEndpoint>,
+            ExtractResponseOutput<TEndpoint>,
+            ExtractUrlVariablesOutput<TEndpoint>,
+            ExtractAllowedRoles<TEndpoint>
+          >;
+        };
     readonly trpc?: TrpcHandlerReturnType<
       ExtractRequestOutput<TEndpoint>,
       ExtractResponseOutput<TEndpoint>,
@@ -238,14 +236,11 @@ export interface DefinitionModule<
  */
 export type InferJwtPayloadType<TUserRoleValue extends typeof UserRoleValue> =
   TUserRoleValue extends typeof UserRole.PUBLIC
-  ? JWTPublicPayloadType
-  : JwtPayloadType;
+    ? JWTPublicPayloadType
+    : JwtPayloadType;
 
 /**
  * Type helper for arrays of user roles
- *
- * CRITICAL: Must use exact string literal "PUBLIC" instead of typeof UserRole.PUBLIC
- * because typeof returns the same type for all enum values due to how mapped types work
  *
  * Logic:
  * - Exclude<TRoles[number], "PUBLIC"> removes "PUBLIC" from the union
@@ -256,11 +251,11 @@ export type InferJwtPayloadType<TUserRoleValue extends typeof UserRoleValue> =
 export type InferJwtPayloadTypeFromRoles<
   TRoles extends readonly (typeof UserRoleValue)[],
 > =
-  Exclude<TRoles[number], "PUBLIC"> extends never
-  ? JWTPublicPayloadType
-  : Extract<TRoles[number], "PUBLIC"> extends never
-  ? JwtPrivatePayloadType
-  : JwtPayloadType;
+  Exclude<TRoles[number], typeof UserRole.PUBLIC> extends never
+    ? JWTPublicPayloadType
+    : Extract<TRoles[number], typeof UserRole.PUBLIC> extends never
+      ? JwtPrivatePayloadType
+      : JwtPayloadType;
 
 /**
  * Extract methods that exist in the definitions object
@@ -285,15 +280,15 @@ export type ExtractEndpointTypeInfo<T> = T extends {
   allowedRoles: infer TUserRoleValue;
 }
   ? {
-    requestInput: TRequestInput;
-    requestOutput: TRequestOutput;
-    responseInput: TResponseInput;
-    responseOutput: TResponseOutput;
-    urlPathParamsInput: TUrlVariablesInput;
-    urlPathParamsOutput: TUrlVariablesOutput;
-    method: TMethod;
-    userRoleValue: TUserRoleValue;
-  }
+      requestInput: TRequestInput;
+      requestOutput: TRequestOutput;
+      responseInput: TResponseInput;
+      responseOutput: TResponseOutput;
+      urlPathParamsInput: TUrlVariablesInput;
+      urlPathParamsOutput: TUrlVariablesOutput;
+      method: TMethod;
+      userRoleValue: TUserRoleValue;
+    }
   : never;
 
 /**
@@ -327,17 +322,17 @@ export type EndpointHandlerConfig<T> = {
   endpoint: T;
 } & {
   [K in Methods]?: K extends keyof T
-  ? T[K] extends {
-    types: {
-      RequestOutput: infer TReqOut;
-      ResponseOutput: infer TResOut;
-      UrlVariablesOutput: infer TUrlOut;
-    };
-    allowedRoles: readonly (typeof UserRoleValue)[];
-  }
-  ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, T[K]["allowedRoles"]>
-  : never
-  : never;
+    ? T[K] extends {
+        types: {
+          RequestOutput: infer TReqOut;
+          ResponseOutput: infer TResOut;
+          UrlVariablesOutput: infer TUrlOut;
+        };
+        allowedRoles: readonly (typeof UserRoleValue)[];
+      }
+      ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, T[K]["allowedRoles"]>
+      : never
+    : never;
 };
 
 /**
@@ -360,8 +355,8 @@ export type EndpointsHandlerReturn<T> = {
   tools: {
     trpc: {
       [K in keyof T as K extends Methods
-      ? K
-      : never]: T[K] extends CreateApiEndpoint<
+        ? K
+        : never]: T[K] extends CreateApiEndpoint<
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         infer _TExampleKey,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -371,22 +366,22 @@ export type EndpointsHandlerReturn<T> = {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         infer _TFields
       >
-      ? (
-        input: (T[K] extends { types: { RequestOutput: infer TReqOut } }
-          ? TReqOut
-          : Record<string, never>) & {
-            urlPathParams?: T[K] extends {
-              types: { UrlVariablesOutput: infer TUrlOut };
-            }
-            ? TUrlOut
-            : never;
-          },
-      ) => Promise<
-        T[K] extends { types: { ResponseOutput: infer TResOut } }
-        ? TResOut
-        : never
-      >
-      : never;
+        ? (
+            input: (T[K] extends { types: { RequestOutput: infer TReqOut } }
+              ? TReqOut
+              : Record<string, never>) & {
+              urlPathParams?: T[K] extends {
+                types: { UrlVariablesOutput: infer TUrlOut };
+              }
+                ? TUrlOut
+                : never;
+            },
+          ) => Promise<
+            T[K] extends { types: { ResponseOutput: infer TResOut } }
+              ? TResOut
+              : never
+          >
+        : never;
     };
     cli: Record<
       string,
@@ -449,9 +444,9 @@ export type ApiHandlerFunction<
 > = (
   props: ApiHandlerProps<TRequestOutput, TUrlVariablesOutput, TUserRoleValue>,
 ) =>
-    | Promise<ResponseType<TResponseOutput> | StreamingResponse>
-    | ResponseType<TResponseOutput>
-    | StreamingResponse;
+  | Promise<ResponseType<TResponseOutput> | StreamingResponse>
+  | ResponseType<TResponseOutput>
+  | StreamingResponse;
 
 /**
  * Email handler configuration
@@ -531,14 +526,14 @@ export interface ApiHandlerOptions<
 
   /** Email handlers (optional) */
   email?:
-  | {
-    afterHandlerEmails?: EmailHandler<
-      TRequestOutput,
-      TResponseOutput,
-      TUrlVariablesOutput
-    >[];
-  }
-  | undefined;
+    | {
+        afterHandlerEmails?: EmailHandler<
+          TRequestOutput,
+          TResponseOutput,
+          TUrlVariablesOutput
+        >[];
+      }
+    | undefined;
   /** SMS handlers (optional) */
   sms?: {
     afterHandlerSms?: SMSHandler<

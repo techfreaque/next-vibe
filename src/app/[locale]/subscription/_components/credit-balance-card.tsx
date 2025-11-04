@@ -9,6 +9,8 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import type { JSX } from "react";
+
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { CreditBalance } from "./types";
@@ -25,7 +27,7 @@ export function CreditBalanceCard({
   locale,
   initialCredits,
   freeCredits,
-}: CreditBalanceCardProps) {
+}: CreditBalanceCardProps): JSX.Element {
   const { t } = useTranslation();
 
   return (

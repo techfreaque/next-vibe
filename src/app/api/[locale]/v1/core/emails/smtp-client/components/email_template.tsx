@@ -2,6 +2,7 @@ import {
   Body,
   Container,
   Html,
+  Img,
   Preview,
   Section,
 } from "@react-email/components";
@@ -73,51 +74,41 @@ export function EmailTemplate({
             <div
               style={{
                 display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                marginBottom: "12px",
+              }}
+            >
+              <Img
+                src={`${envClient.NEXT_PUBLIC_APP_URL}/unbottled-icon.png`}
+                alt={t("config.appName")}
+                width="28"
+                height="28"
+                style={{
+                  display: "block",
+                }}
+              />
+              <Span
+                style={{
+                  fontSize: "16px",
+                  fontWeight: "700",
+                  margin: "0",
+                  color: "#111827",
+                  lineHeight: "1",
+                  letterSpacing: "-0.025em",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t("config.appName")}
+              </Span>
+            </div>
+            <div
+              style={{
+                display: "flex",
                 flexDirection: "column",
                 alignItems: "flex-start",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  marginBottom: "12px",
-                }}
-              >
-                <Span
-                  style={{
-                    fontSize: "24px",
-                    fontWeight: "700",
-                    margin: "0",
-                    background: "linear-gradient(to right, #06b6d4, #2563eb)", // Cyan to blue gradient like nav
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                    lineHeight: "1",
-                    letterSpacing: "-0.5px",
-                    textAlign: "left",
-                  }}
-                 >
-                   {t("config.logoPart1")}
-                 </Span>
-                 <Span
-                   style={{
-                     fontSize: "24px",
-                     fontWeight: "700",
-                     margin: "0",
-                     background: "linear-gradient(to right, #06b6d4, #2563eb)", // Cyan to blue gradient like nav
-                     WebkitBackgroundClip: "text",
-                     WebkitTextFillColor: "transparent",
-                     backgroundClip: "text",
-                     lineHeight: "1",
-                     letterSpacing: "-0.5px",
-                     textAlign: "left",
-                   }}
-                 >
-                   {t("config.logoPart2")}
-                </Span>
-              </div>
 
               {/* Tagline - below logo, left aligned */}
               <Span
@@ -220,7 +211,7 @@ export function EmailTemplate({
             >
               {t("app.api.v1.core.emails.footer.allRightsReserved", {
                 currentYear,
-                appName: `${t("config.logoPart1")} ${t("config.logoPart2")}`,
+                appName: t("config.appName"),
               })}
             </Span>
 
@@ -256,7 +247,7 @@ export function EmailTemplate({
                 "app.api.v1.core.emails.smtpClient.components.email.footer.copyright",
                 {
                   currentYear,
-                  appName: `${t("config.logoPart1")} ${t("config.logoPart2")}`,
+                  appName: t("config.appName"),
                 },
               )}
             </Span>

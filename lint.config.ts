@@ -41,6 +41,29 @@ const enablePedanticRules = false;
 export const oxlintConfig: OxlintConfig = {
   $schema: "https://docs.rs/oxc_linter/latest/oxc_linter/schema.json",
 
+  ignorePatterns: [
+    ".dist",
+    ".next",
+    ".tmp",
+    "postcss.config.mjs",
+    "node_modules",
+    ".git",
+    "coverage",
+    "public",
+    "drizzle",
+    ".vscode",
+    ".vibe-guard-instance",
+    ".github",
+    ".claude",
+    "to_migrate",
+    "postgres_data",
+    ".nyc_output",
+    "*.min.js",
+    "next-env.d.ts",
+    "nativewind-env.d.ts",
+    // Test and development files
+    "**/*test-files/**",
+  ],
   plugins: [
     "typescript",
     "oxc",
@@ -75,10 +98,10 @@ export const oxlintConfig: OxlintConfig = {
     // ========================================
     "no-debugger": "error",
     "no-console": "error",
-    "curly": "error",
-    "eqeqeq": "error",
+    curly: "error",
+    eqeqeq: "error",
     "no-undef": "off",
-    "camelcase": "error",
+    camelcase: "error",
     "no-template-curly-in-string": "error",
     "no-unsafe-optional-chaining": "error",
     "array-callback-return": "error",
@@ -167,22 +190,24 @@ export const oxlintConfig: OxlintConfig = {
     // ========================================
     // Import Rules
     // ========================================
-    ...(enableImportRules ? {
-      "import/no-duplicates": "error",
-      "import/first": "error",
-      "import/newline-after-import": "error",
-      "import/namespace": "error",
-      "import/no-unresolved": "error",
-      "import/no-restricted-paths": "error",
-      "import/no-default-export": "off",
-      "import/extensions": "off",
-      "import/no-unassigned-import": [
-        "error",
-        {
-          allow: ["server-only", "**/*.css", "**/*.scss"],
-        },
-      ],
-    }: {}),
+    ...(enableImportRules
+      ? {
+          "import/no-duplicates": "error",
+          "import/first": "error",
+          "import/newline-after-import": "error",
+          "import/namespace": "error",
+          "import/no-unresolved": "error",
+          "import/no-restricted-paths": "error",
+          "import/no-default-export": "off",
+          "import/extensions": "off",
+          "import/no-unassigned-import": [
+            "error",
+            {
+              allow: ["server-only", "**/*.css", "**/*.scss"],
+            },
+          ],
+        }
+      : {}),
 
     // ========================================
     // Promise Rules
@@ -408,14 +433,14 @@ export const oxlintConfig: OxlintConfig = {
       components: {},
       attributes: {},
     },
-    "next": {
+    next: {
       rootDir: ["."],
     },
-    "react": {
+    react: {
       formComponents: [],
       linkComponents: [],
     },
-    "jsdoc": {
+    jsdoc: {
       ignorePrivate: false,
       ignoreInternal: false,
       ignoreReplacesDocs: true,
@@ -440,36 +465,6 @@ export const oxlintConfig: OxlintConfig = {
     process: "readonly",
     global: "readonly",
   },
-
-  ignorePatterns: [
-    ".dist",
-    ".next",
-    ".tmp",
-    "postcss.config.mjs",
-    "node_modules",
-    ".git",
-    "coverage",
-    "public",
-    "drizzle",
-    ".vscode",
-    ".vibe-guard-instance",
-    ".github",
-    ".claude",
-    "to_migrate",
-    "postgres_data",
-    ".nyc_output",
-    "*.min.js",
-    "next-env.d.ts",
-    "nativewind-env.d.ts",
-    // Test and development files
-    "**/*test-files/**",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    // System builder test files
-    "src/app/api/[locale]/v1/core/system/builder/test-files/**",
-  ],
 };
 
 // ============================================================

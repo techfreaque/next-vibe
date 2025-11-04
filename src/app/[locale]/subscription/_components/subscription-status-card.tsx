@@ -3,6 +3,8 @@ import { CreditCard } from "lucide-react";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import type { JSX } from "react";
+
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { SubscriptionData } from "./types";
@@ -13,7 +15,7 @@ interface SubscriptionStatusCardProps {
   initialSubscription: SubscriptionData;
 }
 
-export function SubscriptionStatusCard({ locale, initialSubscription }: SubscriptionStatusCardProps) {
+export function SubscriptionStatusCard({ locale, initialSubscription }: SubscriptionStatusCardProps): JSX.Element {
   const { t } = useTranslation();
 
   return (

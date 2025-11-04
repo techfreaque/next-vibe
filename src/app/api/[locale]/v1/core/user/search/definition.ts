@@ -20,7 +20,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
-import { UserRole, UserRoleOptions } from "../user-roles/enum";
+import { UserRole, UserRoleDB, UserRoleOptions } from "../user-roles/enum";
 import { UserSearchStatus, UserSearchStatusOptions } from "./enum";
 
 /**
@@ -105,7 +105,7 @@ const { GET } = createEndpoint({
               helpText:
                 "app.api.v1.core.user.search.fields.roles.help" as const,
             },
-            z.array(z.string()).optional(),
+            z.array(z.enum(UserRoleDB)).optional(),
           ),
 
           status: requestDataField(

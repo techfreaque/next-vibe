@@ -20,7 +20,7 @@
   },
   "scripts": {
     "build": "builder build && chmod +x .dist/launchpad.mjs",
-    "prepare": "builder build && chmod +x .dist/launchpad.mjs",
+    "____prepare": "builder build && chmod +x .dist/launchpad.mjs",
     "dev": "bun src/scripts/launchpad.ts",
     "test": "vitest run",
     "test:watch": "vitest",

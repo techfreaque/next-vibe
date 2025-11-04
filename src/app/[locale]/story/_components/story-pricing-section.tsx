@@ -61,7 +61,7 @@ export function StoryPricingSection({
 
       {/* Overview Section */}
       <Div className="space-y-6">
-        <OverviewTab />
+        <OverviewTab locale={locale} />
       </Div>
 
       {/* Buy Credits Section */}

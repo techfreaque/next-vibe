@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { AlertCircle, CheckCircle, X } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import { Button } from "next-vibe-ui/ui/button";
+import type { JSX } from "react";
+
 import { useTranslation } from "@/i18n/core/client";
 
 interface PaymentStatusAlertProps {
@@ -16,10 +18,12 @@ export function PaymentStatusAlert({
   alertType,
   alertMessage,
   onClose,
-}: PaymentStatusAlertProps) {
+}: PaymentStatusAlertProps): JSX.Element | null {
   const { t } = useTranslation();
 
-  if (!showAlert) return null;
+  if (!showAlert) {
+    return null;
+  }
 
   return (
     <motion.div

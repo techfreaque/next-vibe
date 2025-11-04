@@ -7,7 +7,7 @@
 
 import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schema";
 import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
-import {  H4, P, } from "next-vibe-ui/ui/typography";
+import { H4, P } from "next-vibe-ui/ui/typography";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -307,12 +307,12 @@ export function LeadsStatsChart({
         );
 
         const sourceKey = source as keyof typeof LeadSource;
-        const sourceTranslationKey = LeadSource[sourceKey] as TranslationKey;
+        const sourceTranslationKey = LeadSource[sourceKey];
 
         return {
           source: sourceTranslationKey,
           name: t(sourceTranslationKey),
-          color: CHART_CONSTANTS.SOURCE_COLORS[sourceKey] || "#6b7280",
+          color: CHART_CONSTANTS.SOURCE_COLORS[sourceTranslationKey] || "#6b7280",
           visible: visibleSources[sourceKey] || false,
           count,
           percentage: total > 0 ? (count / total) * 100 : 0,

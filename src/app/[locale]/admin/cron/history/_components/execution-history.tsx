@@ -25,6 +25,7 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { H4, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
+import { CronTaskStatus } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
 import type { CronHistoryResponseOutput } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/history/definition";
 import type { CronHistoryEndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/history/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -41,19 +42,19 @@ type CronTaskStatusType = CronExecutionType["status"];
 
 const getStatusIcon = (status: CronTaskStatusType): React.ReactElement => {
     switch (status) {
-      case "COMPLETED":
+      case CronTaskStatus.COMPLETED:
         return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case "FAILED":
+      case CronTaskStatus.FAILED:
         return <XCircle className="h-4 w-4 text-red-600" />;
-      case "TIMEOUT":
+      case CronTaskStatus.TIMEOUT:
         return <XCircle className="h-4 w-4 text-red-600" />;
-      case "RUNNING":
+      case CronTaskStatus.RUNNING:
         return <Clock className="h-4 w-4 text-blue-600 animate-pulse" />;
-      case "PENDING":
+      case CronTaskStatus.PENDING:
         return <Clock className="h-4 w-4 text-yellow-600" />;
-      case "CANCELLED":
+      case CronTaskStatus.CANCELLED:
         return <XCircle className="h-4 w-4 text-gray-600" />;
-      case "SKIPPED":
+      case CronTaskStatus.SKIPPED:
         return <AlertCircle className="h-4 w-4 text-orange-600" />;
       default:
         return <AlertCircle className="h-4 w-4 text-yellow-600" />;
@@ -61,27 +62,27 @@ const getStatusIcon = (status: CronTaskStatusType): React.ReactElement => {
   };
 
 const STATUS_COLORS: Record<CronTaskStatusType, string> = {
-  COMPLETED:
+  [CronTaskStatus.COMPLETED]:
     "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
-  FAILED: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-  TIMEOUT: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-  RUNNING: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
-  PENDING:
+  [CronTaskStatus.FAILED]: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  [CronTaskStatus.TIMEOUT]: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  [CronTaskStatus.RUNNING]: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
+  [CronTaskStatus.PENDING]:
     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
-  CANCELLED:
+  [CronTaskStatus.CANCELLED]:
     "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
-  SKIPPED:
+  [CronTaskStatus.SKIPPED]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
-  STOPPED: "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
-  ERROR: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-  BLOCKED:
+  [CronTaskStatus.STOPPED]: "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
+  [CronTaskStatus.ERROR]: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  [CronTaskStatus.BLOCKED]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
-  SCHEDULED:
+  [CronTaskStatus.SCHEDULED]:
     "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
 };
 
 const getStatusColor = (status: CronTaskStatusType): string => {
-  return STATUS_COLORS[status] || STATUS_COLORS.PENDING;
+  return STATUS_COLORS[status] || STATUS_COLORS[CronTaskStatus.PENDING];
 };
 
 const formatDate = (dateString: string): string => {

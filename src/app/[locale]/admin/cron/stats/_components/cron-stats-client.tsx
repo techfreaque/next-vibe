@@ -92,9 +92,9 @@ function getStatusTranslation(
   status: (typeof CronTaskStatus)[keyof typeof CronTaskStatus],
 ): TranslationKey {
   switch (status) {
-    case "PENDING":
+    case CronTaskStatus.PENDING:
       return "app.admin.cron.stats.status.pending";
-    case "RUNNING":
+    case CronTaskStatus.RUNNING:
       return "app.admin.cron.stats.status.running";
     case CronTaskStatus.COMPLETED:
       return "app.admin.cron.stats.status.completed";

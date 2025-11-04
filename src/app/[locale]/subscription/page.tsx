@@ -92,7 +92,7 @@ export default async function SubscriptionPage({
         leadId,
         isPublic: false,
       },
-      createEndpointLogger(false, Date.now(), locale),
+      logger,
     );
     credits = creditsResponse.success ? creditsResponse.data : null;
 
@@ -107,7 +107,7 @@ export default async function SubscriptionPage({
     // Fetch subscription data
     const subscriptionResponse = await subscriptionRepository.getSubscription(
       userId,
-      createEndpointLogger(false, Date.now(), locale),
+      logger,
     );
     subscription = subscriptionResponse.success
       ? subscriptionResponse.data

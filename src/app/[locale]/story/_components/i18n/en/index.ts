@@ -120,10 +120,8 @@ export const translations = {
     cta: {
       title: "Ready to Join the AI + Community Platform?",
       subtitle:
-        "Chat privately with 40+ AI models. Join public forum discussions. Choose your privacy level. Start free today.",
-      button: "Get Started Free",
+        "Chat privately with {{modelCount}}+ AI models. Join public forum discussions. Choose your privacy level. Start free today.",
       viewPlans: "View Pricing Plans",
-      noCredit: "No credit card required",
     },
     pricingSection: {
       title: "Simple Pricing",
@@ -459,7 +457,7 @@ export const translations = {
       title: "About {{appName}}",
       subtitle: "Pioneering Uncensored AI Conversations",
       description:
-        "We're on a mission to democratize access to uncensored AI. Founded in {{config.group.foundedYear}}, {{appName}} provides a platform where users can have honest, unfiltered conversations with the world's most advanced AI models.",
+        "We're on a mission to democratize access to uncensored AI. Founded in {{foundedYear}}, {{appName}} provides a platform where users can have honest, unfiltered conversations with the world's most advanced AI models.",
       values: {
         title: "Our Values",
         description:

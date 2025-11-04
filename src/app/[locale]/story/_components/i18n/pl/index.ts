@@ -122,9 +122,7 @@ export const translations: typeof enTranslations = {
       title: "Gotowy dołączyć do platformy AI + społeczności?",
       subtitle:
         "Czatuj prywatnie z 40+ modelami AI. Dołącz do publicznych dyskusji na forum. Wybierz poziom prywatności. Zacznij za darmo już dziś.",
-      button: "Zacznij za darmo",
       viewPlans: "Zobacz plany cenowe",
-      noCredit: "Nie wymagana karta kredytowa",
     },
     pricingSection: {
       title: "Proste ceny",
@@ -465,7 +463,7 @@ export const translations: typeof enTranslations = {
       title: "O {{appName}}",
       subtitle: "Pionierzy niecenzurowanych rozmów AI",
       description:
-        "Naszą misją jest demokratyzacja dostępu do niecenzurowanej AI. Założona w {{config.group.foundedYear}} roku, {{appName}} zapewnia platformę, na której użytkownicy mogą prowadzić szczere, niefiltrowane rozmowy z najbardziej zaawansowanymi modelami AI na świecie.",
+        "Naszą misją jest demokratyzacja dostępu do niecenzurowanej AI. Założona w {{foundedYear}} roku, {{appName}} zapewnia platformę, na której użytkownicy mogą prowadzić szczere, niefiltrowane rozmowy z najbardziej zaawansowanymi modelami AI na świecie.",
       values: {
         title: "Nasze wartości",
         description: "Zasady, które kierują wszystkim, co robimy w {{appName}}",

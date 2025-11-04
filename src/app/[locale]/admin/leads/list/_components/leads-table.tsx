@@ -3,7 +3,6 @@
 import { Edit, ExternalLink, Eye } from "lucide-react";
 import Link from "next/link";
 import {
-  EmailCampaignStageOptions,
   LeadStatus,
   type LeadStatusValues,
 } from "next-vibe/leads/enum";
@@ -256,12 +255,7 @@ export function LeadsTable({
                   <TableCell>
                     {lead.currentCampaignStage ? (
                       <Badge variant="outline">
-                        {t(
-                          EmailCampaignStageOptions.find(
-                            (opt) => opt.value === lead.currentCampaignStage,
-                          )?.label ||
-                            "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
-                        )}
+                        {t(lead.currentCampaignStage)}
                       </Badge>
                     ) : (
                       <span className="text-gray-400">

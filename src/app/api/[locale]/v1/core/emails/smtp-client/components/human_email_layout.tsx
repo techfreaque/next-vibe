@@ -8,12 +8,14 @@ import {
   Container,
   Head,
   Html,
+  Img,
   Preview,
   Section,
 } from "@react-email/components";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX, ReactNode } from "react";
 
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -98,40 +100,32 @@ export function HumanEmailLayout({
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "column",
                   alignItems: "center",
+                  gap: "6px",
                   marginBottom: "10px",
                 }}
               >
+                <Img
+                  src={`${envClient.NEXT_PUBLIC_APP_URL}/unbottled-icon.png`}
+                  alt={t("config.appName")}
+                  width="24"
+                  height="24"
+                  style={{
+                    display: "block",
+                  }}
+                />
                 <Span
                   style={{
-                    fontSize: "20px",
+                    fontSize: "16px",
                     fontWeight: "700",
                     margin: "0",
-                    background: "linear-gradient(to right, #06b6d4, #2563eb)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
+                    color: "#111827",
                     lineHeight: "1",
-                    letterSpacing: "-0.5px",
-                  }}
-                 >
-                   {t("config.logoPart1")}
-                 </Span>
-                 <Span
-                   style={{
-                     fontSize: "20px",
-                     fontWeight: "700",
-                     margin: "0",
-                     background: "linear-gradient(to right, #06b6d4, #2563eb)",
-                     WebkitBackgroundClip: "text",
-                     WebkitTextFillColor: "transparent",
-                     backgroundClip: "text",
-                     lineHeight: "1",
-                    letterSpacing: "-0.5px",
+                    letterSpacing: "-0.025em",
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  {t("config.logoPart2")}
+                  {t("config.appName")}
                 </Span>
               </div>
               <Span

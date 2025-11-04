@@ -23,6 +23,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { paymentTransactions } from "../../db";
+import { InvoiceStatus } from "../../enum";
 import type {
   PaymentInvoiceRequestOutput,
   PaymentInvoiceResponseOutput,
@@ -159,14 +160,14 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           currency: data.currency,
           status:
             finalizedInvoice.status === "open"
-              ? "OPEN"
+              ? InvoiceStatus.OPEN
               : finalizedInvoice.status === "paid"
-                ? "PAID"
+                ? InvoiceStatus.PAID
                 : finalizedInvoice.status === "void"
-                  ? "VOID"
+                  ? InvoiceStatus.VOID
                   : finalizedInvoice.status === "uncollectible"
-                    ? "UNCOLLECTIBLE"
-                    : "DRAFT",
+                    ? InvoiceStatus.UNCOLLECTIBLE
+                    : InvoiceStatus.DRAFT,
           invoiceUrl: finalizedInvoice.hosted_invoice_url || "",
           invoicePdf: finalizedInvoice.invoice_pdf || "",
           dueDate: data.dueDate || new Date().toISOString(),

@@ -40,10 +40,13 @@ import {
 } from "./db";
 import type {
   BatchOperationScopeValues,
+  EmailCampaignStageFilterValues,
   EmailCampaignStageValues,
   EngagementTypesValues,
   LeadSortFieldValues,
+  LeadSourceFilterValues,
   LeadSourceValues,
+  LeadStatusFilterValues,
   LeadStatusValues,
   SortOrderValues,
 } from "./enum";
@@ -85,9 +88,9 @@ type LeadSourceType = typeof LeadSourceValues;
 type EngagementTypesType = typeof EngagementTypesValues;
 
 // Type aliases for filter values (CountryFilter and LanguageFilter are imported from i18n/core/config)
-type LeadStatusFilterType = typeof LeadStatusValues | "ALL";
-type EmailCampaignStageFilterType = typeof EmailCampaignStageValues | "ALL";
-type LeadSourceFilterType = typeof LeadSourceValues | "ALL";
+type LeadStatusFilterType = typeof LeadStatusFilterValues;
+type EmailCampaignStageFilterType = typeof EmailCampaignStageFilterValues;
+type LeadSourceFilterType = typeof LeadSourceFilterValues;
 
 const INVALID_STATUS_TRANSITION_ERROR = "Invalid status transition";
 

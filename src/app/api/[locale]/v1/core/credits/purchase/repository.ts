@@ -18,6 +18,7 @@ import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { ProductIds } from "../../products/repository-client";
 import { getPaymentProvider } from "../../payment/providers";
+import { SubscriptionStatus } from "../../subscription/enum";
 import type {
   CreditsPurchasePostRequestOutput,
   CreditsPurchasePostResponseOutput,
@@ -100,7 +101,7 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
       }
 
       const subscription = subscriptionResult.data;
-      if (subscription.status !== "ACTIVE") {
+      if (subscription.status !== SubscriptionStatus.ACTIVE) {
         logger.warn(
           "Credit pack purchase attempted with inactive subscription",
           {

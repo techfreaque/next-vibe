@@ -1254,7 +1254,7 @@ const { GET } = createEndpoint({
         includeComparison: false,
         status: LeadStatusFilter.ALL,
         campaignStage: EmailCampaignStageFilter.ALL,
-        sortBy: "CREATED_AT",
+        sortBy: LeadSortField.CREATED_AT,
         sortOrder: SortOrder.DESC,
       },
     },

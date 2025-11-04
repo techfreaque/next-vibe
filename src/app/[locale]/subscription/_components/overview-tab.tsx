@@ -10,12 +10,14 @@ import {
 import { Div } from "next-vibe-ui/ui/div";
 import { H4, P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
+import type { JSX } from "react";
+
 import { useTranslation } from "@/i18n/core/client";
 import {
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
-import type { CountryLanguage } from "@/i18n/core/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { formatPrice } from "./types";
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/v1/core/products/repository-client";
 
@@ -37,11 +39,6 @@ export function OverviewTab({
   freeCredits,
 }: OverviewTabProps): JSX.Element {
   const { t } = useTranslation();
-
-  // Format currency for display
-  const currency = "EUR";
-  const formattedSubPrice = formatPrice(subscriptionPrice, locale);
-  const formattedPackPrice = formatPrice(packPrice, locale);
 
   return (
     <motion.div

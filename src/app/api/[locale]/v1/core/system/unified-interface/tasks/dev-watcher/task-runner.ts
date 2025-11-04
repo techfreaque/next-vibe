@@ -12,6 +12,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import { createMockUser } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/auth/cli-user";
 
 import { generateAllRepository } from "../../../generators/generate-all/repository";
+import { CronTaskPriority, TaskCategory } from "../enum";
 import type { TaskRunner } from "../types/repository";
 
 /**
@@ -70,9 +71,9 @@ const devWatcherTaskRunner: TaskRunner = {
   name: "dev-file-watcher",
   description:
     "app.api.v1.core.system.unifiedInterface.tasks.devWatcher.description",
-  category: "DEVELOPMENT",
+  category: TaskCategory.DEVELOPMENT,
   enabled: getEnvVar("NODE_ENV") === "development",
-  priority: "MEDIUM",
+  priority: CronTaskPriority.MEDIUM,
 
   async run({
     logger,
@@ -321,9 +322,9 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
   name: "db-health-monitor",
   description:
     "app.api.v1.core.system.unifiedInterface.tasks.dbHealthMonitor.description",
-  category: "MONITORING",
+  category: TaskCategory.MONITORING,
   enabled: true,
-  priority: "LOW",
+  priority: CronTaskPriority.LOW,
 
   async run({
     logger,

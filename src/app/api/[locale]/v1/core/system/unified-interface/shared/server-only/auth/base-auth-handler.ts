@@ -177,12 +177,9 @@ export abstract class BaseAuthHandler {
    * Helper: Check if user has required roles
    */
   protected hasRequiredRoles(
-    userRoles: string[],
+    userRoles: (typeof UserRoleValue)[],
     requiredRoles: readonly (typeof UserRoleValue)[],
   ): boolean {
-    if (requiredRoles.includes("PUBLIC")) {
-      return true;
-    }
     return requiredRoles.some((role) => userRoles.includes(role));
   }
 

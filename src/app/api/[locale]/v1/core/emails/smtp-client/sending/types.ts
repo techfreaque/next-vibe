@@ -7,16 +7,20 @@ import "server-only";
 
 import type { Countries, Languages } from "@/i18n/core/config";
 
-import type { CampaignType } from "../enum";
+import type { CampaignTypeValue } from "../enum";
+import {
+  type EmailCampaignStageValues,
+  type EmailJourneyVariantValues,
+} from "../../../leads/enum";
 
 /**
  * SMTP Selection Criteria
  * Uses singular field names to match the selection logic
  */
 export interface SmtpSelectionCriteria {
-  campaignType: (typeof CampaignType)[keyof typeof CampaignType];
-  emailJourneyVariant: string | null;
-  emailCampaignStage: string | null;
+  campaignType: typeof CampaignTypeValue;
+  emailJourneyVariant: typeof EmailJourneyVariantValues | null;
+  emailCampaignStage: typeof EmailCampaignStageValues | null;
   country: Countries;
   language: Languages;
 }
@@ -74,7 +78,3 @@ export interface SmtpCapacityResponseOutput {
   totalCapacity: number;
   remainingCapacity: number;
 }
-
-const definitions = {};
-
-export default definitions;

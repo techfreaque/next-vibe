@@ -1,3 +1,4 @@
+// oxlint-disable no-explicit-any
 /**
  * Type inference tests to validate the entire type chain
  * Each test builds on the previous one to ensure complete type safety
@@ -12,7 +13,10 @@
 
 import type { z } from "zod";
 
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import {
+  type UserRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type { ApiEndpoint, CreateApiEndpoint } from "../../endpoint/create";
 import type {
@@ -602,7 +606,7 @@ const test14_1: Test14_1_Result = "✓ PASS";
 type Test14_2_DeleteEndpoint = CreateApiEndpoint<
   "delete",
   Methods.DELETE,
-  readonly ["ADMIN"],
+  readonly [typeof UserRole.ADMIN],
   ObjectField<
     {
       id: PrimitiveField<z.ZodString, { request: "urlPathParams" }>;

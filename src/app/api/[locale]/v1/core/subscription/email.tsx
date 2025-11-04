@@ -44,9 +44,9 @@ function getPlanName(
 ): string {
   switch (planId) {
     case SubscriptionPlan.SUBSCRIPTION:
-      return t("app.story.pricing.creditPricing.subscription.title");
+      return t("app.api.v1.core.products.subscription.name");
     default:
-      return t("app.story.pricing.creditPricing.subscription.title");
+      return t("app.api.v1.core.products.subscription.name");
   }
 }
 

@@ -164,7 +164,7 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         response: {
-          allowedRoles: ["PUBLIC", "CUSTOMER", "ADMIN"],
+          allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
           moderatorIds: [
             "223e4567-e89b-12d3-a456-426614174001",
             "323e4567-e89b-12d3-a456-426614174002",
@@ -347,7 +347,7 @@ const { PATCH } = createEndpoint({
     },
     requests: {
       default: {
-        allowedRoles: ["PUBLIC", "CUSTOMER"],
+        allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER],
         moderatorIds: [
           "223e4567-e89b-12d3-a456-426614174001",
           "323e4567-e89b-12d3-a456-426614174002",
@@ -357,7 +357,7 @@ const { PATCH } = createEndpoint({
     responses: {
       default: {
         response: {
-          allowedRoles: ["PUBLIC", "CUSTOMER"],
+          allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER],
           moderatorIds: [
             "223e4567-e89b-12d3-a456-426614174001",
             "323e4567-e89b-12d3-a456-426614174002",

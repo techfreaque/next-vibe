@@ -13,7 +13,7 @@ export const {
   options: SubscriptionPlanOptions,
   Value: SubscriptionPlanValue,
 } = createEnumOptions({
-  SUBSCRIPTION: "app.story.pricing.creditPricing.subscription.title",
+  SUBSCRIPTION: "app.api.v1.core.subscription.enums.plan.subscription",
 });
 
 /**

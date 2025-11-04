@@ -76,6 +76,7 @@ export const translations = {
       noText: "Nie podano tekstu",
       noAudioUrl: "Nie otrzymano URL audio od dostawcy",
       audioFetchFailed: "Nie udało się pobrać pliku audio",
+      providerError: "Błąd dostawcy: {error}",
       internalError: "Wewnętrzny błąd serwera",
     },
     success: {

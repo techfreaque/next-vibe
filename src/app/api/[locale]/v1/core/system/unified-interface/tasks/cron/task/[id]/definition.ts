@@ -22,7 +22,12 @@ import {
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import {
+  CronTaskPriority,
   CronTaskPriorityDB,
+  CronTaskStatus,
+  TaskCategory,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
+import {
   CronTaskPriorityOptions,
   CronTaskStatusDB,
   TaskCategoryDB,
@@ -172,9 +177,9 @@ const { GET } = createEndpoint({
           description: "An example cron task",
           schedule: "0 0 * * *",
           enabled: true,
-          priority: "MEDIUM",
-          status: "PENDING",
-          category: "SYSTEM",
+          priority: CronTaskPriority.MEDIUM,
+          status: CronTaskStatus.PENDING,
+          category: TaskCategory.SYSTEM,
           timeout: 3600,
           retries: 3,
           version: 1,
@@ -441,7 +446,7 @@ const { PUT } = createEndpoint({
         description: "An updated cron task",
         schedule: "0 */2 * * *",
         enabled: false,
-        priority: "HIGH",
+        priority: CronTaskPriority.HIGH,
         timeout: 7200,
         retries: 5,
       },
@@ -454,9 +459,9 @@ const { PUT } = createEndpoint({
           description: "An updated cron task",
           schedule: "0 */2 * * *",
           enabled: false,
-          priority: "HIGH",
-          status: "PENDING",
-          category: "SYSTEM",
+          priority: CronTaskPriority.HIGH,
+          status: CronTaskStatus.PENDING,
+          category: TaskCategory.SYSTEM,
           timeout: 7200,
           retries: 5,
           version: 2,

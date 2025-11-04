@@ -94,7 +94,7 @@ export default async function HomePage({
           </CardContent>
           <CardFooter>
             <Div>
-              <Link href={`/${locale}/chat`} asChild>
+              <Link href={`/${locale}`} asChild>
                 {/* <Button className="w-full"> */}
                 <Span>{t("app.native.page.links.chat")}</Span>
                 {/* </Button> */}

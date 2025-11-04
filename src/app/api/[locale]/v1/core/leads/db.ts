@@ -8,7 +8,6 @@ import {
   boolean,
   integer,
   jsonb,
-  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -16,8 +15,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
-
-import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
 import { users } from "../user/db";
 import {
@@ -34,9 +31,11 @@ import {
   LeadStatusDB,
 } from "./enum";
 
-// Create country and language enums from i18n config
-export const countryEnum = pgEnum("country", CountriesArr);
-export const languageEnum = pgEnum("language", LanguagesArr);
+/**
+ * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys
+ * exceed PostgreSQL's 63-byte enum label limit. Type safety is maintained through
+ * Drizzle's enum constraint and Zod validation.
+ */
 
 /**
  * Leads Table
@@ -51,8 +50,8 @@ export const leads = pgTable("leads", {
   website: text("website"),
 
   // Location and language
-  country: countryEnum("country").notNull(),
-  language: languageEnum("language").notNull(),
+  country: text("country", { enum: ["DE", "PL", "GLOBAL"] }).notNull(),
+  language: text("language", { enum: ["de", "pl", "en"] }).notNull(),
 
   // IP tracking for free tier credits
   ipAddress: text("ip_address"),

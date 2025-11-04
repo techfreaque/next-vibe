@@ -254,6 +254,7 @@ export class LoginRepositoryImpl implements LoginRepository {
         leadId,
         email,
         userResponse.data.id,
+        user,
         locale,
         logger,
       );
@@ -374,7 +375,12 @@ export class LoginRepositoryImpl implements LoginRepository {
       // Link the cookie leadId to the user if it exists
       // This ensures the userLeads table has the relationship for credit lookups
       if (cookieLeadId) {
-        await leadAuthRepository.linkLeadToUser(cookieLeadId, userId, locale, logger);
+        await leadAuthRepository.linkLeadToUser(
+          cookieLeadId,
+          userId,
+          locale,
+          logger,
+        );
       }
 
       // Get primary leadId for user (now that we've linked the cookie leadId)
@@ -588,12 +594,14 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param leadId - Lead ID from tracking if available
    * @param email - User email
    * @param userId - User ID
+   * @param publicUser - Public user from handler (for type safety)
    * @param logger - Logger instance
    */
   private async handleLeadConversion(
     leadId: string,
     email: string,
     userId: string,
+    publicUser: JWTPublicPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -605,13 +613,14 @@ export class LoginRepositoryImpl implements LoginRepository {
       });
 
       // Convert lead with both email (for anonymous leads) and userId (for user relationship)
+      // Pass publicUser from handler to maintain type safety
       const convertResult = await leadsRepository.convertLead(
         leadId,
         {
           email,
           userId,
         },
-        { id: userId, leadId, isPublic: false },
+        publicUser,
         locale,
         logger,
       );

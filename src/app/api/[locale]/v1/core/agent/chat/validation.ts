@@ -26,11 +26,11 @@ export function validateNotIncognito(
 ): ResponseType<never> | null {
   if (rootFolderId === "incognito") {
     return fail({
-      message: `${errorKeyPrefix}.errors.forbidden.title` as TranslationKey,
+      message: `${errorKeyPrefix}.errors.forbidden.title`,
       errorType: ErrorResponseTypes.FORBIDDEN,
       messageParams: {
         message: simpleT(locale).t(
-          `${errorKeyPrefix}.errors.forbidden.incognitoNotAllowed` as TranslationKey,
+          `${errorKeyPrefix}.errors.forbidden.incognitoNotAllowed`,
         ),
       },
     });
