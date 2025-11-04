@@ -151,7 +151,8 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
     };
 
     checkInitialAuthState();
-  }, [authChecked, setQueryEnabled, setAuthChecked, logger]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authChecked, setQueryEnabled, setAuthChecked]); // Removed logger from deps to prevent re-runs
 
   return {
     user: authUser,
@@ -228,7 +229,9 @@ export function useDeleteAccount(
     onSuccess: () => {
       toast({
         title: t("app.api.v1.core.user.private.me.delete.success.title"),
-        description: t("app.api.v1.core.user.private.me.delete.success.description"),
+        description: t(
+          "app.api.v1.core.user.private.me.delete.success.description",
+        ),
         variant: "default",
       });
 

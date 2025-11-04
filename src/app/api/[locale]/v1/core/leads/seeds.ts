@@ -21,11 +21,11 @@ import {
 import {
   EmailCampaignStage,
   EmailJourneyVariant,
-  EmailStatus,
   EngagementTypes,
   LeadSource,
   LeadStatus,
 } from "./enum";
+import { EmailStatus } from "../emails/messages/enum";
 
 /**
  * Number of random leads to generate

@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - /next-vibe-db-data:/var/lib/postgresql/data
     networks:
       - app-network
     healthcheck:
@@ -79,6 +79,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "3000:3000"
     networks:
       - app-network
       - caddy_internal
@@ -91,6 +93,3 @@ networks:
     driver: bridge
   caddy_internal:
     external: true
-
-volumes:
-  postgres_data:

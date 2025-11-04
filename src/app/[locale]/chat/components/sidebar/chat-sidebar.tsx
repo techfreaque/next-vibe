@@ -133,12 +133,14 @@ export function ChatSidebar({
     : chat.currentRootFolderId || DEFAULT_FOLDER_IDS.PRIVATE;
 
   // Check if user is authenticated using auth status cookie (client-side only)
+  // Run only once on mount
   useEffect(() => {
     const authStatusResponse = authClientRepository.hasAuthStatus(logger);
     setIsAuthenticated(
       authStatusResponse.success && authStatusResponse.data === true,
     );
-  }, [logger]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - run only once on mount
 
   // Check if current folder requires authentication
   const requiresAuth = activeRootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO;
@@ -263,17 +265,6 @@ export function ChatSidebar({
             className="pl-8 h-10 sm:h-8 text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-500"
           />
         </Div>
-        {/* {onNavigateToThreads && (
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onNavigateToThreads}
-            className="h-10 w-10 sm:h-8 sm:w-8 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800"
-            title={t("app.chat.common.viewAllThreads")}
-          >
-            <Maximize2 className="h-3.5 w-3.5" />
-          </Button>
-        )} */}
       </Div>
 
       <Div className="flex-1 overflow-hidden px-0">

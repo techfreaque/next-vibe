@@ -1,7 +1,13 @@
 import { motion } from "framer-motion";
 import { CreditCard } from "lucide-react";
 import { Badge } from "next-vibe-ui/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
@@ -15,7 +21,10 @@ interface SubscriptionStatusCardProps {
   initialSubscription: SubscriptionData;
 }
 
-export function SubscriptionStatusCard({ locale, initialSubscription }: SubscriptionStatusCardProps): JSX.Element {
+export function SubscriptionStatusCard({
+  locale,
+  initialSubscription,
+}: SubscriptionStatusCardProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -39,7 +48,7 @@ export function SubscriptionStatusCard({ locale, initialSubscription }: Subscrip
               </CardDescription>
             </Div>
             <Badge className="bg-green-600 text-white">
-              {initialSubscription.status}
+              {t(initialSubscription.status)}
             </Badge>
           </Div>
         </CardHeader>
@@ -50,7 +59,7 @@ export function SubscriptionStatusCard({ locale, initialSubscription }: Subscrip
                 {t("app.subscription.subscription.billingInterval")}
               </Div>
               <Div className="text-lg font-semibold capitalize">
-                {initialSubscription.billingInterval.toLowerCase()}
+                {t(initialSubscription.billingInterval)}
               </Div>
             </Div>
             <Div className="p-4 rounded-lg bg-accent border">

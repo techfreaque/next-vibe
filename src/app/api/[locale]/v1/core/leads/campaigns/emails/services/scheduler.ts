@@ -12,7 +12,8 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import { emailCampaigns, leads } from "../../../db";
 import type { EmailJourneyVariant, EmailProvider } from "../../../enum";
-import { EmailCampaignStage, EmailStatus, LeadStatus } from "../../../enum";
+import { EmailCampaignStage, LeadStatus } from "../../../enum";
+import { EmailStatus } from "../../../../emails/messages/enum";
 import type { CampaignSchedulingOptions } from "../types";
 import { abTestingService } from "./ab-testing";
 

@@ -260,17 +260,23 @@ export function ChatInterface({
   }, [activeThreadMessages]);
 
   const { t, locale, currentCountry } = useTranslation();
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  // Create logger once - memoize to prevent recreating on every render
+  const logger = React.useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = checking
   const router = useRouter();
 
   // Check if user is authenticated using auth status cookie (client-side only)
+  // Run only once on mount
   useEffect(() => {
     const authStatusResponse = authClientRepository.hasAuthStatus(logger);
     setIsAuthenticated(
       authStatusResponse.success && authStatusResponse.data === true,
     );
-  }, [logger]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - run only once on mount
 
   // Parse URL path to determine root folder, sub folder, and thread
   // CRITICAL: This must be the single source of truth for all IDs

@@ -22,7 +22,7 @@ import { useAIStreamStore } from "../ai-stream/hooks/store";
 import type { DefaultFolderId } from "./config";
 import { DEFAULT_FOLDER_IDS } from "./config";
 import { createCreditUpdateCallback } from "./credit-updater";
-import { ChatMessageRole } from "./enum";
+import { ChatMessageRole, ThreadStatus } from "./enum";
 import {
   GET as foldersGetEndpoint,
   type FolderListResponseOutput,
@@ -599,7 +599,7 @@ export function useChat(
           title: streamThread.title,
           rootFolderId: streamThread.rootFolderId,
           folderId: streamThread.subFolderId,
-          status: "active",
+          status: ThreadStatus.ACTIVE,
           defaultModel: null,
           defaultPersona: null,
           systemPrompt: null,

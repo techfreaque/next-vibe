@@ -538,8 +538,7 @@ program
           options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
           {
             success: false,
-            message: handled.message,
-            exitCode: handled.exitCode,
+            error: handled.message,
           },
         );
         process.exit(handled.exitCode);

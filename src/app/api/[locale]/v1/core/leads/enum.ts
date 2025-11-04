@@ -69,25 +69,6 @@ export const {
 } as const);
 
 /**
- * Email Status Enum
- * Defines the possible states of an email
- */
-export const {
-  enum: EmailStatus,
-  options: EmailStatusOptions,
-  Value: EmailStatusValues,
-} = createEnumOptions({
-  PENDING: "app.api.v1.core.leads.enums.emailStatus.pending",
-  SENT: "app.api.v1.core.leads.enums.emailStatus.sent",
-  DELIVERED: "app.api.v1.core.leads.enums.emailStatus.delivered",
-  OPENED: "app.api.v1.core.leads.enums.emailStatus.opened",
-  CLICKED: "app.api.v1.core.leads.enums.emailStatus.clicked",
-  BOUNCED: "app.api.v1.core.leads.enums.emailStatus.bounced",
-  FAILED: "app.api.v1.core.leads.enums.emailStatus.failed",
-  UNSUBSCRIBED: "app.api.v1.core.leads.enums.emailStatus.unsubscribed",
-});
-
-/**
  * Email Journey Variant Enum
  * Different A/B test variants for email journeys
  */
@@ -636,16 +617,6 @@ export const EmailCampaignStageDB = [
   EmailCampaignStage.REACTIVATION,
 ] as const;
 
-export const EmailStatusDB = [
-  EmailStatus.PENDING,
-  EmailStatus.SENT,
-  EmailStatus.DELIVERED,
-  EmailStatus.OPENED,
-  EmailStatus.CLICKED,
-  EmailStatus.BOUNCED,
-  EmailStatus.FAILED,
-  EmailStatus.UNSUBSCRIBED,
-] as const;
 
 export const EmailJourneyVariantDB = [
   EmailJourneyVariant.PERSONAL_APPROACH,

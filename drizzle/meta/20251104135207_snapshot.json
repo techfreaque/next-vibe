@@ -1,5 +1,5 @@
 {
-  "id": "4c44f5cd-722e-4531-864a-2951b407415b",
+  "id": "4045c4f1-9ff9-4644-88e8-a053ba0502a1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -548,7 +548,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'ACTIVE'"
+          "default": "'app.api.v1.core.agent.chat.enums.threadStatus.active'"
         },
         "default_model": {
           "name": "default_model",
@@ -964,7 +964,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'NEW'"
+          "default": "'app.api.v1.core.contact.status.new'"
         },
         "user_id": {
           "name": "user_id",
@@ -1319,7 +1319,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'INFO'"
+          "default": "'app.api.v1.core.emails.enums.imapLoggingLevel.info'"
         },
         "rate_limit_enabled": {
           "name": "rate_limit_enabled",
@@ -1439,7 +1439,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'PLAIN'"
+          "default": "'app.api.v1.core.emails.enums.imapAuthMethod.plain'"
         },
         "connection_timeout": {
           "name": "connection_timeout",
@@ -1500,7 +1500,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'PENDING'"
+          "default": "'app.api.v1.core.emails.enums.imapSyncStatus.pending'"
         },
         "sync_error": {
           "name": "sync_error",
@@ -1720,7 +1720,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'PENDING'"
+          "default": "'app.api.v1.core.emails.enums.imapSyncStatus.pending'"
         },
         "sync_error": {
           "name": "sync_error",
@@ -1899,14 +1899,14 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'PENDING'"
+          "default": "'app.api.v1.core.emails.enums.emailStatus.pending'"
         },
         "email_provider": {
           "name": "email_provider",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'SMTP'"
+          "default": "'app.api.v1.core.emails.enums.emailProvider.smtp'"
         },
         "external_id": {
           "name": "external_id",
@@ -2120,7 +2120,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'PENDING'"
+          "default": "'app.api.v1.core.emails.enums.imapSyncStatus.pending'"
         },
         "sync_error": {
           "name": "sync_error",
@@ -2604,7 +2604,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'INFO'"
+          "default": "'app.api.v1.core.emails.enums.imapLoggingLevel.info'"
         },
         "created_at": {
           "name": "created_at",
@@ -2781,7 +2781,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'STARTTLS'"
+          "default": "'app.api.v1.core.emails.enums.smtpSecurityType.starttls'"
         },
         "username": {
           "name": "username",
@@ -2827,7 +2827,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'ACTIVE'"
+          "default": "'app.api.v1.core.emails.enums.smtpAccountStatus.active'"
         },
         "is_default": {
           "name": "is_default",
@@ -3285,14 +3285,14 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'PENDING'"
+          "default": "'app.api.v1.core.emails.enums.emailStatus.pending'"
         },
         "email_provider": {
           "name": "email_provider",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'SMTP'"
+          "default": "'app.api.v1.core.emails.enums.emailProvider.smtp'"
         },
         "external_id": {
           "name": "external_id",
@@ -3675,15 +3675,13 @@
         },
         "country": {
           "name": "country",
-          "type": "country",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "language": {
           "name": "language",
-          "type": "language",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -3698,7 +3696,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'NEW'"
+          "default": "'app.api.v1.core.leads.enums.leadStatus.new'"
         },
         "source": {
           "name": "source",
@@ -3759,7 +3757,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'NOT_STARTED'"
+          "default": "'app.api.v1.core.leads.enums.emailCampaignStage.notStarted'"
         },
         "email_journey_variant": {
           "name": "email_journey_variant",
@@ -4004,28 +4002,28 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'NEW'"
+          "default": "'app.api.v1.core.leads.enums.leadStatus.new'"
         },
         "default_campaign_stage": {
           "name": "default_campaign_stage",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'NOT_STARTED'"
+          "default": "'app.api.v1.core.leads.enums.emailCampaignStage.notStarted'"
         },
         "default_source": {
           "name": "default_source",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'CSV_IMPORT'"
+          "default": "'app.api.v1.core.leads.enums.leadSource.csvImport'"
         },
         "status": {
           "name": "status",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'PENDING'"
+          "default": "'app.api.v1.core.leads.import.enums.csvImportJobStatus.pending'"
         },
         "total_rows": {
           "name": "total_rows",
@@ -4494,7 +4492,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'SUBSCRIBED'"
+          "default": "'app.api.v1.core.newsletter.enum.status.subscribed'"
         },
         "preferences": {
           "name": "preferences",
@@ -4773,7 +4771,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'DRAFT'"
+          "default": "'app.api.v1.core.payment.enums.invoiceStatus.draft'"
         },
         "invoice_url": {
           "name": "invoice_url",
@@ -4985,7 +4983,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'PENDING'"
+          "default": "'app.api.v1.core.payment.enums.refundStatus.pending'"
         },
         "reason": {
           "name": "reason",
@@ -5095,21 +5093,21 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'PENDING'"
+          "default": "'app.api.v1.core.payment.enums.paymentStatus.pending'"
         },
         "provider": {
           "name": "provider",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'STRIPE'"
+          "default": "'app.api.v1.core.payment.enums.paymentProvider.stripe'"
         },
         "mode": {
           "name": "mode",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'PAYMENT'"
+          "default": "'app.api.v1.core.payment.enums.checkoutMode.payment'"
         },
         "metadata": {
           "name": "metadata",
@@ -5242,7 +5240,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'INCOMPLETE'"
+          "default": "'app.api.v1.core.subscription.enums.status.incomplete'"
         },
         "plan_id": {
           "name": "plan_id",
@@ -5255,7 +5253,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'MONTHLY'"
+          "default": "'app.api.v1.core.subscription.enums.billing.monthly'"
         },
         "current_period_start": {
           "name": "current_period_start",
@@ -5378,6 +5376,13 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "subscriptions_user_id_unique": {
+          "name": "subscriptions_user_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id"
+          ]
+        },
         "subscriptions_provider_subscription_id_unique": {
           "name": "subscriptions_provider_subscription_id_unique",
           "nullsNotDistinct": false,
@@ -7112,26 +7117,7 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {
-    "public.country": {
-      "name": "country",
-      "schema": "public",
-      "values": [
-        "DE",
-        "PL",
-        "GLOBAL"
-      ]
-    },
-    "public.language": {
-      "name": "language",
-      "schema": "public",
-      "values": [
-        "de",
-        "pl",
-        "en"
-      ]
-    }
-  },
+  "enums": {},
   "schemas": {},
   "sequences": {},
   "roles": {},

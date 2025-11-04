@@ -215,13 +215,14 @@ export class StripeProvider implements PaymentProvider {
         subscriptionId,
       );
 
-      // Stripe subscription has current_period_end as a Unix timestamp (seconds)
-      const currentPeriodEnd = subscription.current_period_end;
+      // In API version 2025-09-30.clover, current_period_end/start were removed from Subscription
+      // Use billing_cycle_anchor or retrieve from latest_invoice instead
+      const currentPeriodEnd = subscription.billing_cycle_anchor;
 
       logger.debug("Retrieved Stripe subscription", {
         subscriptionId,
-        currentPeriodEnd,
-        currentPeriodEndMs: currentPeriodEnd * 1000,
+        billingCycleAnchor: currentPeriodEnd,
+        billingCycleAnchorMs: currentPeriodEnd * 1000,
       });
 
       return createSuccessResponse({
