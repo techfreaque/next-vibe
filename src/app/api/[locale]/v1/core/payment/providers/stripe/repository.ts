@@ -211,22 +211,27 @@ export class StripeProvider implements PaymentProvider {
 
   async retrieveSubscription(subscriptionId: string, logger: EndpointLogger) {
     try {
-      const subscription = await this.stripe.subscriptions.retrieve(
-        subscriptionId,
-      );
+      const subscription =
+        await this.stripe.subscriptions.retrieve(subscriptionId);
 
       // In API version 2025-09-30.clover, current_period_end/start were removed from Subscription
-      // Use billing_cycle_anchor or retrieve from latest_invoice instead
+      // Use billing_cycle_anchor for period end and start_date/created for period start
       const currentPeriodEnd = subscription.billing_cycle_anchor;
+      // Use start_date if available, otherwise fall back to created timestamp
+      const currentPeriodStart =
+        subscription.start_date || subscription.created;
 
       logger.debug("Retrieved Stripe subscription", {
         subscriptionId,
+        currentPeriodStart,
+        currentPeriodStartMs: currentPeriodStart * 1000,
         billingCycleAnchor: currentPeriodEnd,
         billingCycleAnchorMs: currentPeriodEnd * 1000,
       });
 
       return createSuccessResponse({
         userId: subscription.metadata?.userId || "",
+        currentPeriodStart: currentPeriodStart * 1000, // Convert to milliseconds
         currentPeriodEnd: currentPeriodEnd * 1000, // Convert to milliseconds
       });
     } catch (error) {

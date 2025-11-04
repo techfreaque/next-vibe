@@ -22,6 +22,7 @@ import { simpleT } from "@/i18n/core/shared";
 import {
   productsRepository,
   type ProductIds,
+  TOTAL_MODEL_COUNT,
 } from "../../../products/repository-client";
 import type { PaymentInterval } from "../types";
 
@@ -55,13 +56,20 @@ export class StripePriceManager {
   ): Promise<ResponseType<StripePriceResult>> {
     try {
       // Get product definition from code with correct interval
-      const product = productsRepository.getProduct(productId, locale, interval);
+      const product = productsRepository.getProduct(
+        productId,
+        locale,
+        interval,
+      );
 
       const { t } = simpleT(locale);
 
-      // Translate product name and description
+      // Translate product name and description with interpolation
       const productName = t(product.name);
-      const productDescription = t(product.description);
+      const productDescription = t(product.description, {
+        subCredits: product.credits,
+        modelCount: TOTAL_MODEL_COUNT,
+      });
 
       logger.debug("Creating Stripe price", {
         productId,

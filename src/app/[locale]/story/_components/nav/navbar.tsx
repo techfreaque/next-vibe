@@ -30,14 +30,14 @@ import { UserMenu } from "./user-menu";
 interface NavbarProps {
   user: StandardUserType | undefined;
   locale: CountryLanguage;
-  isOnboardingComplete: boolean;
+  hasSubscription: boolean;
   navigationItems: NavItemType[];
 }
 
 export function Navbar({
   user,
   locale,
-  isOnboardingComplete,
+  hasSubscription,
   navigationItems,
 }: NavbarProps): JSX.Element {
   const { t } = simpleT(locale);
@@ -199,7 +199,7 @@ export function Navbar({
             <UserMenu
               user={user}
               locale={locale}
-              isOnboardingComplete={isOnboardingComplete}
+              hasSubscription={hasSubscription}
             />
           ) : (
             <>

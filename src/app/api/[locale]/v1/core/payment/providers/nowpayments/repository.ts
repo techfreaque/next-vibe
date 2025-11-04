@@ -119,7 +119,13 @@ export class NOWPaymentsProvider implements PaymentProvider {
   async retrieveSubscription(
     subscriptionId: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ userId: string; currentPeriodEnd?: number }>> {
+  ): Promise<
+    ResponseType<{
+      userId: string;
+      currentPeriodStart?: number;
+      currentPeriodEnd?: number;
+    }>
+  > {
     // NOWPayments doesn't support subscriptions - only one-time payments
     logger.error("NOWPayments does not support subscriptions", {
       subscriptionId,
@@ -152,4 +158,3 @@ export class NOWPaymentsProvider implements PaymentProvider {
     );
   }
 }
-

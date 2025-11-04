@@ -3,7 +3,7 @@
  * Handles all credit-related database operations
  */
 
-import { and, desc, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNull, lt, or, sql } from "drizzle-orm";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -151,7 +151,8 @@ export interface CreditRepositoryInterface {
  */
 class CreditRepository
   extends BaseCreditHandler
-  implements CreditRepositoryInterface {
+  implements CreditRepositoryInterface
+{
   async getBalance(
     identifier: CreditIdentifier,
     logger: EndpointLogger,
@@ -485,7 +486,10 @@ class CreditRepository
         .returning();
 
       // Create initial free tier credits from products repository
-      const freeTier = productsRepository.getProduct(ProductIds.FREE_TIER, locale);
+      const freeTier = productsRepository.getProduct(
+        ProductIds.FREE_TIER,
+        locale,
+      );
       const freeCredits = freeTier.credits;
 
       await db.insert(leadCredits).values({
@@ -625,7 +629,12 @@ class CreditRepository
         userId,
         amount,
         balanceAfter: amount,
-        type: type === "subscription" ? "subscription" : "purchase",
+        type:
+          type === "subscription"
+            ? "subscription"
+            : type === "free"
+              ? "free_tier"
+              : "purchase",
       });
 
       return createSuccessResponse(undefined);
@@ -682,58 +691,71 @@ class CreditRepository
       }
 
       if (useUserCredits && identifier.userId) {
-        // Deduct from user credits (expiring first, then permanent, then lead credits)
-        // Filter out expired credits
-        const credits = await db
-          .select()
-          .from(userCredits)
-          .where(
-            and(
-              eq(userCredits.userId, identifier.userId),
-              or(
-                isNull(userCredits.expiresAt),
-                gte(userCredits.expiresAt, new Date()),
-              ),
-            ),
-          )
-          .orderBy(
-            sql`CASE WHEN type = 'subscription' THEN 1 WHEN type = 'free' THEN 2 ELSE 3 END`,
-          );
+        // Deduct credits with correct priority:
+        // 1. Lead credits (20 free monthly credits) - HIGHEST PRIORITY
+        // 2. User free credits
+        // 3. User subscription credits
+        // 4. User permanent credits - LOWEST PRIORITY
 
         let remaining = amount;
-        for (const credit of credits) {
-          if (remaining <= 0) {
-            break;
-          }
 
-          const deduction = Math.min(credit.amount, remaining);
+        // STEP 1: Deduct from lead credits first (20 free monthly credits)
+        const [leadCredit] = await db
+          .select()
+          .from(leadCredits)
+          .where(eq(leadCredits.leadId, identifier.leadId))
+          .limit(1);
 
-          if (deduction === credit.amount) {
-            await db.delete(userCredits).where(eq(userCredits.id, credit.id));
-          } else {
-            await db
-              .update(userCredits)
-              .set({ amount: sql`amount - ${deduction}`, updatedAt: new Date() })
-              .where(eq(userCredits.id, credit.id));
-          }
-
+        if (leadCredit && leadCredit.amount > 0) {
+          const deduction = Math.min(leadCredit.amount, remaining);
+          await db
+            .update(leadCredits)
+            .set({
+              amount: sql`amount - ${deduction}`,
+              updatedAt: new Date(),
+            })
+            .where(eq(leadCredits.id, leadCredit.id));
           remaining -= deduction;
         }
 
-        // If still have remaining amount, deduct from lead credits (free monthly credits)
+        // STEP 2: If still have remaining amount, deduct from user credits
+        // Order: free → subscription → permanent
         if (remaining > 0) {
-          const [leadCredit] = await db
+          const credits = await db
             .select()
-            .from(leadCredits)
-            .where(eq(leadCredits.leadId, identifier.leadId))
-            .limit(1);
+            .from(userCredits)
+            .where(
+              and(
+                eq(userCredits.userId, identifier.userId),
+                or(
+                  isNull(userCredits.expiresAt),
+                  gte(userCredits.expiresAt, new Date()),
+                ),
+              ),
+            )
+            .orderBy(
+              sql`CASE WHEN type = 'free' THEN 1 WHEN type = 'subscription' THEN 2 ELSE 3 END`,
+            );
 
-          if (leadCredit && leadCredit.amount > 0) {
-            const deduction = Math.min(leadCredit.amount, remaining);
-            await db
-              .update(leadCredits)
-              .set({ amount: sql`amount - ${deduction}`, updatedAt: new Date() })
-              .where(eq(leadCredits.id, leadCredit.id));
+          for (const credit of credits) {
+            if (remaining <= 0) {
+              break;
+            }
+
+            const deduction = Math.min(credit.amount, remaining);
+
+            if (deduction === credit.amount) {
+              await db.delete(userCredits).where(eq(userCredits.id, credit.id));
+            } else {
+              await db
+                .update(userCredits)
+                .set({
+                  amount: sql`amount - ${deduction}`,
+                  updatedAt: new Date(),
+                })
+                .where(eq(userCredits.id, credit.id));
+            }
+
             remaining -= deduction;
           }
         }
@@ -794,7 +816,8 @@ class CreditRepository
   }
 
   /**
-   * Get transaction history
+   * Get transaction history by userId
+   * Includes transactions from all leads linked to this user
    */
   async getTransactions(
     userId: string,
@@ -807,10 +830,26 @@ class CreditRepository
     }>
   > {
     try {
+      // Get all leadIds linked to this user
+      const userLeadLinks = await db
+        .select({ leadId: userLeads.leadId })
+        .from(userLeads)
+        .where(eq(userLeads.userId, userId));
+
+      const leadIds = userLeadLinks.map((link) => link.leadId);
+
+      // Fetch transactions where userId matches OR leadId matches any of user's leads
       const transactions = await db
         .select()
         .from(creditTransactions)
-        .where(eq(creditTransactions.userId, userId))
+        .where(
+          or(
+            eq(creditTransactions.userId, userId),
+            leadIds.length > 0
+              ? inArray(creditTransactions.leadId, leadIds)
+              : sql`false`,
+          ),
+        )
         .orderBy(desc(creditTransactions.createdAt))
         .limit(limit)
         .offset(offset);
@@ -818,7 +857,61 @@ class CreditRepository
       const [{ count }] = await db
         .select({ count: sql<number>`count(*)` })
         .from(creditTransactions)
-        .where(eq(creditTransactions.userId, userId));
+        .where(
+          or(
+            eq(creditTransactions.userId, userId),
+            leadIds.length > 0
+              ? inArray(creditTransactions.leadId, leadIds)
+              : sql`false`,
+          ),
+        );
+
+      return createSuccessResponse({
+        transactions: transactions.map((t) => ({
+          id: t.id,
+          amount: t.amount,
+          balanceAfter: t.balanceAfter,
+          type: t.type,
+          modelId: t.modelId,
+          messageId: t.messageId,
+          createdAt: t.createdAt.toISOString(),
+        })),
+        totalCount: count,
+      });
+    } catch {
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.credits.errors.getTransactionsFailed",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Get transaction history by leadId (for public users)
+   */
+  async getTransactionsByLeadId(
+    leadId: string,
+    limit: number,
+    offset: number,
+  ): Promise<
+    ResponseType<{
+      transactions: CreditTransactionOutput[];
+      totalCount: number;
+    }>
+  > {
+    try {
+      const transactions = await db
+        .select()
+        .from(creditTransactions)
+        .where(eq(creditTransactions.leadId, leadId))
+        .orderBy(desc(creditTransactions.createdAt))
+        .limit(limit)
+        .offset(offset);
+
+      const [{ count }] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(creditTransactions)
+        .where(eq(creditTransactions.leadId, leadId));
 
       return createSuccessResponse({
         transactions: transactions.map((t) => ({
@@ -970,7 +1063,10 @@ class CreditRepository
         );
 
         if (identifierResult.success && identifierResult.data) {
-          if (identifierResult.data.creditType === CreditTypeIdentifier.USER_SUBSCRIPTION) {
+          if (
+            identifierResult.data.creditType ===
+            CreditTypeIdentifier.USER_SUBSCRIPTION
+          ) {
             creditIdentifier = { leadId: user.leadId, userId: user.id };
           } else {
             creditIdentifier = { leadId: user.leadId };

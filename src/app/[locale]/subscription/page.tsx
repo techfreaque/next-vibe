@@ -67,7 +67,7 @@ export default async function SubscriptionPage({
     "id" in userResponse.data &&
     !!userResponse.data.id;
 
-  // For authenticated users, fetch their data
+  // Fetch data for both authenticated and public users
   let credits: CreditBalance | null = null;
   let history: {
     transactions: CreditTransaction[];
@@ -75,34 +75,48 @@ export default async function SubscriptionPage({
   } | null = null;
   let subscription: SubscriptionData | null = null;
 
-  if (
-    isAuthenticated &&
-    userResponse.data &&
-    "id" in userResponse.data &&
-    userResponse.data.id &&
-    userResponse.data.leadId
-  ) {
-    const userId = userResponse.data.id;
-    const leadId = userResponse.data.leadId;
-
-    // Fetch credit balance
+  // Fetch credit balance for all users (both authenticated and public)
+  if (userResponse.data && userResponse.data.leadId) {
     const creditsResponse = await creditRepository.getCreditBalanceForUser(
       {
-        id: userId,
-        leadId,
-        isPublic: false,
+        id: "id" in userResponse.data ? userResponse.data.id : undefined,
+        leadId: userResponse.data.leadId,
+        isPublic: userResponse.data.isPublic,
       },
       logger,
     );
     credits = creditsResponse.success ? creditsResponse.data : null;
+  }
 
-    // Fetch transaction history
-    const historyResponse = await creditRepository.getTransactions(
-      userId,
-      50, // limit
-      0, // offset
-    );
-    history = historyResponse.success ? historyResponse.data : null;
+  // Fetch transaction history for all users (both authenticated and public)
+  if (userResponse.data && userResponse.data.leadId) {
+    if (isAuthenticated && "id" in userResponse.data && userResponse.data.id) {
+      // Authenticated users: fetch by userId
+      const historyResponse = await creditRepository.getTransactions(
+        userResponse.data.id,
+        50, // limit
+        0, // offset
+      );
+      history = historyResponse.success ? historyResponse.data : null;
+    } else {
+      // Public users: fetch by leadId
+      const historyResponse = await creditRepository.getTransactionsByLeadId(
+        userResponse.data.leadId,
+        50, // limit
+        0, // offset
+      );
+      history = historyResponse.success ? historyResponse.data : null;
+    }
+  }
+
+  // For authenticated users only, fetch subscription data
+  if (
+    isAuthenticated &&
+    userResponse.data &&
+    "id" in userResponse.data &&
+    userResponse.data.id
+  ) {
+    const userId = userResponse.data.id;
 
     // Fetch subscription data
     const subscriptionResponse = await subscriptionRepository.getSubscription(

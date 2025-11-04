@@ -323,8 +323,7 @@ export const translations: typeof enTranslations = {
           "Dołącz do naszego zespołu i pomóż budować przyszłość niecenzurowanej AI",
         category: "Kariera",
         imageAlt: "Kariera w {{appName}}",
-        keywords:
-          "kariera, praca, praca AI, praca zdalna, kariera {{config.appName}}",
+        keywords: "kariera, praca, praca AI, praca zdalna, kariera {{appName}}",
       },
       title: "Dołącz do naszego zespołu",
       description:
@@ -457,7 +456,9 @@ export const translations: typeof enTranslations = {
       },
       applyNow: "Aplikuj teraz",
       readyToJoin: "Gotowy dołączyć?",
-      explorePositions: "Przeglądaj otwarte stanowiska",
+      explorePositions:
+        "Zawsze szukamy utalentowanych osób do naszego zespołu. Sprawdź nasze otwarte stanowiska lub skontaktuj się z nami, aby dowiedzieć się więcej o możliwościach kariery.",
+      getInTouch: "Skontaktuj się",
     },
     aboutUs: {
       backToHome: "Powrót do strony głównej",
@@ -887,6 +888,6 @@ export const translations: typeof enTranslations = {
     },
     builtWith: "Zbudowano z",
     framework: "{{appName}} Framework",
-    copyright: "© {{year}} {{config.appName}}. Wszelkie prawa zastrzeżone.",
+    copyright: "© {{year}} {{appName}}. Wszelkie prawa zastrzeżone.",
   },
 };

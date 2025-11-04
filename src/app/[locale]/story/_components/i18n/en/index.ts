@@ -451,7 +451,9 @@ export const translations = {
       },
       applyNow: "Apply Now",
       readyToJoin: "Ready to Join?",
-      explorePositions: "Explore Open Positions",
+      explorePositions:
+        "We're always looking for talented people to join our team. Check out our open positions or get in touch to learn more about career opportunities.",
+      getInTouch: "Get in Touch",
     },
     aboutUs: {
       backToHome: "Back to Home",
@@ -879,6 +881,6 @@ export const translations = {
     },
     builtWith: "Built with",
     framework: "{{appName}} Framework",
-    copyright: "© {{year}} {{config.appName}}. All rights reserved.",
+    copyright: "© {{year}} {{appName}}. All rights reserved.",
   },
 };

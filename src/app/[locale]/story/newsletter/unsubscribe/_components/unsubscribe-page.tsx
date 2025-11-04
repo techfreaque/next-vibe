@@ -252,7 +252,7 @@ export function UnsubscribePage({
             </Button>
             <Button
               onClick={() => {
-                window.location.href = `/${locale}/story/help`;
+                window.location.href = `/${locale}/help`;
               }}
               variant="outline"
               size="lg"

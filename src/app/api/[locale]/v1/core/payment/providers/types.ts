@@ -86,7 +86,13 @@ export interface PaymentProvider {
   retrieveSubscription(
     subscriptionId: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ userId: string; currentPeriodEnd?: number }>>;
+  ): Promise<
+    ResponseType<{
+      userId: string;
+      currentPeriodStart?: number;
+      currentPeriodEnd?: number;
+    }>
+  >;
 
   cancelSubscription(
     subscriptionId: string,

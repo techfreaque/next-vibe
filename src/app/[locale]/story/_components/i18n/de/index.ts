@@ -321,7 +321,7 @@ export const translations: typeof enTranslations = {
         category: "Karriere",
         imageAlt: "Karriere bei {{appName}}",
         keywords:
-          "karriere, jobs, KI-Jobs, remote-arbeit, {{config.appName}} karriere",
+          "karriere, jobs, KI-Jobs, remote-arbeit, {{appName}} karriere",
       },
       title: "Werden Sie Teil unseres Teams",
       description:
@@ -454,7 +454,9 @@ export const translations: typeof enTranslations = {
       },
       applyNow: "Jetzt bewerben",
       readyToJoin: "Bereit beizutreten?",
-      explorePositions: "Offene Stellen erkunden",
+      explorePositions:
+        "Wir sind immer auf der Suche nach talentierten Menschen, die unserem Team beitreten möchten. Schauen Sie sich unsere offenen Stellen an oder nehmen Sie Kontakt mit uns auf, um mehr über Karrieremöglichkeiten zu erfahren.",
+      getInTouch: "Kontakt aufnehmen",
     },
     aboutUs: {
       backToHome: "Zurück zur Startseite",
@@ -889,6 +891,6 @@ export const translations: typeof enTranslations = {
     },
     builtWith: "Erstellt mit",
     framework: "{{appName}} Framework",
-    copyright: "© {{year}} {{config.appName}}. Alle Rechte vorbehalten.",
+    copyright: "© {{year}} {{appName}}. Alle Rechte vorbehalten.",
   },
 };

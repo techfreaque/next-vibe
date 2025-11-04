@@ -162,22 +162,21 @@ export function OverviewTab({
                           {provider.name}
                         </H4>
                         <Div className="grid grid-cols-2 gap-2 text-sm">
-                          {providerModels.map((model) => (
-                            <Div
-                              key={model.id}
-                              className="flex justify-between p-2 rounded bg-accent"
-                            >
-                              <Span>{model.name}</Span>
-                              <Span className="font-mono">
-                                {t(
-                                  "app.subscription.subscription.overview.costs.models.cost",
-                                  {
-                                    count: model.creditCost,
-                                  },
-                                )}
-                              </Span>
-                            </Div>
-                          ))}
+                          {providerModels.map((model) => {
+                            const creditText =
+                              model.creditCost === 1
+                                ? `${model.creditCost} credit`
+                                : `${model.creditCost} credits`;
+                            return (
+                              <Div
+                                key={model.id}
+                                className="flex justify-between p-2 rounded bg-accent"
+                              >
+                                <Span>{model.name}</Span>
+                                <Span className="font-mono">{creditText}</Span>
+                              </Div>
+                            );
+                          })}
                         </Div>
                       </Div>
                     );

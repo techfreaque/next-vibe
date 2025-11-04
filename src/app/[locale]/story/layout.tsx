@@ -4,6 +4,8 @@ import type { JSX, ReactNode } from "react";
 import Footer from "@/app/[locale]/story/_components/footer";
 import { Navbar } from "@/app/[locale]/story/_components/nav/navbar";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
+import { subscriptionRepository } from "@/app/api/[locale]/v1/core/subscription/repository";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -32,16 +34,24 @@ export default async function SiteLayoutServer({
     logger,
   );
 
-  // TODO: Get onboarding status when onboarding module is implemented
-  // For now, set to false as onboarding repository doesn't exist yet
-  const isOnboardingComplete = false;
+  // Get subscription status for authenticated users
+  let hasSubscription = false;
+  if (userResponse.success && userResponse.data?.id) {
+    const subscriptionResponse = await subscriptionRepository.getSubscription(
+      userResponse.data.id,
+      logger,
+    );
+    hasSubscription =
+      subscriptionResponse.success &&
+      subscriptionResponse.data.status === SubscriptionStatus.ACTIVE;
+  }
 
   return (
     <Div role="main" className="min-h-screen ">
       <Navbar
         user={userResponse.success ? userResponse.data : undefined}
         locale={locale}
-        isOnboardingComplete={isOnboardingComplete}
+        hasSubscription={hasSubscription}
         navigationItems={navItems}
       />
       {children}

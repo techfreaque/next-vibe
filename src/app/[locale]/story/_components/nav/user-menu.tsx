@@ -3,7 +3,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui/avatar";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "next-vibe-ui/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "next-vibe-ui/ui/dropdown-menu";
 import { HelpCircle, LogOut, User } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { P } from "next-vibe-ui/ui/typography";
@@ -19,13 +26,13 @@ import { simpleT } from "@/i18n/core/shared";
 interface UserMenuProps {
   user: StandardUserType;
   locale: CountryLanguage;
-  isOnboardingComplete: boolean;
+  hasSubscription: boolean;
 }
 
 export function UserMenu({
   user,
   locale,
-  isOnboardingComplete,
+  hasSubscription,
 }: UserMenuProps): JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -57,11 +64,9 @@ export function UserMenu({
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link
-            href={
-              isOnboardingComplete ? `/${locale}/app/dashboard` : `/${locale}/`
-            }
+            href={hasSubscription ? `/${locale}` : `/${locale}/subscription`}
           >
-            {isOnboardingComplete ? (
+            {hasSubscription ? (
               <>
                 <User className="mr-2 h-4 w-4" />
                 <Span>{t("app.story._components.nav.user.dashboard")}</Span>

@@ -64,6 +64,11 @@ export async function dev(
   logger.debug("🌱 Seeding subscription data for development environment");
 
   try {
+    // NOTE: Demo user intentionally does NOT get a subscription by default
+    // This allows testing the subscription purchase flow
+    // To test with an active subscription, uncomment the code below
+
+    /*
     // Get demo user for subscription testing
     const demoUserResponse = await userRepository.getUserByEmail(
       "demo@example.com",
@@ -171,6 +176,7 @@ export async function dev(
         logger.debug("Demo user already has credits, skipping credit creation");
       }
     }
+    */
 
     // Get admin user for subscription testing
     const adminUserResponse = await userRepository.getUserByEmail(
@@ -254,8 +260,13 @@ export async function dev(
             : undefined;
 
           // Get subscription credits from products repository
-          const { productsRepository, ProductIds } = await import("../products/repository-client");
-          const subscription = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
+          const { productsRepository, ProductIds } = await import(
+            "../products/repository-client"
+          );
+          const subscription = productsRepository.getProduct(
+            ProductIds.SUBSCRIPTION,
+            locale,
+          );
           const subscriptionCredits = subscription.credits;
 
           const creditsResult = await creditRepository.addUserCredits(
@@ -267,10 +278,13 @@ export async function dev(
           );
 
           if (creditsResult.success) {
-            logger.debug(`Added ${subscriptionCredits} subscription credits to admin user`, {
-              userId: adminUser.id,
-              credits: subscriptionCredits,
-            });
+            logger.debug(
+              `Added ${subscriptionCredits} subscription credits to admin user`,
+              {
+                userId: adminUser.id,
+                credits: subscriptionCredits,
+              },
+            );
           } else {
             logger.error("Failed to add subscription credits to admin user", {
               userId: adminUser.id,

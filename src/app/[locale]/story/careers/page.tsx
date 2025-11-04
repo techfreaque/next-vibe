@@ -298,8 +298,8 @@ export default async function CareersPage({
               {t("app.story._components.home.careers.explorePositions")}
             </P>
             <Button size="lg" asChild>
-              <Link href={`/${locale}/story/help`}>
-                {t("app.story._components.nav.contact")}
+              <Link href={`/${locale}/help`}>
+                {t("app.story._components.home.careers.getInTouch")}
               </Link>
             </Button>
           </section>

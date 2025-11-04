@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
   emailJourneys: {
     components: {
       footer: {
-        copyright: "© 2024 {{config.appName}}. Alle Rechte vorbehalten.",
+        copyright: "© 2024 {{appName}}. Alle Rechte vorbehalten.",
         helpText:
           "Bei Fragen kontaktieren Sie uns bitte unter {{config.emails.support}}",
         unsubscribeText: "Möchten Sie diese E-Mails nicht mehr erhalten?",

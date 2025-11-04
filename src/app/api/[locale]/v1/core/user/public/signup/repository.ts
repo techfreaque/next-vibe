@@ -389,23 +389,9 @@ export class SignupRepositoryImpl implements SignupRepository {
         logger,
       );
 
-      const creditsResult = await creditRepository.addCredits(
-        { leadId, userId: userResponse.data.id },
-        20,
-        "free",
-        logger,
-      );
-
-      if (creditsResult.success) {
-        logger.debug("Added 20 free credits to new user", {
-          userId: userResponse.data.id,
-        });
-      } else {
-        logger.error("Failed to add free credits to new user", {
-          userId: userResponse.data.id,
-          error: creditsResult.message,
-        });
-      }
+      // Note: Free credits are automatically created for the lead when it's first accessed
+      // No need to manually add credits here - the lead already has 20 free credits
+      // from when it was created (in getOrCreateLeadByIp or getLeadBalance)
 
       logger.debug("User created successfully", {
         email,

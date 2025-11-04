@@ -332,7 +332,9 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
           status: SubscriptionStatus.ACTIVE,
           provider: providerName,
           providerSubscriptionId,
-          currentPeriodStart: new Date(),
+          currentPeriodStart: subscriptionResult.data.currentPeriodStart
+            ? new Date(subscriptionResult.data.currentPeriodStart)
+            : new Date(),
           currentPeriodEnd: subscriptionResult.data.currentPeriodEnd
             ? new Date(subscriptionResult.data.currentPeriodEnd)
             : null,
@@ -342,7 +344,9 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
           set: {
             status: SubscriptionStatus.ACTIVE,
             providerSubscriptionId,
-            currentPeriodStart: new Date(),
+            currentPeriodStart: subscriptionResult.data.currentPeriodStart
+              ? new Date(subscriptionResult.data.currentPeriodStart)
+              : new Date(),
             currentPeriodEnd: subscriptionResult.data.currentPeriodEnd
               ? new Date(subscriptionResult.data.currentPeriodEnd)
               : null,
@@ -436,7 +440,9 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       await db
         .update(subscriptions)
         .set({
-          currentPeriodStart: new Date(),
+          currentPeriodStart: subscriptionResult.data.currentPeriodStart
+            ? new Date(subscriptionResult.data.currentPeriodStart)
+            : new Date(),
           currentPeriodEnd: subscriptionResult.data.currentPeriodEnd
             ? new Date(subscriptionResult.data.currentPeriodEnd)
             : undefined,
