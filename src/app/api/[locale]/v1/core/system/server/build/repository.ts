@@ -8,6 +8,7 @@ import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -165,15 +166,19 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
           });
           output.push(MESSAGES.NEXTJS_BUILD_SUCCESS);
         } catch (buildError) {
-          errors.push(MESSAGES.NEXTJS_BUILD_FAILED);
+          const parsedError = parseError(buildError);
+          const errorMsg = `${MESSAGES.NEXTJS_BUILD_FAILED}: ${parsedError.message}`;
+          errors.push(errorMsg);
+
           if (!data.force) {
-            const response: BuildResponseType = {
-              success: false,
-              output: output.join("\n"),
-              duration: Date.now() - startTime,
-              errors,
-            };
-            return createSuccessResponse(response);
+            return fail({
+              message:
+                "app.api.v1.core.system.server.build.post.errors.nextjs_build_failed.title",
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              messageParams: {
+                error: parsedError.message,
+              },
+            });
           }
         }
       }

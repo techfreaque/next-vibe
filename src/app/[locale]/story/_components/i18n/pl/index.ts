@@ -122,6 +122,7 @@ export const translations: typeof enTranslations = {
       title: "Gotowy dołączyć do platformy AI + społeczności?",
       subtitle:
         "Czatuj prywatnie z 40+ modelami AI. Dołącz do publicznych dyskusji na forum. Wybierz poziom prywatności. Zacznij za darmo już dziś.",
+      signUp: "Zarejestruj się za darmo",
       viewPlans: "Zobacz plany cenowe",
     },
     pricingSection: {

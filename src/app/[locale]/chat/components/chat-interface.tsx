@@ -281,8 +281,8 @@ export function ChatInterface({
       if (urlPath && urlPath.length > 0) {
         const parsed = parseChatUrl(urlPath);
         logger.debug("Chat: Parsed URL path", {
-          urlPath,
-          parsed,
+          urlPath: urlPath.join("/"),
+          parsed: JSON.stringify(parsed),
         });
         return parsed;
       }

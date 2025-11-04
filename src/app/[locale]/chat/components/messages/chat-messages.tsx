@@ -97,7 +97,7 @@ export function ChatMessages({
   const scrollAnimationFrameRef = useRef<number | null>(null);
   const lastScrollTimeRef = useRef<number>(0);
   const userInteractingRef = useRef<boolean>(false);
-  const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const interactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastThreadIdRef = useRef<string | null>(null);
 
   // Use custom hook for message action state management

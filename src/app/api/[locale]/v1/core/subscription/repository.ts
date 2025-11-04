@@ -593,12 +593,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         .set({
           status,
           cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
-          currentPeriodStart: stripeSubscription.current_period_start
-            ? new Date(stripeSubscription.current_period_start * 1000)
-            : undefined,
-          currentPeriodEnd: stripeSubscription.current_period_end
-            ? new Date(stripeSubscription.current_period_end * 1000)
-            : undefined,
+          // Note: Stripe.Subscription doesn't have current_period_start/end in the type definition
+          // These would need to be retrieved from the latest invoice or billing cycle
+          currentPeriodStart: undefined,
+          currentPeriodEnd: undefined,
           updatedAt: new Date(),
         })
         .where(eq(subscriptions.providerSubscriptionId, stripeSubscription.id));

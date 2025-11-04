@@ -22,6 +22,8 @@ export const translations: typeof enTranslations = {
       "{{subCredits}} Credits pro Monat mit allen {{modelCount}} KI-Modellen",
     longDescription:
       "Monatsabonnement mit {{subCredits}} Credits für alle {{modelCount}} unzensierten KI-Modellen",
+    price: "Monatliche Abonnementpreise",
+    cta: "Jetzt abonnieren",
     features: {
       credits: "{{subCredits}} Credits pro Monat",
       allModels: "Alle {{modelCount}} KI-Modelle",

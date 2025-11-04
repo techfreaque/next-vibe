@@ -97,6 +97,10 @@ export const translations = {
         title: "Conflict",
         description: "Build conflict detected",
       },
+      nextjs_build_failed: {
+        title: "Next.js Build Failed",
+        description: "The Next.js build process failed: {{error}}",
+      },
     },
     success: {
       title: "Build Completed",

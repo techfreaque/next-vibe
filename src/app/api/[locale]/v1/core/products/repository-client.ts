@@ -420,10 +420,10 @@ function buildPricingPlans(
       name: subscriptionDef.name,
       description: subscriptionDef.description,
       features: [
-        "app.api.v1.core.products.SUBSCRIPTION.features.messages",
-        "app.api.v1.core.products.SUBSCRIPTION.features.models",
-        "app.api.v1.core.products.SUBSCRIPTION.features.folders",
-        "app.api.v1.core.products.SUBSCRIPTION.features.personas",
+        "app.api.v1.core.products.subscription.features.credits",
+        "app.api.v1.core.products.subscription.features.allModels",
+        "app.api.v1.core.products.subscription.features.allFeatures",
+        "app.api.v1.core.products.subscription.features.cancel",
       ],
       priceByCountry: {
         DE: {
@@ -442,8 +442,8 @@ function buildPricingPlans(
           currency: getPriceData("GLOBAL", "month").currency,
         },
       },
-      pricing: "app.api.v1.core.products.SUBSCRIPTION.price",
-      cta: "app.api.v1.core.products.SUBSCRIPTION.cta",
+      pricing: "app.api.v1.core.products.subscription.price",
+      cta: "app.api.v1.core.products.subscription.cta",
       highlighted: false,
       icon: icon,
     },

@@ -122,6 +122,7 @@ export const translations: typeof enTranslations = {
       title: "Bereit, der KI + Community-Plattform beizutreten?",
       subtitle:
         "Chatten Sie privat mit 40+ KI-Modellen. Nehmen Sie an öffentlichen Forum-Diskussionen teil. Wählen Sie Ihr Privatsphäre-Level. Starten Sie heute kostenlos.",
+      signUp: "Kostenlos anmelden",
       viewPlans: "Preispläne ansehen",
     },
     pricingSection: {

@@ -107,7 +107,7 @@ ENV BRAVE_SEARCH_API_KEY=$BRAVE_SEARCH_API_KEY
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Install dependencies (skip prepare scripts that may fail in Docker)
-RUN bun install --frozen-lockfile --ignore-scripts
+RUN bun install --frozen-lockfile
 
 # Build using vibe CLI
 RUN bun src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts build

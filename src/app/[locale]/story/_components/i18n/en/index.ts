@@ -121,6 +121,7 @@ export const translations = {
       title: "Ready to Join the AI + Community Platform?",
       subtitle:
         "Chat privately with {{modelCount}}+ AI models. Join public forum discussions. Choose your privacy level. Start free today.",
+      signUp: "Sign Up Free",
       viewPlans: "View Pricing Plans",
     },
     pricingSection: {

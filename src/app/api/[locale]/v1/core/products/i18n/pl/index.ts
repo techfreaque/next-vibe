@@ -21,6 +21,8 @@ export const translations: typeof enTranslations = {
       "{{subCredits}} kredytów miesięcznie ze wszystkimi {{modelCount}} modelami AI",
     longDescription:
       "Miesięczna subskrypcja z {{subCredits}} kredytów dla wszystkich {{modelCount}} niecenzurowanych modeli AI",
+    price: "Ceny subskrypcji miesięcznej",
+    cta: "Subskrybuj teraz",
     features: {
       credits: "{{subCredits}} kredytów miesięcznie",
       allModels: "Wszystkie {{modelCount}} modeli AI",

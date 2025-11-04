@@ -46,6 +46,7 @@ export function StoryPricingSection({
   const SUBSCRIPTION_CREDITS = products[ProductIds.SUBSCRIPTION].credits;
   const PACK_PRICE = products[ProductIds.CREDIT_PACK].price;
   const PACK_CREDITS = products[ProductIds.CREDIT_PACK].credits;
+  const FREE_CREDITS = products[ProductIds.FREE_TIER].credits;
 
   return (
     <Container className="py-16 space-y-12">
@@ -61,7 +62,14 @@ export function StoryPricingSection({
 
       {/* Overview Section */}
       <Div className="space-y-6">
-        <OverviewTab locale={locale} />
+        <OverviewTab
+          locale={locale}
+          subscriptionPrice={SUBSCRIPTION_PRICE}
+          subscriptionCredits={SUBSCRIPTION_CREDITS}
+          packPrice={PACK_PRICE}
+          packCredits={PACK_CREDITS}
+          freeCredits={FREE_CREDITS}
+        />
       </Div>
 
       {/* Buy Credits Section */}

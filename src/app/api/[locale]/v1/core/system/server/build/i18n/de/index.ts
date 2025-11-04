@@ -102,6 +102,10 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Build-Konflikt erkannt",
       },
+      nextjs_build_failed: {
+        title: "Next.js-Build fehlgeschlagen",
+        description: "Der Next.js-Build-Prozess ist fehlgeschlagen: {{error}}",
+      },
     },
     success: {
       title: "Build abgeschlossen",

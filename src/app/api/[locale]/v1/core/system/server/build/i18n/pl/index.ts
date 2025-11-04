@@ -100,6 +100,10 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Wykryto konflikt budowania",
       },
+      nextjs_build_failed: {
+        title: "Budowanie Next.js nie powiodło się",
+        description: "Proces budowania Next.js nie powiódł się: {{error}}",
+      },
     },
     success: {
       title: "Budowanie zakończone",

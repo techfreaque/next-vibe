@@ -19,6 +19,8 @@ export const translations = {
       "{{subCredits}} credits per month with all {{modelCount}} AI models",
     longDescription:
       "Monthly subscription with {{subCredits}} credits for all {{modelCount}} uncensored AI models",
+    price: "Monthly subscription pricing",
+    cta: "Subscribe Now",
     features: {
       credits: "{{subCredits}} credits per month",
       allModels: "All {{modelCount}} AI models",

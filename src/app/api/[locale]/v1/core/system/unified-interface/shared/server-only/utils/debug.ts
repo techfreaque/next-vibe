@@ -13,6 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { binaryStartTime } from "../../../cli/vibe-runtime";
+import type { RouteExecutionResult } from "../../../cli/route-executor";
 import type { EndpointLogger } from "../../logger/endpoint";
 
 /**
@@ -348,7 +349,9 @@ function formatExecutionSummary(
     // eslint-disable-next-line prefer-template
     "\n" +
     t(
-      "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.executionSummary" as Parameters<typeof t>[0],
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.executionSummary" as Parameters<
+        typeof t
+      >[0],
       {
         executionSeconds,
         overheadSeconds,
@@ -461,6 +464,7 @@ export class CliResourceManager {
     logger: EndpointLogger,
     verbose = false,
     locale: CountryLanguage,
+    result: RouteExecutionResult,
   ): Promise<void> {
     try {
       // Mark end timing
@@ -532,10 +536,10 @@ export class CliResourceManager {
             "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.problematicHandlesDetected",
           );
         }
-        setTimeout(() => process.exit(0), 100);
+        setTimeout(() => this.exit(result), 100);
       } else {
         // Clean exit
-        process.exit(0);
+        this.exit(result);
       }
     } catch (cleanupError) {
       const error =
@@ -547,6 +551,15 @@ export class CliResourceManager {
         { cleanupError: error },
       );
       process.exit(1);
+    }
+  }
+
+  exit(result: RouteExecutionResult): void {
+    // Exit with error code if the result indicates failure
+    if (!result.success || result.cause || result.error) {
+      process.exit(1);
+    } else {
+      process.exit(0);
     }
   }
 }

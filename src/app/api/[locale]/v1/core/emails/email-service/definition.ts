@@ -19,6 +19,10 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import {
+  EmailCampaignStageDB,
+  EmailJourneyVariantDB,
+} from "@/app/api/[locale]/v1/core/leads/enum";
 
 import { CampaignType, CampaignTypeOptions } from "../smtp-client/enum";
 
@@ -250,7 +254,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.emailService.send.emailJourneyVariant.placeholder",
               layout: { columns: 12 },
             },
-            z.string().optional(),
+            z.enum(EmailJourneyVariantDB).optional().nullable(),
           ),
 
           emailCampaignStage: requestDataField(
@@ -265,7 +269,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.emailService.send.emailCampaignStage.placeholder",
               layout: { columns: 12 },
             },
-            z.string().optional(),
+            z.enum(EmailCampaignStageDB).optional().nullable(),
           ),
 
           leadId: requestDataField(

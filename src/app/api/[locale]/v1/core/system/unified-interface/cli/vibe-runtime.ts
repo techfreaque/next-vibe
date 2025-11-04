@@ -479,7 +479,7 @@ program
         performanceMonitor.mark("parseEnd");
 
         performanceMonitor.mark("routeStart");
-        await cli.executeCommand(command, {
+        const result = await cli.executeCommand(command, {
           data: parsedData,
           cliArgs: {
             positionalArgs: parsedArgs.positionalArgs,
@@ -506,6 +506,7 @@ program
           logger,
           options.verbose ?? false,
           options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
+          result
         );
       } catch (error) {
         const handled = ErrorHandler.handleError(
@@ -535,6 +536,11 @@ program
           logger,
           options.verbose ?? false,
           options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
+          {
+            success: false,
+            message: handled.message,
+            exitCode: handled.exitCode,
+          },
         );
         process.exit(handled.exitCode);
       }
