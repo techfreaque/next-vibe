@@ -158,6 +158,13 @@ export interface CreditRepositoryInterface {
     feature: string,
     logger: EndpointLogger,
   ): Promise<{ success: boolean; messageId?: string }>;
+
+  // Merge credits when leads are linked
+  mergeLeadCredits(
+    primaryLeadId: string,
+    linkedLeadIds: string[],
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>>;
 }
 
 /**
@@ -335,6 +342,7 @@ class CreditRepository
   /**
    * Get credit balance for user (handles both subscription and lead credits)
    * Determines whether to use user credits or lead credits based on subscription status
+   * Automatically merges credits if user has multiple linked leads
    */
   async getCreditBalanceForUser(
     user: JwtPayloadType,
@@ -346,6 +354,44 @@ class CreditRepository
       if (user.isPublic) {
         // Public users always use lead credits
         return await this.getLeadBalanceAsBalance(user.leadId);
+      }
+
+      // Private user - check if they have multiple linked leads and merge if needed
+      const allUserLeads = await db
+        .select()
+        .from(userLeads)
+        .where(eq(userLeads.userId, user.id));
+
+      if (allUserLeads.length > 1) {
+        // Find primary lead
+        const primaryLead = allUserLeads.find((l) => l.isPrimary);
+        const primaryLeadId = primaryLead?.leadId ?? allUserLeads[0].leadId;
+
+        // Get all other lead IDs
+        const linkedLeadIds = allUserLeads
+          .filter((l) => l.leadId !== primaryLeadId)
+          .map((l) => l.leadId);
+
+        // Merge credits (idempotent - safe to call multiple times)
+        const mergeResult = await this.mergeLeadCredits(
+          primaryLeadId,
+          linkedLeadIds,
+          logger,
+        );
+
+        if (!mergeResult.success) {
+          logger.error("Failed to merge credits for user with multiple leads", {
+            userId: user.id,
+            primaryLeadId,
+            linkedLeadIds,
+          });
+        } else {
+          logger.debug("Credits merged for user with multiple leads", {
+            userId: user.id,
+            primaryLeadId,
+            linkedLeadIds,
+          });
+        }
       }
 
       // Private user - check subscription to determine credit source
@@ -1224,6 +1270,136 @@ class CreditRepository
         error: parseError(error),
         sessionId: session.id,
       });
+    }
+  }
+
+  /**
+   * Merge credits when leads are linked
+   * Sums up spent credits from all linked leads and consolidates into primary lead
+   * Deletes duplicate lead credit records after merging
+   *
+   * Logic:
+   * 1. Calculate total spent credits from all leads (initial 20 - current balance)
+   * 2. Set primary lead balance to max(0, 20 - totalSpent)
+   * 3. Delete credit records for linked leads
+   * 4. Create transaction records for the merge
+   */
+  async mergeLeadCredits(
+    primaryLeadId: string,
+    linkedLeadIds: string[],
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    try {
+      if (linkedLeadIds.length === 0) {
+        logger.debug("No linked leads to merge", { primaryLeadId });
+        return createSuccessResponse(undefined);
+      }
+
+      // Get all lead IDs including primary
+      const allLeadIds = [primaryLeadId, ...linkedLeadIds];
+
+      logger.debug("Starting credit merge", {
+        primaryLeadId,
+        linkedLeadIds,
+        totalLeads: allLeadIds.length,
+      });
+
+      // Get all lead credit records
+      const allCredits = await db
+        .select()
+        .from(leadCredits)
+        .where(inArray(leadCredits.leadId, allLeadIds));
+
+      // Calculate total spent credits across all leads
+      // Each lead starts with 20 credits, so spent = 20 - current balance
+      let totalSpent = 0;
+      const creditDetails: Array<{
+        leadId: string;
+        balance: number;
+        spent: number;
+      }> = [];
+
+      for (const leadId of allLeadIds) {
+        const credit = allCredits.find((c) => c.leadId === leadId);
+        const currentBalance = credit?.amount ?? 20; // Default to 20 if no record exists
+        const spent = 20 - currentBalance;
+        totalSpent += spent;
+        creditDetails.push({ leadId, balance: currentBalance, spent });
+      }
+
+      // Calculate merged balance: max(0, 20 - totalSpent)
+      // If they spent 10 each (2 leads), totalSpent = 20, so balance = 0
+      const mergedBalance = Math.max(0, 20 - totalSpent);
+
+      logger.info("Calculated merged credits", {
+        primaryLeadId,
+        totalSpent,
+        mergedBalance,
+        creditDetails,
+      });
+
+      // Update or create primary lead credit record
+      const [existingPrimaryCredit] = await db
+        .select()
+        .from(leadCredits)
+        .where(eq(leadCredits.leadId, primaryLeadId))
+        .limit(1);
+
+      if (existingPrimaryCredit) {
+        await db
+          .update(leadCredits)
+          .set({
+            amount: mergedBalance,
+            updatedAt: new Date(),
+          })
+          .where(eq(leadCredits.id, existingPrimaryCredit.id));
+      } else {
+        await db.insert(leadCredits).values({
+          leadId: primaryLeadId,
+          amount: mergedBalance,
+        });
+      }
+
+      // Delete credit records for linked leads
+      if (linkedLeadIds.length > 0) {
+        await db
+          .delete(leadCredits)
+          .where(inArray(leadCredits.leadId, linkedLeadIds));
+
+        logger.debug("Deleted credit records for linked leads", {
+          linkedLeadIds,
+          count: linkedLeadIds.length,
+        });
+      }
+
+      // Create transaction record for the merge
+      await db.insert(creditTransactions).values({
+        leadId: primaryLeadId,
+        amount: 0, // No new credits added, just consolidation
+        balanceAfter: mergedBalance,
+        type: "free_tier",
+        modelId: null,
+        messageId: null,
+      });
+
+      logger.info("Credit merge completed successfully", {
+        primaryLeadId,
+        linkedLeadIds,
+        totalSpent,
+        mergedBalance,
+      });
+
+      return createSuccessResponse(undefined);
+    } catch (error) {
+      logger.error("Failed to merge lead credits", {
+        error: parseError(error),
+        primaryLeadId,
+        linkedLeadIds,
+      });
+      return createErrorResponse(
+        "app.api.v1.core.credits.errors.mergeFailed",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
     }
   }
 }
