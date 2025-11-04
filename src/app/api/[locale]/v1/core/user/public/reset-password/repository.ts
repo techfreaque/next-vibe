@@ -9,7 +9,7 @@ import { randomBytes } from "node:crypto";
 
 import { and, eq, gt, lt, or } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
-import { RESET_TOKEN_EXPIRY } from "next-vibe/shared/constants";
+import { RESET_TOKEN_EXPIRY } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,

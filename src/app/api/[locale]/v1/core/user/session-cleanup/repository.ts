@@ -9,7 +9,7 @@ import { lt, sql } from "drizzle-orm";
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_DAYS,
   RESET_TOKEN_EXPIRY,
-} from "next-vibe/shared/constants";
+} from "@/config/constants";
 import {
   createErrorResponse,
   createSuccessResponse,
