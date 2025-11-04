@@ -20,7 +20,13 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { ContactPriority, ContactPriorityOptions, ContactStatus } from "./enum";
+import {
+  ContactPriority,
+  ContactPriorityOptions,
+  ContactStatus,
+  ContactSubject,
+  ContactSubjectOptions,
+} from "./enum";
 
 /**
  * Contact form endpoint
@@ -96,16 +102,18 @@ const { POST } = createEndpoint({
       subject: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
+          fieldType: FieldDataType.SELECT,
           label: "app.api.v1.core.contact.form.fields.subject.label",
           description:
             "app.api.v1.core.contact.form.fields.subject.description",
           placeholder:
             "app.api.v1.core.contact.form.fields.subject.placeholder",
+          options: ContactSubjectOptions,
           layout: { columns: 12 },
-          validation: { required: true, minLength: 1 },
+          validation: { required: true },
+          behavior: { searchable: false, clearable: false },
         },
-        z.string().min(1),
+        z.enum(ContactSubject),
       ),
       message: requestDataField(
         {

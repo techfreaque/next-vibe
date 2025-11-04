@@ -42,7 +42,7 @@ export const translations: typeof enTranslations = {
           q3: {
             question: "Wie funktioniert das Guthabensystem?",
             answer:
-              "Kostenlose Benutzer erhalten {{freeCredits}} Credits/Monat. Bezahlte Benutzer können zwischen unbegrenztem Abonnement ({{subPrice}}/Monat) oder Pay-as-you-go Guthaben-Paketen ({{packPrice}} für {{packCredits}} Credits) wählen. Guthaben verfallen nie und funktionieren mit allen 40+ KI-Modellen.",
+              "Kostenlose Benutzer erhalten {{freeCredits}} Credits/Monat. Bezahlte Benutzer können zwischen unbegrenztem Abonnement ({{subPrice}}/Monat) oder Pay-as-you-go Guthaben-Paketen ({{packPrice}} für {{packCredits}} Credits) wählen. Guthaben verfallen nie und funktionieren mit allen {{modelCount}} KI-Modellen.",
           },
           q4: {
             question: "Sind meine Daten privat und sicher?",

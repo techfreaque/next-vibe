@@ -215,18 +215,51 @@ export class StripeProvider implements PaymentProvider {
         await this.stripe.subscriptions.retrieve(subscriptionId);
 
       // In API version 2025-09-30.clover, current_period_end/start were removed from Subscription
-      // Use billing_cycle_anchor for period end and start_date/created for period start
-      const currentPeriodEnd = subscription.billing_cycle_anchor;
+      // Use start_date/created for period start and billing_cycle_anchor for the cycle anchor
       // Use start_date if available, otherwise fall back to created timestamp
       const currentPeriodStart =
         subscription.start_date || subscription.created;
+
+      // Calculate currentPeriodEnd based on billing interval
+      // billing_cycle_anchor is the start of the billing cycle, not the end
+      // We need to add the interval duration to get the period end
+      const billingInterval =
+        subscription.items.data[0]?.plan.interval || "month";
+      const intervalCount =
+        subscription.items.data[0]?.plan.interval_count || 1;
+
+      // Calculate period end by adding the interval to period start
+      const periodStartDate = new Date(currentPeriodStart * 1000);
+      let periodEndDate: Date;
+
+      if (billingInterval === "month") {
+        periodEndDate = new Date(periodStartDate);
+        periodEndDate.setMonth(periodEndDate.getMonth() + intervalCount);
+      } else if (billingInterval === "year") {
+        periodEndDate = new Date(periodStartDate);
+        periodEndDate.setFullYear(periodEndDate.getFullYear() + intervalCount);
+      } else if (billingInterval === "week") {
+        periodEndDate = new Date(periodStartDate);
+        periodEndDate.setDate(periodEndDate.getDate() + 7 * intervalCount);
+      } else if (billingInterval === "day") {
+        periodEndDate = new Date(periodStartDate);
+        periodEndDate.setDate(periodEndDate.getDate() + intervalCount);
+      } else {
+        // Default to 1 month if interval is unknown
+        periodEndDate = new Date(periodStartDate);
+        periodEndDate.setMonth(periodEndDate.getMonth() + 1);
+      }
+
+      const currentPeriodEnd = Math.floor(periodEndDate.getTime() / 1000);
 
       logger.debug("Retrieved Stripe subscription", {
         subscriptionId,
         currentPeriodStart,
         currentPeriodStartMs: currentPeriodStart * 1000,
-        billingCycleAnchor: currentPeriodEnd,
-        billingCycleAnchorMs: currentPeriodEnd * 1000,
+        currentPeriodEnd,
+        currentPeriodEndMs: currentPeriodEnd * 1000,
+        billingInterval,
+        intervalCount,
       });
 
       return createSuccessResponse({

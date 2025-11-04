@@ -13,7 +13,7 @@ export const translations: typeof enTranslations = {
       description:
         "Twoje dostępne kredyty na rozmowy z AI z {{modelCount}} modelami",
       total: "kredyty",
-      nextExpiration: "Następne wygaśnięcie: {{date}}",
+      nextExpiration: "Następne wygaśnięcie",
       expiring: {
         title: "Kredyty subskrypcyjne",
         description: "Z miesięcznej subskrypcji (1000 kredytów/miesiąc)",

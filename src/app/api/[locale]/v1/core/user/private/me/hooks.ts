@@ -98,6 +98,7 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
           [
             "app.error.unauthorized",
             "app.api.errors.authentication_required",
+            "app.api.v1.core.user.private.me.get.errors.unauthorized.title",
           ].includes(error.message)
         ) {
           return;

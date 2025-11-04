@@ -40,7 +40,7 @@ export const translations = {
           q3: {
             question: "How does the credit system work?",
             answer:
-              "Free users get {{freeCredits}} credits/month. Paid users can choose unlimited subscription ({{subPrice}}/month) or pay-as-you-go credit packs ({{packPrice}} for {{packCredits}} credits). Credits never expire and work across all 40+ AI models.",
+              "Free users get {{freeCredits}} credits/month. Paid users can choose unlimited subscription ({{subPrice}}/month) or pay-as-you-go credit packs ({{packPrice}} for {{packCredits}} credits). Credits never expire and work across all {{modelCount}} AI models.",
           },
           q4: {
             question: "Is my data private and secure?",

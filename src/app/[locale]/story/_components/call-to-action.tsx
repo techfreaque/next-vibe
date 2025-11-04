@@ -45,7 +45,9 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
               {t("app.story._components.home.cta.title")}
             </H2>
             <P className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto mb-8 leading-relaxed">
-              {t("app.story._components.home.cta.subtitle")}
+              {t("app.story._components.home.cta.subtitle", {
+                modelCount: 40,
+              })}
             </P>
 
             <Div className="flex flex-col sm:flex-row justify-center gap-4">

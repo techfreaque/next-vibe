@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { AlertCircle, Calendar, Coins, Sparkles, Zap } from "lucide-react";
 import { Badge } from "next-vibe-ui/ui/badge";
@@ -10,7 +12,10 @@ import {
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
+import { useMemo } from "react";
 
+import { useCredits } from "@/app/api/[locale]/v1/core/credits/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { CreditBalance } from "./types";
@@ -29,6 +34,18 @@ export function CreditBalanceCard({
   freeCredits,
 }: CreditBalanceCardProps): JSX.Element {
   const { t } = useTranslation();
+
+  // Create logger once - memoize to prevent recreating on every render
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
+
+  // Fetch live credits data (will refetch on window focus and has no cache)
+  const { data: liveCredits } = useCredits(logger);
+
+  // Use live credits if available, otherwise fall back to initial credits
+  const credits = liveCredits ?? initialCredits;
 
   return (
     <motion.div
@@ -53,7 +70,7 @@ export function CreditBalanceCard({
               </CardDescription>
             </Div>
             <Badge className="text-lg font-bold px-4 py-2">
-              {initialCredits?.total ?? 0}{" "}
+              {credits?.total ?? 0}{" "}
               {t("app.subscription.subscription.balance.total")}
             </Badge>
           </Div>
@@ -67,7 +84,7 @@ export function CreditBalanceCard({
                 {t("app.subscription.subscription.balance.expiring.title")}
               </Div>
               <Div className="text-2xl font-bold text-amber-900 dark:text-amber-100">
-                {initialCredits?.expiring ?? 0}
+                {credits?.expiring ?? 0}
               </Div>
               <Div className="text-xs text-amber-600 dark:text-amber-400 mt-1">
                 {t(
@@ -83,7 +100,7 @@ export function CreditBalanceCard({
                 {t("app.subscription.subscription.balance.permanent.title")}
               </Div>
               <Div className="text-2xl font-bold text-green-900 dark:text-green-100">
-                {initialCredits?.permanent ?? 0}
+                {credits?.permanent ?? 0}
               </Div>
               <Div className="text-xs text-green-600 dark:text-green-400 mt-1">
                 {t(
@@ -99,7 +116,7 @@ export function CreditBalanceCard({
                 {t("app.subscription.subscription.balance.free.title")}
               </Div>
               <Div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                {initialCredits?.free ?? 0}
+                {credits?.free ?? 0}
               </Div>
               <Div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                 {t("app.subscription.subscription.balance.free.description", {
@@ -109,17 +126,17 @@ export function CreditBalanceCard({
             </Div>
 
             {/* Expiration Notice */}
-            {initialCredits?.expiresAt && initialCredits.expiring > 0 && (
+            {credits?.expiresAt && credits.expiring > 0 && (
               <Div className="p-4 rounded-lg bg-accent border">
                 <Div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                   <AlertCircle className="h-4 w-4" />
                   {t("app.subscription.subscription.balance.nextExpiration")}
                 </Div>
                 <Div className="text-lg font-semibold">
-                  {formatDate(initialCredits.expiresAt, locale)}
+                  {formatDate(credits.expiresAt, locale)}
                 </Div>
                 <Div className="text-xs text-muted-foreground mt-1">
-                  {initialCredits.expiring}{" "}
+                  {credits.expiring}{" "}
                   {t("app.subscription.subscription.balance.total")}
                 </Div>
               </Div>

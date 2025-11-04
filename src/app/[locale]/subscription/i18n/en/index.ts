@@ -11,7 +11,7 @@ export const translations = {
       description:
         "Your available credits for AI conversations with {{modelCount}} models",
       total: "credits",
-      nextExpiration: "Next Expiration: {{date}}",
+      nextExpiration: "Next Expiration",
       expiring: {
         title: "Subscription Credits",
         description: "From monthly subscription (1000 credits/month)",

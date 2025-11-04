@@ -15,6 +15,10 @@ import type { ModelId } from "./model-access/models";
 
 /**
  * Update credit balance after AI response
+ * Deducts credits in the correct order:
+ * 1. Free credits (highest priority)
+ * 2. Expiring credits (subscription)
+ * 3. Permanent credits (lowest priority)
  */
 export function updateCreditBalance(
   modelId: ModelId,
@@ -37,13 +41,41 @@ export function updateCreditBalance(
     }
 
     const data = oldData.data as CreditsGetResponseOutput;
+
+    // Deduct credits in the correct order: free → expiring → permanent
+    let remaining = creditCost;
+    let newFree = data.free;
+    let newExpiring = data.expiring;
+    let newPermanent = data.permanent;
+
+    // Step 1: Deduct from free credits first
+    if (remaining > 0 && newFree > 0) {
+      const deduction = Math.min(newFree, remaining);
+      newFree -= deduction;
+      remaining -= deduction;
+    }
+
+    // Step 2: Deduct from expiring credits (subscription)
+    if (remaining > 0 && newExpiring > 0) {
+      const deduction = Math.min(newExpiring, remaining);
+      newExpiring -= deduction;
+      remaining -= deduction;
+    }
+
+    // Step 3: Deduct from permanent credits
+    if (remaining > 0 && newPermanent > 0) {
+      const deduction = Math.min(newPermanent, remaining);
+      newPermanent -= deduction;
+      remaining -= deduction;
+    }
+
     return {
       success: true,
       data: {
         total: data.total - creditCost,
-        expiring: data.expiring,
-        permanent: data.permanent,
-        free: data.free,
+        expiring: newExpiring,
+        permanent: newPermanent,
+        free: newFree,
         expiresAt: data.expiresAt,
       },
     };

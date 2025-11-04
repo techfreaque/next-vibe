@@ -358,14 +358,12 @@ export function ChatSidebar({
                     </Span>
                     <Span className="font-medium">{credits.total}</Span>
                   </Div>
-                  {credits.permanent > 0 && (
+                  {credits.free > 0 && (
                     <Div className="flex justify-between">
                       <Span className="text-muted-foreground">
-                        {t("app.chat.credits.permanent", {
-                          count: credits.permanent,
-                        })}
+                        {t("app.chat.credits.free", { count: credits.free })}
                       </Span>
-                      <Span>{credits.permanent}</Span>
+                      <Span>{credits.free}</Span>
                     </Div>
                   )}
                   {credits.expiring > 0 && (
@@ -378,12 +376,14 @@ export function ChatSidebar({
                       <Span>{credits.expiring}</Span>
                     </Div>
                   )}
-                  {credits.free > 0 && (
+                  {credits.permanent > 0 && (
                     <Div className="flex justify-between">
                       <Span className="text-muted-foreground">
-                        {t("app.chat.credits.free", { count: credits.free })}
+                        {t("app.chat.credits.permanent", {
+                          count: credits.permanent,
+                        })}
                       </Span>
-                      <Span>{credits.free}</Span>
+                      <Span>{credits.permanent}</Span>
                     </Div>
                   )}
                   {credits.expiresAt && (

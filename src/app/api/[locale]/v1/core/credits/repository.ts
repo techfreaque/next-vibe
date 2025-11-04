@@ -39,6 +39,21 @@ import { CreditTypeIdentifier, type CreditTypeIdentifierValue } from "./enum";
 export type { CreditBalance };
 
 /**
+ * In-memory cache for credit identifier lookups
+ * Reduces redundant database queries for subscription status checks
+ * Cache expires after 30 seconds
+ */
+interface CreditIdentifierCacheEntry {
+  userId?: string;
+  leadId?: string;
+  creditType: CreditTypeIdentifierValue;
+  timestamp: number;
+}
+
+const creditIdentifierCache = new Map<string, CreditIdentifierCacheEntry>();
+const CACHE_TTL_MS = 30 * 1000; // 30 seconds
+
+/**
  * Credit Transaction Interface
  */
 export interface CreditTransactionOutput {
@@ -962,6 +977,8 @@ class CreditRepository
    * Logic:
    * - If user has active subscription → return { userId } (use user credits)
    * - If user has no subscription → return { leadId } (use lead credits)
+   *
+   * Optimization: Uses in-memory cache with 30-second TTL to reduce database queries
    */
   async getCreditIdentifierBySubscription(
     userId: string,
@@ -975,6 +992,22 @@ class CreditRepository
     }>
   > {
     try {
+      // Check cache first
+      const cacheKey = `${userId}:${leadId}`;
+      const cached = creditIdentifierCache.get(cacheKey);
+      if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+        logger.debug("Using cached credit identifier", {
+          userId,
+          creditType: cached.creditType,
+          cacheAge: Date.now() - cached.timestamp,
+        });
+        return createSuccessResponse({
+          userId: cached.userId,
+          leadId: cached.leadId,
+          creditType: cached.creditType,
+        });
+      }
+
       // Check if user has an active subscription
       const [subscription] = await db
         .select()
@@ -985,16 +1018,22 @@ class CreditRepository
       const hasActiveSubscription =
         subscription && subscription.status === SubscriptionStatus.ACTIVE;
 
+      let result: {
+        userId?: string;
+        leadId?: string;
+        creditType: CreditTypeIdentifierValue;
+      };
+
       if (hasActiveSubscription) {
         // User has active subscription → use user credits
         logger.debug("Using user credits (subscription)", {
           userId,
           subscriptionId: subscription.id,
         });
-        return createSuccessResponse({
+        result = {
           userId,
           creditType: CreditTypeIdentifier.USER_SUBSCRIPTION,
-        });
+        };
       } else {
         // User has no active subscription → use lead credits
         // Get primary lead for user
@@ -1016,11 +1055,19 @@ class CreditRepository
           userId,
           leadId: userLead.leadId,
         });
-        return createSuccessResponse({
+        result = {
           leadId: userLead.leadId,
           creditType: CreditTypeIdentifier.LEAD_FREE,
-        });
+        };
       }
+
+      // Cache the result
+      creditIdentifierCache.set(cacheKey, {
+        ...result,
+        timestamp: Date.now(),
+      });
+
+      return createSuccessResponse(result);
     } catch (error) {
       logger.error("Failed to get credit identifier", parseError(error), {
         userId,

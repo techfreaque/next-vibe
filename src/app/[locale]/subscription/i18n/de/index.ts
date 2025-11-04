@@ -13,7 +13,7 @@ export const translations: typeof enTranslations = {
       description:
         "Ihre verfügbaren Credits für KI-Gespräche mit {{modelCount}} Modellen",
       total: "Credits",
-      nextExpiration: "Nächster Ablauf: {{date}}",
+      nextExpiration: "Nächster Ablauf",
       expiring: {
         title: "Abonnement-Credits",
         description: "Aus monatlichem Abonnement (1000 Credits/Monat)",

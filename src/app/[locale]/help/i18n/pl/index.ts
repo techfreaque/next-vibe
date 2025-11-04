@@ -41,7 +41,7 @@ export const translations: typeof enTranslations = {
           q3: {
             question: "Jak działa system kredytów?",
             answer:
-              "Darmowi użytkownicy otrzymują {{freeCredits}} kredytów/miesiąc. Płatni użytkownicy mogą wybrać nieograniczoną subskrypcję ({{subPrice}}/miesiąc) lub pakiety kredytowe pay-as-you-go ({{packPrice}} za {{packCredits}} kredytów). Kredyty nigdy nie wygasają i działają ze wszystkimi 40+ modelami AI.",
+              "Darmowi użytkownicy otrzymują {{freeCredits}} kredytów/miesiąc. Płatni użytkownicy mogą wybrać nieograniczoną subskrypcję ({{subPrice}}/miesiąc) lub pakiety kredytowe pay-as-you-go ({{packPrice}} za {{packCredits}} kredytów). Kredyty nigdy nie wygasają i działają ze wszystkimi {{modelCount}} modelami AI.",
           },
           q4: {
             question: "Czy moje dane są prywatne i bezpieczne?",

@@ -25,6 +25,7 @@ import purchaseDefinitions, {
 
 /**
  * Hook for fetching current user's credit balance
+ * Optimized with 10-second cache to reduce excessive API calls
  */
 export function useCredits(
   logger: EndpointLogger,
@@ -35,7 +36,7 @@ export function useCredits(
       queryOptions: {
         enabled: true,
         refetchOnWindowFocus: true,
-        staleTime: 0, // Always refetch (no caching) for real-time credit updates
+        staleTime: 10 * 1000, // 10 seconds cache to prevent excessive refetching
       },
     },
     logger,
@@ -68,7 +69,7 @@ export function useCreditHistory(
 export function useCreditPurchase(
   logger: EndpointLogger,
 ): EndpointReturn<typeof purchaseDefinitions> {
-  const { toast } = useToast(); 
+  const { toast } = useToast();
   const { t } = useTranslation();
 
   // Success callback for credit purchase

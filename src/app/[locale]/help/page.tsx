@@ -162,6 +162,7 @@ export default async function ContactPage({
                   ),
                   packPrice: formatPrice(creditPack.price, creditPack.currency),
                   packCredits: creditPack.credits,
+                  modelCount: TOTAL_MODEL_COUNT,
                 })}
               </P>
             </Div>
