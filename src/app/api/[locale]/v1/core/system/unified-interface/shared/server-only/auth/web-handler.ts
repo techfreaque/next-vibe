@@ -50,6 +50,8 @@ export class WebAuthHandler extends BaseAuthHandler {
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPayloadType>> {
+    // Get existingLeadId at the top level so it's available in catch block
+    let existingLeadId: string | undefined;
     try {
       logger.debug("Web authentication started", {
         platform: context.platform,
@@ -59,7 +61,7 @@ export class WebAuthHandler extends BaseAuthHandler {
       // Get token and leadId from cookies
       const cookieStore = await cookies();
       const token = cookieStore.get(AUTH_TOKEN_COOKIE_NAME)?.value;
-      const existingLeadId = cookieStore.get(LEAD_ID_COOKIE_NAME)?.value;
+      existingLeadId = cookieStore.get(LEAD_ID_COOKIE_NAME)?.value;
 
       if (!token) {
         logger.debug("No auth token in cookies");
@@ -69,6 +71,10 @@ export class WebAuthHandler extends BaseAuthHandler {
           context.locale,
           logger,
         );
+        // Ensure leadId cookie is set for logged-out users
+        if (leadId && leadId !== existingLeadId) {
+          await this.setLeadIdCookie(leadId, logger);
+        }
         return createSuccessResponse(this.createPublicUser(leadId || ""));
       }
 
@@ -83,6 +89,10 @@ export class WebAuthHandler extends BaseAuthHandler {
           context.locale,
           logger,
         );
+        // Ensure leadId cookie is set for logged-out users
+        if (leadId && leadId !== existingLeadId) {
+          await this.setLeadIdCookie(leadId, logger);
+        }
         return createSuccessResponse(this.createPublicUser(leadId || ""));
       }
 
@@ -103,6 +113,10 @@ export class WebAuthHandler extends BaseAuthHandler {
           context.locale,
           logger,
         );
+        // Ensure leadId cookie is set for logged-out users
+        if (leadId && leadId !== existingLeadId) {
+          await this.setLeadIdCookie(leadId, logger);
+        }
         return createSuccessResponse(this.createPublicUser(leadId || ""));
       }
 
@@ -118,6 +132,10 @@ export class WebAuthHandler extends BaseAuthHandler {
         context.locale,
         logger,
       );
+      // Ensure leadId cookie is set for logged-out users
+      if (leadId && leadId !== existingLeadId) {
+        await this.setLeadIdCookie(leadId, logger);
+      }
       return createSuccessResponse(this.createPublicUser(leadId || ""));
     }
   }
@@ -263,6 +281,7 @@ export class WebAuthHandler extends BaseAuthHandler {
 
       // Set lead ID cookie for client-side tracking
       // This cookie is readable by client (httpOnly: false) for analytics/tracking
+      // No maxAge - cookie never expires (persists indefinitely for tracking)
       cookieStore.set({
         name: LEAD_ID_COOKIE_NAME,
         value: leadId,
@@ -270,7 +289,7 @@ export class WebAuthHandler extends BaseAuthHandler {
         path: "/",
         secure: env.NODE_ENV === Environment.PRODUCTION,
         sameSite: "lax" as const,
-        maxAge: 30 * 24 * 60 * 60, // 30 days
+        // No maxAge - cookie persists indefinitely
       });
 
       logger.debug("Auth token and lead ID stored in cookies");
@@ -309,6 +328,44 @@ export class WebAuthHandler extends BaseAuthHandler {
       return fail({
         message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.clearFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
+    }
+  }
+
+  /**
+   * Set lead ID cookie for public users
+   * This ensures leadId is persisted across requests for logged-out users
+   */
+  async setLeadIdCookie(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    try {
+      logger.debug("Setting leadId cookie", { leadId });
+
+      const cookieStore = await cookies();
+
+      // Set lead ID cookie for client-side tracking
+      // This cookie is readable by client (httpOnly: false) for analytics/tracking
+      // No maxAge - cookie never expires (persists indefinitely for tracking)
+      cookieStore.set({
+        name: LEAD_ID_COOKIE_NAME,
+        value: leadId,
+        httpOnly: false, // Needs to be readable by client
+        path: "/",
+        secure: env.NODE_ENV === Environment.PRODUCTION,
+        sameSite: "lax" as const,
+        // No maxAge - cookie persists indefinitely
+      });
+
+      return createSuccessResponse(undefined);
+    } catch (error) {
+      logger.error("Failed to set leadId cookie", parseError(error));
+      return fail({
+        message:
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.setLeadIdCookieFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

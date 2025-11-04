@@ -1089,20 +1089,39 @@ class CreditRepository
     feature: string,
     logger: EndpointLogger,
   ): Promise<{ success: boolean; messageId?: string }> {
-    if (user.isPublic || cost <= 0) {
-      logger.debug("Skipping credit deduction", {
+    // Skip deduction only if cost is 0 or negative
+    if (cost <= 0) {
+      logger.debug("Skipping credit deduction - zero or negative cost", {
+        feature,
+        cost,
+      });
+      return { success: true };
+    }
+
+    // Validate leadId is present (required for both public and private users)
+    if (!user.leadId) {
+      logger.error("No leadId available for credit deduction", {
         feature,
         cost,
         isPublic: user.isPublic,
       });
-      return { success: true };
+      return { success: false };
     }
 
     try {
       const creditMessageId = crypto.randomUUID();
       let creditIdentifier: CreditIdentifier;
 
-      if (user.id && user.leadId) {
+      // Public users always use lead credits
+      if (user.isPublic) {
+        creditIdentifier = { leadId: user.leadId };
+        logger.debug("Using lead credits for public user", {
+          leadId: user.leadId,
+          feature,
+          cost,
+        });
+      } else if (user.id && user.leadId) {
+        // Private users: check subscription to determine credit source
         const identifierResult = await this.getCreditIdentifierBySubscription(
           user.id,
           user.leadId,
