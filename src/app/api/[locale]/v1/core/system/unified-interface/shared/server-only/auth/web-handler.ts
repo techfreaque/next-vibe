@@ -1,11 +1,12 @@
+import "server-only";
+
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 import {
-  AUTH_STATUS_COOKIE_NAME,
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
   AUTH_TOKEN_COOKIE_NAME,
   LEAD_ID_COOKIE_NAME,
-} from "next-vibe/shared/constants";
+} from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createSuccessResponse,
@@ -107,7 +108,10 @@ export class WebAuthHandler extends BaseAuthHandler {
 
       return createSuccessResponse(verifyResult.data);
     } catch (error) {
-      logger.error("Web authentication failed - clearing cookies", parseError(error));
+      logger.error(
+        "Web authentication failed - clearing cookies",
+        parseError(error),
+      );
       await this.clearAuthToken(logger);
       const leadId = await this.getLeadIdFromDb(
         undefined,
@@ -257,16 +261,6 @@ export class WebAuthHandler extends BaseAuthHandler {
 
       cookieStore.set(cookieOptions);
 
-      // Set auth status cookie for client-side checks
-      cookieStore.set({
-        name: AUTH_STATUS_COOKIE_NAME,
-        value: "true",
-        path: "/",
-        secure: env.NODE_ENV === Environment.PRODUCTION,
-        sameSite: "lax" as const,
-        maxAge: AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
-      });
-
       // Set lead ID cookie for client-side tracking
       // This cookie is readable by client (httpOnly: false) for analytics/tracking
       cookieStore.set({
@@ -284,7 +278,8 @@ export class WebAuthHandler extends BaseAuthHandler {
     } catch (error) {
       logger.error("Error storing auth token", parseError(error));
       return fail({
-        message: "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.storeFailed",
+        message:
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.storeFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -298,10 +293,8 @@ export class WebAuthHandler extends BaseAuthHandler {
     try {
       logger.debug("Clearing auth token from cookies");
       try {
-
         const cookieStore = await cookies();
         cookieStore.delete(AUTH_TOKEN_COOKIE_NAME);
-        cookieStore.delete(AUTH_STATUS_COOKIE_NAME);
         // Note: We don't delete LEAD_ID_COOKIE_NAME on logout
         // Lead ID persists across sessions for tracking purposes
       } catch (error) {
@@ -314,7 +307,8 @@ export class WebAuthHandler extends BaseAuthHandler {
     } catch (error) {
       logger.error("Error clearing auth token", parseError(error));
       return fail({
-        message: "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.clearFailed",
+        message:
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.clearFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

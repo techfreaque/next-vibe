@@ -1,5 +1,5 @@
 import { jwtVerify, SignJWT } from "jose";
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "next-vibe/shared/constants";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createSuccessResponse,

@@ -2,11 +2,12 @@
  * Login repository implementation
  * Handles user authentication
  */
+import "server-only";
 
 import { eq } from "drizzle-orm";
 import { cookies, headers } from "next/headers";
 import type { NextRequest } from "next/server";
-import { LEAD_ID_COOKIE_NAME } from "next-vibe/shared/constants";
+import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,

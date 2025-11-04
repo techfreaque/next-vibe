@@ -654,8 +654,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         "Content-Length": pixel.length.toString(),
         // eslint-disable-next-line i18next/no-literal-string
         "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
+        Pragma: "no-cache",
+        Expires: "0",
       },
     });
   }
@@ -935,27 +935,44 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       }
 
       // Establish lead-user relationship if user is logged in
+      // Check if relationship already exists before attempting conversion
       const currentUserId =
         data.userId || (user.isPublic ? undefined : user.id);
       if (currentUserId && !user.isPublic) {
         try {
-          const convertResult = await leadsRepository.convertLeadInternal(
+          // First check if lead is already converted to avoid unnecessary conversion attempts
+          const leadResult = await leadsRepository.getLeadByIdInternal(
             leadId,
-            {
-              userId: currentUserId,
-              email: "", // Email will be fetched from user record during conversion
-            },
             logger,
           );
-          if (convertResult.success) {
+
+          if (
+            leadResult.success &&
+            leadResult.data?.convertedUserId === currentUserId
+          ) {
+            // Lead already converted to this user - skip conversion entirely
             relationshipEstablished = true;
-            logger.debug(
-              "app.api.v1.core.leads.tracking.engagement.relationshipEstablished",
+            // No need to log - relationship already exists
+          } else {
+            // Attempt conversion
+            const convertResult = await leadsRepository.convertLeadInternal(
+              leadId,
               {
-                leadId,
                 userId: currentUserId,
+                email: "", // Email will be fetched from user record during conversion
               },
+              logger,
             );
+            if (convertResult.success) {
+              relationshipEstablished = true;
+              logger.debug(
+                "app.api.v1.core.leads.tracking.engagement.relationshipEstablished",
+                {
+                  leadId,
+                  userId: currentUserId,
+                },
+              );
+            }
           }
         } catch (error) {
           // Don't fail the engagement if relationship establishment fails

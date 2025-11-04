@@ -4,7 +4,7 @@
  * specifically for authentication tokens and session data.
  */
 
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "next-vibe/shared/constants";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import { Environment } from "next-vibe/shared/utils";
 
 import { envClient } from "@/config/env-client";

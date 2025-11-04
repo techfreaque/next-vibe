@@ -12,7 +12,7 @@ import type { NextRequest } from "next/server";
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
   AUTH_TOKEN_COOKIE_NAME,
-} from "next-vibe/shared/constants";
+} from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,

@@ -14,7 +14,7 @@
  * All methods return ResponseType<T> for consistent error handling
  */
 
-import { AUTH_STATUS_COOKIE_NAME } from "next-vibe/shared/constants";
+import { AUTH_STATUS_COOKIE_NAME } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,

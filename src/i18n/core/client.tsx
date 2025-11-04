@@ -1,7 +1,7 @@
 "use client";
 import type { Route } from "next";
 import type { RouteType } from "next/dist/lib/load-custom-routes";
-import { LOCALE_COOKIE_NAME } from "next-vibe/shared/constants";
+import { LOCALE_COOKIE_NAME } from "@/config/constants";
 import { usePathname, useRouter } from "next-vibe-ui/hooks";
 import { storage } from "next-vibe-ui/ui/storage";
 import type { JSX, ReactNode } from "react";

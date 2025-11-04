@@ -9,7 +9,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { AUTH_STATUS_COOKIE_PREFIX } from "next-vibe/shared/constants";
+import { AUTH_STATUS_COOKIE_PREFIX } from "@/config/constants";
 import { parseError } from "next-vibe/shared/utils";
 
 import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
