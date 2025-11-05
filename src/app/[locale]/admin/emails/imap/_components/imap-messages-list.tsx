@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Eye, Mail, MailOpen, Paperclip, Star } from "lucide-react";
+import { Eye, Mail, MailOpen, Paperclip, Star } from 'next-vibe-ui/ui/icons';
 import { useRouter } from "next/navigation";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";

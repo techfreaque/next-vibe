@@ -3,7 +3,7 @@
  * Displays and manages A/B testing configuration for email campaigns
  */
 
-import { BarChart3, Settings, TestTube, Users } from "lucide-react";
+import { BarChart3, Settings, TestTube, Users } from 'next-vibe-ui/ui/icons';
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";

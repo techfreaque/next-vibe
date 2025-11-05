@@ -146,19 +146,35 @@ const { GET } = createEndpoint({
                 },
                 z.record(z.string(), z.any()),
               ),
-              allowedRoles: responseField(
+              rolesRead: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.allowedRoles.content" as const,
+                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesRead.content" as const,
                 },
                 z.array(z.string()),
               ),
-              moderatorIds: responseField(
+              rolesWrite: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.moderatorIds.content" as const,
+                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesWrite.content" as const,
+                },
+                z.array(z.string()),
+              ),
+              rolesHide: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesHide.content" as const,
+                },
+                z.array(z.string()),
+              ),
+              rolesDelete: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesDelete.content" as const,
                 },
                 z.array(z.string()),
               ),
@@ -260,8 +276,10 @@ const { GET } = createEndpoint({
             expanded: true,
             sortOrder: 0,
             metadata: {},
-            allowedRoles: [],
-            moderatorIds: [],
+            rolesRead: [],
+            rolesWrite: [],
+            rolesHide: [],
+            rolesDelete: [],
             createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
             updatedAt: new Date("2024-01-01T00:00:00Z").toISOString(),
           },
@@ -406,26 +424,50 @@ const { PATCH } = createEndpoint({
             },
             z.record(z.string(), z.any()).optional(),
           ),
-          allowedRoles: requestDataField(
+          rolesRead: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.JSON,
               label:
-                "app.api.v1.core.agent.chat.folders.id.patch.allowedRoles.label" as const,
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesRead.label" as const,
               description:
-                "app.api.v1.core.agent.chat.folders.id.patch.allowedRoles.description" as const,
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesRead.description" as const,
               layout: { columns: 12 },
             },
             z.array(z.string()).optional(),
           ),
-          moderatorIds: requestDataField(
+          rolesWrite: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.JSON,
               label:
-                "app.api.v1.core.agent.chat.folders.id.patch.moderatorIds.label" as const,
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesWrite.label" as const,
               description:
-                "app.api.v1.core.agent.chat.folders.id.patch.moderatorIds.description" as const,
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesWrite.description" as const,
+              layout: { columns: 12 },
+            },
+            z.array(z.string()).optional(),
+          ),
+          rolesHide: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.JSON,
+              label:
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesHide.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesHide.description" as const,
+              layout: { columns: 12 },
+            },
+            z.array(z.string()).optional(),
+          ),
+          rolesDelete: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.JSON,
+              label:
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesDelete.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesDelete.description" as const,
               layout: { columns: 12 },
             },
             z.array(z.string()).optional(),
@@ -526,19 +568,35 @@ const { PATCH } = createEndpoint({
                 },
                 z.record(z.string(), z.any()),
               ),
-              allowedRoles: responseField(
+              rolesRead: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.allowedRoles.content" as const,
+                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesRead.content" as const,
                 },
                 z.array(z.string()),
               ),
-              moderatorIds: responseField(
+              rolesWrite: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.moderatorIds.content" as const,
+                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesWrite.content" as const,
+                },
+                z.array(z.string()),
+              ),
+              rolesHide: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesHide.content" as const,
+                },
+                z.array(z.string()),
+              ),
+              rolesDelete: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesDelete.content" as const,
                 },
                 z.array(z.string()),
               ),
@@ -650,8 +708,10 @@ const { PATCH } = createEndpoint({
             expanded: true,
             sortOrder: 0,
             metadata: {},
-            allowedRoles: [],
-            moderatorIds: [],
+            rolesRead: [],
+            rolesWrite: [],
+            rolesHide: [],
+            rolesDelete: [],
             createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
             updatedAt: new Date().toISOString(),
           },

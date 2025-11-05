@@ -288,7 +288,9 @@ export function useAIStream(
                 // Check chat store asynchronously (for existing threads)
                 void (async (): Promise<void> => {
                   try {
-                    const { useChatStore } = await import("../../chat/store");
+                    const { useChatStore } = await import(
+                      "../../chat/hooks/store"
+                    );
                     const chatThread =
                       useChatStore.getState().threads[eventData.threadId];
                     const isIncognito =
@@ -448,7 +450,9 @@ export function useAIStream(
                   // Save to localStorage incrementally for incognito mode
                   void (async (): Promise<void> => {
                     try {
-                      const { useChatStore } = await import("../../chat/store");
+                      const { useChatStore } = await import(
+                        "../../chat/hooks/store"
+                      );
                       const chatThread =
                         useChatStore.getState().threads[
                           currentMessage.threadId
@@ -534,7 +538,9 @@ export function useAIStream(
                   // Also update chat store and localStorage for incognito mode
                   void (async (): Promise<void> => {
                     try {
-                      const { useChatStore } = await import("../../chat/store");
+                      const { useChatStore } = await import(
+                        "../../chat/hooks/store"
+                      );
                       const chatMessage =
                         useChatStore.getState().messages[eventData.messageId];
 
@@ -620,7 +626,9 @@ export function useAIStream(
                   // Also update chat store so reasoning content is persisted
                   void (async (): Promise<void> => {
                     try {
-                      const { useChatStore } = await import("../../chat/store");
+                      const { useChatStore } = await import(
+                        "../../chat/hooks/store"
+                      );
                       const chatMessage =
                         useChatStore.getState().messages[eventData.messageId];
 
@@ -714,7 +722,7 @@ export function useAIStream(
                     streamThread?.rootFolderId === "incognito";
 
                   if (isIncognitoFromStream) {
-                    void import("../../chat/store")
+                    void import("../../chat/hooks/store")
                       .then(({ useChatStore }) => {
                         useChatStore
                           .getState()
@@ -785,7 +793,9 @@ export function useAIStream(
                 if (message) {
                   void (async (): Promise<void> => {
                     try {
-                      const { useChatStore } = await import("../../chat/store");
+                      const { useChatStore } = await import(
+                        "../../chat/hooks/store"
+                      );
                       const chatThread =
                         useChatStore.getState().threads[message.threadId];
                       const isIncognito =
@@ -882,7 +892,7 @@ export function useAIStream(
 
                 if (activeThreadId) {
                   // Import chat store dynamically to avoid circular dependencies
-                  void import("../../chat/store")
+                  void import("../../chat/hooks/store")
                     .then(({ useChatStore }) => {
                       const errorMessageId = crypto.randomUUID();
 

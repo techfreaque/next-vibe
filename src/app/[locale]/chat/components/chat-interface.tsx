@@ -26,7 +26,7 @@ import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
 import { parseChatUrl } from "../lib/url-parser";
-import type { ChatFolder, ChatThread, ModelId } from "../shared/types";
+import type { ChatFolder, ChatThread, ModelId } from "../types";
 import { ChatArea } from "./layout/chat-area";
 import { SidebarWrapper } from "./layout/sidebar-wrapper";
 import { TopBar } from "./layout/top-bar";

@@ -30,6 +30,7 @@ export const translations: typeof enTranslations = {
     noCreditSource: "Keine Credit-Quelle verfügbar",
     stripeCustomerFailed: "Fehler beim Erstellen des Stripe-Kunden",
     checkoutFailed: "Fehler beim Erstellen der Checkout-Sitzung",
+    mergeFailed: "Fehler beim Zusammenführen der Lead-Credits",
   },
   get: {
     title: "Credit-Guthaben abrufen",
@@ -89,7 +90,8 @@ export const translations: typeof enTranslations = {
       },
       noActiveSubscription: {
         title: "Aktives Abonnement erforderlich",
-        description: "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
+        description:
+          "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
@@ -101,7 +103,8 @@ export const translations: typeof enTranslations = {
       },
       no_active_subscription: {
         title: "Aktives Abonnement erforderlich",
-        description: "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
+        description:
+          "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
       },
     },
   },

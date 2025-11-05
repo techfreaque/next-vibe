@@ -5,7 +5,7 @@
 
 "use client";
 
-import { BarChart3, List, UserPlus } from "lucide-react";
+import { BarChart3, List, UserPlus } from 'next-vibe-ui/ui/icons';
 import NextLink from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import { Span } from "next-vibe-ui/ui/span";

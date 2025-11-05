@@ -22,6 +22,7 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { DEFAULT_FOLDER_IDS } from "../chat/config";
 import { ModelId, ModelIdOptions } from "../chat/model-access/models";
+import { ChatMessageRoleOptions, ChatMessageRole } from "../chat/enum";
 
 /**
  * Chat message schema
@@ -190,25 +191,9 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.aiStream.post.role.description",
           layout: { columns: 4 },
-          options: [
-            {
-              value: "user",
-              label:
-                "app.api.v1.core.agent.chat.aiStream.post.role.options.user" as const,
-            },
-            {
-              value: "assistant",
-              label:
-                "app.api.v1.core.agent.chat.aiStream.post.role.options.assistant" as const,
-            },
-            {
-              value: "system",
-              label:
-                "app.api.v1.core.agent.chat.aiStream.post.role.options.system" as const,
-            },
-          ],
+          options: ChatMessageRoleOptions,
         },
-        z.enum(["user", "assistant", "system"]).default("user"),
+        z.nativeEnum(ChatMessageRole).default(ChatMessageRole.USER),
       ),
 
       // === AI CONFIGURATION ===
@@ -420,7 +405,7 @@ const { POST } = createEndpoint({
         threadId: null,
         parentMessageId: null,
         content: "Hello, can you help me write a professional email?",
-        role: "user",
+        role: ChatMessageRole.USER,
         model: ModelId.GPT_5_MINI,
         persona: null,
         temperature: 0.7,
@@ -433,7 +418,7 @@ const { POST } = createEndpoint({
         threadId: null,
         parentMessageId: null,
         content: "Write a marketing email for our new product launch",
-        role: "user",
+        role: ChatMessageRole.USER,
         model: ModelId.GPT_5,
         persona: null,
         temperature: 0.8,
@@ -448,7 +433,7 @@ const { POST } = createEndpoint({
         threadId: "550e8400-e29b-41d4-a716-446655440000",
         parentMessageId: "660e8400-e29b-41d4-a716-446655440001",
         content: "Can you try that again with more detail?",
-        role: "user",
+        role: ChatMessageRole.USER,
         model: ModelId.CLAUDE_SONNET_4_5,
         persona: null,
         temperature: 0.7,

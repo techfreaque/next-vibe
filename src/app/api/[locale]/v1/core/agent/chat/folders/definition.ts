@@ -20,7 +20,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { UserRoleDB, UserRoleOptions, UserRole,
+import {
+  UserRoleDB,
+  UserRoleOptions,
+  UserRole,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { DEFAULT_FOLDER_IDS } from "../config";
@@ -199,7 +202,7 @@ const { GET } = createEndpoint({
               },
               z.record(z.string(), z.any()),
             ),
-            allowedRoles: responseArrayField(
+            rolesRead: responseArrayField(
               {
                 type: WidgetType.DATA_LIST,
                 layout: "inline",
@@ -213,16 +216,45 @@ const { GET } = createEndpoint({
                 },
               ),
             ),
-            moderatorIds: responseArrayField(
+            rolesWrite: responseArrayField(
               {
                 type: WidgetType.DATA_LIST,
                 layout: "inline",
               },
               field(
-                z.string(),
+                z.enum(UserRoleDB),
                 { response: true },
                 {
-                  type: WidgetType.TEXT,
+                  type: WidgetType.BADGE,
+                  options: UserRoleOptions,
+                },
+              ),
+            ),
+            rolesHide: responseArrayField(
+              {
+                type: WidgetType.DATA_LIST,
+                layout: "inline",
+              },
+              field(
+                z.enum(UserRoleDB),
+                { response: true },
+                {
+                  type: WidgetType.BADGE,
+                  options: UserRoleOptions,
+                },
+              ),
+            ),
+            rolesDelete: responseArrayField(
+              {
+                type: WidgetType.DATA_LIST,
+                layout: "inline",
+              },
+              field(
+                z.enum(UserRoleDB),
+                { response: true },
+                {
+                  type: WidgetType.BADGE,
+                  options: UserRoleOptions,
                 },
               ),
             ),
@@ -548,7 +580,7 @@ const { POST } = createEndpoint({
                 },
                 z.record(z.string(), z.any()),
               ),
-              allowedRoles: responseArrayField(
+              rolesRead: responseArrayField(
                 {
                   type: WidgetType.DATA_LIST,
                   layout: "inline",
@@ -562,16 +594,45 @@ const { POST } = createEndpoint({
                   },
                 ),
               ),
-              moderatorIds: responseArrayField(
+              rolesWrite: responseArrayField(
                 {
                   type: WidgetType.DATA_LIST,
                   layout: "inline",
                 },
                 field(
-                  z.string(),
+                  z.enum(UserRoleDB),
                   { response: true },
                   {
-                    type: WidgetType.TEXT,
+                    type: WidgetType.BADGE,
+                    options: UserRoleOptions,
+                  },
+                ),
+              ),
+              rolesHide: responseArrayField(
+                {
+                  type: WidgetType.DATA_LIST,
+                  layout: "inline",
+                },
+                field(
+                  z.enum(UserRoleDB),
+                  { response: true },
+                  {
+                    type: WidgetType.BADGE,
+                    options: UserRoleOptions,
+                  },
+                ),
+              ),
+              rolesDelete: responseArrayField(
+                {
+                  type: WidgetType.DATA_LIST,
+                  layout: "inline",
+                },
+                field(
+                  z.enum(UserRoleDB),
+                  { response: true },
+                  {
+                    type: WidgetType.BADGE,
+                    options: UserRoleOptions,
                   },
                 ),
               ),
@@ -678,8 +739,10 @@ const { POST } = createEndpoint({
             expanded: true,
             sortOrder: 0,
             metadata: {},
-            allowedRoles: [],
-            moderatorIds: [],
+            rolesRead: [],
+            rolesWrite: [],
+            rolesHide: [],
+            rolesDelete: [],
             createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
             updatedAt: new Date("2024-01-01T00:00:00Z").toISOString(),
           },

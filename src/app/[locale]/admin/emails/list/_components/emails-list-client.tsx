@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Filter, Mail, RefreshCw } from "lucide-react";
+import { Filter, Mail, RefreshCw } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";

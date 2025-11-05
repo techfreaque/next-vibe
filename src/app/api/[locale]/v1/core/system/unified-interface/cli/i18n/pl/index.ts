@@ -40,6 +40,7 @@ export const translations = {
       deleteFailed: "Nie udało się usunąć sesji",
       storeFailed: "Nie udało się zapisać sesji",
       clearFailed: "Nie udało się wyczyścić sesji",
+      setLeadIdCookieFailed: "Nie udało się ustawić ciasteczka ID leada",
     },
     endpoints: {
       endpointHandler: {

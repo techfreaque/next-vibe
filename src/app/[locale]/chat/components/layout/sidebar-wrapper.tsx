@@ -6,10 +6,8 @@ import type { JSX } from "react";
 import React from "react";
 
 import { isDefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
-import type {
-  FolderUpdate,
-  UseChatReturn,
-} from "@/app/api/[locale]/v1/core/agent/chat/hooks";
+import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks/hooks";
+import type { FolderUpdate } from "@/app/api/[locale]/v1/core/agent/chat/folders/hooks/use-operations";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

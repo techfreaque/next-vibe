@@ -12,7 +12,7 @@ import {
   Filter,
   RefreshCw,
   XCircle,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";

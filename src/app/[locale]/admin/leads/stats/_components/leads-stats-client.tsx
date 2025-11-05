@@ -17,7 +17,7 @@ import {
   TrendingUp,
   UserCheck,
   Users,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import type { HistoricalDataSeriesType } from "next-vibe/shared/types/stats-filtering.schema";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";

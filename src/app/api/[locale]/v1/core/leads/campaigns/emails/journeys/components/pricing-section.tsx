@@ -5,7 +5,7 @@
  */
 
 import { Section } from "@react-email/components";
-import type * as icons from "lucide-react";
+import type * as icons from 'next-vibe-ui/ui/icons';
 import React, { type JSX } from "react";
 import { Span } from "next-vibe-ui/ui/span";
 

@@ -8,7 +8,7 @@ import {
   isDefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 
-import type { DefaultFolderId } from "../shared/types";
+import type { DefaultFolderId } from "../types";
 
 /**
  * Parsed URL result

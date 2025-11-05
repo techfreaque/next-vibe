@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Calendar, Coins, Info, Sparkles, Zap } from "lucide-react";
+import { Calendar, Coins, Info, Sparkles, Zap } from 'next-vibe-ui/ui/icons';
 import {
   Card,
   CardContent,

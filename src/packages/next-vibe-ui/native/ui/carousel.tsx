@@ -9,7 +9,7 @@ import type { ScrollViewProps } from "react-native";
 import { ScrollView, View } from "react-native";
 import { styled } from "nativewind";
 
-import type { CarouselProps as WebCarouselProps } from "next-vibe-ui/ui/carousel";
+import type { CarouselProps as WebCarouselProps } from "@/packages/next-vibe-ui/web/ui/carousel";
 import { cn } from "next-vibe/shared/utils/utils";
 
 // Native carousel uses subset of web props, with ScrollView native props
@@ -54,11 +54,12 @@ export interface CarouselItemProps {
   className?: string;
 }
 
-export function CarouselItem({ className, children }: CarouselItemProps): React.JSX.Element {
+export function CarouselItem({
+  className,
+  children,
+}: CarouselItemProps): React.JSX.Element {
   return (
-    <StyledView className={cn("shrink-0", className)}>
-      {children}
-    </StyledView>
+    <StyledView className={cn("shrink-0", className)}>{children}</StyledView>
   );
 }
 

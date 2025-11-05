@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckIcon } from "@radix-ui/react-icons";
+import { CheckIcon } from 'next-vibe-ui/ui/icons';
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";

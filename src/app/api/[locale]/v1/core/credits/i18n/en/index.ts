@@ -30,6 +30,7 @@ export const translations = {
     noCreditSource: "No credit source available",
     stripeCustomerFailed: "Failed to create Stripe customer",
     checkoutFailed: "Failed to create checkout session",
+    mergeFailed: "Failed to merge lead credits",
   },
   get: {
     title: "Get Credit Balance",

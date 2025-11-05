@@ -75,9 +75,12 @@ export interface BaseButtonProps {
   disabled?: boolean;
   children?: ReactNode;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
   type?: "button" | "submit" | "reset";
   title?: string;
   role?: React.ComponentPropsWithoutRef<"button">["role"];
+  tabIndex?: number;
 }
 
 export interface AsChildButtonProps extends BaseButtonProps {
@@ -92,23 +95,31 @@ export interface RegularButtonProps extends BaseButtonProps {
 
 export type ButtonProps = AsChildButtonProps | RegularButtonProps;
 
-export function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  suppressHydrationWarning = false,
-  ...props
-}: ButtonProps): JSX.Element {
-  const Comp = asChild ? Slot : "button";
-  return (
-    <Comp
-      {...(suppressHydrationWarning ? { suppressHydrationWarning: true } : {})}
-      className={cn(
-        buttonVariants({ variant, size, className }),
-        "cursor-pointer",
-      )}
-      {...props}
-    />
-  );
-}
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      suppressHydrationWarning = false,
+      ...props
+    },
+    ref,
+  ): JSX.Element => {
+    const Comp = asChild ? Slot : "button";
+    return (
+      <Comp
+        ref={ref}
+        {...(suppressHydrationWarning ? { suppressHydrationWarning: true } : {})}
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          "cursor-pointer",
+        )}
+        {...props}
+      />
+    );
+  },
+);
+
+Button.displayName = "Button";

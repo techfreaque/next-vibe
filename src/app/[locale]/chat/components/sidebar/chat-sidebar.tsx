@@ -27,10 +27,8 @@ import type { JSX } from "react";
 import React, { useEffect, useRef, useState } from "react";
 
 import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
-import type {
-  FolderUpdate,
-  UseChatReturn,
-} from "@/app/api/[locale]/v1/core/agent/chat/hooks";
+import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks/hooks";
+import type { FolderUpdate } from "@/app/api/[locale]/v1/core/agent/chat/folders/hooks/use-operations";
 import { useCredits } from "@/app/api/[locale]/v1/core/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
@@ -290,6 +288,7 @@ export function ChatSidebar({
                   onArchiveThread={onArchiveThread}
                   chat={chat}
                   locale={locale}
+                  logger={logger}
                   compact
                 />
                 {searchResults.length === 0 && (
@@ -318,6 +317,7 @@ export function ChatSidebar({
                 onReorderFolder={onReorderFolder}
                 onMoveFolderToParent={onMoveFolderToParent}
                 onUpdateThreadTitle={onUpdateThreadTitle}
+                logger={logger}
               />
             )}
           </Div>

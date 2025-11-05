@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Mail, Send } from "lucide-react";
+import { Mail, Send } from 'next-vibe-ui/ui/icons';
 
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";

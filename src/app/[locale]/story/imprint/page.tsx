@@ -1,4 +1,4 @@
-import { Building, FileText, Info } from "lucide-react";
+import { Building, FileText, Info } from 'next-vibe-ui/ui/icons';
 import type { Metadata, ResolvingMetadata } from "next";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Span } from "next-vibe-ui/ui/span";

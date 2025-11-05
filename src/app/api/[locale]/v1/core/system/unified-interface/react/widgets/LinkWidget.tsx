@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink } from "lucide-react";
+import { ExternalLink } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils";
 import { Span } from "next-vibe-ui//ui/span";
 import { Link } from "next-vibe-ui//ui/link";

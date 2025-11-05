@@ -1,6 +1,6 @@
 "use client";
 
-import { DragHandleDots2Icon } from "@radix-ui/react-icons";
+import { DragHandleDots2Icon } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils/utils";
 import type { ComponentProps, JSX, ReactNode } from "react";
 import { forwardRef } from "react";

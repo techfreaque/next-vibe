@@ -16,7 +16,7 @@ import {
   ChevronRight,
   Search,
   X,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 

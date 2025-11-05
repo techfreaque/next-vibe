@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Plus, Save } from "lucide-react";
+import { Plus, Save } from 'next-vibe-ui/ui/icons';
 import { Form, } from "next-vibe-ui/ui/form/form";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";

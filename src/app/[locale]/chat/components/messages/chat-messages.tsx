@@ -12,7 +12,7 @@ import React, {
 } from "react";
 
 import { useAIStreamStore } from "@/app/api/[locale]/v1/core/agent/ai-stream/hooks/store";
-import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
+import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks/hooks";
 import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -97,7 +97,9 @@ export function ChatMessages({
   const scrollAnimationFrameRef = useRef<number | null>(null);
   const lastScrollTimeRef = useRef<number>(0);
   const userInteractingRef = useRef<boolean>(false);
-  const interactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const interactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const lastThreadIdRef = useRef<string | null>(null);
 
   // Use custom hook for message action state management

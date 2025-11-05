@@ -17,7 +17,7 @@ import type {
   MenubarLabelProps,
   MenubarSeparatorProps,
   MenubarShortcutProps,
-} from "next-vibe-ui/ui/menubar";
+} from "@/packages/next-vibe-ui/web/ui/menubar";
 
 import { Check } from "./icons/Check";
 import { ChevronDown } from "./icons/ChevronDown";
@@ -27,7 +27,8 @@ import { Span } from "./span";
 import { TextClassContext } from "./text";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
-const TEXT_CLASS_ITEM = "select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground";
+const TEXT_CLASS_ITEM =
+  "select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground";
 /* eslint-enable i18next/no-literal-string */
 
 const MenubarMenu = MenubarPrimitive.Menu;
@@ -170,9 +171,7 @@ function MenubarItem({
   children,
 }: MenubarItemProps): JSX.Element {
   return (
-    <TextClassContext.Provider
-      value={TEXT_CLASS_ITEM}
-    >
+    <TextClassContext.Provider value={TEXT_CLASS_ITEM}>
       <MenubarPrimitive.Item
         className={cn(
           "relative flex flex-row web:cursor-default items-center gap-2 rounded-sm px-2 py-1.5 native:py-2 web:outline-none web:focus:bg-accent active:bg-accent web:hover:bg-accent group",
@@ -193,7 +192,8 @@ function MenubarCheckboxItem({
   checked,
   onCheckedChange,
 }: MenubarCheckboxItemProps): JSX.Element {
-  const handleCheckedChange = onCheckedChange ?? ((() => undefined) as (checked: boolean) => void);
+  const handleCheckedChange =
+    onCheckedChange ?? ((() => undefined) as (checked: boolean) => void);
   return (
     <MenubarPrimitive.CheckboxItem
       className={cn(

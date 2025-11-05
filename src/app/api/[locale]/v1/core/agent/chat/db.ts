@@ -20,6 +20,7 @@ import type { z } from "zod";
 
 import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { DEFAULT_FOLDER_IDS, type DefaultFolderId } from "./config";
 import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
@@ -221,12 +222,20 @@ export const chatFolders = pgTable(
     // Metadata
     metadata: jsonb("metadata").$type<FolderMetadata>().default({}),
 
-    // Moderators (array of user IDs who can moderate this folder)
-    moderatorIds: jsonb("moderator_ids").$type<string[]>().default([]),
-
-    // Allowed roles (array of UserRole values who can see this folder)
-    // If empty, inherits from rootFolderId defaults
-    allowedRoles: jsonb("allowed_roles").$type<string[]>().default([]),
+    // Permission roles - if empty, inherits from parent folder
+    // Each role array contains UserRole enum values
+    rolesRead: jsonb("roles_read")
+      .$type<(typeof UserRoleValue)[]>()
+      .default([]),
+    rolesWrite: jsonb("roles_write")
+      .$type<(typeof UserRoleValue)[]>()
+      .default([]),
+    rolesHide: jsonb("roles_hide")
+      .$type<(typeof UserRoleValue)[]>()
+      .default([]),
+    rolesDelete: jsonb("roles_delete")
+      .$type<(typeof UserRoleValue)[]>()
+      .default([]),
 
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -240,10 +249,22 @@ export const chatFolders = pgTable(
     ),
     parentIdIdx: index("chat_folders_parent_id_idx").on(table.parentId),
     sortOrderIdx: index("chat_folders_sort_order_idx").on(table.sortOrder),
-    // GIN index for array containment queries on allowedRoles
-    allowedRolesIdx: index("chat_folders_allowed_roles_idx").using(
+    // GIN indexes for array containment queries on role fields
+    rolesReadIdx: index("chat_folders_roles_read_idx").using(
       "gin",
-      table.allowedRoles,
+      table.rolesRead,
+    ),
+    rolesWriteIdx: index("chat_folders_roles_write_idx").using(
+      "gin",
+      table.rolesWrite,
+    ),
+    rolesHideIdx: index("chat_folders_roles_hide_idx").using(
+      "gin",
+      table.rolesHide,
+    ),
+    rolesDeleteIdx: index("chat_folders_roles_delete_idx").using(
+      "gin",
+      table.rolesDelete,
     ),
   }),
 );
@@ -288,12 +309,20 @@ export const chatThreads = pgTable(
     preview: text("preview"), // First user message preview
     metadata: jsonb("metadata").$type<ThreadMetadata>().default({}),
 
-    // Moderators (array of user IDs who can moderate this thread)
-    moderatorIds: jsonb("moderator_ids").$type<string[]>().default([]),
-
-    // Allowed roles (array of UserRole values who can see this thread)
-    // If empty, inherits from parent folder's allowedRoles
-    allowedRoles: jsonb("allowed_roles").$type<string[]>().default([]),
+    // Permission roles - if empty, inherits from parent folder
+    // Each role array contains UserRole enum values
+    rolesRead: jsonb("roles_read")
+      .$type<(typeof UserRoleValue)[]>()
+      .default([]),
+    rolesWrite: jsonb("roles_write")
+      .$type<(typeof UserRoleValue)[]>()
+      .default([]),
+    rolesHide: jsonb("roles_hide")
+      .$type<(typeof UserRoleValue)[]>()
+      .default([]),
+    rolesDelete: jsonb("roles_delete")
+      .$type<(typeof UserRoleValue)[]>()
+      .default([]),
 
     // Published status (for SHARED folders - allows public read access via link)
     published: boolean("published").default(false).notNull(),
@@ -320,10 +349,22 @@ export const chatThreads = pgTable(
     statusIdx: index("chat_threads_status_idx").on(table.status),
     createdAtIdx: index("chat_threads_created_at_idx").on(table.createdAt),
     updatedAtIdx: index("chat_threads_updated_at_idx").on(table.updatedAt),
-    // GIN index for array containment queries on allowedRoles
-    allowedRolesIdx: index("chat_threads_allowed_roles_idx").using(
+    // GIN indexes for array containment queries on role fields
+    rolesReadIdx: index("chat_threads_roles_read_idx").using(
       "gin",
-      table.allowedRoles,
+      table.rolesRead,
+    ),
+    rolesWriteIdx: index("chat_threads_roles_write_idx").using(
+      "gin",
+      table.rolesWrite,
+    ),
+    rolesHideIdx: index("chat_threads_roles_hide_idx").using(
+      "gin",
+      table.rolesHide,
+    ),
+    rolesDeleteIdx: index("chat_threads_roles_delete_idx").using(
+      "gin",
+      table.rolesDelete,
     ),
   }),
 );

@@ -19,7 +19,7 @@ import {
   TrendingUp,
   UserCheck,
   UserX,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";

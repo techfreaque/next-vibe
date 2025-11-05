@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import { Loader2 } from 'next-vibe-ui/ui/icons';
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";

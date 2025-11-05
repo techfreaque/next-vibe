@@ -5,10 +5,12 @@
 
 import { create } from "zustand";
 
-import type { DefaultFolderId } from "./config";
-import type { MessageMetadata, ToolCall } from "./db";
-import type { IconValue } from "./model-access/icons";
-import { ModelId, type ModelId as ModelIdType } from "./model-access/models";
+import type { DefaultFolderId } from "../config";
+import type { MessageMetadata, ToolCall } from "../db";
+import type { IconValue } from "../model-access/icons";
+import { ModelId, type ModelId as ModelIdType } from "../model-access/models";
+import { type ChatMessageRole } from "../enum";
+import { type UserRoleValue } from "../../../user/user-roles/enum";
 
 /**
  * Chat thread type
@@ -27,8 +29,10 @@ export interface ChatThread {
   archived: boolean;
   tags: string[];
   preview: string | null;
-  moderatorIds?: string[] | null;
-  allowedRoles?: string[] | null;
+  rolesRead?: (typeof UserRoleValue)[] | null;
+  rolesWrite?: (typeof UserRoleValue)[] | null;
+  rolesHide?: (typeof UserRoleValue)[] | null;
+  rolesDelete?: (typeof UserRoleValue)[] | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,7 +43,7 @@ export interface ChatThread {
 export interface ChatMessage {
   id: string;
   threadId: string;
-  role: "user" | "assistant" | "system" | "tool" | "error";
+  role: ChatMessageRole;
   content: string;
   parentId: string | null;
   depth: number;
@@ -76,8 +80,10 @@ export interface ChatFolder {
   expanded: boolean;
   sortOrder: number;
   metadata: Record<string, string | number | boolean | null>;
-  allowedRoles?: string[] | null; // Roles that can view this folder (PUBLIC, CUSTOMER, ADMIN)
-  moderatorIds?: string[] | null; // User IDs that can moderate this folder
+  rolesRead?: (typeof UserRoleValue)[] | null; // Roles that can read/view this folder
+  rolesWrite?: (typeof UserRoleValue)[] | null; // Roles that can write/create in this folder
+  rolesHide?: (typeof UserRoleValue)[] | null; // Roles that can hide/moderate this folder
+  rolesDelete?: (typeof UserRoleValue)[] | null; // Roles that can delete this folder
   createdAt: Date;
   updatedAt: Date;
 }

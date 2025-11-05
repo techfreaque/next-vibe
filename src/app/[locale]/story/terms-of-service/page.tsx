@@ -1,4 +1,4 @@
-import { FileText, Scale } from "lucide-react";
+import { FileText, Scale } from 'next-vibe-ui/ui/icons';
 import type { Metadata, ResolvingMetadata } from "next";
 import type { JSX } from "react";
 

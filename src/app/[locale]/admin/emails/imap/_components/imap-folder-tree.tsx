@@ -11,7 +11,7 @@ import {
   Folder,
   FolderOpen,
   Mail,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import { useRouter } from "next/navigation";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";

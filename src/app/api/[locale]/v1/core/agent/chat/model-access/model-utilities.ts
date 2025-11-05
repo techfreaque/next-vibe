@@ -5,7 +5,7 @@ import {
   MessageSquare,
   Sparkles,
   Zap,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 

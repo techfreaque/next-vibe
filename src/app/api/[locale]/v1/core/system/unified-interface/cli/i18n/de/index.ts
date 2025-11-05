@@ -41,6 +41,7 @@ export const translations: typeof enTranslations = {
       deleteFailed: "Sitzung konnte nicht gelöscht werden",
       storeFailed: "Sitzung konnte nicht gespeichert werden",
       clearFailed: "Sitzung konnte nicht gelöscht werden",
+      setLeadIdCookieFailed: "Lead-ID-Cookie konnte nicht gesetzt werden",
     },
     endpoints: {
       endpointHandler: {

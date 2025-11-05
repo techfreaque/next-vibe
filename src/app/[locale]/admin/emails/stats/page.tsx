@@ -3,7 +3,7 @@
  * Server component for email statistics and analytics
  */
 
-import { BarChart3 } from "lucide-react";
+import { BarChart3 } from 'next-vibe-ui/ui/icons';
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import type React from "react";

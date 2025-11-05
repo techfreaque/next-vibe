@@ -7,9 +7,7 @@ import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 
 // Import all types from web (web is source of truth)
-import type {
-  PopoverRootProps,
-} from "next-vibe-ui/ui/popover";
+import type { PopoverRootProps } from "@/packages/next-vibe-ui/web/ui/popover";
 
 const Popover = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Root>,

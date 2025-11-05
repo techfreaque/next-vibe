@@ -1,7 +1,7 @@
 "use client";
 
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-import { CheckIcon } from "@radix-ui/react-icons";
+import { CheckIcon } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 

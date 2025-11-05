@@ -5,7 +5,7 @@ import {
   Handshake,
   Heart,
   Lightbulb,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Button } from "next-vibe-ui/ui/button";

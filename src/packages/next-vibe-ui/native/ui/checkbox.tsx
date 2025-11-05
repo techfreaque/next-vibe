@@ -6,7 +6,7 @@ import { Platform } from "react-native";
 import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
 
-import type { CheckboxBaseProps } from "next-vibe-ui/ui/checkbox";
+import type { CheckboxBaseProps } from "@/packages/next-vibe-ui/web/ui/checkbox";
 
 export type CheckboxProps = Omit<
   CheckboxBaseProps,

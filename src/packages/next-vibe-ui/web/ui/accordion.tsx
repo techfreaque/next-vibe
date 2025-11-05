@@ -1,7 +1,7 @@
 "use client";
 
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { ChevronDownIcon } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 

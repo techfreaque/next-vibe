@@ -1,6 +1,6 @@
 "use client";
 
-import { Printer } from "lucide-react";
+import { Printer } from 'next-vibe-ui/ui/icons';
 import type { ReactElement } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

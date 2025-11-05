@@ -11,7 +11,7 @@ import type {
   TableRowProps,
   TableHeadProps,
   TableCellProps,
-} from "next-vibe-ui/ui/table";
+} from "@/packages/next-vibe-ui/web/ui/table";
 
 import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";

@@ -19,7 +19,7 @@ import type {
   PaginationPreviousProps,
   PaginationNextProps,
   PaginationEllipsisProps,
-} from "next-vibe-ui/ui/pagination";
+} from "@/packages/next-vibe-ui/web/ui/pagination";
 
 import { buttonVariants } from "./button";
 

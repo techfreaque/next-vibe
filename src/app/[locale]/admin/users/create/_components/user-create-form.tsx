@@ -5,7 +5,7 @@
 
 "use client";
 
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save } from 'next-vibe-ui/ui/icons';
 import { useRouter } from "next/navigation";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";

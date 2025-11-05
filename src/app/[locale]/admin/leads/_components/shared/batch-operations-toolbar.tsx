@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Users } from "lucide-react";
+import { Users } from 'next-vibe-ui/ui/icons';
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";

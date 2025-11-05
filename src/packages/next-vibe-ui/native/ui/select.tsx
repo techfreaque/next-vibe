@@ -13,7 +13,7 @@ import { ChevronDown } from "./icons/ChevronDown";
 import { ChevronUp } from "./icons/ChevronUp";
 
 // Import cross-platform types from web
-import type { SelectOption } from "next-vibe-ui/ui/select";
+import type { SelectOption } from "@/packages/next-vibe-ui/web/ui/select";
 
 // Native prop types - use native primitive props with additional web-compatible props
 type SelectTriggerProps = SelectPrimitive.TriggerProps & {
@@ -103,10 +103,7 @@ const SelectScrollUpButton = ({
     className,
   );
   return (
-    <StyledSelectScrollUpButton
-      className={scrollButtonClassName}
-      {...props}
-    >
+    <StyledSelectScrollUpButton className={scrollButtonClassName} {...props}>
       <ChevronUp size={14} />
     </StyledSelectScrollUpButton>
   );
@@ -127,10 +124,7 @@ const SelectScrollDownButton = ({
     className,
   );
   return (
-    <StyledSelectScrollDownButton
-      className={scrollButtonClassName}
-      {...props}
-    >
+    <StyledSelectScrollDownButton className={scrollButtonClassName} {...props}>
       <ChevronDown size={14} />
     </StyledSelectScrollDownButton>
   );
@@ -166,7 +160,11 @@ function SelectContent({
       <SelectPrimitive.Overlay
         style={Platform.OS !== "web" ? StyleSheet.absoluteFill : undefined}
       >
-        <StyledAnimatedView className={animatedViewClassName} entering={FadeIn} exiting={FadeOut}>
+        <StyledAnimatedView
+          className={animatedViewClassName}
+          entering={FadeIn}
+          exiting={FadeOut}
+        >
           <StyledSelectContent
             position={position}
             className={contentClassName}
@@ -190,9 +188,7 @@ function SelectLabel({ className, ...props }: SelectLabelProps): JSX.Element {
     "py-1.5 native:pb-2 pl-8 native:pl-10 pr-2 text-popover-foreground text-sm native:text-base font-semibold",
     className,
   );
-  return (
-    <StyledSelectLabel className={labelClassName} {...props} />
-  );
+  return <StyledSelectLabel className={labelClassName} {...props} />;
 }
 SelectLabel.displayName = SelectPrimitive.Label.displayName;
 
@@ -209,8 +205,10 @@ function SelectItem({
     props.disabled && "web:pointer-events-none opacity-50",
     className,
   );
-  const viewClassName = "absolute left-2 native:left-3.5 flex h-3.5 native:pt-px w-3.5 items-center justify-center";
-  const itemTextClassName = "text-sm native:text-lg text-popover-foreground native:text-base web:group-focus:text-accent-foreground";
+  const viewClassName =
+    "absolute left-2 native:left-3.5 flex h-3.5 native:pt-px w-3.5 items-center justify-center";
+  const itemTextClassName =
+    "text-sm native:text-lg text-popover-foreground native:text-base web:group-focus:text-accent-foreground";
   return (
     <StyledSelectItem
       value={value as string}
@@ -229,14 +227,12 @@ function SelectItem({
 }
 SelectItem.displayName = SelectPrimitive.Item.displayName;
 
-function SelectSeparator({ className, ...props }: SelectSeparatorProps): JSX.Element {
+function SelectSeparator({
+  className,
+  ...props
+}: SelectSeparatorProps): JSX.Element {
   const separatorClassName = cn("-mx-1 my-1 h-px bg-muted", className);
-  return (
-    <StyledSelectSeparator
-      className={separatorClassName}
-      {...props}
-    />
-  );
+  return <StyledSelectSeparator className={separatorClassName} {...props} />;
 }
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 

@@ -1,4 +1,4 @@
-import { AlertCircle } from "lucide-react";
+import { AlertCircle } from 'next-vibe-ui/ui/icons';
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";

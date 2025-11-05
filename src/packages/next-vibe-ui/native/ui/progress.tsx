@@ -9,7 +9,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
-import type { ProgressProps } from "next-vibe-ui/ui/progress";
+import type { ProgressProps } from "@/packages/next-vibe-ui/web/ui/progress";
 import type { ViewPropsWithClassName } from "../lib/types";
 import { cn } from "next-vibe/shared/utils/utils";
 
@@ -57,7 +57,13 @@ function Indicator({
 
   if (Platform.OS === "web") {
     return (
-      <ProgressPrimitive.Indicator asChild className={cn("h-full w-full flex-1 bg-primary web:transition-all", className)}>
+      <ProgressPrimitive.Indicator
+        asChild
+        className={cn(
+          "h-full w-full flex-1 bg-primary web:transition-all",
+          className,
+        )}
+      >
         <View
           style={{
             transform: `translateX(-${100 - (value ?? 0)}%)`,
@@ -68,7 +74,10 @@ function Indicator({
   }
 
   return (
-    <ProgressPrimitive.Indicator asChild className={cn("h-full bg-foreground", className)}>
+    <ProgressPrimitive.Indicator
+      asChild
+      className={cn("h-full bg-foreground", className)}
+    >
       <Animated.View style={indicator} />
     </ProgressPrimitive.Indicator>
   );

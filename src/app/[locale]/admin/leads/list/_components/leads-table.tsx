@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, ExternalLink, Eye } from "lucide-react";
+import { Edit, ExternalLink, Eye } from 'next-vibe-ui/ui/icons';
 import Link from "next/link";
 import {
   LeadStatus,

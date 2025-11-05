@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Edit, Trash2, X } from "lucide-react";
+import { Edit, Trash2, X } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";

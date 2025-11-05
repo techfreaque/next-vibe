@@ -6,7 +6,7 @@
 
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus } from 'next-vibe-ui/ui/icons';
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import {

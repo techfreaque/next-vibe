@@ -14,12 +14,15 @@ import type {
   ChartBaseProps,
   ChartContainerBaseProps,
   ChartDataPoint,
-} from "next-vibe-ui/ui/chart";
+} from "@/packages/next-vibe-ui/web/ui/chart";
 
 // Type-safe View with className support (NativeWind)
 const StyledView = styled(View);
 
-export function Chart({ className, children }: ChartBaseProps): React.JSX.Element {
+export function Chart({
+  className,
+  children,
+}: ChartBaseProps): React.JSX.Element {
   return (
     <StyledView className={cn("flex flex-col gap-2", className)}>
       {children}

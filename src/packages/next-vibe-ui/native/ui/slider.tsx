@@ -5,7 +5,7 @@
 import * as SliderPrimitive from "@rn-primitives/slider";
 import React from "react";
 
-import type { SliderProps } from "next-vibe-ui/ui/slider";
+import type { SliderProps } from "@/packages/next-vibe-ui/web/ui/slider";
 import { cn } from "../lib/utils";
 import { styled } from "nativewind";
 
@@ -34,16 +34,10 @@ const Slider = React.forwardRef<
       onValueChange={onValueChange}
       {...props}
     >
-      <StyledSliderTrack
-        className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20"
-      >
-        <StyledSliderRange
-          className={RANGE_CLASSNAME}
-        />
+      <StyledSliderTrack className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20">
+        <StyledSliderRange className={RANGE_CLASSNAME} />
       </StyledSliderTrack>
-      <StyledSliderThumb
-        className="block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-      />
+      <StyledSliderThumb className="block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50" />
     </StyledSliderRoot>
   );
 });

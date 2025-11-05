@@ -3,7 +3,7 @@ import * as React from "react";
 import { Platform, StyleSheet } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
-import type { HoverCardContentProps as WebHoverCardContentProps } from "next-vibe-ui/ui/hover-card";
+import type { HoverCardContentProps as WebHoverCardContentProps } from "@/packages/next-vibe-ui/web/ui/hover-card";
 import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 
@@ -23,7 +23,7 @@ function HoverCardContent({
   className,
   children,
   disablePositioningStyle,
-  asChild
+  asChild,
 }: NativeHoverCardContentProps): JSX.Element {
   const { open } = HoverCardPrimitive.useRootContext();
   return (

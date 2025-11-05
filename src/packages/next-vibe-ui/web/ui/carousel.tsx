@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftIcon, ArrowRightIcon } from "@radix-ui/react-icons";
+import { ArrowLeftIcon, ArrowRightIcon } from 'next-vibe-ui/ui/icons';
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
@@ -206,16 +206,19 @@ CarouselItem.displayName = "CarouselItem";
 
 const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
-  React.ComponentProps<typeof Button>
->(({ className, variant = "outline", size = "icon", ...props }, ref) => {
+  Omit<
+    React.ComponentProps<typeof Button>,
+    "onClick" | "disabled" | "onMouseEnter" | "onMouseLeave" | "tabIndex"
+  >
+>(({ className, variant = "outline", size = "icon" }, ref) => {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
   const { t } = useTranslation();
 
   return (
     <Button
       ref={ref}
-      variant={variant}
-      size={size}
+      variant={variant ?? "outline"}
+      size={size ?? "icon"}
       className={cn(
         "absolute  h-8 w-8 rounded-full",
         orientation === "horizontal"
@@ -225,7 +228,6 @@ const CarouselPrevious = React.forwardRef<
       )}
       disabled={!canScrollPrev}
       onClick={scrollPrev}
-      {...props}
     >
       <>
         <ArrowLeftIcon className="h-4 w-4" />
@@ -242,16 +244,19 @@ CarouselPrevious.displayName = "CarouselPrevious";
 
 const CarouselNext = React.forwardRef<
   HTMLButtonElement,
-  React.ComponentProps<typeof Button>
->(({ className, variant = "outline", size = "icon", ...props }, ref) => {
+  Omit<
+    React.ComponentProps<typeof Button>,
+    "onClick" | "disabled" | "onMouseEnter" | "onMouseLeave" | "tabIndex"
+  >
+>(({ className, variant = "outline", size = "icon" }, ref) => {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
   const { t } = useTranslation();
 
   return (
     <Button
       ref={ref}
-      variant={variant}
-      size={size}
+      variant={variant ?? "outline"}
+      size={size ?? "icon"}
       className={cn(
         "absolute h-8 w-8 rounded-full",
         orientation === "horizontal"
@@ -261,7 +266,6 @@ const CarouselNext = React.forwardRef<
       )}
       disabled={!canScrollNext}
       onClick={scrollNext}
-      {...props}
     >
       <>
         <ArrowRightIcon className="h-4 w-4" />

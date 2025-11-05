@@ -1,7 +1,10 @@
 import { Pressable, Text as RNText } from "react-native";
 
-import type { ButtonProps } from "next-vibe-ui/ui/button";
-import { buttonTextVariants, buttonVariants } from "next-vibe-ui/ui/button";
+import type { ButtonProps } from "@/packages/next-vibe-ui/web/ui/button";
+import {
+  buttonTextVariants,
+  buttonVariants,
+} from "@/packages/next-vibe-ui/web/ui/button";
 import { cn } from "next-vibe/shared/utils/utils";
 
 function Button({

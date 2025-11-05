@@ -7,7 +7,7 @@ import type {
   TabsListProps,
   TabsTriggerProps,
   TabsContentProps,
-} from "next-vibe-ui/ui/tabs";
+} from "@/packages/next-vibe-ui/web/ui/tabs";
 
 import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
@@ -19,7 +19,11 @@ const StyledTabsContent = styled(TabsPrimitive.Content);
 
 const Tabs = TabsPrimitive.Root;
 
-const TabsList = ({ className, children, ...props }: TabsListProps): JSX.Element => (
+const TabsList = ({
+  className,
+  children,
+  ...props
+}: TabsListProps): JSX.Element => (
   <StyledTabsList
     className={cn(
       "web:inline-flex h-10 native:h-12 items-center justify-center rounded-md bg-muted p-1 native:px-1.5",
@@ -32,7 +36,13 @@ const TabsList = ({ className, children, ...props }: TabsListProps): JSX.Element
 );
 TabsList.displayName = TabsPrimitive.List.displayName;
 
-const TabsTrigger = ({ className, value, disabled, children, ...props }: TabsTriggerProps): JSX.Element => {
+const TabsTrigger = ({
+  className,
+  value,
+  disabled,
+  children,
+  ...props
+}: TabsTriggerProps): JSX.Element => {
   const { value: selectedValue } = TabsPrimitive.useRootContext();
   return (
     <TextClassContext.Provider
@@ -60,7 +70,12 @@ const TabsTrigger = ({ className, value, disabled, children, ...props }: TabsTri
 };
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
-const TabsContent = ({ className, value, children, ...props }: TabsContentProps): JSX.Element => (
+const TabsContent = ({
+  className,
+  value,
+  children,
+  ...props
+}: TabsContentProps): JSX.Element => (
   <StyledTabsContent
     value={value}
     className={cn(

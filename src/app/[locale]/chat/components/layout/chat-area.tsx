@@ -10,7 +10,7 @@ import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useAIStreamStore } from "@/app/api/[locale]/v1/core/agent/ai-stream/hooks/store";
-import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
+import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { _simpleT } from "@/i18n/core/shared";

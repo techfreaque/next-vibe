@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { History, TrendingUp } from "lucide-react";
+import { History, TrendingUp } from 'next-vibe-ui/ui/icons';
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { H1, P } from "next-vibe-ui/ui/typography";

@@ -74,8 +74,10 @@ export async function getFolder(
               string,
               string | number | boolean | null
             >) || {},
-          allowedRoles: folder.allowedRoles || [],
-          moderatorIds: folder.moderatorIds || [],
+          rolesRead: folder.rolesRead || [],
+          rolesWrite: folder.rolesWrite || [],
+          rolesHide: folder.rolesHide || [],
+          rolesDelete: folder.rolesDelete || [],
           createdAt: folder.createdAt.toISOString(),
           updatedAt: folder.updatedAt.toISOString(),
         },
@@ -137,15 +139,59 @@ export async function updateFolder(
 
     // Update the folder
     logger.info("Updating folder with data:", { id, updates });
+
+    // Build update object with proper types
+    const updateData: Partial<typeof chatFolders.$inferInsert> = {
+      updatedAt: new Date(),
+    };
+
+    // Only include fields that are actually being updated
+    if (updates.name !== undefined) {
+      updateData.name = updates.name;
+    }
+    if (updates.icon !== undefined) {
+      updateData.icon = updates.icon;
+    }
+    if (updates.color !== undefined) {
+      updateData.color = updates.color;
+    }
+    if (updates.parentId !== undefined) {
+      updateData.parentId = updates.parentId;
+    }
+    if (updates.expanded !== undefined) {
+      updateData.expanded = updates.expanded;
+    }
+    if (updates.sortOrder !== undefined) {
+      updateData.sortOrder = updates.sortOrder;
+    }
+    if (updates.metadata !== undefined) {
+      updateData.metadata = updates.metadata;
+    }
+    if (updates.rolesRead !== undefined) {
+      updateData.rolesRead =
+        updates.rolesRead as typeof chatFolders.$inferInsert.rolesRead;
+    }
+    if (updates.rolesWrite !== undefined) {
+      updateData.rolesWrite =
+        updates.rolesWrite as typeof chatFolders.$inferInsert.rolesWrite;
+    }
+    if (updates.rolesHide !== undefined) {
+      updateData.rolesHide =
+        updates.rolesHide as typeof chatFolders.$inferInsert.rolesHide;
+    }
+    if (updates.rolesDelete !== undefined) {
+      updateData.rolesDelete =
+        updates.rolesDelete as typeof chatFolders.$inferInsert.rolesDelete;
+    }
+
     const [updatedFolder] = await db
       .update(chatFolders)
-      .set({
-        ...updates,
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(eq(chatFolders.id, id))
       .returning();
-    logger.info("Updated folder result:", { updatedFolder: updatedFolder ? { id: updatedFolder.id } : null });
+    logger.info("Updated folder result:", {
+      updatedFolder: updatedFolder ? { id: updatedFolder.id } : null,
+    });
 
     if (!updatedFolder) {
       return fail({
@@ -171,8 +217,10 @@ export async function updateFolder(
               string,
               string | number | boolean | null
             >) || {},
-          allowedRoles: (updatedFolder.allowedRoles as string[]) || [],
-          moderatorIds: (updatedFolder.moderatorIds as string[]) || [],
+          rolesRead: updatedFolder.rolesRead || [],
+          rolesWrite: updatedFolder.rolesWrite || [],
+          rolesHide: updatedFolder.rolesHide || [],
+          rolesDelete: updatedFolder.rolesDelete || [],
           createdAt: updatedFolder.createdAt.toISOString(),
           updatedAt: updatedFolder.updatedAt.toISOString(),
         },

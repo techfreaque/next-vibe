@@ -12,7 +12,7 @@ import type {
   ResizablePanelGroupProps,
   ResizablePanelProps,
   ResizableHandleProps,
-} from "next-vibe-ui/ui/resizable";
+} from "@/packages/next-vibe-ui/web/ui/resizable";
 
 import { styled } from "nativewind";
 
@@ -22,7 +22,7 @@ const StyledView = styled(View);
 export function ResizablePanelGroup({
   className,
   direction = "horizontal",
-  children
+  children,
 }: ResizablePanelGroupProps): React.JSX.Element {
   return (
     <StyledView
@@ -39,11 +39,12 @@ export function ResizablePanelGroup({
 
 ResizablePanelGroup.displayName = "ResizablePanelGroup";
 
-export function ResizablePanel({ className, children }: ResizablePanelProps): React.JSX.Element {
+export function ResizablePanel({
+  className,
+  children,
+}: ResizablePanelProps): React.JSX.Element {
   return (
-    <StyledView className={cn("flex-1", className)}>
-      {children}
-    </StyledView>
+    <StyledView className={cn("flex-1", className)}>{children}</StyledView>
   );
 }
 

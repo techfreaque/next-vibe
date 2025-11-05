@@ -10,7 +10,7 @@ import {
   Settings,
   Twitter,
   Youtube,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Card,

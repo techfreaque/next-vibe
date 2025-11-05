@@ -15,7 +15,7 @@ import type {
   SidebarFooterProps,
   SidebarMenuItemProps,
   SidebarContextType,
-} from "next-vibe-ui/ui/sidebar";
+} from "@/packages/next-vibe-ui/web/ui/sidebar";
 import { cn } from "../lib/utils";
 import { styled } from "nativewind";
 
@@ -34,9 +34,15 @@ export function useSidebar(): SidebarContextType {
 }
 
 // Native sidebar props combine web props with ViewProps
-type NativeSidebarProps = WebSidebarProps & ViewProps & { defaultOpen?: boolean };
+type NativeSidebarProps = WebSidebarProps &
+  ViewProps & { defaultOpen?: boolean };
 
-export function Sidebar({ className, children, defaultOpen = true, ...props }: NativeSidebarProps): React.ReactElement {
+export function Sidebar({
+  className,
+  children,
+  defaultOpen = true,
+  ...props
+}: NativeSidebarProps): React.ReactElement {
   const [open, setOpen] = useState(defaultOpen);
 
   const contextValue = useMemo<SidebarContextType>(
@@ -69,33 +75,48 @@ export function Sidebar({ className, children, defaultOpen = true, ...props }: N
 
 Sidebar.displayName = "Sidebar";
 
-export const SidebarHeader = React.forwardRef<View, SidebarHeaderProps & ViewProps>(
-  ({ className, children, ...props }, ref) => (
-    <StyledView ref={ref} className={cn("flex flex-col gap-2 p-4", className)} {...props}>
-      {children}
-    </StyledView>
-  ),
-);
+export const SidebarHeader = React.forwardRef<
+  View,
+  SidebarHeaderProps & ViewProps
+>(({ className, children, ...props }, ref) => (
+  <StyledView
+    ref={ref}
+    className={cn("flex flex-col gap-2 p-4", className)}
+    {...props}
+  >
+    {children}
+  </StyledView>
+));
 
 SidebarHeader.displayName = "SidebarHeader";
 
-export const SidebarContent = React.forwardRef<View, SidebarContentProps & ViewProps>(
-  ({ className, children, ...props }, ref) => (
-    <StyledView ref={ref} className={cn("flex-1 overflow-y-auto", className)} {...props}>
-      {children}
-    </StyledView>
-  ),
-);
+export const SidebarContent = React.forwardRef<
+  View,
+  SidebarContentProps & ViewProps
+>(({ className, children, ...props }, ref) => (
+  <StyledView
+    ref={ref}
+    className={cn("flex-1 overflow-y-auto", className)}
+    {...props}
+  >
+    {children}
+  </StyledView>
+));
 
 SidebarContent.displayName = "SidebarContent";
 
-export const SidebarFooter = React.forwardRef<View, SidebarFooterProps & ViewProps>(
-  ({ className, children, ...props }, ref) => (
-    <StyledView ref={ref} className={cn("flex flex-col gap-2 p-4", className)} {...props}>
-      {children}
-    </StyledView>
-  ),
-);
+export const SidebarFooter = React.forwardRef<
+  View,
+  SidebarFooterProps & ViewProps
+>(({ className, children, ...props }, ref) => (
+  <StyledView
+    ref={ref}
+    className={cn("flex flex-col gap-2 p-4", className)}
+    {...props}
+  >
+    {children}
+  </StyledView>
+));
 
 SidebarFooter.displayName = "SidebarFooter";
 

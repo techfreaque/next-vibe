@@ -19,13 +19,14 @@ import type {
   AccordionItemProps,
   AccordionProps,
   AccordionTriggerProps,
-} from "next-vibe-ui/ui/accordion";
+} from "@/packages/next-vibe-ui/web/ui/accordion";
 import { cn } from "../lib/utils";
 import { ChevronDown } from "./icons/ChevronDown";
 import { TextClassContext } from "./text";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
-const TEXT_CLASS_TRIGGER = "native:text-lg font-medium web:group-hover:underline";
+const TEXT_CLASS_TRIGGER =
+  "native:text-lg font-medium web:group-hover:underline";
 const TEXT_CLASS_CONTENT = "native:text-lg";
 /* eslint-enable i18next/no-literal-string */
 
@@ -109,7 +110,10 @@ const AccordionItem = ({
 };
 AccordionItem.displayName = AccordionPrimitive.Item.displayName;
 
-const AccordionTrigger = ({ className, children }: AccordionTriggerProps): JSX.Element => {
+const AccordionTrigger = ({
+  className,
+  children,
+}: AccordionTriggerProps): JSX.Element => {
   const { isExpanded } = AccordionPrimitive.useItemContext();
 
   const progress = useDerivedValue(() =>
@@ -137,9 +141,7 @@ const AccordionTrigger = ({ className, children }: AccordionTriggerProps): JSX.E
   );
 
   return (
-    <TextClassContext.Provider
-      value={TEXT_CLASS_TRIGGER}
-    >
+    <TextClassContext.Provider value={TEXT_CLASS_TRIGGER}>
       <AccordionPrimitive.Header className="flex">
         <AccordionPrimitive.Trigger asChild>
           {Platform.OS === "web" ? (
@@ -158,12 +160,13 @@ const AccordionTrigger = ({ className, children }: AccordionTriggerProps): JSX.E
 };
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
-const AccordionContent = ({ className, children }: AccordionContentProps): JSX.Element => {
+const AccordionContent = ({
+  className,
+  children,
+}: AccordionContentProps): JSX.Element => {
   const { isExpanded } = AccordionPrimitive.useItemContext();
   return (
-    <TextClassContext.Provider
-      value={TEXT_CLASS_CONTENT}
-    >
+    <TextClassContext.Provider value={TEXT_CLASS_CONTENT}>
       <AccordionPrimitive.Content
         className={cn(
           "overflow-hidden text-sm web:transition-all",

@@ -40,6 +40,7 @@ export const translations = {
       deleteFailed: "Failed to delete session",
       storeFailed: "Failed to store session",
       clearFailed: "Failed to clear session",
+      setLeadIdCookieFailed: "Failed to set lead ID cookie",
     },
     endpoints: {
       endpointHandler: {

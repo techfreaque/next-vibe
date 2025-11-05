@@ -1,7 +1,7 @@
 import * as SeparatorPrimitive from "@rn-primitives/separator";
 import * as React from "react";
 
-import type { SeparatorProps } from "next-vibe-ui/ui/separator";
+import type { SeparatorProps } from "@/packages/next-vibe-ui/web/ui/separator";
 import { cn } from "next-vibe/shared/utils/utils";
 import { styled } from "nativewind";
 

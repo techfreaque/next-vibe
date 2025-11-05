@@ -5,7 +5,7 @@
 
 "use client";
 
-import type { LucideProps } from "lucide-react";
+import type { LucideProps } from 'next-vibe-ui/ui/icons';
 import { Button } from "next-vibe-ui//ui/button";
 import type { JSX } from "react";
 

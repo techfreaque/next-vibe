@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingDown, TrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui//ui/div";
 import { Span } from "next-vibe-ui//ui/span";

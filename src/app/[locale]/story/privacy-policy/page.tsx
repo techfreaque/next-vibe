@@ -1,4 +1,4 @@
-import { Lock, Shield } from "lucide-react";
+import { Lock, Shield } from 'next-vibe-ui/ui/icons';
 import type { Metadata, ResolvingMetadata } from "next";
 import type { JSX } from "react";
 

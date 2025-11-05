@@ -38,7 +38,7 @@ import { Trash2 } from "next-vibe-ui//ui/icons/Trash2";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
+import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks/hooks";
 import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -46,7 +46,8 @@ import { simpleT } from "@/i18n/core/shared";
 import { useTouchDevice } from "../../hooks/use-touch-device";
 import { chatColors, chatTransitions } from "../../lib/design-tokens";
 import type { ChatThread } from "../../types";
-import { PermissionsDialog } from "./permissions-dialog";
+import { ThreadPermissionsDialog } from "./thread-permissions-dialog";
+import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 
 interface ThreadListProps {
   threads: ChatThread[];
@@ -60,6 +61,7 @@ interface ThreadListProps {
   chat?: UseChatReturn;
   compact?: boolean;
   locale: CountryLanguage;
+  logger: EndpointLogger;
 }
 
 export function ThreadList({
@@ -74,6 +76,7 @@ export function ThreadList({
   chat,
   compact = false,
   locale,
+  logger,
 }: ThreadListProps): JSX.Element {
   return (
     <Div className="space-y-0.5">
@@ -91,6 +94,7 @@ export function ThreadList({
           chat={chat}
           compact={compact}
           locale={locale}
+          logger={logger}
         />
       ))}
     </Div>
@@ -106,13 +110,10 @@ interface ThreadItemProps {
   onMoveThread?: (threadId: string, folderId: string | null) => void;
   onPinThread?: (threadId: string, pinned: boolean) => void;
   onArchiveThread?: (threadId: string, archived: boolean) => void;
-  onUpdatePermissions?: (
-    threadId: string,
-    data: { moderatorIds: string[]; allowedRoles?: string[] },
-  ) => void;
   chat?: UseChatReturn;
   compact?: boolean;
   locale: CountryLanguage;
+  logger: EndpointLogger;
 }
 
 function ThreadItem({
@@ -123,10 +124,10 @@ function ThreadItem({
   onMoveThread,
   onPinThread,
   onArchiveThread,
-  onUpdatePermissions,
   chat,
   compact = false,
   locale,
+  logger,
 }: ThreadItemProps): JSX.Element {
   const router = useRouter();
   const isTouch = useTouchDevice();
@@ -201,15 +202,6 @@ function ThreadItem({
   const handleManagePermissions = (): void => {
     setDropdownOpen(false);
     setPermissionsDialogOpen(true);
-  };
-
-  const handleSavePermissions = (data: {
-    moderatorIds: string[];
-    allowedRoles?: string[];
-  }): void => {
-    if (onUpdatePermissions) {
-      onUpdatePermissions(thread.id, data);
-    }
   };
 
   // Get all folders for the move menu - only folders from the same root folder
@@ -389,15 +381,13 @@ function ThreadItem({
                 </DropdownMenuItem>
               )}
 
-              {onUpdatePermissions && (
-                <DropdownMenuItem
-                  onSelect={handleManagePermissions}
-                  className="cursor-pointer"
-                >
-                  <Shield className="h-4 w-4 mr-2" />
-                  {t("app.chat.folderList.managePermissions")}
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem
+                onSelect={handleManagePermissions}
+                className="cursor-pointer"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                {t("app.chat.folderList.managePermissions")}
+              </DropdownMenuItem>
 
               {onMoveThread && chat && (
                 <>
@@ -504,15 +494,13 @@ function ThreadItem({
       </AlertDialog>
 
       {/* Permissions Dialog */}
-      <PermissionsDialog
+      <ThreadPermissionsDialog
         open={permissionsDialogOpen}
         onOpenChange={setPermissionsDialogOpen}
-        resourceType="thread"
-        resourceName={thread.title}
-        moderatorIds={(thread.moderatorIds as string[]) || []}
-        allowedRoles={(thread.allowedRoles as string[]) || []}
-        onSave={handleSavePermissions}
+        threadId={thread.id}
+        threadTitle={thread.title}
         locale={locale}
+        logger={logger}
       />
     </Div>
   );

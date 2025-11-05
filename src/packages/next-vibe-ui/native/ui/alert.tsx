@@ -8,7 +8,7 @@ import type {
   AlertProps,
   AlertTitleProps,
   AlertVariant,
-} from "next-vibe-ui/ui/alert";
+} from "@/packages/next-vibe-ui/web/ui/alert";
 import { cn } from "next-vibe/shared/utils/utils";
 import { Span } from "./span";
 
@@ -38,10 +38,7 @@ function Alert({
 }: AlertProps): React.JSX.Element {
   const { colors } = useTheme();
   return (
-    <View
-      role="alert"
-      className={cn(alertVariants({ variant }), className)}
-    >
+    <View role="alert" className={cn(alertVariants({ variant }), className)}>
       {Icon && (
         <View className="absolute left-3.5 top-4 -translate-y-0.5">
           <Icon
@@ -58,7 +55,10 @@ function Alert({
 }
 Alert.displayName = "Alert";
 
-function AlertTitle({ className, children }: AlertTitleProps): React.JSX.Element {
+function AlertTitle({
+  className,
+  children,
+}: AlertTitleProps): React.JSX.Element {
   return (
     <Span
       className={cn(
@@ -72,7 +72,10 @@ function AlertTitle({ className, children }: AlertTitleProps): React.JSX.Element
 }
 AlertTitle.displayName = "AlertTitle";
 
-function AlertDescription({ className, children }: AlertDescriptionProps): React.JSX.Element {
+function AlertDescription({
+  className,
+  children,
+}: AlertDescriptionProps): React.JSX.Element {
   return (
     <Span
       className={cn("pl-7 text-sm leading-relaxed text-foreground", className)}

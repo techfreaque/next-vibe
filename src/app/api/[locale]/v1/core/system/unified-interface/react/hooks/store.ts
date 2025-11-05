@@ -289,15 +289,15 @@ export interface ApiStore {
     updater: (
       oldData:
         | {
-          success: boolean;
-          data: TEndpoint["TResponseOutput"];
-        }
+            success: boolean;
+            data: TEndpoint["TResponseOutput"];
+          }
         | undefined,
     ) =>
       | {
-        success: boolean;
-        data: TEndpoint["TResponseOutput"];
-      }
+          success: boolean;
+          data: TEndpoint["TResponseOutput"];
+        }
       | undefined,
     requestData?: TEndpoint["TRequestOutput"],
     urlPathParams?: TEndpoint["TUrlVariablesOutput"],
@@ -393,13 +393,14 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     // This is determined by checking if the schema is undefinedSchema
     const isUndefinedSchema =
       endpoint.requestSchema.safeParse(undefined).success &&
-       !endpoint.requestSchema.safeParse({}).success;
+      !endpoint.requestSchema.safeParse({}).success;
 
     // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
     const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
     const isEmptyObjectSchema =
       requestSchema instanceof z.ZodObject &&
-      Object.keys((requestSchema as z.ZodObject<z.ZodRawShape>).shape || {}).length === 0;
+      Object.keys((requestSchema as z.ZodObject<z.ZodRawShape>).shape || {})
+        .length === 0;
 
     // If the schema expects undefined but we received an object, set requestData to undefined
     if (
@@ -763,8 +764,78 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       }
 
       try {
-        // Build the endpoint URL with locale
-        const endpointUrl = `/api/${locale}/${endpoint.path.join("/")}`;
+        // Build the endpoint URL with locale and replace URL path parameters
+        let endpointUrl = `/api/${locale}`;
+
+        // Build path from endpoint.path array, replacing [param] placeholders
+        for (const segment of endpoint.path) {
+          // Check if this segment is a URL parameter (wrapped in brackets)
+          if (segment.startsWith("[") && segment.endsWith("]")) {
+            // Extract parameter name (e.g., "[id]" → "id")
+            const paramName = segment.slice(1, -1);
+
+            // Get value from pathParams
+            const paramValue =
+              pathParams?.[paramName as keyof typeof pathParams];
+
+            if (paramValue === undefined) {
+              logger.error("executeQuery: Missing URL path parameter", {
+                paramName,
+                endpoint: endpoint.path.join("/"),
+                availableParams: pathParams ? Object.keys(pathParams) : [],
+              });
+
+              // Create a proper error response
+              const errorResponse = fail({
+                message:
+                  "app.api.v1.core.system.unifiedInterface.reactNative.errors.missingUrlParam",
+                errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                messageParams: { paramName, endpoint: endpoint.path.join("/") },
+              });
+
+              // Update state with error
+              set((state) => {
+                const existingQuery = state.queries[queryId];
+                return {
+                  queries: {
+                    ...state.queries,
+                    [queryId]: {
+                      ...(existingQuery ?? {}),
+                      response: errorResponse as ResponseType<AnyData>,
+                      data: existingQuery?.data,
+                      error: errorResponse,
+                      isLoading: false,
+                      isFetching: false,
+                      isError: true,
+                      isSuccess: false,
+                      isLoadingFresh: false,
+                      isCachedData: existingQuery?.isCachedData ?? false,
+                      statusMessage:
+                        "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.request_failed" as const,
+                      lastFetchTime: Date.now(),
+                    },
+                  },
+                };
+              });
+
+              // Call onError callback if provided
+              if (options.onError) {
+                options.onError({
+                  error: errorResponse,
+                  requestData,
+                  urlPathParams: pathParams,
+                });
+              }
+
+              // Return undefined since we can't throw - the error is already handled in state
+              return undefined as TEndpoint["TResponseOutput"];
+            }
+
+            endpointUrl += `/${encodeURIComponent(String(paramValue))}`;
+          } else {
+            endpointUrl += `/${segment}`;
+          }
+        }
 
         // Prepare the request body for non-GET requests
         // Check if requestData contains File objects - if so, use FormData
@@ -891,8 +962,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   response: onSuccessResult as ResponseType<AnyData>,
                   data: (
                     state.queries[queryId] as
-                    | QueryStoreType<AnyData>
-                    | undefined
+                      | QueryStoreType<AnyData>
+                      | undefined
                   )?.data,
                   error: onSuccessResult,
                   isLoading: false,
@@ -1002,11 +1073,11 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const errorResponse = isErrorResponseType(error)
         ? error
         : fail({
-          message:
-            "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.request_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: parseError(error).message },
-        });
+            message:
+              "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.request_failed",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: { error: parseError(error).message },
+          });
       return errorResponse;
     }
   },
@@ -1037,13 +1108,14 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     // This is determined by checking if the schema is undefinedSchema
     const isUndefinedSchema =
       endpoint.requestSchema.safeParse(undefined).success &&
-       !endpoint.requestSchema.safeParse({}).success;
+      !endpoint.requestSchema.safeParse({}).success;
 
     // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
     const requestSchema = endpoint.requestSchema as z.ZodTypeAny;
     const isEmptyObjectSchema =
       requestSchema instanceof z.ZodObject &&
-      Object.keys((requestSchema as z.ZodObject<z.ZodRawShape>).shape || {}).length === 0;
+      Object.keys((requestSchema as z.ZodObject<z.ZodRawShape>).shape || {})
+        .length === 0;
 
     // If the schema expects undefined but we received an object, set requestData to undefined
     if (
@@ -1127,8 +1199,70 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         return errorResponse;
       }
 
-      // Build the endpoint URL with locale
-      const endpointUrl = `/api/${locale}/${endpoint.path.join("/")}`;
+      // Build the endpoint URL with locale and replace URL path parameters
+      let endpointUrl = `/api/${locale}`;
+
+      // Build path from endpoint.path array, replacing [param] placeholders
+      for (const segment of endpoint.path) {
+        // Check if this segment is a URL parameter (wrapped in brackets)
+        if (segment.startsWith("[") && segment.endsWith("]")) {
+          // Extract parameter name (e.g., "[id]" → "id")
+          const paramName = segment.slice(1, -1);
+
+          // Get value from pathParams
+          const paramValue = pathParams?.[paramName as keyof typeof pathParams];
+
+          if (paramValue === undefined) {
+            logger.error("executeMutation: Missing URL path parameter", {
+              paramName,
+              endpoint: endpoint.path.join("/"),
+              availableParams: pathParams ? Object.keys(pathParams) : [],
+            });
+
+            // Create a proper error response
+            const errorResponse = fail({
+              message:
+                "app.api.v1.core.system.unifiedInterface.reactNative.errors.missingUrlParam",
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+              messageParams: { paramName, endpoint: endpoint.path.join("/") },
+            });
+
+            // Update error state
+            set((state) => {
+              return {
+                mutations: {
+                  ...state.mutations,
+                  [mutationId]: {
+                    response: errorResponse as ResponseType<AnyData>,
+                    isPending: false,
+                    isError: true,
+                    error: errorResponse,
+                    isSuccess: false,
+                    statusMessage:
+                      "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.mutation_failed" as const,
+                    data: undefined,
+                  },
+                },
+              };
+            });
+
+            // Call onError handler if provided
+            if (options.onError) {
+              await options.onError({
+                pathParams,
+                requestData,
+                error: errorResponse,
+              });
+            }
+
+            return errorResponse;
+          }
+
+          endpointUrl += `/${encodeURIComponent(String(paramValue))}`;
+        } else {
+          endpointUrl += `/${segment}`;
+        }
+      }
 
       // Prepare the request body for non-GET requests
       // Check if requestData contains File objects - if so, use FormData
@@ -1257,11 +1391,11 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const errorResponse = isErrorResponseType(error)
         ? error
         : fail({
-          message:
-            "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.mutation_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: parseError(error).message },
-        });
+            message:
+              "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.mutation_failed",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: { error: parseError(error).message },
+          });
 
       // Update error state
       set((state) => ({
@@ -1416,15 +1550,15 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     updater: (
       oldData:
         | {
-          success: boolean;
-          data: TEndpoint["TResponseOutput"];
-        }
+            success: boolean;
+            data: TEndpoint["TResponseOutput"];
+          }
         | undefined,
     ) =>
       | {
-        success: boolean;
-        data: TEndpoint["TResponseOutput"];
-      }
+          success: boolean;
+          data: TEndpoint["TResponseOutput"];
+        }
       | undefined,
     requestData?: TEndpoint["TRequestOutput"],
     urlPathParams?: TEndpoint["TUrlVariablesOutput"],
@@ -1477,9 +1611,9 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       // Use response field (not deprecated data field) to get the full ResponseType
       const oldData = existingQuery.response as
         | {
-          success: boolean;
-          data: TEndpoint["TResponseOutput"];
-        }
+            success: boolean;
+            data: TEndpoint["TResponseOutput"];
+          }
         | undefined;
 
       const newData = updater(oldData);
@@ -1634,7 +1768,8 @@ export const apiClient = {
     const requestSchema = endpoint.requestSchema as z.ZodTypeAny;
     const isEmptyObjectSchema =
       requestSchema instanceof z.ZodObject &&
-      Object.keys((requestSchema as z.ZodObject<z.ZodRawShape>).shape || {}).length === 0;
+      Object.keys((requestSchema as z.ZodObject<z.ZodRawShape>).shape || {})
+        .length === 0;
 
     // If the schema expects undefined but we received an object, set data to undefined
     if (isUndefinedSchema && typeof data === "object" && data !== null) {
@@ -1753,15 +1888,15 @@ export const apiClient = {
     updater: (
       oldData:
         | {
-          success: boolean;
-          data: TEndpoint["TResponseOutput"];
-        }
+            success: boolean;
+            data: TEndpoint["TResponseOutput"];
+          }
         | undefined,
     ) =>
       | {
-        success: boolean;
-        data: TEndpoint["TResponseOutput"];
-      }
+          success: boolean;
+          data: TEndpoint["TResponseOutput"];
+        }
       | undefined,
     requestData?: TEndpoint["TRequestOutput"],
     urlPathParams?: TEndpoint["TUrlVariablesOutput"],

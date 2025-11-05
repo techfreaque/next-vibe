@@ -15,7 +15,7 @@ import {
   Paperclip,
   Star,
   User,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import { useRouter } from "next/navigation";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";

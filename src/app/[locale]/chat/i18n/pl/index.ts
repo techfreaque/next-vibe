@@ -670,15 +670,37 @@ export const translations: typeof enTranslations = {
   permissions: {
     folder: {
       title: "Uprawnienia folderu",
-      description: "Zarządzaj tym, kto może moderować ten folder",
+      description: "Zarządzaj uprawnieniami dla tego folderu",
     },
     thread: {
       title: "Uprawnienia wątku",
-      description: "Zarządzaj tym, kto może moderować ten wątek",
+      description: "Zarządzaj uprawnieniami dla tego wątku",
+    },
+    read: {
+      label: "Uprawnienia do odczytu",
+      description: "Kto może przeglądać i czytać tę treść",
+    },
+    write: {
+      label: "Uprawnienia do zapisu",
+      description: "Kto może tworzyć i pisać treści",
+    },
+    hide: {
+      label: "Uprawnienia do ukrywania",
+      description: "Kto może ukrywać i moderować treści",
+    },
+    delete: {
+      label: "Uprawnienia do usuwania",
+      description: "Kto może usuwać treści",
+    },
+    roles: {
+      public: "Publiczny (Wszyscy użytkownicy)",
+      customer: "Tylko klienci",
+      admin: "Tylko administratorzy",
     },
     visibility: {
       label: "Kto może to zobaczyć?",
-      description: "Wybierz, które role użytkowników mogą przeglądać ten folder/wątek",
+      description:
+        "Wybierz, które role użytkowników mogą przeglądać ten folder/wątek",
       public: "Publiczny (Wszyscy użytkownicy)",
       customer: "Tylko klienci",
       admin: "Tylko administratorzy",
@@ -822,7 +844,8 @@ export const translations: typeof enTranslations = {
       errorLabel: "Błąd:",
       noArguments: "Brak argumentów",
       noResult: "Brak wyniku",
-      metadataNotAvailable: "Metadane widgetu niedostępne. Pokazywanie surowych danych.",
+      metadataNotAvailable:
+        "Metadane widgetu niedostępne. Pokazywanie surowych danych.",
     },
   },
   threadList: {

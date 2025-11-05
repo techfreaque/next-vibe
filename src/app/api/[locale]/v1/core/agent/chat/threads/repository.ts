@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, desc, eq, gte, ilike, isNull, lte, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, ilike, isNull, lte, or } from "drizzle-orm";
 import {
   createSuccessResponse,
   ErrorResponseTypes,
@@ -17,17 +17,11 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
-import type { UserRoleDB } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { getDefaultFolderConfig } from "../config";
 import { chatFolders, chatThreads, type ChatFolder } from "../db";
-import {
-  canReadThread,
-  canWriteFolder,
-  isFolderModerator,
-} from "../permissions/permissions";
+import { canReadThread, canWriteFolder } from "../permissions/permissions";
 import { ThreadStatus } from "../enum";
 import type { PersonaId } from "../personas/config";
 import { validateNotIncognito } from "../validation";
@@ -128,40 +122,10 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         // PUBLIC folder: Show all threads in public folder (from all users)
         conditions.push(eq(chatThreads.rootFolderId, "public"));
       } else if (rootFolderId === "shared") {
-        // SHARED folder: Show user's own threads + threads where user is moderator (thread-level or folder-level)
+        // SHARED folder: Show user's own threads
+        // Permission filtering happens later via canReadThread
         conditions.push(eq(chatThreads.rootFolderId, "shared"));
-
-        // If subFolderId is specified, check if user is moderator of that folder
-        if (subFolderId && subFolderId !== null) {
-          // Get the folder to check moderatorIds
-          const [targetFolder] = await db
-            .select()
-            .from(chatFolders)
-            .where(eq(chatFolders.id, subFolderId))
-            .limit(1);
-
-          if (targetFolder && isFolderModerator(userIdentifier, targetFolder)) {
-            // User is moderator of the folder, show all threads in this folder
-            logger.debug("User is folder moderator, showing all threads in folder");
-            // No additional user filter needed - show all threads in this folder
-          } else {
-            // User is not folder moderator, only show their own threads or threads they moderate
-            conditions.push(
-              or(
-                eq(chatThreads.userId, userIdentifier), // User's own threads
-                sql`${chatThreads.moderatorIds}::jsonb @> ${JSON.stringify([userIdentifier])}::jsonb`, // User is thread moderator
-              ),
-            );
-          }
-        } else {
-          // No subFolderId specified, show user's own threads + threads they moderate
-          conditions.push(
-            or(
-              eq(chatThreads.userId, userIdentifier), // User's own threads
-              sql`${chatThreads.moderatorIds}::jsonb @> ${JSON.stringify([userIdentifier])}::jsonb`, // User is thread moderator
-            ),
-          );
-        }
+        conditions.push(eq(chatThreads.userId, userIdentifier));
       } else {
         // Other folders: Show only user's own threads
         conditions.push(eq(chatThreads.userId, userIdentifier));
@@ -251,12 +215,19 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       const threads = visibleThreads.map((thread) => ({
         id: thread.id,
         title: thread.title,
-        rootFolderId: thread.rootFolderId as "incognito" | "private" | "public" | "shared",
+        rootFolderId: thread.rootFolderId as
+          | "incognito"
+          | "private"
+          | "public"
+          | "shared",
         folderId: thread.folderId,
         status: thread.status,
         preview: thread.preview,
         pinned: thread.pinned,
-        allowedRoles: (thread.allowedRoles || []) as ("ADMIN" | "AI_TOOL_OFF" | "CLI_OFF" | "CUSTOMER" | "PARTNER_ADMIN" | "PARTNER_EMPLOYEE" | "PUBLIC" | "WEB_OFF")[],
+        rolesRead: thread.rolesRead || [],
+        rolesWrite: thread.rolesWrite || [],
+        rolesHide: thread.rolesHide || [],
+        rolesDelete: thread.rolesDelete || [],
         createdAt: thread.createdAt.toISOString(),
         updatedAt: thread.updatedAt.toISOString(),
       }));
@@ -372,8 +343,10 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
           expanded: true,
           sortOrder: 0,
           metadata: {},
-          allowedRoles: [],
-          moderatorIds: [],
+          rolesRead: [],
+          rolesWrite: [],
+          rolesHide: [],
+          rolesDelete: [],
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -393,17 +366,9 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         });
       }
 
-      // Determine allowedRoles: inherit from parent folder or set based on rootFolderId
-      let allowedRoles: (typeof UserRoleDB)[number][] = [];
-
-      if (folder && folderId) {
-        // Inherit allowedRoles from parent folder (already fetched above)
-        allowedRoles = (folder.allowedRoles || []) as (typeof UserRoleDB)[number][];
-      } else {
-        // Get default allowedRoles from root folder config
-        const rootFolderConfig = getDefaultFolderConfig(data.thread?.rootFolderId);
-        allowedRoles = rootFolderConfig?.defaultAllowedRoles || [];
-      }
+      // DO NOT set permission fields - leave as empty arrays to inherit from parent folder
+      // Permission inheritance: empty array [] = inherit from parent folder
+      // Only set explicit permissions when user overrides via context menu
 
       const threadData = {
         userId: userIdentifier,
@@ -423,7 +388,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         tags: [],
         preview: null,
         metadata: {},
-        allowedRoles,
+        // rolesRead, rolesWrite, rolesHide, rolesDelete are NOT set
+        // They default to [] which means inherit from parent folder
       } satisfies typeof chatThreads.$inferInsert;
 
       const [dbThread] = await db

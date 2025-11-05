@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle } from 'next-vibe-ui/ui/icons';
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import React, { Component, type ErrorInfo, type ReactNode } from "react";
 

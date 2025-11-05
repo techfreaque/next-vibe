@@ -501,11 +501,26 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
   if (typedField.type === "array") {
     if (hasUsage(typedField.usage)) {
-      const childSchema = generateSchemaForUsage(typedField.child, targetUsage);
-      // Check if schema is z.never() using instanceof check
-      if (childSchema instanceof z.ZodNever) {
-        return z.never() as InferSchemaFromField<F, Usage>;
+      // Check if child is a raw Zod schema (not a UnifiedField)
+      // Raw Zod schemas don't have a 'type' property
+      const isRawZodSchema =
+        typedField.child &&
+        typeof typedField.child === "object" &&
+        "_def" in typedField.child;
+
+      let childSchema: z.ZodTypeAny;
+      if (isRawZodSchema) {
+        // Child is already a Zod schema, use it directly
+        childSchema = typedField.child as z.ZodTypeAny;
+      } else {
+        // Child is a UnifiedField, generate schema from it
+        childSchema = generateSchemaForUsage(typedField.child, targetUsage);
+        // Check if schema is z.never() using instanceof check
+        if (childSchema instanceof z.ZodNever) {
+          return z.never() as InferSchemaFromField<F, Usage>;
+        }
       }
+
       return z.array(childSchema) as InferSchemaFromField<F, Usage>;
     }
     return z.never() as InferSchemaFromField<F, Usage>;

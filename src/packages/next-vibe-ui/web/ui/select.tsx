@@ -1,11 +1,10 @@
 "use client";
 
 import {
-  CaretSortIcon,
-  CheckIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-} from "@radix-ui/react-icons";
+  Check,
+  ChevronDown,
+  ChevronUp,
+} from "@/packages/next-vibe-ui/web/ui/icons";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
@@ -30,7 +29,7 @@ const SelectTrigger = React.forwardRef<
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <CaretSortIcon className="h-4 w-4 opacity-50" />
+      <ChevronDown className="h-4 w-4 opacity-50" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ));
@@ -48,7 +47,7 @@ const SelectScrollUpButton = React.forwardRef<
     )}
     {...props}
   >
-    <ChevronUpIcon />
+    <ChevronUp />
   </SelectPrimitive.ScrollUpButton>
 ));
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
@@ -65,7 +64,7 @@ const SelectScrollDownButton = React.forwardRef<
     )}
     {...props}
   >
-    <ChevronDownIcon />
+    <ChevronDown />
   </SelectPrimitive.ScrollDownButton>
 ));
 SelectScrollDownButton.displayName =
@@ -130,7 +129,7 @@ const SelectItem = React.forwardRef<
   >
     <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <CheckIcon className="h-4 w-4" />
+        <Check className="h-4 w-4" />
       </SelectPrimitive.ItemIndicator>
     </span>
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
@@ -156,26 +155,36 @@ export interface SelectOption {
   label: string;
 }
 
-export type SelectTriggerProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+export type SelectTriggerProps = React.ComponentPropsWithoutRef<
+  typeof SelectPrimitive.Trigger
+> & {
   children?: React.ReactNode;
   disabled?: boolean;
 };
 
-export type SelectContentProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> & {
+export type SelectContentProps = React.ComponentPropsWithoutRef<
+  typeof SelectPrimitive.Content
+> & {
   children?: React.ReactNode;
   position?: "popper" | "item-aligned";
 };
 
-export type SelectItemProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item> & {
+export type SelectItemProps = React.ComponentPropsWithoutRef<
+  typeof SelectPrimitive.Item
+> & {
   value: string;
   label?: string;
   children?: React.ReactNode;
   disabled?: boolean;
 };
 
-export type SelectLabelProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>;
+export type SelectLabelProps = React.ComponentPropsWithoutRef<
+  typeof SelectPrimitive.Label
+>;
 
-export type SelectSeparatorProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>;
+export type SelectSeparatorProps = React.ComponentPropsWithoutRef<
+  typeof SelectPrimitive.Separator
+>;
 
 export {
   Select,

@@ -5,7 +5,7 @@
 
 "use client";
 
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save } from 'next-vibe-ui/ui/icons';
 import { useRouter } from "next/navigation";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";

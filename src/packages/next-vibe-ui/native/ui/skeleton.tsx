@@ -8,12 +8,16 @@ import Animated, {
 } from "react-native-reanimated";
 import type { ViewStyle } from "react-native";
 
-import type { SkeletonProps } from "next-vibe-ui/ui/skeleton";
+import type { SkeletonProps } from "@/packages/next-vibe-ui/web/ui/skeleton";
 import { cn } from "../lib/utils";
 
 const duration = 1000;
 
-function Skeleton({ className, style: customStyle, ...props }: SkeletonProps): React.JSX.Element {
+function Skeleton({
+  className,
+  style: customStyle,
+  ...props
+}: SkeletonProps): React.JSX.Element {
   const sv = useSharedValue(1);
 
   React.useEffect(() => {

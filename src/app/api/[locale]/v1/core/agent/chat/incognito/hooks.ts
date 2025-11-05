@@ -13,8 +13,9 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { DefaultFolderId } from "../config";
 import { CHAT_CONSTANTS } from "../config";
+import { ChatMessageRole } from "../enum";
 import type { ModelId } from "../model-access/models";
-import type { ChatFolder, ChatMessage, ChatThread } from "../store";
+import type { ChatFolder, ChatMessage, ChatThread } from "../hooks/store";
 import {
   createIncognitoMessage,
   createIncognitoThread,
@@ -48,7 +49,7 @@ export interface UseIncognitoChatReturn {
   // Message operations
   addMessage: (
     threadId: string,
-    role: "user" | "assistant" | "system" | "error",
+    role: ChatMessageRole,
     content: string,
     parentId?: string | null,
     model?: ModelId | null,
@@ -176,7 +177,7 @@ export function useIncognitoChat(
   const addMessage = useCallback(
     (
       threadId: string,
-      role: "user" | "assistant" | "system" | "error",
+      role: ChatMessage["role"],
       content: string,
       parentId: string | null = null,
       model: ModelId | null = null,
@@ -275,7 +276,7 @@ export function useIncognitoChat(
       // Create user message
       const userMessage = addMessage(
         state.activeThreadId || "",
-        "user",
+        ChatMessageRole.USER,
         content,
         null,
         model,
@@ -290,7 +291,7 @@ export function useIncognitoChat(
       /* eslint-enable i18next/no-literal-string */
       addMessage(
         state.activeThreadId || "",
-        "assistant",
+        ChatMessageRole.ASSISTANT,
         placeholderMessage,
         userMessage.id,
         model,

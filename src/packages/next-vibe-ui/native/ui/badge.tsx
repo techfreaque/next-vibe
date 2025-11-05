@@ -3,7 +3,7 @@ import { cva } from "class-variance-authority";
 import type * as React from "react";
 import { View } from "react-native";
 
-import type { BadgeProps } from "next-vibe-ui/ui/badge";
+import type { BadgeProps } from "@/packages/next-vibe-ui/web/ui/badge";
 import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 
@@ -55,18 +55,14 @@ function Badge({
   if (asChild) {
     return (
       <TextClassContext.Provider value={badgeTextVariants({ variant })}>
-        <Slot.View className={combinedClassName}>
-          {children}
-        </Slot.View>
+        <Slot.View className={combinedClassName}>{children}</Slot.View>
       </TextClassContext.Provider>
     );
   }
 
   return (
     <TextClassContext.Provider value={badgeTextVariants({ variant })}>
-      <View className={combinedClassName}>
-        {children}
-      </View>
+      <View className={combinedClassName}>{children}</View>
     </TextClassContext.Provider>
   );
 }

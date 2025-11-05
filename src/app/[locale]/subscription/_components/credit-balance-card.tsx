@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertCircle, Calendar, Coins, Sparkles, Zap } from "lucide-react";
+import { AlertCircle, Calendar, Coins, Sparkles, Zap } from 'next-vibe-ui/ui/icons';
 import { Badge } from "next-vibe-ui/ui/badge";
 import {
   Card,
@@ -18,13 +18,13 @@ import { useCredits } from "@/app/api/[locale]/v1/core/credits/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { CreditBalance } from "./types";
 import { formatDate } from "./types";
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/v1/core/products/repository-client";
+import { type CreditsGetResponseOutput } from "@/app/api/[locale]/v1/core/credits/definition";
 
 interface CreditBalanceCardProps {
   locale: CountryLanguage;
-  initialCredits: CreditBalance | null;
+  initialCredits: CreditsGetResponseOutput | null;
   freeCredits: number;
 }
 
@@ -42,7 +42,11 @@ export function CreditBalanceCard({
   );
 
   // Fetch live credits data (will refetch on window focus and has no cache)
-  const { data: liveCredits } = useCredits(logger);
+  const creditsEndpoint = useCredits(logger);
+  const liveCredits =
+    creditsEndpoint.read.response?.success && creditsEndpoint.read.response.data
+      ? creditsEndpoint.read.response.data
+      : null;
 
   // Use live credits if available, otherwise fall back to initial credits
   const credits = liveCredits ?? initialCredits;

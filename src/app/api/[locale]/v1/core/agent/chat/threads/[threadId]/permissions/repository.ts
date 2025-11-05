@@ -62,18 +62,20 @@ export async function getThreadPermissions(
       });
     }
 
-    const moderatorIds = Array.isArray(thread.moderatorIds)
-      ? thread.moderatorIds
+    const rolesRead = Array.isArray(thread.rolesRead) ? thread.rolesRead : [];
+    const rolesWrite = Array.isArray(thread.rolesWrite)
+      ? thread.rolesWrite
       : [];
-    const allowedRoles = Array.isArray(thread.allowedRoles)
-      ? thread.allowedRoles
+    const rolesHide = Array.isArray(thread.rolesHide) ? thread.rolesHide : [];
+    const rolesDelete = Array.isArray(thread.rolesDelete)
+      ? thread.rolesDelete
       : [];
 
     return createSuccessResponse({
-      response: {
-        allowedRoles,
-        moderatorIds,
-      },
+      rolesRead,
+      rolesWrite,
+      rolesHide,
+      rolesDelete,
     });
   } catch {
     return fail({
@@ -101,7 +103,7 @@ export async function updateThreadPermissions(
   }
 
   try {
-    const { threadId, moderatorIds, allowedRoles } = data;
+    const { threadId, rolesRead, rolesWrite, rolesHide, rolesDelete } = data;
 
     // Verify thread exists
     const [existingThread] = await db
@@ -130,19 +132,29 @@ export async function updateThreadPermissions(
 
     // Prepare update data - only update fields that are provided
     const updateData: {
-      moderatorIds?: string[];
-      allowedRoles?: (typeof UserRoleDB)[number][];
+      rolesRead?: (typeof UserRoleDB)[number][];
+      rolesWrite?: (typeof UserRoleDB)[number][];
+      rolesHide?: (typeof UserRoleDB)[number][];
+      rolesDelete?: (typeof UserRoleDB)[number][];
       updatedAt: Date;
     } = {
       updatedAt: new Date(),
     };
 
-    if (moderatorIds !== undefined) {
-      updateData.moderatorIds = moderatorIds;
+    if (rolesRead !== undefined) {
+      updateData.rolesRead = rolesRead;
     }
 
-    if (allowedRoles !== undefined) {
-      updateData.allowedRoles = allowedRoles;
+    if (rolesWrite !== undefined) {
+      updateData.rolesWrite = rolesWrite;
+    }
+
+    if (rolesHide !== undefined) {
+      updateData.rolesHide = rolesHide;
+    }
+
+    if (rolesDelete !== undefined) {
+      updateData.rolesDelete = rolesDelete;
     }
 
     // Update the permissions
@@ -153,22 +165,24 @@ export async function updateThreadPermissions(
 
     logger.info("Thread permissions updated", {
       threadId,
-      moderatorCount: moderatorIds?.length ?? 0,
-      allowedRolesCount: allowedRoles?.length ?? 0,
+      rolesReadCount: rolesRead?.length ?? 0,
+      rolesWriteCount: rolesWrite?.length ?? 0,
+      rolesHideCount: rolesHide?.length ?? 0,
+      rolesDeleteCount: rolesDelete?.length ?? 0,
     });
 
     // Return updated values
-    const finalModeratorIds = moderatorIds ?? existingThread.moderatorIds ?? [];
-    const finalAllowedRoles = allowedRoles ?? existingThread.allowedRoles ?? [];
+    const finalRolesRead = rolesRead ?? existingThread.rolesRead ?? [];
+    const finalRolesWrite = rolesWrite ?? existingThread.rolesWrite ?? [];
+    const finalRolesHide = rolesHide ?? existingThread.rolesHide ?? [];
+    const finalRolesDelete = rolesDelete ?? existingThread.rolesDelete ?? [];
 
     return createSuccessResponse({
       response: {
-        allowedRoles: Array.isArray(finalAllowedRoles)
-          ? finalAllowedRoles
-          : [],
-        moderatorIds: Array.isArray(finalModeratorIds)
-          ? finalModeratorIds
-          : [],
+        rolesRead: Array.isArray(finalRolesRead) ? finalRolesRead : [],
+        rolesWrite: Array.isArray(finalRolesWrite) ? finalRolesWrite : [],
+        rolesHide: Array.isArray(finalRolesHide) ? finalRolesHide : [],
+        rolesDelete: Array.isArray(finalRolesDelete) ? finalRolesDelete : [],
       },
     });
   } catch {

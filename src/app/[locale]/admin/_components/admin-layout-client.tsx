@@ -14,7 +14,7 @@ import {
   Shield,
   Users,
   X,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Span } from "next-vibe-ui/ui/span";

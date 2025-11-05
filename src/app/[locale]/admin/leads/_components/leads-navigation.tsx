@@ -5,7 +5,7 @@
 
 "use client";
 
-import { BarChart3, List, Mail, Settings, TestTube } from "lucide-react";
+import { BarChart3, List, Mail, Settings, TestTube } from 'next-vibe-ui/ui/icons';
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import { Span } from "next-vibe-ui/ui/span";

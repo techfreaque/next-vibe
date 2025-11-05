@@ -689,15 +689,37 @@ export const translations: typeof enTranslations = {
   permissions: {
     folder: {
       title: "Ordnerberechtigungen",
-      description: "Verwalten Sie, wer diesen Ordner moderieren kann",
+      description: "Berechtigungen für diesen Ordner verwalten",
     },
     thread: {
       title: "Thread-Berechtigungen",
-      description: "Verwalten Sie, wer diesen Thread moderieren kann",
+      description: "Berechtigungen für diesen Thread verwalten",
+    },
+    read: {
+      label: "Leseberechtigungen",
+      description: "Wer kann diesen Inhalt ansehen und lesen",
+    },
+    write: {
+      label: "Schreibberechtigungen",
+      description: "Wer kann Inhalte erstellen und schreiben",
+    },
+    hide: {
+      label: "Ausblenden-Berechtigungen",
+      description: "Wer kann Inhalte ausblenden und moderieren",
+    },
+    delete: {
+      label: "Löschberechtigungen",
+      description: "Wer kann Inhalte löschen",
+    },
+    roles: {
+      public: "Öffentlich (Alle Benutzer)",
+      customer: "Nur Kunden",
+      admin: "Nur Administratoren",
     },
     visibility: {
       label: "Wer kann das sehen?",
-      description: "Wählen Sie aus, welche Benutzerrollen diesen Ordner/Thread sehen können",
+      description:
+        "Wählen Sie aus, welche Benutzerrollen diesen Ordner/Thread sehen können",
       public: "Öffentlich (Alle Benutzer)",
       customer: "Nur Kunden",
       admin: "Nur Administratoren",

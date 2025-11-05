@@ -17,14 +17,19 @@ import type {
   BreadcrumbPageProps,
   BreadcrumbProps,
   BreadcrumbSeparatorProps,
-} from "next-vibe-ui/ui/breadcrumb";
+} from "@/packages/next-vibe-ui/web/ui/breadcrumb";
 import { cn } from "next-vibe/shared/utils/utils";
 
-export function Breadcrumb({ className, children }: BreadcrumbProps): React.JSX.Element {
+export function Breadcrumb({
+  className,
+  children,
+}: BreadcrumbProps): React.JSX.Element {
   const { t } = useTranslation();
   return (
     <View
-      accessibilityLabel={t("packages.nextVibeUi.native.ui.breadcrumb.navigation")}
+      accessibilityLabel={t(
+        "packages.nextVibeUi.native.ui.breadcrumb.navigation",
+      )}
       className={className}
     >
       {children}
@@ -34,7 +39,10 @@ export function Breadcrumb({ className, children }: BreadcrumbProps): React.JSX.
 
 Breadcrumb.displayName = "Breadcrumb";
 
-export function BreadcrumbList({ className, children }: BreadcrumbListProps): React.JSX.Element {
+export function BreadcrumbList({
+  className,
+  children,
+}: BreadcrumbListProps): React.JSX.Element {
   return (
     <View
       className={cn(
@@ -49,11 +57,12 @@ export function BreadcrumbList({ className, children }: BreadcrumbListProps): Re
 
 BreadcrumbList.displayName = "BreadcrumbList";
 
-export function BreadcrumbItem({ className, children }: BreadcrumbItemProps): React.JSX.Element {
+export function BreadcrumbItem({
+  className,
+  children,
+}: BreadcrumbItemProps): React.JSX.Element {
   return (
-    <View
-      className={cn("flex flex-row items-center gap-1.5", className)}
-    >
+    <View className={cn("flex flex-row items-center gap-1.5", className)}>
       {children}
     </View>
   );
@@ -71,12 +80,16 @@ export function BreadcrumbLink({
   children,
   onPress,
 }: NativeBreadcrumbLinkProps): React.JSX.Element {
-  const combinedClassName = cn("transition-colors active:text-foreground", className);
-  const content = typeof children === "string" ? (
-    <RNText className="text-muted-foreground">{children}</RNText>
-  ) : (
-    children
+  const combinedClassName = cn(
+    "transition-colors active:text-foreground",
+    className,
   );
+  const content =
+    typeof children === "string" ? (
+      <RNText className="text-muted-foreground">{children}</RNText>
+    ) : (
+      children
+    );
 
   if (asChild) {
     return (
@@ -95,7 +108,10 @@ export function BreadcrumbLink({
 
 BreadcrumbLink.displayName = "BreadcrumbLink";
 
-export function BreadcrumbPage({ className, children }: BreadcrumbPageProps): React.JSX.Element {
+export function BreadcrumbPage({
+  className,
+  children,
+}: BreadcrumbPageProps): React.JSX.Element {
   return (
     <RNText
       aria-disabled={true}
@@ -119,9 +135,7 @@ export function BreadcrumbSeparator({
       aria-hidden={true}
       className={cn("w-3.5 h-3.5", className)}
     >
-      {children ?? (
-        <ChevronRight size={14} color="currentColor" />
-      )}
+      {children ?? <ChevronRight size={14} color="currentColor" />}
     </View>
   );
 }

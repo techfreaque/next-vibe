@@ -22,8 +22,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { chatFolders, chatMessages, chatThreads } from "../../../../db";
 import {
   canDeleteMessage,
-  canEditMessage,
   canReadMessage,
+  canWriteMessage,
 } from "../../../../permissions/permissions";
 import { validateNotIncognito } from "../../../../validation";
 import type {
@@ -223,8 +223,29 @@ class MessageRepository implements MessageRepositoryInterface {
         });
       }
 
+      // Get folder if thread has one
+      let folder = null;
+      if (thread.folderId) {
+        const [folderResult] = await db
+          .select()
+          .from(chatFolders)
+          .where(eq(chatFolders.id, thread.folderId))
+          .limit(1);
+        folder = folderResult || null;
+      }
+
       // Check if user can edit this message
-      if (!canEditMessage(user, existingMessage, thread)) {
+      // User must be the author or have write permission on the thread
+      const userId = user.isPublic ? user.leadId : user.id;
+      const isAuthor = existingMessage.authorId === userId;
+      const hasWritePermission = await canWriteMessage(
+        user,
+        thread,
+        folder,
+        logger,
+      );
+
+      if (!isAuthor && !hasWritePermission) {
         return fail({
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.forbidden.title" as const,
@@ -235,14 +256,14 @@ class MessageRepository implements MessageRepositoryInterface {
       // Update message
       const updateData = data.role
         ? {
-          content: data.content,
-          role: data.role,
-          updatedAt: new Date(),
-        }
+            content: data.content,
+            role: data.role,
+            updatedAt: new Date(),
+          }
         : {
-          content: data.content,
-          updatedAt: new Date(),
-        };
+            content: data.content,
+            updatedAt: new Date(),
+          };
 
       const [updatedMessage] = await db
         .update(chatMessages)
@@ -334,7 +355,9 @@ class MessageRepository implements MessageRepositoryInterface {
       }
 
       // Check if user can delete this message
-      if (!(await canDeleteMessage(user, existingMessage, thread, folder, logger))) {
+      if (
+        !(await canDeleteMessage(user, existingMessage, thread, folder, logger))
+      ) {
         return fail({
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.forbidden.title" as const,

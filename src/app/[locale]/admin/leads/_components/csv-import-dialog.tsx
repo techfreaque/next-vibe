@@ -5,7 +5,7 @@
 
 "use client";
 
-import { CheckCircle, Download, FileText, Upload } from "lucide-react";
+import { CheckCircle, Download, FileText, Upload } from 'next-vibe-ui/ui/icons';
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";

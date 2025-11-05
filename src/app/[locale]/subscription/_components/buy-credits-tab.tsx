@@ -6,7 +6,7 @@ import {
   Sparkles,
   TrendingUp,
   Zap,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
 import type { JSX } from "react";
@@ -30,16 +30,16 @@ import {
   SubscriptionPlan,
   SubscriptionStatus,
 } from "@/app/api/[locale]/v1/core/subscription/enum";
+import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { SubscriptionData } from "./types";
 import { formatPrice } from "./types";
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/v1/core/products/repository-client";
 
 interface BuyCreditsTabProps {
   locale: CountryLanguage;
   isAuthenticated: boolean;
-  initialSubscription: SubscriptionData | null;
+  initialSubscription: SubscriptionGetResponseOutput | null;
   subscriptionPrice: number;
   subscriptionCredits: number;
   packPrice: number;

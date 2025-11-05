@@ -30,6 +30,7 @@ export const translations: typeof enTranslations = {
     noCreditSource: "Brak dostępnego źródła kredytów",
     stripeCustomerFailed: "Nie udało się utworzyć klienta Stripe",
     checkoutFailed: "Nie udało się utworzyć sesji płatności",
+    mergeFailed: "Nie udało się połączyć kredytów leada",
   },
   get: {
     title: "Pobierz saldo kredytów",
@@ -88,7 +89,8 @@ export const translations: typeof enTranslations = {
       },
       noActiveSubscription: {
         title: "Wymagane aktywne subskrypcja",
-        description: "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
+        description:
+          "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
@@ -100,7 +102,8 @@ export const translations: typeof enTranslations = {
       },
       no_active_subscription: {
         title: "Wymagane aktywne subskrypcja",
-        description: "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
+        description:
+          "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
       },
     },
   },

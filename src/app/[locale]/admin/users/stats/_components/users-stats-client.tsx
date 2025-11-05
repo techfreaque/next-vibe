@@ -15,7 +15,7 @@ import {
   TrendingUp,
   UserCheck,
   Users,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";

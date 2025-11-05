@@ -1,6 +1,6 @@
 "use client";
 
-import { DashIcon } from "@radix-ui/react-icons";
+import { DashIcon } from 'next-vibe-ui/ui/icons';
 import type { SlotProps } from "input-otp";
 import { OTPInput, OTPInputContext } from "input-otp";
 import { cn } from "next-vibe/shared/utils/utils";

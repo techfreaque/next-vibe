@@ -71,7 +71,7 @@ import type { TrpcHandlerReturnType } from "../../trpc/types";
 import type { CreateApiEndpoint } from "../endpoint/create";
 import type { EndpointLogger } from "../logger/endpoint";
 import type { Methods } from "./enums";
-import { UserRole } from "../../../../user/user-roles/enum";
+import type { UserRole } from "../../../../user/user-roles/enum";
 
 // Re-export MCP types for convenience
 export type {

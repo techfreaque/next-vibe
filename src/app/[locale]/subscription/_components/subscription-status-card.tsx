@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CreditCard } from "lucide-react";
+import { CreditCard } from 'next-vibe-ui/ui/icons';
 import { Badge } from "next-vibe-ui/ui/badge";
 import {
   Card,
@@ -13,12 +13,12 @@ import type { JSX } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { SubscriptionData } from "./types";
 import { formatDate } from "./types";
+import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
 
 interface SubscriptionStatusCardProps {
   locale: CountryLanguage;
-  initialSubscription: SubscriptionData;
+  initialSubscription: SubscriptionGetResponseOutput;
 }
 
 export function SubscriptionStatusCard({

@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Mail, Send, X } from "lucide-react";
+import { Check, Mail, Send, X } from 'next-vibe-ui/ui/icons';
 import Link from "next/link";
 import { Button } from "next-vibe-ui/ui/button";
 import { Form } from "next-vibe-ui/ui/form/form";

@@ -7,12 +7,15 @@ import { ScrollView } from "react-native";
 import { styled } from "nativewind";
 
 import { cn } from "next-vibe/shared/utils/utils";
-import type { ScrollAreaProps } from "next-vibe-ui/ui/scroll-area";
+import type { ScrollAreaProps } from "@/packages/next-vibe-ui/web/ui/scroll-area";
 
 // Type-safe ScrollView with className support (NativeWind)
 const StyledScrollView = styled(ScrollView);
 
-export function ScrollArea({ className, children }: ScrollAreaProps): React.JSX.Element {
+export function ScrollArea({
+  className,
+  children,
+}: ScrollAreaProps): React.JSX.Element {
   return (
     <StyledScrollView className={cn("relative", className)}>
       {children}

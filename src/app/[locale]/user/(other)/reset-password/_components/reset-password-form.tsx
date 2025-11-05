@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowLeft, CheckCircle, Loader2, Mail } from "lucide-react";
+import { ArrowLeft, CheckCircle, Loader2, Mail } from 'next-vibe-ui/ui/icons';
 import Link from "next/link";
 import { Environment } from "next-vibe/shared/utils/env-util";
 import { Button } from "next-vibe-ui/ui/button";

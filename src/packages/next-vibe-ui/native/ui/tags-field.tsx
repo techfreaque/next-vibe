@@ -3,12 +3,18 @@
  * Production-ready multi-select tags input with suggestions and custom values
  */
 import React, { useState } from "react";
-import type { NativeSyntheticEvent, TextInputKeyPressEventData } from "react-native";
+import type {
+  NativeSyntheticEvent,
+  TextInputKeyPressEventData,
+} from "react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { Plus, X } from "./icons";
 
 // Import cross-platform types from web (source of truth)
-import type { TagOptionBase, TagsFieldPropsBase } from "next-vibe-ui/ui/tags-field";
+import type {
+  TagOptionBase,
+  TagsFieldPropsBase,
+} from "@/packages/next-vibe-ui/web/ui/tags-field";
 
 import { useTranslation } from "../../../../i18n/core/client";
 import { cn } from "../lib/utils";
@@ -37,11 +43,15 @@ export function TagsField({
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Filter suggestions based on input and exclude already selected
-  const filteredSuggestions = suggestions.filter((suggestion: TagOptionBase) => {
-    const matchesInput = suggestion.label.toLowerCase().includes(inputValue.toLowerCase());
-    const notSelected = !value.includes(suggestion.value);
-    return matchesInput && notSelected;
-  });
+  const filteredSuggestions = suggestions.filter(
+    (suggestion: TagOptionBase) => {
+      const matchesInput = suggestion.label
+        .toLowerCase()
+        .includes(inputValue.toLowerCase());
+      const notSelected = !value.includes(suggestion.value);
+      return matchesInput && notSelected;
+    },
+  );
 
   // Group suggestions by category
   const groupedSuggestions = filteredSuggestions.reduce(
@@ -82,12 +92,18 @@ export function TagsField({
     onChange(value.filter((tag: string) => tag !== tagToRemove));
   };
 
-  const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>): void => {
+  const handleKeyPress = (
+    e: NativeSyntheticEvent<TextInputKeyPressEventData>,
+  ): void => {
     if (e.nativeEvent.key === "Enter" && inputValue.trim()) {
       if (allowCustom) {
         addTag(inputValue);
       }
-    } else if (e.nativeEvent.key === "Backspace" && !inputValue && value.length > 0) {
+    } else if (
+      e.nativeEvent.key === "Backspace" &&
+      !inputValue &&
+      value.length > 0
+    ) {
       removeTag(value[value.length - 1]);
     }
   };
@@ -107,7 +123,9 @@ export function TagsField({
   };
 
   const getTagLabel = (tagValue: string): string => {
-    const suggestion = suggestions.find((s: TagOptionBase) => s.value === tagValue);
+    const suggestion = suggestions.find(
+      (s: TagOptionBase) => s.value === tagValue,
+    );
     return suggestion ? suggestion.label : tagValue;
   };
 
@@ -128,7 +146,11 @@ export function TagsField({
       >
         {/* Render selected tags */}
         {value.map((tag: string) => (
-          <Badge key={tag} variant="secondary" className="flex-row items-center gap-1 px-2 py-1">
+          <Badge
+            key={tag}
+            variant="secondary"
+            className="flex-row items-center gap-1 px-2 py-1"
+          >
             <UIText className="text-xs">{getTagLabel(tag)}</UIText>
             {!disabled && (
               <Pressable
@@ -143,7 +165,10 @@ export function TagsField({
 
         {/* Input field */}
         {canAddMore && !disabled && (
-          <Popover open={showSuggestions} onOpenChange={handleSuggestionsOpenChange}>
+          <Popover
+            open={showSuggestions}
+            onOpenChange={handleSuggestionsOpenChange}
+          >
             <PopoverTrigger>
               <View className="flex-1 min-w-[120px]">
                 <Input
@@ -161,31 +186,42 @@ export function TagsField({
             {suggestions.length > 0 && filteredSuggestions.length > 0 && (
               <PopoverContent className="w-80 p-0" align="start">
                 <ScrollView className="max-h-[200px]">
-                  {Object.entries(groupedSuggestions).map(([category, categorySuggestions]) => (
-                    <View key={category} className="p-2">
-                      {category !== "other" && (
-                        <UIText className="px-2 py-1 text-xs font-medium text-muted-foreground uppercase">
-                          {category}
-                        </UIText>
-                      )}
-                      <View className="gap-1">
-                        {(categorySuggestions as TagOptionBase[]).map((suggestion: TagOptionBase) => (
-                          <Pressable
-                            key={suggestion.value}
-                            onPress={() => addTag(suggestion.value)}
-                            className="flex-row items-center w-full h-8 px-2 rounded-sm active:bg-accent"
-                          >
-                            <Plus size={14} className="mr-2 text-foreground" />
-                            <UIText className="text-base">{suggestion.label}</UIText>
-                          </Pressable>
-                        ))}
+                  {Object.entries(groupedSuggestions).map(
+                    ([category, categorySuggestions]) => (
+                      <View key={category} className="p-2">
+                        {category !== "other" && (
+                          <UIText className="px-2 py-1 text-xs font-medium text-muted-foreground uppercase">
+                            {category}
+                          </UIText>
+                        )}
+                        <View className="gap-1">
+                          {(categorySuggestions as TagOptionBase[]).map(
+                            (suggestion: TagOptionBase) => (
+                              <Pressable
+                                key={suggestion.value}
+                                onPress={() => addTag(suggestion.value)}
+                                className="flex-row items-center w-full h-8 px-2 rounded-sm active:bg-accent"
+                              >
+                                <Plus
+                                  size={14}
+                                  className="mr-2 text-foreground"
+                                />
+                                <UIText className="text-base">
+                                  {suggestion.label}
+                                </UIText>
+                              </Pressable>
+                            ),
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  ))}
+                    ),
+                  )}
 
                   {allowCustom &&
                     inputValue.trim() &&
-                    !filteredSuggestions.some((s: TagOptionBase) => s.value === inputValue.trim()) && (
+                    !filteredSuggestions.some(
+                      (s: TagOptionBase) => s.value === inputValue.trim(),
+                    ) && (
                       <View className="p-2 border-t border-border">
                         <Pressable
                           onPress={() => addTag(inputValue)}
@@ -193,9 +229,12 @@ export function TagsField({
                         >
                           <Plus size={14} className="mr-2 text-foreground" />
                           <UIText className="text-base">
-                            {t("packages.nextVibeUi.web.common.addCustomValue", {
-                              value: inputValue.trim(),
-                            })}
+                            {t(
+                              "packages.nextVibeUi.web.common.addCustomValue",
+                              {
+                                value: inputValue.trim(),
+                              },
+                            )}
                           </UIText>
                         </Pressable>
                       </View>

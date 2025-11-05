@@ -5,7 +5,7 @@
 
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from 'next-vibe-ui/ui/icons';
 import { Button } from "next-vibe-ui/ui/button";
 import type { JSX } from "react";
 import type { UseFormReturn } from "react-hook-form";

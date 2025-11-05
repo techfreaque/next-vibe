@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Filter, List, Plus, RefreshCw, Table, Users } from "lucide-react";
+import { Filter, List, Plus, RefreshCw, Table, Users } from 'next-vibe-ui/ui/icons';
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";

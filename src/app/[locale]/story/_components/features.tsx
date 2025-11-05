@@ -10,7 +10,7 @@ import {
   TrendingUp,
   Users,
   Zap,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import {
   Card,
   CardContent,

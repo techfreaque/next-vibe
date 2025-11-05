@@ -1,7 +1,7 @@
 "use client";
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Cross2Icon } from "@radix-ui/react-icons";
+import { Cross2Icon } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 

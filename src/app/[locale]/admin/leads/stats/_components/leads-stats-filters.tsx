@@ -5,7 +5,7 @@
 
 "use client";
 
-import { RefreshCw } from "lucide-react";
+import { RefreshCw } from 'next-vibe-ui/ui/icons';
 import {
   ChartType,
   DateRangePreset,

@@ -7,7 +7,7 @@ import {
   Lightbulb,
   MessageSquare,
   PenTool,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import Image from "next/image";
 import Link from "next/link";
 import { Span } from "next-vibe-ui/ui/span";

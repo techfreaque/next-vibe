@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { AlertCircle, CheckCircle, X } from "lucide-react";
+import { AlertCircle, CheckCircle, X } from 'next-vibe-ui/ui/icons';
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import { Button } from "next-vibe-ui/ui/button";
 import type { JSX } from "react";

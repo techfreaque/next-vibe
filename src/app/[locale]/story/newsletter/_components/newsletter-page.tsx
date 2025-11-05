@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Mail, Send, TrendingUp, Users, X, Zap } from "lucide-react";
+import { Check, Mail, Send, TrendingUp, Users, X, Zap } from 'next-vibe-ui/ui/icons';
 import Link from "next/link";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { Button } from "next-vibe-ui/ui/button";

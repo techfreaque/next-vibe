@@ -33,6 +33,7 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import type { DefaultFolderId } from "../chat/config";
 import {
+  chatFolders,
   chatMessages,
   chatThreads,
   type ToolCall,
@@ -50,6 +51,7 @@ import type {
 import { createStreamEvent, formatSSEEvent } from "./events";
 import { isUncensoredAIModel } from "./providers/uncensored-ai";
 import { handleUncensoredAI } from "./providers/uncensored-handler";
+import { canWriteFolder, isAdmin } from "../chat/permissions/permissions";
 
 /**
  * Maximum duration for streaming responses (in seconds)
@@ -98,7 +100,7 @@ function isValidToolResult(value: unknown): value is ToolCallResult {
   }
   if (typeof value === "object") {
     // Objects are valid - recursively check values
-     
+
     return Object.values(value).every((v) => isValidToolResult(v));
   }
   // Reject functions, symbols, etc.
@@ -106,14 +108,12 @@ function isValidToolResult(value: unknown): value is ToolCallResult {
 }
 
 /**
- * Convert lowercase role to ChatMessageRole enum
+ * Convert lowercase role string to ChatMessageRole enum
+ * Used when receiving roles from API definition (which uses lowercase strings)
  */
 function toChatMessageRole(
   role: "user" | "assistant" | "system",
-):
-  | typeof ChatMessageRole.USER
-  | typeof ChatMessageRole.ASSISTANT
-  | typeof ChatMessageRole.SYSTEM {
+): ChatMessageRole {
   switch (role) {
     case "user":
       return ChatMessageRole.USER;
@@ -122,6 +122,38 @@ function toChatMessageRole(
     case "system":
       return ChatMessageRole.SYSTEM;
   }
+}
+
+/**
+ * Convert ChatMessageRole enum to AI SDK compatible role
+ * Filters out TOOL and ERROR roles (converts TOOL -> USER, ERROR -> ASSISTANT)
+ */
+function toAiSdkMessage(message: { role: ChatMessageRole; content: string }): {
+  role: "user" | "assistant" | "system";
+  content: string;
+} | null {
+  switch (message.role) {
+    case ChatMessageRole.USER:
+      return { content: message.content, role: ChatMessageRole.USER };
+    case ChatMessageRole.ASSISTANT:
+      return { content: message.content, role: ChatMessageRole.ASSISTANT };
+    case ChatMessageRole.SYSTEM:
+      return { content: message.content, role: ChatMessageRole.SYSTEM };
+    case ChatMessageRole.TOOL:
+      return { content: message.content, role: ChatMessageRole.USER };
+    case ChatMessageRole.ERROR:
+      // Error messages become get removed
+      return null;
+  }
+}
+
+function toAiSdkMessages(
+  messages: Array<{ role: ChatMessageRole; content: string }>,
+): Array<{ role: "user" | "assistant" | "system"; content: string }> {
+  return messages.map((msg) => toAiSdkMessage(msg)).filter(Boolean) as Array<{
+    role: "user" | "assistant" | "system";
+    content: string;
+  }>;
 }
 
 /**
@@ -185,7 +217,7 @@ async function ensureThread({
   user,
 }: {
   threadId: string | null | undefined;
-  rootFolderId: string;
+  rootFolderId: DefaultFolderId;
   subFolderId: string | null | undefined;
   userId?: string;
   content: string;
@@ -193,15 +225,14 @@ async function ensureThread({
   logger: EndpointLogger;
   user: JwtPayloadType;
 }): Promise<{ threadId: string; isNew: boolean }> {
-  // If threadId provided, verify it exists (unless incognito)
+  // If threadId provided, verify it exists and check permissions (unless incognito)
   if (threadId) {
     if (!isIncognito && userId) {
+      // Get thread without user filter to check permissions properly
       const [existing] = await db
         .select()
         .from(chatThreads)
-        .where(
-          and(eq(chatThreads.id, threadId), eq(chatThreads.userId, userId)),
-        )
+        .where(eq(chatThreads.id, threadId))
         .limit(1);
 
       if (!existing?.id) {
@@ -209,6 +240,47 @@ async function ensureThread({
         // Return error through Promise rejection - caller will handle
         return await Promise.reject(new Error("THREAD_NOT_FOUND"));
       }
+
+      // Check if user has permission to write to this thread
+      const { canWriteThread } = await import(
+        "../chat/permissions/permissions"
+      );
+      const { chatFolders } = await import("../chat/db");
+
+      // Get folder if thread has one
+      let folder: typeof chatFolders.$inferSelect | null = null;
+      if (existing.folderId) {
+        const [folderResult] = await db
+          .select()
+          .from(chatFolders)
+          .where(eq(chatFolders.id, existing.folderId))
+          .limit(1);
+        folder = folderResult || null;
+      }
+
+      // Check write permission
+      const hasPermission = await canWriteThread(
+        user,
+        existing,
+        folder,
+        logger,
+      );
+      if (!hasPermission) {
+        logger.error("User does not have permission to write to thread", {
+          threadId,
+          userId,
+          threadUserId: existing.userId,
+          rootFolderId: existing.rootFolderId,
+        });
+        return await Promise.reject(new Error("PERMISSION_DENIED"));
+      }
+
+      logger.debug("Thread access granted", {
+        threadId,
+        userId,
+        threadUserId: existing.userId,
+        rootFolderId: existing.rootFolderId,
+      });
     }
     return { threadId, isNew: false };
   }
@@ -219,10 +291,6 @@ async function ensureThread({
 
   // Only store in DB if not incognito
   if (!isIncognito && userId) {
-    // Check permissions: get folder if subFolderId is provided
-    const { canWriteFolder } = await import("../chat/permissions/permissions");
-    const { chatFolders } = await import("../chat/db");
-
     let folder: typeof chatFolders.$inferSelect | null = null;
 
     if (subFolderId) {
@@ -248,7 +316,6 @@ async function ensureThread({
     } else if (rootFolderId === "public" && !subFolderId) {
       // Creating thread directly in PUBLIC root (no folder) - need to check ADMIN permission
       // This is the only case where we need to check for ADMIN role
-      const { isAdmin } = await import("../chat/permissions/permissions");
       const isAdminUser = await isAdmin(userId, logger);
 
       if (!isAdminUser) {
@@ -296,15 +363,24 @@ async function ensureThread({
       }
     }
 
+    // DO NOT set permission fields - leave as empty arrays to inherit from parent folder
+    // Permission inheritance: empty array [] = inherit from parent folder
+    // Only set explicit permissions when user overrides via context menu
+
     await db.insert(chatThreads).values({
       id: newThreadId,
       userId,
       title,
       rootFolderId: rootFolderId as DefaultFolderId,
       folderId: subFolderId ?? null,
+      // rolesRead, rolesWrite, rolesHide, rolesDelete are NOT set
+      // They default to [] which means inherit from parent folder
     });
 
-    logger.debug("Created new thread", { threadId: newThreadId, title });
+    logger.debug("Created new thread", {
+      threadId: newThreadId,
+      title,
+    });
   } else {
     logger.debug("Generated incognito thread ID", { threadId: newThreadId });
   }
@@ -361,8 +437,8 @@ async function fetchMessageHistory(
     const roleLowercase = msg.role.toLowerCase();
     const validRole: "user" | "assistant" | "system" =
       roleLowercase === "user" ||
-        roleLowercase === "assistant" ||
-        roleLowercase === "system"
+      roleLowercase === "assistant" ||
+      roleLowercase === "system"
         ? roleLowercase
         : "user";
     return {
@@ -384,7 +460,7 @@ async function getParentMessage(
 ): Promise<{
   id: string;
   threadId: string;
-  role: "user" | "assistant" | "system";
+  role: ChatMessageRole;
   content: string;
   parentId: string | null;
   depth: number;
@@ -408,19 +484,10 @@ async function getParentMessage(
     authorId: message.authorId,
   });
 
-  // DB stores role as ChatMessageRole enum (uppercase), convert to lowercase
-  const roleLowercase = message.role.toLowerCase();
-  const validRole: "user" | "assistant" | "system" =
-    roleLowercase === "user" ||
-      roleLowercase === "assistant" ||
-      roleLowercase === "system"
-      ? roleLowercase
-      : "user";
-
   return {
     id: message.id,
     threadId: message.threadId,
-    role: validRole,
+    role: message.role,
     content: message.content,
     parentId: message.parentId,
     depth: message.depth,
@@ -438,7 +505,7 @@ class AiStreamRepository implements IAiStreamRepository {
     threadId: string | null | undefined;
     parentMessageId: string | null | undefined;
     content: string;
-    role: "user" | "assistant" | "system";
+    role: ChatMessageRole;
   } {
     return {
       threadId: data.threadId,
@@ -459,7 +526,7 @@ class AiStreamRepository implements IAiStreamRepository {
     threadId: string;
     parentMessageId: string | null;
     content: string;
-    role: "user" | "assistant" | "system";
+    role: ChatMessageRole;
   } | null> {
     if (!data.parentMessageId) {
       logger.error("Edit operation requires parentMessageId");
@@ -495,7 +562,7 @@ class AiStreamRepository implements IAiStreamRepository {
     threadId: string;
     parentMessageId: string;
     content: string;
-    role: "user" | "assistant" | "system";
+    role: ChatMessageRole;
   } | null> {
     if (!data.parentMessageId) {
       logger.error("Retry operation requires parentMessageId");
@@ -527,7 +594,7 @@ class AiStreamRepository implements IAiStreamRepository {
     threadId: string | null | undefined;
     parentMessageId: string | null | undefined;
     content: string;
-    role: "user" | "assistant" | "system";
+    role: ChatMessageRole;
   } {
     return {
       threadId: data.threadId,
@@ -543,7 +610,7 @@ class AiStreamRepository implements IAiStreamRepository {
   private async createUserMessage(params: {
     messageId: string;
     threadId: string;
-    role: "user" | "assistant" | "system";
+    role: ChatMessageRole;
     content: string;
     parentId: string | null;
     depth: number;
@@ -553,7 +620,7 @@ class AiStreamRepository implements IAiStreamRepository {
     await db.insert(chatMessages).values({
       id: params.messageId,
       threadId: params.threadId,
-      role: toChatMessageRole(params.role),
+      role: params.role,
       content: params.content,
       parentId: params.parentId,
       depth: params.depth,
@@ -622,7 +689,14 @@ class AiStreamRepository implements IAiStreamRepository {
     sequenceIndex?: number; // Position in sequence
     logger: EndpointLogger;
   }): Promise<void> {
-    const metadata: Record<string, string | number | boolean | null | Record<string, string | number | boolean | null>> = {
+    const metadata: Record<
+      string,
+      | string
+      | number
+      | boolean
+      | null
+      | Record<string, string | number | boolean | null>
+    > = {
       errorType: params.errorType,
     };
 
@@ -724,7 +798,15 @@ class AiStreamRepository implements IAiStreamRepository {
     sequenceIndex: number;
     logger: EndpointLogger;
   }): Promise<void> {
-    const metadata: Record<string, string | number | boolean | null | Record<string, string | number | boolean | null> | ToolCall> = {
+    const metadata: Record<
+      string,
+      | string
+      | number
+      | boolean
+      | null
+      | Record<string, string | number | boolean | null>
+      | ToolCall
+    > = {
       toolCall: params.toolCall,
     };
 
@@ -759,10 +841,13 @@ class AiStreamRepository implements IAiStreamRepository {
     threadId: string | null | undefined;
     parentMessageId: string | null | undefined;
     content: string;
-    role: "user" | "assistant" | "system";
+    role: ChatMessageRole;
     userId: string | undefined;
     isIncognito: boolean;
-    messageHistory?: Array<{ role: "user" | "assistant" | "system"; content: string }> | null;
+    messageHistory?: Array<{
+      role: ChatMessageRole;
+      content: string;
+    }> | null;
     logger: EndpointLogger;
   }): Promise<
     Array<{ role: "user" | "assistant" | "system"; content: string }>
@@ -787,7 +872,7 @@ class AiStreamRepository implements IAiStreamRepository {
     if (params.operation === "answer-as-ai") {
       // For incognito mode, use provided message history
       if (params.isIncognito && params.messageHistory) {
-        const messages = [...params.messageHistory];
+        const messages = toAiSdkMessages(params.messageHistory);
         if (params.content.trim()) {
           messages.push({ role: "user", content: params.content });
         } else {
@@ -818,16 +903,7 @@ class AiStreamRepository implements IAiStreamRepository {
 
         if (parentIndex !== -1) {
           const contextMessages = allMessages.slice(0, parentIndex + 1);
-          const messages = contextMessages.map((msg) => {
-            const roleLowercase = msg.role.toLowerCase();
-            const validRole: "user" | "assistant" | "system" =
-              roleLowercase === "user" ||
-                roleLowercase === "assistant" ||
-                roleLowercase === "system"
-                ? roleLowercase
-                : "user";
-            return { role: validRole, content: msg.content };
-          });
+          const messages = toAiSdkMessages(contextMessages);
 
           if (params.content.trim()) {
             messages.push({ role: "user", content: params.content });
@@ -859,17 +935,39 @@ class AiStreamRepository implements IAiStreamRepository {
         params.userId,
         params.logger,
       );
-      return [...history, { role: params.role, content: params.content }];
+      const currentMessage = toAiSdkMessage({
+        role: params.role,
+        content: params.content,
+      });
+      if (!currentMessage) {
+        return history;
+      }
+      return [...history, currentMessage];
     } else if (params.isIncognito && params.messageHistory) {
       // Incognito mode with message history: use provided history from client
       params.logger.debug("Using provided message history for incognito mode", {
         operation: params.operation,
         historyLength: params.messageHistory.length,
       });
-      return [...params.messageHistory, { role: params.role, content: params.content }];
+      const historyMessages = toAiSdkMessages(params.messageHistory);
+      const currentMessage = toAiSdkMessage({
+        role: params.role,
+        content: params.content,
+      });
+      if (!currentMessage) {
+        return historyMessages;
+      }
+      return [...historyMessages, currentMessage];
     } else {
       // Fallback: no thread or no history (new conversation)
-      return [{ role: params.role, content: params.content }];
+      const currentMessage = toAiSdkMessage({
+        role: params.role,
+        content: params.content,
+      });
+      if (!currentMessage) {
+        return [];
+      }
+      return [currentMessage];
     }
   }
 
@@ -939,10 +1037,10 @@ class AiStreamRepository implements IAiStreamRepository {
 
       if (enabledEndpoints.length > 0) {
         const { getToolExecutor } = await import(
-          "@/app/api/[locale]/v1/core/system/unified-interface/ai/executor",
+          "@/app/api/[locale]/v1/core/system/unified-interface/ai/executor"
         );
         const { createToolsFromEndpoints } = await import(
-          "@/app/api/[locale]/v1/core/system/unified-interface/ai/factory",
+          "@/app/api/[locale]/v1/core/system/unified-interface/ai/factory"
         );
         const toolExecutor = getToolExecutor();
         const toolsMap = createToolsFromEndpoints(
@@ -1115,7 +1213,7 @@ class AiStreamRepository implements IAiStreamRepository {
       threadId: string | null | undefined;
       parentMessageId: string | null | undefined;
       content: string;
-      role: "user" | "assistant" | "system";
+      role: ChatMessageRole;
     };
 
     switch (data.operation) {
@@ -1262,7 +1360,12 @@ class AiStreamRepository implements IAiStreamRepository {
       role: effectiveRole,
       userId,
       isIncognito,
-      messageHistory: data.messageHistory,
+      messageHistory: data.messageHistory
+        ? data.messageHistory.map((msg) => ({
+            role: toChatMessageRole(msg.role),
+            content: msg.content,
+          }))
+        : null,
       logger,
     });
 
@@ -1398,7 +1501,7 @@ class AiStreamRepository implements IAiStreamRepository {
               const userMessageEvent = createStreamEvent.messageCreated({
                 messageId: userMessageId,
                 threadId: threadResult.threadId,
-                role: toChatMessageRole(effectiveRole),
+                role: effectiveRole,
                 parentId: effectiveParentMessageId || null,
                 depth: messageDepth,
                 content: effectiveContent,
@@ -1480,31 +1583,33 @@ class AiStreamRepository implements IAiStreamRepository {
               system: systemPrompt || undefined,
               ...(tools
                 ? {
-                  tools,
-                  // Enable multi-step tool calling loop - AI can call tools up to 50 times
-                  // stopWhen is required for the loop to continue after tool results
-                  stopWhen: stepCountIs(50),
-                  onStepFinish: ({
-                    text,
-                    toolCalls,
-                    toolResults,
-                    finishReason,
-                    usage,
-                  }): void => {
-                    logger.info("[AI Stream] Step finished", {
-                      hasText: !!text,
-                      textLength: text?.length || 0,
-                      toolCallsCount: toolCalls.length,
-                      toolResultsCount: toolResults.length,
+                    tools,
+                    // Enable multi-step tool calling loop - AI can call tools up to 50 times
+                    // stopWhen is required for the loop to continue after tool results
+                    stopWhen: stepCountIs(50),
+                    onStepFinish: ({
+                      text,
+                      toolCalls,
+                      toolResults,
                       finishReason,
-                      totalTokens: usage.totalTokens,
-                      textPreview: text?.substring(0, 100),
-                    });
-                  },
-                }
+                      usage,
+                    }): void => {
+                      logger.info("[AI Stream] Step finished", {
+                        hasText: !!text,
+                        textLength: text?.length || 0,
+                        toolCallsCount: toolCalls.length,
+                        toolResultsCount: toolResults.length,
+                        finishReason,
+                        totalTokens: usage.totalTokens,
+                        textPreview: text?.substring(0, 100),
+                      });
+                    },
+                  }
                 : {}),
             });
-            logger.info("[AI Stream] ⏱️ streamText returned, starting iteration");
+            logger.info(
+              "[AI Stream] ⏱️ streamText returned, starting iteration",
+            );
 
             // Lazy load endpoint metadata only when tool calls are encountered
             // This avoids loading all 143 endpoints when no tools are used
@@ -1536,14 +1641,19 @@ class AiStreamRepository implements IAiStreamRepository {
 
             logger.info("[AI Stream] ⏱️ Entering for-await loop");
             for await (const part of streamResult.fullStream) {
-
               if (part.type === "start-step") {
                 logger.info("[AI Stream] Step started", {
-                  stepNumber: ("stepNumber" in part ? String(part.stepNumber) : "unknown") as string,
+                  stepNumber: ("stepNumber" in part
+                    ? String(part.stepNumber)
+                    : "unknown") as string,
                 });
               } else if (part.type === "finish-step") {
-                const finishReason = "finishReason" in part ? String(part.finishReason) : "unknown";
-                const usage = "usage" in part && part.usage ? part.usage : undefined;
+                const finishReason =
+                  "finishReason" in part
+                    ? String(part.finishReason)
+                    : "unknown";
+                const usage =
+                  "usage" in part && part.usage ? part.usage : undefined;
                 logger.info("[AI Stream] Step finished", {
                   finishReason,
                   usage: usage as Record<string, number> | undefined,
@@ -1575,7 +1685,9 @@ class AiStreamRepository implements IAiStreamRepository {
                       sequenceId,
                       sequenceIndex,
                     });
-                    controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
+                    controller.enqueue(
+                      encoder.encode(formatSSEEvent(messageEvent)),
+                    );
 
                     // Save ASSISTANT message to database if not incognito
                     if (!isIncognito && userId) {
@@ -1608,7 +1720,9 @@ class AiStreamRepository implements IAiStreamRepository {
                     messageId: currentAssistantMessageId,
                     delta: textDelta,
                   });
-                  controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
+                  controller.enqueue(
+                    encoder.encode(formatSSEEvent(deltaEvent)),
+                  );
                 }
               } else if (part.type === "reasoning-start") {
                 // NEW ARCHITECTURE: Add <think> tag inline to current ASSISTANT message
@@ -1633,7 +1747,9 @@ class AiStreamRepository implements IAiStreamRepository {
                     sequenceId,
                     sequenceIndex,
                   });
-                  controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
+                  controller.enqueue(
+                    encoder.encode(formatSSEEvent(messageEvent)),
+                  );
 
                   // Save ASSISTANT message to database if not incognito
                   if (!isIncognito && userId) {
@@ -1665,7 +1781,9 @@ class AiStreamRepository implements IAiStreamRepository {
                     messageId: currentAssistantMessageId,
                     delta: thinkTag,
                   });
-                  controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
+                  controller.enqueue(
+                    encoder.encode(formatSSEEvent(deltaEvent)),
+                  );
                 }
 
                 logger.info("[AI Stream] ⏱️ Reasoning started → <think>");
@@ -1687,7 +1805,9 @@ class AiStreamRepository implements IAiStreamRepository {
                     messageId: currentAssistantMessageId,
                     delta: reasoningText,
                   });
-                  controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
+                  controller.enqueue(
+                    encoder.encode(formatSSEEvent(deltaEvent)),
+                  );
                 }
               } else if (part.type === "reasoning-end") {
                 // NEW ARCHITECTURE: Add </think> tag inline to current ASSISTANT message
@@ -1702,7 +1822,9 @@ class AiStreamRepository implements IAiStreamRepository {
                     messageId: currentAssistantMessageId,
                     delta: thinkCloseTag,
                   });
-                  controller.enqueue(encoder.encode(formatSSEEvent(thinkCloseDelta)));
+                  controller.enqueue(
+                    encoder.encode(formatSSEEvent(thinkCloseDelta)),
+                  );
 
                   isInReasoningBlock = false;
 
@@ -1791,13 +1913,16 @@ class AiStreamRepository implements IAiStreamRepository {
                       hasDefinition: !!endpoint.definition,
                       hasFields: !!endpoint.definition?.fields,
                       fieldsType: typeof endpoint.definition?.fields,
-                      fieldsKeys: endpoint.definition?.fields && typeof endpoint.definition.fields === 'object'
-                        ? Object.keys(endpoint.definition.fields).slice(0, 5)
-                        : [],
+                      fieldsKeys:
+                        endpoint.definition?.fields &&
+                        typeof endpoint.definition.fields === "object"
+                          ? Object.keys(endpoint.definition.fields).slice(0, 5)
+                          : [],
                     });
 
-                    const metadata =
-                      extractor.extractResponseMetadata(endpoint.definition);
+                    const metadata = extractor.extractResponseMetadata(
+                      endpoint.definition,
+                    );
 
                     logger.info("[AI Stream] Widget metadata extraction", {
                       toolName: part.toolName,
@@ -1823,13 +1948,17 @@ class AiStreamRepository implements IAiStreamRepository {
                       logger.info("[AI Stream] Widget metadata created", {
                         toolName: part.toolName,
                         endpointId: widgetMetadata.endpointId,
-                        responseFieldsCount: widgetMetadata.responseFields.length,
+                        responseFieldsCount:
+                          widgetMetadata.responseFields.length,
                       });
                     } else {
                       widgetMetadata = undefined;
-                      logger.warn("[AI Stream] No widget metadata fields found", {
-                        toolName: part.toolName,
-                      });
+                      logger.warn(
+                        "[AI Stream] No widget metadata fields found",
+                        {
+                          toolName: part.toolName,
+                        },
+                      );
                     }
                   } catch (error) {
                     logger.error("Failed to extract widget metadata", {
@@ -1885,7 +2014,9 @@ class AiStreamRepository implements IAiStreamRepository {
                   sequenceIndex,
                   toolCalls: [toolCallData], // Include tool call data for frontend rendering
                 });
-                controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
+                controller.enqueue(
+                  encoder.encode(formatSSEEvent(toolMessageEvent)),
+                );
 
                 // Emit TOOL_CALL event for real-time UX
                 const toolCallEvent = createStreamEvent.toolCall({
@@ -1897,11 +2028,14 @@ class AiStreamRepository implements IAiStreamRepository {
                   encoder.encode(formatSSEEvent(toolCallEvent)),
                 );
 
-                logger.info("[AI Stream] Tool call started (UI notified, DB storage pending)", {
-                  messageId: currentToolMessageId,
-                  toolName: part.toolName,
-                  sequenceIndex,
-                });
+                logger.info(
+                  "[AI Stream] Tool call started (UI notified, DB storage pending)",
+                  {
+                    messageId: currentToolMessageId,
+                    toolName: part.toolName,
+                    sequenceIndex,
+                  },
+                );
 
                 // Increment sequence index for next message
                 sequenceIndex++;
@@ -1945,7 +2079,9 @@ class AiStreamRepository implements IAiStreamRepository {
 
                   // Validate and type the output using type guard
                   const validatedOutput: ToolCallResult | undefined =
-                    isValidToolResult(cleanedOutput) ? cleanedOutput : undefined;
+                    isValidToolResult(cleanedOutput)
+                      ? cleanedOutput
+                      : undefined;
 
                   // If error, create ERROR message first (proper timestamp order)
                   if (toolError && !isIncognito && userId) {
@@ -1963,10 +2099,13 @@ class AiStreamRepository implements IAiStreamRepository {
                       logger,
                     });
 
-                    logger.info("[AI Stream] ERROR message created for tool error", {
-                      errorMessageId,
-                      toolError,
-                    });
+                    logger.info(
+                      "[AI Stream] ERROR message created for tool error",
+                      {
+                        errorMessageId,
+                        toolError,
+                      },
+                    );
                   }
 
                   // Add result to tool call data (for both DB and UI)
@@ -1991,15 +2130,18 @@ class AiStreamRepository implements IAiStreamRepository {
                     });
                   }
 
-                  logger.info("[AI Stream] Tool result validated and saved to DB", {
-                    messageId: currentToolMessageId,
-                    toolName: part.toolName,
-                    hasResult: !!validatedOutput,
-                    hasError: !!toolError,
-                    resultType: typeof validatedOutput,
-                    isValid: isValidToolResult(cleanedOutput),
-                    wasCleaned: output !== cleanedOutput,
-                  });
+                  logger.info(
+                    "[AI Stream] Tool result validated and saved to DB",
+                    {
+                      messageId: currentToolMessageId,
+                      toolName: part.toolName,
+                      hasResult: !!validatedOutput,
+                      hasError: !!toolError,
+                      resultType: typeof validatedOutput,
+                      isValid: isValidToolResult(cleanedOutput),
+                      wasCleaned: output !== cleanedOutput,
+                    },
+                  );
 
                   // Emit TOOL_RESULT event for real-time UX with updated tool call data
                   const toolResultEvent = createStreamEvent.toolResult({
@@ -2073,7 +2215,9 @@ class AiStreamRepository implements IAiStreamRepository {
                 totalTokens: usage.totalTokens ?? null,
                 finishReason: finishReason || null,
               });
-              controller.enqueue(encoder.encode(formatSSEEvent(contentDoneEvent)));
+              controller.enqueue(
+                encoder.encode(formatSSEEvent(contentDoneEvent)),
+              );
 
               // Update ASSISTANT message in database with final content and tokens
               if (!isIncognito && userId) {
@@ -2143,7 +2287,9 @@ class AiStreamRepository implements IAiStreamRepository {
               sequenceId: lastSequenceId,
               sequenceIndex: lastSequenceIndex,
             });
-            controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
+            controller.enqueue(
+              encoder.encode(formatSSEEvent(errorMessageEvent)),
+            );
 
             // Also emit legacy error event for compatibility
             const errorEvent = createStreamEvent.error({
@@ -2162,7 +2308,7 @@ class AiStreamRepository implements IAiStreamRepository {
           headers: {
             "Content-Type": "text/event-stream",
             "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
+            Connection: "keep-alive",
           },
         }),
       );

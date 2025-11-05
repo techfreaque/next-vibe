@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, or } from "drizzle-orm";
 import {
   createSuccessResponse,
   ErrorResponseTypes,
@@ -10,8 +10,10 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
-import { getDefaultFolderConfig } from "@/app/api/[locale]/v1/core/agent/chat/config";
-import { canCreateFolder, canReadFolder } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
+import {
+  canCreateFolder,
+  canReadFolder,
+} from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -47,7 +49,9 @@ export interface ChatFoldersRepositoryInterface {
 /**
  * Chat Folders Repository Implementation
  */
-export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface {
+export class ChatFoldersRepositoryImpl
+  implements ChatFoldersRepositoryInterface
+{
   /**
    * Get all folders for the authenticated user or anonymous user (lead)
    */
@@ -84,14 +88,11 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
         // PUBLIC folder: fetch all folders in this root folder
         whereConditions = eq(chatFolders.rootFolderId, rootFolderId);
       } else if (rootFolderId === "shared") {
-        // SHARED folder: fetch user's own folders + folders where user is moderator
-        // Use JSONB array containment to check if user is in moderatorIds
+        // SHARED folder: fetch user's own folders
+        // Permission filtering happens later via canReadFolder
         whereConditions = and(
           eq(chatFolders.rootFolderId, rootFolderId),
-          or(
-            eq(chatFolders.userId, userIdentifier), // User's own folders
-            sql`${chatFolders.moderatorIds}::jsonb @> ${JSON.stringify([userIdentifier])}::jsonb`, // User is moderator
-          ),
+          eq(chatFolders.userId, userIdentifier), // User's own folders
         );
       } else if (rootFolderId) {
         // Other specific root folder: only user's own folders
@@ -101,14 +102,9 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
         );
       } else {
         // No rootFolderId specified: fetch all PUBLIC folders + user's own folders from other root folders
-        // + SHARED folders where user is moderator
         whereConditions = or(
           eq(chatFolders.rootFolderId, "public"), // All PUBLIC folders
           eq(chatFolders.userId, userIdentifier), // User's own folders from any root folder
-          and(
-            eq(chatFolders.rootFolderId, "shared"), // SHARED folders
-            sql`${chatFolders.moderatorIds}::jsonb @> ${JSON.stringify([userIdentifier])}::jsonb`, // User is moderator
-          ),
         );
       }
 
@@ -130,7 +126,11 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
         folders: visibleFolders.map((folder) => ({
           id: folder.id,
           userId: folder.userId,
-          rootFolderId: folder.rootFolderId as "incognito" | "private" | "public" | "shared",
+          rootFolderId: folder.rootFolderId as
+            | "incognito"
+            | "private"
+            | "public"
+            | "shared",
           name: folder.name,
           icon: folder.icon,
           color: folder.color,
@@ -138,8 +138,10 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
           expanded: folder.expanded,
           sortOrder: folder.sortOrder,
           metadata: folder.metadata || {},
-          allowedRoles: folder.allowedRoles || [],
-          moderatorIds: folder.moderatorIds || [],
+          rolesRead: folder.rolesRead || [],
+          rolesWrite: folder.rolesWrite || [],
+          rolesHide: folder.rolesHide || [],
+          rolesDelete: folder.rolesDelete || [],
           createdAt: folder.createdAt.toISOString(),
           updatedAt: folder.updatedAt.toISOString(),
         })),
@@ -245,9 +247,9 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
 
       const nextSortOrder = existingFolders.length;
 
-      // Set allowedRoles based on rootFolderId config
-      const rootFolderConfig = getDefaultFolderConfig(folderData.rootFolderId);
-      const allowedRoles = rootFolderConfig?.defaultAllowedRoles || [];
+      // DO NOT set permission fields - leave as empty arrays to inherit from parent
+      // Permission inheritance: empty array [] = inherit from parent folder
+      // Only set explicit permissions when user overrides via context menu
 
       const [newFolder] = await db
         .insert(chatFolders)
@@ -261,7 +263,8 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
           expanded: true,
           sortOrder: nextSortOrder,
           metadata: {},
-          allowedRoles,
+          // rolesRead, rolesWrite, rolesHide, rolesDelete are NOT set
+          // They default to [] which means inherit from parent folder
         })
         .returning();
 
@@ -279,7 +282,11 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
           folder: {
             id: newFolder.id,
             userId: newFolder.userId,
-            rootFolderId: newFolder.rootFolderId as "incognito" | "private" | "public" | "shared",
+            rootFolderId: newFolder.rootFolderId as
+              | "incognito"
+              | "private"
+              | "public"
+              | "shared",
             name: newFolder.name,
             icon: newFolder.icon,
             color: newFolder.color,
@@ -287,8 +294,10 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
             expanded: newFolder.expanded,
             sortOrder: newFolder.sortOrder,
             metadata: newFolder.metadata || {},
-            allowedRoles: newFolder.allowedRoles || [],
-            moderatorIds: newFolder.moderatorIds || [],
+            rolesRead: newFolder.rolesRead || [],
+            rolesWrite: newFolder.rolesWrite || [],
+            rolesHide: newFolder.rolesHide || [],
+            rolesDelete: newFolder.rolesDelete || [],
             createdAt: newFolder.createdAt.toISOString(),
             updatedAt: newFolder.updatedAt.toISOString(),
           },

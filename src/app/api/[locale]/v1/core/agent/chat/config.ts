@@ -4,7 +4,10 @@
  */
 
 import type { TranslationKey } from "@/i18n/core/static-types";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import {
+  type UserRoleValue,
+  UserRole,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type { IconValue } from "./model-access/icons";
 
@@ -56,11 +59,15 @@ export interface DefaultFolderConfig {
   /** Color identifier for UI theming */
   color: string;
 
-  /** URL path segment for routing */
-  urlPath: string;
-
-  /** Default allowed roles for folders in this root folder */
-  defaultAllowedRoles: (typeof UserRole)[keyof typeof UserRole][];
+  /** Default permission roles for folders in this root folder */
+  /** Roles that can read/view this folder and its contents */
+  rolesRead: (typeof UserRoleValue)[];
+  /** Roles that can write/create content in this folder */
+  rolesWrite: (typeof UserRoleValue)[];
+  /** Roles that can hide/moderate content in this folder */
+  rolesHide: (typeof UserRoleValue)[];
+  /** Roles that can delete content in this folder */
+  rolesDelete: (typeof UserRoleValue)[];
 }
 
 /**
@@ -75,8 +82,10 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     descriptionKey: "app.chat.folders.privateDescription",
     order: 0,
     color: "sky", // Softer blue for private/secure
-    urlPath: "private",
-    defaultAllowedRoles: [], // Owner only
+    rolesRead: [], // Owner only
+    rolesWrite: [], // Owner only
+    rolesHide: [], // Owner only
+    rolesDelete: [], // Owner only
   },
   {
     id: DEFAULT_FOLDER_IDS.INCOGNITO,
@@ -85,8 +94,10 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     descriptionKey: "app.chat.folders.incognitoDescription",
     order: 1,
     color: "zinc", // Neutral gray for incognito/hidden
-    urlPath: "incognito",
-    defaultAllowedRoles: [], // Local only
+    rolesRead: [], // Local only
+    rolesWrite: [], // Local only
+    rolesHide: [], // Local only
+    rolesDelete: [], // Local only
   },
   {
     id: DEFAULT_FOLDER_IDS.SHARED,
@@ -95,8 +106,10 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     descriptionKey: "app.chat.folders.sharedDescription",
     order: 2,
     color: "teal", // Collaborative teal for shared
-    urlPath: "shared",
-    defaultAllowedRoles: [], // Will be set via share links
+    rolesRead: [], // Will be set via share links
+    rolesWrite: [], // Will be set via share links
+    rolesHide: [], // Will be set via share links
+    rolesDelete: [], // Will be set via share links
   },
   {
     id: DEFAULT_FOLDER_IDS.PUBLIC,
@@ -105,8 +118,10 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     descriptionKey: "app.chat.folders.publicDescription",
     order: 3,
     color: "amber", // Premium gold/amber for public 1A
-    urlPath: "public",
-    defaultAllowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN], // Visible to all
+    rolesRead: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN], // Visible to all
+    rolesWrite: [UserRole.ADMIN], // Only admins can write
+    rolesHide: [UserRole.PARTNER_ADMIN, UserRole.ADMIN], // Moderators and admins can hide
+    rolesDelete: [UserRole.ADMIN], // Only admins can delete
   },
 ] as const;
 

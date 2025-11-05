@@ -10,13 +10,14 @@ import Animated, {
 
 import { styled } from "nativewind";
 
-import type { SwitchBaseProps } from "next-vibe-ui/ui/switch";
+import type { SwitchBaseProps } from "@/packages/next-vibe-ui/web/ui/switch";
 
 import { useColorScheme } from "../lib/useColorScheme";
 import { cn } from "next-vibe/shared/utils/utils";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
-const THUMB_CLASSNAME = "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0";
+const THUMB_CLASSNAME =
+  "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0";
 /* eslint-enable i18next/no-literal-string */
 
 type NativeSwitchProps = SwitchBaseProps;
@@ -25,38 +26,39 @@ const StyledAnimatedView = styled(Animated.View);
 const StyledSwitchRoot = styled(SwitchPrimitives.Root);
 const StyledSwitchThumb = styled(SwitchPrimitives.Thumb);
 
-const SwitchWeb = React.forwardRef<
-  SwitchPrimitives.RootRef,
-  NativeSwitchProps
->(({ className, checked, onCheckedChange, disabled, ...props }, ref) => {
-  const isChecked = checked ?? false;
-  const handleCheckedChange = onCheckedChange ?? ((_checked: boolean): void => {
-    return;
-  });
-  return (
-    <StyledSwitchRoot
-    className={cn(
-        // eslint-disable-next-line i18n/no-literal-string
-        "peer flex-row h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed",
-        isChecked ? "bg-primary" : "bg-input",
-        disabled && "opacity-50",
-        className,
-      )}
-      checked={isChecked}
-      onCheckedChange={handleCheckedChange}
-      disabled={disabled}
-      {...props}
-      ref={ref}
-    >
-      <StyledSwitchThumb
+const SwitchWeb = React.forwardRef<SwitchPrimitives.RootRef, NativeSwitchProps>(
+  ({ className, checked, onCheckedChange, disabled, ...props }, ref) => {
+    const isChecked = checked ?? false;
+    const handleCheckedChange =
+      onCheckedChange ??
+      ((_checked: boolean): void => {
+        return;
+      });
+    return (
+      <StyledSwitchRoot
         className={cn(
-          "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-md shadow-foreground/5 ring-0 transition-transform",
-          isChecked ? "translate-x-5" : "translate-x-0",
+          // eslint-disable-next-line i18n/no-literal-string
+          "peer flex-row h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed",
+          isChecked ? "bg-primary" : "bg-input",
+          disabled && "opacity-50",
+          className,
         )}
-      />
-    </StyledSwitchRoot>
-  );
-});
+        checked={isChecked}
+        onCheckedChange={handleCheckedChange}
+        disabled={disabled}
+        {...props}
+        ref={ref}
+      >
+        <StyledSwitchThumb
+          className={cn(
+            "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-md shadow-foreground/5 ring-0 transition-transform",
+            isChecked ? "translate-x-5" : "translate-x-0",
+          )}
+        />
+      </StyledSwitchRoot>
+    );
+  },
+);
 
 SwitchWeb.displayName = "SwitchWeb";
 
@@ -78,9 +80,11 @@ const SwitchNative = React.forwardRef<
 >(({ className, checked, onCheckedChange, disabled, ...props }, ref) => {
   const { colorScheme } = useColorScheme();
   const isChecked = checked ?? false;
-  const handleCheckedChange = onCheckedChange ?? ((_checked: boolean): void => {
-    return;
-  });
+  const handleCheckedChange =
+    onCheckedChange ??
+    ((_checked: boolean): void => {
+      return;
+    });
   const translateX = useDerivedValue(() => (isChecked ? 18 : 0));
   const animatedRootStyle = useAnimatedStyle(() => {
     return {
@@ -99,10 +103,7 @@ const SwitchNative = React.forwardRef<
   return (
     <StyledAnimatedView
       style={animatedRootStyle}
-      className={cn(
-        "h-8 w-[46px] rounded-full",
-        disabled && "opacity-50",
-      )}
+      className={cn("h-8 w-[46px] rounded-full", disabled && "opacity-50")}
     >
       <StyledSwitchRoot
         className={cn(
@@ -117,9 +118,7 @@ const SwitchNative = React.forwardRef<
         ref={ref}
       >
         <StyledAnimatedView style={animatedThumbStyle}>
-          <StyledSwitchThumb
-            className={THUMB_CLASSNAME}
-          />
+          <StyledSwitchThumb className={THUMB_CLASSNAME} />
         </StyledAnimatedView>
       </StyledSwitchRoot>
     </StyledAnimatedView>

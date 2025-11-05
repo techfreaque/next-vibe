@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Plus, Users } from "lucide-react";
+import { Plus, Users } from 'next-vibe-ui/ui/icons';
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Link } from "next-vibe-ui/ui/link";
 import { cn } from "next-vibe/shared/utils";

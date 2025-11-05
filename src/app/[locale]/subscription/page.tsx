@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import type { JSX } from "react";
 
-import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
+import {
+  type CreditBalance,
+  type CreditTransactionOutput,
+  creditRepository,
+} from "@/app/api/[locale]/v1/core/credits/repository";
 import { subscriptionRepository } from "@/app/api/[locale]/v1/core/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
@@ -12,6 +16,7 @@ import { metadataGenerator } from "@/i18n/core/metadata";
 import { translations } from "@/config/i18n/en";
 
 import { SubscriptionClientContent } from "./_components/subscription-client-content";
+import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
 
 interface SubscriptionPageProps {
   params: Promise<{ locale: CountryLanguage }>;
@@ -70,26 +75,22 @@ export default async function SubscriptionPage({
   // Fetch data for both authenticated and public users
   let credits: CreditBalance | null = null;
   let history: {
-    transactions: CreditTransaction[];
+    transactions: CreditTransactionOutput[];
     totalCount: number;
   } | null = null;
-  let subscription: SubscriptionData | null = null;
+  let subscription: SubscriptionGetResponseOutput | null = null;
 
   // Fetch credit balance for all users (both authenticated and public)
-  if (userResponse.data && userResponse.data.leadId) {
+  if (userResponse.success && userResponse.data && userResponse.data.leadId) {
     const creditsResponse = await creditRepository.getCreditBalanceForUser(
-      {
-        id: "id" in userResponse.data ? userResponse.data.id : undefined,
-        leadId: userResponse.data.leadId,
-        isPublic: userResponse.data.isPublic,
-      },
+      userResponse.data,
       logger,
     );
     credits = creditsResponse.success ? creditsResponse.data : null;
   }
 
   // Fetch transaction history for all users (both authenticated and public)
-  if (userResponse.data && userResponse.data.leadId) {
+  if (userResponse.success && userResponse.data && userResponse.data.leadId) {
     if (isAuthenticated && "id" in userResponse.data && userResponse.data.id) {
       // Authenticated users: fetch by userId
       const historyResponse = await creditRepository.getTransactions(
@@ -112,6 +113,7 @@ export default async function SubscriptionPage({
   // For authenticated users only, fetch subscription data
   if (
     isAuthenticated &&
+    userResponse.success &&
     userResponse.data &&
     "id" in userResponse.data &&
     userResponse.data.id
@@ -137,36 +139,4 @@ export default async function SubscriptionPage({
       isAuthenticated={isAuthenticated}
     />
   );
-}
-
-// Type definitions for the data structures
-interface CreditBalance {
-  total: number;
-  expiring: number;
-  permanent: number;
-  free: number;
-  expiresAt: string | null;
-}
-
-interface CreditTransaction {
-  id: string;
-  amount: number;
-  balanceAfter: number;
-  type: string;
-  modelId: string | null;
-  messageId: string | null;
-  createdAt: string;
-}
-
-interface SubscriptionData {
-  id: string;
-  userId: string;
-  plan: string;
-  billingInterval: string;
-  status: string;
-  currentPeriodStart: string;
-  currentPeriodEnd: string;
-  cancelAtPeriodEnd: boolean;
-  createdAt: string;
-  updatedAt: string;
 }

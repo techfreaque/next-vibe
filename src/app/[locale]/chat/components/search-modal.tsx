@@ -2,7 +2,12 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
 import { MessageSquarePlus, Search } from "next-vibe-ui/ui/icons";
@@ -12,7 +17,7 @@ import React, { useState } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { ChatThread } from "../shared/types";
+import type { ChatThread } from "../types";
 
 interface SearchModalProps {
   open: boolean;

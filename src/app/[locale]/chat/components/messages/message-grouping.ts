@@ -3,7 +3,7 @@
  * Groups messages that are part of the same AI response sequence
  */
 
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
 
 /**
  * Grouped message sequence

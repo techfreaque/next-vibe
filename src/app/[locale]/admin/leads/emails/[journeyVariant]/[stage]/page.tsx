@@ -3,7 +3,7 @@
  * Server-rendered email preview page
  */
 
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'next-vibe-ui/ui/icons';
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Div } from "next-vibe-ui/ui/div";

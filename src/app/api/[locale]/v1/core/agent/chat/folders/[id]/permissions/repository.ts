@@ -62,19 +62,25 @@ export async function getFolderPermissions(
       });
     }
 
-    const moderatorIds = Array.isArray(folder.moderatorIds)
-      ? folder.moderatorIds
+    const rolesRead = Array.isArray(folder.rolesRead) ? folder.rolesRead : [];
+    const rolesWrite = Array.isArray(folder.rolesWrite)
+      ? folder.rolesWrite
       : [];
-    const allowedRoles = Array.isArray(folder.allowedRoles)
-      ? folder.allowedRoles
+    const rolesHide = Array.isArray(folder.rolesHide) ? folder.rolesHide : [];
+    const rolesDelete = Array.isArray(folder.rolesDelete)
+      ? folder.rolesDelete
       : [];
 
-    return createSuccessResponse({
-      response: {
-        allowedRoles,
-        moderatorIds,
-      },
-    });
+    const responseData = {
+      rolesRead,
+      rolesWrite,
+      rolesHide,
+      rolesDelete,
+    };
+
+    logger.info("GET permissions response data", responseData);
+
+    return createSuccessResponse(responseData);
   } catch {
     return fail({
       message:
@@ -101,7 +107,7 @@ export async function updateFolderPermissions(
   }
 
   try {
-    const { id, moderatorIds, allowedRoles } = data;
+    const { id, rolesRead, rolesWrite, rolesHide, rolesDelete } = data;
 
     // Verify folder exists
     const [existingFolder] = await db
@@ -130,45 +136,54 @@ export async function updateFolderPermissions(
 
     // Prepare update data - only update fields that are provided
     const updateData: {
-      moderatorIds?: string[];
-      allowedRoles?: (typeof UserRoleDB)[number][];
+      rolesRead?: (typeof UserRoleDB)[number][];
+      rolesWrite?: (typeof UserRoleDB)[number][];
+      rolesHide?: (typeof UserRoleDB)[number][];
+      rolesDelete?: (typeof UserRoleDB)[number][];
       updatedAt: Date;
     } = {
       updatedAt: new Date(),
     };
 
-    if (moderatorIds !== undefined) {
-      updateData.moderatorIds = moderatorIds;
+    if (rolesRead !== undefined) {
+      updateData.rolesRead = rolesRead;
     }
 
-    if (allowedRoles !== undefined) {
-      updateData.allowedRoles = allowedRoles;
+    if (rolesWrite !== undefined) {
+      updateData.rolesWrite = rolesWrite;
+    }
+
+    if (rolesHide !== undefined) {
+      updateData.rolesHide = rolesHide;
+    }
+
+    if (rolesDelete !== undefined) {
+      updateData.rolesDelete = rolesDelete;
     }
 
     // Update the permissions
-    await db
-      .update(chatFolders)
-      .set(updateData)
-      .where(eq(chatFolders.id, id));
+    await db.update(chatFolders).set(updateData).where(eq(chatFolders.id, id));
 
     logger.info("Folder permissions updated", {
       folderId: id,
-      moderatorCount: moderatorIds?.length ?? 0,
-      allowedRolesCount: allowedRoles?.length ?? 0,
+      rolesReadCount: rolesRead?.length ?? 0,
+      rolesWriteCount: rolesWrite?.length ?? 0,
+      rolesHideCount: rolesHide?.length ?? 0,
+      rolesDeleteCount: rolesDelete?.length ?? 0,
     });
 
     // Return updated values
-    const finalModeratorIds = moderatorIds ?? existingFolder.moderatorIds ?? [];
-    const finalAllowedRoles = allowedRoles ?? existingFolder.allowedRoles ?? [];
+    const finalRolesRead = rolesRead ?? existingFolder.rolesRead ?? [];
+    const finalRolesWrite = rolesWrite ?? existingFolder.rolesWrite ?? [];
+    const finalRolesHide = rolesHide ?? existingFolder.rolesHide ?? [];
+    const finalRolesDelete = rolesDelete ?? existingFolder.rolesDelete ?? [];
 
     return createSuccessResponse({
       response: {
-        allowedRoles: Array.isArray(finalAllowedRoles)
-          ? finalAllowedRoles
-          : [],
-        moderatorIds: Array.isArray(finalModeratorIds)
-          ? finalModeratorIds
-          : [],
+        rolesRead: Array.isArray(finalRolesRead) ? finalRolesRead : [],
+        rolesWrite: Array.isArray(finalRolesWrite) ? finalRolesWrite : [],
+        rolesHide: Array.isArray(finalRolesHide) ? finalRolesHide : [],
+        rolesDelete: Array.isArray(finalRolesDelete) ? finalRolesDelete : [],
       },
     });
   } catch {

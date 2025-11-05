@@ -357,6 +357,9 @@ export function useApiForm<
         messageParams: { formErrors: JSON.stringify(errors) },
       });
 
+      // Set the error in the form state so it's displayed
+      setError(errorResponse);
+
       options?.onError?.({
         error: errorResponse,
         requestData: formMethods.getValues(),

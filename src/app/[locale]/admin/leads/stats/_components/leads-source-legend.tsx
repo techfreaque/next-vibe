@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from 'next-vibe-ui/ui/icons';
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";

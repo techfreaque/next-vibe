@@ -3,7 +3,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   DotsHorizontalIcon,
-} from "@radix-ui/react-icons";
+} from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 

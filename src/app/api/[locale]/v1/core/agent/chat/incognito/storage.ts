@@ -7,7 +7,7 @@
 "use client";
 
 import type { DefaultFolderId } from "../config";
-import type { ChatFolder, ChatMessage, ChatThread } from "../store";
+import type { ChatFolder, ChatMessage, ChatThread } from "../hooks/store";
 
 /**
  * Storage keys
@@ -268,7 +268,7 @@ export function createIncognitoThread(
  */
 export function createIncognitoMessage(
   threadId: string,
-  role: "user" | "assistant" | "system" | "error",
+  role: ChatMessage["role"],
   content: string,
   parentId: string | null = null,
   model: ChatMessage["model"] = null,

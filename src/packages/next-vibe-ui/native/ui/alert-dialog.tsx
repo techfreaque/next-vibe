@@ -11,7 +11,7 @@ import type {
   AlertDialogFooterProps,
   AlertDialogHeaderProps,
   AlertDialogTitleProps,
-} from "next-vibe-ui/ui/alert-dialog";
+} from "@/packages/next-vibe-ui/web/ui/alert-dialog";
 
 const AlertDialog = AlertDialogPrimitive.Root;
 
@@ -24,7 +24,10 @@ interface AlertDialogOverlayWebProps {
   children?: React.ReactNode;
 }
 
-const AlertDialogOverlayWeb = ({ className, children }: AlertDialogOverlayWebProps): React.ReactNode => {
+const AlertDialogOverlayWeb = ({
+  className,
+  children,
+}: AlertDialogOverlayWebProps): React.ReactNode => {
   const { open } = AlertDialogPrimitive.useRootContext();
   return (
     <AlertDialogPrimitive.Overlay
@@ -46,7 +49,10 @@ interface AlertDialogOverlayNativeProps {
   children?: React.ReactNode;
 }
 
-const AlertDialogOverlayNative = ({ className, children }: AlertDialogOverlayNativeProps): React.ReactNode => {
+const AlertDialogOverlayNative = ({
+  className,
+  children,
+}: AlertDialogOverlayNativeProps): React.ReactNode => {
   return (
     <AlertDialogPrimitive.Overlay
       style={StyleSheet.absoluteFill}
@@ -108,9 +114,7 @@ const AlertDialogHeader = ({
   className,
   children,
 }: AlertDialogHeaderProps): React.JSX.Element => (
-  <View className={cn("flex flex-col gap-2", className)}>
-    {children}
-  </View>
+  <View className={cn("flex flex-col gap-2", className)}>{children}</View>
 );
 AlertDialogHeader.displayName = "AlertDialogHeader";
 

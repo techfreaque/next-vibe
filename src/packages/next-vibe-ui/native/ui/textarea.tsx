@@ -2,13 +2,14 @@ import * as React from "react";
 import type { TextInputProps } from "react-native";
 import { TextInput } from "react-native";
 
-import type { TextareaProps as WebTextareaProps } from "next-vibe-ui/ui/textarea";
+import type { TextareaProps as WebTextareaProps } from "@/packages/next-vibe-ui/web/ui/textarea";
 
 import { cn } from "../lib/utils";
 import { Div } from "./div";
 
 // Native textarea props combine web interface with native TextInput props
-export type TextareaProps = WebTextareaProps & Omit<TextInputProps, "className" | "disabled" | "minRows" | "variant">;
+export type TextareaProps = WebTextareaProps &
+  Omit<TextInputProps, "className" | "disabled" | "minRows" | "variant">;
 
 const Textarea = React.forwardRef<
   React.ElementRef<typeof TextInput>,
@@ -42,7 +43,8 @@ const Textarea = React.forwardRef<
           "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2",
           !isEditable && "opacity-50",
           className,
-        )}>
+        )}
+      >
         <TextInput
           ref={ref}
           style={[

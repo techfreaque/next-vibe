@@ -5,7 +5,7 @@
 
 "use client";
 
-import { BarChart3Icon, LineChartIcon, TrendingUpIcon } from "lucide-react";
+import { BarChart3Icon, LineChartIcon, TrendingUpIcon } from 'next-vibe-ui/ui/icons';
 import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schema";
 import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";

@@ -28,7 +28,6 @@ import type {
 } from "../../../web/ui/form/form";
 
 import { Label } from "../label";
-import { Div } from "../div";
 import { P } from "../typography";
 
 // ============================================================================
@@ -106,21 +105,27 @@ const useFormField = (): UseFormFieldReturn => {
 };
 
 /**
- * FormItem - Native implementation using Div (View) instead of div
+ * FormItem - Native implementation using View instead of div
  * Uses FormItemProps type from web but renders with native components
  *
  * Type compatibility: FormItemProps is HTMLAttributes on web, but we need
  * ViewProps on native. We pick only the compatible props (className, children, etc.)
  */
-const FormItem = ({ className, ...props }: FormItemProps): JSX.Element => {
+const FormItem = React.forwardRef<
+  View,
+  Pick<FormItemProps, "className" | "children">
+>((props, ref): React.JSX.Element => {
   const id = React.useId();
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <Div className={cn("space-y-2", className)} {...props} />
+      <View ref={ref} className={cn("space-y-2", props.className)}>
+        {props.children}
+      </View>
     </FormItemContext.Provider>
   );
-};
+});
+FormItem.displayName = "FormItem";
 
 /**
  * FormLabel - Native implementation using Label component

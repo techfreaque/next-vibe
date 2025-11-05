@@ -9,8 +9,10 @@ CREATE TABLE "chat_folders" (
 	"expanded" boolean DEFAULT true NOT NULL,
 	"sort_order" integer DEFAULT 0 NOT NULL,
 	"metadata" jsonb DEFAULT '{}'::jsonb,
-	"moderator_ids" jsonb DEFAULT '[]'::jsonb,
-	"allowed_roles" jsonb DEFAULT '[]'::jsonb,
+	"roles_read" jsonb DEFAULT '[]'::jsonb,
+	"roles_write" jsonb DEFAULT '[]'::jsonb,
+	"roles_hide" jsonb DEFAULT '[]'::jsonb,
+	"roles_delete" jsonb DEFAULT '[]'::jsonb,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -61,8 +63,10 @@ CREATE TABLE "chat_threads" (
 	"tags" jsonb DEFAULT '[]'::jsonb,
 	"preview" text,
 	"metadata" jsonb DEFAULT '{}'::jsonb,
-	"moderator_ids" jsonb DEFAULT '[]'::jsonb,
-	"allowed_roles" jsonb DEFAULT '[]'::jsonb,
+	"roles_read" jsonb DEFAULT '[]'::jsonb,
+	"roles_write" jsonb DEFAULT '[]'::jsonb,
+	"roles_hide" jsonb DEFAULT '[]'::jsonb,
+	"roles_delete" jsonb DEFAULT '[]'::jsonb,
 	"published" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
@@ -973,7 +977,10 @@ CREATE INDEX "chat_folders_user_id_idx" ON "chat_folders" USING btree ("user_id"
 CREATE INDEX "chat_folders_root_folder_id_idx" ON "chat_folders" USING btree ("root_folder_id");--> statement-breakpoint
 CREATE INDEX "chat_folders_parent_id_idx" ON "chat_folders" USING btree ("parent_id");--> statement-breakpoint
 CREATE INDEX "chat_folders_sort_order_idx" ON "chat_folders" USING btree ("sort_order");--> statement-breakpoint
-CREATE INDEX "chat_folders_allowed_roles_idx" ON "chat_folders" USING gin ("allowed_roles");--> statement-breakpoint
+CREATE INDEX "chat_folders_roles_read_idx" ON "chat_folders" USING gin ("roles_read");--> statement-breakpoint
+CREATE INDEX "chat_folders_roles_write_idx" ON "chat_folders" USING gin ("roles_write");--> statement-breakpoint
+CREATE INDEX "chat_folders_roles_hide_idx" ON "chat_folders" USING gin ("roles_hide");--> statement-breakpoint
+CREATE INDEX "chat_folders_roles_delete_idx" ON "chat_folders" USING gin ("roles_delete");--> statement-breakpoint
 CREATE INDEX "chat_messages_search_vector_idx" ON "chat_messages" USING gin (to_tsvector('english', "content"));--> statement-breakpoint
 CREATE INDEX "chat_messages_thread_id_idx" ON "chat_messages" USING btree ("thread_id");--> statement-breakpoint
 CREATE INDEX "chat_messages_parent_id_idx" ON "chat_messages" USING btree ("parent_id");--> statement-breakpoint
@@ -986,7 +993,10 @@ CREATE INDEX "chat_threads_folder_id_idx" ON "chat_threads" USING btree ("folder
 CREATE INDEX "chat_threads_status_idx" ON "chat_threads" USING btree ("status");--> statement-breakpoint
 CREATE INDEX "chat_threads_created_at_idx" ON "chat_threads" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "chat_threads_updated_at_idx" ON "chat_threads" USING btree ("updated_at");--> statement-breakpoint
-CREATE INDEX "chat_threads_allowed_roles_idx" ON "chat_threads" USING gin ("allowed_roles");--> statement-breakpoint
+CREATE INDEX "chat_threads_roles_read_idx" ON "chat_threads" USING gin ("roles_read");--> statement-breakpoint
+CREATE INDEX "chat_threads_roles_write_idx" ON "chat_threads" USING gin ("roles_write");--> statement-breakpoint
+CREATE INDEX "chat_threads_roles_hide_idx" ON "chat_threads" USING gin ("roles_hide");--> statement-breakpoint
+CREATE INDEX "chat_threads_roles_delete_idx" ON "chat_threads" USING gin ("roles_delete");--> statement-breakpoint
 CREATE INDEX "imap_accounts_email_idx" ON "imap_accounts" USING btree ("email");--> statement-breakpoint
 CREATE INDEX "imap_accounts_user_id_idx" ON "imap_accounts" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "imap_accounts_enabled_idx" ON "imap_accounts" USING btree ("enabled");--> statement-breakpoint

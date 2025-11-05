@@ -9,7 +9,7 @@
 
 "use client";
 
-import { AlertCircle, Calendar } from "lucide-react";
+import { AlertCircle, Calendar } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { safeGetRequiredFields } from "next-vibe/shared/utils/zod-required-fields";
 import type { JSX } from "react";

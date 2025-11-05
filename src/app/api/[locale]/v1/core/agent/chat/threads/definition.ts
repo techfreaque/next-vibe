@@ -20,7 +20,11 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { UserRole, UserRoleDB, UserRoleOptions } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import {
+  UserRole,
+  UserRoleDB,
+  UserRoleOptions,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { DEFAULT_FOLDER_IDS } from "../config";
 import { ThreadStatus, ThreadStatusOptions } from "../enum";
@@ -276,7 +280,49 @@ const { GET } = createEndpoint({
                   },
                   z.boolean(),
                 ),
-                allowedRoles: responseArrayField(
+                rolesRead: responseArrayField(
+                  {
+                    type: WidgetType.DATA_LIST,
+                    layout: "inline",
+                  },
+                  field(
+                    z.enum(UserRoleDB),
+                    { response: true },
+                    {
+                      type: WidgetType.BADGE,
+                      options: UserRoleOptions,
+                    },
+                  ),
+                ),
+                rolesWrite: responseArrayField(
+                  {
+                    type: WidgetType.DATA_LIST,
+                    layout: "inline",
+                  },
+                  field(
+                    z.enum(UserRoleDB),
+                    { response: true },
+                    {
+                      type: WidgetType.BADGE,
+                      options: UserRoleOptions,
+                    },
+                  ),
+                ),
+                rolesHide: responseArrayField(
+                  {
+                    type: WidgetType.DATA_LIST,
+                    layout: "inline",
+                  },
+                  field(
+                    z.enum(UserRoleDB),
+                    { response: true },
+                    {
+                      type: WidgetType.BADGE,
+                      options: UserRoleOptions,
+                    },
+                  ),
+                ),
+                rolesDelete: responseArrayField(
                   {
                     type: WidgetType.DATA_LIST,
                     layout: "inline",

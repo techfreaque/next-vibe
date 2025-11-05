@@ -5,7 +5,7 @@ import { Button } from "next-vibe-ui//ui/button";
 import { Div } from "next-vibe-ui//ui/div";
 import { Form } from "next-vibe-ui//ui/form/form";
 import { Textarea } from "next-vibe-ui//ui/textarea";
-import { Send, Square } from "lucide-react";
+import { Send, Square } from 'next-vibe-ui/ui/icons';
 import type { JSX } from "react";
 import React, { forwardRef } from "react";
 

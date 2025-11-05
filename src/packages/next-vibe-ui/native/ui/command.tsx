@@ -18,7 +18,7 @@ import type {
   CommandGroupProps,
   CommandItemProps,
   CommandSeparatorProps,
-} from "next-vibe-ui/ui/command";
+} from "@/packages/next-vibe-ui/web/ui/command";
 
 export const Command = React.forwardRef<View, CommandProps>(
   ({ className, children, ...props }, ref) => {
@@ -68,20 +68,21 @@ export const CommandList = React.forwardRef<View, CommandListProps>(
 
 CommandList.displayName = "CommandList";
 
-export const CommandEmpty = React.forwardRef<View, Omit<ViewProps, 'children'> & {
-  children?: ReactNode;
-  className?: string;
-}>(
-  ({ className, children, ...props }, ref) => (
-    <View
-      ref={ref}
-      className={cn("py-6 text-center text-sm", className)}
-      {...props}
-    >
-      {children}
-    </View>
-  ),
-);
+export const CommandEmpty = React.forwardRef<
+  View,
+  Omit<ViewProps, "children"> & {
+    children?: ReactNode;
+    className?: string;
+  }
+>(({ className, children, ...props }, ref) => (
+  <View
+    ref={ref}
+    className={cn("py-6 text-center text-sm", className)}
+    {...props}
+  >
+    {children}
+  </View>
+));
 
 CommandEmpty.displayName = "CommandEmpty";
 

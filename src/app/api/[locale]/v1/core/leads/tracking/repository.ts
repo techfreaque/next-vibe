@@ -948,7 +948,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
           if (
             leadResult.success &&
-            leadResult.data?.convertedUserId === currentUserId
+            leadResult.data?.lead.conversion.convertedUserId === currentUserId
           ) {
             // Lead already converted to this user - skip conversion entirely
             relationshipEstablished = true;

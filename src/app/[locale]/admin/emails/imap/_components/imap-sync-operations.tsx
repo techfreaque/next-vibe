@@ -13,7 +13,7 @@ import {
   Play,
   RefreshCw,
   Square,
-} from "lucide-react";
+} from 'next-vibe-ui/ui/icons';
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { Badge } from "next-vibe-ui/ui/badge";

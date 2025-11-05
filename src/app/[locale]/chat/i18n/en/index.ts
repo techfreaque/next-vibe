@@ -494,7 +494,8 @@ export const translations = {
       errorLabel: "Error:",
       noArguments: "No arguments",
       noResult: "No result",
-      metadataNotAvailable: "Widget metadata not available. Showing raw result.",
+      metadataNotAvailable:
+        "Widget metadata not available. Showing raw result.",
     },
   },
   reasoning: {
@@ -689,11 +690,32 @@ export const translations = {
   permissions: {
     folder: {
       title: "Folder Permissions",
-      description: "Manage who can moderate this folder",
+      description: "Manage permissions for this folder",
     },
     thread: {
       title: "Thread Permissions",
-      description: "Manage who can moderate this thread",
+      description: "Manage permissions for this thread",
+    },
+    read: {
+      label: "Read Permissions",
+      description: "Who can view and read this content",
+    },
+    write: {
+      label: "Write Permissions",
+      description: "Who can create and write content",
+    },
+    hide: {
+      label: "Hide Permissions",
+      description: "Who can hide and moderate content",
+    },
+    delete: {
+      label: "Delete Permissions",
+      description: "Who can delete content",
+    },
+    roles: {
+      public: "Public (All Users)",
+      customer: "Customers Only",
+      admin: "Admins Only",
     },
     visibility: {
       label: "Who can see this?",

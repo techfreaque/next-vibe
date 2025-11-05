@@ -6,7 +6,7 @@
 "use client";
 
 import { render } from "@react-email/render";
-import { Mail, Send } from "lucide-react";
+import { Mail, Send } from 'next-vibe-ui/ui/icons';
 import { parseError } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { H2, P } from "next-vibe-ui/ui/typography";

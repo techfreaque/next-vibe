@@ -109,6 +109,11 @@ export default async function HomePage({
                 <Span>{t("app.native.page.links.about")}</Span>
                 {/* </Button> */}
               </Link>
+              <Link href={`/${locale}/story`} asChild>
+                {/* <Button className="w-full"> */}
+                <Span>{t("app.native.page.links.about")}</Span>
+                {/* </Button> */}
+              </Link>
             </Div>
           </CardFooter>
         </Card>

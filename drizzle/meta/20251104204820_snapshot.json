@@ -1,5 +1,5 @@
 {
-  "id": "4045c4f1-9ff9-4644-88e8-a053ba0502a1",
+  "id": "639bb3b0-6319-4b56-a0f1-e435a262c446",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -73,15 +73,29 @@
           "notNull": false,
           "default": "'{}'::jsonb"
         },
-        "moderator_ids": {
-          "name": "moderator_ids",
+        "roles_read": {
+          "name": "roles_read",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
           "default": "'[]'::jsonb"
         },
-        "allowed_roles": {
-          "name": "allowed_roles",
+        "roles_write": {
+          "name": "roles_write",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        },
+        "roles_hide": {
+          "name": "roles_hide",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        },
+        "roles_delete": {
+          "name": "roles_delete",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
@@ -163,11 +177,56 @@
           "method": "btree",
           "with": {}
         },
-        "chat_folders_allowed_roles_idx": {
-          "name": "chat_folders_allowed_roles_idx",
+        "chat_folders_roles_read_idx": {
+          "name": "chat_folders_roles_read_idx",
           "columns": [
             {
-              "expression": "allowed_roles",
+              "expression": "roles_read",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "chat_folders_roles_write_idx": {
+          "name": "chat_folders_roles_write_idx",
+          "columns": [
+            {
+              "expression": "roles_write",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "chat_folders_roles_hide_idx": {
+          "name": "chat_folders_roles_hide_idx",
+          "columns": [
+            {
+              "expression": "roles_hide",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "chat_folders_roles_delete_idx": {
+          "name": "chat_folders_roles_delete_idx",
+          "columns": [
+            {
+              "expression": "roles_delete",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -602,15 +661,29 @@
           "notNull": false,
           "default": "'{}'::jsonb"
         },
-        "moderator_ids": {
-          "name": "moderator_ids",
+        "roles_read": {
+          "name": "roles_read",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
           "default": "'[]'::jsonb"
         },
-        "allowed_roles": {
-          "name": "allowed_roles",
+        "roles_write": {
+          "name": "roles_write",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        },
+        "roles_hide": {
+          "name": "roles_hide",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        },
+        "roles_delete": {
+          "name": "roles_delete",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
@@ -750,11 +823,56 @@
           "method": "btree",
           "with": {}
         },
-        "chat_threads_allowed_roles_idx": {
-          "name": "chat_threads_allowed_roles_idx",
+        "chat_threads_roles_read_idx": {
+          "name": "chat_threads_roles_read_idx",
           "columns": [
             {
-              "expression": "allowed_roles",
+              "expression": "roles_read",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "chat_threads_roles_write_idx": {
+          "name": "chat_threads_roles_write_idx",
+          "columns": [
+            {
+              "expression": "roles_write",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "chat_threads_roles_hide_idx": {
+          "name": "chat_threads_roles_hide_idx",
+          "columns": [
+            {
+              "expression": "roles_hide",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "chat_threads_roles_delete_idx": {
+          "name": "chat_threads_roles_delete_idx",
+          "columns": [
+            {
+              "expression": "roles_delete",
               "isExpression": false,
               "asc": true,
               "nulls": "last"

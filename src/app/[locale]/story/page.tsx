@@ -3,6 +3,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { subscriptionRepository } from "@/app/api/[locale]/v1/core/subscription/repository";
+import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
@@ -87,7 +88,7 @@ export default async function HomePage({
     !!userResponse.data.id;
 
   // For authenticated users, fetch subscription data
-  let subscription: SubscriptionData | null = null;
+  let subscription: SubscriptionGetResponseOutput | null = null;
 
   if (
     isAuthenticated &&
@@ -126,15 +127,3 @@ export default async function HomePage({
 }
 
 // Type definition for subscription data
-interface SubscriptionData {
-  id: string;
-  userId: string;
-  plan: string;
-  billingInterval: string;
-  status: string;
-  currentPeriodStart: string;
-  currentPeriodEnd: string;
-  cancelAtPeriodEnd: boolean;
-  createdAt: string;
-  updatedAt: string;
-}

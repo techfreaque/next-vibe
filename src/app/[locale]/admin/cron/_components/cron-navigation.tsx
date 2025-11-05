@@ -5,7 +5,7 @@
 
 "use client";
 
-import { History, List, TrendingUp } from "lucide-react";
+import { History, List, TrendingUp } from 'next-vibe-ui/ui/icons';
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils/utils";
 import { Badge } from "next-vibe-ui/ui/badge";

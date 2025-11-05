@@ -22,7 +22,7 @@ import type {
   NavigationMenuContentProps,
   NavigationMenuViewportProps,
   NavigationMenuIndicatorProps,
-} from "next-vibe-ui/ui/navigation-menu";
+} from "@/packages/next-vibe-ui/web/ui/navigation-menu";
 
 // navigationMenuTriggerStyle helper function (native implementation)
 function navigationMenuTriggerStyle(): string {
@@ -33,7 +33,17 @@ function navigationMenuTriggerStyle(): string {
 }
 import { ChevronDown } from "./icons/ChevronDown";
 
-function NavigationMenu({ className, children, value, onValueChange, ...props }: NavigationMenuProps & Omit<NavigationMenuPrimitive.RootProps, keyof NavigationMenuProps>): JSX.Element {
+function NavigationMenu({
+  className,
+  children,
+  value,
+  onValueChange,
+  ...props
+}: NavigationMenuProps &
+  Omit<
+    NavigationMenuPrimitive.RootProps,
+    keyof NavigationMenuProps
+  >): JSX.Element {
   return (
     <NavigationMenuPrimitive.Root
       value={value}
@@ -51,7 +61,14 @@ function NavigationMenu({ className, children, value, onValueChange, ...props }:
 }
 NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName;
 
-function NavigationMenuList({ className, ...props }: NavigationMenuListProps & Omit<NavigationMenuPrimitive.ListProps, keyof NavigationMenuListProps>): JSX.Element {
+function NavigationMenuList({
+  className,
+  ...props
+}: NavigationMenuListProps &
+  Omit<
+    NavigationMenuPrimitive.ListProps,
+    keyof NavigationMenuListProps
+  >): JSX.Element {
   return (
     <NavigationMenuPrimitive.List
       className={cn(
@@ -66,9 +83,19 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
-function NavigationMenuTrigger({ className, children, ...props }: NavigationMenuTriggerProps & Omit<NavigationMenuPrimitive.TriggerProps, keyof NavigationMenuTriggerProps | 'children'> & {
-  children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
-}): JSX.Element {
+function NavigationMenuTrigger({
+  className,
+  children,
+  ...props
+}: NavigationMenuTriggerProps &
+  Omit<
+    NavigationMenuPrimitive.TriggerProps,
+    keyof NavigationMenuTriggerProps | "children"
+  > & {
+    children?:
+      | React.ReactNode
+      | ((props: { pressed: boolean }) => React.ReactNode);
+  }): JSX.Element {
   const { value } = NavigationMenuPrimitive.useRootContext();
   const { value: itemValue } = NavigationMenuPrimitive.useItemContext();
 
@@ -107,9 +134,18 @@ function NavigationMenuTrigger({ className, children, ...props }: NavigationMenu
 }
 NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName;
 
-function NavigationMenuContent({ className, children, portalHost, ...props }: NavigationMenuContentProps & Omit<NavigationMenuPrimitive.ContentProps, keyof NavigationMenuContentProps> & {
-  portalHost?: string;
-}): JSX.Element {
+function NavigationMenuContent({
+  className,
+  children,
+  portalHost,
+  ...props
+}: NavigationMenuContentProps &
+  Omit<
+    NavigationMenuPrimitive.ContentProps,
+    keyof NavigationMenuContentProps
+  > & {
+    portalHost?: string;
+  }): JSX.Element {
   const { value } = NavigationMenuPrimitive.useRootContext();
   const { value: itemValue } = NavigationMenuPrimitive.useItemContext();
   return (
@@ -138,7 +174,14 @@ NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
 
 const NavigationMenuLink = NavigationMenuPrimitive.Link;
 
-function NavigationMenuViewport({ className, ...props }: NavigationMenuViewportProps & Omit<NavigationMenuPrimitive.ViewportProps, keyof NavigationMenuViewportProps>): React.ReactElement {
+function NavigationMenuViewport({
+  className,
+  ...props
+}: NavigationMenuViewportProps &
+  Omit<
+    NavigationMenuPrimitive.ViewportProps,
+    keyof NavigationMenuViewportProps
+  >): React.ReactElement {
   return (
     <View className={cn("absolute left-0 top-full flex justify-center")}>
       <View
@@ -156,7 +199,14 @@ function NavigationMenuViewport({ className, ...props }: NavigationMenuViewportP
 NavigationMenuViewport.displayName =
   NavigationMenuPrimitive.Viewport.displayName;
 
-function NavigationMenuIndicator({ className, ...props }: NavigationMenuIndicatorProps & Omit<NavigationMenuPrimitive.IndicatorProps, keyof NavigationMenuIndicatorProps>): JSX.Element {
+function NavigationMenuIndicator({
+  className,
+  ...props
+}: NavigationMenuIndicatorProps &
+  Omit<
+    NavigationMenuPrimitive.IndicatorProps,
+    keyof NavigationMenuIndicatorProps
+  >): JSX.Element {
   const { value } = NavigationMenuPrimitive.useRootContext();
   const { value: itemValue } = NavigationMenuPrimitive.useItemContext();
 

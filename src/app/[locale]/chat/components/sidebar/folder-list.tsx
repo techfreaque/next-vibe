@@ -31,10 +31,8 @@ import { Trash2 } from "next-vibe-ui//ui/icons/Trash2";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
-import type {
-  FolderUpdate,
-  UseChatReturn,
-} from "@/app/api/[locale]/v1/core/agent/chat/hooks";
+import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks/hooks";
+import type { FolderUpdate } from "@/app/api/[locale]/v1/core/agent/chat/folders/hooks/use-operations";
 import {
   getIconComponent,
   type IconValue,
@@ -51,11 +49,12 @@ import {
 } from "../../lib/utils/folder-utils";
 import { buildFolderUrl, getRootFolderId } from "../../lib/utils/navigation";
 import type { ChatFolder, ChatThread } from "../../types";
+import { FolderPermissionsDialog } from "./folder-permissions-dialog";
 import { MoveFolderDialog } from "./move-folder-dialog";
-import { PermissionsDialog } from "./permissions-dialog";
 import { RenameFolderDialog } from "./rename-folder-dialog";
 import { ThreadList } from "./thread-list";
 import { P } from "next-vibe-ui/ui/typography";
+import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 
 // Time grouping helpers
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -147,6 +146,7 @@ interface FolderListProps {
   onReorderFolder: (folderId: string, direction: "up" | "down") => void;
   onMoveFolderToParent: (folderId: string, newParentId: string | null) => void;
   onUpdateThreadTitle: (threadId: string, title: string) => void;
+  logger: EndpointLogger;
 }
 
 export function FolderList({
@@ -168,6 +168,7 @@ export function FolderList({
   onReorderFolder,
   onMoveFolderToParent,
   onUpdateThreadTitle,
+  logger,
 }: FolderListProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -212,6 +213,7 @@ export function FolderList({
           onReorderFolder={onReorderFolder}
           onMoveFolderToParent={onMoveFolderToParent}
           onUpdateThreadTitle={onUpdateThreadTitle}
+          logger={logger}
         />
       ))}
 
@@ -234,6 +236,7 @@ export function FolderList({
                 onArchiveThread={onArchiveThread}
                 chat={chat}
                 locale={locale}
+                logger={logger}
               />
             </Div>
           )}
@@ -254,6 +257,7 @@ export function FolderList({
                 onArchiveThread={onArchiveThread}
                 chat={chat}
                 locale={locale}
+                logger={logger}
               />
             </Div>
           )}
@@ -274,6 +278,7 @@ export function FolderList({
                 onArchiveThread={onArchiveThread}
                 chat={chat}
                 locale={locale}
+                logger={logger}
               />
             </Div>
           )}
@@ -303,13 +308,14 @@ interface FolderItemProps {
   onPinThread: (threadId: string, pinned: boolean) => void;
   onArchiveThread: (threadId: string, archived: boolean) => void;
   onCreateFolder: (name: string, parentId: string, icon?: string) => void;
-  onUpdateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
+  onUpdateFolder: (folderId: string, updates: FolderUpdate) => void;
   onDeleteFolder: (folderId: string, deleteThreads: boolean) => void;
   onToggleFolderExpanded: (folderId: string) => void;
   onReorderFolder: (folderId: string, direction: "up" | "down") => void;
   onMoveFolderToParent: (folderId: string, newParentId: string | null) => void;
   onUpdateThreadTitle: (threadId: string, title: string) => void;
   depth?: number;
+  logger: EndpointLogger;
 }
 
 function FolderItem({
@@ -332,6 +338,7 @@ function FolderItem({
   onMoveFolderToParent,
   onUpdateThreadTitle,
   depth = 0,
+  logger,
 }: FolderItemProps): JSX.Element {
   const router = useRouter();
   const isTouch = useTouchDevice();
@@ -432,16 +439,6 @@ function FolderItem({
   const handleManagePermissions = (): void => {
     setDropdownOpen(false);
     setPermissionsDialogOpen(true);
-  };
-
-  const handleSavePermissions = (data: {
-    moderatorIds: string[];
-    allowedRoles?: string[];
-  }): void => {
-    onUpdateFolder(folder.id, {
-      moderatorIds: data.moderatorIds,
-      allowedRoles: data.allowedRoles,
-    });
   };
 
   // Determine if move up/down should be disabled
@@ -663,6 +660,7 @@ function FolderItem({
                 onMoveFolderToParent={onMoveFolderToParent}
                 onUpdateThreadTitle={onUpdateThreadTitle}
                 depth={depth + 1}
+                logger={logger}
               />
             ))}
 
@@ -685,6 +683,7 @@ function FolderItem({
                     onArchiveThread={onArchiveThread}
                     chat={chat}
                     locale={locale}
+                    logger={logger}
                   />
                 </Div>
               )}
@@ -705,6 +704,7 @@ function FolderItem({
                     onArchiveThread={onArchiveThread}
                     chat={chat}
                     locale={locale}
+                    logger={logger}
                   />
                 </Div>
               )}
@@ -725,6 +725,7 @@ function FolderItem({
                     onArchiveThread={onArchiveThread}
                     chat={chat}
                     locale={locale}
+                    logger={logger}
                   />
                 </Div>
               )}
@@ -751,15 +752,13 @@ function FolderItem({
         locale={locale}
       />
 
-      <PermissionsDialog
+      <FolderPermissionsDialog
         open={permissionsDialogOpen}
         onOpenChange={setPermissionsDialogOpen}
-        resourceType="folder"
-        resourceName={folderDisplayName}
-        moderatorIds={(folder.moderatorIds as string[]) || []}
-        allowedRoles={(folder.allowedRoles as string[]) || []}
-        onSave={handleSavePermissions}
+        folderId={folder.id}
+        folderName={folderDisplayName}
         locale={locale}
+        logger={logger}
       />
 
       {/* Delete Confirmation Dialog */}

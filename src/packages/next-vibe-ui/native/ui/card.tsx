@@ -13,7 +13,7 @@ import type {
   CardDescriptionProps,
   CardContentProps,
   CardFooterProps,
-} from "next-vibe-ui/ui/card";
+} from "@/packages/next-vibe-ui/web/ui/card";
 
 // Type-safe View with className support (NativeWind)
 const StyledView = styled(View);
@@ -32,11 +32,12 @@ function Card({ className, children }: CardProps): React.JSX.Element {
 }
 Card.displayName = "Card";
 
-function CardHeader({ className, children }: CardHeaderProps): React.JSX.Element {
+function CardHeader({
+  className,
+  children,
+}: CardHeaderProps): React.JSX.Element {
   return (
-    <StyledView
-      className={cn("flex flex-col space-y-1.5 p-6", className)}
-    >
+    <StyledView className={cn("flex flex-col space-y-1.5 p-6", className)}>
       {children}
     </StyledView>
   );
@@ -57,29 +58,34 @@ function CardTitle({ className, children }: CardTitleProps): React.JSX.Element {
 }
 CardTitle.displayName = "CardTitle";
 
-function CardDescription({ className, children }: CardDescriptionProps): React.JSX.Element {
+function CardDescription({
+  className,
+  children,
+}: CardDescriptionProps): React.JSX.Element {
   return (
-    <Span
-      className={cn("text-sm text-muted-foreground", className)}
-    >
+    <Span className={cn("text-sm text-muted-foreground", className)}>
       {children}
     </Span>
   );
 }
 CardDescription.displayName = "CardDescription";
 
-function CardContent({ className, children }: CardContentProps): React.JSX.Element {
+function CardContent({
+  className,
+  children,
+}: CardContentProps): React.JSX.Element {
   return (
     <TextClassContext.Provider value="text-card-foreground">
-      <StyledView className={cn("p-6 pt-0", className)}>
-        {children}
-      </StyledView>
+      <StyledView className={cn("p-6 pt-0", className)}>{children}</StyledView>
     </TextClassContext.Provider>
   );
 }
 CardContent.displayName = "CardContent";
 
-function CardFooter({ className, children }: CardFooterProps): React.JSX.Element {
+function CardFooter({
+  className,
+  children,
+}: CardFooterProps): React.JSX.Element {
   return (
     <StyledView
       className={cn("flex flex-row items-center p-6 pt-0", className)}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Edit2, X } from "lucide-react";
+import { Check, Edit2, X } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui//ui/div";
 import { Span } from "next-vibe-ui//ui/span";

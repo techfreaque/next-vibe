@@ -6,7 +6,7 @@
 
 "use client";
 
-import { Filter, RefreshCw } from "lucide-react";
+import { Filter, RefreshCw } from 'next-vibe-ui/ui/icons';
 import { Div } from "next-vibe-ui/ui/div";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Span } from "next-vibe-ui/ui/span";

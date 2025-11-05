@@ -13,24 +13,12 @@ import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { BuyCreditsTab } from "@/app/[locale]/subscription/_components/buy-credits-tab";
 import { OverviewTab } from "@/app/[locale]/subscription/_components/overview-tab";
-
-interface SubscriptionData {
-  id: string;
-  userId: string;
-  plan: string;
-  billingInterval: string;
-  status: string;
-  currentPeriodStart: string;
-  currentPeriodEnd: string;
-  cancelAtPeriodEnd: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
 
 interface StoryPricingSectionProps {
   locale: CountryLanguage;
   isAuthenticated: boolean;
-  initialSubscription: SubscriptionData | null;
+  initialSubscription: SubscriptionGetResponseOutput | null;
 }
 
 export function StoryPricingSection({

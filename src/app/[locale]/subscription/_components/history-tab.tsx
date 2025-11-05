@@ -1,8 +1,14 @@
 import { motion } from "framer-motion";
-import { History } from "lucide-react";
+import { History } from 'next-vibe-ui/ui/icons';
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
@@ -11,18 +17,21 @@ import type { JSX } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { CreditTransaction } from "./types";
 import { formatDate, getTransactionTypeKey } from "./types";
+import type { CreditTransactionOutput } from "@/app/api/[locale]/v1/core/credits/repository";
 
 interface HistoryTabProps {
   locale: CountryLanguage;
   initialHistory: {
-    transactions: CreditTransaction[];
+    transactions: CreditTransactionOutput[];
     totalCount: number;
   } | null;
 }
 
-export function HistoryTab({ locale, initialHistory }: HistoryTabProps): JSX.Element {
+export function HistoryTab({
+  locale,
+  initialHistory,
+}: HistoryTabProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -50,9 +59,7 @@ export function HistoryTab({ locale, initialHistory }: HistoryTabProps): JSX.Ele
                   {t("app.subscription.subscription.history.empty.title")}
                 </P>
                 <P className="text-sm text-muted-foreground mt-2">
-                  {t(
-                    "app.subscription.subscription.history.empty.description",
-                  )}
+                  {t("app.subscription.subscription.history.empty.description")}
                 </P>
               </Div>
             </Div>
@@ -96,12 +103,9 @@ export function HistoryTab({ locale, initialHistory }: HistoryTabProps): JSX.Ele
                       {transaction.amount}
                     </Div>
                     <Div className="text-xs text-muted-foreground">
-                      {t(
-                        "app.subscription.subscription.history.balance",
-                        {
-                          count: transaction.balanceAfter,
-                        },
-                      )}
+                      {t("app.subscription.subscription.history.balance", {
+                        count: transaction.balanceAfter,
+                      })}
                     </Div>
                   </Div>
                 </Div>

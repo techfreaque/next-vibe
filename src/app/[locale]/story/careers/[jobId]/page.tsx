@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft } from 'next-vibe-ui/ui/icons';
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";

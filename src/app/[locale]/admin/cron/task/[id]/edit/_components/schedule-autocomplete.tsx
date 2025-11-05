@@ -4,7 +4,7 @@
  * Schedule Autocomplete Component
  * Custom autocomplete for cron schedules with human-readable labels
  */
-import { Check, ChevronDown, Search, X } from "lucide-react";
+import { Check, ChevronDown, Search, X } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";

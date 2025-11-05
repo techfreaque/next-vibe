@@ -17,7 +17,7 @@ import { Text as UIText } from "./text";
 import type {
   AutocompleteOptionBase,
   AutocompleteFieldPropsBase,
-} from "next-vibe-ui/ui/autocomplete-field";
+} from "@/packages/next-vibe-ui/web/ui/autocomplete-field";
 
 // Native uses the exact same interface as web
 export type AutocompleteFieldProps = AutocompleteFieldPropsBase;
@@ -128,11 +128,15 @@ export function AutocompleteField({
             )}
           >
             <View className="flex-1 flex-row items-center gap-2 min-w-0">
-               {isCustomValue && (
-                 <Badge variant="secondary" className="text-xs">
-                    <UIText>{t("packages.nextVibeUi.native.ui.autocompleteField.custom")}</UIText>
-                 </Badge>
-               )}
+              {isCustomValue && (
+                <Badge variant="secondary" className="text-xs">
+                  <UIText>
+                    {t(
+                      "packages.nextVibeUi.native.ui.autocompleteField.custom",
+                    )}
+                  </UIText>
+                </Badge>
+              )}
               <RNText
                 numberOfLines={1}
                 className={cn(
@@ -152,7 +156,10 @@ export function AutocompleteField({
                   <X size={14} className="text-foreground" />
                 </Pressable>
               )}
-              <ChevronDown size={16} className="text-muted-foreground opacity-50" />
+              <ChevronDown
+                size={16}
+                className="text-muted-foreground opacity-50"
+              />
             </View>
           </Pressable>
         </PopoverTrigger>
@@ -160,7 +167,10 @@ export function AutocompleteField({
           <View className="rounded-md border border-border bg-popover">
             {/* Search input */}
             <View className="flex-row items-center border-b border-border px-3">
-              <Search size={16} className="mr-2 text-muted-foreground opacity-50" />
+              <Search
+                size={16}
+                className="mr-2 text-muted-foreground opacity-50"
+              />
               <Input
                 placeholder={searchPlaceholder}
                 value={searchValue}
@@ -172,59 +182,71 @@ export function AutocompleteField({
             {/* Options list */}
             <ScrollView className="max-h-[300px]">
               {Object.keys(filteredGroups).length === 0 ? (
-                 <View className="py-6 text-center">
-                    <UIText className="text-sm text-muted-foreground text-center">
-                      {t("packages.nextVibeUi.native.ui.autocompleteField.noOptionsFound")}
-                    </UIText>
+                <View className="py-6 text-center">
+                  <UIText className="text-sm text-muted-foreground text-center">
+                    {t(
+                      "packages.nextVibeUi.native.ui.autocompleteField.noOptionsFound",
+                    )}
+                  </UIText>
                   {allowCustom && searchValue && (
-                     <Pressable
-                       onPress={() => handleCustomValue(searchValue)}
-                       className="mt-2 items-center"
-                     >
-                         <UIText className="text-sm text-primary">
-                           {t("packages.nextVibeUi.native.ui.autocompleteField.use", { value: searchValue })}
-                         </UIText>
-                     </Pressable>
+                    <Pressable
+                      onPress={() => handleCustomValue(searchValue)}
+                      className="mt-2 items-center"
+                    >
+                      <UIText className="text-sm text-primary">
+                        {t(
+                          "packages.nextVibeUi.native.ui.autocompleteField.use",
+                          { value: searchValue },
+                        )}
+                      </UIText>
+                    </Pressable>
                   )}
                 </View>
               ) : (
-                Object.entries(filteredGroups).map(([category, categoryOptions]) => (
-                  <View key={category} className="p-1">
-                    {category !== "other" && (
-                      <UIText className="px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase">
-                        {category}
-                      </UIText>
-                    )}
-                    {categoryOptions.map((option) => (
-                      <Pressable
-                        key={option.value}
-                        onPress={() => handleSelect(option.value)}
-                        className={cn(
-                          "flex-row items-center justify-between rounded-sm px-2 py-2 active:bg-accent",
-                        )}
-                      >
-                        <UIText className="text-base">{option.label}</UIText>
-                        {value === option.value && (
-                          <Check size={16} className="text-foreground" />
-                        )}
-                      </Pressable>
-                    ))}
-                  </View>
-                ))
+                Object.entries(filteredGroups).map(
+                  ([category, categoryOptions]) => (
+                    <View key={category} className="p-1">
+                      {category !== "other" && (
+                        <UIText className="px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase">
+                          {category}
+                        </UIText>
+                      )}
+                      {categoryOptions.map((option) => (
+                        <Pressable
+                          key={option.value}
+                          onPress={() => handleSelect(option.value)}
+                          className={cn(
+                            "flex-row items-center justify-between rounded-sm px-2 py-2 active:bg-accent",
+                          )}
+                        >
+                          <UIText className="text-base">{option.label}</UIText>
+                          {value === option.value && (
+                            <Check size={16} className="text-foreground" />
+                          )}
+                        </Pressable>
+                      ))}
+                    </View>
+                  ),
+                )
               )}
 
-              {allowCustom && searchValue && Object.keys(filteredGroups).length > 0 && (
-                <View className="border-t border-border p-1">
-                   <Pressable
-                     onPress={() => handleCustomValue(searchValue)}
-                     className="flex-row items-center rounded-sm px-2 py-2 active:bg-accent"
-                   >
-                       <UIText className="text-base">
-                         {t("packages.nextVibeUi.native.ui.autocompleteField.use", { value: searchValue })}
-                       </UIText>
-                   </Pressable>
-                </View>
-              )}
+              {allowCustom &&
+                searchValue &&
+                Object.keys(filteredGroups).length > 0 && (
+                  <View className="border-t border-border p-1">
+                    <Pressable
+                      onPress={() => handleCustomValue(searchValue)}
+                      className="flex-row items-center rounded-sm px-2 py-2 active:bg-accent"
+                    >
+                      <UIText className="text-base">
+                        {t(
+                          "packages.nextVibeUi.native.ui.autocompleteField.use",
+                          { value: searchValue },
+                        )}
+                      </UIText>
+                    </Pressable>
+                  </View>
+                )}
             </ScrollView>
           </View>
         </PopoverContent>

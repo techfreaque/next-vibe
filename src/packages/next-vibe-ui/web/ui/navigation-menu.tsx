@@ -1,4 +1,4 @@
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { ChevronDownIcon } from 'next-vibe-ui/ui/icons';
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";

@@ -13,10 +13,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
 
 // Import all types and constants from web (web is source of truth)
-import type { PhoneFieldProps } from "next-vibe-ui/ui/phone-field";
-import { COUNTRIES } from "next-vibe-ui/ui/phone-field";
+import type { PhoneFieldProps } from "@/packages/next-vibe-ui/web/ui/phone-field";
+import { COUNTRIES } from "@/packages/next-vibe-ui/web/ui/phone-field";
 
-import type { CountryData } from "next-vibe-ui/ui/phone-field";
+import type { CountryData } from "@/packages/next-vibe-ui/web/ui/phone-field";
 
 export function PhoneField({
   value = "",
@@ -25,9 +25,9 @@ export function PhoneField({
   placeholder = "Enter phone number",
   defaultCountry = "US",
   preferredCountries = [],
-   disabled = false,
-   className,
-   name: _name,
+  disabled = false,
+  className,
+  name: _name,
 }: PhoneFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
@@ -58,8 +58,11 @@ export function PhoneField({
     return { country: defaultCountry || "US", number: phoneValue };
   };
 
-  const { country: selectedCountry, number: phoneNumber } = parsePhoneValue(value);
-  const currentCountry = COUNTRIES.find((c: CountryData) => c.code === selectedCountry) || COUNTRIES[0];
+  const { country: selectedCountry, number: phoneNumber } =
+    parsePhoneValue(value);
+  const currentCountry =
+    COUNTRIES.find((c: CountryData) => c.code === selectedCountry) ||
+    COUNTRIES[0];
 
   // Organize countries with preferred ones first
   const organizedCountries = useMemo(() => {
@@ -73,7 +76,9 @@ export function PhoneField({
   }, [preferredCountries]);
 
   const handleCountrySelect = (countryCode: string): void => {
-    const newCountry = COUNTRIES.find((c: CountryData) => c.code === countryCode);
+    const newCountry = COUNTRIES.find(
+      (c: CountryData) => c.code === countryCode,
+    );
     if (newCountry) {
       const newValue = phoneNumber
         ? `${newCountry.prefix} ${phoneNumber}`
@@ -86,7 +91,9 @@ export function PhoneField({
   const handleNumberChange = (newNumber: string): void => {
     // Remove any non-digit characters except spaces and dashes
     const cleanNumber = newNumber.replace(/[^\d\s-]/g, "");
-    const newValue = cleanNumber ? `${currentCountry.prefix} ${cleanNumber}` : "";
+    const newValue = cleanNumber
+      ? `${currentCountry.prefix} ${cleanNumber}`
+      : "";
     onChange(newValue);
   };
 
@@ -100,7 +107,9 @@ export function PhoneField({
         <UIText className="text-lg">{country.flag}</UIText>
         <UIText className="text-base">{country.name}</UIText>
       </View>
-      <UIText className="text-sm text-muted-foreground">{country.prefix}</UIText>
+      <UIText className="text-sm text-muted-foreground">
+        {country.prefix}
+      </UIText>
     </Pressable>
   );
 
