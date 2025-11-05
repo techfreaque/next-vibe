@@ -302,7 +302,7 @@ class CreditRepository
 
   /**
    * Get lead's current credit balance
-   * If lead has no credits, create initial 20 free credits
+   * If lead has no credits, create initial free credits from products repository
    */
   async getLeadBalance(leadId: string): Promise<ResponseType<number>> {
     try {
@@ -312,22 +312,28 @@ class CreditRepository
         .where(eq(leadCredits.leadId, leadId))
         .limit(1);
 
-      // If lead has no credits, create initial 20 free credits
+      // Get free tier credits from products repository
+      const freeCredits = productsRepository.getProduct(
+        ProductIds.FREE_TIER,
+        "en-GLOBAL",
+      ).credits;
+
+      // If lead has no credits, create initial free credits
       if (!credits[0]) {
         await db.insert(leadCredits).values({
           leadId,
-          amount: 20,
+          amount: freeCredits,
         });
 
         // Create transaction record
         await db.insert(creditTransactions).values({
           leadId,
-          amount: 20,
-          balanceAfter: 20,
+          amount: freeCredits,
+          balanceAfter: freeCredits,
           type: "free_tier",
         });
 
-        return createSuccessResponse(20);
+        return createSuccessResponse(freeCredits);
       }
 
       return createSuccessResponse(credits[0].amount);
@@ -1279,8 +1285,8 @@ class CreditRepository
    * Deletes duplicate lead credit records after merging
    *
    * Logic:
-   * 1. Calculate total spent credits from all leads (initial 20 - current balance)
-   * 2. Set primary lead balance to max(0, 20 - totalSpent)
+   * 1. Calculate total spent credits from all leads (initial free credits - current balance)
+   * 2. Set primary lead balance to max(0, free credits - totalSpent)
    * 3. Delete credit records for linked leads
    * 4. Create transaction records for the merge
    */
@@ -1294,6 +1300,12 @@ class CreditRepository
         logger.debug("No linked leads to merge", { primaryLeadId });
         return createSuccessResponse(undefined);
       }
+
+      // Get free tier credits from products repository
+      const freeCredits = productsRepository.getProduct(
+        ProductIds.FREE_TIER,
+        "en-GLOBAL",
+      ).credits;
 
       // Get all lead IDs including primary
       const allLeadIds = [primaryLeadId, ...linkedLeadIds];
@@ -1311,7 +1323,7 @@ class CreditRepository
         .where(inArray(leadCredits.leadId, allLeadIds));
 
       // Calculate total spent credits across all leads
-      // Each lead starts with 20 credits, so spent = 20 - current balance
+      // Each lead starts with free credits, so spent = freeCredits - current balance
       let totalSpent = 0;
       const creditDetails: Array<{
         leadId: string;
@@ -1321,15 +1333,15 @@ class CreditRepository
 
       for (const leadId of allLeadIds) {
         const credit = allCredits.find((c) => c.leadId === leadId);
-        const currentBalance = credit?.amount ?? 20; // Default to 20 if no record exists
-        const spent = 20 - currentBalance;
+        const currentBalance = credit?.amount ?? freeCredits; // Default to free credits if no record exists
+        const spent = freeCredits - currentBalance;
         totalSpent += spent;
         creditDetails.push({ leadId, balance: currentBalance, spent });
       }
 
-      // Calculate merged balance: max(0, 20 - totalSpent)
+      // Calculate merged balance: max(0, freeCredits - totalSpent)
       // If they spent 10 each (2 leads), totalSpent = 20, so balance = 0
-      const mergedBalance = Math.max(0, 20 - totalSpent);
+      const mergedBalance = Math.max(0, freeCredits - totalSpent);
 
       logger.info("Calculated merged credits", {
         primaryLeadId,

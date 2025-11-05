@@ -1,7 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertCircle, Calendar, Coins, Sparkles, Zap } from 'next-vibe-ui/ui/icons';
+import {
+  AlertCircle,
+  Calendar,
+  Coins,
+  Sparkles,
+  Zap,
+} from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import {
   Card,
@@ -41,15 +47,17 @@ export function CreditBalanceCard({
     [locale],
   );
 
-  // Fetch live credits data (will refetch on window focus and has no cache)
-  const creditsEndpoint = useCredits(logger);
-  const liveCredits =
-    creditsEndpoint.read.response?.success && creditsEndpoint.read.response.data
+  // Fetch credits data with server-side initial data (disables initial fetch)
+  // Will refetch on window focus to keep data fresh
+  // Only use credits hook if we have initial data from server
+  const creditsEndpoint = initialCredits
+    ? useCredits(logger, initialCredits)
+    : null;
+  const credits =
+    creditsEndpoint?.read?.response?.success &&
+    creditsEndpoint.read.response.data
       ? creditsEndpoint.read.response.data
-      : null;
-
-  // Use live credits if available, otherwise fall back to initial credits
-  const credits = liveCredits ?? initialCredits;
+      : initialCredits;
 
   return (
     <motion.div
@@ -74,8 +82,13 @@ export function CreditBalanceCard({
               </CardDescription>
             </Div>
             <Badge className="text-lg font-bold px-4 py-2">
-              {credits?.total ?? 0}{" "}
-              {t("app.subscription.subscription.balance.total")}
+              {(credits?.total ?? 0) === 1
+                ? t("app.subscription.subscription.balance.credit", {
+                    count: credits?.total ?? 0,
+                  })
+                : t("app.subscription.subscription.balance.credits", {
+                    count: credits?.total ?? 0,
+                  })}
             </Badge>
           </Div>
         </CardHeader>
@@ -140,8 +153,13 @@ export function CreditBalanceCard({
                   {formatDate(credits.expiresAt, locale)}
                 </Div>
                 <Div className="text-xs text-muted-foreground mt-1">
-                  {credits.expiring}{" "}
-                  {t("app.subscription.subscription.balance.total")}
+                  {credits.expiring === 1
+                    ? t("app.subscription.subscription.balance.credit", {
+                        count: credits.expiring,
+                      })
+                    : t("app.subscription.subscription.balance.credits", {
+                        count: credits.expiring,
+                      })}
                 </Div>
               </Div>
             )}

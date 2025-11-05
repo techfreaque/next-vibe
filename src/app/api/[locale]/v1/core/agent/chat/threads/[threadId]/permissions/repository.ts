@@ -9,7 +9,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { chatThreads } from "@/app/api/[locale]/v1/core/agent/chat/db";
-import { canManageThread } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
+import { canManageThreadPermissions } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -22,7 +22,9 @@ import type {
 } from "./definition";
 
 /**
- * Get thread permissions (moderator IDs)
+ * Get thread permissions
+ * Returns 5 permission fields: rolesView, rolesEdit, rolesPost, rolesModerate, rolesAdmin
+ * Each field can be: null (inherit), [] (deny), or [roles...] (allow)
  */
 export async function getThreadPermissions(
   user: JwtPayloadType,
@@ -53,7 +55,12 @@ export async function getThreadPermissions(
     }
 
     // Check if user can manage this thread's permissions
-    const canManage = await canManageThread(user, thread, logger);
+    const canManage = await canManageThreadPermissions(
+      user,
+      thread,
+      null,
+      logger,
+    );
     if (!canManage) {
       return fail({
         message:
@@ -62,20 +69,13 @@ export async function getThreadPermissions(
       });
     }
 
-    const rolesRead = Array.isArray(thread.rolesRead) ? thread.rolesRead : [];
-    const rolesWrite = Array.isArray(thread.rolesWrite)
-      ? thread.rolesWrite
-      : [];
-    const rolesHide = Array.isArray(thread.rolesHide) ? thread.rolesHide : [];
-    const rolesDelete = Array.isArray(thread.rolesDelete)
-      ? thread.rolesDelete
-      : [];
-
+    // Return permissions as-is (null, [], or [roles...])
     return createSuccessResponse({
-      rolesRead,
-      rolesWrite,
-      rolesHide,
-      rolesDelete,
+      rolesView: thread.rolesView,
+      rolesEdit: thread.rolesEdit,
+      rolesPost: thread.rolesPost,
+      rolesModerate: thread.rolesModerate,
+      rolesAdmin: thread.rolesAdmin,
     });
   } catch {
     return fail({
@@ -87,7 +87,9 @@ export async function getThreadPermissions(
 }
 
 /**
- * Update thread permissions (moderator IDs)
+ * Update thread permissions
+ * Updates 5 permission fields: rolesView, rolesEdit, rolesPost, rolesModerate, rolesAdmin
+ * Each field can be: null (inherit), [] (deny), or [roles...] (allow)
  */
 export async function updateThreadPermissions(
   user: JwtPayloadType,
@@ -103,7 +105,14 @@ export async function updateThreadPermissions(
   }
 
   try {
-    const { threadId, rolesRead, rolesWrite, rolesHide, rolesDelete } = data;
+    const {
+      threadId,
+      rolesView,
+      rolesEdit,
+      rolesPost,
+      rolesModerate,
+      rolesAdmin,
+    } = data;
 
     // Verify thread exists
     const [existingThread] = await db
@@ -121,7 +130,12 @@ export async function updateThreadPermissions(
     }
 
     // Check if user can manage this thread's permissions
-    const canManage = await canManageThread(user, existingThread, logger);
+    const canManage = await canManageThreadPermissions(
+      user,
+      existingThread,
+      null,
+      logger,
+    );
     if (!canManage) {
       return fail({
         message:
@@ -132,29 +146,34 @@ export async function updateThreadPermissions(
 
     // Prepare update data - only update fields that are provided
     const updateData: {
-      rolesRead?: (typeof UserRoleDB)[number][];
-      rolesWrite?: (typeof UserRoleDB)[number][];
-      rolesHide?: (typeof UserRoleDB)[number][];
-      rolesDelete?: (typeof UserRoleDB)[number][];
+      rolesView?: (typeof UserRoleDB)[number][] | null;
+      rolesEdit?: (typeof UserRoleDB)[number][] | null;
+      rolesPost?: (typeof UserRoleDB)[number][] | null;
+      rolesModerate?: (typeof UserRoleDB)[number][] | null;
+      rolesAdmin?: (typeof UserRoleDB)[number][] | null;
       updatedAt: Date;
     } = {
       updatedAt: new Date(),
     };
 
-    if (rolesRead !== undefined) {
-      updateData.rolesRead = rolesRead;
+    if (rolesView !== undefined) {
+      updateData.rolesView = rolesView;
     }
 
-    if (rolesWrite !== undefined) {
-      updateData.rolesWrite = rolesWrite;
+    if (rolesEdit !== undefined) {
+      updateData.rolesEdit = rolesEdit;
     }
 
-    if (rolesHide !== undefined) {
-      updateData.rolesHide = rolesHide;
+    if (rolesPost !== undefined) {
+      updateData.rolesPost = rolesPost;
     }
 
-    if (rolesDelete !== undefined) {
-      updateData.rolesDelete = rolesDelete;
+    if (rolesModerate !== undefined) {
+      updateData.rolesModerate = rolesModerate;
+    }
+
+    if (rolesAdmin !== undefined) {
+      updateData.rolesAdmin = rolesAdmin;
     }
 
     // Update the permissions
@@ -165,24 +184,21 @@ export async function updateThreadPermissions(
 
     logger.info("Thread permissions updated", {
       threadId,
-      rolesReadCount: rolesRead?.length ?? 0,
-      rolesWriteCount: rolesWrite?.length ?? 0,
-      rolesHideCount: rolesHide?.length ?? 0,
-      rolesDeleteCount: rolesDelete?.length ?? 0,
+      rolesView: rolesView ?? "unchanged",
+      rolesEdit: rolesEdit ?? "unchanged",
+      rolesPost: rolesPost ?? "unchanged",
+      rolesModerate: rolesModerate ?? "unchanged",
+      rolesAdmin: rolesAdmin ?? "unchanged",
     });
 
-    // Return updated values
-    const finalRolesRead = rolesRead ?? existingThread.rolesRead ?? [];
-    const finalRolesWrite = rolesWrite ?? existingThread.rolesWrite ?? [];
-    const finalRolesHide = rolesHide ?? existingThread.rolesHide ?? [];
-    const finalRolesDelete = rolesDelete ?? existingThread.rolesDelete ?? [];
-
+    // Return updated values (use provided values or keep existing)
     return createSuccessResponse({
       response: {
-        rolesRead: Array.isArray(finalRolesRead) ? finalRolesRead : [],
-        rolesWrite: Array.isArray(finalRolesWrite) ? finalRolesWrite : [],
-        rolesHide: Array.isArray(finalRolesHide) ? finalRolesHide : [],
-        rolesDelete: Array.isArray(finalRolesDelete) ? finalRolesDelete : [],
+        rolesView: rolesView ?? existingThread.rolesView,
+        rolesEdit: rolesEdit ?? existingThread.rolesEdit,
+        rolesPost: rolesPost ?? existingThread.rolesPost,
+        rolesModerate: rolesModerate ?? existingThread.rolesModerate,
+        rolesAdmin: rolesAdmin ?? existingThread.rolesAdmin,
       },
     });
   } catch {

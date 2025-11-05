@@ -71,49 +71,49 @@ export function useApiQuery<
 } & (TEndpoint["TRequestOutput"] extends never
   ? { requestData?: never }
   : {
-    requestData: TEndpoint["TRequestOutput"];
-  }) &
+      requestData: TEndpoint["TRequestOutput"];
+    }) &
   (TEndpoint["TUrlVariablesOutput"] extends never
     ? { urlPathParams?: never }
     : {
-      urlPathParams: TEndpoint["TUrlVariablesOutput"];
-    }) & {
-      options: {
-        queryKey?: QueryKey;
-        enabled?: boolean;
-        staleTime?: number;
-        cacheTime?: number;
-        onSuccess?: (data: {
-          responseData: TEndpoint["TResponseOutput"];
-          requestData: TEndpoint["TRequestOutput"];
-          urlPathParams: TEndpoint["TUrlVariablesOutput"];
-        }) => void;
-        onError?: ({
-          error,
-          requestData,
-          urlPathParams,
-        }: {
-          error: ErrorResponseType;
-          requestData: TEndpoint["TRequestOutput"];
-          urlPathParams: TEndpoint["TUrlVariablesOutput"];
-        }) => void;
-        disableLocalCache?: boolean;
-        refreshDelay?: number;
-        /**
-         * Whether to skip initial fetch when component mounts
-         * @default false
-         */
-        skipInitialFetch?: boolean;
-        /**
-         * Whether to refetch when dependencies change
-         * @default true
-         */
-        refetchOnWindowFocus?: boolean;
-        retry?: number;
-        refetchOnDependencyChange?: boolean;
-        initialData?: TEndpoint["TResponseOutput"];
-      };
-    }): ApiQueryReturn<TEndpoint["TResponseOutput"]> {
+        urlPathParams: TEndpoint["TUrlVariablesOutput"];
+      }) & {
+    options: {
+      queryKey?: QueryKey;
+      enabled?: boolean;
+      staleTime?: number;
+      cacheTime?: number;
+      onSuccess?: (data: {
+        responseData: TEndpoint["TResponseOutput"];
+        requestData: TEndpoint["TRequestOutput"];
+        urlPathParams: TEndpoint["TUrlVariablesOutput"];
+      }) => void;
+      onError?: ({
+        error,
+        requestData,
+        urlPathParams,
+      }: {
+        error: ErrorResponseType;
+        requestData: TEndpoint["TRequestOutput"];
+        urlPathParams: TEndpoint["TUrlVariablesOutput"];
+      }) => void;
+      disableLocalCache?: boolean;
+      refreshDelay?: number;
+      /**
+       * Whether to skip initial fetch when component mounts
+       * @default false
+       */
+      skipInitialFetch?: boolean;
+      /**
+       * Whether to refetch when dependencies change
+       * @default true
+       */
+      refetchOnWindowFocus?: boolean;
+      retry?: number;
+      refetchOnDependencyChange?: boolean;
+      initialData?: TEndpoint["TResponseOutput"];
+    };
+  }): ApiQueryReturn<TEndpoint["TResponseOutput"]> {
   const {
     queryKey: customQueryKey,
     skipInitialFetch = false,
@@ -286,10 +286,29 @@ export function useApiQuery<
         } as QueryStoreType<TEndpoint["TResponseOutput"]>;
       }
 
+      // If initial data is provided, create a proper success response
+      // This allows server-side data to be used without an initial fetch
+      if (initialData) {
+        const successResponse = createSuccessResponse(initialData);
+        return {
+          response: successResponse,
+          data: initialData,
+          error: null,
+          isLoading: false,
+          isFetching: false,
+          isError: false,
+          isSuccess: true,
+          isLoadingFresh: false,
+          isCachedData: false,
+          statusMessage: undefined,
+          lastFetchTime: Date.now(),
+        };
+      }
+
       // No existing data, start with loading state
       return {
         response: undefined,
-        data: initialData,
+        data: undefined,
         error: null,
         isLoading: true,
         isFetching: true,
@@ -411,7 +430,7 @@ export function useApiQuery<
           const isFresh =
             existingQuery?.lastFetchTime &&
             Date.now() - existingQuery.lastFetchTime <
-            (queryOptions.staleTime || 60_000);
+              (queryOptions.staleTime || 60_000);
 
           // Skip fetch if we have fresh data (even on initial mount if data exists)
           if (hasValidData && isFresh) {
@@ -437,14 +456,14 @@ export function useApiQuery<
                   // Ensure onError has the correct signature
                   onError: queryOptions.onError
                     ? ({ error }: { error: ErrorResponseType }): void => {
-                      if (queryOptions.onError) {
-                        queryOptions.onError({
-                          error,
-                          requestData: requestData!,
-                          urlPathParams: urlPathParams!,
-                        });
+                        if (queryOptions.onError) {
+                          queryOptions.onError({
+                            error,
+                            requestData: requestData!,
+                            urlPathParams: urlPathParams!,
+                          });
+                        }
                       }
-                    }
                     : undefined,
                 },
               );
@@ -484,7 +503,7 @@ export function useApiQuery<
     const isFresh =
       existingQuery?.lastFetchTime &&
       Date.now() - existingQuery.lastFetchTime <
-      (queryOptions.staleTime || 60_000);
+        (queryOptions.staleTime || 60_000);
 
     // Skip fetch if we have fresh SUCCESSFUL data (don't skip if we have cached errors)
     if (hasValidData && isFresh) {
@@ -525,14 +544,14 @@ export function useApiQuery<
             // Ensure onError has the correct signature
             onError: queryOptions.onError
               ? ({ error }: { error: ErrorResponseType }): void => {
-                if (queryOptions.onError) {
-                  queryOptions.onError({
-                    error,
-                    requestData: requestData!,
-                    urlPathParams: urlPathParams!,
-                  });
+                  if (queryOptions.onError) {
+                    queryOptions.onError({
+                      error,
+                      requestData: requestData!,
+                      urlPathParams: urlPathParams!,
+                    });
+                  }
                 }
-              }
               : undefined,
           },
         );
@@ -592,14 +611,14 @@ export function useApiQuery<
           // Ensure onError has the correct signature
           onError: queryOptions.onError
             ? ({ error }: { error: ErrorResponseType }): void => {
-              if (queryOptions.onError) {
-                queryOptions.onError({
-                  error,
-                  requestData: requestData!,
-                  urlPathParams: urlPathParams!,
-                });
+                if (queryOptions.onError) {
+                  queryOptions.onError({
+                    error,
+                    requestData: requestData!,
+                    urlPathParams: urlPathParams!,
+                  });
+                }
               }
-            }
             : undefined,
         },
       );

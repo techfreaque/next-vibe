@@ -12,11 +12,12 @@ export const translations: typeof enTranslations = {
       title: "Credit-Guthaben",
       description:
         "Ihre verfügbaren Credits für KI-Gespräche mit {{modelCount}} Modellen",
-      total: "Credits",
+      credit: "{{count}} Credit",
+      credits: "{{count}} Credits",
       nextExpiration: "Nächster Ablauf",
       expiring: {
         title: "Abonnement-Credits",
-        description: "Aus monatlichem Abonnement (1000 Credits/Monat)",
+        description: "Aus monatlichem Abonnement ({{subCredits}} Credits/Monat)",
       },
       permanent: {
         title: "Permanente Credits",
@@ -45,7 +46,7 @@ export const translations: typeof enTranslations = {
         free: {
           title: "Kostenlose Test-Credits",
           description:
-            "Jeder erhält 20 kostenlose Credits zum Testen unseres Services. Keine Kreditkarte erforderlich!",
+            "Jeder erhält {{count}} kostenlose Credits zum Testen unseres Services. Keine Kreditkarte erforderlich!",
         },
       },
       costs: {

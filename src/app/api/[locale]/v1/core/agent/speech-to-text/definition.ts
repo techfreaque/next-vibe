@@ -30,6 +30,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "agent", "speech-to-text"],
   allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
+  credits: 2, // Cost 2 credits per STT conversion
 
   title: "app.api.v1.core.agent.speechToText.post.title",
   description: "app.api.v1.core.agent.speechToText.post.description",

@@ -14,8 +14,6 @@ import {
 import { getModelCost } from "@/app/api/[locale]/v1/core/agent/chat/model-access/costs";
 import { userLeads } from "@/app/api/[locale]/v1/core/leads/db";
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
-import { subscriptions } from "@/app/api/[locale]/v1/core/subscription/db";
-import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -82,115 +80,69 @@ class CreditValidator implements CreditValidatorInterface {
     try {
       const cost = getModelCost(modelId);
 
-      // Step 1: Check if user has an active subscription
-      const [subscription] = await db
+      // Get primary lead for user
+      const [userLead] = await db
         .select()
-        .from(subscriptions)
-        .where(eq(subscriptions.userId, userId))
+        .from(userLeads)
+        .where(eq(userLeads.userId, userId))
         .limit(1);
 
-      const hasActiveSubscription =
-        subscription && subscription.status === SubscriptionStatus.ACTIVE;
+      if (!userLead) {
+        logger.error("No lead found for user", { userId });
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
+          ErrorResponseTypes.NOT_FOUND,
+        );
+      }
 
-      logger.debug("Checked subscription status", {
+      // Use repository method to determine credit source and get balance
+      const identifierResult = await creditRepository.getCreditIdentifierBySubscription(
         userId,
-        hasSubscription: !!subscription,
-        subscriptionStatus: subscription?.status,
-        hasActiveSubscription,
+        userLead.leadId,
+        logger,
+      );
+
+      if (!identifierResult.success) {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
+          ErrorResponseTypes.INTERNAL_ERROR,
+        );
+      }
+
+      const { creditType } = identifierResult.data;
+
+      // Get balance using the repository method
+      const balanceResult = await creditRepository.getBalance(
+        { leadId: userLead.leadId, userId },
+        logger,
+      );
+
+      if (!balanceResult.success) {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
+          ErrorResponseTypes.INTERNAL_ERROR,
+        );
+      }
+
+      const balance = balanceResult.data.total;
+      const hasCredits = balance >= cost;
+
+      logger.info("Validated user credits", {
+        userId,
+        leadId: userLead.leadId,
+        modelId,
+        cost,
+        balance,
+        hasCredits,
+        creditType,
       });
 
-      if (hasActiveSubscription) {
-        const [userLead] = await db
-          .select()
-          .from(userLeads)
-          .where(eq(userLeads.userId, userId))
-          .limit(1);
-
-        if (!userLead) {
-          logger.error("No lead found for user", { userId });
-          return createErrorResponse(
-            "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
-            ErrorResponseTypes.NOT_FOUND,
-          );
-        }
-
-        const balanceResult = await creditRepository.getBalance(
-          { leadId: userLead.leadId, userId },
-          logger,
-        );
-        if (!balanceResult.success) {
-          return createErrorResponse(
-            "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
-            ErrorResponseTypes.INTERNAL_ERROR,
-          );
-        }
-
-        const balance = balanceResult.data.total;
-        const hasCredits = balance >= cost;
-
-        logger.info("Validated user credits (subscription user)", {
-          userId,
-          modelId,
-          cost,
-          balance,
-          hasCredits,
-          creditType: "user_subscription",
-        });
-
-        return createSuccessResponse({
-          hasCredits,
-          cost,
-          balance,
-          canUseModel: hasCredits || cost === 0,
-        });
-      } else {
-        // User has no active subscription → use lead credits
-        // Get primary lead for user
-        const [userLead] = await db
-          .select()
-          .from(userLeads)
-          .where(eq(userLeads.userId, userId))
-          .limit(1);
-
-        if (!userLead) {
-          logger.error("No lead found for user", { userId });
-          return createErrorResponse(
-            "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
-            ErrorResponseTypes.NOT_FOUND,
-          );
-        }
-
-        // Get lead balance
-        const balanceResult = await creditRepository.getLeadBalance(
-          userLead.leadId,
-        );
-        if (!balanceResult.success) {
-          return createErrorResponse(
-            "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
-            ErrorResponseTypes.INTERNAL_ERROR,
-          );
-        }
-
-        const balance = balanceResult.data;
-        const hasCredits = balance >= cost;
-
-        logger.info("Validated user credits (non-subscription user)", {
-          userId,
-          leadId: userLead.leadId,
-          modelId,
-          cost,
-          balance,
-          hasCredits,
-          creditType: "lead_free",
-        });
-
-        return createSuccessResponse({
-          hasCredits,
-          cost,
-          balance,
-          canUseModel: hasCredits || cost === 0,
-        });
-      }
+      return createSuccessResponse({
+        hasCredits,
+        cost,
+        balance,
+        canUseModel: hasCredits || cost === 0,
+      });
     } catch (error) {
       logger.error("Failed to validate user credits", parseError(error), {
         userId,

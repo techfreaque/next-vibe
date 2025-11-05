@@ -10,6 +10,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import React from "react";
 
+import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -56,7 +57,9 @@ interface LinearMessageViewProps {
   onSwitchBranch: (parentMessageId: string, branchIndex: number) => void;
 
   logger: EndpointLogger;
-  rootFolderId?: string;
+  rootFolderId: DefaultFolderId;
+  currentUserId?: string;
+  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 export function LinearMessageView({
@@ -83,7 +86,9 @@ export function LinearMessageView({
   onBranchEdit,
   onSwitchBranch,
   logger,
-  rootFolderId = "general",
+  rootFolderId,
+  currentUserId,
+  deductCredits,
 }: LinearMessageViewProps): JSX.Element {
   // Collapse state management for thinking/tool sections
   const collapseState = useCollapseState();
@@ -164,6 +169,7 @@ export function LinearMessageView({
                     onPersonaChange={onPersonaChange}
                     locale={locale}
                     logger={logger}
+                    deductCredits={deductCredits}
                   />
                 </Div>
               ) : isRetrying ? (
@@ -207,8 +213,9 @@ export function LinearMessageView({
                       onBranch={onStartEdit}
                       onRetry={onStartRetry}
                       onDelete={onDeleteMessage}
-                      showAuthor={true}
+                      showAuthor={rootFolderId === "public"}
                       rootFolderId={rootFolderId}
+                      currentUserId={currentUserId}
                     />
                   )}
                   {(message.role === "assistant" || message.role === "tool") &&
@@ -221,6 +228,7 @@ export function LinearMessageView({
                         onDelete={onDeleteMessage}
                         showAuthor={true}
                         logger={logger}
+                        rootFolderId={rootFolderId}
                         collapseState={collapseState}
                       />
                     )}

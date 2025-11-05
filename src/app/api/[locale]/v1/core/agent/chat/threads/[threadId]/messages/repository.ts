@@ -27,8 +27,8 @@ import {
 } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
 import {
-  canReadThread,
-  canWriteThread,
+  canPostInThread,
+  canViewThread,
 } from "../../../permissions/permissions";
 import { validateNotIncognito } from "../../../validation";
 import type {
@@ -36,6 +36,410 @@ import type {
   MessageCreateResponseOutput,
   MessageListResponseOutput,
 } from "./definition";
+
+/**
+ * Calculate message depth from parent
+ * Returns 0 if no parent or if incognito mode
+ */
+export async function calculateMessageDepth(
+  parentMessageId: string | null | undefined,
+  isIncognito: boolean,
+): Promise<number> {
+  if (!parentMessageId || isIncognito) {
+    return 0;
+  }
+
+  const [parent] = await db
+    .select()
+    .from(chatMessages)
+    .where(eq(chatMessages.id, parentMessageId))
+    .limit(1);
+
+  return parent ? parent.depth + 1 : 0;
+}
+
+/**
+ * Fetch message history for a thread
+ * Returns messages in chronological order for AI context
+ */
+export async function fetchMessageHistory(
+  threadId: string,
+  userId: string,
+  logger: EndpointLogger,
+): Promise<Array<{ role: "user" | "assistant" | "system"; content: string }>> {
+  const messages = await db
+    .select()
+    .from(chatMessages)
+    .where(
+      and(
+        eq(chatMessages.threadId, threadId),
+        eq(chatMessages.authorId, userId),
+      ),
+    )
+    .orderBy(chatMessages.createdAt);
+
+  logger.info("Fetched message history", {
+    threadId,
+    messageCount: messages.length,
+  });
+
+  return messages.map((msg) => {
+    const roleLowercase = msg.role.toLowerCase();
+    const validRole: "user" | "assistant" | "system" =
+      roleLowercase === "user" ||
+      roleLowercase === "assistant" ||
+      roleLowercase === "system"
+        ? roleLowercase
+        : "user";
+    return {
+      role: validRole,
+      content: msg.content,
+    };
+  });
+}
+
+/**
+ * Get parent message for retry/edit operations
+ * Note: This function does NOT check thread ownership - that's handled at the API route level
+ * We just need to verify the message exists and return its data
+ */
+export async function getParentMessage(
+  messageId: string,
+  userId: string,
+  logger: EndpointLogger,
+): Promise<{
+  id: string;
+  threadId: string;
+  role: ChatMessageRole;
+  content: string;
+  parentId: string | null;
+  depth: number;
+} | null> {
+  // Get the message by ID (supports both user and AI messages)
+  const [message] = await db
+    .select()
+    .from(chatMessages)
+    .where(eq(chatMessages.id, messageId))
+    .limit(1);
+
+  if (!message) {
+    logger.error("Parent message not found", { messageId, userId });
+    return null;
+  }
+
+  logger.info("Found parent message", {
+    messageId: message.id,
+    threadId: message.threadId,
+    role: message.role,
+    authorId: message.authorId,
+  });
+
+  return {
+    id: message.id,
+    threadId: message.threadId,
+    role: message.role,
+    content: message.content,
+    parentId: message.parentId,
+    depth: message.depth,
+  };
+}
+
+export async function createUserMessage(params: {
+  messageId: string;
+  threadId: string;
+  role: ChatMessageRole;
+  content: string;
+  parentId: string | null;
+  depth: number;
+  userId: string | undefined;
+  authorName: string | null;
+  logger: EndpointLogger;
+}): Promise<void> {
+  await db.insert(chatMessages).values({
+    id: params.messageId,
+    threadId: params.threadId,
+    role: params.role,
+    content: params.content,
+    parentId: params.parentId,
+    depth: params.depth,
+    authorId: params.userId ?? null,
+    authorName: params.authorName,
+    isAI: false,
+  });
+
+  params.logger.debug("Created user message", {
+    messageId: params.messageId,
+    threadId: params.threadId,
+    userId: params.userId ?? "public",
+    authorName: params.authorName,
+  });
+}
+
+export async function createAiMessagePlaceholder(params: {
+  messageId: string;
+  threadId: string;
+  parentId: string | null;
+  depth: number;
+  userId: string | undefined;
+  model: string;
+  persona: string | null | undefined;
+  sequenceId: string | null;
+  sequenceIndex: number;
+  logger: EndpointLogger;
+}): Promise<void> {
+  await db.insert(chatMessages).values({
+    id: params.messageId,
+    threadId: params.threadId,
+    role: ChatMessageRole.ASSISTANT,
+    content: " ",
+    parentId: params.parentId,
+    depth: params.depth,
+    authorId: params.userId ?? null,
+    sequenceId: params.sequenceId,
+    sequenceIndex: params.sequenceIndex,
+    isAI: true,
+    model: params.model,
+    persona: params.persona ?? undefined,
+  });
+
+  params.logger.info("Created AI message placeholder", {
+    messageId: params.messageId,
+    threadId: params.threadId,
+    sequenceId: params.sequenceId,
+    sequenceIndex: params.sequenceIndex,
+    userId: params.userId ?? "public",
+  });
+}
+
+export async function createErrorMessage(params: {
+  messageId: string;
+  threadId: string;
+  content: string;
+  parentId: string | null;
+  depth: number;
+  userId: string | undefined;
+  errorType: string;
+  errorDetails?: Record<string, string | number | boolean | null>;
+  sequenceId?: string | null;
+  sequenceIndex?: number;
+  logger: EndpointLogger;
+}): Promise<void> {
+  const metadata: Record<
+    string,
+    | string
+    | number
+    | boolean
+    | null
+    | Record<string, string | number | boolean | null>
+  > = {
+    errorType: params.errorType,
+  };
+
+  if (params.errorDetails) {
+    metadata.errorDetails = params.errorDetails;
+  }
+
+  await db.insert(chatMessages).values({
+    id: params.messageId,
+    threadId: params.threadId,
+    role: ChatMessageRole.ERROR,
+    content: params.content,
+    parentId: params.parentId,
+    depth: params.depth,
+    authorId: params.userId ?? null,
+    isAI: false,
+    sequenceId: params.sequenceId ?? null,
+    sequenceIndex: params.sequenceIndex ?? 0,
+    metadata,
+  });
+
+  params.logger.info("Created ERROR message", {
+    messageId: params.messageId,
+    threadId: params.threadId,
+    errorType: params.errorType,
+    userId: params.userId ?? "public",
+  });
+}
+
+export async function createTextMessage(params: {
+  messageId: string;
+  threadId: string;
+  content: string;
+  parentId: string | null;
+  depth: number;
+  userId: string | undefined;
+  model: string;
+  persona: string | null | undefined;
+  sequenceId: string | null;
+  sequenceIndex: number;
+  logger: EndpointLogger;
+}): Promise<void> {
+  await db.insert(chatMessages).values({
+    id: params.messageId,
+    threadId: params.threadId,
+    role: ChatMessageRole.ASSISTANT,
+    content: params.content,
+    parentId: params.parentId,
+    depth: params.depth,
+    authorId: params.userId ?? null,
+    sequenceId: params.sequenceId,
+    sequenceIndex: params.sequenceIndex,
+    isAI: true,
+    model: params.model,
+    persona: params.persona ?? undefined,
+  });
+
+  params.logger.debug("Created text message", {
+    messageId: params.messageId,
+    threadId: params.threadId,
+    sequenceId: params.sequenceId,
+    sequenceIndex: params.sequenceIndex,
+    userId: params.userId ?? "public",
+  });
+}
+
+export async function updateMessageContent(params: {
+  messageId: string;
+  content: string;
+  logger: EndpointLogger;
+}): Promise<void> {
+  await db
+    .update(chatMessages)
+    .set({ content: params.content })
+    .where(eq(chatMessages.id, params.messageId));
+
+  params.logger.debug("Updated message content", {
+    messageId: params.messageId,
+    contentLength: params.content.length,
+  });
+}
+
+export async function createToolMessage(params: {
+  messageId: string;
+  threadId: string;
+  toolCall: ToolCall;
+  parentId: string | null;
+  depth: number;
+  userId: string | undefined;
+  sequenceId: string | null;
+  sequenceIndex: number;
+  logger: EndpointLogger;
+}): Promise<void> {
+  const metadata: Record<
+    string,
+    | string
+    | number
+    | boolean
+    | null
+    | Record<string, string | number | boolean | null>
+    | ToolCall
+  > = {
+    toolCall: params.toolCall,
+  };
+
+  await db.insert(chatMessages).values({
+    id: params.messageId,
+    threadId: params.threadId,
+    role: ChatMessageRole.TOOL,
+    content: "",
+    parentId: params.parentId,
+    depth: params.depth,
+    authorId: params.userId ?? null,
+    sequenceId: params.sequenceId,
+    sequenceIndex: params.sequenceIndex,
+    isAI: true,
+    metadata,
+  });
+
+  params.logger.debug("Created TOOL message", {
+    messageId: params.messageId,
+    threadId: params.threadId,
+    toolName: params.toolCall.toolName,
+    sequenceId: params.sequenceId,
+    sequenceIndex: params.sequenceIndex,
+    userId: params.userId ?? "public",
+  });
+}
+
+export async function handleEditOperation<T extends { parentMessageId?: string | null; content: string; role: ChatMessageRole }>(
+  data: T,
+  userId: string | undefined,
+  logger: EndpointLogger,
+): Promise<{
+  threadId: string;
+  parentMessageId: string | null;
+  content: string;
+  role: ChatMessageRole;
+} | null> {
+  if (!data.parentMessageId) {
+    logger.error("Edit operation requires parentMessageId");
+    return null;
+  }
+
+  const parentMessage = await getParentMessage(
+    data.parentMessageId,
+    userId ?? "",
+    logger,
+  );
+
+  if (!parentMessage) {
+    return null;
+  }
+
+  return {
+    threadId: parentMessage.threadId,
+    parentMessageId: parentMessage.parentId,
+    content: data.content,
+    role: data.role,
+  };
+}
+
+export async function handleRetryOperation<T extends { parentMessageId?: string | null }>(
+  data: T,
+  userId: string | undefined,
+  logger: EndpointLogger,
+): Promise<{
+  threadId: string;
+  parentMessageId: string;
+  content: string;
+  role: ChatMessageRole;
+} | null> {
+  if (!data.parentMessageId) {
+    logger.error("Retry operation requires parentMessageId");
+    return null;
+  }
+
+  const userMessage = await getParentMessage(
+    data.parentMessageId,
+    userId ?? "",
+    logger,
+  );
+
+  if (!userMessage) {
+    return null;
+  }
+
+  return {
+    threadId: userMessage.threadId,
+    parentMessageId: data.parentMessageId,
+    content: userMessage.content,
+    role: userMessage.role,
+  };
+}
+
+export function handleAnswerAsAiOperation<T extends { threadId?: string | null; parentMessageId?: string | null; content: string; role: ChatMessageRole }>(data: T): {
+  threadId: string | null | undefined;
+  parentMessageId: string | null | undefined;
+  content: string;
+  role: ChatMessageRole;
+} {
+  return {
+    threadId: data.threadId,
+    parentMessageId: data.parentMessageId,
+    content: data.content,
+    role: data.role,
+  };
+}
 
 /**
  * Messages Repository Interface
@@ -112,7 +516,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       }
 
       // Check read permission using permission system
-      if (!(await canReadThread(user, thread, folder, logger))) {
+      if (!(await canViewThread(user, thread, folder, logger))) {
         return fail({
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.title" as const,
@@ -284,7 +688,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       }
 
       // Check write permission using permission system
-      if (!(await canWriteThread(user, thread, folder, logger))) {
+      if (!(await canPostInThread(user, thread, folder, logger))) {
         return fail({
           message:
             "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,

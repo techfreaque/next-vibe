@@ -22,6 +22,7 @@ interface UseEdenAISpeechOptions {
   lang?: string;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 interface UseEdenAISpeechReturn {
@@ -40,6 +41,7 @@ export function useEdenAISpeech({
   lang = "en-US",
   locale,
   logger,
+  deductCredits,
 }: UseEdenAISpeechOptions): UseEdenAISpeechReturn {
   const { t } = simpleT(locale);
   const [isRecording, setIsRecording] = useState(false);
@@ -140,6 +142,13 @@ export function useEdenAISpeech({
             logger.debug("STT: Transcription received successfully", {
               textLength: transcribedText.length,
             });
+
+            // Optimistically update credit balance in UI
+            const creditCost = speechToTextDefinitions.POST.credits ?? 0;
+            if (creditCost > 0) {
+              deductCredits(creditCost, "stt");
+            }
+
             setTranscript(transcribedText);
             onTranscript?.(transcribedText);
             setIsProcessing(false);
@@ -177,7 +186,7 @@ export function useEdenAISpeech({
       setIsProcessing(false);
       cleanup();
     }
-  }, [lang, endpoint, logger, t, onTranscript, onError, cleanup]);
+  }, [lang, endpoint, logger, t, onTranscript, onError, cleanup, deductCredits]);
 
   const startRecording = useCallback(async (): Promise<void> => {
     try {

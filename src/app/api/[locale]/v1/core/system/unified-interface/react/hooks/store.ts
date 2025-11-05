@@ -837,10 +837,26 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           }
         }
 
-        // Prepare the request body for non-GET requests
-        // Check if requestData contains File objects - if so, use FormData
+        // For GET requests, add query parameters to URL
+        // For non-GET requests, prepare the request body
         let postBody: string | FormData | undefined;
-        if (endpoint.method !== Methods.GET) {
+        if (endpoint.method === Methods.GET) {
+          // Add query parameters to URL for GET requests
+          if (requestData && typeof requestData === "object") {
+            const searchParams = new URLSearchParams();
+            for (const [key, value] of Object.entries(requestData)) {
+              if (value !== undefined && value !== null) {
+                searchParams.append(key, String(value));
+              }
+            }
+            const queryString = searchParams.toString();
+            if (queryString) {
+              endpointUrl += `?${queryString}`;
+            }
+          }
+        } else {
+          // Prepare the request body for non-GET requests
+          // Check if requestData contains File objects - if so, use FormData
           if (containsFile(requestData)) {
             // Convert to FormData
             // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: FormData conversion requires 'unknown' for flexible data structure support
@@ -1264,10 +1280,26 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         }
       }
 
-      // Prepare the request body for non-GET requests
-      // Check if requestData contains File objects - if so, use FormData
+      // For GET requests, add query parameters to URL
+      // For non-GET requests, prepare the request body
       let postBody: string | FormData | undefined;
-      if (endpoint.method !== Methods.GET) {
+      if (endpoint.method === Methods.GET) {
+        // Add query parameters to URL for GET requests
+        if (requestData && typeof requestData === "object") {
+          const searchParams = new URLSearchParams();
+          for (const [key, value] of Object.entries(requestData)) {
+            if (value !== undefined && value !== null) {
+              searchParams.append(key, String(value));
+            }
+          }
+          const queryString = searchParams.toString();
+          if (queryString) {
+            endpointUrl += `?${queryString}`;
+          }
+        }
+      } else {
+        // Prepare the request body for non-GET requests
+        // Check if requestData contains File objects - if so, use FormData
         if (containsFile(requestData)) {
           // Convert to FormData
           // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: FormData conversion requires 'unknown' for flexible data structure support

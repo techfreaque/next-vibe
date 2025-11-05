@@ -12,6 +12,7 @@ import React, {
 } from "react";
 
 import { useAIStreamStore } from "@/app/api/[locale]/v1/core/agent/ai-stream/hooks/store";
+import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks/hooks";
 import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -58,9 +59,10 @@ interface ChatMessagesProps {
   ) => void;
   inputHeight?: number;
   viewMode?: ViewMode;
-  rootFolderId?: string;
+  rootFolderId: DefaultFolderId;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  currentUserId?: string;
 }
 
 export function ChatMessages({
@@ -82,10 +84,11 @@ export function ChatMessages({
   onSendMessage,
   inputHeight = LAYOUT.DEFAULT_INPUT_HEIGHT,
   viewMode = "linear",
-  rootFolderId = "general",
+  rootFolderId = "private",
   locale,
   logger,
   chat,
+  currentUserId,
 }: ChatMessagesProps): JSX.Element {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -421,6 +424,8 @@ export function ChatMessages({
                   chat.inputRef.current?.focus();
                 }}
                 rootFolderId={rootFolderId}
+                currentUserId={currentUserId}
+                deductCredits={chat.deductCredits}
               />
             );
           })()
@@ -469,7 +474,8 @@ export function ChatMessages({
                 onVoteMessage={onVoteMessage}
                 onModelChange={onModelChange}
                 onPersonaChange={onPersonaChange}
-                rootFolderId={rootFolderId}
+                currentUserId={currentUserId}
+                deductCredits={chat.deductCredits}
               />
             ));
           })()
@@ -509,6 +515,8 @@ export function ChatMessages({
                 onSwitchBranch={onSwitchBranch}
                 logger={logger}
                 rootFolderId={rootFolderId}
+                currentUserId={currentUserId}
+                deductCredits={chat.deductCredits}
               />
             );
           })()

@@ -5,7 +5,18 @@
 
 import "server-only";
 
-import { and, count, desc, eq, gte, ilike, isNull, lte, or } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  gte,
+  ilike,
+  inArray,
+  isNull,
+  lte,
+  or,
+} from "drizzle-orm";
 import {
   createSuccessResponse,
   ErrorResponseTypes,
@@ -21,16 +32,286 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { chatFolders, chatThreads, type ChatFolder } from "../db";
-import { canReadThread, canWriteFolder } from "../permissions/permissions";
+import {
+  canCreateThreadInFolder,
+  canViewThread,
+  canEditThread,
+  canPostInThread,
+  canHideThread,
+  canDeleteThread,
+  canManageThreadPermissions,
+} from "../permissions/permissions";
 import { ThreadStatus } from "../enum";
 import type { PersonaId } from "../personas/config";
 import { validateNotIncognito } from "../validation";
+import type { DefaultFolderId } from "../config";
 import type {
   ThreadCreateRequestOutput,
   ThreadCreateResponseOutput,
   ThreadListRequestOutput,
   ThreadListResponseOutput,
 } from "./definition";
+
+/**
+ * Generate thread title from first message
+ * Truncates content to max 50 characters at word boundary
+ */
+export function generateThreadTitle(content: string): string {
+  const maxLength = 50;
+  const minLastSpace = 20;
+  const ellipsis = "...";
+  const truncated = content.substring(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(" ");
+  return lastSpace > minLastSpace
+    ? `${truncated.substring(0, lastSpace)}${ellipsis}`
+    : truncated;
+}
+
+/**
+ * Verify existing thread and check permissions
+ * Returns thread ID if valid, error response otherwise
+ */
+async function verifyExistingThread(params: {
+  threadId: string;
+  isIncognito: boolean;
+  userId?: string;
+  user: JwtPayloadType;
+  logger: EndpointLogger;
+}): Promise<ResponseType<string>> {
+  const { threadId, isIncognito, userId, user, logger } = params;
+
+  if (!isIncognito && userId) {
+    const [existing] = await db
+      .select()
+      .from(chatThreads)
+      .where(eq(chatThreads.id, threadId))
+      .limit(1);
+
+    if (!existing?.id) {
+      logger.error("Thread not found", { threadId, userId });
+      return fail({
+        message: "app.api.v1.core.agent.chat.threads.get.errors.notFound.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    let folder: ChatFolder | null = null;
+    if (existing.folderId) {
+      const [folderResult] = await db
+        .select()
+        .from(chatFolders)
+        .where(eq(chatFolders.id, existing.folderId))
+        .limit(1);
+      folder = folderResult || null;
+    }
+
+    const hasPermission = await canPostInThread(user, existing, folder, logger);
+
+    if (!hasPermission) {
+      logger.error("User does not have permission to post in thread", {
+        threadId,
+        userId,
+        threadUserId: existing.userId,
+        rootFolderId: existing.rootFolderId,
+      });
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.threads.get.errors.forbidden.title",
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
+
+    logger.debug("Permission check passed for existing thread", {
+      threadId,
+      userId,
+      threadUserId: existing.userId,
+      rootFolderId: existing.rootFolderId,
+    });
+  }
+
+  return createSuccessResponse(threadId);
+}
+
+/**
+ * Ensure thread exists or create new one with permission checks
+ * Used by AI streaming to get or create a thread before posting messages
+ */
+export async function ensureThread({
+  threadId,
+  rootFolderId,
+  subFolderId,
+  userId,
+  content,
+  isIncognito,
+  logger,
+  user,
+  leadId,
+}: {
+  threadId: string | null | undefined;
+  rootFolderId: DefaultFolderId;
+  subFolderId: string | null | undefined;
+  userId?: string;
+  leadId?: string;
+  content: string;
+  isIncognito: boolean;
+  logger: EndpointLogger;
+  user: JwtPayloadType;
+}): Promise<{ threadId: string; isNew: boolean }> {
+  logger.debug("ensureThread called", {
+    threadId,
+    rootFolderId,
+    subFolderId,
+    userId,
+    leadId,
+    isIncognito,
+  });
+
+  // If threadId provided, verify it exists and check permissions (unless incognito)
+  if (threadId) {
+    const verifyResult = await verifyExistingThread({
+      threadId,
+      isIncognito,
+      userId,
+      user,
+      logger,
+    });
+
+    if (!verifyResult.success) {
+      const errorMessage = verifyResult.message || "UNKNOWN_ERROR";
+      return await Promise.reject(new Error(errorMessage));
+    }
+
+    return { threadId: verifyResult.data, isNew: false };
+  }
+
+  // Create new thread - check permissions first
+  const newThreadId = crypto.randomUUID();
+  const title = generateThreadTitle(content);
+
+  // Only store in DB if not incognito
+  if (!isIncognito) {
+    let folder: ChatFolder | null = null;
+
+    if (subFolderId) {
+      // Get parent folder to check permissions
+      const [folderResult] = await db
+        .select()
+        .from(chatFolders)
+        .where(eq(chatFolders.id, subFolderId))
+        .limit(1);
+
+      if (!folderResult) {
+        logger.error("Folder not found", { subFolderId });
+        return await Promise.reject(new Error("FOLDER_NOT_FOUND"));
+      }
+
+      folder = folderResult;
+      logger.debug("Found folder for permission check", {
+        folderId: folder.id,
+        folderName: folder.name,
+        rootFolderId: folder.rootFolderId,
+        parentId: folder.parentId,
+      });
+    } else if (!subFolderId) {
+      // Creating thread directly in a root folder (no subfolder)
+      // Check permission using DEFAULT_FOLDER_CONFIGS rolesCreateThread
+      const { getDefaultFolderConfig } = await import("../config");
+      const { hasRolePermission } = await import("../permissions/permissions");
+
+      const rootConfig = getDefaultFolderConfig(rootFolderId);
+      if (!rootConfig) {
+        logger.error("Root folder config not found", { rootFolderId });
+        return await Promise.reject(new Error("FOLDER_NOT_FOUND"));
+      }
+
+      const hasPermission = await hasRolePermission(
+        user,
+        rootConfig.rolesCreateThread,
+        logger,
+      );
+
+      if (!hasPermission) {
+        logger.error(
+          "User does not have permission to create threads in root folder",
+          {
+            userId,
+            leadId,
+            isPublic: user.isPublic,
+            rootFolderId,
+            requiredRoles: rootConfig.rolesCreateThread,
+          },
+        );
+        return await Promise.reject(new Error("PERMISSION_DENIED"));
+      }
+
+      logger.info("User has permission to create thread in root folder", {
+        userId,
+        leadId,
+        isPublic: user.isPublic,
+        rootFolderId,
+      });
+    }
+
+    // Check if user has permission to create thread in this folder (only if folder exists)
+    if (folder) {
+      logger.debug("About to check permissions", {
+        hasFolder: !!folder,
+        folderId: folder?.id,
+        folderName: folder?.name,
+        folderParentId: folder?.parentId,
+        userId,
+        leadId,
+        rootFolderId,
+        subFolderId,
+      });
+      const hasPermission = await canCreateThreadInFolder(user, folder, logger);
+
+      logger.debug("Permission check result", {
+        hasPermission,
+        userId,
+        leadId,
+        rootFolderId,
+        subFolderId,
+      });
+
+      if (!hasPermission) {
+        logger.error("User does not have permission to create thread", {
+          userId,
+          leadId,
+          rootFolderId,
+          subFolderId,
+        });
+        return await Promise.reject(new Error("PERMISSION_DENIED"));
+      }
+    }
+
+    // DO NOT set permission fields - leave as empty arrays to inherit from parent folder
+    // Permission inheritance: empty array [] = inherit from parent folder
+    // Only set explicit permissions when user overrides via context menu
+
+    await db.insert(chatThreads).values({
+      id: newThreadId,
+      userId: userId ?? null,
+      leadId: leadId ?? null,
+      title,
+      rootFolderId: rootFolderId as DefaultFolderId,
+      folderId: subFolderId ?? null,
+      // rolesRead, rolesWrite, rolesModerate, rolesAdmin are NOT set
+      // They default to [] which means inherit from parent folder
+    });
+
+    logger.debug("Created new thread", {
+      threadId: newThreadId,
+      title,
+      userId,
+      leadId,
+    });
+  } else {
+    logger.debug("Generated incognito thread ID", { threadId: newThreadId });
+  }
+
+  return { threadId: newThreadId, isNew: true };
+}
 
 /**
  * Threads Repository Interface
@@ -76,7 +357,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       const dateTo = data.dateTo;
 
       // Extract userId safely - only exists for authenticated users
-      const userId = !user.isPublic && "id" in user ? user.id : undefined;
+      const userId = !user.isPublic && user.id;
 
       logger.info("Listing threads - START", {
         userId,
@@ -116,6 +397,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       // For PUBLIC folder, show all public threads from all users
       // For SHARED folder, show user's own threads + threads where user is moderator
       // For other folders, only show user's own threads
+      // If no rootFolderId specified, show threads from all folders (filtered by permissions later)
       const conditions = [];
 
       if (rootFolderId === "public") {
@@ -123,16 +405,39 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         conditions.push(eq(chatThreads.rootFolderId, "public"));
       } else if (rootFolderId === "shared") {
         // SHARED folder: Show user's own threads
-        // Permission filtering happens later via canReadThread
+        // Permission filtering happens later via canViewThread
         conditions.push(eq(chatThreads.rootFolderId, "shared"));
-        conditions.push(eq(chatThreads.userId, userIdentifier));
+        // For public users, filter by leadId; for authenticated users, filter by userId
+        if (user.isPublic) {
+          conditions.push(eq(chatThreads.leadId, userIdentifier));
+        } else {
+          conditions.push(eq(chatThreads.userId, userIdentifier));
+        }
+      } else if (rootFolderId) {
+        // Specific folder: Show only user's own threads in that folder
+        // For public users, filter by leadId; for authenticated users, filter by userId
+        if (user.isPublic) {
+          conditions.push(eq(chatThreads.leadId, userIdentifier));
+        } else {
+          conditions.push(eq(chatThreads.userId, userIdentifier));
+        }
+        conditions.push(eq(chatThreads.rootFolderId, rootFolderId));
       } else {
-        // Other folders: Show only user's own threads
-        conditions.push(eq(chatThreads.userId, userIdentifier));
-
-        // Filter by root folder if specified
-        if (rootFolderId) {
-          conditions.push(eq(chatThreads.rootFolderId, rootFolderId));
+        // No rootFolderId specified: Show threads from all folders
+        // For public users, show threads from public folder
+        // For authenticated users, show their own threads from all folders + all public threads
+        // Permission filtering happens later via canViewThread
+        if (user.isPublic) {
+          // Public users: Show all threads from public folder
+          conditions.push(eq(chatThreads.rootFolderId, "public"));
+        } else {
+          // Authenticated users: Show their own threads from all folders + all threads from public folder
+          conditions.push(
+            or(
+              eq(chatThreads.userId, userIdentifier),
+              eq(chatThreads.rootFolderId, "public"),
+            )!,
+          );
         }
       }
 
@@ -192,45 +497,136 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         .limit(limit)
         .offset(offset);
 
+      // Build folder map for permission inheritance
+      // Fetch all folders that are referenced by threads
+      const folderIds = dbThreads
+        .map((t) => t.folderId)
+        .filter((id): id is string => id !== null);
+
+      const allFolders: Record<string, ChatFolder> = {};
+      if (folderIds.length > 0) {
+        const folders = await db
+          .select()
+          .from(chatFolders)
+          .where(inArray(chatFolders.id, folderIds));
+
+        for (const folder of folders) {
+          allFolders[folder.id] = folder;
+        }
+
+        // Also fetch parent folders for proper inheritance chain
+        const parentIds = folders
+          .map((f) => f.parentId)
+          .filter((id): id is string => id !== null);
+
+        if (parentIds.length > 0) {
+          const parentFolders = await db
+            .select()
+            .from(chatFolders)
+            .where(inArray(chatFolders.id, parentIds));
+
+          for (const folder of parentFolders) {
+            allFolders[folder.id] = folder;
+          }
+        }
+      }
+
       // Filter threads based on user permissions
       const visibleThreads = [];
       for (const thread of dbThreads) {
         // Get folder if thread has one
-        let folder = null;
-        if (thread.folderId) {
-          const [folderResult] = await db
-            .select()
-            .from(chatFolders)
-            .where(eq(chatFolders.id, thread.folderId))
-            .limit(1);
-          folder = folderResult || null;
-        }
+        const folder = thread.folderId
+          ? allFolders[thread.folderId] || null
+          : null;
 
-        if (await canReadThread(user, thread, folder, logger)) {
+        logger.info("Checking thread visibility", {
+          threadId: thread.id,
+          threadTitle: thread.title,
+          folderId: thread.folderId,
+          hasFolder: !!folder,
+          folderName: folder?.name,
+          threadRolesView: thread.rolesView,
+          folderRolesView: folder?.rolesView,
+          userId: user.id,
+          isPublic: user.isPublic,
+        });
+
+        const canView = await canViewThread(
+          user,
+          thread,
+          folder,
+          logger,
+          allFolders,
+        );
+
+        logger.info("Thread visibility result", {
+          threadId: thread.id,
+          canView,
+        });
+
+        if (canView) {
           visibleThreads.push(thread);
         }
       }
 
       // Map DB fields to API response format (DB has rootFolderId as DefaultFolderId, folderId as UUID)
-      const threads = visibleThreads.map((thread) => ({
-        id: thread.id,
-        title: thread.title,
-        rootFolderId: thread.rootFolderId as
-          | "incognito"
-          | "private"
-          | "public"
-          | "shared",
-        folderId: thread.folderId,
-        status: thread.status,
-        preview: thread.preview,
-        pinned: thread.pinned,
-        rolesRead: thread.rolesRead || [],
-        rolesWrite: thread.rolesWrite || [],
-        rolesHide: thread.rolesHide || [],
-        rolesDelete: thread.rolesDelete || [],
-        createdAt: thread.createdAt.toISOString(),
-        updatedAt: thread.updatedAt.toISOString(),
-      }));
+      // Compute permission flags for each thread
+      const threads = await Promise.all(
+        visibleThreads.map(async (thread) => {
+          const folder = thread.folderId
+            ? allFolders[thread.folderId] || null
+            : null;
+
+          // Compute all permission flags server-side
+          const [
+            canEditFlag,
+            canPostFlag,
+            canModerateFlag,
+            canDeleteFlag,
+            canManagePermsFlag,
+          ] = await Promise.all([
+            canEditThread(user, thread, folder, logger, allFolders),
+            canPostInThread(user, thread, folder, logger, allFolders),
+            canHideThread(user, thread, logger, folder, allFolders),
+            canDeleteThread(user, thread, logger),
+            canManageThreadPermissions(
+              user,
+              thread,
+              folder,
+              logger,
+              allFolders,
+            ),
+          ]);
+
+          return {
+            id: thread.id,
+            title: thread.title,
+            rootFolderId: thread.rootFolderId as
+              | "incognito"
+              | "private"
+              | "public"
+              | "shared",
+            folderId: thread.folderId,
+            status: thread.status,
+            preview: thread.preview,
+            pinned: thread.pinned,
+            // Preserve null values for inheritance (null = inherit, [] = deny, [roles...] = allow)
+            rolesView: thread.rolesView,
+            rolesEdit: thread.rolesEdit,
+            rolesPost: thread.rolesPost,
+            rolesModerate: thread.rolesModerate,
+            rolesAdmin: thread.rolesAdmin,
+            // Permission flags - computed server-side
+            canEdit: canEditFlag,
+            canPost: canPostFlag,
+            canModerate: canModerateFlag,
+            canDelete: canDeleteFlag,
+            canManagePermissions: canManagePermsFlag,
+            createdAt: thread.createdAt.toISOString(),
+            updatedAt: thread.updatedAt.toISOString(),
+          };
+        }),
+      );
 
       const pageCount = Math.ceil(total / limit);
 
@@ -334,7 +730,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         // Create a virtual folder object for permission check
         folder = {
           id: "public-root",
-          userId: "", // Root folders have no owner
+          userId: null, // Root folders have no owner
+          leadId: null,
           rootFolderId: "public" as const,
           name: "Public",
           icon: null,
@@ -343,17 +740,19 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
           expanded: true,
           sortOrder: 0,
           metadata: {},
-          rolesRead: [],
-          rolesWrite: [],
-          rolesHide: [],
-          rolesDelete: [],
+          rolesView: [],
+          rolesManage: [],
+          rolesCreateThread: [],
+          rolesPost: [],
+          rolesModerate: [],
+          rolesAdmin: [],
           createdAt: new Date(),
           updatedAt: new Date(),
         };
       }
 
       // Check if user has permission to create thread in this folder
-      const hasPermission = await canWriteFolder(user, folder, logger);
+      const hasPermission = await canCreateThreadInFolder(user, folder, logger);
 
       if (!hasPermission) {
         return fail({
@@ -388,8 +787,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         tags: [],
         preview: null,
         metadata: {},
-        // rolesRead, rolesWrite, rolesHide, rolesDelete are NOT set
-        // They default to [] which means inherit from parent folder
+        // rolesView, rolesEdit, rolesPost, rolesModerate, rolesAdmin are NOT set
+        // They default to null which means inherit from parent folder
       } satisfies typeof chatThreads.$inferInsert;
 
       const [dbThread] = await db

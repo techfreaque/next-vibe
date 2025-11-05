@@ -5,7 +5,6 @@
 
 import { useEffect, useRef } from "react";
 
-import { AUTH_STATUS_COOKIE_PREFIX } from "@/config/constants";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -35,22 +34,15 @@ export function useMessageLoader(
       return;
     }
 
-    // Check if user is authenticated
-    const authStatusCookie = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith(AUTH_STATUS_COOKIE_PREFIX));
-    const isAuthenticated = authStatusCookie !== undefined;
-
     // Skip loading for incognito mode (messages are in localStorage)
     const thread = threads[activeThreadId];
     if (!thread || thread.rootFolderId === "incognito") {
       return;
     }
 
-    // Skip if not authenticated
-    if (!isAuthenticated) {
-      return;
-    }
+    // Public users can load messages from public threads
+    // Authenticated users can load messages from all their threads
+    // No need to check authentication here - the API will enforce permissions
 
     // Mark as loaded before starting request to prevent duplicate requests
     loadedThreadsRef.current.add(activeThreadId);
@@ -85,16 +77,16 @@ export function useMessageLoader(
                 role: message.role,
                 content: message.content,
                 model: message.model,
-                persona: message.persona,
+                persona: null, // Persona is not returned by API, will be resolved from model
                 parentId: message.parentId,
                 depth: message.depth,
-                authorId: null,
+                authorId: message.authorId,
                 authorName: null,
-                isAI: message.role === "assistant" || message.role === "tool",
+                isAI: message.isAI,
                 errorType: null,
                 errorMessage: null,
                 edited: false,
-                tokens: null,
+                tokens: message.tokens,
                 toolCalls: message.toolCalls,
                 upvotes: null,
                 downvotes: null,

@@ -11,6 +11,7 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
+import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -20,7 +21,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
  * Incognito threads should never be accessed on the server
  */
 export function validateNotIncognito(
-  rootFolderId: string,
+  rootFolderId: DefaultFolderId,
   locale: CountryLanguage,
   errorKeyPrefix: string,
 ): ResponseType<never> | null {

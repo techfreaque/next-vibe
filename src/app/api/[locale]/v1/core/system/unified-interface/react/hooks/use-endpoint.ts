@@ -69,7 +69,12 @@ export function useEndpoint<
   const readEndpoint = endpoints.GET ?? null;
 
   type PrimaryEndpoint = T[keyof T & Methods] extends infer E
-    ? E extends CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], UnifiedField<z.ZodTypeAny>>
+    ? E extends CreateApiEndpoint<
+        string,
+        Methods,
+        readonly (typeof UserRoleValue)[],
+        UnifiedField<z.ZodTypeAny>
+      >
       ? E
       : never
     : never;
@@ -81,10 +86,25 @@ export function useEndpoint<
   const deleteEndpoint = endpoints.DELETE ?? null;
 
   // Compute read options with defaults
-  const readQueryEnabled = options.read?.queryOptions?.enabled ?? options.enabled ?? options.queryOptions?.enabled ?? true;
-  const readUrlPathParams = options.read?.urlPathParams ?? options.urlPathParams ?? options.queryOptions?.urlPathParams;
-  const readStaleTime = options.read?.queryOptions?.staleTime ?? options.staleTime ?? options.queryOptions?.staleTime ?? 5 * 60 * 1000;
-  const readRefetchOnWindowFocus = options.read?.queryOptions?.refetchOnWindowFocus ?? options.refetchOnWindowFocus ?? options.queryOptions?.refetchOnWindowFocus ?? true;
+  const readQueryEnabled =
+    options.read?.queryOptions?.enabled ??
+    options.enabled ??
+    options.queryOptions?.enabled ??
+    true;
+  const readUrlPathParams =
+    options.read?.urlPathParams ??
+    options.urlPathParams ??
+    options.queryOptions?.urlPathParams;
+  const readStaleTime =
+    options.read?.queryOptions?.staleTime ??
+    options.staleTime ??
+    options.queryOptions?.staleTime ??
+    5 * 60 * 1000;
+  const readRefetchOnWindowFocus =
+    options.read?.queryOptions?.refetchOnWindowFocus ??
+    options.refetchOnWindowFocus ??
+    options.queryOptions?.refetchOnWindowFocus ??
+    true;
   const autoPrefillEnabled = options.autoPrefill ?? true;
 
   // Use read hook for GET endpoints
@@ -107,7 +127,9 @@ export function useEndpoint<
       showUnsavedChangesAlert: false,
       clearStorageAfterSubmit: false,
     },
-    initialState: options.read?.initialState ?? options.filterOptions?.initialFilters,
+    initialState:
+      options.read?.initialState ?? options.filterOptions?.initialFilters,
+    initialData: options.read?.initialData,
   });
 
   // Use the appropriate operation based on endpoint type
@@ -119,13 +141,17 @@ export function useEndpoint<
   }, [autoPrefillEnabled, read?.response]);
 
   // Compute create options with defaults
-  const createUrlPathParams = options.create?.urlPathParams ?? options.urlPathParams ?? readUrlPathParams;
+  const createUrlPathParams =
+    options.create?.urlPathParams ?? options.urlPathParams ?? readUrlPathParams;
 
   // Build create options - keep types flowing from original options
   const createFormOptions = {
     persistForm: options.create?.formOptions?.persistForm ?? false,
     persistenceKey: options.create?.formOptions?.persistenceKey,
-    defaultValues: options.create?.formOptions?.defaultValues ?? options.defaultValues ?? options.formOptions?.defaultValues,
+    defaultValues:
+      options.create?.formOptions?.defaultValues ??
+      options.defaultValues ??
+      options.formOptions?.defaultValues,
   };
 
   // Calculate the appropriate reset data for form clearing
@@ -143,7 +169,9 @@ export function useEndpoint<
   // 1. Both types are extracted from the same generic T
   // 2. UseEndpointOptions<T> ensures options match the endpoint types at compile time
   // 3. Runtime behavior is correct as types are structurally compatible
-  type CreateOptions = typeof options.create extends object ? typeof options.create : Record<string, never>;
+  type CreateOptions = typeof options.create extends object
+    ? typeof options.create
+    : Record<string, never>;
 
   const createOperation = primaryEndpoint
     ? useEndpointCreate<PrimaryEndpoint>(

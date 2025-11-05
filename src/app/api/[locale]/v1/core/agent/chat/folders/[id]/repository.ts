@@ -11,8 +11,8 @@ import {
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import {
   canDeleteFolder,
-  canReadFolder,
   canUpdateFolder,
+  canViewFolder,
 } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { validateNoCircularReference } from "@/app/api/[locale]/v1/core/agent/chat/validation";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
@@ -50,7 +50,7 @@ export async function getFolder(
     }
 
     // Check if user can read this folder
-    if (!(await canReadFolder(user, folder, logger))) {
+    if (!(await canViewFolder(user, folder, logger))) {
       return fail({
         message:
           "app.api.v1.core.agent.chat.folders.id.get.errors.forbidden.title",
@@ -69,15 +69,13 @@ export async function getFolder(
           parentId: folder.parentId,
           expanded: folder.expanded,
           sortOrder: folder.sortOrder,
-          metadata:
-            (folder.metadata as Record<
-              string,
-              string | number | boolean | null
-            >) || {},
-          rolesRead: folder.rolesRead || [],
-          rolesWrite: folder.rolesWrite || [],
-          rolesHide: folder.rolesHide || [],
-          rolesDelete: folder.rolesDelete || [],
+          metadata: folder.metadata || {},
+          rolesView: folder.rolesView,
+          rolesManage: folder.rolesManage,
+          rolesCreateThread: folder.rolesCreateThread,
+          rolesPost: folder.rolesPost,
+          rolesModerate: folder.rolesModerate,
+          rolesAdmin: folder.rolesAdmin,
           createdAt: folder.createdAt.toISOString(),
           updatedAt: folder.updatedAt.toISOString(),
         },
@@ -138,7 +136,7 @@ export async function updateFolder(
     }
 
     // Update the folder
-    logger.info("Updating folder with data:", { id, updates });
+    logger.info("Updating folder", { id });
 
     // Build update object with proper types
     const updateData: Partial<typeof chatFolders.$inferInsert> = {
@@ -167,21 +165,23 @@ export async function updateFolder(
     if (updates.metadata !== undefined) {
       updateData.metadata = updates.metadata;
     }
-    if (updates.rolesRead !== undefined) {
-      updateData.rolesRead =
-        updates.rolesRead as typeof chatFolders.$inferInsert.rolesRead;
+    if (updates.rolesView !== undefined) {
+      updateData.rolesView = updates.rolesView;
     }
-    if (updates.rolesWrite !== undefined) {
-      updateData.rolesWrite =
-        updates.rolesWrite as typeof chatFolders.$inferInsert.rolesWrite;
+    if (updates.rolesManage !== undefined) {
+      updateData.rolesManage = updates.rolesManage;
     }
-    if (updates.rolesHide !== undefined) {
-      updateData.rolesHide =
-        updates.rolesHide as typeof chatFolders.$inferInsert.rolesHide;
+    if (updates.rolesCreateThread !== undefined) {
+      updateData.rolesCreateThread = updates.rolesCreateThread;
     }
-    if (updates.rolesDelete !== undefined) {
-      updateData.rolesDelete =
-        updates.rolesDelete as typeof chatFolders.$inferInsert.rolesDelete;
+    if (updates.rolesPost !== undefined) {
+      updateData.rolesPost = updates.rolesPost;
+    }
+    if (updates.rolesModerate !== undefined) {
+      updateData.rolesModerate = updates.rolesModerate;
+    }
+    if (updates.rolesAdmin !== undefined) {
+      updateData.rolesAdmin = updates.rolesAdmin;
     }
 
     const [updatedFolder] = await db
@@ -212,15 +212,13 @@ export async function updateFolder(
           parentId: updatedFolder.parentId,
           expanded: updatedFolder.expanded,
           sortOrder: updatedFolder.sortOrder,
-          metadata:
-            (updatedFolder.metadata as Record<
-              string,
-              string | number | boolean | null
-            >) || {},
-          rolesRead: updatedFolder.rolesRead || [],
-          rolesWrite: updatedFolder.rolesWrite || [],
-          rolesHide: updatedFolder.rolesHide || [],
-          rolesDelete: updatedFolder.rolesDelete || [],
+          metadata: updatedFolder.metadata || {},
+          rolesView: updatedFolder.rolesView,
+          rolesManage: updatedFolder.rolesManage,
+          rolesCreateThread: updatedFolder.rolesCreateThread,
+          rolesPost: updatedFolder.rolesPost,
+          rolesModerate: updatedFolder.rolesModerate,
+          rolesAdmin: updatedFolder.rolesAdmin,
           createdAt: updatedFolder.createdAt.toISOString(),
           updatedAt: updatedFolder.updatedAt.toISOString(),
         },

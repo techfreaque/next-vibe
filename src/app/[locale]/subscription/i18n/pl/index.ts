@@ -12,11 +12,12 @@ export const translations: typeof enTranslations = {
       title: "Saldo kredytów",
       description:
         "Twoje dostępne kredyty na rozmowy z AI z {{modelCount}} modelami",
-      total: "kredyty",
+      credit: "{{count}} kredyt",
+      credits: "{{count}} kredytów",
       nextExpiration: "Następne wygaśnięcie",
       expiring: {
         title: "Kredyty subskrypcyjne",
-        description: "Z miesięcznej subskrypcji (1000 kredytów/miesiąc)",
+        description: "Z miesięcznej subskrypcji ({{subCredits}} kredytów/miesiąc)",
       },
       permanent: {
         title: "Kredyty stałe",
@@ -45,7 +46,7 @@ export const translations: typeof enTranslations = {
         free: {
           title: "Darmowe kredyty testowe",
           description:
-            "Każdy otrzymuje 20 darmowych kredytów do wypróbowania naszej usługi. Nie wymaga karty kredytowej!",
+            "Każdy otrzymuje {{count}} darmowych kredytów do wypróbowania naszej usługi. Nie wymaga karty kredytowej!",
         },
       },
       costs: {

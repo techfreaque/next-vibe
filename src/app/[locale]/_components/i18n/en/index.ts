@@ -120,7 +120,7 @@ export const translations = {
       title: "{{appName}} - Uncensored AI Chat",
       category: "AI Chat Platform",
       description:
-        "Experience truly uncensored AI conversations with 40+ models. No filters, no restrictions, just honest AI.",
+        "Experience truly uncensored AI conversations with {{modelCount}}+ models. No filters, no restrictions, just honest AI.",
       imageAlt: "{{appName}} - Uncensored AI Chat Platform",
       keywords:
         "uncensored AI, AI chat, GPT-4, Claude, Gemini, AI models, no filters, honest AI, AI conversations",
@@ -215,7 +215,7 @@ export const translations = {
       defaultTitle: "{{appName}} - Uncensored AI Chat",
       category: "AI Chat Platform",
       description:
-        "Experience truly uncensored AI conversations with 40+ models. No filters, no restrictions, just honest AI.",
+        "Experience truly uncensored AI conversations with {{modelCount}}+ models. No filters, no restrictions, just honest AI.",
     },
     openGraph: {
       imageAlt: "{{appName}} - Uncensored AI Chat Platform",

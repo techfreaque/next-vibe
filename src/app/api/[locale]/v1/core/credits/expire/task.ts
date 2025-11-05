@@ -99,26 +99,3 @@ const creditExpirationTask: Task = {
 export const tasks: Task[] = [creditExpirationTask];
 
 export default tasks;
-
-/**
- * Legacy exports for backward compatibility
- */
-export const taskDefinition = {
-  name: "credit-expiration",
-  description: "app.api.v1.core.agent.chat.credits.expire.task.description",
-  version: "1.0.0",
-  schedule: CRON_SCHEDULES.DAILY_MIDNIGHT,
-  timezone: "UTC",
-  enabled: true,
-  timeout: TASK_TIMEOUTS.SHORT,
-  retries: 2,
-  retryDelay: 5000,
-  priority: CronTaskPriority.MEDIUM,
-  tags: ["credits", "cleanup", "subscription"],
-  dependencies: [],
-  monitoring: {
-    alertOnFailure: true,
-    alertOnLongExecution: false,
-    maxExecutionTime: 60000, // 1 minute
-  },
-};

@@ -301,163 +301,191 @@ function ThreadItem({
         </Div>
       )}
 
-      {!isEditing && (isHovered || isTouched || isActive || isTouch) && (
-        <Div
-          className="flex items-center gap-1"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <DropdownMenu
-            open={dropdownOpen}
-            onOpenChange={(open) => {
-              setDropdownOpen(open);
-              // Reset hover/touch state when dropdown closes
-              if (!open) {
-                setIsHovered(false);
-                setIsTouched(false);
-              }
-            }}
-          >
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-5 w-6"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDropdownOpen(true);
+      {/* Determine if context menu has any items */}
+      {!isEditing &&
+        (isHovered || isTouched || isActive || isTouch) &&
+        ((): JSX.Element | null => {
+          const hasMenuItems =
+            thread.canEdit || // Rename, pin, archive, move
+            thread.canManagePermissions || // Manage permissions
+            thread.canDelete; // Delete
+
+          if (!hasMenuItems) {
+            return null;
+          }
+
+          return (
+            <Div
+              className="flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <DropdownMenu
+                open={dropdownOpen}
+                onOpenChange={(open) => {
+                  setDropdownOpen(open);
+                  // Reset hover/touch state when dropdown closes
+                  if (!open) {
+                    setIsHovered(false);
+                    setIsTouched(false);
+                  }
                 }}
               >
-                <MoreVertical className="h-3.5 w-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              onClick={(e) => e.stopPropagation()}
-              onCloseAutoFocus={(e) => e.preventDefault()}
-            >
-              <DropdownMenuItem
-                onSelect={handleEdit}
-                className="cursor-pointer"
-              >
-                <Edit2 className="h-4 w-4 mr-2" />
-                {t("app.chat.actions.rename")}
-              </DropdownMenuItem>
-
-              {onPinThread && (
-                <DropdownMenuItem
-                  onSelect={handlePinToggle}
-                  className="cursor-pointer"
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-6"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDropdownOpen(true);
+                    }}
+                  >
+                    <MoreVertical className="h-3.5 w-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  onClick={(e) => e.stopPropagation()}
+                  onCloseAutoFocus={(e) => e.preventDefault()}
                 >
-                  {thread.pinned ? (
-                    <>
-                      <PinOff className="h-4 w-4 mr-2" />
-                      {t("app.chat.actions.unpin")}
-                    </>
-                  ) : (
-                    <>
-                      <Pin className="h-4 w-4 mr-2" />
-                      {t("app.chat.actions.pin")}
-                    </>
+                  {/* Only show Rename if user has permission (computed server-side) */}
+                  {thread.canEdit && (
+                    <DropdownMenuItem
+                      onSelect={handleEdit}
+                      className="cursor-pointer"
+                    >
+                      <Edit2 className="h-4 w-4 mr-2" />
+                      {t("app.chat.actions.rename")}
+                    </DropdownMenuItem>
                   )}
-                </DropdownMenuItem>
-              )}
 
-              {onArchiveThread && (
-                <DropdownMenuItem
-                  onSelect={handleArchiveToggle}
-                  className="cursor-pointer"
-                >
-                  {thread.archived ? (
-                    <>
-                      <ArchiveRestore className="h-4 w-4 mr-2" />
-                      {t("app.chat.actions.unarchive")}
-                    </>
-                  ) : (
-                    <>
-                      <Archive className="h-4 w-4 mr-2" />
-                      {t("app.chat.actions.archive")}
-                    </>
-                  )}
-                </DropdownMenuItem>
-              )}
-
-              <DropdownMenuItem
-                onSelect={handleManagePermissions}
-                className="cursor-pointer"
-              >
-                <Shield className="h-4 w-4 mr-2" />
-                {t("app.chat.folderList.managePermissions")}
-              </DropdownMenuItem>
-
-              {onMoveThread && chat && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="cursor-pointer">
-                      <FolderInput className="h-4 w-4 mr-2" />
-                      {t("app.chat.actions.moveToFolder")}
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                      {/* Option to move to root (no folder) */}
-                      {currentFolderId !== null && (
-                        <DropdownMenuItem
-                          onSelect={() => handleMoveToFolder(null)}
-                          className="cursor-pointer"
-                        >
-                          {((): JSX.Element => {
-                            const UnfiledIcon = getIconComponent("folder");
-                            return (
-                              <>
-                                <UnfiledIcon className="h-4 w-4 mr-2" />
-                                {t("app.chat.actions.unfiled")}
-                              </>
-                            );
-                          })()}
-                        </DropdownMenuItem>
+                  {/* Only show Pin/Unpin if user has permission (computed server-side) */}
+                  {onPinThread && thread.canEdit && (
+                    <DropdownMenuItem
+                      onSelect={handlePinToggle}
+                      className="cursor-pointer"
+                    >
+                      {thread.pinned ? (
+                        <>
+                          <PinOff className="h-4 w-4 mr-2" />
+                          {t("app.chat.actions.unpin")}
+                        </>
+                      ) : (
+                        <>
+                          <Pin className="h-4 w-4 mr-2" />
+                          {t("app.chat.actions.pin")}
+                        </>
                       )}
+                    </DropdownMenuItem>
+                  )}
 
-                      {/* List all folders */}
-                      {allFolders.length > 0 ? (
-                        allFolders.map((folder) => {
-                          const FolderIcon = getIconComponent(
-                            folder.icon ?? "folder",
-                          );
-                          return (
+                  {/* Only show Archive/Unarchive if user has permission (computed server-side) */}
+                  {onArchiveThread && thread.canEdit && (
+                    <DropdownMenuItem
+                      onSelect={handleArchiveToggle}
+                      className="cursor-pointer"
+                    >
+                      {thread.archived ? (
+                        <>
+                          <ArchiveRestore className="h-4 w-4 mr-2" />
+                          {t("app.chat.actions.unarchive")}
+                        </>
+                      ) : (
+                        <>
+                          <Archive className="h-4 w-4 mr-2" />
+                          {t("app.chat.actions.archive")}
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                  )}
+
+                  {/* Only show Manage Permissions if user has permission (computed server-side) */}
+                  {thread.canManagePermissions && (
+                    <DropdownMenuItem
+                      onSelect={handleManagePermissions}
+                      className="cursor-pointer"
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      {t("app.chat.folderList.managePermissions")}
+                    </DropdownMenuItem>
+                  )}
+
+                  {/* Only show Move to Folder if user has permission (computed server-side) */}
+                  {onMoveThread && chat && thread.canEdit && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="cursor-pointer">
+                          <FolderInput className="h-4 w-4 mr-2" />
+                          {t("app.chat.actions.moveToFolder")}
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          {/* Option to move to root (no folder) */}
+                          {currentFolderId !== null && (
                             <DropdownMenuItem
-                              key={folder.id}
-                              onSelect={() => handleMoveToFolder(folder.id)}
-                              disabled={currentFolderId === folder.id}
+                              onSelect={() => handleMoveToFolder(null)}
                               className="cursor-pointer"
                             >
-                              <FolderIcon className="h-4 w-4 mr-2" />
-                              {folder.name}
+                              {((): JSX.Element => {
+                                const UnfiledIcon = getIconComponent("folder");
+                                return (
+                                  <>
+                                    <UnfiledIcon className="h-4 w-4 mr-2" />
+                                    {t("app.chat.actions.unfiled")}
+                                  </>
+                                );
+                              })()}
                             </DropdownMenuItem>
-                          );
-                        })
-                      ) : (
-                        <DropdownMenuItem disabled>
-                          <Span className="text-sm text-muted-foreground">
-                            {t("app.chat.actions.noFoldersAvailable")}
-                          </Span>
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
-                </>
-              )}
+                          )}
 
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onSelect={handleDeleteClick}
-                className="text-destructive cursor-pointer"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                {t("app.chat.common.delete")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </Div>
-      )}
+                          {/* List all folders */}
+                          {allFolders.length > 0 ? (
+                            allFolders.map((folder) => {
+                              const FolderIcon = getIconComponent(
+                                folder.icon ?? "folder",
+                              );
+                              return (
+                                <DropdownMenuItem
+                                  key={folder.id}
+                                  onSelect={() => handleMoveToFolder(folder.id)}
+                                  disabled={currentFolderId === folder.id}
+                                  className="cursor-pointer"
+                                >
+                                  <FolderIcon className="h-4 w-4 mr-2" />
+                                  {folder.name}
+                                </DropdownMenuItem>
+                              );
+                            })
+                          ) : (
+                            <DropdownMenuItem disabled>
+                              <Span className="text-sm text-muted-foreground">
+                                {t("app.chat.actions.noFoldersAvailable")}
+                              </Span>
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    </>
+                  )}
+
+                  {/* Only show Delete if user has permission (computed server-side) */}
+                  {thread.canDelete && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onSelect={handleDeleteClick}
+                        className="text-destructive cursor-pointer"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        {t("app.chat.common.delete")}
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </Div>
+          );
+        })()}
 
       {thread.pinned && (
         <Div className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />

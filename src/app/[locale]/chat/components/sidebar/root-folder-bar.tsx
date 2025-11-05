@@ -52,6 +52,11 @@ function getColorClasses(color: string | null, isActive: boolean): string {
         "bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20",
       hover: "hover:bg-amber-500/10 hover:text-amber-600",
     },
+    purple: {
+      active:
+        "bg-purple-500/15 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20",
+      hover: "hover:bg-purple-500/10 hover:text-purple-600",
+    },
     zinc: {
       active:
         "bg-zinc-500/15 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-500/20",
@@ -79,6 +84,7 @@ function getTooltipColorClasses(color: string | null): string {
     sky: "bg-sky-600 text-white border-sky-500",
     teal: "bg-teal-600 text-white border-teal-500",
     amber: "bg-amber-600 text-white border-amber-500",
+    purple: "bg-purple-600 text-white border-purple-500",
     zinc: "bg-zinc-600 text-white border-zinc-500",
   };
 

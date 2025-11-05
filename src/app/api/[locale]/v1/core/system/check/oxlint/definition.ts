@@ -29,7 +29,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.check.oxlint.description",
   category: "app.api.v1.core.system.check.oxlint.category",
   tags: ["app.api.v1.core.system.check.oxlint.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF, UserRole.WEB_OFF],
   aliases: ["lint", "l"],
 
   cli: {

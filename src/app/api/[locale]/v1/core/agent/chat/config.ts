@@ -60,14 +60,18 @@ export interface DefaultFolderConfig {
   color: string;
 
   /** Default permission roles for folders in this root folder */
-  /** Roles that can read/view this folder and its contents */
-  rolesRead: (typeof UserRoleValue)[];
-  /** Roles that can write/create content in this folder */
-  rolesWrite: (typeof UserRoleValue)[];
-  /** Roles that can hide/moderate content in this folder */
-  rolesHide: (typeof UserRoleValue)[];
-  /** Roles that can delete content in this folder */
-  rolesDelete: (typeof UserRoleValue)[];
+  /** Roles that can view/read this folder and its contents */
+  rolesView: (typeof UserRoleValue)[];
+  /** Roles that can edit folder and create subfolders */
+  rolesManage: (typeof UserRoleValue)[];
+  /** Roles that can create threads in this folder */
+  rolesCreateThread: (typeof UserRoleValue)[];
+  /** Roles that can post messages in threads */
+  rolesPost: (typeof UserRoleValue)[];
+  /** Roles that can moderate/hide content in this folder */
+  rolesModerate: (typeof UserRoleValue)[];
+  /** Roles that can delete content and manage permissions */
+  rolesAdmin: (typeof UserRoleValue)[];
 }
 
 /**
@@ -82,10 +86,12 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     descriptionKey: "app.chat.folders.privateDescription",
     order: 0,
     color: "sky", // Softer blue for private/secure
-    rolesRead: [], // Owner only
-    rolesWrite: [], // Owner only
-    rolesHide: [], // Owner only
-    rolesDelete: [], // Owner only
+    rolesView: [], // Owner only
+    rolesManage: [], // Owner only
+    rolesCreateThread: [], // Owner only
+    rolesPost: [], // Owner only
+    rolesModerate: [], // Owner only
+    rolesAdmin: [], // Owner only
   },
   {
     id: DEFAULT_FOLDER_IDS.INCOGNITO,
@@ -93,11 +99,13 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     icon: "shield-plus",
     descriptionKey: "app.chat.folders.incognitoDescription",
     order: 1,
-    color: "zinc", // Neutral gray for incognito/hidden
-    rolesRead: [], // Local only
-    rolesWrite: [], // Local only
-    rolesHide: [], // Local only
-    rolesDelete: [], // Local only
+    color: "purple", // Purple for incognito/private
+    rolesView: [], // Local only
+    rolesManage: [], // Local only
+    rolesCreateThread: [], // Local only
+    rolesPost: [], // Local only
+    rolesModerate: [], // Local only
+    rolesAdmin: [], // Local only
   },
   {
     id: DEFAULT_FOLDER_IDS.SHARED,
@@ -106,10 +114,12 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     descriptionKey: "app.chat.folders.sharedDescription",
     order: 2,
     color: "teal", // Collaborative teal for shared
-    rolesRead: [], // Will be set via share links
-    rolesWrite: [], // Will be set via share links
-    rolesHide: [], // Will be set via share links
-    rolesDelete: [], // Will be set via share links
+    rolesView: [], // Will be set via share links
+    rolesManage: [], // Will be set via share links
+    rolesCreateThread: [], // Will be set via share links
+    rolesPost: [], // Will be set via share links
+    rolesModerate: [], // Will be set via share links
+    rolesAdmin: [], // Will be set via share links
   },
   {
     id: DEFAULT_FOLDER_IDS.PUBLIC,
@@ -118,10 +128,12 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     descriptionKey: "app.chat.folders.publicDescription",
     order: 3,
     color: "amber", // Premium gold/amber for public 1A
-    rolesRead: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN], // Visible to all
-    rolesWrite: [UserRole.ADMIN], // Only admins can write
-    rolesHide: [UserRole.PARTNER_ADMIN, UserRole.ADMIN], // Moderators and admins can hide
-    rolesDelete: [UserRole.ADMIN], // Only admins can delete
+    rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN], // Visible to all
+    rolesManage: [UserRole.ADMIN], // Only admins can manage folder
+    rolesCreateThread: [UserRole.CUSTOMER, UserRole.ADMIN], // Only authenticated users can create threads in root public folder
+    rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN], // Everyone can post
+    rolesModerate: [UserRole.PARTNER_ADMIN, UserRole.ADMIN], // Moderators and admins can moderate
+    rolesAdmin: [UserRole.ADMIN], // Only admins can delete
   },
 ] as const;
 

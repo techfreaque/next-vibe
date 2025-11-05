@@ -14,7 +14,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import {
+  UserRoleDB,
+  UserRole,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
  * Get Single Folder Endpoint (GET)
@@ -88,7 +91,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.get.response.folder.userId.content" as const,
                 },
-                z.uuid(),
+                z.uuid().nullable(),
               ),
               name: responseField(
                 {
@@ -144,39 +147,55 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.get.response.folder.metadata.content" as const,
                 },
-                z.record(z.string(), z.any()),
+                z.record(z.string(), z.never()),
               ),
-              rolesRead: responseField(
+              rolesView: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesRead.content" as const,
+                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesView.content" as const,
                 },
-                z.array(z.string()),
+                z.array(z.enum(UserRoleDB)).nullable(),
               ),
-              rolesWrite: responseField(
+              rolesManage: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesWrite.content" as const,
+                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesManage.content" as const,
                 },
-                z.array(z.string()),
+                z.array(z.enum(UserRoleDB)).nullable(),
               ),
-              rolesHide: responseField(
+              rolesCreateThread: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesHide.content" as const,
+                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesCreateThread.content" as const,
                 },
-                z.array(z.string()),
+                z.array(z.enum(UserRoleDB)).nullable(),
               ),
-              rolesDelete: responseField(
+              rolesPost: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesDelete.content" as const,
+                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesPost.content" as const,
                 },
-                z.array(z.string()),
+                z.array(z.enum(UserRoleDB)).nullable(),
+              ),
+              rolesModerate: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesModerate.content" as const,
+                },
+                z.array(z.enum(UserRoleDB)).nullable(),
+              ),
+              rolesAdmin: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.id.get.response.folder.rolesAdmin.content" as const,
+                },
+                z.array(z.enum(UserRoleDB)).nullable(),
               ),
               createdAt: responseField(
                 {
@@ -276,10 +295,12 @@ const { GET } = createEndpoint({
             expanded: true,
             sortOrder: 0,
             metadata: {},
-            rolesRead: [],
-            rolesWrite: [],
-            rolesHide: [],
-            rolesDelete: [],
+            rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER],
+            rolesManage: [UserRole.CUSTOMER],
+            rolesCreateThread: [UserRole.CUSTOMER],
+            rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER],
+            rolesModerate: [UserRole.ADMIN],
+            rolesAdmin: [UserRole.ADMIN],
             createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
             updatedAt: new Date("2024-01-01T00:00:00Z").toISOString(),
           },
@@ -422,55 +443,85 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.folders.id.patch.metadata.description" as const,
               layout: { columns: 12 },
             },
-            z.record(z.string(), z.any()).optional(),
+            z.record(z.string(), z.never()).optional(),
           ),
-          rolesRead: requestDataField(
+          rolesView: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.JSON,
+              fieldType: FieldDataType.MULTISELECT,
               label:
-                "app.api.v1.core.agent.chat.folders.id.patch.rolesRead.label" as const,
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesView.label" as const,
               description:
-                "app.api.v1.core.agent.chat.folders.id.patch.rolesRead.description" as const,
-              layout: { columns: 12 },
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesView.description" as const,
+              layout: { columns: 6 },
+              options: UserRoleDB.map((role) => ({ value: role, label: role })),
             },
-            z.array(z.string()).optional(),
+            z.array(z.enum(UserRoleDB)).nullable().optional(),
           ),
-          rolesWrite: requestDataField(
+          rolesManage: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.JSON,
+              fieldType: FieldDataType.MULTISELECT,
               label:
-                "app.api.v1.core.agent.chat.folders.id.patch.rolesWrite.label" as const,
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesManage.label" as const,
               description:
-                "app.api.v1.core.agent.chat.folders.id.patch.rolesWrite.description" as const,
-              layout: { columns: 12 },
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesManage.description" as const,
+              layout: { columns: 6 },
+              options: UserRoleDB.map((role) => ({ value: role, label: role })),
             },
-            z.array(z.string()).optional(),
+            z.array(z.enum(UserRoleDB)).nullable().optional(),
           ),
-          rolesHide: requestDataField(
+          rolesCreateThread: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.JSON,
+              fieldType: FieldDataType.MULTISELECT,
               label:
-                "app.api.v1.core.agent.chat.folders.id.patch.rolesHide.label" as const,
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesCreateThread.label" as const,
               description:
-                "app.api.v1.core.agent.chat.folders.id.patch.rolesHide.description" as const,
-              layout: { columns: 12 },
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesCreateThread.description" as const,
+              layout: { columns: 6 },
+              options: UserRoleDB.map((role) => ({ value: role, label: role })),
             },
-            z.array(z.string()).optional(),
+            z.array(z.enum(UserRoleDB)).nullable().optional(),
           ),
-          rolesDelete: requestDataField(
+          rolesPost: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.JSON,
+              fieldType: FieldDataType.MULTISELECT,
               label:
-                "app.api.v1.core.agent.chat.folders.id.patch.rolesDelete.label" as const,
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesPost.label" as const,
               description:
-                "app.api.v1.core.agent.chat.folders.id.patch.rolesDelete.description" as const,
-              layout: { columns: 12 },
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesPost.description" as const,
+              layout: { columns: 6 },
+              options: UserRoleDB.map((role) => ({ value: role, label: role })),
             },
-            z.array(z.string()).optional(),
+            z.array(z.enum(UserRoleDB)).nullable().optional(),
+          ),
+          rolesModerate: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label:
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesModerate.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesModerate.description" as const,
+              layout: { columns: 6 },
+              options: UserRoleDB.map((role) => ({ value: role, label: role })),
+            },
+            z.array(z.enum(UserRoleDB)).nullable().optional(),
+          ),
+          rolesAdmin: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label:
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesAdmin.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.folders.id.patch.rolesAdmin.description" as const,
+              layout: { columns: 6 },
+              options: UserRoleDB.map((role) => ({ value: role, label: role })),
+            },
+            z.array(z.enum(UserRoleDB)).nullable().optional(),
           ),
         },
       ),
@@ -510,7 +561,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.patch.response.folder.userId.content" as const,
                 },
-                z.uuid(),
+                z.uuid().nullable(),
               ),
               name: responseField(
                 {
@@ -566,39 +617,55 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.patch.response.folder.metadata.content" as const,
                 },
-                z.record(z.string(), z.any()),
+                z.record(z.string(), z.never()),
               ),
-              rolesRead: responseField(
+              rolesView: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesRead.content" as const,
+                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesView.content" as const,
                 },
-                z.array(z.string()),
+                z.array(z.enum(UserRoleDB)).nullable(),
               ),
-              rolesWrite: responseField(
+              rolesManage: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesWrite.content" as const,
+                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesManage.content" as const,
                 },
-                z.array(z.string()),
+                z.array(z.enum(UserRoleDB)).nullable(),
               ),
-              rolesHide: responseField(
+              rolesCreateThread: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesHide.content" as const,
+                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesCreateThread.content" as const,
                 },
-                z.array(z.string()),
+                z.array(z.enum(UserRoleDB)).nullable(),
               ),
-              rolesDelete: responseField(
+              rolesPost: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesDelete.content" as const,
+                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesPost.content" as const,
                 },
-                z.array(z.string()),
+                z.array(z.enum(UserRoleDB)).nullable(),
+              ),
+              rolesModerate: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesModerate.content" as const,
+                },
+                z.array(z.enum(UserRoleDB)).nullable(),
+              ),
+              rolesAdmin: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.id.patch.response.folder.rolesAdmin.content" as const,
+                },
+                z.array(z.enum(UserRoleDB)).nullable(),
               ),
               createdAt: responseField(
                 {
@@ -708,10 +775,12 @@ const { PATCH } = createEndpoint({
             expanded: true,
             sortOrder: 0,
             metadata: {},
-            rolesRead: [],
-            rolesWrite: [],
-            rolesHide: [],
-            rolesDelete: [],
+            rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER],
+            rolesManage: [UserRole.CUSTOMER],
+            rolesCreateThread: [UserRole.CUSTOMER],
+            rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER],
+            rolesModerate: [UserRole.ADMIN],
+            rolesAdmin: [UserRole.ADMIN],
             createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
             updatedAt: new Date().toISOString(),
           },

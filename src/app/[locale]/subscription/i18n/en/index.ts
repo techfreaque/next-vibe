@@ -10,11 +10,12 @@ export const translations = {
       title: "Credit Balance",
       description:
         "Your available credits for AI conversations with {{modelCount}} models",
-      total: "credits",
+      credit: "{{count}} credit",
+      credits: "{{count}} credits",
       nextExpiration: "Next Expiration",
       expiring: {
         title: "Subscription Credits",
-        description: "From monthly subscription (1000 credits/month)",
+        description: "From monthly subscription ({{subCredits}} credits/month)",
       },
       permanent: {
         title: "Permanent Credits",
@@ -155,7 +156,7 @@ export const translations = {
     subscription: {
       title: "Credits & Subscription - Unbottled AI",
       description:
-        "Subscribe for 1000 monthly credits and buy extra packs when needed. Chat with 40+ uncensored AI models.",
+        "Subscribe for {{subCredits}} monthly credits and buy extra packs when needed. Chat with {{modelCount}}+ uncensored AI models.",
       category: "Account",
       imageAlt: "Credits and subscription management for uncensored AI chat",
       keywords: {
@@ -170,7 +171,7 @@ export const translations = {
     success: {
       title: "Payment Successful",
       subscription:
-        "Your monthly subscription has been activated! You now get 1000 credits per month with all 40+ models.",
+        "Your monthly subscription has been activated! You now get {{subCredits}} credits per month with all {{modelCount}}+ models.",
       credits:
         "Your credit pack purchase was successful! Credits never expire.",
     },

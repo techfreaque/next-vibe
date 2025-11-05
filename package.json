@@ -21,10 +21,7 @@
     "native": "expo start",
     "native:android": "expo run:android",
     "native:ios": "expo run:ios",
-    "native:web": "expo start --web",
-    "native:reset": "expo start --clear",
-    "android": "expo run:android",
-    "ios": "expo run:ios"
+    "native:reset": "expo start --clear"
   },
   "contributors": [
     {

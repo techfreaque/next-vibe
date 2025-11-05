@@ -122,7 +122,7 @@ export const translations: typeof enTranslations = {
       title: "{{appName}} - Niecenzurowany czat AI",
       category: "Platforma czatu AI",
       description:
-        "Doświadcz prawdziwie niecenzurowanych rozmów z AI z ponad 40 modelami. Bez filtrów, bez ograniczeń, tylko szczera AI.",
+        "Doświadcz prawdziwie niecenzurowanych rozmów z AI z ponad {{modelCount}} modelami. Bez filtrów, bez ograniczeń, tylko szczera AI.",
       imageAlt: "{{appName}} - Niecenzurowana platforma czatu AI",
       keywords:
         "niecenzurowana AI, czat AI, GPT-4, Claude, Gemini, modele AI, bez filtrów, szczera AI, rozmowy AI",
@@ -217,7 +217,7 @@ export const translations: typeof enTranslations = {
       defaultTitle: "{{appName}} - Niecenzurowany czat AI",
       category: "Platforma czatu AI",
       description:
-        "Doświadcz prawdziwie niecenzurowanych rozmów z AI z ponad 40 modelami. Bez filtrów, bez ograniczeń, tylko szczera AI.",
+        "Doświadcz prawdziwie niecenzurowanych rozmów z AI z ponad {{modelCount}} modelami. Bez filtrów, bez ograniczeń, tylko szczera AI.",
     },
     openGraph: {
       imageAlt: "{{appName}} - Niecenzurowana platforma czatu AI",

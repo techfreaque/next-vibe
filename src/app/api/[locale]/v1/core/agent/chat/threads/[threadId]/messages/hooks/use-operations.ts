@@ -16,7 +16,7 @@ import { DEFAULT_FOLDER_IDS, type DefaultFolderId } from "../../../../config";
 import { ChatMessageRole } from "../../../../enum";
 import type { ModelId } from "../../../../model-access/models";
 import type { ChatMessage } from "../../../../hooks/store";
-import type { UseAIStreamReturn } from "../../../../../ai-stream/hooks/hooks";
+import type { UseAIStreamReturn } from "../../../../../ai-stream/hooks/use-ai-stream";
 import { createCreditUpdateCallback } from "../../../../credit-updater";
 
 /**
@@ -27,7 +27,7 @@ export interface MessageOperations {
     content: string,
     onThreadCreated?: (
       threadId: string,
-      rootFolderId: string,
+      rootFolderId: DefaultFolderId,
       subFolderId: string | null,
     ) => void,
   ) => Promise<void>;
@@ -46,12 +46,13 @@ interface MessageOperationsDeps {
   locale: CountryLanguage;
   logger: EndpointLogger;
   aiStream: UseAIStreamReturn;
+  // Navigation state - passed separately, not from chatStore
+  activeThreadId: string | null;
+  currentRootFolderId: DefaultFolderId;
+  currentSubFolderId: string | null;
   chatStore: {
-    activeThreadId: string | null;
-    currentRootFolderId: DefaultFolderId;
-    currentSubFolderId: string | null;
     messages: Record<string, ChatMessage>;
-    threads: Record<string, { rootFolderId: string }>;
+    threads: Record<string, { rootFolderId: DefaultFolderId }>;
     setLoading: (loading: boolean) => void;
     getThreadMessages: (threadId: string) => ChatMessage[];
     deleteMessage: (messageId: string) => void;
@@ -72,6 +73,7 @@ interface MessageOperationsDeps {
     enabledToolIds: string[];
   };
   setInput: (input: string) => void;
+  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 /**
@@ -84,10 +86,14 @@ export function useMessageOperations(
     locale,
     logger,
     aiStream,
+    activeThreadId,
+    currentRootFolderId,
+    currentSubFolderId,
     chatStore,
     streamStore,
     settings,
     setInput,
+    deductCredits,
   } = deps;
 
   const sendMessage = useCallback(
@@ -95,20 +101,52 @@ export function useMessageOperations(
       content: string,
       onThreadCreated?: (
         threadId: string,
-        rootFolderId: string,
+        rootFolderId: DefaultFolderId,
         subFolderId: string | null,
       ) => void,
     ): Promise<void> => {
       logger.debug("Message operations: Sending message", {
         content: content.substring(0, 50),
-        activeThreadId: chatStore.activeThreadId,
-        currentRootFolderId: chatStore.currentRootFolderId,
+        activeThreadId,
+        currentRootFolderId,
       });
 
       chatStore.setLoading(true);
 
       try {
-        const threadIdToUse = chatStore.activeThreadId;
+        // CRITICAL FIX: Check if activeThreadId is actually a valid thread
+        // The URL parser can't distinguish between folder UUIDs and thread UUIDs
+        // If activeThreadId is set but doesn't exist in threads store, it's likely a folder ID
+        // In that case, treat it as null to create a new thread
+        // Also handle "new" from URL parser - convert to null for API
+        let threadIdToUse = activeThreadId === "new" ? null : activeThreadId;
+
+        logger.debug("Message operations: Checking activeThreadId", {
+          activeThreadId: threadIdToUse,
+          currentRootFolderId,
+          threadsCount: Object.keys(chatStore.threads).length,
+          threadIds: Object.keys(chatStore.threads),
+        });
+
+        if (threadIdToUse && currentRootFolderId !== "incognito") {
+          // Check if this ID exists in the threads store
+          const threadExists = chatStore.threads[threadIdToUse];
+          logger.debug("Message operations: Thread existence check", {
+            threadIdToUse,
+            threadExists: !!threadExists,
+            threadData: threadExists,
+          });
+          if (!threadExists) {
+            logger.debug(
+              "Message operations: activeThreadId not found in threads store, treating as folder ID",
+              {
+                activeThreadId: threadIdToUse,
+                threadsCount: Object.keys(chatStore.threads).length,
+              },
+            );
+            threadIdToUse = null;
+          }
+        }
 
         let parentMessageId: string | null = null;
         let messageHistory:
@@ -117,7 +155,7 @@ export function useMessageOperations(
 
         if (threadIdToUse) {
           let threadMessages: ChatMessage[] = [];
-          if (chatStore.currentRootFolderId === "incognito") {
+          if (currentRootFolderId === "incognito") {
             const { getMessagesForThread } = await import(
               "../../../../incognito/storage"
             );
@@ -132,10 +170,10 @@ export function useMessageOperations(
             logger.debug("Message operations: Using last message as parent", {
               parentMessageId,
               lastMessageContent: lastMessage.content.substring(0, 50),
-              isIncognito: chatStore.currentRootFolderId === "incognito",
+              isIncognito: currentRootFolderId === "incognito",
             });
 
-            if (chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+            if (currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
               messageHistory = threadMessages
                 .filter((msg) => msg.role !== "tool")
                 .map((msg) => ({
@@ -155,17 +193,20 @@ export function useMessageOperations(
             }
           }
         } else {
-          logger.debug("Message operations: No active thread, creating new thread", {
-            rootFolderId: chatStore.currentRootFolderId,
-            subFolderId: chatStore.currentSubFolderId,
-          });
+          logger.debug(
+            "Message operations: No active thread, creating new thread",
+            {
+              rootFolderId: currentRootFolderId,
+              subFolderId: currentSubFolderId,
+            },
+          );
         }
 
         await aiStream.startStream(
           {
             operation: "send",
-            rootFolderId: chatStore.currentRootFolderId,
-            subFolderId: chatStore.currentSubFolderId,
+            rootFolderId: currentRootFolderId,
+            subFolderId: currentSubFolderId,
             threadId: threadIdToUse,
             parentMessageId,
             content,
@@ -195,7 +236,7 @@ export function useMessageOperations(
             },
             onContentDone: createCreditUpdateCallback(
               settings.selectedModel,
-              logger,
+              deductCredits,
             ),
           },
         );
@@ -211,7 +252,17 @@ export function useMessageOperations(
         chatStore.setLoading(false);
       }
     },
-    [logger, chatStore, aiStream, settings, setInput],
+    [
+      logger,
+      chatStore,
+      aiStream,
+      settings,
+      setInput,
+      activeThreadId,
+      currentRootFolderId,
+      currentSubFolderId,
+      deductCredits,
+    ],
   );
 
   const retryMessage = useCallback(
@@ -231,7 +282,7 @@ export function useMessageOperations(
           | Array<{ role: "user" | "assistant" | "system"; content: string }>
           | undefined;
 
-        if (chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+        if (currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
           const threadMessages = Object.values(chatStore.messages)
             .filter((msg) => msg.threadId === message.threadId)
             .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
@@ -261,8 +312,8 @@ export function useMessageOperations(
         await aiStream.startStream(
           {
             operation: "retry",
-            rootFolderId: chatStore.currentRootFolderId,
-            subFolderId: chatStore.currentSubFolderId,
+            rootFolderId: currentRootFolderId,
+            subFolderId: currentSubFolderId,
             threadId: message.threadId,
             parentMessageId: messageId,
             content: message.content,
@@ -277,7 +328,7 @@ export function useMessageOperations(
           {
             onContentDone: createCreditUpdateCallback(
               settings.selectedModel,
-              logger,
+              deductCredits,
             ),
           },
         );
@@ -290,7 +341,15 @@ export function useMessageOperations(
         chatStore.setLoading(false);
       }
     },
-    [logger, chatStore, aiStream, settings],
+    [
+      logger,
+      chatStore,
+      aiStream,
+      settings,
+      currentRootFolderId,
+      currentSubFolderId,
+      deductCredits,
+    ],
   );
 
   const branchMessage = useCallback(
@@ -318,7 +377,7 @@ export function useMessageOperations(
 
         const branchParentId = message.parentId;
 
-        if (chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+        if (currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
           const threadMessages = Object.values(chatStore.messages)
             .filter((msg) => msg.threadId === message.threadId)
             .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
@@ -346,8 +405,8 @@ export function useMessageOperations(
         await aiStream.startStream(
           {
             operation: "edit",
-            rootFolderId: chatStore.currentRootFolderId,
-            subFolderId: chatStore.currentSubFolderId,
+            rootFolderId: currentRootFolderId,
+            subFolderId: currentSubFolderId,
             threadId: message.threadId,
             parentMessageId: branchParentId,
             content: newContent,
@@ -362,7 +421,7 @@ export function useMessageOperations(
           {
             onContentDone: createCreditUpdateCallback(
               settings.selectedModel,
-              logger,
+              deductCredits,
             ),
           },
         );
@@ -375,7 +434,15 @@ export function useMessageOperations(
         chatStore.setLoading(false);
       }
     },
-    [logger, chatStore, aiStream, settings],
+    [
+      logger,
+      chatStore,
+      aiStream,
+      settings,
+      currentRootFolderId,
+      currentSubFolderId,
+      deductCredits,
+    ],
   );
 
   const answerAsAI = useCallback(
@@ -398,7 +465,7 @@ export function useMessageOperations(
           | Array<{ role: "user" | "assistant" | "system"; content: string }>
           | undefined;
 
-        if (chatStore.currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+        if (currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
           const threadMessages = Object.values(chatStore.messages)
             .filter((msg) => msg.threadId === message.threadId)
             .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
@@ -421,8 +488,8 @@ export function useMessageOperations(
         await aiStream.startStream(
           {
             operation: "answer-as-ai",
-            rootFolderId: chatStore.currentRootFolderId,
-            subFolderId: chatStore.currentSubFolderId,
+            rootFolderId: currentRootFolderId,
+            subFolderId: currentSubFolderId,
             threadId: message.threadId,
             parentMessageId: messageId,
             content,
@@ -437,7 +504,7 @@ export function useMessageOperations(
           {
             onContentDone: createCreditUpdateCallback(
               settings.selectedModel,
-              logger,
+              deductCredits,
             ),
           },
         );
@@ -450,7 +517,15 @@ export function useMessageOperations(
         chatStore.setLoading(false);
       }
     },
-    [logger, chatStore, aiStream, settings],
+    [
+      logger,
+      chatStore,
+      aiStream,
+      settings,
+      currentRootFolderId,
+      currentSubFolderId,
+      deductCredits,
+    ],
   );
 
   const deleteMessage = useCallback(
@@ -582,11 +657,14 @@ export function useMessageOperations(
       const isAuthenticated = authStatusCookie !== undefined;
 
       if (!isAuthenticated || thread.rootFolderId === "incognito") {
-        logger.debug("Message operations: Voting not supported in incognito mode", {
-          messageId,
-          isAuthenticated,
-          rootFolderId: thread.rootFolderId,
-        });
+        logger.debug(
+          "Message operations: Voting not supported in incognito mode",
+          {
+            messageId,
+            isAuthenticated,
+            rootFolderId: thread.rootFolderId,
+          },
+        );
         return;
       }
 

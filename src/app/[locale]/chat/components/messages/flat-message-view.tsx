@@ -13,6 +13,7 @@ import type { JSX } from "react";
 import React, { useState } from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
+import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -51,7 +52,9 @@ interface FlatMessageViewProps {
   onModelChange?: (model: ModelId) => void;
   onPersonaChange?: (persona: string) => void;
   onInsertQuote?: () => void; // Only inserts '>' character
-  rootFolderId?: string;
+  rootFolderId: DefaultFolderId;
+  currentUserId?: string;
+  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 /**
@@ -155,13 +158,13 @@ function MessagePreview({
   shortId,
   position,
   locale,
-  rootFolderId = "general",
+  rootFolderId = "private",
 }: {
   message: ChatMessage;
   shortId: string;
   position: { x: number; y: number };
   locale: CountryLanguage;
-  rootFolderId?: string;
+  rootFolderId: DefaultFolderId;
 }): JSX.Element {
   const { t } = simpleT(locale);
   const idColor = getIdColor(shortId);
@@ -191,7 +194,7 @@ function MessagePreview({
           )}
         >
           {isUser
-            ? rootFolderId === "general" ||
+            ? rootFolderId === "private" ||
               rootFolderId === "shared" ||
               rootFolderId === "public"
               ? t("app.chat.flatView.youLabel")
@@ -337,9 +340,11 @@ interface FlatMessageProps {
   onModelChange?: (model: ModelId) => void;
   onPersonaChange?: (persona: string) => void;
   onInsertQuote?: () => void;
-  rootFolderId?: string;
+  rootFolderId: DefaultFolderId;
   /** Collapse state management callbacks */
   collapseState?: ReturnType<typeof useCollapseState>;
+  currentUserId?: string;
+  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 function FlatMessage({
@@ -366,8 +371,10 @@ function FlatMessage({
   onModelChange,
   onPersonaChange,
   onInsertQuote,
-  rootFolderId = "general",
+  rootFolderId: _rootFolderId = "private",
   collapseState,
+  currentUserId,
+  deductCredits,
 }: FlatMessageProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -405,13 +412,23 @@ function FlatMessage({
       ? personas[message.persona]?.name || message.persona
       : t("app.chat.flatView.anonymous");
 
-  const displayName = isUser
-    ? rootFolderId === "general" ||
-      rootFolderId === "shared" ||
-      rootFolderId === "public"
-      ? t("app.chat.flatView.youLabel")
-      : t("app.chat.flatView.anonymous")
-    : modelDisplayName;
+  // Determine display name for user messages
+  let displayName: string;
+  if (isUser) {
+    if (currentUserId && message.authorId === currentUserId) {
+      // Current user's messages show "You"
+      displayName = t("app.chat.flatView.youLabel");
+    } else if (message.authorName) {
+      // Other users show their name
+      displayName = message.authorName;
+    } else {
+      // No author info - show "Anonymous"
+      displayName = t("app.chat.flatView.anonymous");
+    }
+  } else {
+    // AI messages show model name
+    displayName = modelDisplayName;
+  }
 
   const references = extractReferences(message.content);
   const replyCount = countReplies(messages, message.id);
@@ -583,6 +600,7 @@ function FlatMessage({
             onPersonaChange={onPersonaChange}
             locale={locale}
             logger={logger}
+            deductCredits={deductCredits}
           />
         </Div>
       ) : messageActions.retryingMessageId === message.id ? (
@@ -946,7 +964,9 @@ export function FlatMessageView({
   onModelChange,
   onPersonaChange,
   onInsertQuote: _onInsertQuote,
-  rootFolderId = "general",
+  rootFolderId = "private",
+  currentUserId,
+  deductCredits,
 }: FlatMessageViewProps): JSX.Element {
   const [hoveredRef, setHoveredRef] = useState<string | null>(null);
   const [previewPosition, setPreviewPosition] = useState<{
@@ -1070,6 +1090,8 @@ export function FlatMessageView({
             onInsertQuote={_onInsertQuote}
             rootFolderId={rootFolderId}
             collapseState={collapseState}
+            currentUserId={currentUserId}
+            deductCredits={deductCredits}
           />
         );
       })}

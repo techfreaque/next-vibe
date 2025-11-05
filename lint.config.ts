@@ -140,6 +140,8 @@ export const oxlintConfig: OxlintConfig = {
     "typescript/no-unnecessary-type-assertion": "error",
     "typescript/explicit-function-return-type": "error",
     "typescript/restrict-template-expressions": "error",
+    // We use classes for autocomplete on a domain
+    "no-extraneous-class": "off",
 
     // ========================================
     // React Rules

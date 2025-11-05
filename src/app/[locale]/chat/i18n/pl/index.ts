@@ -146,10 +146,14 @@ export const translations: typeof enTranslations = {
   },
   credits: {
     balance: "Kredyty",
-    total: "{{count}} kredytów",
-    expiring: "{{count}} wygasających",
-    permanent: "{{count}} stałych",
-    free: "{{count}} darmowych",
+    credit: "{{count}} kredyt",
+    credits: "{{count}} kredytów",
+    freeCredit: "{{count}} darmowy kredyt",
+    freeCredits: "{{count}} darmowych kredytów",
+    expiringCredit: "{{count}} wygasający kredyt",
+    expiringCredits: "{{count}} wygasających kredytów",
+    permanentCredit: "{{count}} stały kredyt",
+    permanentCredits: "{{count}} stałych kredytów",
     expiresOn: "Wygasa {{date}}",
     expiresAt: "Wygasa",
     buyMore: "Kup kredyty",
@@ -194,6 +198,13 @@ export const translations: typeof enTranslations = {
   },
   input: {
     placeholder: "Wpisz swoją wiadomość...",
+    noPermission: "Nie masz uprawnień do publikowania wiadomości",
+    noPostPermission:
+      "Nie masz uprawnień do publikowania wiadomości w tym wątku",
+    noCreateThreadPermission:
+      "Nie masz uprawnień do tworzenia wątków w tym folderze",
+    noCreateThreadPermissionInRootFolder:
+      "Nie masz uprawnień do tworzenia wątków w tym folderze. Zaloguj się lub wybierz podfolder.",
     keyboardShortcuts: {
       press: "Naciśnij",
       enter: "Enter",
@@ -676,21 +687,46 @@ export const translations: typeof enTranslations = {
       title: "Uprawnienia wątku",
       description: "Zarządzaj uprawnieniami dla tego wątku",
     },
+    view: {
+      label: "Uprawnienia do przeglądania",
+      description: "Kto może przeglądać i czytać tę treść",
+    },
+    manage: {
+      label: "Uprawnienia do zarządzania",
+      description: "Kto może edytować folder i tworzyć podfoldery",
+    },
+    edit: {
+      label: "Uprawnienia do edycji",
+      description: "Kto może edytować właściwości wątku",
+    },
+    createThread: {
+      label: "Uprawnienia do tworzenia wątków",
+      description: "Kto może tworzyć nowe wątki w tym folderze",
+    },
+    post: {
+      label: "Uprawnienia do postowania",
+      description: "Kto może publikować wiadomości",
+    },
+    moderate: {
+      label: "Uprawnienia moderacyjne",
+      description: "Kto może ukrywać i moderować treści",
+    },
+    admin: {
+      label: "Uprawnienia administratora",
+      description: "Kto może usuwać treści i zarządzać uprawnieniami",
+    },
+    // Legacy keys (kept for backwards compatibility)
     read: {
       label: "Uprawnienia do odczytu",
       description: "Kto może przeglądać i czytać tę treść",
     },
     write: {
       label: "Uprawnienia do zapisu",
-      description: "Kto może tworzyć i pisać treści",
+      description: "Kto może tworzyć wątki i foldery",
     },
-    hide: {
-      label: "Uprawnienia do ukrywania",
-      description: "Kto może ukrywać i moderować treści",
-    },
-    delete: {
-      label: "Uprawnienia do usuwania",
-      description: "Kto może usuwać treści",
+    writePost: {
+      label: "Uprawnienia do postowania",
+      description: "Kto może publikować wiadomości w wątkach",
     },
     roles: {
       public: "Publiczny (Wszyscy użytkownicy)",
@@ -765,6 +801,7 @@ export const translations: typeof enTranslations = {
     userFallback: "Użytkownik",
     assistantFallback: "Asystent",
     youLabel: "Ty",
+    anonymous: "Anonimowy",
   },
   flatView: {
     postNumber: "Post #{{number}}",

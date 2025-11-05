@@ -9,7 +9,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
-import { canManageFolder } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
+import { canManageFolderPermissions } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -22,7 +22,9 @@ import type {
 } from "./definition";
 
 /**
- * Get folder permissions (moderator IDs)
+ * Get folder permissions
+ * Returns 6 permission fields: rolesView, rolesManage, rolesCreateThread, rolesPost, rolesModerate, rolesAdmin
+ * Each field can be: null (inherit), [] (deny), or [roles...] (allow)
  */
 export async function getFolderPermissions(
   user: JwtPayloadType,
@@ -53,7 +55,7 @@ export async function getFolderPermissions(
     }
 
     // Check if user can manage this folder's permissions
-    const canManage = await canManageFolder(user, folder, logger);
+    const canManage = await canManageFolderPermissions(user, folder, logger);
     if (!canManage) {
       return fail({
         message:
@@ -62,20 +64,14 @@ export async function getFolderPermissions(
       });
     }
 
-    const rolesRead = Array.isArray(folder.rolesRead) ? folder.rolesRead : [];
-    const rolesWrite = Array.isArray(folder.rolesWrite)
-      ? folder.rolesWrite
-      : [];
-    const rolesHide = Array.isArray(folder.rolesHide) ? folder.rolesHide : [];
-    const rolesDelete = Array.isArray(folder.rolesDelete)
-      ? folder.rolesDelete
-      : [];
-
+    // Return permissions as-is (null, [], or [roles...])
     const responseData = {
-      rolesRead,
-      rolesWrite,
-      rolesHide,
-      rolesDelete,
+      rolesView: folder.rolesView,
+      rolesManage: folder.rolesManage,
+      rolesCreateThread: folder.rolesCreateThread,
+      rolesPost: folder.rolesPost,
+      rolesModerate: folder.rolesModerate,
+      rolesAdmin: folder.rolesAdmin,
     };
 
     logger.info("GET permissions response data", responseData);
@@ -91,7 +87,9 @@ export async function getFolderPermissions(
 }
 
 /**
- * Update folder permissions (moderator IDs)
+ * Update folder permissions
+ * Updates 6 permission fields: rolesView, rolesManage, rolesCreateThread, rolesPost, rolesModerate, rolesAdmin
+ * Each field can be: null (inherit), [] (deny), or [roles...] (allow)
  */
 export async function updateFolderPermissions(
   user: JwtPayloadType,
@@ -107,7 +105,15 @@ export async function updateFolderPermissions(
   }
 
   try {
-    const { id, rolesRead, rolesWrite, rolesHide, rolesDelete } = data;
+    const {
+      id,
+      rolesView,
+      rolesManage,
+      rolesCreateThread,
+      rolesPost,
+      rolesModerate,
+      rolesAdmin,
+    } = data;
 
     // Verify folder exists
     const [existingFolder] = await db
@@ -125,7 +131,11 @@ export async function updateFolderPermissions(
     }
 
     // Check if user can manage this folder's permissions
-    const canManage = await canManageFolder(user, existingFolder, logger);
+    const canManage = await canManageFolderPermissions(
+      user,
+      existingFolder,
+      logger,
+    );
     if (!canManage) {
       return fail({
         message:
@@ -136,29 +146,39 @@ export async function updateFolderPermissions(
 
     // Prepare update data - only update fields that are provided
     const updateData: {
-      rolesRead?: (typeof UserRoleDB)[number][];
-      rolesWrite?: (typeof UserRoleDB)[number][];
-      rolesHide?: (typeof UserRoleDB)[number][];
-      rolesDelete?: (typeof UserRoleDB)[number][];
+      rolesView?: (typeof UserRoleDB)[number][] | null;
+      rolesManage?: (typeof UserRoleDB)[number][] | null;
+      rolesCreateThread?: (typeof UserRoleDB)[number][] | null;
+      rolesPost?: (typeof UserRoleDB)[number][] | null;
+      rolesModerate?: (typeof UserRoleDB)[number][] | null;
+      rolesAdmin?: (typeof UserRoleDB)[number][] | null;
       updatedAt: Date;
     } = {
       updatedAt: new Date(),
     };
 
-    if (rolesRead !== undefined) {
-      updateData.rolesRead = rolesRead;
+    if (rolesView !== undefined) {
+      updateData.rolesView = rolesView;
     }
 
-    if (rolesWrite !== undefined) {
-      updateData.rolesWrite = rolesWrite;
+    if (rolesManage !== undefined) {
+      updateData.rolesManage = rolesManage;
     }
 
-    if (rolesHide !== undefined) {
-      updateData.rolesHide = rolesHide;
+    if (rolesCreateThread !== undefined) {
+      updateData.rolesCreateThread = rolesCreateThread;
     }
 
-    if (rolesDelete !== undefined) {
-      updateData.rolesDelete = rolesDelete;
+    if (rolesPost !== undefined) {
+      updateData.rolesPost = rolesPost;
+    }
+
+    if (rolesModerate !== undefined) {
+      updateData.rolesModerate = rolesModerate;
+    }
+
+    if (rolesAdmin !== undefined) {
+      updateData.rolesAdmin = rolesAdmin;
     }
 
     // Update the permissions
@@ -166,24 +186,24 @@ export async function updateFolderPermissions(
 
     logger.info("Folder permissions updated", {
       folderId: id,
-      rolesReadCount: rolesRead?.length ?? 0,
-      rolesWriteCount: rolesWrite?.length ?? 0,
-      rolesHideCount: rolesHide?.length ?? 0,
-      rolesDeleteCount: rolesDelete?.length ?? 0,
+      rolesView: rolesView ?? "unchanged",
+      rolesManage: rolesManage ?? "unchanged",
+      rolesCreateThread: rolesCreateThread ?? "unchanged",
+      rolesPost: rolesPost ?? "unchanged",
+      rolesModerate: rolesModerate ?? "unchanged",
+      rolesAdmin: rolesAdmin ?? "unchanged",
     });
 
-    // Return updated values
-    const finalRolesRead = rolesRead ?? existingFolder.rolesRead ?? [];
-    const finalRolesWrite = rolesWrite ?? existingFolder.rolesWrite ?? [];
-    const finalRolesHide = rolesHide ?? existingFolder.rolesHide ?? [];
-    const finalRolesDelete = rolesDelete ?? existingFolder.rolesDelete ?? [];
-
+    // Return updated values (use provided values or keep existing)
     return createSuccessResponse({
       response: {
-        rolesRead: Array.isArray(finalRolesRead) ? finalRolesRead : [],
-        rolesWrite: Array.isArray(finalRolesWrite) ? finalRolesWrite : [],
-        rolesHide: Array.isArray(finalRolesHide) ? finalRolesHide : [],
-        rolesDelete: Array.isArray(finalRolesDelete) ? finalRolesDelete : [],
+        rolesView: rolesView ?? existingFolder.rolesView,
+        rolesManage: rolesManage ?? existingFolder.rolesManage,
+        rolesCreateThread:
+          rolesCreateThread ?? existingFolder.rolesCreateThread,
+        rolesPost: rolesPost ?? existingFolder.rolesPost,
+        rolesModerate: rolesModerate ?? existingFolder.rolesModerate,
+        rolesAdmin: rolesAdmin ?? existingFolder.rolesAdmin,
       },
     });
   } catch {

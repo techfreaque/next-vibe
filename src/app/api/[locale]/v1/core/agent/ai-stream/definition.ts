@@ -152,7 +152,18 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.aiStream.post.threadId.description",
           layout: { columns: 3 },
         },
-        z.uuid().nullable().optional(),
+        z
+          .string()
+          .uuid()
+          .nullable()
+          .optional()
+          .transform((val) => {
+            // Transform "new" to null - client should send null but this provides safety
+            if (val === "new") {
+              return null;
+            }
+            return val;
+          }),
       ),
       parentMessageId: requestDataField(
         {

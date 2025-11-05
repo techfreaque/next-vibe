@@ -1,6 +1,30 @@
 /**
  * Chat Database Schema
  * Database tables for chat threads, folders, and messages
+ *
+ * PERMISSION SYSTEM OVERVIEW:
+ *
+ * Folders (6 permission types):
+ * - rolesView: View/read folder → inherits to subfolders & threads
+ * - rolesManage: Edit folder & create subfolders → inherits to subfolders only
+ * - rolesCreateThread: Create threads → inherits to subfolders & threads
+ * - rolesPost: Post messages → inherits to subfolders & threads
+ * - rolesModerate: Moderate/hide content → inherits to subfolders & threads
+ * - rolesAdmin: Delete & manage permissions → inherits to subfolders & threads
+ *
+ * Threads (5 permission types):
+ * - rolesView: View/read thread & messages
+ * - rolesEdit: Edit thread (title, settings)
+ * - rolesPost: Post messages
+ * - rolesModerate: Moderate/hide messages
+ * - rolesAdmin: Delete thread & manage permissions
+ *
+ * Inheritance Rules:
+ * - null = inherit from parent folder
+ * - [] (empty array) = no roles allowed (explicit deny)
+ * - [roles...] = explicit roles allowed
+ * - Inheritance chain: thread → folder → parent folder → root folder → DEFAULT_FOLDER_CONFIGS
+ * - Owner and Admin users bypass all permission checks
  */
 
 import { relations, sql } from "drizzle-orm";
@@ -40,16 +64,13 @@ import {
   customPersonasRelations,
   type NewCustomPersona,
 } from "./personas/db";
+import { leads } from "@/app/api/[locale]/v1/core/leads/db";
 
 /**
  * Folder metadata structure
+ * Currently empty, can be extended with specific fields in the future
  */
-interface FolderMetadata {
-  customColor?: string;
-  customIcon?: string;
-  sortPreference?: string;
-  viewMode?: string;
-}
+type FolderMetadata = Record<string, never>;
 
 /**
  * Thread metadata structure
@@ -195,9 +216,10 @@ export const chatFolders = pgTable(
   "chat_folders",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
+    // userId can be null for public/anonymous users creating folders in public root
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+    // leadId is used to track public/anonymous users (required when userId is null)
+    leadId: uuid("lead_id").references(() => leads.id, { onDelete: "cascade" }),
 
     // Root folder (constant: private, shared, public, incognito)
     rootFolderId: text("root_folder_id", { enum: RootFolderIdDB })
@@ -222,20 +244,38 @@ export const chatFolders = pgTable(
     // Metadata
     metadata: jsonb("metadata").$type<FolderMetadata>().default({}),
 
-    // Permission roles - if empty, inherits from parent folder
+    // Permission roles - 6-Role Model for Folders
+    // null = inherit from parent folder
+    // [] = no roles allowed (explicit deny)
+    // [roles...] = explicit roles allowed
     // Each role array contains UserRole enum values
-    rolesRead: jsonb("roles_read")
-      .$type<(typeof UserRoleValue)[]>()
-      .default([]),
-    rolesWrite: jsonb("roles_write")
-      .$type<(typeof UserRoleValue)[]>()
-      .default([]),
-    rolesHide: jsonb("roles_hide")
-      .$type<(typeof UserRoleValue)[]>()
-      .default([]),
-    rolesDelete: jsonb("roles_delete")
-      .$type<(typeof UserRoleValue)[]>()
-      .default([]),
+
+    // rolesView: Who can view/read the folder and its existence
+    // Inherits to: subfolders, threads
+    // Note: .$type<T[]> without | null, nullability inferred
+    rolesView: jsonb("roles_view").$type<(typeof UserRoleValue)[]>(),
+
+    // rolesManage: Who can edit/rename folder AND create subfolders
+    // Inherits to: subfolders only (not threads)
+    rolesManage: jsonb("roles_manage").$type<(typeof UserRoleValue)[]>(),
+
+    // rolesCreateThread: Who can create new threads in this folder
+    // Inherits to: subfolders, threads
+    rolesCreateThread: jsonb("roles_create_thread").$type<
+      (typeof UserRoleValue)[]
+    >(),
+
+    // rolesPost: Who can post messages in threads within this folder
+    // Inherits to: subfolders, threads
+    rolesPost: jsonb("roles_post").$type<(typeof UserRoleValue)[]>(),
+
+    // rolesModerate: Who can moderate/hide content (messages, threads)
+    // Inherits to: subfolders, threads
+    rolesModerate: jsonb("roles_moderate").$type<(typeof UserRoleValue)[]>(),
+
+    // rolesAdmin: Who can delete content and manage permissions
+    // Inherits to: subfolders, threads
+    rolesAdmin: jsonb("roles_admin").$type<(typeof UserRoleValue)[]>(),
 
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -250,21 +290,29 @@ export const chatFolders = pgTable(
     parentIdIdx: index("chat_folders_parent_id_idx").on(table.parentId),
     sortOrderIdx: index("chat_folders_sort_order_idx").on(table.sortOrder),
     // GIN indexes for array containment queries on role fields
-    rolesReadIdx: index("chat_folders_roles_read_idx").using(
+    rolesViewIdx: index("chat_folders_roles_view_idx").using(
       "gin",
-      table.rolesRead,
+      table.rolesView,
     ),
-    rolesWriteIdx: index("chat_folders_roles_write_idx").using(
+    rolesManageIdx: index("chat_folders_roles_manage_idx").using(
       "gin",
-      table.rolesWrite,
+      table.rolesManage,
     ),
-    rolesHideIdx: index("chat_folders_roles_hide_idx").using(
+    rolesCreateThreadIdx: index("chat_folders_roles_create_thread_idx").using(
       "gin",
-      table.rolesHide,
+      table.rolesCreateThread,
     ),
-    rolesDeleteIdx: index("chat_folders_roles_delete_idx").using(
+    rolesPostIdx: index("chat_folders_roles_post_idx").using(
       "gin",
-      table.rolesDelete,
+      table.rolesPost,
+    ),
+    rolesModerateIdx: index("chat_folders_roles_moderate_idx").using(
+      "gin",
+      table.rolesModerate,
+    ),
+    rolesAdminIdx: index("chat_folders_roles_admin_idx").using(
+      "gin",
+      table.rolesAdmin,
     ),
   }),
 );
@@ -277,9 +325,10 @@ export const chatThreads = pgTable(
   "chat_threads",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
+    // userId can be null for public/anonymous users posting in public folders
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+    // leadId is used to track public/anonymous users (required when userId is null)
+    leadId: uuid("lead_id").references(() => leads.id, { onDelete: "cascade" }),
 
     // Thread details
     title: text("title").notNull(),
@@ -309,20 +358,27 @@ export const chatThreads = pgTable(
     preview: text("preview"), // First user message preview
     metadata: jsonb("metadata").$type<ThreadMetadata>().default({}),
 
-    // Permission roles - if empty, inherits from parent folder
+    // Permission roles - 5-Role Model for Threads
+    // null = inherit from parent folder
+    // [] = no roles allowed (explicit deny)
+    // [roles...] = explicit roles allowed
     // Each role array contains UserRole enum values
-    rolesRead: jsonb("roles_read")
-      .$type<(typeof UserRoleValue)[]>()
-      .default([]),
-    rolesWrite: jsonb("roles_write")
-      .$type<(typeof UserRoleValue)[]>()
-      .default([]),
-    rolesHide: jsonb("roles_hide")
-      .$type<(typeof UserRoleValue)[]>()
-      .default([]),
-    rolesDelete: jsonb("roles_delete")
-      .$type<(typeof UserRoleValue)[]>()
-      .default([]),
+
+    // rolesView: Who can view/read the thread and its messages
+    // Note: .$type<T[]> without | null, nullability inferred
+    rolesView: jsonb("roles_view").$type<(typeof UserRoleValue)[]>(),
+
+    // rolesEdit: Who can edit the thread (title, settings, etc.)
+    rolesEdit: jsonb("roles_edit").$type<(typeof UserRoleValue)[]>(),
+
+    // rolesPost: Who can post messages in this thread
+    rolesPost: jsonb("roles_post").$type<(typeof UserRoleValue)[]>(),
+
+    // rolesModerate: Who can moderate/hide messages in this thread
+    rolesModerate: jsonb("roles_moderate").$type<(typeof UserRoleValue)[]>(),
+
+    // rolesAdmin: Who can delete the thread and manage permissions
+    rolesAdmin: jsonb("roles_admin").$type<(typeof UserRoleValue)[]>(),
 
     // Published status (for SHARED folders - allows public read access via link)
     published: boolean("published").default(false).notNull(),
@@ -350,21 +406,25 @@ export const chatThreads = pgTable(
     createdAtIdx: index("chat_threads_created_at_idx").on(table.createdAt),
     updatedAtIdx: index("chat_threads_updated_at_idx").on(table.updatedAt),
     // GIN indexes for array containment queries on role fields
-    rolesReadIdx: index("chat_threads_roles_read_idx").using(
+    rolesViewIdx: index("chat_threads_roles_view_idx").using(
       "gin",
-      table.rolesRead,
+      table.rolesView,
     ),
-    rolesWriteIdx: index("chat_threads_roles_write_idx").using(
+    rolesEditIdx: index("chat_threads_roles_edit_idx").using(
       "gin",
-      table.rolesWrite,
+      table.rolesEdit,
     ),
-    rolesHideIdx: index("chat_threads_roles_hide_idx").using(
+    rolesPostIdx: index("chat_threads_roles_post_idx").using(
       "gin",
-      table.rolesHide,
+      table.rolesPost,
     ),
-    rolesDeleteIdx: index("chat_threads_roles_delete_idx").using(
+    rolesModerateIdx: index("chat_threads_roles_moderate_idx").using(
       "gin",
-      table.rolesDelete,
+      table.rolesModerate,
+    ),
+    rolesAdminIdx: index("chat_threads_roles_admin_idx").using(
+      "gin",
+      table.rolesAdmin,
     ),
   }),
 );

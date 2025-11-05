@@ -48,7 +48,7 @@ import {
   isDefaultFolder,
 } from "../../lib/utils/folder-utils";
 import { buildFolderUrl, getRootFolderId } from "../../lib/utils/navigation";
-import type { ChatFolder, ChatThread } from "../../types";
+import type { DefaultFolderId, ChatFolder, ChatThread } from "../../types";
 import { FolderPermissionsDialog } from "./folder-permissions-dialog";
 import { MoveFolderDialog } from "./move-folder-dialog";
 import { RenameFolderDialog } from "./rename-folder-dialog";
@@ -60,6 +60,62 @@ import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WEEK_MS = 7 * DAY_MS;
 const MONTH_MS = 30 * DAY_MS;
+
+/**
+ * Get the ancestry chain of a folder (all parent folders up to root)
+ * Returns an array of folder IDs from root to the given folder
+ */
+function getFolderAncestry(
+  folderId: string,
+  folders: Record<string, ChatFolder>,
+): string[] {
+  const ancestry: string[] = [];
+  let currentId: string | null = folderId;
+
+  while (currentId !== null) {
+    ancestry.unshift(currentId);
+    const folder = folders[currentId];
+    currentId = folder?.parentId ?? null;
+  }
+
+  return ancestry;
+}
+
+/**
+ * Determine if a folder should be expanded based on active thread/folder
+ * Pure function - no state, just computation
+ */
+function shouldFolderBeExpanded(
+  folderId: string,
+  activeThreadId: string | null,
+  activeFolderId: string | null,
+  folders: Record<string, ChatFolder>,
+  threads: Record<string, ChatThread>,
+): boolean {
+  // Determine which folder should be the "target" (the one containing the active item)
+  let targetFolderId: string | null = null;
+
+  if (activeFolderId) {
+    // If there's an active folder, that's our target
+    targetFolderId = activeFolderId;
+  } else if (activeThreadId) {
+    // If there's an active thread, find its folder
+    const thread = threads[activeThreadId];
+    targetFolderId = thread?.folderId ?? null;
+  }
+
+  // If no target, nothing should be expanded
+  if (!targetFolderId) {
+    return false;
+  }
+
+  // Get the ancestry chain of the target folder
+  const targetAncestry = getFolderAncestry(targetFolderId, folders);
+
+  // This folder should be expanded if it's in the ancestry chain (but not the target itself)
+  // The target folder itself should also be expanded to show its contents
+  return targetAncestry.includes(folderId);
+}
 
 /**
  * Get Tailwind color classes for folder hover effects based on root folder color
@@ -87,6 +143,12 @@ function getFolderColorClasses(color: string | null): {
         hover: "hover:bg-amber-500/8",
         active: "bg-amber-500/12",
         border: "border-amber-400",
+      };
+    case "purple":
+      return {
+        hover: "hover:bg-purple-500/8",
+        active: "bg-purple-500/12",
+        border: "border-purple-400",
       };
     case "zinc":
       return {
@@ -130,8 +192,8 @@ function groupThreadsByTime(threads: ChatThread[]): {
 interface FolderListProps {
   chat: UseChatReturn;
   activeThreadId: string | null;
-  activeRootFolderId: string | null;
-  activeFolderId?: string;
+  activeRootFolderId: DefaultFolderId;
+  activeFolderId: string | null;
   locale: CountryLanguage;
   onCreateThread: (folderId?: string | null) => void;
   onSelectThread: (threadId: string) => void;
@@ -142,7 +204,6 @@ interface FolderListProps {
   onCreateFolder: (name: string, parentId: string, icon?: string) => void;
   onUpdateFolder: (folderId: string, updates: FolderUpdate) => void;
   onDeleteFolder: (folderId: string, deleteThreads: boolean) => void;
-  onToggleFolderExpanded: (folderId: string) => void;
   onReorderFolder: (folderId: string, direction: "up" | "down") => void;
   onMoveFolderToParent: (folderId: string, newParentId: string | null) => void;
   onUpdateThreadTitle: (threadId: string, title: string) => void;
@@ -164,7 +225,6 @@ export function FolderList({
   onCreateFolder,
   onUpdateFolder,
   onDeleteFolder,
-  onToggleFolderExpanded,
   onReorderFolder,
   onMoveFolderToParent,
   onUpdateThreadTitle,
@@ -209,7 +269,6 @@ export function FolderList({
           onCreateFolder={onCreateFolder}
           onUpdateFolder={onUpdateFolder}
           onDeleteFolder={onDeleteFolder}
-          onToggleFolderExpanded={onToggleFolderExpanded}
           onReorderFolder={onReorderFolder}
           onMoveFolderToParent={onMoveFolderToParent}
           onUpdateThreadTitle={onUpdateThreadTitle}
@@ -299,7 +358,7 @@ interface FolderItemProps {
   folder: ChatFolder;
   chat: UseChatReturn;
   activeThreadId: string | null;
-  activeFolderId?: string;
+  activeFolderId: string | null;
   locale: CountryLanguage;
   onCreateThread: (folderId?: string | null) => void;
   onSelectThread: (threadId: string) => void;
@@ -310,7 +369,6 @@ interface FolderItemProps {
   onCreateFolder: (name: string, parentId: string, icon?: string) => void;
   onUpdateFolder: (folderId: string, updates: FolderUpdate) => void;
   onDeleteFolder: (folderId: string, deleteThreads: boolean) => void;
-  onToggleFolderExpanded: (folderId: string) => void;
   onReorderFolder: (folderId: string, direction: "up" | "down") => void;
   onMoveFolderToParent: (folderId: string, newParentId: string | null) => void;
   onUpdateThreadTitle: (threadId: string, title: string) => void;
@@ -333,7 +391,6 @@ function FolderItem({
   onCreateFolder,
   onUpdateFolder,
   onDeleteFolder,
-  onToggleFolderExpanded,
   onReorderFolder,
   onMoveFolderToParent,
   onUpdateThreadTitle,
@@ -349,6 +406,15 @@ function FolderItem({
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [permissionsDialogOpen, setPermissionsDialogOpen] =
     React.useState(false);
+
+  // Compute if this folder should be expanded (pure computation, no state)
+  const isExpanded = shouldFolderBeExpanded(
+    folder.id,
+    activeThreadId,
+    activeFolderId,
+    chat.folders,
+    chat.threads,
+  );
 
   const threadsInFolder = useMemo(() => {
     return Object.values(chat.threads)
@@ -400,7 +466,20 @@ function FolderItem({
 
   const handleToggleExpanded = (e: React.MouseEvent): void => {
     e.stopPropagation(); // Prevent folder navigation when clicking chevron
-    onToggleFolderExpanded(folder.id);
+
+    // If currently expanded (this folder is in the active path), collapse by navigating to parent
+    if (isExpanded) {
+      // Navigate to parent folder to "collapse" this folder
+      const rootFolderId = getRootFolderId(chat.folders, folder.id);
+      const parentFolderId = folder.parentId;
+      const url = buildFolderUrl(locale, rootFolderId, parentFolderId);
+      router.push(url);
+    } else {
+      // If not expanded, expand by navigating to this folder
+      const rootFolderId = getRootFolderId(chat.folders, folder.id);
+      const url = buildFolderUrl(locale, rootFolderId, folder.id);
+      router.push(url);
+    }
   };
 
   const handleCreateThreadInFolder = (e: React.MouseEvent): void => {
@@ -494,7 +573,7 @@ function FolderItem({
         onClick={handleToggleExpanded}
         className="h-5 w-5 p-0 hover:bg-transparent flex-shrink-0"
       >
-        {folder.expanded ? (
+        {isExpanded ? (
           <ChevronDown className="h-4 w-4" />
         ) : (
           <ChevronRight className="h-4 w-4" />
@@ -513,118 +592,144 @@ function FolderItem({
         {/* eslint-enable i18next/no-literal-string */}
       </Div>
 
-      <Div
-        className="flex items-center gap-1 flex-shrink-0"
-        style={{
-          width: isHovered || isTouch ? "auto" : "0px",
-          opacity: isHovered || isTouch ? 1 : 0,
-          overflow: "hidden",
-        }}
-        onClick={(e): void => e.stopPropagation()}
-      >
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleCreateThreadInFolder}
-          className="h-6 w-6"
-          title={t("app.chat.folderList.newChatInFolder")}
-        >
-          <MessageSquarePlus className="h-3.5 w-3.5" />
-        </Button>
+      {/* Determine if context menu has any items */}
+      {((): JSX.Element => {
+        const hasMenuItems =
+          folder.canManage || // Move up/down, create subfolder, rename, move to folder
+          folder.canManagePermissions || // Manage permissions
+          (!isDefault && folder.canDelete); // Delete folder
 
-        <DropdownMenu
-          open={dropdownOpen}
-          onOpenChange={(open) => {
-            setDropdownOpen(open);
-            // Reset hover state when dropdown closes
-            if (!open) {
-              setIsHovered(false);
-            }
-          }}
-        >
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6"
-              onClick={(e) => {
-                e.stopPropagation();
-                setDropdownOpen(true);
-              }}
-            >
-              <MoreVertical className="h-3.5 w-3.5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            onClick={(e) => e.stopPropagation()}
-            onCloseAutoFocus={(e) => e.preventDefault()}
+        return (
+          <Div
+            className="flex items-center gap-1 shrink-0"
+            style={{
+              width: isHovered || isTouch ? "auto" : "0px",
+              opacity: isHovered || isTouch ? 1 : 0,
+              overflow: "hidden",
+            }}
+            onClick={(e): void => e.stopPropagation()}
           >
-            {/* All folders can be reordered and have subfolders */}
-            <DropdownMenuItem
-              onSelect={handleMoveUp}
-              disabled={!canMoveUp}
-              className="cursor-pointer"
-            >
-              <ArrowUp className="h-4 w-4 mr-2" />
-              {t("app.chat.folderList.moveUp")}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={handleMoveDown}
-              disabled={!canMoveDown}
-              className="cursor-pointer"
-            >
-              <ArrowDown className="h-4 w-4 mr-2" />
-              {t("app.chat.folderList.moveDown")}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={handleCreateSubfolder}
-              className="cursor-pointer"
-            >
-              <FolderPlus className="h-4 w-4 mr-2" />
-              {t("app.chat.folderList.newSubfolder")}
-            </DropdownMenuItem>
-
-            {/* Permissions only for PUBLIC root folder */}
-            {folder.rootFolderId === "public" && (
-              <DropdownMenuItem
-                onSelect={handleManagePermissions}
-                className="cursor-pointer"
+            {/* Only show "New chat in folder" button if user has permission */}
+            {folder.canCreateThread && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleCreateThreadInFolder}
+                className="h-6 w-6"
+                title={t("app.chat.folderList.newChatInFolder")}
               >
-                <Shield className="h-4 w-4 mr-2" />
-                {t("app.chat.folderList.managePermissions")}
-              </DropdownMenuItem>
+                <MessageSquarePlus className="h-3.5 w-3.5" />
+              </Button>
             )}
 
-            {/* Only custom folders can be renamed, moved, and deleted */}
-            {!isDefault && (
-              <>
-                <DropdownMenuItem
-                  onSelect={handleRenameFolder}
-                  className="cursor-pointer"
+            {/* Only show context menu button if there are items to show */}
+            {hasMenuItems && (
+              <DropdownMenu
+                open={dropdownOpen}
+                onOpenChange={(open) => {
+                  setDropdownOpen(open);
+                  // Reset hover state when dropdown closes
+                  if (!open) {
+                    setIsHovered(false);
+                  }
+                }}
+              >
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDropdownOpen(true);
+                    }}
+                  >
+                    <MoreVertical className="h-3.5 w-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  onClick={(e) => e.stopPropagation()}
+                  onCloseAutoFocus={(e) => e.preventDefault()}
                 >
-                  <Edit className="h-4 w-4 mr-2" />
-                  {t("app.chat.folderList.renameFolder")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={handleMoveToFolder}
-                  className="cursor-pointer"
-                >
-                  <FolderInput className="h-4 w-4 mr-2" />
-                  {t("app.chat.folderList.moveToFolder")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={handleDeleteClick}
-                  className="text-destructive cursor-pointer"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  {t("app.chat.folderList.deleteFolder")}
-                </DropdownMenuItem>
-              </>
+                  {/* Only show move up/down if user has manage permission */}
+                  {folder.canManage && (
+                    <>
+                      <DropdownMenuItem
+                        onSelect={handleMoveUp}
+                        disabled={!canMoveUp}
+                        className="cursor-pointer"
+                      >
+                        <ArrowUp className="h-4 w-4 mr-2" />
+                        {t("app.chat.folderList.moveUp")}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={handleMoveDown}
+                        disabled={!canMoveDown}
+                        className="cursor-pointer"
+                      >
+                        <ArrowDown className="h-4 w-4 mr-2" />
+                        {t("app.chat.folderList.moveDown")}
+                      </DropdownMenuItem>
+                    </>
+                  )}
+
+                  {/* Only show Create Subfolder if user has permission (computed server-side) */}
+                  {folder.canManage && (
+                    <DropdownMenuItem
+                      onSelect={handleCreateSubfolder}
+                      className="cursor-pointer"
+                    >
+                      <FolderPlus className="h-4 w-4 mr-2" />
+                      {t("app.chat.folderList.newSubfolder")}
+                    </DropdownMenuItem>
+                  )}
+
+                  {/* Only show Manage Permissions if user has permission (computed server-side) */}
+                  {folder.canManagePermissions && (
+                    <DropdownMenuItem
+                      onSelect={handleManagePermissions}
+                      className="cursor-pointer"
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      {t("app.chat.folderList.managePermissions")}
+                    </DropdownMenuItem>
+                  )}
+
+                  {/* Only custom folders can be renamed, moved, and deleted - check permissions */}
+                  {!isDefault && folder.canManage && (
+                    <>
+                      <DropdownMenuItem
+                        onSelect={handleRenameFolder}
+                        className="cursor-pointer"
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        {t("app.chat.folderList.renameFolder")}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={handleMoveToFolder}
+                        className="cursor-pointer"
+                      >
+                        <FolderInput className="h-4 w-4 mr-2" />
+                        {t("app.chat.folderList.moveToFolder")}
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  {!isDefault && folder.canDelete && (
+                    <DropdownMenuItem
+                      onSelect={handleDeleteClick}
+                      className="text-destructive cursor-pointer"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      {t("app.chat.folderList.deleteFolder")}
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </Div>
+          </Div>
+        );
+      })()}
     </Div>
   );
 
@@ -632,7 +737,7 @@ function FolderItem({
     <Div>
       {folderHeaderContent}
 
-      {folder.expanded && (
+      {isExpanded && (
         <Div>
           {/* Child folders */}
           {Object.values(chat.folders)
@@ -655,7 +760,6 @@ function FolderItem({
                 onCreateFolder={onCreateFolder}
                 onUpdateFolder={onUpdateFolder}
                 onDeleteFolder={onDeleteFolder}
-                onToggleFolderExpanded={onToggleFolderExpanded}
                 onReorderFolder={onReorderFolder}
                 onMoveFolderToParent={onMoveFolderToParent}
                 onUpdateThreadTitle={onUpdateThreadTitle}

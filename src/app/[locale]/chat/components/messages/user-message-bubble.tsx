@@ -4,6 +4,7 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
+import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -24,7 +25,8 @@ interface UserMessageBubbleProps {
   onRetry?: (messageId: string) => void;
   onDelete?: (messageId: string) => void;
   showAuthor?: boolean;
-  rootFolderId?: string;
+  rootFolderId: DefaultFolderId;
+  currentUserId?: string;
 }
 
 export function UserMessageBubble({
@@ -34,8 +36,9 @@ export function UserMessageBubble({
   onBranch,
   onRetry,
   onDelete,
-  showAuthor = false,
-  rootFolderId = "general",
+  showAuthor,
+  rootFolderId,
+  currentUserId,
 }: UserMessageBubbleProps): JSX.Element {
   const tone =
     message.role === "user" || message.role === "assistant"
@@ -50,6 +53,8 @@ export function UserMessageBubble({
           <Div className="mb-2 flex justify-end">
             <MessageAuthorInfo
               authorName={message.authorName}
+              authorId={message.authorId}
+              currentUserId={currentUserId}
               isAI={message.isAI}
               model={message.model}
               timestamp={message.createdAt}

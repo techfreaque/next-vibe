@@ -172,7 +172,7 @@ export function setActiveThread(threadId: string | null): void {
  * Set current folder
  */
 export function setCurrentFolder(
-  rootFolderId: string,
+  rootFolderId: DefaultFolderId,
   subFolderId: string | null,
 ): void {
   setItem(STORAGE_KEYS.CURRENT_ROOT_FOLDER, rootFolderId);
@@ -183,7 +183,7 @@ export function setCurrentFolder(
  * Get threads for a specific folder
  */
 export function getThreadsForFolder(
-  rootFolderId: string,
+  rootFolderId: DefaultFolderId,
   subFolderId: string | null,
 ): ChatThread[] {
   const threads = getItem<Record<string, ChatThread>>(STORAGE_KEYS.THREADS, {});
@@ -255,6 +255,13 @@ export function createIncognitoThread(
     archived: false,
     tags: [],
     preview: null,
+    // Incognito threads: everyone has full permissions locally
+    // BUT canManagePermissions is false because permissions don't apply to local-only content
+    canPost: true,
+    canEdit: true,
+    canModerate: true,
+    canDelete: true,
+    canManagePermissions: false,
     createdAt: new Date(),
     updatedAt: new Date(),
   };

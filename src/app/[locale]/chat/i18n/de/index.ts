@@ -146,10 +146,14 @@ export const translations: typeof enTranslations = {
   },
   credits: {
     balance: "Credits",
-    total: "{{count}} Credits",
-    expiring: "{{count}} ablaufend",
-    permanent: "{{count}} dauerhaft",
-    free: "{{count}} kostenlos",
+    credit: "{{count}} Credit",
+    credits: "{{count}} Credits",
+    freeCredit: "{{count}} kostenloses Credit",
+    freeCredits: "{{count}} kostenlose Credits",
+    expiringCredit: "{{count}} ablaufendes Credit",
+    expiringCredits: "{{count}} ablaufende Credits",
+    permanentCredit: "{{count}} dauerhaftes Credit",
+    permanentCredits: "{{count}} dauerhafte Credits",
     expiresOn: "Läuft ab am {{date}}",
     expiresAt: "Läuft ab",
     buyMore: "Credits kaufen",
@@ -194,6 +198,13 @@ export const translations: typeof enTranslations = {
   },
   input: {
     placeholder: "Geben Sie Ihre Nachricht ein...",
+    noPermission: "Sie haben keine Berechtigung, Nachrichten zu posten",
+    noPostPermission:
+      "Sie haben keine Berechtigung, Nachrichten in diesem Thread zu posten",
+    noCreateThreadPermission:
+      "Sie haben keine Berechtigung, Threads in diesem Ordner zu erstellen",
+    noCreateThreadPermissionInRootFolder:
+      "Sie haben keine Berechtigung, Threads in diesem Ordner zu erstellen. Bitte melden Sie sich an oder wählen Sie einen Unterordner.",
     keyboardShortcuts: {
       press: "Drücken Sie",
       enter: "Eingabe",
@@ -695,21 +706,46 @@ export const translations: typeof enTranslations = {
       title: "Thread-Berechtigungen",
       description: "Berechtigungen für diesen Thread verwalten",
     },
+    view: {
+      label: "Anzeigeberechtigungen",
+      description: "Wer kann diesen Inhalt ansehen und lesen",
+    },
+    manage: {
+      label: "Verwaltungsberechtigungen",
+      description: "Wer kann Ordner bearbeiten und Unterordner erstellen",
+    },
+    edit: {
+      label: "Bearbeitungsberechtigungen",
+      description: "Wer kann Thread-Eigenschaften bearbeiten",
+    },
+    createThread: {
+      label: "Thread-Erstellungsberechtigungen",
+      description: "Wer kann neue Threads in diesem Ordner erstellen",
+    },
+    post: {
+      label: "Beitragsberechtigungen",
+      description: "Wer kann Nachrichten posten",
+    },
+    moderate: {
+      label: "Moderationsberechtigungen",
+      description: "Wer kann Inhalte ausblenden und moderieren",
+    },
+    admin: {
+      label: "Admin-Berechtigungen",
+      description: "Wer kann Inhalte löschen und Berechtigungen verwalten",
+    },
+    // Legacy keys (kept for backwards compatibility)
     read: {
       label: "Leseberechtigungen",
       description: "Wer kann diesen Inhalt ansehen und lesen",
     },
     write: {
       label: "Schreibberechtigungen",
-      description: "Wer kann Inhalte erstellen und schreiben",
+      description: "Wer kann Threads und Ordner erstellen",
     },
-    hide: {
-      label: "Ausblenden-Berechtigungen",
-      description: "Wer kann Inhalte ausblenden und moderieren",
-    },
-    delete: {
-      label: "Löschberechtigungen",
-      description: "Wer kann Inhalte löschen",
+    writePost: {
+      label: "Beitragsberechtigungen",
+      description: "Wer kann Nachrichten in Threads posten",
     },
     roles: {
       public: "Öffentlich (Alle Benutzer)",
@@ -786,6 +822,7 @@ export const translations: typeof enTranslations = {
     userFallback: "Benutzer",
     assistantFallback: "Assistent",
     youLabel: "Sie",
+    anonymous: "Anonym",
   },
   flatView: {
     postNumber: "Beitrag #{{number}}",

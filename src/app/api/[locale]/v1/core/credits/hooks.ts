@@ -8,38 +8,198 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { useToast } from "next-vibe-ui//hooks/use-toast";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { handleCheckoutRedirect } from "@/app/api/[locale]/v1/core/payment/utils/redirect";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
+import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
-import definitions from "./definition";
+import definitions, { type CreditsGetResponseOutput } from "./definition";
 import historyDefinitions from "./history/definition";
 import purchaseDefinitions, {
   type CreditsPurchasePostRequestOutput,
   type CreditsPurchasePostResponseOutput,
 } from "./purchase/definition";
 
+interface EndpointData {
+  success: boolean;
+  data: CreditsGetResponseOutput;
+}
+
+export interface UseCreditsReturn extends EndpointReturn<typeof definitions> {
+  /**
+   * Optimistically deduct credits from the balance
+   * IMPORTANT: This must match server-side deduction logic in repository.ts
+   *
+   * Deduction Priority Order:
+   * 1. Free credits (includes lead credits) - HIGHEST PRIORITY
+   * 2. Expiring credits (subscription)
+   * 3. Permanent credits - LOWEST PRIORITY
+   *
+   * @param creditCost - Number of credits to deduct
+   * @param feature - Feature name for logging (e.g., "chat_message", "tts", "stt", "brave_search")
+   */
+  deductCredits: (creditCost: number, feature: string) => void;
+
+  /**
+   * Refetch credits from server to sync with actual state
+   */
+  refetchCredits: () => void;
+}
+
 /**
- * Hook for fetching current user's credit balance
+ * Hook for fetching current user's credit balance with optimistic updates
  * Optimized with 10-second cache to reduce excessive API calls
+ *
+ * @param logger - Endpoint logger for tracking requests
+ * @param initialData - Optional initial credit data from server (disables initial fetch when provided)
  */
 export function useCredits(
   logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
-  return useEndpoint(
+  // this has to be provided from server side
+  initialData: CreditsGetResponseOutput,
+): UseCreditsReturn {
+  const endpoint = useEndpoint(
     definitions,
     {
-      queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: true,
-        staleTime: 10 * 1000, // 10 seconds cache to prevent excessive refetching
+      read: {
+        // Pass initial data to disable initial fetch and use server data
+        // useEndpointRead automatically disables initial fetch when initialData is provided
+        initialData: initialData ?? undefined,
+        queryOptions: {
+          refetchOnWindowFocus: true,
+          staleTime: 10 * 1000, // 10 seconds cache to prevent excessive refetching
+        },
       },
     },
     logger,
+  );
+
+  /**
+   * Deduct credits optimistically following the correct priority order
+   */
+  const deductCredits = useCallback(
+    (creditCost: number, feature: string) => {
+      if (creditCost <= 0 || !definitions.GET) {
+        return;
+      }
+
+      apiClient.updateEndpointData(
+        definitions.GET,
+        (oldData: EndpointData | undefined) => {
+          if (!oldData?.success || !oldData.data) {
+            logger.warn(
+              "Credits optimistic update skipped - no existing data",
+              {
+                feature,
+                creditCost,
+              },
+            );
+            return oldData;
+          }
+
+          const data = oldData.data;
+
+          // Ensure we don't go negative
+          if (data.total < creditCost) {
+            logger.warn(
+              "Credits optimistic update skipped - insufficient credits",
+              {
+                feature,
+                creditCost,
+                currentTotal: data.total,
+              },
+            );
+            return oldData;
+          }
+
+          // Deduct credits in the correct order: free → expiring → permanent
+          let remaining = creditCost;
+          let newFree = data.free;
+          let newExpiring = data.expiring;
+          let newPermanent = data.permanent;
+
+          // Step 1: Deduct from free credits first (includes lead credits)
+          if (remaining > 0 && newFree > 0) {
+            const deduction = Math.min(newFree, remaining);
+            newFree -= deduction;
+            remaining -= deduction;
+          }
+
+          // Step 2: Deduct from expiring credits (subscription)
+          if (remaining > 0 && newExpiring > 0) {
+            const deduction = Math.min(newExpiring, remaining);
+            newExpiring -= deduction;
+            remaining -= deduction;
+          }
+
+          // Step 3: Deduct from permanent credits
+          if (remaining > 0 && newPermanent > 0) {
+            const deduction = Math.min(newPermanent, remaining);
+            newPermanent -= deduction;
+            remaining -= deduction;
+          }
+
+          const newTotal = newFree + newExpiring + newPermanent;
+
+          logger.debug("Credits optimistically updated", {
+            feature,
+            creditCost,
+            before: {
+              total: data.total,
+              free: data.free,
+              expiring: data.expiring,
+              permanent: data.permanent,
+            },
+            after: {
+              total: newTotal,
+              free: newFree,
+              expiring: newExpiring,
+              permanent: newPermanent,
+            },
+          });
+
+          return {
+            success: true,
+            data: {
+              total: newTotal,
+              expiring: newExpiring,
+              permanent: newPermanent,
+              free: newFree,
+              expiresAt: data.expiresAt,
+            },
+          };
+        },
+      );
+    },
+    [logger],
+  );
+
+  /**
+   * Refetch credits from server
+   */
+  const refetchCredits = useCallback(() => {
+    if (!definitions.GET) {
+      return;
+    }
+    // Trigger a refetch by invalidating the query
+    // Use the endpoint path as the query key
+    const queryKey = ["credits"];
+    apiClient.invalidateQueries(queryKey).catch((error) => {
+      logger.error("Failed to refetch credits", { error });
+    });
+  }, [logger]);
+
+  return useMemo(
+    () => ({
+      ...endpoint,
+      deductCredits,
+      refetchCredits,
+    }),
+    [endpoint, deductCredits, refetchCredits],
   );
 }
 

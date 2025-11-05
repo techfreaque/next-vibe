@@ -26,10 +26,12 @@ export interface FolderUpdate {
   parentId?: string | null;
   expanded?: boolean;
   sortOrder?: number;
-  rolesRead?: (typeof UserRoleValue)[] | null;
-  rolesWrite?: (typeof UserRoleValue)[] | null;
-  rolesHide?: (typeof UserRoleValue)[] | null;
-  rolesDelete?: (typeof UserRoleValue)[] | null;
+  rolesView?: (typeof UserRoleValue)[] | null;
+  rolesManage?: (typeof UserRoleValue)[] | null;
+  rolesCreateThread?: (typeof UserRoleValue)[] | null;
+  rolesPost?: (typeof UserRoleValue)[] | null;
+  rolesModerate?: (typeof UserRoleValue)[] | null;
+  rolesAdmin?: (typeof UserRoleValue)[] | null;
 }
 
 /**
@@ -104,10 +106,19 @@ export function useFolderOperations(
           expanded: true,
           sortOrder: 0,
           metadata: {},
-          rolesRead: [],
-          rolesWrite: [],
-          rolesHide: [],
-          rolesDelete: [],
+          rolesView: [],
+          rolesManage: [],
+          rolesCreateThread: [],
+          rolesPost: [],
+          rolesModerate: [],
+          rolesAdmin: [],
+          // Incognito folders: everyone has full permissions locally
+          // BUT canManagePermissions is false because permissions don't apply to local-only content
+          canManage: true,
+          canCreateThread: true,
+          canModerate: true,
+          canDelete: true,
+          canManagePermissions: false,
           createdAt: new Date(),
           updatedAt: new Date(),
         };

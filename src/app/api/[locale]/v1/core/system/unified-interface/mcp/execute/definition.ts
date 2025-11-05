@@ -30,7 +30,7 @@ const { POST } = createEndpoint({
     "app.api.v1.core.system.unifiedInterface.mcp.execute.post.description" as const,
   category: "app.api.v1.core.system.unifiedInterface.mcp.execute.category" as const,
   tags: ["app.api.v1.core.system.unifiedInterface.mcp.execute.tags.mcp" as const],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.WEB_OFF] as const,
 
   fields: objectField(
     {

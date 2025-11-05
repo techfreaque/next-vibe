@@ -14,7 +14,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { updateCreditBalanceForTTS } from "./credit-updater";
 import textToSpeechDefinitions from "./definition";
 
 interface UseTTSAudioOptions {
@@ -24,6 +23,7 @@ interface UseTTSAudioOptions {
   locale: CountryLanguage;
   onError?: (error: string) => void;
   logger: EndpointLogger;
+  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 interface UseTTSAudioReturn {
@@ -41,6 +41,7 @@ export function useTTSAudio({
   locale,
   onError,
   logger,
+  deductCredits,
 }: UseTTSAudioOptions): UseTTSAudioReturn {
   const { t } = simpleT(locale);
   const [isLoading, setIsLoading] = useState(false);
@@ -138,7 +139,10 @@ export function useTTSAudio({
           });
 
           // Optimistically update credit balance in UI
-          updateCreditBalanceForTTS(logger);
+          const creditCost = textToSpeechDefinitions.POST.credits ?? 0;
+          if (creditCost > 0) {
+            deductCredits(creditCost, "tts");
+          }
 
           // Create audio element
           const audio = new Audio(audioDataUrl);
@@ -197,7 +201,7 @@ export function useTTSAudio({
       // eslint-disable-next-line require-atomic-updates
       isProcessingRef.current = false;
     }
-  }, [text, audioUrl, endpoint, logger, t, onError]);
+  }, [text, audioUrl, endpoint, logger, t, onError, deductCredits]);
 
   // Auto-play when streaming completes if enabled
   // TODO: Re-enable auto TTS after fixing timing and UX issues

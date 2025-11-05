@@ -1,27 +1,38 @@
 /**
- * Chat Permission System - 4-Role Model with Inheritance
+ * Chat Permission System - 6-Role Model for Folders, 5-Role Model for Threads
  * Implements permission checks for folders, threads, and messages
  *
- * Permission Types:
- * - rolesRead: Who can view/read content
- * - rolesWrite: Who can create/write content
- * - rolesHide: Who can hide/moderate content
- * - rolesDelete: Who can delete content
+ * Folder Permission Types (6):
+ * - rolesView: Who can view/read folder
+ * - rolesManage: Who can edit folder and create subfolders
+ * - rolesCreateThread: Who can create threads
+ * - rolesPost: Who can post messages
+ * - rolesModerate: Who can moderate/hide content
+ * - rolesAdmin: Who can delete and manage permissions
+ *
+ * Thread Permission Types (5):
+ * - rolesView: Who can view/read thread
+ * - rolesEdit: Who can edit thread properties
+ * - rolesPost: Who can post messages
+ * - rolesModerate: Who can moderate/hide messages
+ * - rolesAdmin: Who can delete and manage permissions
  *
  * Inheritance Rules:
- * - Empty array [] = inherit from parent folder
- * - Non-empty array = explicit override (no inheritance)
+ * - null = inherit from parent folder
+ * - [] (empty array) = no roles allowed (explicit deny)
+ * - [roles...] = explicit roles allowed
  * - Inheritance chain: thread → folder → parent folder → root folder → DEFAULT_FOLDER_CONFIGS
  */
 
 import "server-only";
 
+import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { userRolesRepository } from "@/app/api/[locale]/v1/core/user/user-roles/repository";
 
-import { getDefaultFolderConfig } from "../config";
+import { type DefaultFolderConfig, getDefaultFolderConfig } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 
 // ============================================================================
@@ -46,27 +57,117 @@ export async function isAdmin(
 /**
  * Check if user is the owner of a resource
  */
-export function isOwner(userId: string, resourceUserId: string): boolean {
+export function isOwner(
+  userId: string,
+  resourceUserId: string | null,
+): boolean {
+  if (!resourceUserId) {
+    return false;
+  }
   return userId === resourceUserId;
 }
 
 /**
  * Get effective roles for a permission type with inheritance
- * If the resource has non-empty permission array, use it (no inheritance)
- * If empty, inherit from parent folder recursively up to root folder
+ * - null = inherit from parent folder
+ * - [] (empty array) = no roles allowed (explicit deny)
+ * - [roles...] = explicit roles allowed
  */
-function getEffectiveRoles(
+function getFolderPermissionValue(
+  folder: ChatFolder,
+  permissionType:
+    | "rolesView"
+    | "rolesManage"
+    | "rolesCreateThread"
+    | "rolesPost"
+    | "rolesModerate"
+    | "rolesAdmin",
+): string[] | null {
+  return folder[permissionType] ?? null;
+}
+
+function getThreadPermissionValue(
+  thread: ChatThread,
+  permissionType:
+    | "rolesView"
+    | "rolesEdit"
+    | "rolesPost"
+    | "rolesModerate"
+    | "rolesAdmin",
+): string[] | null {
+  return thread[permissionType] ?? null;
+}
+
+function getPermissionValue(
   resource: ChatFolder | ChatThread,
-  permissionType: "rolesRead" | "rolesWrite" | "rolesHide" | "rolesDelete",
-  allFolders: Record<string, ChatFolder>,
-): string[] {
-  // If resource has non-empty permission array, use it (explicit override)
-  const roles = resource[permissionType];
-  if (roles && Array.isArray(roles) && roles.length > 0) {
-    return roles;
+  permissionType:
+    | "rolesView"
+    | "rolesManage"
+    | "rolesEdit"
+    | "rolesCreateThread"
+    | "rolesPost"
+    | "rolesModerate"
+    | "rolesAdmin",
+): string[] | null {
+  if ("parentId" in resource) {
+    if (permissionType === "rolesEdit") {
+      return null;
+    }
+    return getFolderPermissionValue(resource, permissionType);
   }
 
-  // Empty array - inherit from parent
+  if (
+    permissionType === "rolesManage" ||
+    permissionType === "rolesCreateThread"
+  ) {
+    return null;
+  }
+  return getThreadPermissionValue(resource, permissionType);
+}
+
+function getDefaultConfigValue(
+  config: DefaultFolderConfig | undefined,
+  permissionType:
+    | "rolesView"
+    | "rolesManage"
+    | "rolesEdit"
+    | "rolesCreateThread"
+    | "rolesPost"
+    | "rolesModerate"
+    | "rolesAdmin",
+): string[] {
+  if (!config) {
+    return [];
+  }
+
+  if (permissionType === "rolesEdit") {
+    return [];
+  }
+
+  return config[permissionType] ?? [];
+}
+
+export function getEffectiveRoles(
+  resource: ChatFolder | ChatThread,
+  permissionType:
+    | "rolesView"
+    | "rolesManage"
+    | "rolesEdit"
+    | "rolesCreateThread"
+    | "rolesPost"
+    | "rolesModerate"
+    | "rolesAdmin",
+  allFolders: Record<string, ChatFolder>,
+): string[] {
+  // Get the permission value
+  const roles = getPermissionValue(resource, permissionType);
+
+  // If roles is an array (empty or not), use it directly (explicit override)
+  if (Array.isArray(roles)) {
+    return roles; // Could be [] (deny) or [roles...] (allow)
+  }
+
+  // If roles is null, inherit from parent
   // If resource is a thread, check its parent folder
   if ("folderId" in resource && resource.folderId) {
     const parentFolder = allFolders[resource.folderId];
@@ -86,14 +187,14 @@ function getEffectiveRoles(
   // Reached root folder - use DEFAULT_FOLDER_CONFIGS
   const rootFolderId = resource.rootFolderId;
   const rootConfig = getDefaultFolderConfig(rootFolderId);
-  return rootConfig?.[permissionType] || [];
+  return getDefaultConfigValue(rootConfig, permissionType);
 }
 
 /**
  * Check if user has permission based on role arrays
  * Handles both public and authenticated users
  */
-async function hasRolePermission(
+export async function hasRolePermission(
   user: JwtPayloadType,
   effectiveRoles: string[],
   logger: EndpointLogger,
@@ -124,13 +225,13 @@ async function hasRolePermission(
 // ============================================================================
 
 /**
- * Check if user can read a folder
- * Uses rolesRead with inheritance from parent folders
- * - Owner can always read
- * - Admin can always read
- * - Check rolesRead (with inheritance) for role-based access
+ * Check if user can view/read a folder
+ * Uses rolesView with inheritance from parent folders
+ * - Owner can always view
+ * - Admin can always view
+ * - Check rolesView (with inheritance) for role-based access
  */
-export async function canReadFolder(
+export async function canViewFolder(
   user: JwtPayloadType,
   folder: ChatFolder,
   logger: EndpointLogger,
@@ -138,18 +239,18 @@ export async function canReadFolder(
 ): Promise<boolean> {
   const userId = user.id;
 
-  // Owner can always read
+  // Owner can always view
   if (userId && isOwner(userId, folder.userId)) {
     return true;
   }
 
-  // Admin can always read
+  // Admin can always view
   if (userId && (await isAdmin(userId, logger))) {
     return true;
   }
 
-  // Get effective rolesRead (with inheritance)
-  const effectiveRoles = getEffectiveRoles(folder, "rolesRead", allFolders);
+  // Get effective rolesView (with inheritance)
+  const effectiveRoles = getEffectiveRoles(folder, "rolesView", allFolders);
 
   // Check if user has required role
   return await hasRolePermission(user, effectiveRoles, logger);
@@ -171,7 +272,7 @@ export async function canReadFolder(
  */
 export async function canCreateFolder(
   user: JwtPayloadType,
-  rootFolderId: string,
+  rootFolderId: DefaultFolderId,
   logger: EndpointLogger,
   parentId?: string | null,
 ): Promise<boolean> {
@@ -218,7 +319,7 @@ export async function canCreateFolder(
     const allFolders = { [parentFolder.id]: parentFolder };
     const effectiveHideRoles = getEffectiveRoles(
       parentFolder,
-      "rolesHide",
+      "rolesModerate",
       allFolders,
     );
     const hasHidePermission = await hasRolePermission(
@@ -240,37 +341,78 @@ export async function canCreateFolder(
 }
 
 /**
- * Check if user can write to a folder (create threads)
- * Uses rolesWrite with inheritance from parent folders
- * - Owner can always write
- * - Admin can always write
- * - Check rolesWrite (with inheritance) for role-based access
+ * Check if user can manage a folder (edit folder, create subfolders)
+ * Uses rolesManage with inheritance from parent folders
+ * - Owner can always manage
+ * - Admin can always manage
+ * - Check rolesManage (with inheritance) for role-based access
  */
-export async function canWriteFolder(
+export async function canManageFolder(
   user: JwtPayloadType,
   folder: ChatFolder | null,
   logger: EndpointLogger,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
-  // If no folder specified, cannot write
+  // If no folder specified, cannot manage
   if (!folder) {
     return false;
   }
 
   const userId = user.id;
 
-  // Owner can always write
+  // Owner can always manage
   if (userId && isOwner(userId, folder.userId)) {
     return true;
   }
 
-  // Admin can always write
+  // Admin can always manage
   if (userId && (await isAdmin(userId, logger))) {
     return true;
   }
 
-  // Get effective rolesWrite (with inheritance)
-  const effectiveRoles = getEffectiveRoles(folder, "rolesWrite", allFolders);
+  // Get effective rolesManage (with inheritance)
+  const effectiveRoles = getEffectiveRoles(folder, "rolesManage", allFolders);
+
+  // Check if user has required role
+  return await hasRolePermission(user, effectiveRoles, logger);
+}
+
+/**
+ * Check if user can create threads in a folder
+ * Uses rolesCreateThread with inheritance from parent folders
+ * - Owner can always create threads
+ * - Admin can always create threads
+ * - Check rolesCreateThread (with inheritance) for role-based access
+ */
+export async function canCreateThreadInFolder(
+  user: JwtPayloadType,
+  folder: ChatFolder | null,
+  logger: EndpointLogger,
+  allFolders: Record<string, ChatFolder> = {},
+): Promise<boolean> {
+  // If no folder specified, cannot create thread
+  if (!folder) {
+    return false;
+  }
+
+  const userId = user.id;
+
+  // Owner can always create threads
+  if (userId && isOwner(userId, folder.userId)) {
+    return true;
+  }
+
+  // Admin can always create threads
+  if (userId && (await isAdmin(userId, logger))) {
+    return true;
+  }
+
+  // Get effective rolesCreateThread (with inheritance)
+  const effectiveRoles = getEffectiveRoles(
+    folder,
+    "rolesCreateThread",
+    allFolders,
+  );
 
   // Check if user has required role
   return await hasRolePermission(user, effectiveRoles, logger);
@@ -278,10 +420,10 @@ export async function canWriteFolder(
 
 /**
  * Check if user can delete a folder
- * Uses rolesDelete with inheritance from parent folders
+ * Uses rolesAdmin with inheritance from parent folders
  * - Owner can always delete
  * - Admin can always delete
- * - Check rolesDelete (with inheritance) for role-based access
+ * - Check rolesAdmin (with inheritance) for role-based access
  */
 export async function canDeleteFolder(
   user: JwtPayloadType,
@@ -301,8 +443,8 @@ export async function canDeleteFolder(
     return true;
   }
 
-  // Get effective rolesDelete (with inheritance)
-  const effectiveRoles = getEffectiveRoles(folder, "rolesDelete", allFolders);
+  // Get effective rolesAdmin (with inheritance)
+  const effectiveRoles = getEffectiveRoles(folder, "rolesAdmin", allFolders);
 
   // Check if user has required role
   return await hasRolePermission(user, effectiveRoles, logger);
@@ -310,10 +452,10 @@ export async function canDeleteFolder(
 
 /**
  * Check if user can hide/moderate a folder
- * Uses rolesHide with inheritance from parent folders
+ * Uses rolesModerate with inheritance from parent folders
  * - Owner can always hide
  * - Admin can always hide
- * - Check rolesHide (with inheritance) for role-based access
+ * - Check rolesModerate (with inheritance) for role-based access
  */
 export async function canHideFolder(
   user: JwtPayloadType,
@@ -333,8 +475,8 @@ export async function canHideFolder(
     return true;
   }
 
-  // Get effective rolesHide (with inheritance)
-  const effectiveRoles = getEffectiveRoles(folder, "rolesHide", allFolders);
+  // Get effective rolesModerate (with inheritance)
+  const effectiveRoles = getEffectiveRoles(folder, "rolesModerate", allFolders);
 
   // Check if user has required role
   return await hasRolePermission(user, effectiveRoles, logger);
@@ -342,7 +484,7 @@ export async function canHideFolder(
 
 /**
  * Check if user can update a folder (rename, change icon, etc.)
- * Same as write permission - uses rolesWrite
+ * Same as manage permission - uses rolesManage
  */
 export async function canUpdateFolder(
   user: JwtPayloadType,
@@ -350,31 +492,34 @@ export async function canUpdateFolder(
   logger: EndpointLogger,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
-  return await canWriteFolder(user, folder, logger, allFolders);
+  return await canManageFolder(user, folder, logger, allFolders);
 }
 
 /**
  * Check if user can manage folder permissions
- * Only owner and admin can manage permissions
+ * Uses rolesAdmin - only owner, admin, and users with rolesAdmin can manage permissions
  */
-export async function canManageFolder(
+export async function canManageFolderPermissions(
   user: JwtPayloadType,
   folder: ChatFolder,
   logger: EndpointLogger,
+  allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   const userId = user.id;
 
-  // Owner can manage
+  // Owner can manage permissions
   if (userId && isOwner(userId, folder.userId)) {
     return true;
   }
 
-  // Admin can manage
+  // Admin can manage permissions
   if (userId && (await isAdmin(userId, logger))) {
     return true;
   }
 
-  return false;
+  // Check rolesAdmin permission
+  const effectiveRoles = getEffectiveRoles(folder, "rolesAdmin", allFolders);
+  return await hasRolePermission(user, effectiveRoles, logger);
 }
 
 // ============================================================================
@@ -382,13 +527,13 @@ export async function canManageFolder(
 // ============================================================================
 
 /**
- * Check if user can read a thread
- * Uses rolesRead with inheritance from parent folder
- * - Owner can always read
- * - Admin can always read
- * - Check rolesRead (with inheritance) for role-based access
+ * Check if user can view/read a thread
+ * Uses rolesView with inheritance from parent folder
+ * - Owner can always view
+ * - Admin can always view
+ * - Check rolesView (with inheritance) for role-based access
  */
-export async function canReadThread(
+export async function canViewThread(
   user: JwtPayloadType,
   thread: ChatThread,
   folder: ChatFolder | null,
@@ -397,12 +542,81 @@ export async function canReadThread(
 ): Promise<boolean> {
   const userId = user.id;
 
-  // Owner can always read
+  logger.debug("canViewThread: Checking permissions", {
+    userId,
+    threadId: thread.id,
+    threadUserId: thread.userId,
+    threadRootFolderId: thread.rootFolderId,
+    folderId: thread.folderId,
+    folderName: folder?.name,
+  });
+
+  // Owner can always view
+  if (userId && isOwner(userId, thread.userId)) {
+    logger.debug("canViewThread: User is owner", {
+      userId,
+      threadUserId: thread.userId,
+    });
+    return true;
+  }
+
+  // Admin can always view
+  if (userId) {
+    const isAdminUser = await isAdmin(userId, logger);
+    logger.debug("canViewThread: Admin check", { userId, isAdminUser });
+    if (isAdminUser) {
+      return true;
+    }
+  }
+
+  // Build folder map for inheritance
+  const folderMap: Record<string, ChatFolder> = { ...allFolders };
+  if (folder && folder.id) {
+    folderMap[folder.id] = folder;
+  }
+
+  // Get effective rolesView (with inheritance from folder)
+  const effectiveRoles = getEffectiveRoles(thread, "rolesView", folderMap);
+
+  logger.debug("canViewThread: Checking role permission", {
+    effectiveRoles,
+    userId: user.id,
+    isPublic: user.isPublic,
+  });
+
+  // Check if user has required role
+  const hasPermission = await hasRolePermission(user, effectiveRoles, logger);
+
+  logger.debug("canViewThread: Final result", {
+    hasPermission,
+    threadId: thread.id,
+  });
+
+  return hasPermission;
+}
+
+/**
+ * Check if user can edit a thread (title, settings, etc.)
+ * Uses rolesEdit with inheritance from parent folder
+ * - Owner can always edit
+ * - Admin can always edit
+ * - Check rolesEdit (with inheritance) for role-based access
+ */
+export async function canEditThread(
+  user: JwtPayloadType,
+  thread: ChatThread,
+  folder: ChatFolder | null,
+  logger: EndpointLogger,
+  allFolders: Record<string, ChatFolder> = {},
+): Promise<boolean> {
+  const userId = user.id;
+
+  // Owner can always edit
   if (userId && isOwner(userId, thread.userId)) {
     return true;
   }
 
-  // Admin can always read
+  // Admin can always edit
   if (userId && (await isAdmin(userId, logger))) {
     return true;
   }
@@ -413,21 +627,21 @@ export async function canReadThread(
     folderMap[folder.id] = folder;
   }
 
-  // Get effective rolesRead (with inheritance from folder)
-  const effectiveRoles = getEffectiveRoles(thread, "rolesRead", folderMap);
+  // Get effective rolesEdit (with inheritance from folder)
+  const effectiveRoles = getEffectiveRoles(thread, "rolesEdit", folderMap);
 
   // Check if user has required role
   return await hasRolePermission(user, effectiveRoles, logger);
 }
 
 /**
- * Check if user can write to a thread (create messages)
- * Uses rolesWrite with inheritance from parent folder
- * - Owner can always write
- * - Admin can always write
- * - Check rolesWrite (with inheritance) for role-based access
+ * Check if user can post messages in a thread
+ * Uses rolesPost with inheritance from parent folder
+ * - Owner can always post
+ * - Admin can always post
+ * - Check rolesPost (with inheritance) for role-based access
  */
-export async function canWriteThread(
+export async function canPostInThread(
   user: JwtPayloadType,
   thread: ChatThread,
   folder: ChatFolder | null,
@@ -436,12 +650,12 @@ export async function canWriteThread(
 ): Promise<boolean> {
   const userId = user.id;
 
-  // Owner can always write
+  // Owner can always post
   if (userId && isOwner(userId, thread.userId)) {
     return true;
   }
 
-  // Admin can always write
+  // Admin can always post
   if (userId && (await isAdmin(userId, logger))) {
     return true;
   }
@@ -452,8 +666,8 @@ export async function canWriteThread(
     folderMap[folder.id] = folder;
   }
 
-  // Get effective rolesWrite (with inheritance from folder)
-  const effectiveRoles = getEffectiveRoles(thread, "rolesWrite", folderMap);
+  // Get effective rolesPost (with inheritance from folder)
+  const effectiveRoles = getEffectiveRoles(thread, "rolesPost", folderMap);
 
   // Check if user has required role
   return await hasRolePermission(user, effectiveRoles, logger);
@@ -461,10 +675,10 @@ export async function canWriteThread(
 
 /**
  * Check if user can delete a thread
- * Uses rolesDelete with inheritance from parent folder
+ * Uses rolesAdmin with inheritance from parent folder
  * - Owner can always delete
  * - Admin can always delete
- * - Check rolesDelete (with inheritance) for role-based access
+ * - Check rolesAdmin (with inheritance) for role-based access
  */
 export async function canDeleteThread(
   user: JwtPayloadType,
@@ -491,8 +705,8 @@ export async function canDeleteThread(
     folderMap[folder.id] = folder;
   }
 
-  // Get effective rolesDelete (with inheritance from folder)
-  const effectiveRoles = getEffectiveRoles(thread, "rolesDelete", folderMap);
+  // Get effective rolesAdmin (with inheritance from folder)
+  const effectiveRoles = getEffectiveRoles(thread, "rolesAdmin", folderMap);
 
   // Check if user has required role
   return await hasRolePermission(user, effectiveRoles, logger);
@@ -500,10 +714,10 @@ export async function canDeleteThread(
 
 /**
  * Check if user can hide/moderate a thread
- * Uses rolesHide with inheritance from parent folder
+ * Uses rolesModerate with inheritance from parent folder
  * - Owner can always hide
  * - Admin can always hide
- * - Check rolesHide (with inheritance) for role-based access
+ * - Check rolesModerate (with inheritance) for role-based access
  */
 export async function canHideThread(
   user: JwtPayloadType,
@@ -530,8 +744,8 @@ export async function canHideThread(
     folderMap[folder.id] = folder;
   }
 
-  // Get effective rolesHide (with inheritance from folder)
-  const effectiveRoles = getEffectiveRoles(thread, "rolesHide", folderMap);
+  // Get effective rolesModerate (with inheritance from folder)
+  const effectiveRoles = getEffectiveRoles(thread, "rolesModerate", folderMap);
 
   // Check if user has required role
   return await hasRolePermission(user, effectiveRoles, logger);
@@ -539,7 +753,7 @@ export async function canHideThread(
 
 /**
  * Check if user can update a thread (rename, change settings, etc.)
- * Same as write permission - uses rolesWrite
+ * Same as edit permission - uses rolesEdit
  */
 export async function canUpdateThread(
   user: JwtPayloadType,
@@ -548,31 +762,41 @@ export async function canUpdateThread(
   logger: EndpointLogger,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
-  return await canWriteThread(user, thread, folder, logger, allFolders);
+  return await canEditThread(user, thread, folder, logger, allFolders);
 }
 
 /**
  * Check if user can manage thread permissions
- * Only owner and admin can manage permissions
+ * Uses rolesAdmin - only owner, admin, and users with rolesAdmin can manage permissions
  */
-export async function canManageThread(
+export async function canManageThreadPermissions(
   user: JwtPayloadType,
   thread: ChatThread,
+  folder: ChatFolder | null,
   logger: EndpointLogger,
+  allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   const userId = user.id;
 
-  // Owner can manage
+  // Owner can manage permissions
   if (userId && isOwner(userId, thread.userId)) {
     return true;
   }
 
-  // Admin can manage
+  // Admin can manage permissions
   if (userId && (await isAdmin(userId, logger))) {
     return true;
   }
 
-  return false;
+  // Build folder map for inheritance
+  const folderMap: Record<string, ChatFolder> = { ...allFolders };
+  if (folder && folder.id) {
+    folderMap[folder.id] = folder;
+  }
+
+  // Check rolesAdmin permission
+  const effectiveRoles = getEffectiveRoles(thread, "rolesAdmin", folderMap);
+  return await hasRolePermission(user, effectiveRoles, logger);
 }
 
 // ============================================================================
@@ -581,7 +805,7 @@ export async function canManageThread(
 
 /**
  * Check if user can read a message
- * Inherits from thread read permissions
+ * Inherits from thread view permissions
  */
 export async function canReadMessage(
   user: JwtPayloadType,
@@ -592,12 +816,15 @@ export async function canReadMessage(
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   // Messages inherit thread permissions
-  return await canReadThread(user, thread, folder, logger, allFolders);
+  return await canViewThread(user, thread, folder, logger, allFolders);
 }
 
 /**
- * Check if user can create a message in a thread
- * Inherits from thread write permissions
+ * Check if user can create a message in a thread (post messages)
+ * Uses rolesPost with inheritance from parent folder
+ * - Owner can always post
+ * - Admin can always post
+ * - Check rolesPost (with inheritance) for role-based access
  */
 export async function canWriteMessage(
   user: JwtPayloadType,
@@ -606,16 +833,15 @@ export async function canWriteMessage(
   logger: EndpointLogger,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
-  // Messages inherit thread write permissions
-  return await canWriteThread(user, thread, folder, logger, allFolders);
+  return await canPostInThread(user, thread, folder, logger, allFolders);
 }
 
 /**
  * Check if user can delete a message
- * Uses thread's rolesDelete permission (with inheritance)
+ * Uses thread's rolesAdmin permission (with inheritance)
  * - Author can delete their own messages
  * - Admin can delete any message
- * - Check rolesDelete (with inheritance) for role-based access
+ * - Check rolesAdmin (with inheritance) for role-based access
  */
 export async function canDeleteMessage(
   user: JwtPayloadType,
@@ -643,8 +869,8 @@ export async function canDeleteMessage(
     folderMap[folder.id] = folder;
   }
 
-  // Get effective rolesDelete (with inheritance from folder)
-  const effectiveRoles = getEffectiveRoles(thread, "rolesDelete", folderMap);
+  // Get effective rolesAdmin (with inheritance from folder)
+  const effectiveRoles = getEffectiveRoles(thread, "rolesAdmin", folderMap);
 
   // Check if user has required role
   return await hasRolePermission(user, effectiveRoles, logger);
@@ -652,10 +878,10 @@ export async function canDeleteMessage(
 
 /**
  * Check if user can hide/moderate a message
- * Uses thread's rolesHide permission (with inheritance)
+ * Uses thread's rolesModerate permission (with inheritance)
  * - Author can hide their own messages
  * - Admin can hide any message
- * - Check rolesHide (with inheritance) for role-based access
+ * - Check rolesModerate (with inheritance) for role-based access
  */
 export async function canHideMessage(
   user: JwtPayloadType,
@@ -683,8 +909,8 @@ export async function canHideMessage(
     folderMap[folder.id] = folder;
   }
 
-  // Get effective rolesHide (with inheritance from folder)
-  const effectiveRoles = getEffectiveRoles(thread, "rolesHide", folderMap);
+  // Get effective rolesModerate (with inheritance from folder)
+  const effectiveRoles = getEffectiveRoles(thread, "rolesModerate", folderMap);
 
   // Check if user has required role
   return await hasRolePermission(user, effectiveRoles, logger);

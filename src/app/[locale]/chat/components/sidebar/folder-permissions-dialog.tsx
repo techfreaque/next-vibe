@@ -89,52 +89,78 @@ export function FolderPermissionsDialog({
                 {t("app.chat.permissions.folder.description")}
               </Div>
 
-              {/* Read Permissions */}
+              {/* View Permissions */}
               <EndpointFormField
-                name="rolesRead"
+                name="rolesView"
                 config={{
                   type: "multiselect",
-                  label: "app.chat.permissions.read.label",
-                  description: "app.chat.permissions.read.description",
+                  label: "app.chat.permissions.view.label",
+                  description: "app.chat.permissions.view.description",
                   options: UserRoleOptions,
                 }}
                 control={endpoint.create.form.control}
                 theme={{ style: "none", showAllRequired: false }}
               />
 
-              {/* Write Permissions */}
+              {/* Manage Permissions */}
               <EndpointFormField
-                name="rolesWrite"
+                name="rolesManage"
                 config={{
                   type: "multiselect",
-                  label: "app.chat.permissions.write.label",
-                  description: "app.chat.permissions.write.description",
+                  label: "app.chat.permissions.manage.label",
+                  description: "app.chat.permissions.manage.description",
                   options: UserRoleOptions,
                 }}
                 control={endpoint.create.form.control}
                 theme={{ style: "none", showAllRequired: false }}
               />
 
-              {/* Hide Permissions */}
+              {/* Create Thread Permissions */}
               <EndpointFormField
-                name="rolesHide"
+                name="rolesCreateThread"
                 config={{
                   type: "multiselect",
-                  label: "app.chat.permissions.hide.label",
-                  description: "app.chat.permissions.hide.description",
+                  label: "app.chat.permissions.createThread.label",
+                  description: "app.chat.permissions.createThread.description",
                   options: UserRoleOptions,
                 }}
                 control={endpoint.create.form.control}
                 theme={{ style: "none", showAllRequired: false }}
               />
 
-              {/* Delete Permissions */}
+              {/* Post Permissions */}
               <EndpointFormField
-                name="rolesDelete"
+                name="rolesPost"
                 config={{
                   type: "multiselect",
-                  label: "app.chat.permissions.delete.label",
-                  description: "app.chat.permissions.delete.description",
+                  label: "app.chat.permissions.post.label",
+                  description: "app.chat.permissions.post.description",
+                  options: UserRoleOptions,
+                }}
+                control={endpoint.create.form.control}
+                theme={{ style: "none", showAllRequired: false }}
+              />
+
+              {/* Moderate Permissions */}
+              <EndpointFormField
+                name="rolesModerate"
+                config={{
+                  type: "multiselect",
+                  label: "app.chat.permissions.moderate.label",
+                  description: "app.chat.permissions.moderate.description",
+                  options: UserRoleOptions,
+                }}
+                control={endpoint.create.form.control}
+                theme={{ style: "none", showAllRequired: false }}
+              />
+
+              {/* Admin Permissions */}
+              <EndpointFormField
+                name="rolesAdmin"
+                config={{
+                  type: "multiselect",
+                  label: "app.chat.permissions.admin.label",
+                  description: "app.chat.permissions.admin.description",
                   options: UserRoleOptions,
                 }}
                 control={endpoint.create.form.control}

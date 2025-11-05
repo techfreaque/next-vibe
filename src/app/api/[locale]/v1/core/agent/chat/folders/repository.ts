@@ -11,8 +11,19 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import {
+  DEFAULT_FOLDER_CONFIGS,
+  type DefaultFolderId,
+  isIncognitoFolder,
+} from "@/app/api/[locale]/v1/core/agent/chat/config";
+import {
   canCreateFolder,
-  canReadFolder,
+  canViewFolder,
+  canManageFolder,
+  canCreateThreadInFolder,
+  canHideFolder,
+  canDeleteFolder,
+  canManageFolderPermissions,
+  hasRolePermission,
 } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
@@ -52,6 +63,83 @@ export interface ChatFoldersRepositoryInterface {
 export class ChatFoldersRepositoryImpl
   implements ChatFoldersRepositoryInterface
 {
+  /**
+   * Compute permissions for a root folder
+   * Root folders don't exist in the database, so we compute permissions based on DEFAULT_FOLDER_CONFIGS
+   */
+  private async computeRootFolderPermissions(
+    rootFolderId: DefaultFolderId,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<{ canCreateThread: boolean; canCreateFolder: boolean }> {
+    // Get the root folder config
+    const rootConfig = DEFAULT_FOLDER_CONFIGS.find(
+      (config) => config.id === rootFolderId,
+    );
+
+    if (!rootConfig) {
+      logger.error("Root folder config not found", { rootFolderId });
+      return { canCreateThread: false, canCreateFolder: false };
+    }
+
+    // Special handling for incognito folder
+    // Incognito is localStorage-only and should allow everyone to create threads/folders locally
+    const isIncognito = isIncognitoFolder(rootFolderId);
+
+    if (isIncognito) {
+      return {
+        canCreateThread: true,
+        canCreateFolder: true,
+      };
+    }
+
+    // Admin users can always create threads and folders in any root folder
+    const userId = user.id;
+    if (userId) {
+      const { isAdmin } = await import("../permissions/permissions");
+      const isAdminUser = await isAdmin(userId, logger);
+      if (isAdminUser) {
+        return {
+          canCreateThread: true,
+          canCreateFolder: true,
+        };
+      }
+    }
+
+    // For PRIVATE and SHARED root folders with empty rolesCreateThread ([]),
+    // authenticated users should be able to create threads (owner-only semantics don't apply to root folders)
+    // For PUBLIC root folder, use the explicit rolesCreateThread configuration
+    let canCreateThreadInRoot: boolean;
+    if (
+      (rootFolderId === "private" || rootFolderId === "shared") &&
+      rootConfig.rolesCreateThread.length === 0
+    ) {
+      // Empty array for PRIVATE/SHARED means "authenticated users only"
+      canCreateThreadInRoot = !user.isPublic && !!userId;
+    } else {
+      // Use the rolesCreateThread from the root folder config
+      canCreateThreadInRoot = await hasRolePermission(
+        user,
+        rootConfig.rolesCreateThread,
+        logger,
+      );
+    }
+
+    // Check canCreateFolder permission
+    // Use canCreateFolder helper which has special logic for each root folder
+    const canCreateFolderInRoot = await canCreateFolder(
+      user,
+      rootFolderId as "private" | "shared" | "public" | "incognito",
+      logger,
+      null, // No parent folder for root level
+    );
+
+    return {
+      canCreateThread: canCreateThreadInRoot,
+      canCreateFolder: canCreateFolderInRoot,
+    };
+  }
+
   /**
    * Get all folders for the authenticated user or anonymous user (lead)
    */
@@ -114,37 +202,81 @@ export class ChatFoldersRepositoryImpl
         .where(whereConditions)
         .orderBy(desc(chatFolders.sortOrder), desc(chatFolders.createdAt));
 
-      // Filter folders based on user permissions using canReadFolder
+      // Filter folders based on user permissions using canViewFolder
       const visibleFolders = [];
       for (const folder of allFolders) {
-        if (await canReadFolder(user, folder, logger)) {
+        if (await canViewFolder(user, folder, logger)) {
           visibleFolders.push(folder);
         }
       }
 
+      // Build folder map for permission checks
+      const folderMap: Record<string, (typeof allFolders)[0]> = {};
+      for (const folder of allFolders) {
+        folderMap[folder.id] = folder;
+      }
+
+      // Map folders to response format with permission flags
+      const foldersWithPermissions = await Promise.all(
+        visibleFolders.map(async (folder) => {
+          // Compute all permission flags server-side
+          const [
+            canManageFolderFlag,
+            canCreateThreadFlag,
+            canModerateFlag,
+            canDeleteFlag,
+            canManagePermsFlag,
+          ] = await Promise.all([
+            canManageFolder(user, folder, logger, folderMap),
+            canCreateThreadInFolder(user, folder, logger, folderMap),
+            canHideFolder(user, folder, logger, folderMap),
+            canDeleteFolder(user, folder, logger, folderMap),
+            canManageFolderPermissions(user, folder, logger, folderMap),
+          ]);
+
+          return {
+            id: folder.id,
+            userId: folder.userId,
+            rootFolderId: folder.rootFolderId as
+              | "incognito"
+              | "private"
+              | "public"
+              | "shared",
+            name: folder.name,
+            icon: folder.icon,
+            color: folder.color,
+            parentId: folder.parentId,
+            expanded: folder.expanded,
+            sortOrder: folder.sortOrder,
+            metadata: folder.metadata || {},
+            rolesView: folder.rolesView || [],
+            rolesManage: folder.rolesManage || [],
+            rolesCreateThread: folder.rolesCreateThread || [],
+            rolesPost: folder.rolesPost || [],
+            rolesModerate: folder.rolesModerate || [],
+            rolesAdmin: folder.rolesAdmin || [],
+            // Permission flags - computed server-side
+            canManage: canManageFolderFlag,
+            canCreateThread: canCreateThreadFlag,
+            canModerate: canModerateFlag,
+            canDelete: canDeleteFlag,
+            canManagePermissions: canManagePermsFlag,
+            createdAt: folder.createdAt.toISOString(),
+            updatedAt: folder.updatedAt.toISOString(),
+          };
+        }),
+      );
+
+      // Compute root folder permissions
+      // If rootFolderId is specified, compute permissions for that root folder
+      // Otherwise, return default permissions (no permissions)
+      const rootFolderPermissions = rootFolderId
+        ? await this.computeRootFolderPermissions(rootFolderId, user, logger)
+        : { canCreateThread: false, canCreateFolder: false };
+
       return createSuccessResponse({
-        folders: visibleFolders.map((folder) => ({
-          id: folder.id,
-          userId: folder.userId,
-          rootFolderId: folder.rootFolderId as
-            | "incognito"
-            | "private"
-            | "public"
-            | "shared",
-          name: folder.name,
-          icon: folder.icon,
-          color: folder.color,
-          parentId: folder.parentId,
-          expanded: folder.expanded,
-          sortOrder: folder.sortOrder,
-          metadata: folder.metadata || {},
-          rolesRead: folder.rolesRead || [],
-          rolesWrite: folder.rolesWrite || [],
-          rolesHide: folder.rolesHide || [],
-          rolesDelete: folder.rolesDelete || [],
-          createdAt: folder.createdAt.toISOString(),
-          updatedAt: folder.updatedAt.toISOString(),
-        })),
+        rootFolderPermissions,
+        folders: foldersWithPermissions,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }) as any;
     } catch (error) {
@@ -263,8 +395,8 @@ export class ChatFoldersRepositoryImpl
           expanded: true,
           sortOrder: nextSortOrder,
           metadata: {},
-          // rolesRead, rolesWrite, rolesHide, rolesDelete are NOT set
-          // They default to [] which means inherit from parent folder
+          // rolesView, rolesManage, rolesCreateThread, rolesPost, rolesModerate, rolesAdmin are NOT set
+          // They default to null which means inherit from parent folder
         })
         .returning();
 
@@ -294,10 +426,12 @@ export class ChatFoldersRepositoryImpl
             expanded: newFolder.expanded,
             sortOrder: newFolder.sortOrder,
             metadata: newFolder.metadata || {},
-            rolesRead: newFolder.rolesRead || [],
-            rolesWrite: newFolder.rolesWrite || [],
-            rolesHide: newFolder.rolesHide || [],
-            rolesDelete: newFolder.rolesDelete || [],
+            rolesView: newFolder.rolesView || [],
+            rolesManage: newFolder.rolesManage || [],
+            rolesCreateThread: newFolder.rolesCreateThread || [],
+            rolesPost: newFolder.rolesPost || [],
+            rolesModerate: newFolder.rolesModerate || [],
+            rolesAdmin: newFolder.rolesAdmin || [],
             createdAt: newFolder.createdAt.toISOString(),
             updatedAt: newFolder.updatedAt.toISOString(),
           },

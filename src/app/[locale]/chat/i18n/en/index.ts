@@ -143,10 +143,14 @@ export const translations = {
   },
   credits: {
     balance: "Credits",
-    total: "{{count}} credits",
-    expiring: "{{count}} expiring",
-    permanent: "{{count}} permanent",
-    free: "{{count}} free",
+    credit: "{{count}} credit",
+    credits: "{{count}} credits",
+    freeCredit: "{{count}} free credit",
+    freeCredits: "{{count}} free credits",
+    expiringCredit: "{{count}} expiring credit",
+    expiringCredits: "{{count}} expiring credits",
+    permanentCredit: "{{count}} permanent credit",
+    permanentCredits: "{{count}} permanent credits",
     expiresOn: "Expires {{date}}",
     expiresAt: "Expires",
     buyMore: "Buy credits",
@@ -191,6 +195,13 @@ export const translations = {
   },
   input: {
     placeholder: "Type your message...",
+    noPermission: "You don't have permission to post messages",
+    noPostPermission:
+      "You don't have permission to post messages in this thread",
+    noCreateThreadPermission:
+      "You don't have permission to create threads in this folder",
+    noCreateThreadPermissionInRootFolder:
+      "You don't have permission to create threads in this folder. Please sign in or select a subfolder.",
     keyboardShortcuts: {
       press: "Press",
       enter: "Enter",
@@ -696,21 +707,46 @@ export const translations = {
       title: "Thread Permissions",
       description: "Manage permissions for this thread",
     },
+    view: {
+      label: "View Permissions",
+      description: "Who can view and read this content",
+    },
+    manage: {
+      label: "Manage Permissions",
+      description: "Who can edit folder and create subfolders",
+    },
+    edit: {
+      label: "Edit Permissions",
+      description: "Who can edit thread properties",
+    },
+    createThread: {
+      label: "Create Thread Permissions",
+      description: "Who can create new threads in this folder",
+    },
+    post: {
+      label: "Post Permissions",
+      description: "Who can post messages",
+    },
+    moderate: {
+      label: "Moderate Permissions",
+      description: "Who can hide and moderate content",
+    },
+    admin: {
+      label: "Admin Permissions",
+      description: "Who can delete content and manage permissions",
+    },
+    // Legacy keys (kept for backwards compatibility)
     read: {
       label: "Read Permissions",
       description: "Who can view and read this content",
     },
     write: {
       label: "Write Permissions",
-      description: "Who can create and write content",
+      description: "Who can create threads and folders",
     },
-    hide: {
-      label: "Hide Permissions",
-      description: "Who can hide and moderate content",
-    },
-    delete: {
-      label: "Delete Permissions",
-      description: "Who can delete content",
+    writePost: {
+      label: "Post Permissions",
+      description: "Who can post messages in threads",
     },
     roles: {
       public: "Public (All Users)",
@@ -790,6 +826,7 @@ export const translations = {
     userFallback: "User",
     assistantFallback: "Assistant",
     youLabel: "You",
+    anonymous: "Anonymous",
   },
   flatView: {
     postNumber: "Post #{{number}}",

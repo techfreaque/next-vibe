@@ -192,7 +192,7 @@ export function RequestFieldsRenderer({
 
   // Render all fields
   return (
-    <Div className="space-y-2 rounded-md bg-muted/30 border border-border/30 p-3">
+    <Div className="space-y-2 rounded-md bg-muted border border-border/30 p-3">
       {Object.entries(args).map(([key, value]) => renderField(key, value))}
     </Div>
   );

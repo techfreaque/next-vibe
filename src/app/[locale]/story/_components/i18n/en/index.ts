@@ -7,7 +7,7 @@ export const translations = {
       badge: "🔥 AI Chat + Community Forum",
       title: "Chat with AI, Connect with Community",
       subtitle:
-        "Experience uncensored AI conversations with 40+ models. Join forum discussions. All in one platform.",
+        "Experience uncensored AI conversations with {{modelCount}}+ models. Join forum discussions. All in one platform.",
       description:
         "Private AI chats, collaborative spaces, and public forum threads. Choose your privacy level: Private (encrypted), Incognito (local-only), Shared (collaborative), or Public (community forum).",
       cta: "Start Chatting Free",
@@ -18,7 +18,7 @@ export const translations = {
       imageAlt: "{{appName}} Chat + Forum Interface",
       stats: {
         users: "10,000+ Users",
-        models: "40+ AI Models",
+        models: "{{modelCount}}+ AI Models",
         messages: "1M+ Messages",
       },
       imageOverlay: {
@@ -59,7 +59,7 @@ export const translations = {
       contentCreation: {
         title: "Private Folders - Your Personal AI",
         description:
-          "Encrypted, server-stored chats. Access GPT-4, Claude, Gemini, and 40+ models. Your private conversations, synced across devices.",
+          "Encrypted, server-stored chats. Access GPT-4, Claude, Gemini, and {{modelCount}}+ models. Your private conversations, synced across devices.",
       },
       strategyDevelopment: {
         title: "Incognito Folders - Local Only",
@@ -77,7 +77,7 @@ export const translations = {
           "Join the community! Create public threads, participate in discussions, upvote content, and connect with other AI enthusiasts.",
       },
       growth: {
-        title: "40+ Uncensored AI Models",
+        title: "{{modelCount}}+ Uncensored AI Models",
         description:
           "GPT-4, Claude, Gemini, Llama, Mistral, and more. No filters, no restrictions. Switch models mid-conversation.",
       },
@@ -94,7 +94,7 @@ export const translations = {
       adCampaigns: {
         title: "Flexible Pricing",
         description:
-          "Free tier: 20 credits/month. Unlimited plan: €10/month. Credit packs: €5. Crypto or card payments accepted.",
+          "Subscription: {{subCurrency}}{{subPrice}}/month with {{subCredits}} credits. Credit packs: {{packCurrency}}{{packPrice}} for {{packCredits}} credits (never expire). Crypto or card payments accepted.",
       },
       dataAnalysis: {
         title: "Advanced Analytics",
@@ -190,7 +190,7 @@ export const translations = {
       badge: "Free Trial",
       title: "Try All AI Models Free",
       description:
-        "Start with 20 free credits. Test all 40+ AI models before upgrading.",
+        "Start with {{freeCredits}} free credits. Test all {{modelCount}}+ AI models before upgrading.",
       card: {
         title: "Free Access",
         subtitle: "Everything you need to get started",
@@ -202,8 +202,8 @@ export const translations = {
       },
       benefits: {
         professionalSetup: "No credit card required",
-        brandConsistency: "Access to all 40+ models",
-        optimizedProfiles: "20 free credits to start",
+        brandConsistency: "Access to all {{modelCount}}+ models",
+        optimizedProfiles: "{{freeCredits}} free credits to start",
         strategicPlanning: "Upgrade anytime",
       },
     },
@@ -219,7 +219,7 @@ export const translations = {
         strategyDevelopment: {
           title: "1. Sign Up Free",
           description:
-            "Create your account in seconds. No credit card required. Start with {{freeCredits}} free credits per month across all 40+ AI models.",
+            "Create your account in seconds. No credit card required. Start with {{freeCredits}} free credits per month across all {{modelCount}}+ AI models.",
           tags: {
             audienceAnalysis: "Quick Setup",
             competitorResearch: "No Credit Card",
@@ -248,7 +248,7 @@ export const translations = {
           description:
             "Have private AI conversations, collaborate with friends, or join public forum discussions. Use custom personas and switch AI models mid-chat.",
           tags: {
-            optimalTiming: "40+ AI Models",
+            optimalTiming: "{{modelCount}}+ AI Models",
             communityBuilding: "Community Forum",
           },
         },
@@ -268,7 +268,7 @@ export const translations = {
         title: "About {{appName}}",
         subtitle: "AI Chat + Community Forum. Your Privacy. Your Choice.",
         description:
-          "We're building a platform that combines private AI conversations with community forum discussions. Choose your privacy level, chat with 40+ AI models, and connect with our community.",
+          "We're building a platform that combines private AI conversations with community forum discussions. Choose your privacy level, chat with {{modelCount}}+ AI models, and connect with our community.",
       },
       mission: {
         title: "Our Mission",
@@ -278,7 +278,7 @@ export const translations = {
       story: {
         title: "Our Story",
         description:
-          "{{appName}} was created to solve two problems: censored AI platforms and fragmented chat experiences. We built a single platform where you can have private AI chats, collaborate with teams, and participate in public forum discussions. Today, thousands of users enjoy complete privacy control while accessing 40+ uncensored AI models.",
+          "{{appName}} was created to solve two problems: censored AI platforms and fragmented chat experiences. We built a single platform where you can have private AI chats, collaborate with teams, and participate in public forum discussions. Today, thousands of users enjoy complete privacy control while accessing {{modelCount}}+ uncensored AI models.",
       },
       values: {
         excellence: {
@@ -767,7 +767,7 @@ export const translations = {
           plans: {
             title: "Subscription Plans",
             content:
-              "We offer Free (20 credits/month), Credit Packs (€5/500 credits), and Unlimited (€10/month) plans.",
+              "We offer a subscription plan ({{subCurrency}}{{subPrice}}/month with {{subCredits}} credits) and credit packs ({{packCurrency}}{{packPrice}} for {{packCredits}} credits). Credit packs never expire, even after subscription ends.",
           },
           billing: {
             title: "Billing",
@@ -853,7 +853,7 @@ export const translations = {
   },
   footer: {
     tagline: "Chat with AI, Connect with Community",
-    privacyTagline: "Privacy-first AI chat with 40+ uncensored models",
+    privacyTagline: "Privacy-first AI chat with {{modelCount}}+ uncensored models",
     platform: {
       title: "Platform",
       features: "Features",

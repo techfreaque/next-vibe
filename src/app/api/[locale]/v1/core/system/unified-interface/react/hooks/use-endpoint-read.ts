@@ -56,6 +56,7 @@ export function useEndpointRead<
     urlPathParams?: TEndpoint["TUrlVariablesOutput"];
     autoPrefillData?: Partial<TEndpoint["TRequestOutput"]>;
     initialState?: Partial<TEndpoint["TRequestOutput"]>;
+    initialData?: TEndpoint["TResponseOutput"];
     autoPrefillConfig?: AutoPrefillConfig;
   } = {},
 ): ApiQueryFormReturn<
@@ -73,6 +74,7 @@ export function useEndpointRead<
     urlPathParams = {} as TEndpoint["TUrlVariablesOutput"],
     autoPrefillData,
     initialState,
+    initialData,
     autoPrefillConfig = {
       autoPrefill: true,
       autoPrefillFromLocalStorage: false,
@@ -110,12 +112,10 @@ export function useEndpointRead<
     };
   }, [formOptions, autoPrefillData, initialState, autoPrefillConfig]);
 
-  // Enhanced query options with initial state support
+  // Enhanced query options with initial data support
   const enhancedQueryOptions = useMemo(() => {
-    // If initial state is provided, disable the initial request
-    const shouldSkipInitialRequest = Boolean(
-      initialState && Object.keys(initialState).length > 0,
-    );
+    // If initial data (response) is provided, disable the initial request
+    const shouldSkipInitialRequest = Boolean(initialData);
 
     const finalEnabled = shouldSkipInitialRequest
       ? false
@@ -123,10 +123,13 @@ export function useEndpointRead<
 
     return {
       ...queryOptions,
-      // Skip initial request if we have initial state
+      // Skip initial request if we have initial data from server
       enabled: finalEnabled,
+      // Pass initial data for the query
+      // This will be wrapped in a success response by useApiQuery
+      initialData: initialData,
     };
-  }, [queryOptions, initialState]);
+  }, [queryOptions, initialData]);
 
   // Use the existing query form hook with enhanced options
   const queryFormResult = useApiQueryForm({

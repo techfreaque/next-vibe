@@ -64,9 +64,10 @@ interface ThreadedMessageProps {
   onModelChange?: (model: ModelId) => void;
   onPersonaChange?: (persona: string) => void;
   maxDepth?: number;
-  rootFolderId?: string;
   /** Collapse state management callbacks */
   collapseState?: ReturnType<typeof useCollapseState>;
+  currentUserId?: string;
+  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 export function ThreadedMessage({
@@ -90,7 +91,8 @@ export function ThreadedMessage({
   onModelChange,
   onPersonaChange,
   maxDepth = LAYOUT.MAX_THREAD_DEPTH,
-  rootFolderId = "general",
+  currentUserId,
+  deductCredits,
 }: ThreadedMessageProps): JSX.Element {
   const { t } = simpleT(locale);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -132,6 +134,7 @@ export function ThreadedMessage({
     isStreaming: isMessageStreaming,
     locale,
     logger,
+    deductCredits,
   });
 
   const hasReplies = replies.length > 0;
@@ -222,6 +225,7 @@ export function ThreadedMessage({
                 onPersonaChange={onPersonaChange}
                 locale={locale}
                 logger={logger}
+                deductCredits={deductCredits}
               />
             </Div>
           ) : isRetrying ? (
@@ -318,11 +322,11 @@ export function ThreadedMessage({
                         );
                       })()}
                     {message.role === "user"
-                      ? rootFolderId === "general" ||
-                        rootFolderId === "shared" ||
-                        rootFolderId === "public"
+                      ? currentUserId && message.authorId === currentUserId
                         ? t("app.chat.threadedView.youLabel")
-                        : t("app.chat.threadedView.userFallback")
+                        : message.authorName
+                          ? message.authorName
+                          : t("app.chat.threadedView.anonymous")
                       : message.role === "assistant" && message.model
                         ? getModelById(message.model).name
                         : t("app.chat.threadedView.assistantFallback")}
@@ -693,7 +697,8 @@ export function ThreadedMessage({
                   onModelChange={onModelChange}
                   onPersonaChange={onPersonaChange}
                   maxDepth={maxDepth}
-                  rootFolderId={rootFolderId}
+                  currentUserId={currentUserId}
+                  deductCredits={deductCredits}
                 />
               ))}
             </Div>

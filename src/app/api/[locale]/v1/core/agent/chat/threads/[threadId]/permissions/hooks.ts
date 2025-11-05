@@ -15,7 +15,7 @@ import definitions from "./definition";
  * Hook for thread permission operations (GET, PATCH)
  *
  * Features:
- * - GET: Fetch thread permissions (rolesRead, rolesWrite, rolesHide, rolesDelete)
+ * - GET: Fetch thread permissions (rolesView, rolesEdit, rolesPost, rolesModerate, rolesAdmin)
  * - PATCH: Update thread permissions
  * - Cache invalidation on mutations
  *
@@ -46,5 +46,6 @@ export function useThreadPermissions(
   );
 }
 
-export type ThreadPermissionsEndpointReturn = EndpointReturn<typeof definitions>;
-
+export type ThreadPermissionsEndpointReturn = EndpointReturn<
+  typeof definitions
+>;

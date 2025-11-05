@@ -108,6 +108,27 @@ const { GET } = createEndpoint({
       ),
 
       // === RESPONSE ===
+      // Root folder permissions - computed server-side for the requested root folder
+      rootFolderPermissions: responseField(
+        {
+          type: WidgetType.CONTAINER,
+          title:
+            "app.api.v1.core.agent.chat.folders.get.response.rootFolderPermissions.title" as const,
+          layout: { type: LayoutType.GRID, columns: 2 },
+        },
+        z.object({
+          canCreateThread: z
+            .boolean()
+            .describe(
+              "Whether the current user can create threads in the root folder",
+            ),
+          canCreateFolder: z
+            .boolean()
+            .describe(
+              "Whether the current user can create folders in the root folder",
+            ),
+        }),
+      ),
       folders: responseArrayField(
         {
           type: WidgetType.DATA_CARDS,
@@ -200,9 +221,9 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.folders.get.response.folders.folder.metadata.content" as const,
               },
-              z.record(z.string(), z.any()),
+              z.record(z.string(), z.never()),
             ),
-            rolesRead: responseArrayField(
+            rolesView: responseArrayField(
               {
                 type: WidgetType.DATA_LIST,
                 layout: "inline",
@@ -216,7 +237,7 @@ const { GET } = createEndpoint({
                 },
               ),
             ),
-            rolesWrite: responseArrayField(
+            rolesManage: responseArrayField(
               {
                 type: WidgetType.DATA_LIST,
                 layout: "inline",
@@ -230,7 +251,7 @@ const { GET } = createEndpoint({
                 },
               ),
             ),
-            rolesHide: responseArrayField(
+            rolesCreateThread: responseArrayField(
               {
                 type: WidgetType.DATA_LIST,
                 layout: "inline",
@@ -244,7 +265,7 @@ const { GET } = createEndpoint({
                 },
               ),
             ),
-            rolesDelete: responseArrayField(
+            rolesPost: responseArrayField(
               {
                 type: WidgetType.DATA_LIST,
                 layout: "inline",
@@ -257,6 +278,93 @@ const { GET } = createEndpoint({
                   options: UserRoleOptions,
                 },
               ),
+            ),
+            rolesModerate: responseArrayField(
+              {
+                type: WidgetType.DATA_LIST,
+                layout: "inline",
+              },
+              field(
+                z.enum(UserRoleDB),
+                { response: true },
+                {
+                  type: WidgetType.BADGE,
+                  options: UserRoleOptions,
+                },
+              ),
+            ),
+            rolesAdmin: responseArrayField(
+              {
+                type: WidgetType.DATA_LIST,
+                layout: "inline",
+              },
+              field(
+                z.enum(UserRoleDB),
+                { response: true },
+                {
+                  type: WidgetType.BADGE,
+                  options: UserRoleOptions,
+                },
+              ),
+            ),
+            // Permission flags - computed server-side based on user's roles
+            canManage: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.agent.chat.folders.get.response.folders.folder.canManage.content" as const,
+              },
+              z
+                .boolean()
+                .describe(
+                  "Whether the current user can manage (edit/rename) this folder and create subfolders",
+                ),
+            ),
+            canCreateThread: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.agent.chat.folders.get.response.folders.folder.canCreateThread.content" as const,
+              },
+              z
+                .boolean()
+                .describe(
+                  "Whether the current user can create threads in this folder",
+                ),
+            ),
+            canModerate: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.agent.chat.folders.get.response.folders.folder.canModerate.content" as const,
+              },
+              z
+                .boolean()
+                .describe(
+                  "Whether the current user can moderate/hide content in this folder",
+                ),
+            ),
+            canDelete: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.agent.chat.folders.get.response.folders.folder.canDelete.content" as const,
+              },
+              z
+                .boolean()
+                .describe("Whether the current user can delete this folder"),
+            ),
+            canManagePermissions: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.agent.chat.folders.get.response.folders.folder.canManagePermissions.content" as const,
+              },
+              z
+                .boolean()
+                .describe(
+                  "Whether the current user can manage permissions for this folder",
+                ),
             ),
             createdAt: responseField(
               {
@@ -342,6 +450,10 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
+        rootFolderPermissions: {
+          canCreateThread: true,
+          canCreateFolder: true,
+        },
         folders: [],
       },
     },
@@ -578,9 +690,9 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.post.response.folder.metadata.content" as const,
                 },
-                z.record(z.string(), z.any()),
+                z.record(z.string(), z.never()),
               ),
-              rolesRead: responseArrayField(
+              rolesView: responseArrayField(
                 {
                   type: WidgetType.DATA_LIST,
                   layout: "inline",
@@ -594,7 +706,7 @@ const { POST } = createEndpoint({
                   },
                 ),
               ),
-              rolesWrite: responseArrayField(
+              rolesManage: responseArrayField(
                 {
                   type: WidgetType.DATA_LIST,
                   layout: "inline",
@@ -608,7 +720,7 @@ const { POST } = createEndpoint({
                   },
                 ),
               ),
-              rolesHide: responseArrayField(
+              rolesCreateThread: responseArrayField(
                 {
                   type: WidgetType.DATA_LIST,
                   layout: "inline",
@@ -622,7 +734,35 @@ const { POST } = createEndpoint({
                   },
                 ),
               ),
-              rolesDelete: responseArrayField(
+              rolesPost: responseArrayField(
+                {
+                  type: WidgetType.DATA_LIST,
+                  layout: "inline",
+                },
+                field(
+                  z.enum(UserRoleDB),
+                  { response: true },
+                  {
+                    type: WidgetType.BADGE,
+                    options: UserRoleOptions,
+                  },
+                ),
+              ),
+              rolesModerate: responseArrayField(
+                {
+                  type: WidgetType.DATA_LIST,
+                  layout: "inline",
+                },
+                field(
+                  z.enum(UserRoleDB),
+                  { response: true },
+                  {
+                    type: WidgetType.BADGE,
+                    options: UserRoleOptions,
+                  },
+                ),
+              ),
+              rolesAdmin: responseArrayField(
                 {
                   type: WidgetType.DATA_LIST,
                   layout: "inline",
@@ -739,10 +879,12 @@ const { POST } = createEndpoint({
             expanded: true,
             sortOrder: 0,
             metadata: {},
-            rolesRead: [],
-            rolesWrite: [],
-            rolesHide: [],
-            rolesDelete: [],
+            rolesView: [],
+            rolesManage: [],
+            rolesCreateThread: [],
+            rolesPost: [],
+            rolesModerate: [],
+            rolesAdmin: [],
             createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
             updatedAt: new Date("2024-01-01T00:00:00Z").toISOString(),
           },

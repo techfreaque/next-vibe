@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
       badge: "🔥 KI-Chat + Community-Forum",
       title: "Chatten Sie mit KI, Verbinden Sie sich mit der Community",
       subtitle:
-        "Erleben Sie unzensierte KI-Gespräche mit über 40 Modellen. Nehmen Sie an Forum-Diskussionen teil. Alles auf einer Plattform.",
+        "Erleben Sie unzensierte KI-Gespräche mit über {{modelCount}} Modellen. Nehmen Sie an Forum-Diskussionen teil. Alles auf einer Plattform.",
       description:
         "Private KI-Chats, kollaborative Räume und öffentliche Forum-Threads. Wählen Sie Ihr Privatsphäre-Level: Privat (verschlüsselt), Inkognito (nur lokal), Geteilt (kollaborativ) oder Öffentlich (Community-Forum).",
       cta: "Kostenlos chatten",
@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
       contentCreation: {
         title: "Private Ordner - Ihre persönliche KI",
         description:
-          "Verschlüsselt, server-gespeicherte Chats. Zugriff auf GPT-4, Claude, Gemini und 40+ Modelle. Ihre privaten Gespräche, synchronisiert über Geräte.",
+          "Verschlüsselt, server-gespeicherte Chats. Zugriff auf GPT-4, Claude, Gemini und {{modelCount}}+ Modelle. Ihre privaten Gespräche, synchronisiert über Geräte.",
       },
       strategyDevelopment: {
         title: "Inkognito-Ordner - Nur lokal",
@@ -95,7 +95,7 @@ export const translations: typeof enTranslations = {
       adCampaigns: {
         title: "Flexible Preisgestaltung",
         description:
-          "Kostenlos: 20 Credits/Monat. Unbegrenzt: €10/Monat. Guthaben-Pakete: €5. Krypto- oder Kartenzahlungen akzeptiert.",
+          "Abonnement: {{subCurrency}}{{subPrice}}/Monat mit {{subCredits}} Credits. Guthaben-Pakete: {{packCurrency}}{{packPrice}} für {{packCredits}} Credits (verfallen nie). Krypto- oder Kartenzahlungen akzeptiert.",
       },
       dataAnalysis: {
         title: "Erweiterte Analysen",
@@ -121,7 +121,7 @@ export const translations: typeof enTranslations = {
     cta: {
       title: "Bereit, der KI + Community-Plattform beizutreten?",
       subtitle:
-        "Chatten Sie privat mit 40+ KI-Modellen. Nehmen Sie an öffentlichen Forum-Diskussionen teil. Wählen Sie Ihr Privatsphäre-Level. Starten Sie heute kostenlos.",
+        "Chatten Sie privat mit {{modelCount}}+ KI-Modellen. Nehmen Sie an öffentlichen Forum-Diskussionen teil. Wählen Sie Ihr Privatsphäre-Level. Starten Sie heute kostenlos.",
       signUp: "Kostenlos anmelden",
       viewPlans: "Preispläne ansehen",
     },
@@ -191,7 +191,7 @@ export const translations: typeof enTranslations = {
       badge: "Kostenlose Testversion",
       title: "Testen Sie alle KI-Modelle kostenlos",
       description:
-        "Starten Sie mit 10 kostenlosen Nachrichten pro Tag. Testen Sie alle 40+ KI-Modelle vor dem Upgrade.",
+        "Starten Sie mit {{freeCredits}} kostenlosen Credits. Testen Sie alle {{modelCount}}+ KI-Modelle vor dem Upgrade.",
       card: {
         title: "Kostenloser Zugang",
         subtitle: "Alles, was Sie für den Einstieg benötigen",
@@ -203,8 +203,8 @@ export const translations: typeof enTranslations = {
       },
       benefits: {
         professionalSetup: "Keine Kreditkarte erforderlich",
-        brandConsistency: "Zugriff auf alle 40+ Modelle",
-        optimizedProfiles: "10 kostenlose Nachrichten täglich",
+        brandConsistency: "Zugriff auf alle {{modelCount}}+ Modelle",
+        optimizedProfiles: "{{freeCredits}} kostenlose Credits zum Starten",
         strategicPlanning: "Jederzeit upgraden",
       },
     },
@@ -219,22 +219,22 @@ export const translations: typeof enTranslations = {
         strategyDevelopment: {
           title: "Kostenlos anmelden",
           description:
-            "Erstellen Sie Ihr Konto in Sekunden. Keine Kreditkarte erforderlich. Starten Sie mit 10 kostenlosen Nachrichten pro Tag.",
+            "Erstellen Sie Ihr Konto in Sekunden. Keine Kreditkarte erforderlich. Starten Sie mit {{freeCredits}} kostenlosen Credits pro Monat über alle {{modelCount}}+ KI-Modelle.",
           tags: {
             audienceAnalysis: "Schnelle Einrichtung",
             competitorResearch: "Keine Kreditkarte",
           },
           insights: {
             title: "Für immer kostenlos",
-            description: "10 Nachrichten täglich, Zugriff auf alle Modelle",
+            description: "{{freeCredits}} Credits monatlich, alle Modelle, alle Ordnertypen",
           },
         },
         contentCreation: {
           title: "Wählen Sie Ihr KI-Modell",
           description:
-            "Wählen Sie aus über 40 unzensierten KI-Modellen einschließlich GPT-4, Claude, Gemini und mehr.",
+            "Wählen Sie aus über {{modelCount}} unzensierten KI-Modellen einschließlich GPT-4, Claude, Gemini und mehr.",
           tags: {
-            brandAlignedContent: "40+ Modelle",
+            brandAlignedContent: "{{modelCount}}+ Modelle",
             engagingVisuals: "Keine Zensur",
           },
           insights: {
@@ -863,7 +863,7 @@ export const translations: typeof enTranslations = {
   footer: {
     tagline: "Chatten Sie mit KI, Verbinden Sie sich mit der Community",
     privacyTagline:
-      "Datenschutzorientierter KI-Chat mit 40+ unzensierten Modellen",
+      "Datenschutzorientierter KI-Chat mit {{modelCount}}+ unzensierten Modellen",
     platform: {
       title: "Plattform",
       features: "Funktionen",

@@ -157,10 +157,14 @@ export interface UseEndpointOptions<T> {
       : GetEndpointTypes<T>["urlPathParams"];
     /** Auto-prefill configuration */
     autoPrefillConfig?: AutoPrefillConfig;
-    /** Initial state for the form */
+    /** Initial state for the form (request data) */
     initialState?: GetEndpointTypes<T> extends never
       ? undefined
       : Partial<GetEndpointTypes<T>["request"]>;
+    /** Initial data for the response (disables initial fetch when provided) */
+    initialData?: GetEndpointTypes<T> extends never
+      ? undefined
+      : GetEndpointTypes<T>["response"];
   };
 
   /**

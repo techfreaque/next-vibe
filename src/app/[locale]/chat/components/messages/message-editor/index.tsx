@@ -5,7 +5,7 @@ import { Button } from "next-vibe-ui//ui/button";
 import { Div } from "next-vibe-ui//ui/div";
 import { Form } from "next-vibe-ui//ui/form/form";
 import { Textarea } from "next-vibe-ui//ui/textarea";
-import { GitBranch, X } from 'next-vibe-ui/ui/icons';
+import { GitBranch, X } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React from "react";
 
@@ -30,6 +30,7 @@ interface MessageEditorProps {
   onPersonaChange?: (persona: string) => void;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 export function MessageEditor({
@@ -42,6 +43,7 @@ export function MessageEditor({
   onPersonaChange,
   locale,
   logger,
+  deductCredits,
 }: MessageEditorProps): JSX.Element {
   const speechLang = getLocaleString(locale);
   const { t } = simpleT(locale);
@@ -134,6 +136,7 @@ export function MessageEditor({
               lang={speechLang}
               locale={locale}
               logger={logger}
+              deductCredits={deductCredits}
             />
 
             {/* Branch Button - Now the primary action */}

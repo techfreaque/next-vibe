@@ -7,19 +7,17 @@ import "server-only";
 
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { stepCountIs, streamText } from "ai";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import {
   createStreamingResponse,
   ErrorResponseTypes,
-  fail,
   type ResponseType,
   type StreamingResponse,
 } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
 
 import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
-import { creditValidator } from "@/app/api/[locale]/v1/core/credits/validator";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
+import { loadTools } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/loader";
 import type {
   CoreTool,
   DiscoveredEndpoint,
@@ -31,27 +29,33 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { DefaultFolderId } from "../chat/config";
+import { setupAiStream } from "./stream-setup";
+
 import {
-  chatFolders,
   chatMessages,
-  chatThreads,
   type ToolCall,
   type ToolCallResult,
   type ToolCallWidgetMetadata,
-} from "../chat/db";
-import { ChatMessageRole } from "../chat/enum";
-import { getModelCost } from "../chat/model-access/costs";
-import { getModelById, type ModelId } from "../chat/model-access/models";
-import { CONTINUE_CONVERSATION_PROMPT } from "./system-prompt";
+} from "../../chat/db";
+import type { DefaultFolderId } from "../../chat/config";
+import { ChatMessageRole } from "../../chat/enum";
+import { getModelById, type ModelId } from "../../chat/model-access/models";
+import { generateThreadTitle } from "../../chat/threads/repository";
+import {
+  fetchMessageHistory,
+  createErrorMessage,
+  createTextMessage,
+  updateMessageContent,
+  createToolMessage,
+} from "../../chat/threads/[threadId]/messages/repository";
+import { CONTINUE_CONVERSATION_PROMPT } from "../system-prompt";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
-} from "./definition";
-import { createStreamEvent, formatSSEEvent } from "./events";
-import { isUncensoredAIModel } from "./providers/uncensored-ai";
-import { handleUncensoredAI } from "./providers/uncensored-handler";
-import { canWriteFolder, isAdmin } from "../chat/permissions/permissions";
+} from "../definition";
+import { createStreamEvent, formatSSEEvent } from "../events";
+import { isUncensoredAIModel } from "../providers/uncensored-ai";
+import { handleUncensoredAI } from "../providers/uncensored-handler";
 
 /**
  * Maximum duration for streaming responses (in seconds)
@@ -105,23 +109,6 @@ function isValidToolResult(value: unknown): value is ToolCallResult {
   }
   // Reject functions, symbols, etc.
   return false;
-}
-
-/**
- * Convert lowercase role string to ChatMessageRole enum
- * Used when receiving roles from API definition (which uses lowercase strings)
- */
-function toChatMessageRole(
-  role: "user" | "assistant" | "system",
-): ChatMessageRole {
-  switch (role) {
-    case "user":
-      return ChatMessageRole.USER;
-    case "assistant":
-      return ChatMessageRole.ASSISTANT;
-    case "system":
-      return ChatMessageRole.SYSTEM;
-  }
 }
 
 /**
@@ -190,311 +177,6 @@ function extractUserIdentifiers(
 }
 
 /**
- * Generate thread title from first message
- */
-function generateThreadTitle(content: string): string {
-  const maxLength = 50;
-  const minLastSpace = 20;
-  const ellipsis = "...";
-  const truncated = content.substring(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(" ");
-  return lastSpace > minLastSpace
-    ? `${truncated.substring(0, lastSpace)}${ellipsis}`
-    : truncated;
-}
-
-/**
- * Create or get thread ID
- */
-async function ensureThread({
-  threadId,
-  rootFolderId,
-  subFolderId,
-  userId,
-  content,
-  isIncognito,
-  logger,
-  user,
-}: {
-  threadId: string | null | undefined;
-  rootFolderId: DefaultFolderId;
-  subFolderId: string | null | undefined;
-  userId?: string;
-  content: string;
-  isIncognito: boolean;
-  logger: EndpointLogger;
-  user: JwtPayloadType;
-}): Promise<{ threadId: string; isNew: boolean }> {
-  // If threadId provided, verify it exists and check permissions (unless incognito)
-  if (threadId) {
-    if (!isIncognito && userId) {
-      // Get thread without user filter to check permissions properly
-      const [existing] = await db
-        .select()
-        .from(chatThreads)
-        .where(eq(chatThreads.id, threadId))
-        .limit(1);
-
-      if (!existing?.id) {
-        logger.error("Thread not found", { threadId, userId });
-        // Return error through Promise rejection - caller will handle
-        return await Promise.reject(new Error("THREAD_NOT_FOUND"));
-      }
-
-      // Check if user has permission to write to this thread
-      const { canWriteThread } = await import(
-        "../chat/permissions/permissions"
-      );
-      const { chatFolders } = await import("../chat/db");
-
-      // Get folder if thread has one
-      let folder: typeof chatFolders.$inferSelect | null = null;
-      if (existing.folderId) {
-        const [folderResult] = await db
-          .select()
-          .from(chatFolders)
-          .where(eq(chatFolders.id, existing.folderId))
-          .limit(1);
-        folder = folderResult || null;
-      }
-
-      // Check write permission
-      const hasPermission = await canWriteThread(
-        user,
-        existing,
-        folder,
-        logger,
-      );
-      if (!hasPermission) {
-        logger.error("User does not have permission to write to thread", {
-          threadId,
-          userId,
-          threadUserId: existing.userId,
-          rootFolderId: existing.rootFolderId,
-        });
-        return await Promise.reject(new Error("PERMISSION_DENIED"));
-      }
-
-      logger.debug("Thread access granted", {
-        threadId,
-        userId,
-        threadUserId: existing.userId,
-        rootFolderId: existing.rootFolderId,
-      });
-    }
-    return { threadId, isNew: false };
-  }
-
-  // Create new thread - check permissions first
-  const newThreadId = crypto.randomUUID();
-  const title = generateThreadTitle(content);
-
-  // Only store in DB if not incognito
-  if (!isIncognito && userId) {
-    let folder: typeof chatFolders.$inferSelect | null = null;
-
-    if (subFolderId) {
-      // Get parent folder to check permissions
-      const [folderResult] = await db
-        .select()
-        .from(chatFolders)
-        .where(eq(chatFolders.id, subFolderId))
-        .limit(1);
-
-      if (!folderResult) {
-        logger.error("Folder not found", { subFolderId });
-        return await Promise.reject(new Error("FOLDER_NOT_FOUND"));
-      }
-
-      folder = folderResult;
-      logger.debug("Found folder for permission check", {
-        folderId: folder.id,
-        folderName: folder.name,
-        rootFolderId: folder.rootFolderId,
-        parentId: folder.parentId,
-      });
-    } else if (rootFolderId === "public" && !subFolderId) {
-      // Creating thread directly in PUBLIC root (no folder) - need to check ADMIN permission
-      // This is the only case where we need to check for ADMIN role
-      const isAdminUser = await isAdmin(userId, logger);
-
-      if (!isAdminUser) {
-        logger.error("Only ADMIN can create threads directly in PUBLIC root", {
-          userId,
-          rootFolderId,
-        });
-        return await Promise.reject(new Error("PERMISSION_DENIED"));
-      }
-
-      // Admin user - allow thread creation in PUBLIC root
-      logger.info("ADMIN user creating thread in PUBLIC root", {
-        userId,
-        rootFolderId,
-      });
-    }
-
-    // Check if user has permission to create thread in this folder (only if folder exists)
-    if (folder) {
-      logger.debug("About to check permissions", {
-        hasFolder: !!folder,
-        folderId: folder?.id,
-        folderName: folder?.name,
-        folderParentId: folder?.parentId,
-        userId,
-        rootFolderId,
-        subFolderId,
-      });
-      const hasPermission = await canWriteFolder(user, folder, logger);
-
-      logger.debug("Permission check result", {
-        hasPermission,
-        userId,
-        rootFolderId,
-        subFolderId,
-      });
-
-      if (!hasPermission) {
-        logger.error("User does not have permission to create thread", {
-          userId,
-          rootFolderId,
-          subFolderId,
-        });
-        return await Promise.reject(new Error("PERMISSION_DENIED"));
-      }
-    }
-
-    // DO NOT set permission fields - leave as empty arrays to inherit from parent folder
-    // Permission inheritance: empty array [] = inherit from parent folder
-    // Only set explicit permissions when user overrides via context menu
-
-    await db.insert(chatThreads).values({
-      id: newThreadId,
-      userId,
-      title,
-      rootFolderId: rootFolderId as DefaultFolderId,
-      folderId: subFolderId ?? null,
-      // rolesRead, rolesWrite, rolesHide, rolesDelete are NOT set
-      // They default to [] which means inherit from parent folder
-    });
-
-    logger.debug("Created new thread", {
-      threadId: newThreadId,
-      title,
-    });
-  } else {
-    logger.debug("Generated incognito thread ID", { threadId: newThreadId });
-  }
-
-  return { threadId: newThreadId, isNew: true };
-}
-
-/**
- * Calculate message depth from parent
- */
-async function calculateMessageDepth(
-  parentMessageId: string | null | undefined,
-  isIncognito: boolean,
-): Promise<number> {
-  if (!parentMessageId || isIncognito) {
-    return 0;
-  }
-
-  const [parent] = await db
-    .select()
-    .from(chatMessages)
-    .where(eq(chatMessages.id, parentMessageId))
-    .limit(1);
-
-  return parent ? parent.depth + 1 : 0;
-}
-
-/**
- * Fetch message history for a thread
- * Returns messages in chronological order for AI context
- */
-async function fetchMessageHistory(
-  threadId: string,
-  userId: string,
-  logger: EndpointLogger,
-): Promise<Array<{ role: "user" | "assistant" | "system"; content: string }>> {
-  const messages = await db
-    .select()
-    .from(chatMessages)
-    .where(
-      and(
-        eq(chatMessages.threadId, threadId),
-        eq(chatMessages.authorId, userId),
-      ),
-    )
-    .orderBy(chatMessages.createdAt);
-
-  logger.info("Fetched message history", {
-    threadId,
-    messageCount: messages.length,
-  });
-
-  return messages.map((msg) => {
-    const roleLowercase = msg.role.toLowerCase();
-    const validRole: "user" | "assistant" | "system" =
-      roleLowercase === "user" ||
-      roleLowercase === "assistant" ||
-      roleLowercase === "system"
-        ? roleLowercase
-        : "user";
-    return {
-      role: validRole,
-      content: msg.content,
-    };
-  });
-}
-
-/**
- * Get parent message for retry/edit operations
- * Note: This function does NOT check thread ownership - that's handled at the API route level
- * We just need to verify the message exists and return its data
- */
-async function getParentMessage(
-  messageId: string,
-  userId: string,
-  logger: EndpointLogger,
-): Promise<{
-  id: string;
-  threadId: string;
-  role: ChatMessageRole;
-  content: string;
-  parentId: string | null;
-  depth: number;
-} | null> {
-  // Get the message by ID (supports both user and AI messages)
-  const [message] = await db
-    .select()
-    .from(chatMessages)
-    .where(eq(chatMessages.id, messageId))
-    .limit(1);
-
-  if (!message) {
-    logger.error("Parent message not found", { messageId, userId });
-    return null;
-  }
-
-  logger.info("Found parent message", {
-    messageId: message.id,
-    threadId: message.threadId,
-    role: message.role,
-    authorId: message.authorId,
-  });
-
-  return {
-    id: message.id,
-    threadId: message.threadId,
-    role: message.role,
-    content: message.content,
-    parentId: message.parentId,
-    depth: message.depth,
-  };
-}
-
-/**
  * AI Stream Repository Implementation
  */
 class AiStreamRepository implements IAiStreamRepository {
@@ -513,324 +195,6 @@ class AiStreamRepository implements IAiStreamRepository {
       content: data.content,
       role: data.role,
     };
-  }
-
-  /**
-   * Handle edit operation - create branch from existing message
-   */
-  private async handleEditOperation(
-    data: AiStreamPostRequestOutput,
-    userId: string | undefined,
-    logger: EndpointLogger,
-  ): Promise<{
-    threadId: string;
-    parentMessageId: string | null;
-    content: string;
-    role: ChatMessageRole;
-  } | null> {
-    if (!data.parentMessageId) {
-      logger.error("Edit operation requires parentMessageId");
-      return null;
-    }
-
-    const parentMessage = await getParentMessage(
-      data.parentMessageId,
-      userId ?? "",
-      logger,
-    );
-
-    if (!parentMessage) {
-      return null;
-    }
-
-    return {
-      threadId: parentMessage.threadId,
-      parentMessageId: parentMessage.parentId,
-      content: data.content,
-      role: data.role,
-    };
-  }
-
-  /**
-   * Handle retry operation - retry AI response
-   */
-  private async handleRetryOperation(
-    data: AiStreamPostRequestOutput,
-    userId: string | undefined,
-    logger: EndpointLogger,
-  ): Promise<{
-    threadId: string;
-    parentMessageId: string;
-    content: string;
-    role: ChatMessageRole;
-  } | null> {
-    if (!data.parentMessageId) {
-      logger.error("Retry operation requires parentMessageId");
-      return null;
-    }
-
-    const userMessage = await getParentMessage(
-      data.parentMessageId,
-      userId ?? "",
-      logger,
-    );
-
-    if (!userMessage) {
-      return null;
-    }
-
-    return {
-      threadId: userMessage.threadId,
-      parentMessageId: data.parentMessageId,
-      content: userMessage.content,
-      role: userMessage.role,
-    };
-  }
-
-  /**
-   * Handle answer-as-ai operation - user provides AI response
-   */
-  private handleAnswerAsAiOperation(data: AiStreamPostRequestOutput): {
-    threadId: string | null | undefined;
-    parentMessageId: string | null | undefined;
-    content: string;
-    role: ChatMessageRole;
-  } {
-    return {
-      threadId: data.threadId,
-      parentMessageId: data.parentMessageId,
-      content: data.content,
-      role: data.role,
-    };
-  }
-
-  /**
-   * Create user message in database
-   */
-  private async createUserMessage(params: {
-    messageId: string;
-    threadId: string;
-    role: ChatMessageRole;
-    content: string;
-    parentId: string | null;
-    depth: number;
-    userId: string;
-    logger: EndpointLogger;
-  }): Promise<void> {
-    await db.insert(chatMessages).values({
-      id: params.messageId,
-      threadId: params.threadId,
-      role: params.role,
-      content: params.content,
-      parentId: params.parentId,
-      depth: params.depth,
-      authorId: params.userId,
-      isAI: false,
-    });
-
-    params.logger.debug("Created user message", {
-      messageId: params.messageId,
-      threadId: params.threadId,
-    });
-  }
-
-  /**
-   * Create AI message placeholder in database
-   */
-  private async createAiMessagePlaceholder(params: {
-    messageId: string;
-    threadId: string;
-    parentId: string | null;
-    depth: number;
-    userId: string;
-    model: ModelId;
-    persona: string | null | undefined;
-    sequenceId: string | null; // ID of first message in sequence
-    sequenceIndex: number; // Position in sequence
-    logger: EndpointLogger;
-  }): Promise<void> {
-    await db.insert(chatMessages).values({
-      id: params.messageId,
-      threadId: params.threadId,
-      role: ChatMessageRole.ASSISTANT,
-      content: " ", // Use space instead of empty string (DB constraint requires non-empty)
-      parentId: params.parentId,
-      depth: params.depth,
-      authorId: params.userId, // Set authorId so user can delete their AI messages
-      sequenceId: params.sequenceId,
-      sequenceIndex: params.sequenceIndex,
-      isAI: true,
-      model: params.model,
-      persona: params.persona ?? undefined,
-    });
-
-    params.logger.info("Created AI message placeholder", {
-      messageId: params.messageId,
-      threadId: params.threadId,
-      sequenceId: params.sequenceId,
-      sequenceIndex: params.sequenceIndex,
-    });
-  }
-
-  /**
-   * Create ERROR message in database
-   * Used for all error scenarios (API errors, tool errors, validation errors, etc.)
-   */
-  private async createErrorMessage(params: {
-    messageId: string;
-    threadId: string;
-    content: string; // User-friendly error message
-    parentId: string | null;
-    depth: number;
-    userId: string;
-    errorType: string; // e.g., "STREAM_ERROR", "TOOL_ERROR", "API_ERROR"
-    errorDetails?: Record<string, string | number | boolean | null>; // Additional error metadata
-    sequenceId?: string | null; // Sequence ID for grouping messages in same stream
-    sequenceIndex?: number; // Position in sequence
-    logger: EndpointLogger;
-  }): Promise<void> {
-    const metadata: Record<
-      string,
-      | string
-      | number
-      | boolean
-      | null
-      | Record<string, string | number | boolean | null>
-    > = {
-      errorType: params.errorType,
-    };
-
-    if (params.errorDetails) {
-      metadata.errorDetails = params.errorDetails;
-    }
-
-    await db.insert(chatMessages).values({
-      id: params.messageId,
-      threadId: params.threadId,
-      role: ChatMessageRole.ERROR,
-      content: params.content,
-      parentId: params.parentId,
-      depth: params.depth,
-      authorId: params.userId,
-      isAI: false,
-      sequenceId: params.sequenceId ?? null,
-      sequenceIndex: params.sequenceIndex ?? 0,
-      metadata,
-    });
-
-    params.logger.info("Created ERROR message", {
-      messageId: params.messageId,
-      threadId: params.threadId,
-      errorType: params.errorType,
-    });
-  }
-
-  /**
-   * Create ASSISTANT message for text content in database
-   */
-  private async createTextMessage(params: {
-    messageId: string;
-    threadId: string;
-    content: string;
-    parentId: string | null;
-    depth: number;
-    userId: string;
-    model: ModelId;
-    persona: string | null | undefined;
-    sequenceId: string | null;
-    sequenceIndex: number;
-    logger: EndpointLogger;
-  }): Promise<void> {
-    await db.insert(chatMessages).values({
-      id: params.messageId,
-      threadId: params.threadId,
-      role: ChatMessageRole.ASSISTANT,
-      content: params.content,
-      parentId: params.parentId,
-      depth: params.depth,
-      authorId: params.userId,
-      sequenceId: params.sequenceId,
-      sequenceIndex: params.sequenceIndex,
-      isAI: true,
-      model: params.model,
-      persona: params.persona ?? undefined,
-    });
-
-    params.logger.debug("Created text message", {
-      messageId: params.messageId,
-      threadId: params.threadId,
-      sequenceId: params.sequenceId,
-      sequenceIndex: params.sequenceIndex,
-    });
-  }
-
-  /**
-   * Update message content in database
-   */
-  private async updateMessageContent(params: {
-    messageId: string;
-    content: string;
-    logger: EndpointLogger;
-  }): Promise<void> {
-    await db
-      .update(chatMessages)
-      .set({ content: params.content })
-      .where(eq(chatMessages.id, params.messageId));
-
-    params.logger.debug("Updated message content", {
-      messageId: params.messageId,
-      contentLength: params.content.length,
-    });
-  }
-
-  /**
-   * Create TOOL message in database
-   * Tool calls are stored as separate messages with role=TOOL
-   */
-  private async createToolMessage(params: {
-    messageId: string;
-    threadId: string;
-    toolCall: ToolCall;
-    parentId: string | null;
-    depth: number;
-    userId: string;
-    sequenceId: string | null;
-    sequenceIndex: number;
-    logger: EndpointLogger;
-  }): Promise<void> {
-    const metadata: Record<
-      string,
-      | string
-      | number
-      | boolean
-      | null
-      | Record<string, string | number | boolean | null>
-      | ToolCall
-    > = {
-      toolCall: params.toolCall,
-    };
-
-    await db.insert(chatMessages).values({
-      id: params.messageId,
-      threadId: params.threadId,
-      role: ChatMessageRole.TOOL,
-      content: "", // Tool messages have empty content, data is in metadata
-      parentId: params.parentId,
-      depth: params.depth,
-      authorId: params.userId,
-      sequenceId: params.sequenceId,
-      sequenceIndex: params.sequenceIndex,
-      isAI: true,
-      metadata,
-    });
-
-    params.logger.debug("Created TOOL message", {
-      messageId: params.messageId,
-      threadId: params.threadId,
-      toolName: params.toolCall.toolName,
-      sequenceId: params.sequenceId,
-      sequenceIndex: params.sequenceIndex,
-    });
   }
 
   /**
@@ -989,9 +353,11 @@ class AiStreamRepository implements IAiStreamRepository {
   }
 
   /**
-   * Load and prepare tools for AI
+   * Setup tools for OpenRouter streaming
+   * Returns tools and updated system prompt
    */
-  private async loadTools(params: {
+  private async setupStreamingTools(params: {
+    model: ModelId;
     requestedTools: string[] | null | undefined;
     user: JwtPayloadType;
     locale: CountryLanguage;
@@ -1001,77 +367,331 @@ class AiStreamRepository implements IAiStreamRepository {
     tools: Record<string, CoreTool> | undefined;
     systemPrompt: string;
   }> {
-    let tools: Record<string, CoreTool> | undefined = undefined;
-    let enhancedSystemPrompt = params.systemPrompt;
+    const modelConfig = getModelById(params.model);
 
-    // If tools are explicitly disabled (null) or not requested (undefined/empty), don't load any
-    if (
-      params.requestedTools === null ||
-      params.requestedTools === undefined ||
-      params.requestedTools.length === 0
-    ) {
-      params.logger.debug("No tools requested, skipping tool loading");
-      return { tools, systemPrompt: enhancedSystemPrompt };
+    if (!modelConfig?.supportsTools) {
+      return {
+        tools: undefined,
+        systemPrompt: params.systemPrompt,
+      };
     }
 
-    try {
-      const { getToolRegistry } = await import(
-        "@/app/api/[locale]/v1/core/system/unified-interface/ai/registry"
-      );
-      const registry = getToolRegistry();
+    const toolsResult = await loadTools({
+      requestedTools: params.requestedTools,
+      user: params.user,
+      locale: params.locale,
+      logger: params.logger,
+      systemPrompt: params.systemPrompt,
+    });
 
-      // Lazy load ONLY the requested tools by endpoint IDs instead of loading all 143 endpoints
-      // This uses the generated/endpoint.ts dynamic import system
-      // requestedTools contains endpoint IDs (e.g., "get_v1_core_agent_brave_search")
-      const enabledEndpoints = await registry.getEndpointsByIdsLazy(
-        params.requestedTools,
-        params.user,
-      );
-
-      params.logger.debug("Lazy loaded tools by endpoint IDs", {
-        requestedCount: params.requestedTools.length,
-        loadedCount: enabledEndpoints.length,
-        loadedIds: enabledEndpoints.map((endpoint) => endpoint.id),
-        loadedNames: enabledEndpoints.map((endpoint) => endpoint.toolName),
-      });
-
-      if (enabledEndpoints.length > 0) {
-        const { getToolExecutor } = await import(
-          "@/app/api/[locale]/v1/core/system/unified-interface/ai/executor"
-        );
-        const { createToolsFromEndpoints } = await import(
-          "@/app/api/[locale]/v1/core/system/unified-interface/ai/factory"
-        );
-        const toolExecutor = getToolExecutor();
-        const toolsMap = createToolsFromEndpoints(
-          enabledEndpoints,
-          toolExecutor,
-          {
-            user: params.user,
-            locale: params.locale,
-            logger: params.logger,
-          },
-        );
-
-        tools = Object.fromEntries(toolsMap.entries());
-
-        params.logger.info("Tools created", {
-          count: toolsMap.size,
-          toolNames: [...toolsMap.keys()],
-        });
-
-        // Model already knows how to call tools from tool descriptions
-        // No need to add extra instructions to system prompt
-      }
-    } catch (error) {
-      params.logger.error("Failed to load tools from registry", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      // Continue without tools - don't fail the request
-    }
-
-    return { tools, systemPrompt: enhancedSystemPrompt };
+    return {
+      tools: toolsResult.tools,
+      systemPrompt: toolsResult.systemPrompt,
+    };
   }
+
+  /**
+   * Emit initial stream events (thread creation and user message)
+   */
+  private emitInitialEvents(params: {
+    isNewThread: boolean;
+    threadId: string;
+    rootFolderId: DefaultFolderId;
+    subFolderId: string | null;
+    content: string;
+    operation: "send" | "retry" | "edit" | "answer-as-ai";
+    userMessageId: string;
+    effectiveRole: ChatMessageRole;
+    effectiveParentMessageId: string | null | undefined;
+    messageDepth: number;
+    effectiveContent: string;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
+    logger: EndpointLogger;
+  }): void {
+    const {
+      isNewThread,
+      threadId,
+      rootFolderId,
+      subFolderId,
+      content,
+      operation,
+      userMessageId,
+      effectiveRole,
+      effectiveParentMessageId,
+      messageDepth,
+      effectiveContent,
+      controller,
+      encoder,
+      logger,
+    } = params;
+
+    // Emit thread-created event if new thread
+    if (isNewThread) {
+      logger.debug("Emitting THREAD_CREATED event", {
+        threadId,
+        rootFolderId,
+      });
+      const threadEvent = createStreamEvent.threadCreated({
+        threadId,
+        title: generateThreadTitle(content),
+        rootFolderId,
+        subFolderId: subFolderId || null,
+      });
+      controller.enqueue(encoder.encode(formatSSEEvent(threadEvent)));
+      logger.debug("THREAD_CREATED event emitted", {
+        threadId,
+      });
+    } else {
+      logger.debug("Thread already exists, not emitting THREAD_CREATED", {
+        threadId,
+        isNew: isNewThread,
+      });
+    }
+
+    // For answer-as-ai, skip user message event and only emit AI message
+    // For regular operations, emit both user and AI message events
+    if (operation !== "answer-as-ai" && operation !== "retry") {
+      // Emit user message-created event
+      logger.debug("Emitting USER MESSAGE_CREATED event", {
+        messageId: userMessageId,
+        threadId,
+        parentId: effectiveParentMessageId || null,
+      });
+      const userMessageEvent = createStreamEvent.messageCreated({
+        messageId: userMessageId,
+        threadId,
+        role: effectiveRole,
+        parentId: effectiveParentMessageId || null,
+        depth: messageDepth,
+        content: effectiveContent,
+      });
+      const userMessageEventString = formatSSEEvent(userMessageEvent);
+      logger.debug("USER MESSAGE_CREATED event formatted", {
+        messageId: userMessageId,
+      });
+      controller.enqueue(encoder.encode(userMessageEventString));
+      logger.debug("USER MESSAGE_CREATED event emitted", {
+        messageId: userMessageId,
+      });
+    } else {
+      logger.debug(
+        "Skipping USER MESSAGE_CREATED event for answer-as-ai operation",
+        {
+          messageId: userMessageId,
+        },
+      );
+    }
+  }
+
+  /**
+   * Emit content delta event for streaming
+   */
+  private emitContentDelta(params: {
+    messageId: string;
+    delta: string;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
+  }): void {
+    const { messageId, delta, controller, encoder } = params;
+
+    const deltaEvent = createStreamEvent.contentDelta({
+      messageId,
+      delta,
+    });
+    controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
+  }
+
+  /**
+   * Create new ASSISTANT message in stream
+   * Returns the new message ID and content
+   */
+  private async createAssistantMessage(params: {
+    initialContent: string;
+    threadId: string;
+    parentId: string | null;
+    depth: number;
+    model: ModelId;
+    persona: string | undefined;
+    sequenceId: string;
+    sequenceIndex: number;
+    isIncognito: boolean;
+    userId: string | undefined;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
+    logger: EndpointLogger;
+  }): Promise<{ messageId: string; content: string }> {
+    const {
+      initialContent,
+      threadId,
+      parentId,
+      depth,
+      model,
+      persona,
+      sequenceId,
+      sequenceIndex,
+      isIncognito,
+      userId,
+      controller,
+      encoder,
+      logger,
+    } = params;
+
+    const messageId = crypto.randomUUID();
+
+    // Emit MESSAGE_CREATED event
+    const messageEvent = createStreamEvent.messageCreated({
+      messageId,
+      threadId,
+      role: ChatMessageRole.ASSISTANT,
+      content: initialContent,
+      parentId,
+      depth,
+      model,
+      persona,
+      sequenceId,
+      sequenceIndex,
+    });
+    controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
+
+    // Save ASSISTANT message to database if not incognito
+    // Public users (userId undefined) are allowed - helper converts to null
+    if (!isIncognito) {
+      await createTextMessage({
+        messageId,
+        threadId,
+        content: initialContent,
+        parentId,
+        depth,
+        userId,
+        model,
+        persona,
+        sequenceId,
+        sequenceIndex,
+        logger,
+      });
+    }
+
+    logger.debug("ASSISTANT message created", {
+      messageId,
+      sequenceIndex,
+    });
+
+    return { messageId, content: initialContent };
+  }
+
+  /**
+   * Finalize ASSISTANT message at stream end
+   */
+  private async finalizeAssistantMessage(params: {
+    currentAssistantMessageId: string;
+    currentAssistantContent: string;
+    isInReasoningBlock: boolean;
+    streamResult: Pick<
+      ReturnType<typeof streamText>,
+      "finishReason" | "usage"
+    >;
+    isIncognito: boolean;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
+    logger: EndpointLogger;
+  }): Promise<void> {
+    const {
+      currentAssistantMessageId,
+      isInReasoningBlock,
+      streamResult,
+      isIncognito,
+      controller,
+      encoder,
+      logger,
+    } = params;
+
+    let { currentAssistantContent } = params;
+
+    // CRITICAL FIX: If reasoning block is still open, close it at stream end
+    if (isInReasoningBlock) {
+      const thinkCloseTag = "</think>";
+      currentAssistantContent += thinkCloseTag;
+
+      // Emit closing tag delta
+      const thinkCloseDelta = createStreamEvent.contentDelta({
+        messageId: currentAssistantMessageId,
+        delta: thinkCloseTag,
+      });
+      controller.enqueue(encoder.encode(formatSSEEvent(thinkCloseDelta)));
+
+      logger.info("[AI Stream] ⏱️ Reasoning closed at stream end → </think>", {
+        messageId: currentAssistantMessageId,
+      });
+    }
+
+    // Emit CONTENT_DONE event for ASSISTANT message
+    // Wait for completion first to get tokens and finishReason
+    const [finishReason, usage] = await Promise.all([
+      streamResult.finishReason,
+      streamResult.usage,
+    ]);
+
+    const contentDoneEvent = createStreamEvent.contentDone({
+      messageId: currentAssistantMessageId,
+      content: currentAssistantContent,
+      totalTokens: usage.totalTokens ?? null,
+      finishReason: finishReason || null,
+    });
+    controller.enqueue(encoder.encode(formatSSEEvent(contentDoneEvent)));
+
+    // Update ASSISTANT message in database with final content and tokens
+    // Public users (userId undefined) are allowed - helper converts to null
+    if (!isIncognito) {
+      await db
+        .update(chatMessages)
+        .set({
+          content: currentAssistantContent,
+          tokens: usage.totalTokens,
+          updatedAt: new Date(),
+        })
+        .where(eq(chatMessages.id, currentAssistantMessageId));
+    }
+
+    logger.info("Finalized ASSISTANT message", {
+      messageId: currentAssistantMessageId,
+      contentLength: currentAssistantContent.length,
+      tokens: usage.totalTokens,
+    });
+  }
+
+  /**
+   * Handle Uncensored.ai model streaming
+   * Uncensored.ai doesn't support streaming, so we use direct API call
+   */
+  private async handleUncensoredAiStream(
+    messages: Array<{ role: "user" | "assistant" | "system"; content: string }>,
+    temperature: number,
+    maxTokens: number,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse> {
+    if (!env.UNCENSORED_AI_API_KEY) {
+      logger.error("Uncensored.ai API key not configured");
+      return {
+        success: false,
+        message:
+          "app.api.v1.core.agent.chat.aiStream.route.errors.uncensoredApiKeyMissing",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      };
+    }
+
+    const response = await handleUncensoredAI(
+      env.UNCENSORED_AI_API_KEY,
+      messages,
+      temperature,
+      maxTokens,
+      locale,
+    );
+
+    return createStreamingResponse(response);
+  }
+
   /**
    * Create AI streaming response with SSE events
    * Returns StreamingResponse for SSE stream or error ResponseType
@@ -1090,329 +710,54 @@ class AiStreamRepository implements IAiStreamRepository {
     user: JwtPayloadType;
     request: Request;
   }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse> {
-    // Extract user identifiers
     const { userId, leadId, ipAddress } = extractUserIdentifiers(
       user,
       request,
       logger,
     );
 
-    const isIncognito = data.rootFolderId === "incognito";
-
-    logger.debug("Creating AI stream", {
-      operation: data.operation,
-      model: data.model,
-      rootFolderId: data.rootFolderId,
-      isIncognito,
+    const setupResult = await setupAiStream({
+      data,
+      locale,
+      logger,
+      user,
       userId,
       leadId,
+      ipAddress,
+      buildMessageContext: this.buildMessageContext.bind(this),
     });
 
-    // Step 0: Validate that non-logged-in users can only use incognito mode
-    if (!userId && !isIncognito) {
-      logger.error("Non-logged-in user attempted to use non-incognito folder", {
-        rootFolderId: data.rootFolderId,
-        leadId,
-      });
-      return fail({
-        message:
-          "app.api.v1.core.agent.chat.aiStream.route.errors.authenticationRequired",
-        errorType: ErrorResponseTypes.AUTH_ERROR,
-      });
+    if (!setupResult.success) {
+      return setupResult.error;
     }
 
-    // Step 1: Validate credits
-    const modelCost = getModelCost(data.model);
-    let validationResult;
-    let effectiveLeadId = leadId;
-
-    if (userId) {
-      // Authenticated user
-      validationResult = await creditValidator.validateUserCredits(
-        userId,
-        data.model,
-        logger,
-      );
-    } else if (leadId) {
-      // Known lead
-      validationResult = await creditValidator.validateLeadCredits(
-        leadId,
-        data.model,
-        logger,
-      );
-    } else if (ipAddress) {
-      // New visitor - get or create lead by IP
-      const leadByIpResult = await creditValidator.validateLeadByIp(
-        ipAddress,
-        data.model,
-        locale,
-        logger,
-      );
-
-      if (!leadByIpResult.success) {
-        return fail({
-          message:
-            "app.api.v1.core.agent.chat.aiStream.route.errors.creditValidationFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      effectiveLeadId = leadByIpResult.data.leadId;
-      validationResult = {
-        success: true,
-        data: leadByIpResult.data.validation,
-      };
-    } else {
-      // No identifier - should not happen
-      logger.error("No user, lead, or IP address provided");
-      return fail({
-        message:
-          "app.api.v1.core.agent.chat.aiStream.route.errors.noIdentifier",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-      });
-    }
-
-    if (!validationResult.success) {
-      return fail({
-        message:
-          "app.api.v1.core.agent.chat.aiStream.route.errors.creditValidationFailed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-
-    // Step 2: Check if user has enough credits (unless free model)
-    if (!validationResult.data.canUseModel) {
-      logger.warn("Insufficient credits", {
-        userId,
-        leadId: effectiveLeadId,
-        model: data.model,
-        cost: modelCost,
-        balance: validationResult.data.balance,
-      });
-
-      return fail({
-        message:
-          "app.api.v1.core.agent.chat.aiStream.route.errors.insufficientCredits",
-        errorType: ErrorResponseTypes.FORBIDDEN,
-        messageParams: {
-          cost: modelCost.toString(),
-          balance: validationResult.data.balance.toString(),
-        },
-      });
-    }
-
-    logger.debug("Credit validation passed", {
-      userId,
-      leadId: effectiveLeadId,
-      cost: modelCost,
-      balance: validationResult.data.balance,
-    });
-
-    // Step 3: Handle operation-specific logic
-    let operationResult: {
-      threadId: string | null | undefined;
-      parentMessageId: string | null | undefined;
-      content: string;
-      role: ChatMessageRole;
-    };
-
-    switch (data.operation) {
-      case "send":
-        operationResult = this.handleSendOperation(data);
-        break;
-
-      case "retry":
-        if (isIncognito) {
-          // For incognito, client provides the context
-          logger.info("Retry operation in incognito mode", {
-            parentMessageId: data.parentMessageId,
-          });
-          operationResult = this.handleSendOperation(data);
-        } else {
-          const retryResult = await this.handleRetryOperation(
-            data,
-            userId,
-            logger,
-          );
-          if (!retryResult) {
-            return fail({
-              message:
-                "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
-              errorType: ErrorResponseTypes.NOT_FOUND,
-            });
-          }
-          operationResult = retryResult;
-        }
-        break;
-
-      case "edit":
-        if (isIncognito) {
-          // For incognito mode, the client must pass the correct parentId directly
-          // The client looks up the source message and passes its parentId
-          // This creates a sibling branch with the same parent as the source message
-          operationResult = {
-            threadId: data.threadId!,
-            parentMessageId: data.parentMessageId,
-            content: data.content,
-            role: data.role,
-          };
-        } else {
-          const editResult = await this.handleEditOperation(
-            data,
-            userId,
-            logger,
-          );
-          if (!editResult) {
-            return fail({
-              message:
-                "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
-              errorType: ErrorResponseTypes.NOT_FOUND,
-            });
-          }
-          operationResult = editResult;
-        }
-        break;
-
-      case "answer-as-ai":
-        operationResult = this.handleAnswerAsAiOperation(data);
-        logger.info("Answer-as-AI operation", {
-          threadId: data.threadId,
-          parentMessageId: data.parentMessageId,
-        });
-        break;
-    }
-
-    const effectiveThreadId = operationResult.threadId;
-    const effectiveParentMessageId = operationResult.parentMessageId;
-    const effectiveContent = operationResult.content;
-    const effectiveRole = operationResult.role;
-
-    // Step 4: Ensure thread exists (create if needed)
-    let threadResult;
-    try {
-      threadResult = await ensureThread({
-        threadId: effectiveThreadId,
-        rootFolderId: data.rootFolderId,
-        subFolderId: data.subFolderId,
-        userId,
-        content: effectiveContent,
-        isIncognito,
-        logger,
-        user,
-      });
-    } catch (error) {
-      const errorMessage = parseError(error).message;
-      logger.error("Failed to ensure thread", {
-        error: errorMessage,
-      });
-
-      // Check if it's a permission error
-      if (errorMessage === "PERMISSION_DENIED") {
-        return fail({
-          message:
-            "app.api.v1.core.agent.chat.aiStream.post.errors.forbidden.title",
-          errorType: ErrorResponseTypes.FORBIDDEN,
-        });
-      }
-
-      return fail({
-        message:
-          "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
-        errorType: ErrorResponseTypes.NOT_FOUND,
-      });
-    }
-
-    // Step 5: Calculate message depth
-    const messageDepth = await calculateMessageDepth(
+    const {
+      isIncognito,
+      modelCost,
       effectiveParentMessageId,
-      isIncognito,
-    );
+      effectiveContent,
+      effectiveRole,
+      threadId: threadResultThreadId,
+      isNewThread,
+      messageDepth,
+      userMessageId,
+      messages,
+      systemPrompt: initialSystemPrompt,
+    } = setupResult.data;
 
-    // Step 6: Create user message (skip for answer-as-ai and retry operations)
-    const userMessageId = crypto.randomUUID();
-    if (data.operation !== "answer-as-ai" && data.operation !== "retry") {
-      if (!isIncognito && userId) {
-        await this.createUserMessage({
-          messageId: userMessageId,
-          threadId: threadResult.threadId,
-          role: effectiveRole,
-          content: effectiveContent,
-          parentId: effectiveParentMessageId ?? null,
-          depth: messageDepth,
-          userId,
-          logger,
-        });
-      } else {
-        logger.debug("Generated incognito user message ID", {
-          messageId: userMessageId,
-          operation: data.operation,
-        });
-      }
-    }
-
-    // Step 7: Prepare AI message context
-    let systemPrompt = data.systemPrompt || "";
-    const messages = await this.buildMessageContext({
-      operation: data.operation,
-      threadId: effectiveThreadId,
-      parentMessageId: data.parentMessageId,
-      content: effectiveContent,
-      role: effectiveRole,
-      userId,
-      isIncognito,
-      messageHistory: data.messageHistory
-        ? data.messageHistory.map((msg) => ({
-            role: toChatMessageRole(msg.role),
-            content: msg.content,
-          }))
-        : null,
-      logger,
-    });
-
-    // Add system prompt for non-incognito mode
-    if (
-      !isIncognito &&
-      systemPrompt &&
-      messages.length > 0 &&
-      messages[0].role !== "system"
-    ) {
-      messages.unshift({ role: "system", content: systemPrompt });
-    }
-
-    // Step 8: Generate AI message ID
-    // Note: AI message placeholder is created inside the stream (after line 1260)
-    // to avoid duplicate inserts. The placeholder is created when we start streaming content.
-    let aiMessageId = crypto.randomUUID();
-    logger.debug("Generated AI message ID", {
-      messageId: aiMessageId,
-      operation: data.operation,
-      isIncognito,
-    });
+    let systemPrompt = initialSystemPrompt;
 
     // Step 9: Start AI streaming (for all operations including answer-as-ai)
     try {
       // Special handling for Uncensored.ai - doesn't support streaming
       if (isUncensoredAIModel(data.model)) {
-        if (!env.UNCENSORED_AI_API_KEY) {
-          logger.error("Uncensored.ai API key not configured");
-          return {
-            success: false,
-            message:
-              "app.api.v1.core.agent.chat.aiStream.route.errors.uncensoredApiKeyMissing",
-            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          };
-        }
-
-        const response = await handleUncensoredAI(
-          env.UNCENSORED_AI_API_KEY,
+        return await this.handleUncensoredAiStream(
           messages,
           data.temperature,
           data.maxTokens,
           locale,
+          logger,
         );
-
-        // Incognito mode: messages are not persisted, streaming handled client-side
-        return createStreamingResponse(response);
       }
 
       const provider = createOpenRouter({
@@ -1424,31 +769,27 @@ class AiStreamRepository implements IAiStreamRepository {
         tools: data.tools,
       });
 
-      // Get model config to check tool support
       const modelConfig = getModelById(data.model);
 
-      // Load tools if model supports them
-      let tools: Record<string, CoreTool> | undefined = undefined;
-      if (modelConfig?.supportsTools) {
-        const toolsResult = await this.loadTools({
+      const { tools, systemPrompt: updatedSystemPrompt } =
+        await this.setupStreamingTools({
+          model: data.model,
           requestedTools: data.tools,
           user,
           locale,
           logger,
           systemPrompt,
         });
-        tools = toolsResult.tools;
-        systemPrompt = toolsResult.systemPrompt;
-      }
+      systemPrompt = updatedSystemPrompt;
 
       // Create SSE stream
       const encoder = new TextEncoder();
-      // Bind methods to preserve 'this' context in async callback
       const deductCredits = this.deductCreditsAfterCompletion.bind(this);
-      const createTextMessage = this.createTextMessage.bind(this);
-      const updateMessageContent = this.updateMessageContent.bind(this);
-      const createToolMessage = this.createToolMessage.bind(this);
-      const createErrorMessage = this.createErrorMessage.bind(this);
+      const emitInitialEvents = this.emitInitialEvents.bind(this);
+      const emitContentDelta = this.emitContentDelta.bind(this);
+      const createAssistantMessage = this.createAssistantMessage.bind(this);
+      const finalizeAssistantMessage =
+        this.finalizeAssistantMessage.bind(this);
 
       // Track parent/depth/sequence for error handling (accessible in catch block)
       let lastParentId: string | null = null;
@@ -1460,68 +801,23 @@ class AiStreamRepository implements IAiStreamRepository {
         async start(controller): Promise<void> {
           try {
             logger.debug("Stream start() called");
-            // Emit thread-created event if new thread
-            if (threadResult.isNew) {
-              logger.debug("Emitting THREAD_CREATED event", {
-                threadId: threadResult.threadId,
-                rootFolderId: data.rootFolderId,
-              });
-              const threadEvent = createStreamEvent.threadCreated({
-                threadId: threadResult.threadId,
-                title: generateThreadTitle(data.content),
-                rootFolderId: data.rootFolderId,
-                subFolderId: data.subFolderId || null,
-              });
-              controller.enqueue(encoder.encode(formatSSEEvent(threadEvent)));
-              logger.debug("THREAD_CREATED event emitted", {
-                threadId: threadResult.threadId,
-              });
-            } else {
-              logger.debug(
-                "Thread already exists, not emitting THREAD_CREATED",
-                {
-                  threadId: threadResult.threadId,
-                  isNew: threadResult.isNew,
-                },
-              );
-            }
 
-            // For answer-as-ai, skip user message event and only emit AI message
-            // For regular operations, emit both user and AI message events
-            if (
-              data.operation !== "answer-as-ai" &&
-              data.operation !== "retry"
-            ) {
-              // Emit user message-created event
-              logger.debug("Emitting USER MESSAGE_CREATED event", {
-                messageId: userMessageId,
-                threadId: threadResult.threadId,
-                parentId: effectiveParentMessageId || null,
-              });
-              const userMessageEvent = createStreamEvent.messageCreated({
-                messageId: userMessageId,
-                threadId: threadResult.threadId,
-                role: effectiveRole,
-                parentId: effectiveParentMessageId || null,
-                depth: messageDepth,
-                content: effectiveContent,
-              });
-              const userMessageEventString = formatSSEEvent(userMessageEvent);
-              logger.debug("USER MESSAGE_CREATED event formatted", {
-                messageId: userMessageId,
-              });
-              controller.enqueue(encoder.encode(userMessageEventString));
-              logger.debug("USER MESSAGE_CREATED event emitted", {
-                messageId: userMessageId,
-              });
-            } else {
-              logger.debug(
-                "Skipping USER MESSAGE_CREATED event for answer-as-ai operation",
-                {
-                  messageId: userMessageId,
-                },
-              );
-            }
+            emitInitialEvents({
+              isNewThread,
+              threadId: threadResultThreadId,
+              rootFolderId: data.rootFolderId,
+              subFolderId: data.subFolderId || null,
+              content: data.content,
+              operation: data.operation,
+              userMessageId,
+              effectiveRole,
+              effectiveParentMessageId,
+              messageDepth,
+              effectiveContent,
+              controller,
+              encoder,
+              logger,
+            });
 
             // Calculate initial parent and depth for AI message
             // This will be updated if reasoning occurs
@@ -1668,61 +964,35 @@ class AiStreamRepository implements IAiStreamRepository {
                 ) {
                   // NEW ARCHITECTURE: Add text to current ASSISTANT message (or create if doesn't exist)
                   if (!currentAssistantMessageId) {
-                    // Generate new message ID for ASSISTANT message
-                    currentAssistantMessageId = crypto.randomUUID();
-                    currentAssistantContent = textDelta;
-
-                    // Emit MESSAGE_CREATED event
-                    const messageEvent = createStreamEvent.messageCreated({
-                      messageId: currentAssistantMessageId,
-                      threadId: threadResult.threadId,
-                      role: ChatMessageRole.ASSISTANT,
-                      content: textDelta,
+                    const result = await createAssistantMessage({
+                      initialContent: textDelta,
+                      threadId: threadResultThreadId,
                       parentId: currentParentId,
                       depth: currentDepth,
                       model: data.model,
                       persona: data.persona ?? undefined,
                       sequenceId,
                       sequenceIndex,
+                      isIncognito,
+                      userId,
+                      controller,
+                      encoder,
+                      logger,
                     });
-                    controller.enqueue(
-                      encoder.encode(formatSSEEvent(messageEvent)),
-                    );
-
-                    // Save ASSISTANT message to database if not incognito
-                    if (!isIncognito && userId) {
-                      await createTextMessage({
-                        messageId: currentAssistantMessageId,
-                        threadId: threadResult.threadId,
-                        content: textDelta,
-                        parentId: currentParentId,
-                        depth: currentDepth,
-                        userId,
-                        model: data.model,
-                        persona: data.persona ?? undefined,
-                        sequenceId,
-                        sequenceIndex,
-                        logger,
-                      });
-                    }
-
-                    logger.debug("ASSISTANT message created", {
-                      messageId: currentAssistantMessageId,
-                      sequenceIndex,
-                    });
+                    currentAssistantMessageId = result.messageId;
+                    currentAssistantContent = result.content;
                   } else {
                     // Accumulate content
                     currentAssistantContent += textDelta;
                   }
 
                   // Emit content-delta event
-                  const deltaEvent = createStreamEvent.contentDelta({
+                  emitContentDelta({
                     messageId: currentAssistantMessageId,
                     delta: textDelta,
+                    controller,
+                    encoder,
                   });
-                  controller.enqueue(
-                    encoder.encode(formatSSEEvent(deltaEvent)),
-                  );
                 }
               } else if (part.type === "reasoning-start") {
                 // NEW ARCHITECTURE: Add <think> tag inline to current ASSISTANT message
@@ -1731,59 +1001,34 @@ class AiStreamRepository implements IAiStreamRepository {
 
                 // Create ASSISTANT message if it doesn't exist yet
                 if (!currentAssistantMessageId) {
-                  currentAssistantMessageId = crypto.randomUUID();
-                  currentAssistantContent = thinkTag;
-
-                  // Emit MESSAGE_CREATED event
-                  const messageEvent = createStreamEvent.messageCreated({
-                    messageId: currentAssistantMessageId,
-                    threadId: threadResult.threadId,
-                    role: ChatMessageRole.ASSISTANT,
-                    content: thinkTag,
+                  const result = await createAssistantMessage({
+                    initialContent: thinkTag,
+                    threadId: threadResultThreadId,
                     parentId: currentParentId,
                     depth: currentDepth,
                     model: data.model,
                     persona: data.persona ?? undefined,
                     sequenceId,
                     sequenceIndex,
+                    isIncognito,
+                    userId,
+                    controller,
+                    encoder,
+                    logger,
                   });
-                  controller.enqueue(
-                    encoder.encode(formatSSEEvent(messageEvent)),
-                  );
-
-                  // Save ASSISTANT message to database if not incognito
-                  if (!isIncognito && userId) {
-                    await createTextMessage({
-                      messageId: currentAssistantMessageId,
-                      threadId: threadResult.threadId,
-                      content: thinkTag,
-                      parentId: currentParentId,
-                      depth: currentDepth,
-                      userId,
-                      model: data.model,
-                      persona: data.persona ?? undefined,
-                      sequenceId,
-                      sequenceIndex,
-                      logger,
-                    });
-                  }
-
-                  logger.debug("ASSISTANT message created with reasoning", {
-                    messageId: currentAssistantMessageId,
-                    sequenceIndex,
-                  });
+                  currentAssistantMessageId = result.messageId;
+                  currentAssistantContent = result.content;
                 } else {
                   // Add <think> tag to existing message
                   currentAssistantContent += thinkTag;
 
                   // Emit delta for <think> tag
-                  const deltaEvent = createStreamEvent.contentDelta({
+                  emitContentDelta({
                     messageId: currentAssistantMessageId,
                     delta: thinkTag,
+                    controller,
+                    encoder,
                   });
-                  controller.enqueue(
-                    encoder.encode(formatSSEEvent(deltaEvent)),
-                  );
                 }
 
                 logger.info("[AI Stream] ⏱️ Reasoning started → <think>");
@@ -1801,13 +1046,12 @@ class AiStreamRepository implements IAiStreamRepository {
                   currentAssistantContent += reasoningText;
 
                   // Emit content delta
-                  const deltaEvent = createStreamEvent.contentDelta({
+                  emitContentDelta({
                     messageId: currentAssistantMessageId,
                     delta: reasoningText,
+                    controller,
+                    encoder,
                   });
-                  controller.enqueue(
-                    encoder.encode(formatSSEEvent(deltaEvent)),
-                  );
                 }
               } else if (part.type === "reasoning-end") {
                 // NEW ARCHITECTURE: Add </think> tag inline to current ASSISTANT message
@@ -1818,13 +1062,12 @@ class AiStreamRepository implements IAiStreamRepository {
                   currentAssistantContent += thinkCloseTag;
 
                   // Emit closing tag delta
-                  const thinkCloseDelta = createStreamEvent.contentDelta({
+                  emitContentDelta({
                     messageId: currentAssistantMessageId,
                     delta: thinkCloseTag,
+                    controller,
+                    encoder,
                   });
-                  controller.enqueue(
-                    encoder.encode(formatSSEEvent(thinkCloseDelta)),
-                  );
 
                   isInReasoningBlock = false;
 
@@ -1861,7 +1104,8 @@ class AiStreamRepository implements IAiStreamRepository {
                   }
 
                   // Update ASSISTANT message in database with accumulated content
-                  if (!isIncognito && userId) {
+                  // Public users (userId undefined) are allowed - helper converts to null
+                  if (!isIncognito) {
                     await updateMessageContent({
                       messageId: currentAssistantMessageId,
                       content: currentAssistantContent,
@@ -2005,7 +1249,7 @@ class AiStreamRepository implements IAiStreamRepository {
                 // Include toolCalls array so frontend can render tool display
                 const toolMessageEvent = createStreamEvent.messageCreated({
                   messageId: currentToolMessageId,
-                  threadId: threadResult.threadId,
+                  threadId: threadResultThreadId,
                   role: ChatMessageRole.TOOL,
                   content: "",
                   parentId: currentParentId,
@@ -2088,7 +1332,7 @@ class AiStreamRepository implements IAiStreamRepository {
                     const errorMessageId = crypto.randomUUID();
                     await createErrorMessage({
                       messageId: errorMessageId,
-                      threadId: threadResult.threadId,
+                      threadId: threadResultThreadId,
                       content: toolError,
                       errorType: "TOOL_ERROR",
                       parentId: currentToolCallData.parentId,
@@ -2116,10 +1360,11 @@ class AiStreamRepository implements IAiStreamRepository {
                   };
 
                   // NOW create TOOL message in DB with result/error
-                  if (!isIncognito && userId) {
+                  // Public users (userId undefined) are allowed - helper converts to null
+                  if (!isIncognito) {
                     await createToolMessage({
                       messageId: currentToolMessageId,
-                      threadId: threadResult.threadId,
+                      threadId: threadResultThreadId,
                       toolCall: toolCallWithResult,
                       parentId: currentToolCallData.parentId,
                       depth: currentToolCallData.depth,
@@ -2178,63 +1423,15 @@ class AiStreamRepository implements IAiStreamRepository {
 
             // NEW ARCHITECTURE: Finalize current ASSISTANT message if exists
             if (currentAssistantMessageId && currentAssistantContent) {
-              // CRITICAL FIX: If reasoning block is still open, close it at stream end
-              if (isInReasoningBlock) {
-                const thinkCloseTag = "</think>";
-                currentAssistantContent += thinkCloseTag;
-
-                // Emit closing tag delta
-                const thinkCloseDelta = createStreamEvent.contentDelta({
-                  messageId: currentAssistantMessageId,
-                  delta: thinkCloseTag,
-                });
-                controller.enqueue(
-                  encoder.encode(formatSSEEvent(thinkCloseDelta)),
-                );
-
-                isInReasoningBlock = false;
-
-                logger.info(
-                  "[AI Stream] ⏱️ Reasoning closed at stream end → </think>",
-                  {
-                    messageId: currentAssistantMessageId,
-                  },
-                );
-              }
-
-              // Emit CONTENT_DONE event for ASSISTANT message
-              // Wait for completion first to get tokens and finishReason
-              const [finishReason, usage] = await Promise.all([
-                streamResult.finishReason,
-                streamResult.usage,
-              ]);
-
-              const contentDoneEvent = createStreamEvent.contentDone({
-                messageId: currentAssistantMessageId,
-                content: currentAssistantContent,
-                totalTokens: usage.totalTokens ?? null,
-                finishReason: finishReason || null,
-              });
-              controller.enqueue(
-                encoder.encode(formatSSEEvent(contentDoneEvent)),
-              );
-
-              // Update ASSISTANT message in database with final content and tokens
-              if (!isIncognito && userId) {
-                await db
-                  .update(chatMessages)
-                  .set({
-                    content: currentAssistantContent,
-                    tokens: usage.totalTokens,
-                    updatedAt: new Date(),
-                  })
-                  .where(eq(chatMessages.id, currentAssistantMessageId));
-              }
-
-              logger.info("Finalized ASSISTANT message", {
-                messageId: currentAssistantMessageId,
-                contentLength: currentAssistantContent.length,
-                tokens: usage.totalTokens,
+              await finalizeAssistantMessage({
+                currentAssistantMessageId,
+                currentAssistantContent,
+                isInReasoningBlock,
+                streamResult,
+                isIncognito,
+                controller,
+                encoder,
+                logger,
               });
             }
 
@@ -2260,11 +1457,12 @@ class AiStreamRepository implements IAiStreamRepository {
             logger.error("Stream error", { error: errorMessage });
 
             // NEW ARCHITECTURE: Create ERROR message in DB/localStorage
+            // Public users (userId undefined) are allowed - helper converts to null
             const errorMessageId = crypto.randomUUID();
-            if (!isIncognito && userId) {
+            if (!isIncognito) {
               await createErrorMessage({
                 messageId: errorMessageId,
-                threadId: threadResult.threadId,
+                threadId: threadResultThreadId,
                 content: `Stream error: ${errorMessage}`,
                 errorType: "STREAM_ERROR",
                 parentId: lastParentId,
@@ -2279,7 +1477,7 @@ class AiStreamRepository implements IAiStreamRepository {
             // Emit ERROR message event for UI
             const errorMessageEvent = createStreamEvent.messageCreated({
               messageId: errorMessageId,
-              threadId: threadResult.threadId,
+              threadId: threadResultThreadId,
               role: ChatMessageRole.ERROR,
               content: `Stream error: ${errorMessage}`,
               parentId: lastParentId,

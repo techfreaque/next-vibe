@@ -12,7 +12,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { useAIStream } from "../../ai-stream/hooks/hooks";
+import { useAIStream } from "../../ai-stream/hooks/use-ai-stream";
 import { useAIStreamStore } from "../../ai-stream/hooks/store";
 import type { DefaultFolderId } from "../config";
 import type { ModelId } from "../model-access/models";
@@ -30,6 +30,9 @@ import type { FolderUpdate } from "../folders/hooks/use-operations";
 import { useThreadOperations } from "../threads/hooks/use-operations";
 import type { ThreadUpdate } from "../threads/hooks/use-operations";
 import { useMessageOperations } from "../threads/[threadId]/messages/hooks/use-operations";
+import { useNavigation } from "./use-navigation";
+import { useCredits } from "../../../credits/hooks";
+import { type CreditsGetResponseOutput } from "../../../credits/definition";
 
 /**
  * Return type for useChat hook
@@ -39,13 +42,18 @@ export interface UseChatReturn {
   threads: Record<string, ChatThread>;
   messages: Record<string, ChatMessage>;
   folders: Record<string, ChatFolder>;
+  rootFolderPermissions: Record<
+    string,
+    { canCreateThread: boolean; canCreateFolder: boolean }
+  >;
   personas: Record<string, { id: string; name: string; icon: string }>;
   activeThread: ChatThread | null;
   activeThreadMessages: ChatMessage[];
   isLoading: boolean;
   isStreaming: boolean;
 
-  // Current context
+  // Current context (passed as props from URL, not from store)
+  activeThreadId: string | null;
   currentRootFolderId: DefaultFolderId;
   currentSubFolderId: string | null;
 
@@ -73,12 +81,17 @@ export interface UseChatReturn {
   setViewMode: (mode: "linear" | "flat" | "threaded") => void;
   setEnabledToolIds: (toolIds: string[]) => void;
 
+  // Credits
+  initialCredits: CreditsGetResponseOutput;
+  deductCredits: (creditCost: number, feature: string) => void;
+  refetchCredits: () => void;
+
   // Message operations
   sendMessage: (
     content: string,
     onThreadCreated?: (
       threadId: string,
-      rootFolderId: string,
+      rootFolderId: DefaultFolderId,
       subFolderId: string | null,
     ) => void,
   ) => Promise<void>;
@@ -90,8 +103,6 @@ export interface UseChatReturn {
   stopGeneration: () => void;
 
   // Thread operations
-  createNewThread: () => string;
-  setActiveThread: (threadId: string | null) => void;
   deleteThread: (threadId: string) => Promise<void>;
   updateThread: (threadId: string, updates: ThreadUpdate) => Promise<void>;
 
@@ -105,8 +116,13 @@ export interface UseChatReturn {
   updateFolder: (folderId: string, updates: FolderUpdate) => Promise<void>;
   deleteFolder: (folderId: string) => Promise<void>;
 
-  // Navigation
-  setCurrentFolder: (
+  // Navigation operations (use router.push instead of store state)
+  navigateToThread: (threadId: string) => void;
+  navigateToFolder: (
+    rootFolderId: DefaultFolderId,
+    subFolderId: string | null,
+  ) => void;
+  navigateToNewThread: (
     rootFolderId: DefaultFolderId,
     subFolderId: string | null,
   ) => void;
@@ -121,20 +137,29 @@ export interface UseChatReturn {
 /**
  * Central hook that provides all chat functionality
  * Uses modular hooks for better maintainability
+ *
+ * @param locale - Current locale
+ * @param logger - Logger instance
+ * @param activeThreadId - Active thread ID from URL (null if none)
+ * @param currentRootFolderId - Current root folder ID from URL
+ * @param currentSubFolderId - Current subfolder ID from URL (null if none)
+ * @param deductCredits - Function to optimistically deduct credits
  */
 export function useChat(
   locale: CountryLanguage,
   logger: EndpointLogger,
+  activeThreadId: string | null,
+  currentRootFolderId: DefaultFolderId,
+  currentSubFolderId: string | null,
+  initialCredits: CreditsGetResponseOutput,
 ): UseChatReturn {
   // Get stores - subscribe to specific properties
   const threads = useChatStore((state) => state.threads);
   const messages = useChatStore((state) => state.messages);
   const folders = useChatStore((state) => state.folders);
-  const activeThreadId = useChatStore((state) => state.activeThreadId);
-  const currentRootFolderId = useChatStore(
-    (state) => state.currentRootFolderId,
+  const rootFolderPermissions = useChatStore(
+    (state) => state.rootFolderPermissions,
   );
-  const currentSubFolderId = useChatStore((state) => state.currentSubFolderId);
   const isLoading = useChatStore((state) => state.isLoading);
 
   // Get store instances
@@ -143,6 +168,9 @@ export function useChat(
 
   // Get translations
   const { t } = simpleT(locale);
+
+  // Get credits hook with deduct/refetch methods
+  const creditsHook = useCredits(logger, initialCredits);
 
   // Get AI stream hook
   const aiStream = useAIStream(locale, logger, t);
@@ -162,6 +190,7 @@ export function useChat(
     chatStore.addThread,
     chatStore.addMessage,
     chatStore.addFolder,
+    chatStore.setRootFolderPermissions,
   );
 
   useMessageLoader(
@@ -202,11 +231,17 @@ export function useChat(
     locale,
     logger,
     aiStream,
+    activeThreadId,
+    currentRootFolderId,
+    currentSubFolderId,
     chatStore,
     streamStore,
     settings: settingsOps.settings,
     setInput,
+    deductCredits: creditsHook.deductCredits,
   });
+
+  const navigationOps = useNavigation(locale, logger, threads, folders);
 
   // Compute personas map
   const personas = useMemo(() => {
@@ -245,30 +280,20 @@ export function useChat(
       .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
   }, [activeThreadId, messages]);
 
-  // Navigation
-  const setCurrentFolder = (
-    rootFolderId: DefaultFolderId,
-    subFolderId: string | null,
-  ): void => {
-    logger.debug("Chat: Setting current folder", {
-      rootFolderId,
-      subFolderId,
-    });
-    chatStore.setCurrentFolder(rootFolderId, subFolderId);
-  };
-
   return {
     // State
     threads,
     messages,
     folders,
+    rootFolderPermissions,
     personas,
     activeThread,
     activeThreadMessages,
     isLoading,
     isStreaming: streamStore.isStreaming,
 
-    // Current context
+    // Current context (from URL props)
+    activeThreadId,
     currentRootFolderId,
     currentSubFolderId,
 
@@ -305,10 +330,14 @@ export function useChat(
     voteMessage: messageOps.voteMessage,
     stopGeneration: messageOps.stopGeneration,
 
+    // Credits
+    initialCredits: initialCredits,
+    deductCredits: creditsHook.deductCredits,
+    refetchCredits: creditsHook.refetchCredits,
+
     // Thread operations
-    createNewThread: threadOps.createNewThread,
-    setActiveThread: threadOps.setActiveThread,
-    deleteThread: threadOps.deleteThread,
+    deleteThread: (threadId: string) =>
+      threadOps.deleteThread(threadId, activeThreadId),
     updateThread: threadOps.updateThread,
 
     // Folder operations
@@ -316,8 +345,10 @@ export function useChat(
     updateFolder: folderOps.updateFolder,
     deleteFolder: folderOps.deleteFolder,
 
-    // Navigation
-    setCurrentFolder,
+    // Navigation operations
+    navigateToThread: navigationOps.navigateToThread,
+    navigateToFolder: navigationOps.navigateToFolder,
+    navigateToNewThread: navigationOps.navigateToNewThread,
 
     // Refs
     inputRef,

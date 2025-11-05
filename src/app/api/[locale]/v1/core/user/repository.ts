@@ -819,4 +819,34 @@ export class BaseUserRepositoryImpl implements UserRepository {
   }
 }
 
+export async function getUserPublicName(
+  userId: string | undefined,
+  logger: EndpointLogger,
+): Promise<string | null> {
+  if (!userId) {
+    return null;
+  }
+
+  try {
+    const userResult = await db
+      .select({ publicName: users.publicName })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (userResult.length === 0) {
+      logger.warn("User not found when fetching public name", { userId });
+      return null;
+    }
+
+    return userResult[0].publicName || null;
+  } catch (error) {
+    logger.error("Failed to fetch user public name", {
+      userId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+}
+
 export const userRepository = new BaseUserRepositoryImpl();

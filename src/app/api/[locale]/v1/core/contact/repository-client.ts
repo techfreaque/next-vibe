@@ -8,25 +8,15 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/translation-utils";
 
 /**
- * Contact Repository Interface
- * Defines contract for contact operations
- */
-interface ContactRepository {
-  /**
-   * Get support email address
-   */
-  getSupportEmail(locale: CountryLanguage): string;
-}
-
-/**
  * Contact Repository Implementation
  * Handles contact form submissions
  */
-class ContactRepositoryImpl implements ContactRepository {
+export class contactClientRepository {
   /**
    * Get support email address
    */
-  getSupportEmail(locale: CountryLanguage): string {
+
+  static getSupportEmail(locale: CountryLanguage): string {
     const language = getLanguageFromLocale(locale);
     switch (language) {
       case "de":
@@ -40,8 +30,3 @@ class ContactRepositoryImpl implements ContactRepository {
     }
   }
 }
-
-/**
- * Singleton Repository Instance
- */
-export const contactClientRepository = new ContactRepositoryImpl();

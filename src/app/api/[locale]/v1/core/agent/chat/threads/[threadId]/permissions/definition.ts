@@ -5,7 +5,7 @@ import {
   objectField,
   requestDataField,
   requestUrlPathParamsField,
-  responseArrayField,
+  responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.permissions.get.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    {},
+    { request: "urlPathParams", response: true },
     {
       // === REQUEST URL PARAMS ===
       threadId: requestUrlPathParamsField(
@@ -63,37 +63,65 @@ const { GET } = createEndpoint({
       ),
 
       // === RESPONSE FIELDS ===
-      rolesRead: responseArrayField(
+      rolesView: responseField(
         {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesRead.content" as const,
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.MULTISELECT,
+          label:
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesView.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesView.description" as const,
+          options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.enum(UserRoleDB),
+        z.array(z.enum(UserRoleDB)).nullable(),
       ),
-      rolesWrite: responseArrayField(
+      rolesEdit: responseField(
         {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesWrite.content" as const,
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.MULTISELECT,
+          label:
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesEdit.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesEdit.description" as const,
+          options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.enum(UserRoleDB),
+        z.array(z.enum(UserRoleDB)).nullable(),
       ),
-      rolesHide: responseArrayField(
+      rolesPost: responseField(
         {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesHide.content" as const,
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.MULTISELECT,
+          label:
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesPost.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesPost.description" as const,
+          options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.enum(UserRoleDB),
+        z.array(z.enum(UserRoleDB)).nullable(),
       ),
-      rolesDelete: responseArrayField(
+      rolesModerate: responseField(
         {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesDelete.content" as const,
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.MULTISELECT,
+          label:
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesModerate.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesModerate.description" as const,
+          options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.enum(UserRoleDB),
+        z.array(z.enum(UserRoleDB)).nullable(),
+      ),
+      rolesAdmin: responseField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.MULTISELECT,
+          label:
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesAdmin.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.get.response.rolesAdmin.description" as const,
+          options: UserRoleDB.map((role) => ({ value: role, label: role })),
+        },
+        z.array(z.enum(UserRoleDB)).nullable(),
       ),
     },
   ),
@@ -166,13 +194,13 @@ const { GET } = createEndpoint({
     urlPathParams: {
       default: { threadId: "123e4567-e89b-12d3-a456-426614174000" },
     },
-    requests: undefined,
     responses: {
       default: {
-        rolesRead: ["PUBLIC", "CUSTOMER", "ADMIN"],
-        rolesWrite: ["CUSTOMER", "ADMIN"],
-        rolesHide: ["PARTNER_ADMIN", "ADMIN"],
-        rolesDelete: ["ADMIN"],
+        rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesEdit: [UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesModerate: [UserRole.PARTNER_ADMIN, UserRole.ADMIN],
+        rolesAdmin: [UserRole.ADMIN],
       },
     },
   },
@@ -222,57 +250,70 @@ const { PATCH } = createEndpoint({
       ),
 
       // === REQUEST DATA ===
-      rolesRead: requestDataField(
+      rolesView: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
           label:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesRead.label" as const,
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesView.label" as const,
           description:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesRead.description" as const,
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesView.description" as const,
           layout: { columns: 6 },
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.array(z.enum(UserRoleDB)).optional(),
+        z.array(z.enum(UserRoleDB)).nullable().optional(),
       ),
-      rolesWrite: requestDataField(
+      rolesEdit: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
           label:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesWrite.label" as const,
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesEdit.label" as const,
           description:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesWrite.description" as const,
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesEdit.description" as const,
           layout: { columns: 6 },
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.array(z.enum(UserRoleDB)).optional(),
+        z.array(z.enum(UserRoleDB)).nullable().optional(),
       ),
-      rolesHide: requestDataField(
+      rolesPost: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
           label:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesHide.label" as const,
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesPost.label" as const,
           description:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesHide.description" as const,
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesPost.description" as const,
           layout: { columns: 6 },
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.array(z.enum(UserRoleDB)).optional(),
+        z.array(z.enum(UserRoleDB)).nullable().optional(),
       ),
-      rolesDelete: requestDataField(
+      rolesModerate: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
           label:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesDelete.label" as const,
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesModerate.label" as const,
           description:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesDelete.description" as const,
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesModerate.description" as const,
           layout: { columns: 6 },
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.array(z.enum(UserRoleDB)).optional(),
+        z.array(z.enum(UserRoleDB)).nullable().optional(),
+      ),
+      rolesAdmin: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.MULTISELECT,
+          label:
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesAdmin.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesAdmin.description" as const,
+          layout: { columns: 6 },
+          options: UserRoleDB.map((role) => ({ value: role, label: role })),
+        },
+        z.array(z.enum(UserRoleDB)).nullable().optional(),
       ),
 
       // === RESPONSE ===
@@ -287,37 +328,65 @@ const { PATCH } = createEndpoint({
         },
         { response: true },
         {
-          rolesRead: responseArrayField(
+          rolesView: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesRead.content" as const,
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label:
+                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesView.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesView.description" as const,
+              options: UserRoleDB.map((role) => ({ value: role, label: role })),
             },
-            z.string(),
+            z.array(z.enum(UserRoleDB)).nullable(),
           ),
-          rolesWrite: responseArrayField(
+          rolesEdit: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesWrite.content" as const,
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label:
+                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesEdit.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesEdit.description" as const,
+              options: UserRoleDB.map((role) => ({ value: role, label: role })),
             },
-            z.string(),
+            z.array(z.enum(UserRoleDB)).nullable(),
           ),
-          rolesHide: responseArrayField(
+          rolesPost: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesHide.content" as const,
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label:
+                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesPost.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesPost.description" as const,
+              options: UserRoleDB.map((role) => ({ value: role, label: role })),
             },
-            z.string(),
+            z.array(z.enum(UserRoleDB)).nullable(),
           ),
-          rolesDelete: responseArrayField(
+          rolesModerate: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesDelete.content" as const,
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label:
+                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesModerate.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesModerate.description" as const,
+              options: UserRoleDB.map((role) => ({ value: role, label: role })),
             },
-            z.string(),
+            z.array(z.enum(UserRoleDB)).nullable(),
+          ),
+          rolesAdmin: responseField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label:
+                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesAdmin.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.rolesAdmin.description" as const,
+              options: UserRoleDB.map((role) => ({ value: role, label: role })),
+            },
+            z.array(z.enum(UserRoleDB)).nullable(),
           ),
         },
       ),
@@ -394,19 +463,21 @@ const { PATCH } = createEndpoint({
     },
     requests: {
       default: {
-        rolesRead: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
-        rolesWrite: [UserRole.CUSTOMER, UserRole.ADMIN],
-        rolesHide: [UserRole.PARTNER_ADMIN, UserRole.ADMIN],
-        rolesDelete: [UserRole.ADMIN],
+        rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesEdit: [UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesModerate: [UserRole.PARTNER_ADMIN, UserRole.ADMIN],
+        rolesAdmin: [UserRole.ADMIN],
       },
     },
     responses: {
       default: {
         response: {
-          rolesRead: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
-          rolesWrite: [UserRole.CUSTOMER, UserRole.ADMIN],
-          rolesHide: [UserRole.PARTNER_ADMIN, UserRole.ADMIN],
-          rolesDelete: [UserRole.ADMIN],
+          rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+          rolesEdit: [UserRole.CUSTOMER, UserRole.ADMIN],
+          rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+          rolesModerate: [UserRole.PARTNER_ADMIN, UserRole.ADMIN],
+          rolesAdmin: [UserRole.ADMIN],
         },
       },
     },

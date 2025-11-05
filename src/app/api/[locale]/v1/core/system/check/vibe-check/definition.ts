@@ -29,7 +29,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.check.vibeCheck.description",
   category: "app.api.v1.core.system.check.vibeCheck.category",
   tags: ["app.api.v1.core.system.check.vibeCheck.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF, UserRole.WEB_OFF],
   aliases: ["check", "c"],
 
   cli: {

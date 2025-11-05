@@ -29,6 +29,7 @@ import {
 } from "recharts";
 
 import {
+  type LeadSourceValues,
   LeadSource,
   LeadSourceOptions,
 } from "@/app/api/[locale]/v1/core/leads/enum";
@@ -81,7 +82,7 @@ interface LeadsStatsChartWithSourceControlProps {
   locale: CountryLanguage;
   data: ChartDataType & {
     chartType?: ChartType;
-    sourceData?: Record<keyof typeof LeadSource, number>;
+    sourceData?: Record<typeof LeadSourceValues, number>;
   };
   isLoading?: boolean;
   height?: number;
@@ -104,7 +105,7 @@ export function LeadsStatsChart({
     {},
   );
   const [visibleSources, setVisibleSources] = useState<
-    Partial<Record<keyof typeof LeadSource, boolean>>
+    Partial<Record<typeof LeadSourceValues, boolean>>
   >({});
 
   // Initialize visibility state when data changes
@@ -121,8 +122,8 @@ export function LeadsStatsChart({
   // Initialize source visibility
   useEffect(() => {
     if (data?.sourceData) {
-      const initial: Partial<Record<keyof typeof LeadSource, boolean>> = {};
-      (Object.keys(data.sourceData) as Array<keyof typeof LeadSource>).forEach(
+      const initial: Partial<Record<typeof LeadSourceValues, boolean>> = {};
+      (Object.keys(data.sourceData) as Array<typeof LeadSourceValues>).forEach(
         (source) => {
           initial[source] = true;
         },
@@ -177,7 +178,7 @@ export function LeadsStatsChart({
     setVisibleSources((prev) => {
       const updated = { ...prev };
       Object.keys(updated).forEach((key) => {
-        updated[key as keyof typeof LeadSource] = true;
+        updated[key as typeof LeadSourceValues] = true;
       });
       return updated;
     });
@@ -187,7 +188,7 @@ export function LeadsStatsChart({
     setVisibleSources((prev) => {
       const updated = { ...prev };
       Object.keys(updated).forEach((key) => {
-        updated[key as keyof typeof LeadSource] = false;
+        updated[key as typeof LeadSourceValues] = false;
       });
       return updated;
     });
@@ -300,20 +301,21 @@ export function LeadsStatsChart({
 
   // Prepare source legend data
   const sourceLegendData = data?.sourceData
-    ? Object.entries(data.sourceData).map(([source, count]) => {
+    ? (
+        Object.entries(data.sourceData) as Array<
+          [typeof LeadSourceValues, number]
+        >
+      ).map(([source, count]) => {
         const total = Object.values(data.sourceData || {}).reduce(
           (sum, val) => sum + val,
           0,
         );
 
-        const sourceKey = source as keyof typeof LeadSource;
-        const sourceTranslationKey = LeadSource[sourceKey];
-
         return {
-          source: sourceTranslationKey,
-          name: t(sourceTranslationKey),
-          color: CHART_CONSTANTS.SOURCE_COLORS[sourceTranslationKey] || "#6b7280",
-          visible: visibleSources[sourceKey] || false,
+          source: source,
+          name: t(source),
+          color: CHART_CONSTANTS.SOURCE_COLORS[source] || "#6b7280",
+          visible: visibleSources[source] || false,
           count,
           percentage: total > 0 ? (count / total) * 100 : 0,
         };

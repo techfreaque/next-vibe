@@ -12,6 +12,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { useChatContext } from "../../../features/chat/context";
 import { useTouchDevice } from "../../../hooks/use-touch-device";
 import { CopyButton } from "../copy-button";
 import { MessageActionButton } from "../message-action-button";
@@ -40,6 +41,14 @@ export function AssistantMessageActions({
   const { t } = simpleT(locale);
   const isTouch = useTouchDevice();
 
+  // Get deductCredits from context
+  const chatContext = useChatContext();
+  const deductCredits =
+    chatContext?.deductCredits ??
+    ((_creditCost: number, _feature: string): void => {
+      // No-op fallback if context is not available
+    });
+
   // Check if this message is currently streaming
   const streamingMessage = useAIStreamStore(
     (state) => state.streamingMessages[messageId],
@@ -52,6 +61,7 @@ export function AssistantMessageActions({
     isStreaming: isMessageStreaming,
     locale,
     logger,
+    deductCredits,
   });
 
   // Get credit cost from definition

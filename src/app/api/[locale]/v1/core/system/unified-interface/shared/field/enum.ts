@@ -34,17 +34,17 @@ export function createEnumOptions<
   enumMap: T,
 ): {
   enum: { readonly [K in keyof T]: T[K] };
-  options: Array<{ [K in keyof T]: { value: K; label: T[K] } }[keyof T]>;
+  options: Array<{ [K in keyof T]: { value: T[K]; label: T[K] } }[keyof T]>;
   Value: T[keyof T];
 } {
   const enumObj = createEnumObjectWithKeyValues(enumMap);
 
   const optionsArray = Object.entries(enumMap).map(
-    ([key, translationValue]) => ({
-      value: key,
+    ([_key, translationValue]) => ({
+      value: translationValue,
       label: translationValue,
     }),
-  ) as Array<{ [K in keyof T]: { value: K; label: T[K] } }[keyof T]>;
+  ) as Array<{ [K in keyof T]: { value: T[K]; label: T[K] } }[keyof T]>;
 
   return {
     enum: enumObj,

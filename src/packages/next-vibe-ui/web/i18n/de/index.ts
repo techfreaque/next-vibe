@@ -37,5 +37,9 @@ export const translations: typeof enTranslations = {
       copy: "Kopieren",
       copyCode: "Code kopieren",
     },
+    multiSelect: {
+      placeholder: "Elemente auswählen...",
+      noResultsFound: "Keine Ergebnisse gefunden",
+    },
   },
 };

@@ -91,7 +91,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.get.response.thread.userId.content" as const,
             },
-            z.uuid(),
+            z.uuid().nullable(),
           ),
           title: responseField(
             {
@@ -496,7 +496,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.response.thread.userId.content" as const,
             },
-            z.uuid(),
+            z.uuid().nullable(),
           ),
           title: responseField(
             {

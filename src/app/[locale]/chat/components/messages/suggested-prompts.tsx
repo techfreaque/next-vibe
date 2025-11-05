@@ -16,6 +16,7 @@ import { MoreHorizontal } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import {
@@ -33,7 +34,7 @@ interface SuggestedPromptsProps {
     modelId?: ModelId,
   ) => void;
   locale: CountryLanguage;
-  rootFolderId?: string;
+  rootFolderId: DefaultFolderId;
 }
 
 // Get first 5 personas for tabs
@@ -42,7 +43,7 @@ const FEATURED_PERSONAS = DEFAULT_PERSONAS.slice(0, 5);
 export function SuggestedPrompts({
   onSelectPrompt,
   locale,
-  rootFolderId = "general",
+  rootFolderId = "private",
 }: SuggestedPromptsProps): JSX.Element {
   const { t } = simpleT(locale);
   const [selectedPersona, setSelectedPersona] = useState<Persona>(
@@ -64,7 +65,7 @@ export function SuggestedPrompts({
   // Get title based on root folder
   const getTitleKey = (): TranslationKey => {
     switch (rootFolderId) {
-      case "general":
+      case "private":
         return "app.chat.suggestedPrompts.privateTitle";
       case "shared":
         return "app.chat.suggestedPrompts.sharedTitle";

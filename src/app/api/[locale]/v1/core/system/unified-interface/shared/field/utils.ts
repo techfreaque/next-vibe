@@ -20,6 +20,17 @@ import type { CacheStrategy } from "../types/enums";
 import { FieldUsage } from "../types/enums";
 
 // ============================================================================
+// TYPE GUARDS
+// ============================================================================
+
+/**
+ * Type guard to check if a value is a Zod schema
+ */
+function isZodSchema(value: unknown): value is z.ZodTypeAny {
+  return typeof value === "object" && value !== null && "_def" in value;
+}
+
+// ============================================================================
 // FIELD CREATORS
 // ============================================================================
 
@@ -501,17 +512,15 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
   if (typedField.type === "array") {
     if (hasUsage(typedField.usage)) {
-      // Check if child is a raw Zod schema (not a UnifiedField)
-      // Raw Zod schemas don't have a 'type' property
-      const isRawZodSchema =
-        typedField.child &&
-        typeof typedField.child === "object" &&
-        "_def" in typedField.child;
+      // Check if child exists
+      if (!typedField.child) {
+        return z.never() as InferSchemaFromField<F, Usage>;
+      }
 
       let childSchema: z.ZodTypeAny;
-      if (isRawZodSchema) {
+      if (isZodSchema(typedField.child)) {
         // Child is already a Zod schema, use it directly
-        childSchema = typedField.child as z.ZodTypeAny;
+        childSchema = typedField.child;
       } else {
         // Child is a UnifiedField, generate schema from it
         childSchema = generateSchemaForUsage(typedField.child, targetUsage);

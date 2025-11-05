@@ -30,7 +30,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.check.typecheck.description",
   category: "app.api.v1.core.system.check.typecheck.category",
   tags: ["app.api.v1.core.system.check.typecheck.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF, UserRole.WEB_OFF],
   aliases: ["typecheck", "tc"],
   cli: {
     firstCliArgKey: "path",

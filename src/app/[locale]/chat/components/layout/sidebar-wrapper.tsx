@@ -164,6 +164,55 @@ export function SidebarWrapper({
     [onUpdateFolder, logger],
   );
 
+  // Handle reordering folders (move up/down)
+  const handleReorderFolder = React.useCallback(
+    (folderId: string, direction: "up" | "down") => {
+      logger.debug("SidebarWrapper", "Reorder folder", {
+        folderId,
+        direction,
+      });
+
+      const folder = chat.folders[folderId];
+      if (!folder) {
+        logger.error("Folder not found for reordering", { folderId });
+        return;
+      }
+
+      // Get sibling folders (same parent and rootFolderId)
+      const siblings = Object.values(chat.folders)
+        .filter(
+          (f) =>
+            f.rootFolderId === folder.rootFolderId &&
+            f.parentId === folder.parentId &&
+            f.id !== folderId,
+        )
+        .toSorted((a, b) => a.sortOrder - b.sortOrder);
+
+      const currentIndex = siblings.findIndex(
+        (f) => f.sortOrder > folder.sortOrder,
+      );
+      const actualCurrentIndex =
+        currentIndex === -1 ? siblings.length : currentIndex;
+
+      if (direction === "up" && actualCurrentIndex > 0) {
+        // Swap with previous sibling
+        const prevSibling = siblings[actualCurrentIndex - 1];
+        if (prevSibling) {
+          void onUpdateFolder(folderId, { sortOrder: prevSibling.sortOrder });
+          void onUpdateFolder(prevSibling.id, { sortOrder: folder.sortOrder });
+        }
+      } else if (direction === "down" && actualCurrentIndex < siblings.length) {
+        // Swap with next sibling
+        const nextSibling = siblings[actualCurrentIndex];
+        if (nextSibling) {
+          void onUpdateFolder(folderId, { sortOrder: nextSibling.sortOrder });
+          void onUpdateFolder(nextSibling.id, { sortOrder: folder.sortOrder });
+        }
+      }
+    },
+    [chat.folders, onUpdateFolder, logger],
+  );
+
   return (
     <>
       {/* Sidebar Container */}
@@ -183,7 +232,7 @@ export function SidebarWrapper({
             user={user}
             chat={chat}
             activeThreadId={activeThreadId}
-            activeFolderId={activeSubFolderId || undefined}
+            activeFolderId={activeSubFolderId}
             locale={locale}
             logger={logger}
             onCreateThread={handleCreateThread}
@@ -195,20 +244,7 @@ export function SidebarWrapper({
             onCreateFolder={handleCreateFolder}
             onUpdateFolder={onUpdateFolder}
             onDeleteFolder={chat.deleteFolder}
-            onToggleFolderExpanded={(folderId: string): void => {
-              logger.debug("SidebarWrapper", "Toggle folder expanded", {
-                folderId,
-              });
-            }}
-            onReorderFolder={(
-              folderId: string,
-              direction: "up" | "down",
-            ): void => {
-              logger.debug("SidebarWrapper", "Reorder folder", {
-                folderId,
-                direction,
-              });
-            }}
+            onReorderFolder={handleReorderFolder}
             onMoveFolderToParent={handleMoveFolderToParent}
             onUpdateThreadTitle={onUpdateThreadTitle}
             searchThreads={() => []}

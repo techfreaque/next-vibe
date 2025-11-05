@@ -15,7 +15,7 @@ import definitions from "./definition";
  * Hook for folder permission operations (GET, PATCH)
  *
  * Features:
- * - GET: Fetch folder permissions (rolesRead, rolesWrite, rolesHide, rolesDelete)
+ * - GET: Fetch folder permissions (rolesView, rolesManage, rolesCreateThread, rolesPost, rolesModerate, rolesAdmin)
  * - PATCH: Update folder permissions
  * - Cache invalidation on mutations
  *
@@ -46,5 +46,6 @@ export function useFolderPermissions(
   );
 }
 
-export type FolderPermissionsEndpointReturn = EndpointReturn<typeof definitions>;
-
+export type FolderPermissionsEndpointReturn = EndpointReturn<
+  typeof definitions
+>;

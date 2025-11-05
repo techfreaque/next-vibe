@@ -14,6 +14,10 @@
 import type { JSX } from "react";
 
 import { ChatProvider } from "@/app/[locale]/chat/features/chat/context";
+import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
+import { getFolder } from "@/app/api/[locale]/v1/core/agent/chat/folders/[id]/repository";
+import { threadByIdRepository } from "@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/repository";
+import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
@@ -47,12 +51,82 @@ export default async function ThreadsPathPage({
 
   const user = userResponse.success ? userResponse.data : undefined;
 
-  // Path structure: [rootId, ...subfolders, possibleThreadId]
-  // The ChatInterface will determine from localStorage whether the last segment
-  // is a thread or a folder, and render accordingly.
+  // Fetch credit balance for all users (both authenticated and public)
+  // Always fetch credits if we have a user (even public users have leadId)
+  let initialCredits = null;
+  if (userResponse.success && userResponse.data) {
+    const creditsResponse = await creditRepository.getCreditBalanceForUser(
+      userResponse.data,
+      logger,
+    );
+    initialCredits = creditsResponse.success ? creditsResponse.data : null;
+
+    logger.debug("Server-side credits fetch", {
+      success: creditsResponse.success,
+      hasData: !!initialCredits,
+      isPublic: userResponse.data.isPublic,
+      leadId: userResponse.data.leadId,
+    });
+  }
+
+  // Parse URL server-side to get navigation state
+  // This prevents hydration mismatch - URL is the single source of truth
+  let { initialRootFolderId, initialSubFolderId, initialThreadId } =
+    parseChatUrl(path);
+
+  // Disambiguate between thread IDs and folder IDs
+  // Both are UUIDs, so we need to check the database to determine which one it is
+  // This happens when URL is /threads/[rootId]/[uuid] - could be either a thread or a folder
+  if (
+    initialThreadId &&
+    !initialSubFolderId &&
+    isUUID(initialThreadId) &&
+    user
+  ) {
+    // Check if it's a thread first
+    const threadResponse = await threadByIdRepository.getThreadById(
+      initialThreadId,
+      user,
+      locale,
+      logger,
+    );
+
+    if (!threadResponse.success) {
+      // Not a thread, check if it's a folder
+      const folderResponse = await getFolder(
+        user,
+        { id: initialThreadId },
+        logger,
+      );
+
+      if (folderResponse.success) {
+        // It's a folder! Correct the parsed values
+        logger.debug("URL disambiguation: UUID is a folder, not a thread", {
+          folderId: initialThreadId,
+        });
+        initialSubFolderId = initialThreadId;
+        initialThreadId = null;
+      }
+    }
+  }
+
+  // Provide default credits if null (e.g., for unauthenticated users or error cases)
+  const creditsToUse = initialCredits ?? {
+    total: 0,
+    expiring: 0,
+    permanent: 0,
+    free: 0,
+    expiresAt: null,
+  };
 
   return (
-    <ChatProvider locale={locale}>
+    <ChatProvider
+      locale={locale}
+      activeThreadId={initialThreadId}
+      currentRootFolderId={initialRootFolderId}
+      currentSubFolderId={initialSubFolderId}
+      initialCredits={creditsToUse}
+    >
       <ChatInterface urlPath={path} user={user} />
     </ChatProvider>
   );

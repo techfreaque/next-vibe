@@ -22,8 +22,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { chatFolders, chatThreads } from "../../db";
 import {
   canDeleteThread,
-  canReadThread,
   canUpdateThread,
+  canViewThread,
 } from "../../permissions/permissions";
 import type { PersonaId } from "../../personas/config";
 import type {
@@ -107,7 +107,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       }
 
       // Use permission system to check read access
-      if (!(await canReadThread(user, thread, folder, logger))) {
+      if (!(await canViewThread(user, thread, folder, logger))) {
         return fail({
           message:
             "app.api.v1.core.agent.chat.threads.threadId.get.errors.forbidden.title",
@@ -189,7 +189,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       }
 
       // Get folder if thread is in a folder (needed for permission check)
-      let folder: (typeof chatFolders.$inferSelect) | null = null;
+      let folder: typeof chatFolders.$inferSelect | null = null;
       if (existingThread.folderId) {
         const [folderResult] = await db
           .select()

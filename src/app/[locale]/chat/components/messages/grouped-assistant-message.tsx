@@ -5,6 +5,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import type { JSX } from "react";
 
+import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -24,6 +25,7 @@ interface GroupedAssistantMessageProps {
   onDelete?: (messageId: string) => void;
   showAuthor?: boolean;
   logger: EndpointLogger;
+  rootFolderId: DefaultFolderId;
   /** Collapse state management callbacks */
   collapseState?: {
     isCollapsed: (
@@ -58,6 +60,7 @@ export function GroupedAssistantMessage({
   onDelete,
   showAuthor = false,
   logger,
+  rootFolderId,
   collapseState,
 }: GroupedAssistantMessageProps): JSX.Element {
   const { t } = simpleT(locale);
@@ -101,12 +104,15 @@ export function GroupedAssistantMessage({
           <Div className="mb-2">
             <MessageAuthorInfo
               authorName={displayName}
+              authorId={primary.authorId}
+              currentUserId={undefined} // AI messages don't need current user check
               isAI={primary.isAI}
               model={primary.model}
               timestamp={primary.createdAt}
               edited={primary.edited}
               tone={tone}
               locale={locale}
+              rootFolderId={rootFolderId}
               compact
             />
           </Div>

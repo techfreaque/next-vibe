@@ -7,7 +7,6 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
-  field,
   objectField,
   requestDataField,
   responseArrayField,
@@ -23,7 +22,6 @@ import {
 import {
   UserRole,
   UserRoleDB,
-  UserRoleOptions,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { DEFAULT_FOLDER_IDS } from "../config";
@@ -280,61 +278,127 @@ const { GET } = createEndpoint({
                   },
                   z.boolean(),
                 ),
-                rolesRead: responseArrayField(
+                // Permission roles - nullable arrays (null = inherit, [] = deny, [roles...] = allow)
+                rolesView: responseField(
                   {
                     type: WidgetType.DATA_LIST,
                     layout: "inline",
                   },
-                  field(
-                    z.enum(UserRoleDB),
-                    { response: true },
-                    {
-                      type: WidgetType.BADGE,
-                      options: UserRoleOptions,
-                    },
-                  ),
+                  z
+                    .array(z.enum(UserRoleDB))
+                    .nullable()
+                    .describe(
+                      "Roles that can view this thread (null = inherit from folder)",
+                    ),
                 ),
-                rolesWrite: responseArrayField(
+                rolesEdit: responseField(
                   {
                     type: WidgetType.DATA_LIST,
                     layout: "inline",
                   },
-                  field(
-                    z.enum(UserRoleDB),
-                    { response: true },
-                    {
-                      type: WidgetType.BADGE,
-                      options: UserRoleOptions,
-                    },
-                  ),
+                  z
+                    .array(z.enum(UserRoleDB))
+                    .nullable()
+                    .describe(
+                      "Roles that can edit this thread (null = inherit from folder)",
+                    ),
                 ),
-                rolesHide: responseArrayField(
+                rolesPost: responseField(
                   {
                     type: WidgetType.DATA_LIST,
                     layout: "inline",
                   },
-                  field(
-                    z.enum(UserRoleDB),
-                    { response: true },
-                    {
-                      type: WidgetType.BADGE,
-                      options: UserRoleOptions,
-                    },
-                  ),
+                  z
+                    .array(z.enum(UserRoleDB))
+                    .nullable()
+                    .describe(
+                      "Roles that can post messages (null = inherit from folder)",
+                    ),
                 ),
-                rolesDelete: responseArrayField(
+                rolesModerate: responseField(
                   {
                     type: WidgetType.DATA_LIST,
                     layout: "inline",
                   },
-                  field(
-                    z.enum(UserRoleDB),
-                    { response: true },
-                    {
-                      type: WidgetType.BADGE,
-                      options: UserRoleOptions,
-                    },
-                  ),
+                  z
+                    .array(z.enum(UserRoleDB))
+                    .nullable()
+                    .describe(
+                      "Roles that can moderate messages (null = inherit from folder)",
+                    ),
+                ),
+                rolesAdmin: responseField(
+                  {
+                    type: WidgetType.DATA_LIST,
+                    layout: "inline",
+                  },
+                  z
+                    .array(z.enum(UserRoleDB))
+                    .nullable()
+                    .describe(
+                      "Roles that can manage permissions (null = inherit from folder)",
+                    ),
+                ),
+                // Permission flags - computed server-side based on user's roles
+                canEdit: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.v1.core.agent.chat.threads.get.response.threads.thread.canEdit.content" as const,
+                  },
+                  z
+                    .boolean()
+                    .describe(
+                      "Whether the current user can edit this thread (title, settings)",
+                    ),
+                ),
+                canPost: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.v1.core.agent.chat.threads.get.response.threads.thread.canPost.content" as const,
+                  },
+                  z
+                    .boolean()
+                    .describe(
+                      "Whether the current user can post messages in this thread",
+                    ),
+                ),
+                canModerate: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.v1.core.agent.chat.threads.get.response.threads.thread.canModerate.content" as const,
+                  },
+                  z
+                    .boolean()
+                    .describe(
+                      "Whether the current user can moderate/hide messages in this thread",
+                    ),
+                ),
+                canDelete: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.v1.core.agent.chat.threads.get.response.threads.thread.canDelete.content" as const,
+                  },
+                  z
+                    .boolean()
+                    .describe(
+                      "Whether the current user can delete this thread",
+                    ),
+                ),
+                canManagePermissions: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.v1.core.agent.chat.threads.get.response.threads.thread.canManagePermissions.content" as const,
+                  },
+                  z
+                    .boolean()
+                    .describe(
+                      "Whether the current user can manage permissions for this thread",
+                    ),
                 ),
                 createdAt: responseField(
                   {

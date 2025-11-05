@@ -36,12 +36,12 @@ export const translations: typeof enTranslations = {
           q2: {
             question: "Jakie metody płatności akceptujecie?",
             answer:
-              "Akceptujemy karty kredytowe przez Stripe oraz płatności kryptowalutowe (Bitcoin, Ethereum, stablecoiny) przez NowPayments. Wybierz między subskrypcją {{subPrice}}/miesiąc ({{subCredits}} kredytów/miesiąc) lub pakietami kredytowymi {{packPrice}} ({{packCredits}} kredytów każdy, wymaga subskrypcji).",
+              "Akceptujemy karty kredytowe przez Stripe oraz płatności kryptowalutowe (Bitcoin, Ethereum, stablecoiny) przez NowPayments. Subskrypcja {{subPrice}}/miesiąc zawiera {{subCredits}} kredytów/miesiąc. Możesz również kupić pakiety kredytowe ({{packPrice}} za {{packCredits}} kredytów), jeśli potrzebujesz więcej kredytów. Pakiety kredytowe nigdy nie wygasają, nawet po zakończeniu subskrypcji.",
           },
           q3: {
             question: "Jak działa system kredytów?",
             answer:
-              "Darmowi użytkownicy otrzymują {{freeCredits}} kredytów/miesiąc. Płatni użytkownicy mogą wybrać nieograniczoną subskrypcję ({{subPrice}}/miesiąc) lub pakiety kredytowe pay-as-you-go ({{packPrice}} za {{packCredits}} kredytów). Kredyty nigdy nie wygasają i działają ze wszystkimi {{modelCount}} modelami AI.",
+              "Potrzebujesz subskrypcji {{subPrice}}/miesiąc, aby uzyskać dostęp do czatu AI, która zawiera {{subCredits}} kredytów/miesiąc. Jeśli potrzebujesz więcej kredytów, możesz kupić pakiety kredytowe ({{packPrice}} za {{packCredits}} kredytów). Pakiety kredytowe nigdy nie wygasają, nawet po zakończeniu subskrypcji, więc działają ze wszystkimi {{modelCount}} modelami AI, gdy ponownie aktywujesz konto.",
           },
           q4: {
             question: "Czy moje dane są prywatne i bezpieczne?",

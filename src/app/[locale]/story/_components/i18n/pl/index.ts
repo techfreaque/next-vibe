@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
       badge: "🔥 Czat AI + Forum społeczności",
       title: "Czatuj z AI, Łącz się ze społecznością",
       subtitle:
-        "Doświadcz niecenzurowanych rozmów z AI z ponad 40 modelami. Dołącz do dyskusji na forum. Wszystko na jednej platformie.",
+        "Doświadcz niecenzurowanych rozmów z AI z ponad {{modelCount}} modelami. Dołącz do dyskusji na forum. Wszystko na jednej platformie.",
       description:
         "Prywatne czaty AI, przestrzenie współpracy i publiczne wątki forum. Wybierz poziom prywatności: Prywatny (zaszyfrowany), Incognito (tylko lokalnie), Współdzielony (współpraca) lub Publiczny (forum społeczności).",
       cta: "Zacznij czatować za darmo",
@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
       contentCreation: {
         title: "Foldery prywatne - Twoja osobista AI",
         description:
-          "Zaszyfrowane, zapisane na serwerze czaty. Dostęp do GPT-4, Claude, Gemini i 40+ modeli. Twoje prywatne rozmowy, zsynchronizowane na urządzeniach.",
+          "Zaszyfrowane, zapisane na serwerze czaty. Dostęp do GPT-4, Claude, Gemini i {{modelCount}}+ modeli. Twoje prywatne rozmowy, zsynchronizowane na urządzeniach.",
       },
       strategyDevelopment: {
         title: "Foldery incognito - Tylko lokalnie",
@@ -121,7 +121,7 @@ export const translations: typeof enTranslations = {
     cta: {
       title: "Gotowy dołączyć do platformy AI + społeczności?",
       subtitle:
-        "Czatuj prywatnie z 40+ modelami AI. Dołącz do publicznych dyskusji na forum. Wybierz poziom prywatności. Zacznij za darmo już dziś.",
+        "Czatuj prywatnie z {{modelCount}}+ modelami AI. Dołącz do publicznych dyskusji na forum. Wybierz poziom prywatności. Zacznij za darmo już dziś.",
       signUp: "Zarejestruj się za darmo",
       viewPlans: "Zobacz plany cenowe",
     },
@@ -193,7 +193,7 @@ export const translations: typeof enTranslations = {
       badge: "Darmowa wersja próbna",
       title: "Wypróbuj wszystkie modele AI za darmo",
       description:
-        "Zacznij z 10 darmowymi wiadomościami dziennie. Przetestuj wszystkie 40+ modeli AI przed aktualizacją.",
+        "Zacznij z {{freeCredits}} darmowymi kredytami. Przetestuj wszystkie {{modelCount}}+ modeli AI przed aktualizacją.",
       card: {
         title: "Darmowy dostęp",
         subtitle: "Wszystko, czego potrzebujesz, aby zacząć",
@@ -205,8 +205,8 @@ export const translations: typeof enTranslations = {
       },
       benefits: {
         professionalSetup: "Nie wymagana karta kredytowa",
-        brandConsistency: "Dostęp do wszystkich 40+ modeli",
-        optimizedProfiles: "10 darmowych wiadomości dziennie",
+        brandConsistency: "Dostęp do wszystkich {{modelCount}}+ modeli",
+        optimizedProfiles: "{{freeCredits}} darmowych kredytów na start",
         strategicPlanning: "Uaktualnij w dowolnym momencie",
       },
     },
@@ -223,22 +223,22 @@ export const translations: typeof enTranslations = {
         strategyDevelopment: {
           title: "Zarejestruj się za darmo",
           description:
-            "Utwórz swoje konto w kilka sekund. Nie wymagana karta kredytowa. Zacznij z 10 darmowymi wiadomościami dziennie.",
+            "Utwórz swoje konto w kilka sekund. Nie wymagana karta kredytowa. Zacznij z {{freeCredits}} darmowymi kredytami miesięcznie dla wszystkich {{modelCount}}+ modeli AI.",
           tags: {
             audienceAnalysis: "Szybka konfiguracja",
             competitorResearch: "Bez karty kredytowej",
           },
           insights: {
             title: "Na zawsze darmowe",
-            description: "10 wiadomości dziennie, dostęp do wszystkich modeli",
+            description: "{{freeCredits}} kredytów miesięcznie, wszystkie modele, wszystkie typy folderów",
           },
         },
         contentCreation: {
           title: "Wybierz swój model AI",
           description:
-            "Wybierz spośród ponad 40 niecenzurowanych modeli AI, w tym GPT-4, Claude, Gemini i więcej.",
+            "Wybierz spośród ponad {{modelCount}} niecenzurowanych modeli AI, w tym GPT-4, Claude, Gemini i więcej.",
           tags: {
-            brandAlignedContent: "40+ modeli",
+            brandAlignedContent: "{{modelCount}}+ modeli",
             engagingVisuals: "Bez cenzury",
           },
           insights: {
@@ -860,7 +860,7 @@ export const translations: typeof enTranslations = {
   footer: {
     tagline: "Rozmawiaj z AI, łącz się ze społecznością",
     privacyTagline:
-      "Czat AI zorientowany na prywatność z 40+ niecenzurowanymi modelami",
+      "Czat AI zorientowany na prywatność z {{modelCount}}+ niecenzurowanymi modelami",
     platform: {
       title: "Platforma",
       features: "Funkcje",

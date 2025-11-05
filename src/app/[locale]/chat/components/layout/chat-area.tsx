@@ -7,15 +7,22 @@ import { Camera } from "next-vibe-ui//ui/icons/Camera";
 import { Loader2 } from "next-vibe-ui//ui/icons/Loader2";
 import { X } from "next-vibe-ui//ui/icons/X";
 import type { JSX } from "react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { useAIStreamStore } from "@/app/api/[locale]/v1/core/agent/ai-stream/hooks/store";
-import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks/hooks";
+import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { _simpleT } from "@/i18n/core/shared";
 
 import { Logo } from "../../../_components/logo";
+import type { ChatContextValue } from "../../features/chat/context";
 import { DOM_IDS, LAYOUT } from "../../lib/config/constants";
 import type { ChatMessage, ChatThread, ModelId, ViewMode } from "../../types";
 import { AIToolsModal } from "../ai-tools-modal";
@@ -52,9 +59,10 @@ interface ChatAreaProps {
   viewMode?: ViewMode;
   onViewModeChange?: (mode: ViewMode) => void;
   onScreenshot?: () => Promise<void>;
-  rootFolderId?: string;
+  rootFolderId: DefaultFolderId;
   logger: EndpointLogger;
-  chat: UseChatReturn;
+  chat: ChatContextValue;
+  currentUserId?: string;
 }
 
 export function ChatArea({
@@ -86,8 +94,9 @@ export function ChatArea({
   viewMode = "linear",
   onViewModeChange,
   onScreenshot,
-  rootFolderId = "general",
+  rootFolderId = "private",
   logger,
+  currentUserId,
 }: ChatAreaProps): JSX.Element {
   const { t } = {
     t: (key: string, params?: Record<string, string | number>): string =>
@@ -165,6 +174,75 @@ export function ChatArea({
       setIsCapturingScreenshot(false);
     }
   }, [onScreenshot, isCapturingScreenshot]);
+
+  // Compute canPost permission reactively
+  // This determines if the user can send messages in the current context
+  const canPost = useMemo(() => {
+    // If there's a thread, use thread's canPost permission
+    if (thread) {
+      return thread.canPost ?? true;
+    }
+    // If no thread, check if user can create threads in current folder
+    // Case 1: We're in a subfolder - use server-computed canCreateThread permission
+    if (chat.currentSubFolderId) {
+      const currentFolder = chat.folders[chat.currentSubFolderId];
+      // If folder not loaded yet, optimistically enable input (will be corrected once loaded)
+      return currentFolder?.canCreateThread ?? true;
+    }
+    // Case 2: We're in a root folder (no subfolder)
+    // Use server-computed root folder permissions
+    const rootPermissions =
+      chat.rootFolderPermissions[chat.currentRootFolderId];
+    if (rootPermissions !== undefined) {
+      // Permissions are loaded, use the actual value
+      return rootPermissions.canCreateThread;
+    }
+    // Fallback: if permissions not loaded yet, optimistically enable input
+    // This prevents showing error message during hydration/loading
+    // Once permissions load, this will re-compute and disable if needed
+    return true;
+  }, [
+    thread,
+    chat.currentSubFolderId,
+    chat.currentRootFolderId,
+    chat.folders,
+    chat.rootFolderPermissions,
+  ]);
+
+  // Compute noPermissionReason reactively
+  // This provides a user-friendly message explaining why they can't post
+  const noPermissionReason = useMemo(() => {
+    if (thread && thread.canPost === false) {
+      return t("app.chat.input.noPostPermission");
+    }
+    if (!thread && chat.currentSubFolderId) {
+      const currentFolder = chat.folders[chat.currentSubFolderId];
+      // Only show message if folder is loaded and permission is explicitly false
+      if (currentFolder && currentFolder.canCreateThread === false) {
+        return t("app.chat.input.noCreateThreadPermission");
+      }
+    }
+    // Check root folder permissions
+    if (!thread && !chat.currentSubFolderId) {
+      const rootPermissions =
+        chat.rootFolderPermissions[chat.currentRootFolderId];
+      // Only show message if permissions are loaded and permission is explicitly false
+      if (
+        rootPermissions !== undefined &&
+        rootPermissions.canCreateThread === false
+      ) {
+        return t("app.chat.input.noCreateThreadPermissionInRootFolder");
+      }
+    }
+    return undefined;
+  }, [
+    thread,
+    chat.currentSubFolderId,
+    chat.currentRootFolderId,
+    chat.folders,
+    chat.rootFolderPermissions,
+    t,
+  ]);
 
   return (
     <Div className="flex-1 flex flex-col min-w-0 relative w-full h-full">
@@ -263,6 +341,7 @@ export function ChatArea({
             rootFolderId={rootFolderId}
             locale={locale}
             logger={logger}
+            currentUserId={currentUserId}
           />
         ) : (
           // Empty state for new threads - show suggestions
@@ -316,6 +395,9 @@ export function ChatArea({
             onOpenToolsModal={() => setIsToolsModalOpen(true)}
             locale={locale}
             logger={logger}
+            deductCredits={chat.deductCredits}
+            canPost={canPost}
+            noPermissionReason={noPermissionReason}
           />
         </Div>
       </Div>

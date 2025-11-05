@@ -35,5 +35,9 @@ export const translations = {
       copy: "Copy",
       copyCode: "Copy code",
     },
+    multiSelect: {
+      placeholder: "Select items...",
+      noResultsFound: "No results found",
+    },
   },
 };

@@ -23,38 +23,14 @@ import type { ContactRequestOutput, ContactResponseOutput } from "./definition";
 import { ContactStatus } from "./enum";
 
 /**
- * Contact Repository Interface
- * Defines contract for contact operations
- */
-export interface ContactRepository {
-  /**
-   * Submit contact form
-   */
-  submitContactForm(
-    data: ContactRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ContactResponseOutput>>;
-
-  /**
-   * Create contact directly (for seeds)
-   */
-  create(
-    data: NewContact,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ContactResponseOutput>>;
-}
-
-/**
  * Contact Repository Implementation
  * Handles contact form submissions
  */
-export class ContactRepositoryImpl implements ContactRepository {
+export class contactRepository {
   /**
    * Submit contact form
    */
-  async submitContactForm(
+  static async submitContactForm(
     data: ContactRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -158,7 +134,7 @@ export class ContactRepositoryImpl implements ContactRepository {
   /**
    * Create contact directly (for seeds)
    */
-  async create(
+  static async create(
     data: NewContact,
     logger: EndpointLogger,
   ): Promise<ResponseType<ContactResponseOutput>> {
@@ -217,8 +193,3 @@ export class ContactRepositoryImpl implements ContactRepository {
     }
   }
 }
-
-/**
- * Singleton Repository Instance
- */
-export const contactRepository = new ContactRepositoryImpl();

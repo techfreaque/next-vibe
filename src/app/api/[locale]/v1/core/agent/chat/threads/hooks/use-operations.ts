@@ -33,11 +33,13 @@ export type ThreadUpdate = Partial<
 
 /**
  * Thread operations interface
+ * NOTE: createNewThread and setActiveThread removed - use router.push() for navigation instead
  */
 export interface ThreadOperations {
-  createNewThread: () => string;
-  setActiveThread: (threadId: string | null) => void;
-  deleteThread: (threadId: string) => Promise<void>;
+  deleteThread: (
+    threadId: string,
+    activeThreadId: string | null,
+  ) => Promise<void>;
   updateThread: (threadId: string, updates: ThreadUpdate) => Promise<void>;
 }
 
@@ -48,9 +50,7 @@ interface ThreadOperationsDeps {
   locale: CountryLanguage;
   logger: EndpointLogger;
   chatStore: {
-    activeThreadId: string | null;
     threads: Record<string, ChatThread>;
-    setActiveThread: (threadId: string | null) => void;
     deleteThread: (threadId: string) => void;
     updateThread: (threadId: string, updates: Partial<ChatThread>) => void;
   };
@@ -71,26 +71,11 @@ export function useThreadOperations(
 ): ThreadOperations {
   const { locale, logger, chatStore, streamStore } = deps;
 
-  const createNewThread = useCallback((): string => {
-    logger.debug("Thread operations: Creating new thread");
-    const threadId = crypto.randomUUID();
-    chatStore.setActiveThread(threadId);
-    return threadId;
-  }, [logger, chatStore]);
-
-  const setActiveThread = useCallback(
-    (threadId: string | null): void => {
-      logger.debug("Thread operations: Setting active thread", { threadId });
-      chatStore.setActiveThread(threadId);
-    },
-    [logger, chatStore],
-  );
-
   const deleteThread = useCallback(
-    async (threadId: string): Promise<void> => {
+    async (threadId: string, activeThreadId: string | null): Promise<void> => {
       logger.debug("Thread operations: Deleting thread", { threadId });
 
-      const isActiveThread = chatStore.activeThreadId === threadId;
+      const isActiveThread = activeThreadId === threadId;
       const thread = chatStore.threads[threadId];
 
       if (!thread) {
@@ -116,8 +101,6 @@ export function useThreadOperations(
         chatStore.deleteThread(threadId);
 
         if (isActiveThread) {
-          chatStore.setActiveThread(null);
-
           const { buildFolderUrl } = await import(
             "@/app/[locale]/chat/lib/utils/navigation"
           );
@@ -161,8 +144,6 @@ export function useThreadOperations(
         }
 
         if (isActiveThread) {
-          chatStore.setActiveThread(null);
-
           const { buildFolderUrl } = await import(
             "@/app/[locale]/chat/lib/utils/navigation"
           );
@@ -239,8 +220,6 @@ export function useThreadOperations(
   );
 
   return {
-    createNewThread,
-    setActiveThread,
     deleteThread,
     updateThread,
   };

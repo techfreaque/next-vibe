@@ -22,6 +22,7 @@ import type { z } from "zod";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import { MultiSelect } from "../multi-select";
 
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
@@ -588,48 +589,20 @@ function renderFieldInput<
         : [];
 
       return (
-        <div className="space-y-2">
-          {config.options.map((option) => {
-            const isSelected = multiselectValue.includes(option.value);
-            const isDisabled = disabled || config.disabled || option.disabled;
-            const canSelect =
-              !isSelected ||
-              config.maxSelections === undefined ||
-              multiselectValue.length <= config.maxSelections;
-
-            return (
-              <div key={option.value} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id={`${field.name}-${option.value}`}
-                  checked={isSelected}
-                  disabled={isDisabled || (!isSelected && !canSelect)}
-                  onChange={(e) => {
-                    const newValue = e.target.checked
-                      ? [...multiselectValue, option.value]
-                      : multiselectValue.filter((v) => v !== option.value);
-                    field.onChange(newValue);
-                  }}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor={`${field.name}-${option.value}`}
-                  className={cn(
-                    "text-sm font-normal cursor-pointer",
-                    isDisabled && "opacity-50 cursor-not-allowed",
-                  )}
-                >
-                  {t(option.label)}
-                </label>
-              </div>
-            );
-          })}
-          {config.maxSelections && (
-            <div className="text-xs text-gray-500 mt-1">
-              {multiselectValue.length} / {config.maxSelections} selected
-            </div>
-          )}
-        </div>
+        <MultiSelect
+          options={config.options.map((opt) => ({
+            value: opt.value,
+            label: t(opt.label),
+            disabled: opt.disabled,
+          }))}
+          value={multiselectValue}
+          onChange={(newValue) => field.onChange(newValue)}
+          placeholder={config.placeholder ? t(config.placeholder) : undefined}
+          disabled={disabled || config.disabled}
+          maxSelections={config.maxSelections}
+          searchable={config.searchable}
+          className={inputClassName}
+        />
       );
     }
 

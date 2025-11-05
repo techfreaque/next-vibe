@@ -10,13 +10,20 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { DefaultFolderId } from "../config";
+import { DEFAULT_FOLDER_IDS } from "../config";
 import type { FolderListResponseOutput } from "../folders/definition";
 import { GET as foldersGetEndpoint } from "../folders/definition";
-import type { ChatFolder, ChatMessage, ChatThread } from "./store";
+import type {
+  ChatFolder,
+  ChatMessage,
+  ChatThread,
+  RootFolderPermissions,
+} from "./store";
 import { GET as threadsGetEndpoint } from "../threads/definition";
 
 /**
@@ -48,12 +55,19 @@ async function loadIncognitoData(
       folderCount: Object.keys(incognitoState.folders).length,
     });
 
-    // Load threads
+    // Load threads with full permissions (incognito is local-only, everyone has full access)
     Object.values(incognitoState.threads).forEach((thread) => {
       addThread({
         ...thread,
         createdAt: new Date(thread.createdAt),
         updatedAt: new Date(thread.updatedAt),
+        // Incognito threads: everyone has full permissions locally
+        // BUT canManagePermissions is false because permissions don't apply to local-only content
+        canPost: true,
+        canEdit: true,
+        canModerate: true,
+        canDelete: true,
+        canManagePermissions: false,
       });
     });
 
@@ -66,12 +80,19 @@ async function loadIncognitoData(
       });
     });
 
-    // Load folders
+    // Load folders with full permissions (incognito is local-only, everyone has full access)
     Object.values(incognitoState.folders).forEach((folder) => {
       addFolder({
         ...folder,
         createdAt: new Date(folder.createdAt),
         updatedAt: new Date(folder.updatedAt),
+        // Incognito folders: everyone has full permissions locally
+        // BUT canManagePermissions is false because permissions don't apply to local-only content
+        canManage: true,
+        canCreateThread: true,
+        canModerate: true,
+        canDelete: true,
+        canManagePermissions: false,
       });
     });
 
@@ -130,6 +151,16 @@ async function loadThreadsFromServer(
             status: "active" | "archived" | "deleted";
             pinned: boolean;
             preview: string | null;
+            rolesView?: (typeof UserRoleValue)[] | null;
+            rolesEdit?: (typeof UserRoleValue)[] | null;
+            rolesPost?: (typeof UserRoleValue)[] | null;
+            rolesModerate?: (typeof UserRoleValue)[] | null;
+            rolesAdmin?: (typeof UserRoleValue)[] | null;
+            canEdit?: boolean;
+            canPost?: boolean;
+            canModerate?: boolean;
+            canDelete?: boolean;
+            canManagePermissions?: boolean;
             createdAt: Date;
             updatedAt: Date;
           }>;
@@ -156,6 +187,16 @@ async function loadThreadsFromServer(
             archived: false,
             tags: [],
             preview: thread.preview,
+            rolesView: thread.rolesView,
+            rolesEdit: thread.rolesEdit,
+            rolesPost: thread.rolesPost,
+            rolesModerate: thread.rolesModerate,
+            rolesAdmin: thread.rolesAdmin,
+            canEdit: thread.canEdit,
+            canPost: thread.canPost,
+            canModerate: thread.canModerate,
+            canDelete: thread.canDelete,
+            canManagePermissions: thread.canManagePermissions,
             createdAt: new Date(thread.createdAt),
             updatedAt: new Date(thread.updatedAt),
           });
@@ -213,10 +254,17 @@ async function loadFoldersFromServer(
             expanded: folder.expanded,
             sortOrder: folder.sortOrder,
             metadata: folder.metadata,
-            rolesRead: folder.rolesRead || [],
-            rolesWrite: folder.rolesWrite || [],
-            rolesHide: folder.rolesHide || [],
-            rolesDelete: folder.rolesDelete || [],
+            rolesView: folder.rolesView || [],
+            rolesManage: folder.rolesManage || [],
+            rolesCreateThread: folder.rolesCreateThread || [],
+            rolesPost: folder.rolesPost || [],
+            rolesModerate: folder.rolesModerate || [],
+            rolesAdmin: folder.rolesAdmin || [],
+            canManage: folder.canManage,
+            canCreateThread: folder.canCreateThread,
+            canModerate: folder.canModerate,
+            canDelete: folder.canDelete,
+            canManagePermissions: folder.canManagePermissions,
             createdAt: new Date(folder.createdAt),
             updatedAt: new Date(folder.updatedAt),
           });
@@ -232,6 +280,93 @@ async function loadFoldersFromServer(
 }
 
 /**
+ * Load root folder permissions from server
+ * Loads permissions for all 4 root folders (private, shared, public, incognito)
+ * These permissions determine what actions users can take in each root folder
+ */
+async function loadRootFolderPermissions(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+  t: TFunction,
+  setRootFolderPermissions: (
+    rootFolderId: DefaultFolderId,
+    permissions: RootFolderPermissions,
+  ) => void,
+): Promise<void> {
+  try {
+    // All 4 root folders
+    const rootFolderIds: DefaultFolderId[] = [
+      DEFAULT_FOLDER_IDS.PRIVATE,
+      DEFAULT_FOLDER_IDS.SHARED,
+      DEFAULT_FOLDER_IDS.PUBLIC,
+      DEFAULT_FOLDER_IDS.INCOGNITO,
+    ];
+
+    logger.debug("Chat: Loading root folder permissions", {
+      rootFolderIds,
+    });
+
+    // Load permissions for all root folders in parallel
+    await Promise.all(
+      rootFolderIds.map(async (rootFolderId) => {
+        try {
+          const response = await apiClient.fetch(
+            foldersGetEndpoint,
+            logger,
+            { rootFolderId }, // Pass rootFolderId to get permissions for that root
+            {},
+            t,
+            locale,
+            {
+              disableLocalCache: true,
+            },
+          );
+
+          if (response.success && response.data) {
+            const responseData = response.data as FolderListResponseOutput;
+
+            if (responseData.rootFolderPermissions) {
+              // Type assertion needed because objectField creates a complex nested type
+              // that TypeScript infers as {} instead of the actual shape
+              const permissions =
+                responseData.rootFolderPermissions as RootFolderPermissions;
+              setRootFolderPermissions(rootFolderId, permissions);
+              logger.debug("Chat: Root folder permissions loaded", {
+                rootFolderId,
+                canCreateThread: permissions.canCreateThread,
+                canCreateFolder: permissions.canCreateFolder,
+              });
+            } else {
+              logger.warn("Chat: No root folder permissions in response", {
+                rootFolderId,
+              });
+            }
+          } else {
+            logger.error("Chat: Failed to load root folder permissions", {
+              rootFolderId,
+              success: response.success,
+            });
+          }
+        } catch (error) {
+          logger.error(
+            "Chat: Error loading root folder permissions",
+            parseError(error),
+            { rootFolderId },
+          );
+        }
+      }),
+    );
+
+    logger.debug("Chat: All root folder permissions loaded");
+  } catch (error) {
+    logger.error(
+      "Chat: Failed to load root folder permissions",
+      parseError(error),
+    );
+  }
+}
+
+/**
  * Hook for loading initial chat data (threads, folders, messages)
  */
 export function useDataLoader(
@@ -241,6 +376,10 @@ export function useDataLoader(
   addThread: (thread: ChatThread) => void,
   addMessage: (message: ChatMessage) => void,
   addFolder: (folder: ChatFolder) => void,
+  setRootFolderPermissions: (
+    rootFolderId: DefaultFolderId,
+    permissions: RootFolderPermissions,
+  ) => void,
 ): void {
   const dataLoadedRef = useRef(false);
 
@@ -261,14 +400,17 @@ export function useDataLoader(
       // ALWAYS load incognito data from localStorage
       await loadIncognitoData(logger, addThread, addMessage, addFolder);
 
-      // Load server data
+      // Load server data in parallel
       logger.info("Chat: Loading server data", {
         isAuthenticated,
         loadingScope: isAuthenticated ? "all" : "public only",
       });
 
-      await loadThreadsFromServer(logger, locale, t, addThread);
-      await loadFoldersFromServer(logger, locale, t, addFolder);
+      await Promise.all([
+        loadThreadsFromServer(logger, locale, t, addThread),
+        loadFoldersFromServer(logger, locale, t, addFolder),
+        loadRootFolderPermissions(logger, locale, t, setRootFolderPermissions),
+      ]);
     };
 
     void loadData();

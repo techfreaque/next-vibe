@@ -5,7 +5,7 @@ import { Button } from "next-vibe-ui//ui/button";
 import { Div } from "next-vibe-ui//ui/div";
 import { Form } from "next-vibe-ui//ui/form/form";
 import { Textarea } from "next-vibe-ui//ui/textarea";
-import { Send, Square } from 'next-vibe-ui/ui/icons';
+import { Send, Square } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { forwardRef } from "react";
 
@@ -39,6 +39,9 @@ interface ChatInputProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
   className?: string;
+  canPost?: boolean; // Whether user has permission to post messages (computed server-side)
+  noPermissionReason?: string; // Reason why user cannot post (for tooltip)
+  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
@@ -60,6 +63,9 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
       locale,
       logger,
       className,
+      canPost = true, // Default to true for backward compatibility
+      noPermissionReason,
+      deductCredits,
     },
     ref,
   ): JSX.Element => {
@@ -73,11 +79,14 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     // Calculate active tool count (search is treated as one of the tools)
     const activeToolCount = enabledToolIds.length;
 
+    // Determine if input should be disabled
+    const isInputDisabled = isLoading || !canPost;
+
     return (
       <Form
         onSubmit={onSubmit}
         className={cn(
-          "p-3 sm:p-4 bg-card backdrop-blur",
+          "p-3 sm:p-4 bg-card/80 backdrop-blur",
           "border border-border rounded-t-lg",
           className,
         )}
@@ -91,16 +100,17 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
               onChange(e.target.value);
             }}
             onKeyDown={onKeyDown}
-            disabled={isLoading}
+            disabled={isInputDisabled}
             // Placeholder is handled below
             placeholder={""}
             className="px-0 text-base"
             variant={"ghost"}
             rows={2}
+            title={!canPost ? noPermissionReason : undefined}
           />
 
           {/* Hint Text - Shows when textarea is empty - Hidden on mobile */}
-          {!value && (
+          {!value && canPost && (
             <Div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden sm:block">
               {t("app.chat.input.keyboardShortcuts.press")}{" "}
               <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
@@ -111,6 +121,13 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                 {t("app.chat.input.keyboardShortcuts.shiftEnter")}
               </kbd>{" "}
               {t("app.chat.input.keyboardShortcuts.forNewLine")}
+            </Div>
+          )}
+
+          {/* No Permission Message - Shows when user cannot post */}
+          {!canPost && (
+            <Div className="absolute top-2 left-0 pointer-events-none text-sm text-destructive">
+              {noPermissionReason || t("app.chat.input.noPermission")}
             </Div>
           )}
         </Div>
@@ -162,10 +179,11 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                 const newValue = value ? `${value} ${text}`.trim() : text;
                 onChange(newValue);
               }}
-              disabled={isLoading}
+              disabled={isInputDisabled}
               lang={speechLang}
               locale={locale}
               logger={logger}
+              deductCredits={deductCredits}
             />
 
             {/* Send/Stop Button */}
@@ -174,7 +192,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                 type="button"
                 size="icon"
                 onClick={onStop}
-                className="h-9 w-9 flex-shrink-0"
+                className="h-9 w-9 shrink-0"
                 variant="destructive"
                 title={t("app.chat.actions.stopGeneration")}
               >
@@ -184,9 +202,13 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
               <Button
                 type="submit"
                 size="icon"
-                disabled={!value.trim() || isLoading}
-                className="h-9 w-9 flex-shrink-0"
-                title={t("app.chat.actions.sendMessage")}
+                disabled={!value.trim() || isInputDisabled}
+                className="h-9 w-9 shrink-0"
+                title={
+                  !canPost
+                    ? noPermissionReason || t("app.chat.input.noPermission")
+                    : t("app.chat.actions.sendMessage")
+                }
               >
                 <Send className="h-4 w-4" />
               </Button>

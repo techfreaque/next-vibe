@@ -17,93 +17,32 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   DEFAULT_FOLDER_IDS,
   isDefaultFolderId,
+  type DefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
-import { parseChatUrl } from "../lib/url-parser";
-import type { ChatFolder, ChatThread, ModelId } from "../types";
+import type { ModelId } from "../types";
 import { ChatArea } from "./layout/chat-area";
 import { SidebarWrapper } from "./layout/sidebar-wrapper";
 import { TopBar } from "./layout/top-bar";
 
 // Utility functions
-const isNewThread = (threadId: string | undefined): boolean =>
-  threadId === "new";
 const isValidInput = (input: string): boolean => input.trim().length > 0;
 const isSubmitKeyPress = (e: React.KeyboardEvent): boolean =>
   e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey;
 
-const buildThreadUrl = (
-  locale: string,
-  threadId: string,
-  threads: Record<string, ChatThread>,
-): string => {
-  const thread = threads[threadId];
-  if (!thread) {
-    return `/${locale}/threads/${threadId}`;
-  }
-
-  const rootId = thread.rootFolderId;
-  const subId = thread.folderId;
-
-  if (subId) {
-    return `/${locale}/threads/${rootId}/${subId}/${threadId}`;
-  }
-  return `/${locale}/threads/${rootId}/${threadId}`;
-};
-
-const buildNewThreadUrl = (
-  locale: string,
-  folderId: string | null | undefined,
-  folders: Record<string, ChatFolder>,
-): string => {
-  // If no folder specified, default to private
-  if (!folderId) {
-    return `/${locale}/threads/private/new`;
-  }
-
-  // Check if folderId is a root folder ID
-  const isRootFolder =
-    folderId === "private" ||
-    folderId === "shared" ||
-    folderId === "public" ||
-    folderId === "incognito";
-
-  if (isRootFolder) {
-    // Root folder: /threads/rootId/new
-    return `/${locale}/threads/${folderId}/new`;
-  }
-
-  // Subfolder: need to include rootFolderId in URL
-  // URL structure: /threads/rootId/subFolderId/new
-  const folder = folders[folderId];
-  if (folder) {
-    return `/${locale}/threads/${folder.rootFolderId}/${folderId}/new`;
-  }
-
-  // Fallback if folder not found (shouldn't happen)
-  return `/${locale}/threads/private/new`;
-};
-
 interface ChatInterfaceProps {
-  /** @deprecated Use urlPath instead */
-  initialFolderId?: string;
-  /** @deprecated Use urlPath instead */
-  initialThreadId?: string;
-  /** URL path segments from /threads/[...path] route */
+  /** URL path segments from /threads/[...path] route (for logging/debugging only) */
   urlPath?: string[];
   user: JwtPayloadType | undefined;
 }
 
 export function ChatInterface({
-  initialFolderId: deprecatedFolderId,
-  initialThreadId: deprecatedThreadId,
-  urlPath,
+  urlPath: _urlPath,
   user,
 }: ChatInterfaceProps): JSX.Element {
   const chat = useChatContext();
@@ -129,13 +68,13 @@ export function ChatInterface({
     voteMessage,
     stopGeneration,
     deleteThread,
-    setActiveThread,
     updateThread,
     updateFolder,
     deleteFolder,
-    setCurrentFolder,
     currentRootFolderId,
     currentSubFolderId,
+    navigateToThread,
+    navigateToNewThread,
     inputRef,
     // UI settings (persisted)
     ttsAutoplay,
@@ -265,104 +204,36 @@ export function ChatInterface({
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = checking
+  // Use server-provided user prop to determine authentication status immediately
+  // This prevents hydration mismatch - no client-side delay
+  const isAuthenticated = user !== undefined && !user.isPublic;
   const router = useRouter();
 
-  // Check if user is authenticated using auth status cookie (client-side only)
-  // Run only once on mount
-  useEffect(() => {
-    const authStatusResponse = authClientRepository.hasAuthStatus(logger);
-    setIsAuthenticated(
-      authStatusResponse.success && authStatusResponse.data === true,
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty deps - run only once on mount
-
-  // Parse URL path to determine root folder, sub folder, and thread
-  // CRITICAL: This must be the single source of truth for all IDs
-  // All other state (activeThreadId, currentRootFolderId, currentSubFolderId) must derive from this
-  const { initialRootFolderId, initialSubFolderId, initialThreadId } =
-    React.useMemo(() => {
-      // If urlPath is provided, parse it
-      if (urlPath && urlPath.length > 0) {
-        const parsed = parseChatUrl(urlPath);
-        logger.debug("Chat: Parsed URL path", {
-          urlPath: urlPath.join("/"),
-          parsed: JSON.stringify(parsed),
-        });
-        return parsed;
-      }
-
-      // Fallback to deprecated props - parse them properly
-      if (deprecatedFolderId) {
-        const isRoot = isDefaultFolderId(deprecatedFolderId);
-
-        return {
-          initialRootFolderId: isRoot
-            ? deprecatedFolderId
-            : DEFAULT_FOLDER_IDS.PRIVATE,
-          initialSubFolderId: isRoot ? null : deprecatedFolderId,
-          initialThreadId: deprecatedThreadId,
-        };
-      }
-
-      return {
-        initialRootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
-        initialSubFolderId: null,
-        initialThreadId: deprecatedThreadId,
-      };
-    }, [urlPath, deprecatedFolderId, deprecatedThreadId, logger]);
+  // URL parsing is now done server-side and passed as props via ChatProvider
+  // currentRootFolderId, currentSubFolderId, activeThreadId come from chat context
 
   // Redirect public users to incognito if they try to access PRIVATE or SHARED folders
   // PUBLIC users can access PUBLIC and INCOGNITO folders
+  // This runs immediately with server-provided auth state - no hydration delay
   useEffect(() => {
-    // Wait for authentication check to complete
-    if (isAuthenticated === null) {
-      return;
-    }
-
     // If user is not authenticated and tries to access PRIVATE or SHARED folder, redirect to incognito
     if (
       !isAuthenticated &&
-      initialRootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO &&
-      initialRootFolderId !== DEFAULT_FOLDER_IDS.PUBLIC
+      currentRootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO &&
+      currentRootFolderId !== DEFAULT_FOLDER_IDS.PUBLIC
     ) {
       logger.info(
         "Non-authenticated user attempted to access restricted folder, redirecting to incognito",
         {
-          attemptedFolder: initialRootFolderId,
+          attemptedFolder: currentRootFolderId,
         },
       );
       const url = `/${locale}/threads/${DEFAULT_FOLDER_IDS.INCOGNITO}/new`;
       router.push(url);
     }
-  }, [isAuthenticated, initialRootFolderId, locale, router, logger]);
-
-  // Track last synced values to prevent infinite loops
-  // Initialize to undefined so first mount always triggers sync
-  const lastSyncedThreadIdRef = useRef<string | null | undefined>(undefined);
-  const lastSyncedRootFolderIdRef = useRef<string | undefined>(undefined);
-  const lastSyncedSubFolderIdRef = useRef<string | null | undefined>(undefined);
-
-  // CRITICAL: Sync activeThreadId with URL - URL is the ONLY source of truth
-  // This ensures that when URL changes (via navigation), the active thread updates
-  useEffect(() => {
-    const urlThreadId =
-      initialThreadId && !isNewThread(initialThreadId) ? initialThreadId : null;
-
-    // Compare against the actual initialThreadId (including "new"), not the computed urlThreadId
-    // This ensures we detect navigation to "new" page
-    if (lastSyncedThreadIdRef.current !== initialThreadId) {
-      logger.debug("Chat: Syncing activeThreadId with URL", {
-        urlThreadId,
-        previousSyncedValue: lastSyncedThreadIdRef.current,
-        initialThreadId,
-        isNew: initialThreadId ? isNewThread(initialThreadId) : false,
-      });
-      lastSyncedThreadIdRef.current = initialThreadId;
-      setActiveThread(urlThreadId);
-    }
-  }, [initialThreadId, setActiveThread, logger]);
+  }, [isAuthenticated, currentRootFolderId, locale, router, logger]);
+  // URL is the single source of truth - no syncing needed
+  // All navigation state comes from props (activeThreadId, currentRootFolderId, currentSubFolderId)
 
   // DISABLED: This effect was causing issues with new thread navigation
   // The onThreadCreated callback in sendMessage already handles setting the active thread
@@ -411,74 +282,52 @@ export function ChatInterface({
   // }, [threads, initialThreadId, setActiveThread, logger]);
 
   // Handle thread selection with navigation
+  // Uses the navigation hook from chat context
   const handleSelectThread = useCallback(
     (threadId: string): void => {
-      // Build URL with full nested folder path
-      const url = buildThreadUrl(locale, threadId, threads);
-      router.push(url);
-
-      // CRITICAL: Do NOT manually set active thread here
-      // Let the URL sync effect handle it to maintain URL as source of truth
-      // The effect will detect the URL change and update the store
+      navigateToThread(threadId);
     },
-    [threads, locale, router],
+    [navigateToThread],
   );
 
   // Handle new thread creation with navigation
+  // Uses the navigation hook from chat context
   const handleCreateThread = useCallback(
     (folderId?: string | null): void => {
-      // Navigate to /threads/[folderId]/new
-      // Don't create thread yet - will be created on first message
-      const url = buildNewThreadUrl(locale, folderId, chat.folders);
+      // Determine root folder and subfolder from folderId
+      let rootFolderId: DefaultFolderId;
+      let subFolderId: string | null;
 
-      // CRITICAL: Update store IMMEDIATELY before navigation
-      // This ensures that if user sends message quickly, it uses correct context
-
-      // Clear active thread so new thread is created instead of branching
-      setActiveThread(null);
-
-      // Update folder context based on the folderId
       if (!folderId) {
-        // No folder specified, default to private
-        setCurrentFolder(DEFAULT_FOLDER_IDS.PRIVATE, null);
+        // No folder specified, use current folder
+        rootFolderId = currentRootFolderId;
+        subFolderId = currentSubFolderId;
       } else if (isDefaultFolderId(folderId)) {
         // Root folder
-        setCurrentFolder(folderId, null);
+        rootFolderId = folderId;
+        subFolderId = null;
       } else {
         // Subfolder - need to get root folder ID
         const folder = chat.folders[folderId];
         if (folder) {
-          setCurrentFolder(folder.rootFolderId, folderId);
+          rootFolderId = folder.rootFolderId;
+          subFolderId = folderId;
         } else {
           // Fallback if folder not found
-          setCurrentFolder(DEFAULT_FOLDER_IDS.PRIVATE, null);
+          rootFolderId = DEFAULT_FOLDER_IDS.PRIVATE;
+          subFolderId = null;
         }
       }
 
-      router.push(url);
+      navigateToNewThread(rootFolderId, subFolderId);
     },
-    [locale, router, chat.folders, setActiveThread, setCurrentFolder],
+    [
+      currentRootFolderId,
+      currentSubFolderId,
+      chat.folders,
+      navigateToNewThread,
+    ],
   );
-
-  // CRITICAL: Sync currentFolder with URL - URL is the source of truth
-  // This ensures that when URL changes (via navigation), the folder context updates
-  useEffect(() => {
-    // Only update if URL changed (not if store changed)
-    if (
-      lastSyncedRootFolderIdRef.current !== initialRootFolderId ||
-      lastSyncedSubFolderIdRef.current !== initialSubFolderId
-    ) {
-      logger.debug("Chat: Syncing folder context with URL", {
-        urlRootFolderId: initialRootFolderId,
-        urlSubFolderId: initialSubFolderId,
-        previousUrlRootFolderId: lastSyncedRootFolderIdRef.current,
-        previousUrlSubFolderId: lastSyncedSubFolderIdRef.current,
-      });
-      lastSyncedRootFolderIdRef.current = initialRootFolderId;
-      lastSyncedSubFolderIdRef.current = initialSubFolderId;
-      setCurrentFolder(initialRootFolderId, initialSubFolderId);
-    }
-  }, [initialRootFolderId, initialSubFolderId, setCurrentFolder, logger]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -543,7 +392,7 @@ export function ChatInterface({
   );
 
   const handleFillInputWithPrompt = useCallback(
-    (prompt: string, personaId: string, modelId?: ModelId) => {
+    (prompt: string, _personaId: string, modelId?: ModelId) => {
       // Switch to the persona's preferred model if provided
       if (modelId) {
         handleModelChange(modelId);
@@ -596,7 +445,9 @@ export function ChatInterface({
           sidebarCollapsed={sidebarCollapsed}
           onNewChat={() => handleCreateThread(null)}
           locale={locale}
-          onNavigateToThreads={() => router.push(`/${locale}/threads/private`)}
+          onNavigateToThreads={() =>
+            router.push(`/${locale}/threads/${currentRootFolderId}`)
+          }
           messages={messagesRecord}
         />
 
@@ -606,8 +457,8 @@ export function ChatInterface({
           threads={threads}
           folders={chat.folders}
           activeThreadId={activeThread?.id || null}
-          activeRootFolderId={initialRootFolderId}
-          activeSubFolderId={initialSubFolderId}
+          activeRootFolderId={currentRootFolderId}
+          activeSubFolderId={currentSubFolderId}
           collapsed={sidebarCollapsed}
           locale={locale}
           logger={logger}
@@ -663,9 +514,10 @@ export function ChatInterface({
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           onScreenshot={handleScreenshot}
-          rootFolderId={initialRootFolderId}
+          rootFolderId={currentRootFolderId}
           logger={logger}
           chat={chat}
+          currentUserId={user?.id}
         />
       </Div>
 

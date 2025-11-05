@@ -1,5 +1,5 @@
 {
-  "id": "639bb3b0-6319-4b56-a0f1-e435a262c446",
+  "id": "e77f7bbd-50d4-4584-8a02-aa779f48386f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -19,7 +19,13 @@
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "lead_id": {
+          "name": "lead_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
         },
         "root_folder_id": {
           "name": "root_folder_id",
@@ -73,33 +79,41 @@
           "notNull": false,
           "default": "'{}'::jsonb"
         },
-        "roles_read": {
-          "name": "roles_read",
+        "roles_view": {
+          "name": "roles_view",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'[]'::jsonb"
+          "notNull": false
         },
-        "roles_write": {
-          "name": "roles_write",
+        "roles_manage": {
+          "name": "roles_manage",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'[]'::jsonb"
+          "notNull": false
         },
-        "roles_hide": {
-          "name": "roles_hide",
+        "roles_create_thread": {
+          "name": "roles_create_thread",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'[]'::jsonb"
+          "notNull": false
         },
-        "roles_delete": {
-          "name": "roles_delete",
+        "roles_post": {
+          "name": "roles_post",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'[]'::jsonb"
+          "notNull": false
+        },
+        "roles_moderate": {
+          "name": "roles_moderate",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "roles_admin": {
+          "name": "roles_admin",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -177,11 +191,11 @@
           "method": "btree",
           "with": {}
         },
-        "chat_folders_roles_read_idx": {
-          "name": "chat_folders_roles_read_idx",
+        "chat_folders_roles_view_idx": {
+          "name": "chat_folders_roles_view_idx",
           "columns": [
             {
-              "expression": "roles_read",
+              "expression": "roles_view",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -192,11 +206,11 @@
           "method": "gin",
           "with": {}
         },
-        "chat_folders_roles_write_idx": {
-          "name": "chat_folders_roles_write_idx",
+        "chat_folders_roles_manage_idx": {
+          "name": "chat_folders_roles_manage_idx",
           "columns": [
             {
-              "expression": "roles_write",
+              "expression": "roles_manage",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -207,11 +221,11 @@
           "method": "gin",
           "with": {}
         },
-        "chat_folders_roles_hide_idx": {
-          "name": "chat_folders_roles_hide_idx",
+        "chat_folders_roles_create_thread_idx": {
+          "name": "chat_folders_roles_create_thread_idx",
           "columns": [
             {
-              "expression": "roles_hide",
+              "expression": "roles_create_thread",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -222,11 +236,41 @@
           "method": "gin",
           "with": {}
         },
-        "chat_folders_roles_delete_idx": {
-          "name": "chat_folders_roles_delete_idx",
+        "chat_folders_roles_post_idx": {
+          "name": "chat_folders_roles_post_idx",
           "columns": [
             {
-              "expression": "roles_delete",
+              "expression": "roles_post",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "chat_folders_roles_moderate_idx": {
+          "name": "chat_folders_roles_moderate_idx",
+          "columns": [
+            {
+              "expression": "roles_moderate",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "chat_folders_roles_admin_idx": {
+          "name": "chat_folders_roles_admin_idx",
+          "columns": [
+            {
+              "expression": "roles_admin",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -245,6 +289,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "chat_folders_lead_id_leads_id_fk": {
+          "name": "chat_folders_lead_id_leads_id_fk",
+          "tableFrom": "chat_folders",
+          "tableTo": "leads",
+          "columnsFrom": [
+            "lead_id"
           ],
           "columnsTo": [
             "id"
@@ -582,7 +639,13 @@
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "lead_id": {
+          "name": "lead_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
         },
         "title": {
           "name": "title",
@@ -661,33 +724,35 @@
           "notNull": false,
           "default": "'{}'::jsonb"
         },
-        "roles_read": {
-          "name": "roles_read",
+        "roles_view": {
+          "name": "roles_view",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'[]'::jsonb"
+          "notNull": false
         },
-        "roles_write": {
-          "name": "roles_write",
+        "roles_edit": {
+          "name": "roles_edit",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'[]'::jsonb"
+          "notNull": false
         },
-        "roles_hide": {
-          "name": "roles_hide",
+        "roles_post": {
+          "name": "roles_post",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'[]'::jsonb"
+          "notNull": false
         },
-        "roles_delete": {
-          "name": "roles_delete",
+        "roles_moderate": {
+          "name": "roles_moderate",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'[]'::jsonb"
+          "notNull": false
+        },
+        "roles_admin": {
+          "name": "roles_admin",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
         },
         "published": {
           "name": "published",
@@ -823,11 +888,11 @@
           "method": "btree",
           "with": {}
         },
-        "chat_threads_roles_read_idx": {
-          "name": "chat_threads_roles_read_idx",
+        "chat_threads_roles_view_idx": {
+          "name": "chat_threads_roles_view_idx",
           "columns": [
             {
-              "expression": "roles_read",
+              "expression": "roles_view",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -838,11 +903,11 @@
           "method": "gin",
           "with": {}
         },
-        "chat_threads_roles_write_idx": {
-          "name": "chat_threads_roles_write_idx",
+        "chat_threads_roles_edit_idx": {
+          "name": "chat_threads_roles_edit_idx",
           "columns": [
             {
-              "expression": "roles_write",
+              "expression": "roles_edit",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -853,11 +918,11 @@
           "method": "gin",
           "with": {}
         },
-        "chat_threads_roles_hide_idx": {
-          "name": "chat_threads_roles_hide_idx",
+        "chat_threads_roles_post_idx": {
+          "name": "chat_threads_roles_post_idx",
           "columns": [
             {
-              "expression": "roles_hide",
+              "expression": "roles_post",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -868,11 +933,26 @@
           "method": "gin",
           "with": {}
         },
-        "chat_threads_roles_delete_idx": {
-          "name": "chat_threads_roles_delete_idx",
+        "chat_threads_roles_moderate_idx": {
+          "name": "chat_threads_roles_moderate_idx",
           "columns": [
             {
-              "expression": "roles_delete",
+              "expression": "roles_moderate",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "chat_threads_roles_admin_idx": {
+          "name": "chat_threads_roles_admin_idx",
+          "columns": [
+            {
+              "expression": "roles_admin",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -891,6 +971,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "chat_threads_lead_id_leads_id_fk": {
+          "name": "chat_threads_lead_id_leads_id_fk",
+          "tableFrom": "chat_threads",
+          "tableTo": "leads",
+          "columnsFrom": [
+            "lead_id"
           ],
           "columnsTo": [
             "id"

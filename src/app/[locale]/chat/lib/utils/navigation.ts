@@ -5,6 +5,7 @@
 
 import {
   DEFAULT_FOLDER_IDS,
+  type DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -21,7 +22,7 @@ import type { ChatFolder } from "../../types";
 export function getRootFolderId(
   folders: Record<string, ChatFolder>,
   folderId: string | null | undefined,
-): string {
+): DefaultFolderId {
   if (!folderId) {
     return DEFAULT_FOLDER_IDS.PRIVATE;
   }
@@ -49,7 +50,7 @@ export function getRootFolderId(
  */
 export function buildFolderUrl(
   locale: CountryLanguage,
-  rootFolderId: string,
+  rootFolderId: DefaultFolderId,
   subFolderId?: string | null,
 ): string {
   if (subFolderId) {
@@ -63,7 +64,9 @@ export function buildFolderUrl(
  * @param rootFolderId - ID of the root folder
  * @returns Translation key like "app.chat.common.newPrivateChat"
  */
-export function getNewChatTranslationKey(rootFolderId: string): TranslationKey {
+export function getNewChatTranslationKey(
+  rootFolderId: DefaultFolderId,
+): TranslationKey {
   switch (rootFolderId) {
     case DEFAULT_FOLDER_IDS.PRIVATE:
       return "app.chat.common.newPrivateChat";
@@ -84,7 +87,7 @@ export function getNewChatTranslationKey(rootFolderId: string): TranslationKey {
  * @returns Translation key like "app.chat.common.newPrivateFolder"
  */
 export function getNewFolderTranslationKey(
-  rootFolderId: string,
+  rootFolderId: DefaultFolderId,
 ): TranslationKey {
   switch (rootFolderId) {
     case DEFAULT_FOLDER_IDS.PRIVATE:
@@ -106,7 +109,7 @@ export function getNewFolderTranslationKey(
  * @returns Translation key like "app.chat.common.createNewPrivateFolder"
  */
 export function getCreateFolderTranslationKey(
-  rootFolderId: string,
+  rootFolderId: DefaultFolderId,
 ): TranslationKey {
   switch (rootFolderId) {
     case DEFAULT_FOLDER_IDS.PRIVATE:

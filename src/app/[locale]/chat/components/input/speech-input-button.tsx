@@ -21,6 +21,7 @@ interface SpeechInputButtonProps {
   locale: CountryLanguage;
   className?: string;
   logger: EndpointLogger;
+  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 export function SpeechInputButton({
@@ -30,6 +31,7 @@ export function SpeechInputButton({
   locale,
   className,
   logger,
+  deductCredits,
 }: SpeechInputButtonProps): JSX.Element {
   const { t } = simpleT(locale);
   const [displayError, setDisplayError] = useState<string | null>(null);
@@ -43,6 +45,7 @@ export function SpeechInputButton({
       lang,
       locale,
       logger,
+      deductCredits,
     });
 
   // Auto-clear error after 5 seconds
