@@ -498,6 +498,8 @@ export async function canUpdateFolder(
 /**
  * Check if user can manage folder permissions
  * Uses rolesAdmin - only owner, admin, and users with rolesAdmin can manage permissions
+ * Permission management is only available for PUBLIC root folder and its subfolders
+ * Private, shared, and incognito folders don't support permission management
  */
 export async function canManageFolderPermissions(
   user: JwtPayloadType,
@@ -505,6 +507,14 @@ export async function canManageFolderPermissions(
   logger: EndpointLogger,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
+  // Permission management is only available for PUBLIC root folder
+  // Private, shared, and incognito folders are owner-only by design
+  if (
+    folder.rootFolderId !== "public"
+  ) {
+    return false;
+  }
+
   const userId = user.id;
 
   // Owner can manage permissions
@@ -768,6 +778,8 @@ export async function canUpdateThread(
 /**
  * Check if user can manage thread permissions
  * Uses rolesAdmin - only owner, admin, and users with rolesAdmin can manage permissions
+ * Permission management is only available for PUBLIC root folder and its subfolders
+ * Private, shared, and incognito threads don't support permission management
  */
 export async function canManageThreadPermissions(
   user: JwtPayloadType,
@@ -776,6 +788,14 @@ export async function canManageThreadPermissions(
   logger: EndpointLogger,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
+  // Permission management is only available for PUBLIC root folder
+  // Private, shared, and incognito threads are owner-only by design
+  if (
+    thread.rootFolderId !== "public"
+  ) {
+    return false;
+  }
+
   const userId = user.id;
 
   // Owner can manage permissions

@@ -216,7 +216,9 @@ export async function ensureThread({
       // Creating thread directly in a root folder (no subfolder)
       // Check permission using DEFAULT_FOLDER_CONFIGS rolesCreateThread
       const { getDefaultFolderConfig } = await import("../config");
-      const { hasRolePermission } = await import("../permissions/permissions");
+      const { hasRolePermission } = await import(
+        "../permissions/permissions"
+      );
 
       const rootConfig = getDefaultFolderConfig(rootFolderId);
       if (!rootConfig) {
@@ -224,32 +226,37 @@ export async function ensureThread({
         return await Promise.reject(new Error("FOLDER_NOT_FOUND"));
       }
 
-      const hasPermission = await hasRolePermission(
-        user,
-        rootConfig.rolesCreateThread,
-        logger,
-      );
-
-      if (!hasPermission) {
-        logger.error(
-          "User does not have permission to create threads in root folder",
-          {
-            userId,
-            leadId,
-            isPublic: user.isPublic,
-            rootFolderId,
-            requiredRoles: rootConfig.rolesCreateThread,
-          },
+      // Any authenticated user can create threads in their private/shared root folders
+      if (
+        rootFolderId === "public"
+      ) {
+        const hasPermission = await hasRolePermission(
+          user,
+          rootConfig.rolesCreateThread,
+          logger,
         );
-        return await Promise.reject(new Error("PERMISSION_DENIED"));
-      }
 
-      logger.info("User has permission to create thread in root folder", {
-        userId,
-        leadId,
-        isPublic: user.isPublic,
-        rootFolderId,
-      });
+        if (!hasPermission) {
+          logger.error(
+            "User does not have permission to create threads in root folder",
+            {
+              userId,
+              leadId,
+              isPublic: user.isPublic,
+              rootFolderId,
+              requiredRoles: rootConfig.rolesCreateThread,
+            },
+          );
+          return await Promise.reject(new Error("PERMISSION_DENIED"));
+        }
+
+        logger.info("User has permission to create thread in root folder", {
+          userId,
+          leadId,
+          isPublic: user.isPublic,
+          rootFolderId,
+        });
+      }
     }
 
     // Check if user has permission to create thread in this folder (only if folder exists)
