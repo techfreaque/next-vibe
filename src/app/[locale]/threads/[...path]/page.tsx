@@ -16,6 +16,7 @@ import type { JSX } from "react";
 import { ChatProvider } from "@/app/[locale]/chat/features/chat/context";
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
 import { getFolder } from "@/app/api/[locale]/v1/core/agent/chat/folders/[id]/repository";
+import { ChatFoldersRepositoryImpl } from "@/app/api/[locale]/v1/core/agent/chat/folders/repository";
 import { threadByIdRepository } from "@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/repository";
 import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -119,6 +120,16 @@ export default async function ThreadsPathPage({
     expiresAt: null,
   };
 
+  // Compute root folder permissions server-side
+  // This is stateless and based on user role + folder config
+  const rootFolderPermissions = user
+    ? await ChatFoldersRepositoryImpl.computeRootFolderPermissions(
+        initialRootFolderId,
+        user,
+        logger,
+      )
+    : { canCreateThread: false, canCreateFolder: false };
+
   return (
     <ChatProvider
       locale={locale}
@@ -126,6 +137,7 @@ export default async function ThreadsPathPage({
       currentRootFolderId={initialRootFolderId}
       currentSubFolderId={initialSubFolderId}
       initialCredits={creditsToUse}
+      rootFolderPermissions={rootFolderPermissions}
     >
       <ChatInterface urlPath={path} user={user} />
     </ChatProvider>

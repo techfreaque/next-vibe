@@ -207,14 +207,8 @@ export function ChatSidebar({
       <Div className="flex items-center gap-1 px-3 pb-2 min-w-max">
         {(() => {
           // Determine if user can create threads in current location
-          // If in a subfolder, check folder.canCreateThread
-          // If in root folder, bypass permission check for non-public root folders (PRIVATE, INCOGNITO, SHARED)
-          // as they always have permission. Only check permissions for PUBLIC root folder.
-          const canCreateThread =
-            activeRootFolderId === DEFAULT_FOLDER_IDS.PUBLIC
-              ? (chat.rootFolderPermissions[activeRootFolderId]
-                  ?.canCreateThread ?? false)
-              : true;
+          // Permissions are computed server-side and passed as props
+          const canCreateThread = chat.rootFolderPermissions.canCreateThread;
 
           // Don't show button if user doesn't have permission
           if (!canCreateThread) {
@@ -354,13 +348,11 @@ function NewFolderButton({
 }): JSX.Element | null {
   // Determine if user can create folders in current location
   // If in a subfolder, check folder.canManage (which includes canCreateFolder)
-  // If in root folder, check rootFolderPermissions.canCreateFolder
+  // If in root folder, use server-computed permissions from props
   const canCreateFolder = activeFolderId
     ? (chat.folders[activeFolderId]?.canManage ?? false)
-    : activeRootFolderId === DEFAULT_FOLDER_IDS.PUBLIC
-      ? (chat.rootFolderPermissions[activeRootFolderId]?.canCreateFolder ??
-        false)
-      : true;
+    : chat.rootFolderPermissions.canCreateFolder;
+
   // Don't show button if user doesn't have permission
   if (!canCreateFolder) {
     return null;

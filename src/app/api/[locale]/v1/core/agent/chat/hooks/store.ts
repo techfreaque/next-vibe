@@ -119,24 +119,16 @@ export interface ChatSettings {
 }
 
 /**
- * Root folder permissions type
- */
-export interface RootFolderPermissions {
-  canCreateThread: boolean;
-  canCreateFolder: boolean;
-}
-
-/**
  * Chat state
  * NOTE: Navigation state (activeThreadId, currentRootFolderId, currentSubFolderId) removed
  * These are now derived from URL and passed as props instead of stored in state
+ * NOTE: rootFolderPermissions removed - now computed server-side and passed as props
  */
 interface ChatState {
   // Data
   threads: Record<string, ChatThread>;
   messages: Record<string, ChatMessage>;
   folders: Record<string, ChatFolder>;
-  rootFolderPermissions: Record<string, RootFolderPermissions>; // Keyed by root folder ID
 
   // UI state
   isLoading: boolean;
@@ -163,12 +155,6 @@ interface ChatState {
   addFolder: (folder: ChatFolder) => void;
   updateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
   deleteFolder: (folderId: string) => void;
-
-  // Root folder permissions actions
-  setRootFolderPermissions: (
-    rootFolderId: DefaultFolderId,
-    permissions: RootFolderPermissions,
-  ) => void;
 
   // Loading state
   setLoading: (loading: boolean) => void;
@@ -274,7 +260,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
   threads: {},
   messages: {},
   folders: {},
-  rootFolderPermissions: {},
   isLoading: false,
 
   // Use default settings for SSR - will be hydrated from localStorage after mount
@@ -399,18 +384,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
       };
     }),
 
-  // Root folder permissions actions
-  setRootFolderPermissions: (
-    rootFolderId: DefaultFolderId,
-    permissions: RootFolderPermissions,
-  ): void =>
-    set((state) => ({
-      rootFolderPermissions: {
-        ...state.rootFolderPermissions,
-        [rootFolderId]: permissions,
-      },
-    })),
-
   // Settings actions
   hydrateSettings: (): void => {
     const settings = loadSettings();
@@ -443,7 +416,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
       threads: {},
       messages: {},
       folders: {},
-      rootFolderPermissions: {},
       isLoading: false,
       settings: defaultSettings,
     });

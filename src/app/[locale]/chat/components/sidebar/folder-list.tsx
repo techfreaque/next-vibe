@@ -74,7 +74,7 @@ function getFolderAncestry(
 
   while (currentId !== null) {
     ancestry.unshift(currentId);
-    const folder = folders[currentId];
+    const folder: ChatFolder | undefined = folders[currentId];
     currentId = folder?.parentId ?? null;
   }
 

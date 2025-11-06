@@ -328,9 +328,9 @@ export type EndpointHandlerConfig<T> = {
           ResponseOutput: infer TResOut;
           UrlVariablesOutput: infer TUrlOut;
         };
-        allowedRoles: readonly (typeof UserRoleValue)[];
+        allowedRoles: infer TRoles extends readonly (typeof UserRoleValue)[];
       }
-      ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, T[K]["allowedRoles"]>
+      ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, TRoles>
       : never
     : never;
 };

@@ -27,6 +27,14 @@ export type ChatContextValue = UseChatReturn;
 const ChatContext = createContext<ChatContextValue | null>(null);
 
 /**
+ * Root folder permissions type
+ */
+export interface RootFolderPermissions {
+  canCreateThread: boolean;
+  canCreateFolder: boolean;
+}
+
+/**
  * Chat provider props
  * All navigation state comes from URL props (not from store)
  */
@@ -41,6 +49,8 @@ interface ChatProviderProps {
   currentSubFolderId: string | null;
   /** Initial credits from server (must be provided from server) */
   initialCredits: CreditsGetResponseOutput;
+  /** Root folder permissions computed server-side */
+  rootFolderPermissions: RootFolderPermissions;
 }
 
 /**
@@ -55,6 +65,7 @@ export function ChatProvider({
   currentRootFolderId,
   currentSubFolderId,
   initialCredits,
+  rootFolderPermissions,
 }: ChatProviderProps): JSX.Element {
   // Create logger
   const logger = createEndpointLogger(true, Date.now(), locale);
@@ -67,6 +78,7 @@ export function ChatProvider({
     currentRootFolderId,
     currentSubFolderId,
     initialCredits,
+    rootFolderPermissions,
   );
 
   return <ChatContext.Provider value={chat}>{children}</ChatContext.Provider>;

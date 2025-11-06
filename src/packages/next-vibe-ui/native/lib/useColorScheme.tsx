@@ -8,9 +8,11 @@ export function useColorScheme(): {
 } {
   const nativewindColorScheme = useNativewindColorScheme();
   const { colorScheme } = nativewindColorScheme;
+  const normalizedColorScheme: "dark" | "light" =
+    colorScheme === "light" ? "light" : "dark";
   return {
-    colorScheme: colorScheme ?? "dark",
-    isDarkColorScheme: colorScheme === "dark",
+    colorScheme: normalizedColorScheme,
+    isDarkColorScheme: normalizedColorScheme === "dark",
     setColorScheme: (scheme: "dark" | "light"): void => {
       nativewindColorScheme.setColorScheme(scheme);
     },

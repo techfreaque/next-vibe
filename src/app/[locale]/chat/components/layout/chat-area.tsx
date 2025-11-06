@@ -190,21 +190,11 @@ export function ChatArea({
       return currentFolder?.canCreateThread ?? true;
     }
     // Case 2: We're in a root folder (no subfolder)
-    // Use server-computed root folder permissions
-    const rootPermissions =
-      chat.rootFolderPermissions[chat.currentRootFolderId];
-    if (rootPermissions !== undefined) {
-      // Permissions are loaded, use the actual value
-      return rootPermissions.canCreateThread;
-    }
-    // Fallback: if permissions not loaded yet, optimistically enable input
-    // This prevents showing error message during hydration/loading
-    // Once permissions load, this will re-compute and disable if needed
-    return true;
+    // Use server-computed root folder permissions passed as props
+    return chat.rootFolderPermissions.canCreateThread;
   }, [
     thread,
     chat.currentSubFolderId,
-    chat.currentRootFolderId,
     chat.folders,
     chat.rootFolderPermissions,
   ]);
@@ -222,23 +212,18 @@ export function ChatArea({
         return t("app.chat.input.noCreateThreadPermission");
       }
     }
-    // Check root folder permissions
-    if (!thread && !chat.currentSubFolderId) {
-      const rootPermissions =
-        chat.rootFolderPermissions[chat.currentRootFolderId];
-      // Only show message if permissions are loaded and permission is explicitly false
-      if (
-        rootPermissions !== undefined &&
-        rootPermissions.canCreateThread === false
-      ) {
-        return t("app.chat.input.noCreateThreadPermissionInRootFolder");
-      }
+    // Check root folder permissions (server-computed, passed as props)
+    if (
+      !thread &&
+      !chat.currentSubFolderId &&
+      chat.rootFolderPermissions.canCreateThread === false
+    ) {
+      return t("app.chat.input.noCreateThreadPermissionInRootFolder");
     }
     return undefined;
   }, [
     thread,
     chat.currentSubFolderId,
-    chat.currentRootFolderId,
     chat.folders,
     chat.rootFolderPermissions,
     t,

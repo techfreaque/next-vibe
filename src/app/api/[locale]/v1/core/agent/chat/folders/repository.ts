@@ -64,10 +64,13 @@ export class ChatFoldersRepositoryImpl
   implements ChatFoldersRepositoryInterface
 {
   /**
-   * Compute permissions for a root folder
+   * Compute permissions for a root folder (static method for server-side use)
    * Root folders don't exist in the database, so we compute permissions based on DEFAULT_FOLDER_CONFIGS
+   *
+   * For non-public root folders (private, shared, incognito), permissions are always true
+   * For public root folder, permissions are based on user role and folder config
    */
-  private async computeRootFolderPermissions(
+  static async computeRootFolderPermissions(
     rootFolderId: DefaultFolderId,
     user: JwtPayloadType,
     logger: EndpointLogger,
@@ -138,6 +141,21 @@ export class ChatFoldersRepositoryImpl
       canCreateThread: canCreateThreadInRoot,
       canCreateFolder: canCreateFolderInRoot,
     };
+  }
+
+  /**
+   * Compute permissions for a root folder (instance method for backward compatibility)
+   */
+  private async computeRootFolderPermissions(
+    rootFolderId: DefaultFolderId,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<{ canCreateThread: boolean; canCreateFolder: boolean }> {
+    return ChatFoldersRepositoryImpl.computeRootFolderPermissions(
+      rootFolderId,
+      user,
+      logger,
+    );
   }
 
   /**

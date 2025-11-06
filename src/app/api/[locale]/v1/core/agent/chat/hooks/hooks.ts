@@ -42,10 +42,7 @@ export interface UseChatReturn {
   threads: Record<string, ChatThread>;
   messages: Record<string, ChatMessage>;
   folders: Record<string, ChatFolder>;
-  rootFolderPermissions: Record<
-    string,
-    { canCreateThread: boolean; canCreateFolder: boolean }
-  >;
+  rootFolderPermissions: RootFolderPermissions; // Server-computed permissions for current root folder
   personas: Record<string, { id: string; name: string; icon: string }>;
   activeThread: ChatThread | null;
   activeThreadMessages: ChatMessage[];
@@ -135,6 +132,14 @@ export interface UseChatReturn {
 }
 
 /**
+ * Root folder permissions type
+ */
+export interface RootFolderPermissions {
+  canCreateThread: boolean;
+  canCreateFolder: boolean;
+}
+
+/**
  * Central hook that provides all chat functionality
  * Uses modular hooks for better maintainability
  *
@@ -143,7 +148,8 @@ export interface UseChatReturn {
  * @param activeThreadId - Active thread ID from URL (null if none)
  * @param currentRootFolderId - Current root folder ID from URL
  * @param currentSubFolderId - Current subfolder ID from URL (null if none)
- * @param deductCredits - Function to optimistically deduct credits
+ * @param initialCredits - Initial credits from server
+ * @param rootFolderPermissions - Root folder permissions computed server-side
  */
 export function useChat(
   locale: CountryLanguage,
@@ -152,14 +158,12 @@ export function useChat(
   currentRootFolderId: DefaultFolderId,
   currentSubFolderId: string | null,
   initialCredits: CreditsGetResponseOutput,
+  rootFolderPermissions: RootFolderPermissions,
 ): UseChatReturn {
   // Get stores - subscribe to specific properties
   const threads = useChatStore((state) => state.threads);
   const messages = useChatStore((state) => state.messages);
   const folders = useChatStore((state) => state.folders);
-  const rootFolderPermissions = useChatStore(
-    (state) => state.rootFolderPermissions,
-  );
   const isLoading = useChatStore((state) => state.isLoading);
 
   // Get store instances
@@ -190,7 +194,6 @@ export function useChat(
     chatStore.addThread,
     chatStore.addMessage,
     chatStore.addFolder,
-    chatStore.setRootFolderPermissions,
   );
 
   useMessageLoader(
@@ -285,7 +288,7 @@ export function useChat(
     threads,
     messages,
     folders,
-    rootFolderPermissions,
+    rootFolderPermissions, // Server-computed permissions passed as prop
     personas,
     activeThread,
     activeThreadMessages,

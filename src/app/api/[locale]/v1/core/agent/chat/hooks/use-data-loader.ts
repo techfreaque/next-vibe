@@ -15,15 +15,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { DefaultFolderId } from "../config";
-import { DEFAULT_FOLDER_IDS } from "../config";
 import type { FolderListResponseOutput } from "../folders/definition";
 import { GET as foldersGetEndpoint } from "../folders/definition";
-import type {
-  ChatFolder,
-  ChatMessage,
-  ChatThread,
-  RootFolderPermissions,
-} from "./store";
+import type { ChatFolder, ChatMessage, ChatThread } from "./store";
 import { GET as threadsGetEndpoint } from "../threads/definition";
 
 /**
@@ -280,94 +274,8 @@ async function loadFoldersFromServer(
 }
 
 /**
- * Load root folder permissions from server
- * Loads permissions for all 4 root folders (private, shared, public, incognito)
- * These permissions determine what actions users can take in each root folder
- */
-async function loadRootFolderPermissions(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-  t: TFunction,
-  setRootFolderPermissions: (
-    rootFolderId: DefaultFolderId,
-    permissions: RootFolderPermissions,
-  ) => void,
-): Promise<void> {
-  try {
-    // All 4 root folders
-    const rootFolderIds: DefaultFolderId[] = [
-      DEFAULT_FOLDER_IDS.PRIVATE,
-      DEFAULT_FOLDER_IDS.SHARED,
-      DEFAULT_FOLDER_IDS.PUBLIC,
-      DEFAULT_FOLDER_IDS.INCOGNITO,
-    ];
-
-    logger.debug("Chat: Loading root folder permissions", {
-      rootFolderIds,
-    });
-
-    // Load permissions for all root folders in parallel
-    await Promise.all(
-      rootFolderIds.map(async (rootFolderId) => {
-        try {
-          const response = await apiClient.fetch(
-            foldersGetEndpoint,
-            logger,
-            { rootFolderId }, // Pass rootFolderId to get permissions for that root
-            {},
-            t,
-            locale,
-            {
-              disableLocalCache: true,
-            },
-          );
-
-          if (response.success && response.data) {
-            const responseData = response.data as FolderListResponseOutput;
-
-            if (responseData.rootFolderPermissions) {
-              // Type assertion needed because objectField creates a complex nested type
-              // that TypeScript infers as {} instead of the actual shape
-              const permissions =
-                responseData.rootFolderPermissions as RootFolderPermissions;
-              setRootFolderPermissions(rootFolderId, permissions);
-              logger.debug("Chat: Root folder permissions loaded", {
-                rootFolderId,
-                canCreateThread: permissions.canCreateThread,
-                canCreateFolder: permissions.canCreateFolder,
-              });
-            } else {
-              logger.warn("Chat: No root folder permissions in response", {
-                rootFolderId,
-              });
-            }
-          } else {
-            logger.error("Chat: Failed to load root folder permissions", {
-              rootFolderId,
-              success: response.success,
-            });
-          }
-        } catch (error) {
-          logger.error(
-            "Chat: Error loading root folder permissions",
-            parseError(error),
-            { rootFolderId },
-          );
-        }
-      }),
-    );
-
-    logger.debug("Chat: All root folder permissions loaded");
-  } catch (error) {
-    logger.error(
-      "Chat: Failed to load root folder permissions",
-      parseError(error),
-    );
-  }
-}
-
-/**
  * Hook for loading initial chat data (threads, folders, messages)
+ * NOTE: Root folder permissions are now computed server-side and passed as props
  */
 export function useDataLoader(
   locale: CountryLanguage,
@@ -376,10 +284,6 @@ export function useDataLoader(
   addThread: (thread: ChatThread) => void,
   addMessage: (message: ChatMessage) => void,
   addFolder: (folder: ChatFolder) => void,
-  setRootFolderPermissions: (
-    rootFolderId: DefaultFolderId,
-    permissions: RootFolderPermissions,
-  ) => void,
 ): void {
   const dataLoadedRef = useRef(false);
 
@@ -409,7 +313,6 @@ export function useDataLoader(
       await Promise.all([
         loadThreadsFromServer(logger, locale, t, addThread),
         loadFoldersFromServer(logger, locale, t, addFolder),
-        loadRootFolderPermissions(logger, locale, t, setRootFolderPermissions),
       ]);
     };
 

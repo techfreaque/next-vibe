@@ -61,7 +61,8 @@ interface InputData {
     | null
     | undefined
     | InputData
-    | InputData[];
+    | InputData[]
+    | Array<string | number | boolean | null | undefined>;
 }
 
 interface CollectedInputData {
@@ -872,9 +873,11 @@ export class RouteDelegationHandler {
       if (positionalArgs.length === 1 && firstArg !== undefined) {
         data[firstCliArgKey] = firstArg;
       } else {
-        // Pass positional args as a simple string array (not wrapped in objects)
-        // Cast to InputData[] since string[] is compatible with InputData[]
-        data[firstCliArgKey] = positionalArgs as InputData[];
+        // Pass positional args as a simple string array
+        // Explicitly type as array of strings (which is compatible with InputData value types)
+        data[firstCliArgKey] = positionalArgs as Array<
+          string | number | boolean | null | undefined
+        >;
       }
     }
 
