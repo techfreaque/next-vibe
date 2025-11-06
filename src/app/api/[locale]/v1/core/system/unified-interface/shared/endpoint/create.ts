@@ -292,7 +292,7 @@ export type CreateApiEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields,
+  TFields extends UnifiedField<z.ZodTypeAny>,
   RequestInput = ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.RequestData>
   >,
@@ -341,7 +341,7 @@ export type CreateApiEndpoint<
  * Return type for createEndpoint with full type inference from fields
  */
 export type CreateEndpointReturnInMethod<
-  TFields,
+  TFields extends UnifiedField<z.ZodTypeAny>,
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
@@ -359,7 +359,7 @@ export type CreateEndpointReturnInMethod<
  * Returns both legacy format and new destructured format for maximum compatibility
  */
 export function createEndpoint<
-  const TFields,
+  const TFields extends UnifiedField<z.ZodTypeAny>,
   const TExampleKey extends string,
   const TMethod extends Methods,
   const TUserRoleValue extends readonly (typeof UserRoleValue)[],

@@ -10,7 +10,7 @@ import { cookies } from "next/headers";
 import { AUTH_TOKEN_COOKIE_NAME } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -113,21 +113,21 @@ export class SessionRepositoryImpl implements SessionRepository {
       }
 
       // Token not found in database and not a JWT
-      return createErrorResponse(
-        "app.api.v1.core.user.private.session.errors.session_not_found",
-        ErrorResponseTypes.NOT_FOUND,
-        { token },
-      );
+      return fail({
+        message: "app.api.v1.core.user.private.session.errors.session_not_found",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: { token },
+      });
     } catch (error) {
       // Note: Logger not available for internal session methods
-      return createErrorResponse(
-        "app.api.v1.core.user.private.session.errors.session_lookup_failed",
-        ErrorResponseTypes.DATABASE_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.user.private.session.errors.session_lookup_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: {
           token,
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 
@@ -151,13 +151,13 @@ export class SessionRepositoryImpl implements SessionRepository {
       return createSuccessResponse(undefined);
     } catch (error) {
       // Note: Logger not available for internal cleanup methods
-      return createErrorResponse(
-        "app.api.v1.core.user.private.session.errors.expired_sessions_delete_failed",
-        ErrorResponseTypes.DATABASE_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.user.private.session.errors.expired_sessions_delete_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: {
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 
@@ -181,11 +181,11 @@ export class SessionRepositoryImpl implements SessionRepository {
         .returning();
 
       if (result.length === 0) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.session.errors.session_not_found",
-          ErrorResponseTypes.NOT_FOUND,
-          { token },
-        );
+        return fail({
+        message: "app.api.v1.core.user.private.session.errors.session_not_found",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: { token },
+      });
       }
 
       // Session extended successfully
@@ -193,14 +193,14 @@ export class SessionRepositoryImpl implements SessionRepository {
       return createSuccessResponse(undefined);
     } catch (error) {
       // Note: Logger not available for internal session methods
-      return createErrorResponse(
-        "app.api.v1.core.user.private.session.errors.session_lookup_failed",
-        ErrorResponseTypes.DATABASE_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.user.private.session.errors.session_lookup_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: {
           token,
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 
@@ -216,25 +216,25 @@ export class SessionRepositoryImpl implements SessionRepository {
       const results = await db.insert(sessions).values(data).returning();
 
       if (results.length === 0) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.session.errors.session_creation_failed",
-          ErrorResponseTypes.DATABASE_ERROR,
-          { userId: data.userId, operation: "create" },
-        );
+        return fail({
+        message: "app.api.v1.core.user.private.session.errors.session_creation_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: { userId: data.userId, operation: "create" },
+      });
       }
 
       return createSuccessResponse(results[0]);
     } catch (error) {
       // Note: Logger not available for internal session methods
-      return createErrorResponse(
-        "app.api.v1.core.user.private.session.errors.session_creation_database_error",
-        ErrorResponseTypes.DATABASE_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.user.private.session.errors.session_creation_database_error",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: {
           userId: data.userId,
           operation: "create",
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 
@@ -252,14 +252,14 @@ export class SessionRepositoryImpl implements SessionRepository {
       return createSuccessResponse(undefined);
     } catch (error) {
       // Note: Logger not available for internal session methods
-      return createErrorResponse(
-        "app.api.v1.core.user.private.session.errors.user_sessions_delete_failed",
-        ErrorResponseTypes.DATABASE_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.user.private.session.errors.user_sessions_delete_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: {
           userId,
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 
@@ -276,11 +276,11 @@ export class SessionRepositoryImpl implements SessionRepository {
       const token = cookiesStore.get(AUTH_TOKEN_COOKIE_NAME)?.value;
 
       if (!token) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.session.errors.session_not_found",
-          ErrorResponseTypes.UNAUTHORIZED,
-          { reason: SessionErrorReason.NO_TOKEN_IN_COOKIES },
-        );
+        return fail({
+        message: "app.api.v1.core.user.private.session.errors.session_not_found",
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
+        messageParams: { reason: SessionErrorReason.NO_TOKEN_IN_COOKIES },
+      });
       }
 
       // Find the current session
@@ -294,11 +294,11 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       // Check if session is expired
       if (session.expiresAt <= now) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.session.errors.expired",
-          ErrorResponseTypes.UNAUTHORIZED,
-          { expiresAt: session.expiresAt.toISOString() },
-        );
+        return fail({
+        message: "app.api.v1.core.user.private.session.errors.expired",
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
+        messageParams: { expiresAt: session.expiresAt.toISOString() },
+      });
       }
 
       return createSuccessResponse({
@@ -308,11 +308,11 @@ export class SessionRepositoryImpl implements SessionRepository {
       });
     } catch (error) {
       // Note: Logger not available for internal session methods
-      return createErrorResponse(
-        "app.api.v1.core.user.private.session.errors.session_lookup_failed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: error instanceof Error ? error.message : String(error) },
-      );
+      return fail({
+        message: "app.api.v1.core.user.private.session.errors.session_lookup_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: error instanceof Error ? error.message : String(error) },
+      });
     }
   }
 }

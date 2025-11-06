@@ -11,9 +11,9 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -230,11 +230,11 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         "app.api.v1.core.emails.imapClient.folders.list.error.server",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -260,10 +260,10 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         .limit(1);
 
       if (!folder) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
       }
 
       return createSuccessResponse(this.formatFolderResponse(folder));
@@ -272,11 +272,11 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         "app.api.v1.core.emails.imapClient.folders.get.error.server",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -310,10 +310,10 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
           .limit(1);
 
         if (account.length === 0) {
-          return createErrorResponse(
-            "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
-            ErrorResponseTypes.NOT_FOUND,
-          );
+          return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
         }
 
         // Sync folders for the specific account
@@ -348,27 +348,27 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
           };
           return createSuccessResponse(syncResults);
         } else {
-          return createErrorResponse(
-            "app.api.v1.core.emails.imapClient.imapErrors.sync.folder.failed",
-            ErrorResponseTypes.INTERNAL_ERROR,
-          );
+          return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.sync.folder.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
         }
       } else {
-        return createErrorResponse(
-          "app.api.v1.core.emails.imapClient.imapErrors.folders.sync.error.missing_account.title",
-          ErrorResponseTypes.BAD_REQUEST,
-        );
+        return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.folders.sync.error.missing_account.title",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
       }
     } catch (error) {
       logger.error(
         "app.api.v1.core.emails.imapClient.folders.sync.error.server",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -410,11 +410,11 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         "app.api.v1.core.emails.imapClient.folders.byAccount.error.server",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -451,10 +451,10 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         .returning();
 
       if (!updatedFolder) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
       }
 
       return createSuccessResponse({ success: true });
@@ -463,11 +463,11 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         "app.api.v1.core.emails.imapClient.folders.updateSyncStatus.error.server",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -502,10 +502,10 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         .returning();
 
       if (!updatedFolder) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
       }
 
       return createSuccessResponse({ success: true });
@@ -514,11 +514,11 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         "app.api.v1.core.emails.imapClient.folders.updateCounts.error.server",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 }

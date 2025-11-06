@@ -8,7 +8,7 @@ import "server-only";
 import { and, count, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -59,7 +59,7 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapHealthGetResponseOutput>> {
     try {
-      logger.debug("Getting IMAP health status", { userId: user.id });
+      logger.debug("Getting IMAP health status", messageParams: { userId: user.id });
 
       // Get account statistics
       const accountsResponse = await imapAccountsRepository.listAccounts(
@@ -76,9 +76,10 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
       );
 
       if (!accountsResponse.success) {
-        return createErrorResponse(
+        return fail({
+          message: 
           "app.api.v1.core.emails.imapClient.health.health.get.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
           { error: accountsResponse.message },
         );
       }
@@ -117,9 +118,10 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Error getting IMAP health status", parsedError);
-      return createErrorResponse(
+      return fail({
+          message: 
         "app.api.v1.core.emails.imapClient.health.health.get.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );
     }

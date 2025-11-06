@@ -33,6 +33,7 @@ import {
   executeHandler,
 } from "../shared/server-only/execution/core";
 import type { Methods } from "../shared/types/enums";
+import type { UnifiedField } from "../shared/types/endpoint";
 import type {
   ApiHandlerOptions,
   NextHandlerReturnType,
@@ -75,7 +76,7 @@ export function createNextHandler<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields,
+  TFields extends UnifiedField<z.ZodTypeAny>,
   TRequestInput = TRequestOutput,
   TResponseInput = TResponseOutput,
   TUrlVariablesInput = TUrlVariablesOutput,

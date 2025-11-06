@@ -39,7 +39,7 @@ export default async function ChatPage({
   // Redirect to appropriate default folder
   const defaultFolder = isAuthenticated
     ? DEFAULT_FOLDER_IDS.PRIVATE
-    : DEFAULT_FOLDER_IDS.PUBLIC;
+    : DEFAULT_FOLDER_IDS.INCOGNITO;
 
   redirect(`/${locale}/threads/${defaultFolder}`);
 }

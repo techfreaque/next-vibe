@@ -7,9 +7,9 @@ import "server-only";
 
 import { desc, eq } from "drizzle-orm";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -103,13 +103,13 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       // Payment endpoints require authenticated users with ID
       if (user.isPublic) {
         logger.error("payment.create.error.publicUserNotAllowed");
-        return createErrorResponse(
-          "app.api.v1.core.payment.errors.unauthorized.title",
-          ErrorResponseTypes.UNAUTHORIZED,
-          {
+        return fail({
+          message: "app.api.v1.core.payment.errors.unauthorized.title",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+          messageParams: {
             error: t("app.api.v1.core.payment.errors.unauthorized.description"),
           },
-        );
+        });
       }
 
       logger.debug("Creating payment session", {
@@ -127,11 +127,11 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       if (!userRecord) {
         logger.error("payment.create.error.userNotFound", { userId: user.id });
-        return createErrorResponse(
-          "app.api.v1.core.payment.create.errors.notFound.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId: user.id },
-        );
+        return fail({
+          message: "app.api.v1.core.payment.create.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: { userId: user.id },
+        });
       }
 
       // Create or get Stripe customer
@@ -139,13 +139,13 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       if (!stripeCustomerId) {
         logger.error("payment.create.error.stripeCustomerNotFound");
-        return createErrorResponse(
-          "app.api.v1.core.payment.create.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.payment.create.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
             error: t("app.api.v1.core.payment.errors.customerNotFound"),
           },
-        );
+        });
       }
 
       // Create Stripe checkout session
@@ -246,11 +246,11 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         priceId: data.priceId,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.payment.create.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+        message: "app.api.v1.core.payment.create.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -266,13 +266,13 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       // Payment endpoints require authenticated users with ID
       if (user.isPublic) {
         logger.error("payment.get.error.publicUserNotAllowed");
-        return createErrorResponse(
-          "app.api.v1.core.payment.errors.unauthorized.title",
-          ErrorResponseTypes.UNAUTHORIZED,
-          {
+        return fail({
+          message: "app.api.v1.core.payment.errors.unauthorized.title",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+          messageParams: {
             error: t("app.api.v1.core.payment.errors.unauthorized.description"),
           },
-        );
+        });
       }
 
       logger.debug("Getting payment information", {
@@ -315,11 +315,11 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         userId: user.id,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.payment.get.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+        message: "app.api.v1.core.payment.get.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -437,11 +437,11 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         error: parsedError.message,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.payment.errors.server.title",
-        ErrorResponseTypes.BAD_REQUEST,
-        { error: parsedError.message },
-      );
+      return fail({
+        message: "app.api.v1.core.payment.errors.server.title",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 

@@ -7,9 +7,9 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -95,11 +95,11 @@ export class contactRepository {
       const contact = contactResult[0];
 
       if (!contact) {
-        return createErrorResponse(
-          "app.api.v1.core.contact.errors.repositoryCreateFailed",
-          ErrorResponseTypes.DATABASE_ERROR,
-          { email: data.email },
-        );
+        return fail({
+          message: "app.api.v1.core.contact.errors.repositoryCreateFailed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+          messageParams: { email: data.email },
+        });
       }
 
       logger.debug("app.api.v1.core.contact.repository.create.success", {
@@ -119,15 +119,15 @@ export class contactRepository {
         "app.api.v1.core.contact.repository.create.error",
         parsedError,
       );
-      return createErrorResponse(
-        "app.api.v1.core.contact.errors.repositoryCreateFailed",
-        ErrorResponseTypes.DATABASE_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.contact.errors.repositoryCreateFailed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: {
           email: data.email,
           error: parsedError.message,
           details: "app.api.v1.core.contact.errors.repositoryCreateDetails",
         },
-      );
+      });
     }
   }
 
@@ -161,14 +161,14 @@ export class contactRepository {
       const contact = contactResult[0];
 
       if (!contact) {
-        return createErrorResponse(
-          "app.api.v1.core.contact.errors.repositoryCreateFailed",
-          ErrorResponseTypes.DATABASE_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.contact.errors.repositoryCreateFailed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+          messageParams: {
             email: data.email,
             error: "app.api.v1.core.contact.errors.noContactReturned",
           },
-        );
+        });
       }
 
       return createSuccessResponse({
@@ -182,14 +182,14 @@ export class contactRepository {
         "app.api.v1.core.contact.repository.seed.create.error",
         parsedError,
       );
-      return createErrorResponse(
-        "app.api.v1.core.contact.errors.repositoryCreateFailed",
-        ErrorResponseTypes.DATABASE_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.contact.errors.repositoryCreateFailed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: {
           email: data.email,
           error: parsedError.message,
         },
-      );
+      });
     }
   }
 }

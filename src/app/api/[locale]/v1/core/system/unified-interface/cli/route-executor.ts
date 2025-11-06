@@ -29,10 +29,6 @@ import { responseMetadataExtractor } from "./widgets/response-metadata-extractor
 import { schemaUIHandler } from "./widgets/schema-ui-handler";
 import type { RenderableValue, ResponseFieldMetadata } from "./widgets/types";
 
-// Default fields type for generic endpoint handling
-// This is used as the TFields parameter in CreateApiEndpoint
-type DefaultFields = Record<string, string | number | boolean | null>;
-
 // CLI handler function type - matches createCliHandler signature
 interface CliHandlerFunction<
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
@@ -251,11 +247,9 @@ export class RouteDelegationHandler {
           success: true,
           data: {
             dryRun: true,
-            args: {
-              data: inputData.data,
-              urlPathParams: inputData.urlPathParams,
-            },
-          },
+            data: inputData.data as CliResponseData,
+            urlPathParams: inputData.urlPathParams as CliResponseData,
+          } as CliResponseData,
           metadata: {
             executionTime: Date.now() - startTime,
             endpointPath: route.path,
@@ -283,8 +277,8 @@ export class RouteDelegationHandler {
       });
 
       const result = await cliHandler(
-        inputData.data || {},
-        urlPathParams || {},
+        (inputData.data || {}) as CliRequestData,
+        (urlPathParams || {}) as CliUrlParams,
         cliUser,
         locale,
         context.options?.verbose || false,
@@ -342,7 +336,7 @@ export class RouteDelegationHandler {
           string,
           Methods,
           readonly (typeof UserRoleValue)[],
-          DefaultFields
+          UnifiedField<z.ZodTypeAny>
         >
       >(
         {

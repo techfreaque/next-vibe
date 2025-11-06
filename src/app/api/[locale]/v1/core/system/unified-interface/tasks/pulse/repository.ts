@@ -320,7 +320,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
     }
   }
 
-  async getHealthStatistics(_logger: EndpointLogger): Promise<
+  async getHealthStatistics(logger: EndpointLogger): Promise<
     ResponseType<{
       currentStatus: string;
       totalExecutions: number;
@@ -331,11 +331,12 @@ export class PulseHealthRepository implements IPulseHealthRepository {
   > {
     try {
       // Get current health
-      const currentHealthResponse = await this.getCurrentHealth(_logger);
+      const currentHealthResponse = await this.getCurrentHealth(logger);
       if (!currentHealthResponse.success) {
         return fail({
           message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          cause: currentHealthResponse,
         });
       }
       const currentHealth = currentHealthResponse.data;

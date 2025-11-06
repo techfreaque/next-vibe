@@ -20,6 +20,7 @@ import type {
 } from "./enums";
 import { FieldUsage } from "./enums";
 import type { CreateApiEndpoint } from "../endpoint/create";
+import { type UserRoleValue } from "../../../../user/user-roles/enum";
 
 // Re-export FieldUsage for convenience
 export { FieldUsage };
@@ -53,7 +54,7 @@ export type FieldUIConfig = {
  * This uses the any type to accept any possible CreateApiEndpoint instance
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type CreateApiEndpointAny = CreateApiEndpoint<any, any, any, any>;
+export type CreateApiEndpointAny = CreateApiEndpoint< string, Methods, readonly (typeof UserRoleValue)[], any>;
 
 /**
  * Export for backward compatibility

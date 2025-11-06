@@ -28,6 +28,7 @@ import {
   publicProcedure,
   requireRoles,
 } from "./trpc-trpc";
+import { type UnifiedField } from "../shared/types/endpoint";
 // import { endpointHandler } from "../endpoint-handler"; // Unused for now
 
 /**
@@ -38,7 +39,7 @@ export function createTRPCProcedureFromEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields,
+  TFields extends UnifiedField<z.ZodTypeAny>,
   TRequestInput,
   TRequestOutput,
   TResponseInput,
@@ -221,7 +222,7 @@ export function createTRPCProceduresFromEndpoints<
       string,
       Methods,
       readonly (typeof UserRoleValue)[],
-      TFields,
+      UnifiedField<z.ZodTypeAny>,
       any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
       any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
       any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
@@ -230,7 +231,6 @@ export function createTRPCProceduresFromEndpoints<
       any // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
     >
   >,
-  TFields = Record<string, never>,
 >(
   endpoints: T,
   handlers: Record<
@@ -252,7 +252,7 @@ export function createTRPCProceduresFromEndpoints<
         string,
         Methods,
         readonly (typeof UserRoleValue)[],
-        TFields
+        UnifiedField<z.ZodTypeAny>
       >["email"];
       sms?: ApiHandlerOptions<
         Record<string, string | number | boolean>,
@@ -261,7 +261,7 @@ export function createTRPCProceduresFromEndpoints<
         string,
         Methods,
         readonly (typeof UserRoleValue)[],
-        TFields
+        UnifiedField<z.ZodTypeAny>
       >["sms"];
     }
   >,
@@ -297,7 +297,7 @@ export function createTRPCProceduresFromRouteExports(routeExports: {
       string,
       Methods,
       readonly (typeof UserRoleValue)[],
-      Record<string, never>,
+       UnifiedField<z.ZodTypeAny>,
       any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
       any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
       any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
@@ -361,7 +361,7 @@ export type ExtractTRPCProcedures<T> = {
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    infer _TFields,
+    infer _TFields extends UnifiedField<z.ZodTypeAny>,
     any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
     any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
     any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
@@ -384,7 +384,7 @@ export interface RouteFileStructure {
       string,
       Methods,
       readonly (typeof UserRoleValue)[],
-      Record<string, never>,
+      UnifiedField<z.ZodTypeAny>,
       any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
       any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
       any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
@@ -506,7 +506,7 @@ function createCombinedInputSchema<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields,
+  TFields extends UnifiedField<z.ZodTypeAny>,
 >(
   endpoint: CreateApiEndpoint<
     TExampleKey,

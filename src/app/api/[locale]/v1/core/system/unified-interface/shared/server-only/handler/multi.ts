@@ -19,6 +19,8 @@ import type {
   EndpointsHandlerReturn,
 } from "../../types/handler";
 import { endpointHandler } from "./single";
+import type z from "zod";
+import { type UnifiedField } from "../../types/endpoint";
 
 export function endpointsHandler<const T>(
   config: EndpointHandlerConfig<T>,
@@ -33,7 +35,7 @@ export function endpointsHandler<const T>(
         string,
         Methods,
         readonly (typeof UserRoleValue)[],
-        Record<string, string | number | boolean | null>
+        UnifiedField<z.ZodTypeAny>
       >
     >,
   ).filter((key) => Object.values(Methods).includes(key as Methods)) as Array<
@@ -64,14 +66,14 @@ export function endpointsHandler<const T>(
       infer TExampleKey extends string,
       infer TMethod extends Methods,
       infer TUserRoleValue extends readonly (typeof UserRoleValue)[],
-      infer TFields
+      infer TFields extends UnifiedField<z.ZodTypeAny>
     >
       ? CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>
       : CreateApiEndpoint<
           string,
           Methods,
           readonly (typeof UserRoleValue)[],
-          Record<string, string | number | boolean | null>
+          UnifiedField<z.ZodTypeAny>
         >;
     const methodConfig = methodConfigs[method];
 

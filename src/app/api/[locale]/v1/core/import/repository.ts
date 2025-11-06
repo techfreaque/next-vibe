@@ -8,9 +8,9 @@ import "server-only";
 import { and, desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -73,10 +73,10 @@ export class ImportRepositoryImpl implements ImportRepository {
       const rows = this.parseCsv(csvContent);
 
       if (rows.length === 0) {
-        return createErrorResponse(
-          "app.admin.leads.leadsErrors.leadsImport.post.error.validation.title",
-          ErrorResponseTypes.BAD_REQUEST,
-        );
+        return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.post.error.validation.title",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
       }
 
       // Create import batch record
@@ -147,10 +147,10 @@ export class ImportRepositoryImpl implements ImportRepository {
       });
     } catch (error) {
       logger.error("Error importing CSV", parseError(error).message);
-      return createErrorResponse(
-        "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -210,10 +210,10 @@ export class ImportRepositoryImpl implements ImportRepository {
         .returning();
 
       if (!createdJob) {
-        return createErrorResponse(
-          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
       }
 
       return createSuccessResponse({
@@ -233,10 +233,10 @@ export class ImportRepositoryImpl implements ImportRepository {
       });
     } catch (error) {
       logger.error("Error creating chunked import job", parseError(error));
-      return createErrorResponse(
-        "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -261,10 +261,10 @@ export class ImportRepositoryImpl implements ImportRepository {
         .limit(1);
 
       if (!job[0]) {
-        return createErrorResponse(
-          "app.admin.leads.leadsErrors.leads.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+        message: "app.admin.leads.leadsErrors.leads.get.error.not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
       }
 
       const jobData = job[0];
@@ -289,10 +289,10 @@ export class ImportRepositoryImpl implements ImportRepository {
       });
     } catch (error) {
       logger.error("Error getting CSV import job status", parseError(error));
-      return createErrorResponse(
-        "app.admin.leads.leadsErrors.leads.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -313,10 +313,10 @@ export class ImportRepositoryImpl implements ImportRepository {
         .limit(1);
 
       if (!job) {
-        return createErrorResponse(
-          "app.admin.leads.leadsErrors.leads.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+        message: "app.admin.leads.leadsErrors.leads.get.error.not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
       }
 
       if (
@@ -421,10 +421,10 @@ export class ImportRepositoryImpl implements ImportRepository {
         })
         .where(eq(csvImportJobs.id, jobId));
 
-      return createErrorResponse(
-        "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -564,10 +564,10 @@ export class ImportRepositoryImpl implements ImportRepository {
    * NOTE: This is a placeholder. Domain-specific import should use importFromCsv with domain repository
    */
   importCsv(): ResponseType<ImportCsvResponseOutput> {
-    return createErrorResponse(
-      "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
   }
 
   /**
@@ -633,10 +633,10 @@ export class ImportRepositoryImpl implements ImportRepository {
       return createSuccessResponse({ jobs: transformedJobs });
     } catch (error) {
       logger.error("Error listing import jobs", parseError(error).message);
-      return createErrorResponse(
-        "app.admin.leads.leadsErrors.leads.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -666,10 +666,10 @@ export class ImportRepositoryImpl implements ImportRepository {
         .limit(1);
 
       if (existingJob.length === 0) {
-        return createErrorResponse(
-          "app.admin.leads.leadsErrors.leads.get.error.server.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+        message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
       }
 
       const existingJobData = existingJob[0];
@@ -679,10 +679,10 @@ export class ImportRepositoryImpl implements ImportRepository {
         existingJobData.status === CsvImportJobStatus.COMPLETED ||
         existingJobData.status === CsvImportJobStatus.FAILED
       ) {
-        return createErrorResponse(
-          "app.admin.leads.leadsErrors.leads.get.error.server.title",
-          ErrorResponseTypes.CONFLICT,
-        );
+        return fail({
+        message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.CONFLICT,
+      });
       }
 
       // Update the job
@@ -696,10 +696,10 @@ export class ImportRepositoryImpl implements ImportRepository {
         .returning();
 
       if (updatedJobs.length === 0) {
-        return createErrorResponse(
-          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
       }
 
       const job = updatedJobs[0];
@@ -724,10 +724,10 @@ export class ImportRepositoryImpl implements ImportRepository {
       });
     } catch (error) {
       logger.error("Error updating import job", parseError(error).message);
-      return createErrorResponse(
-        "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -752,10 +752,10 @@ export class ImportRepositoryImpl implements ImportRepository {
         );
 
       if (existingJob.length === 0) {
-        return createErrorResponse(
-          "app.admin.leads.leadsErrors.leadsImport.delete.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.delete.error.not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
       }
 
       // Delete the job
@@ -768,10 +768,10 @@ export class ImportRepositoryImpl implements ImportRepository {
       });
     } catch (error) {
       logger.error("Error deleting import job:", parseError(error).message);
-      return createErrorResponse(
-        "app.admin.leads.leadsErrors.leadsImport.delete.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.delete.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -798,10 +798,10 @@ export class ImportRepositoryImpl implements ImportRepository {
         .limit(1);
 
       if (existingJob.length === 0) {
-        return createErrorResponse(
-          "app.admin.leads.leadsErrors.leads.get.error.server.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+        message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
       }
 
       const job = existingJob[0];
@@ -812,10 +812,10 @@ export class ImportRepositoryImpl implements ImportRepository {
             job.status !== CsvImportJobStatus.PROCESSING &&
             job.status !== CsvImportJobStatus.PENDING
           ) {
-            return createErrorResponse(
-              "app.admin.leads.leadsErrors.leads.get.error.server.title",
-              ErrorResponseTypes.CONFLICT,
-            );
+            return fail({
+        message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.CONFLICT,
+      });
           }
 
           await db
@@ -837,10 +837,10 @@ export class ImportRepositoryImpl implements ImportRepository {
 
         case "retry":
           if (job.status !== CsvImportJobStatus.FAILED) {
-            return createErrorResponse(
-              "app.admin.leads.leadsErrors.leads.get.error.server.title",
-              ErrorResponseTypes.CONFLICT,
-            );
+            return fail({
+        message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.CONFLICT,
+      });
           }
 
           await db
@@ -862,17 +862,17 @@ export class ImportRepositoryImpl implements ImportRepository {
           });
 
         default:
-          return createErrorResponse(
-            "app.admin.leads.leadsErrors.leads.get.error.server.title",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+        message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
       }
     } catch (error) {
       logger.error("Error performing job action", parseError(error).message);
-      return createErrorResponse(
-        "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }

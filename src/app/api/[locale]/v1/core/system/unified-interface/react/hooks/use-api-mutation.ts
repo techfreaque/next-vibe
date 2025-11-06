@@ -1,27 +1,19 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import type { UseMutationResult } from "@tanstack/react-query";
 import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import {
-  createSuccessResponse,
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
-import type { AnyData, ApiStore, MutationStoreType } from "./store";
-import { useApiStore } from "./store";
+import { executeMutation } from "./mutation-executor";
 import type { ApiMutationOptions } from "./types";
+import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 
 /**
  * Type for mutation variables
@@ -111,13 +103,7 @@ export type EnhancedMutationResult<TResponse, TRequest, TUrlVariables> = Omit<
  * @returns Mutation result
  */
 export function useApiMutation<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
+  TEndpoint extends CreateApiEndpointAny,
 >(
   endpoint: TEndpoint,
   logger: EndpointLogger,
@@ -131,56 +117,25 @@ export function useApiMutation<
   TEndpoint["TRequestOutput"],
   TEndpoint["TUrlVariablesOutput"]
 > {
-  // Get API store methods
-  const { executeMutation, getMutationId } = useApiStore();
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
 
-  // Get mutation ID
-  const mutationId = useMemo(
-    () => getMutationId(endpoint),
-    [getMutationId, endpoint],
-  );
-
-  // Track error state
+  // Track error state for backward compatibility
   const [localError, setLocalError] = useState<ErrorResponseType | null>(null);
 
-  // Default state for the mutation
-  const defaultState: MutationStoreType<TEndpoint["TResponseOutput"]> = useMemo(
-    () => ({
-      response: undefined,
-      data: undefined,
-      isPending: false,
-      isError: false,
-      error: null,
-      isSuccess: false,
-      statusMessage: undefined,
-    }),
-    [],
-  );
-
-  // Create a selector function for the store
-  const selector = useCallback(
-    (state: ApiStore): MutationStoreType<TEndpoint["TResponseOutput"]> => {
-      const mutation = state.mutations[mutationId];
-      return (
-        (mutation as MutationStoreType<TEndpoint["TResponseOutput"]>) ??
-        defaultState
-      );
-    },
-    [mutationId, defaultState],
-  );
-
-  // Get mutation state from store with shallow comparison
-  const mutationState = useApiStore(selector);
-
-  // Create a type-safe mutate function that accepts both data and urlPathParams
-  const mutate = useCallback(
-    (
-      variables: MutationVariables<
-        TEndpoint["TRequestOutput"],
-        TEndpoint["TUrlVariablesOutput"]
-      >,
-    ) => {
+  // Use React Query's useMutation
+  const mutation = useMutation<
+    ResponseType<TEndpoint["TResponseOutput"]>,
+    ErrorResponseType,
+    MutationVariables<
+      TEndpoint["TRequestOutput"],
+      TEndpoint["TUrlVariablesOutput"]
+    >,
+    MutationContext<
+      TEndpoint["TRequestOutput"],
+      TEndpoint["TUrlVariablesOutput"]
+    >
+  >({
+    mutationFn: async (variables) => {
       // Clear any existing error when starting a new mutation
       setLocalError(null);
 
@@ -194,169 +149,68 @@ export function useApiMutation<
           ? variables.urlPathParams
           : ({} as TEndpoint["TUrlVariablesOutput"]);
 
-      void executeMutation(
-        endpoint as never,
+      // Call mutation executor
+      const response = await executeMutation({
+        endpoint: endpoint as never,
         logger,
-        requestData as never,
-        urlPathParams as never,
-        t,
+        requestData: requestData as never,
+        pathParams: urlPathParams as never,
         locale,
-        options as never,
-      );
-    },
-    [executeMutation, endpoint, logger, t, locale, options],
-  );
-
-  // Create a type-safe mutateAsync function
-  const mutateAsync = useCallback(
-    async (
-      variables: MutationVariables<
-        TEndpoint["TRequestOutput"],
-        TEndpoint["TUrlVariablesOutput"]
-      >,
-    ): Promise<ResponseType<TEndpoint["TResponseOutput"]>> => {
-      try {
-        // Clear any existing error when starting a new mutation
-        setLocalError(null);
-
-        // Handle the case where variables is an empty object (for endpoints with no request data)
-        const requestData =
-          "requestData" in variables
-            ? variables.requestData
-            : ({} as TEndpoint["TRequestOutput"]);
-        const urlPathParams =
-          "urlPathParams" in variables
-            ? variables.urlPathParams
-            : ({} as TEndpoint["TUrlVariablesOutput"]);
-
-        const response = await executeMutation(
-          endpoint as never,
-          logger,
-          requestData as never,
-          urlPathParams as never,
-          t,
-          locale,
-          options as never,
-        );
-
-        // Ensure we return a proper ResponseType
-        return typeof response === "object" &&
-          response !== null &&
-          "success" in response
-          ? response
-          : createSuccessResponse(response);
-      } catch (error) {
-        // Create a properly typed error response
-        const errorResponse = fail({
-          message: "app.common.errors.unknown",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            error: parseError(error).message,
-            endpoint: endpoint.path.join("/"),
-          },
-        });
-
-        // Set the local error state
-        setLocalError(errorResponse);
-
-        return errorResponse;
-      }
-    },
-    [executeMutation, endpoint, logger, t, locale, options],
-  );
-
-  // Helper function for updating mutation state
-  const updateMutationState = useCallback(
-    (updates: Partial<MutationStoreType<TEndpoint["TResponseOutput"]>>) => {
-      useApiStore.setState((state) => {
-        const mutations = { ...state.mutations };
-        const existingMutation = mutations[mutationId];
-        if (existingMutation) {
-          mutations[mutationId] = {
-            ...existingMutation,
-            ...updates,
-          } as MutationStoreType<AnyData>;
-        }
-        return { mutations };
+        options: {
+          onSuccess: options.onSuccess
+            ? (context): void | ErrorResponseType | Promise<void | ErrorResponseType> =>
+                options.onSuccess?.({
+                  requestData: context.requestData,
+                  pathParams: context.urlPathParams,
+                  responseData: context.responseData,
+                })
+            : undefined,
+          onError: options.onError
+            ? (context): void | Promise<void> =>
+                options.onError?.({
+                  error: context.error,
+                  requestData: context.requestData,
+                  pathParams: context.urlPathParams,
+                })
+            : undefined,
+        },
       });
-    },
-    [mutationId],
-  );
 
-  // Reset mutation state
-  const reset = useCallback(() => {
-    // Clear the local error state
-    setLocalError(null);
-
-    updateMutationState({
-      isPending: false,
-      isError: false,
-      error: null,
-      isSuccess: false,
-      data: undefined,
-    });
-  }, [updateMutationState]);
-
-  // Function to set error type
-  const setErrorType = useCallback(
-    (error: ErrorResponseType | null): void => {
-      setLocalError(error);
-
-      // Also update the store if needed
-      if (error !== null) {
-        updateMutationState({
-          isError: true,
-          error,
-          isSuccess: false,
-        });
+      // If response is an error, throw it so React Query treats it as an error
+      if (!response.success) {
+        throw response;
       }
+
+      return response;
     },
-    [updateMutationState],
-  );
+    onError: (error) => {
+      setLocalError(error);
+    },
+  });
 
-  // Create a result object that matches React Query's UseMutationResult
-  return useMemo(() => {
-    // Convert data to ResponseType if needed
-    const data = mutationState.data
-      ? typeof mutationState.data === "object" &&
-        mutationState.data !== null &&
-        "success" in mutationState.data &&
-        "data" in mutationState.data
-        ? (mutationState.data as ResponseType<TEndpoint["TResponseOutput"]>)
-        : createSuccessResponse(
-          mutationState.data as TEndpoint["TResponseOutput"],
-        )
-      : undefined;
+  // Function to set error type for backward compatibility
+  const setErrorType = (error: ErrorResponseType | null): void => {
+    setLocalError(error);
+  };
 
-    // Use local error state if it exists, otherwise fall back to store error
-    const error = localError || mutationState.error;
+  // Return enhanced mutation result with backward-compatible interface
+  return {
+    // React Query's useMutation properties
+    mutate: mutation.mutate,
+    mutateAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    isError: mutation.isError,
+    error: localError || mutation.error,
+    isSuccess: mutation.isSuccess,
+    data: mutation.data,
+    reset: mutation.reset,
+    status: mutation.status,
 
-    return {
-      mutate,
-      mutateAsync,
-      isPending: mutationState.isPending,
-      isError: mutationState.isError || !!localError,
-      error,
-      isSuccess: mutationState.isSuccess && !localError,
-      data,
-      reset,
-      status: mutationState.isPending
-        ? "pending"
-        : mutationState.isError || !!localError
-          ? "error"
-          : mutationState.isSuccess && !localError
-            ? "success"
-            : "idle",
-      setErrorType,
-      variables: undefined,
-      failureCount: 0,
-      failureReason: null,
-      context: undefined as
-        | MutationContext<
-          TEndpoint["TRequestOutput"],
-          TEndpoint["TUrlVariablesOutput"]
-        >
-        | undefined,
-    };
-  }, [mutationState, mutate, mutateAsync, reset, localError, setErrorType]);
+    // Backward compatibility properties
+    setErrorType,
+    variables: mutation.variables,
+    failureCount: mutation.failureCount,
+    failureReason: mutation.failureReason,
+    context: mutation.context,
+  };
 }

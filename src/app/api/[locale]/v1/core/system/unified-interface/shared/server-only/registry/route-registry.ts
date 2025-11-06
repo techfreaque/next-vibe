@@ -17,11 +17,8 @@ import type { EndpointLogger } from "../../logger/endpoint";
 import type { Methods } from "../../types/enums";
 import type { RouteModule } from "../../types/handler";
 import { normalizeRoutePath } from "../../registry/normalize-route-path";
-
-/**
- * Default request data type
- */
-type DefaultRequestData = Record<string, string | number | boolean | null>;
+import { type UnifiedField } from "../../types/endpoint";
+import type z from "zod";
 
 /**
  * Route loading options
@@ -43,12 +40,12 @@ export interface RouteLoadResult<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   > = CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   >,
 > {
   /** Loaded route module */
@@ -70,12 +67,12 @@ export class RouteRegistry {
       string,
       Methods,
       readonly (typeof UserRoleValue)[],
-      DefaultRequestData
+      UnifiedField<z.ZodTypeAny>
     > = CreateApiEndpoint<
       string,
       Methods,
       readonly (typeof UserRoleValue)[],
-      DefaultRequestData
+      UnifiedField<z.ZodTypeAny>
     >,
   >(
     options: RouteLoadOptions,

@@ -16,6 +16,7 @@ import { z } from "zod";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -62,7 +63,7 @@ export async function validateNextRequestData<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields,
+  TFields extends UnifiedField<z.ZodTypeAny>,
 >(
   endpoint: CreateApiEndpoint<
     TExampleKey,

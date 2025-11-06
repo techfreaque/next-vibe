@@ -352,8 +352,8 @@ export function useApiQueryForm<
     options: {
       ...queryOptions,
       enabled: finalEnabled,
-      staleTime: 0, // Disable caching for filter forms to ensure fresh data
-      cacheTime: 0, // Disable cache storage
+      // Respect staleTime and cacheTime from queryOptions
+      // Don't hardcode to 0 as this breaks caching for all read endpoints
       // Use a custom onError handler
       onError: ({ error }): void => {
         if (queryOptions.onError) {

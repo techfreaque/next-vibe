@@ -6,23 +6,20 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { isErrorResponseType } from "next-vibe/shared/utils/parse-error";
 import type { FormEvent } from "react";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-import { useTranslation } from "@/i18n/core/client";
 
-import type { ApiStore, FormQueryParams } from "./store";
 import { useApiStore } from "./store";
 import type {
   ApiFormOptions,
@@ -31,6 +28,7 @@ import type {
   SubmitFormFunction,
   SubmitFormFunctionOptions,
 } from "./types";
+import { useApiMutation } from "./use-api-mutation";
 
 /**
  * Creates a form integrated with API mutation based on the endpoint's request schema
@@ -69,63 +67,14 @@ export function useApiForm<
   TEndpoint["TResponseOutput"],
   TEndpoint["TUrlVariablesOutput"]
 > {
-  // Get Zustand store methods
-  const { executeMutation, getMutationId, getFormId } = useApiStore();
-  const { t, locale } = useTranslation();
+  const { getFormId } = useApiStore();
   const formId = getFormId(endpoint);
-  const mutationId = getMutationId(endpoint);
 
-  // Create memoized selectors to prevent re-renders
-  const mutationSelector = useMemo(
-    () =>
-      (
-        state: ApiStore,
-      ):
-        | {
-            isPending: boolean;
-            isError: boolean;
-            error: ErrorResponseType | null;
-            isSuccess: boolean;
-            data: TEndpoint["TResponseOutput"] | undefined;
-          }
-        | undefined =>
-        state.mutations[mutationId] as
-          | {
-              isPending: boolean;
-              isError: boolean;
-              error: ErrorResponseType | null;
-              isSuccess: boolean;
-              data: TEndpoint["TResponseOutput"] | undefined;
-            }
-          | undefined,
-    [mutationId],
-  );
+  // Use React Query-based mutation hook
+  const mutation = useApiMutation(endpoint, logger, mutationOptions);
 
-  const formSelector = useMemo(
-    () =>
-      (
-        state: ApiStore,
-      ):
-        | {
-            formError: ErrorResponseType | null;
-            isSubmitting: boolean;
-            queryParams?: FormQueryParams;
-          }
-        | undefined =>
-        state.forms[formId],
-    [formId],
-  );
-
-  // Extract state from the Zustand store with shallow comparison
-  const mutationState = useApiStore(mutationSelector) ?? {
-    isPending: false,
-    isError: false,
-    error: null,
-    isSuccess: false,
-    data: undefined,
-  };
-
-  const formState = useApiStore(formSelector) ?? {
+  // Get form state from Zustand (forms state remains in Zustand)
+  const formState = useApiStore((state) => state.forms[formId]) ?? {
     formError: null,
     isSubmitting: false,
   };
@@ -279,17 +228,14 @@ export function useApiForm<
         // Clear any previous errors
         clearFormError();
 
-        // Call the API with the validated form data
-        const result = await executeMutation(
-          endpoint as never,
-          logger,
-          validatedData as never,
-          ((options?.urlParamVariables as TEndpoint["TUrlVariablesOutput"]) ||
-            ({} as TEndpoint["TUrlVariablesOutput"])) as never,
-          t,
-          locale,
-          mutationOptions as never,
-        );
+        // Call the API with the validated form data using React Query mutation
+        const urlPathParams = (options?.urlParamVariables as TEndpoint["TUrlVariablesOutput"]) ||
+          ({} as TEndpoint["TUrlVariablesOutput"]);
+
+        const result = await mutation.mutateAsync({
+          requestData: validatedData,
+          urlPathParams,
+        } as never);
 
         if (result === undefined) {
           logger.error("Mutation result is undefined", {
@@ -372,30 +318,28 @@ export function useApiForm<
     TEndpoint["TUrlVariablesOutput"]
   >;
 
-  // Create the response object
+  // Create the response object from mutation data
   const response: ResponseType<TEndpoint["TResponseOutput"]> | undefined =
-    mutationState.isSuccess
-      ? createSuccessResponse(
-          mutationState.data as TEndpoint["TResponseOutput"],
-        )
-      : mutationState.isError && mutationState.error
-        ? mutationState.error
+    mutation.data
+      ? mutation.data
+      : mutation.error
+        ? mutation.error
         : formState.formError
           ? formState.formError
           : undefined;
 
   // Simplify submitError to avoid complex union types
   const submitError: ErrorResponseType | undefined =
-    mutationState.error || formState.formError || undefined;
+    mutation.error || formState.formError || undefined;
 
   return {
     form: formMethods,
     response,
     // Backward compatibility properties
-    isSubmitSuccessful: mutationState.isSuccess,
+    isSubmitSuccessful: mutation.isSuccess,
     submitError,
 
-    isSubmitting: mutationState.isPending,
+    isSubmitting: mutation.isPending,
     submitForm,
     clearSavedForm,
     setErrorType,

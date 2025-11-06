@@ -20,6 +20,7 @@ import {
   executeHandler,
 } from "../shared/server-only/execution/core";
 import type { Methods } from "../shared/types/enums";
+import type { UnifiedField } from "../shared/types/endpoint";
 import type {
   ApiHandlerOptions,
   CliHandlerReturnType,
@@ -54,7 +55,8 @@ export function createCliHandler<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Infrastructure: Generic endpoint type requires 'any' for TFields parameter to accept all endpoint field configurations
+  TFields extends UnifiedField<any>,
 >(
   options: ApiHandlerOptions<
     TRequestOutput,
@@ -103,8 +105,8 @@ export function createCliHandler<
       endpoint,
       {
         method: endpoint.method,
-        requestData: data,
-        urlParameters: urlPathParams,
+        requestData: data as never,
+        urlParameters: urlPathParams as never,
         locale,
       },
       logger,

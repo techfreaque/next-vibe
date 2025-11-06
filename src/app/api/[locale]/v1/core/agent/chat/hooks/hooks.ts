@@ -190,7 +190,6 @@ export function useChat(
   useDataLoader(
     locale,
     logger,
-    t,
     chatStore.addThread,
     chatStore.addMessage,
     chatStore.addFolder,

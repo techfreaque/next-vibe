@@ -7,9 +7,9 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -55,11 +55,11 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
 
       // Validate phone number format
       if (!this.isValidPhoneNumber(data.to)) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.smsService.errors.invalid_phone.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          { phoneNumber: data.to },
-        );
+        return fail({
+          message: "app.api.v1.core.emails.smsService.errors.invalid_phone.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          messageParams: { phoneNumber: data.to },
+        });
       }
 
       // Validate message length (SMS limit is typically 160 characters)
@@ -94,11 +94,11 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
         "SMS service: Critical error in SMS sending",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.emails.smsService.errors.send.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.emails.smsService.errors.send.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 

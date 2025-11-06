@@ -11,9 +11,9 @@ import {
   RESET_TOKEN_EXPIRY,
 } from "@/config/constants";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -156,15 +156,15 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
 
       // Return error if there were any errors, otherwise success
       if (errors.length > 0) {
-        return createErrorResponse(
-          "app.api.v1.core.user.session-cleanup.errors.partial_failure.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.user.session-cleanup.errors.partial_failure.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
             errors:
               result.errors?.join(", ") ||
               "app.api.v1.core.user.session-cleanup.errors.unknown_error.title",
           },
-        );
+        });
       }
 
       return createSuccessResponse(result);
@@ -177,11 +177,11 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
         executionTimeMs,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.user.session-cleanup.errors.execution_failed.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: errorMessage },
-      );
+      return fail({
+        message: "app.api.v1.core.user.session-cleanup.errors.execution_failed.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
     }
   }
 
@@ -213,27 +213,27 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
         config.sessionRetentionDays < 1 ||
         config.sessionRetentionDays > 365
       ) {
-        return createErrorResponse(
-          "app.api.v1.core.user.session-cleanup.errors.invalid_session_retention.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          { sessionRetentionDays: config.sessionRetentionDays },
-        );
+        return fail({
+          message: "app.api.v1.core.user.session-cleanup.errors.invalid_session_retention.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          messageParams: { sessionRetentionDays: config.sessionRetentionDays },
+        });
       }
 
       if (config.tokenRetentionDays < 1 || config.tokenRetentionDays > 365) {
-        return createErrorResponse(
-          "app.api.v1.core.user.session-cleanup.errors.invalid_token_retention.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          { tokenRetentionDays: config.tokenRetentionDays },
-        );
+        return fail({
+          message: "app.api.v1.core.user.session-cleanup.errors.invalid_token_retention.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          messageParams: { tokenRetentionDays: config.tokenRetentionDays },
+        });
       }
 
       if (config.batchSize < 1 || config.batchSize > 1000) {
-        return createErrorResponse(
-          "app.api.v1.core.user.session-cleanup.errors.invalid_batch_size.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          { batchSize: config.batchSize },
-        );
+        return fail({
+          message: "app.api.v1.core.user.session-cleanup.errors.invalid_batch_size.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          messageParams: { batchSize: config.batchSize },
+        });
       }
 
       logger.debug("Session cleanup configuration validation passed");
@@ -243,11 +243,11 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
         "Session cleanup configuration validation failed",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.user.session-cleanup.errors.validation_failed.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.user.session-cleanup.errors.validation_failed.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 }

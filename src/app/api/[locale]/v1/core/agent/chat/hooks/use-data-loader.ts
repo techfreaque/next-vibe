@@ -12,7 +12,6 @@ import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/r
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import type { DefaultFolderId } from "../config";
 import type { FolderListResponseOutput } from "../folders/definition";
@@ -110,7 +109,6 @@ async function loadIncognitoData(
 async function loadThreadsFromServer(
   logger: EndpointLogger,
   locale: CountryLanguage,
-  t: TFunction,
   addThread: (thread: ChatThread) => void,
 ): Promise<void> {
   try {
@@ -122,7 +120,6 @@ async function loadThreadsFromServer(
         limit: 100,
       },
       {},
-      t,
       locale,
       {
         disableLocalCache: true,
@@ -211,7 +208,6 @@ async function loadThreadsFromServer(
 async function loadFoldersFromServer(
   logger: EndpointLogger,
   locale: CountryLanguage,
-  t: TFunction,
   addFolder: (folder: ChatFolder) => void,
 ): Promise<void> {
   try {
@@ -220,7 +216,6 @@ async function loadFoldersFromServer(
       logger,
       {},
       {},
-      t,
       locale,
       {
         disableLocalCache: true,
@@ -280,7 +275,6 @@ async function loadFoldersFromServer(
 export function useDataLoader(
   locale: CountryLanguage,
   logger: EndpointLogger,
-  t: TFunction,
   addThread: (thread: ChatThread) => void,
   addMessage: (message: ChatMessage) => void,
   addFolder: (folder: ChatFolder) => void,
@@ -311,8 +305,8 @@ export function useDataLoader(
       });
 
       await Promise.all([
-        loadThreadsFromServer(logger, locale, t, addThread),
-        loadFoldersFromServer(logger, locale, t, addFolder),
+        loadThreadsFromServer(logger, locale, addThread),
+        loadFoldersFromServer(logger, locale, addFolder),
       ]);
     };
 

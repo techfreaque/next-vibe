@@ -6,9 +6,9 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import Stripe from "stripe";
@@ -55,11 +55,11 @@ export class StripeProvider implements PaymentProvider {
         .limit(1);
 
       if (!user) {
-        return createErrorResponse(
-          "app.api.v1.core.payment.providers.stripe.errors.userNotFound.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId },
-        );
+        return fail({
+          message: "app.api.v1.core.payment.providers.stripe.errors.userNotFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: { userId },
+        });
       }
 
       if (user.stripeCustomerId) {
@@ -92,11 +92,11 @@ export class StripeProvider implements PaymentProvider {
         error: parseError(error),
         userId,
       });
-      return createErrorResponse(
-        "app.api.v1.core.payment.providers.stripe.errors.customerCreationFailed.title",
-        ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        { error: parseError(error).message, userId },
-      );
+      return fail({
+        message: "app.api.v1.core.payment.providers.stripe.errors.customerCreationFailed.title",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: parseError(error).message, userId },
+      });
     }
   }
 
@@ -175,11 +175,11 @@ export class StripeProvider implements PaymentProvider {
         error: parseError(error),
         userId: params.userId,
       });
-      return createErrorResponse(
-        "app.api.v1.core.payment.providers.stripe.errors.checkoutCreationFailed.title",
-        ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.payment.providers.stripe.errors.checkoutCreationFailed.title",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -201,11 +201,11 @@ export class StripeProvider implements PaymentProvider {
       logger.error("Failed to verify Stripe webhook", {
         error: parseError(error),
       });
-      return createErrorResponse(
-        "app.api.v1.core.payment.providers.stripe.errors.webhookVerificationFailed.title",
-        ErrorResponseTypes.BAD_REQUEST,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.payment.providers.stripe.errors.webhookVerificationFailed.title",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -272,11 +272,11 @@ export class StripeProvider implements PaymentProvider {
         error: parseError(error),
         subscriptionId,
       });
-      return createErrorResponse(
-        "app.api.v1.core.payment.providers.stripe.errors.subscriptionRetrievalFailed.title",
-        ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.payment.providers.stripe.errors.subscriptionRetrievalFailed.title",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -292,11 +292,11 @@ export class StripeProvider implements PaymentProvider {
         error: parseError(error),
         subscriptionId,
       });
-      return createErrorResponse(
-        "app.api.v1.core.payment.providers.stripe.errors.subscriptionCancellationFailed.title",
-        ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.payment.providers.stripe.errors.subscriptionCancellationFailed.title",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 }

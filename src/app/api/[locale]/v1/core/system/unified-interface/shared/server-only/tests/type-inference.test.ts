@@ -43,7 +43,10 @@ import type {
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
 } from "@/app/api/[locale]/v1/core/user/auth/types";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { UserRoleValue,
+ } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { UserRole,
+ } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { InferJwtPayloadTypeFromRoles } from "../../types/handler";

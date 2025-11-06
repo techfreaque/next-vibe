@@ -11,13 +11,10 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 import type { CreateApiEndpoint } from "../../endpoint/create";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Methods } from "../../types/enums";
+import type { UnifiedField } from "../../types/endpoint";
 import type { RouteModule } from "../../types/handler";
 import { routeRegistry } from "../registry/route-registry";
-
-/**
- * Default request data type for route module constraints
- */
-type DefaultRequestData = Record<string, string | number | boolean | null>;
+import type z from "zod";
 
 /**
  * Route loading options
@@ -40,12 +37,12 @@ export interface RouteLoaderResult<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   > = CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   >,
 > {
   /** Loaded route module */
@@ -63,12 +60,12 @@ export async function loadRouteModule<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   > = CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   >,
 >(
   options: RouteLoaderOptions,
@@ -96,12 +93,12 @@ export function extractHandlerFromModule<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   > = CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   >,
 >(
   module: RouteModule<TEndpoint>,
@@ -165,12 +162,12 @@ export async function loadRouteHandler<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   > = CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   >,
 >(
   options: RouteLoaderOptions,

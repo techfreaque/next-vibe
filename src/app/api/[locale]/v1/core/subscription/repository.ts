@@ -8,9 +8,9 @@ import "server-only";
 import { desc, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type Stripe from "stripe";
@@ -86,10 +86,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         .limit(1);
 
       if (results.length === 0) {
-        return createErrorResponse(
-          "app.api.v1.core.subscription.errors.not_found",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+          message: "app.api.v1.core.subscription.errors.not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       const subscription = results[0];
@@ -111,11 +111,11 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       });
     } catch (error) {
       logger.error("Error getting subscription:", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.subscription.errors.database_error",
-        ErrorResponseTypes.DATABASE_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.subscription.errors.database_error",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -126,11 +126,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     _logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionPostResponseOutput>> {
     // This should be called from checkout flow after payment provider confirms
-    return createErrorResponse(
-      "app.api.v1.core.subscription.errors.use_checkout_flow",
-      ErrorResponseTypes.BAD_REQUEST,
-      {},
-    );
+    return fail({
+      message: "app.api.v1.core.subscription.errors.use_checkout_flow",
+      errorType: ErrorResponseTypes.BAD_REQUEST,
+    });
   }
 
   async updateSubscription(
@@ -147,10 +146,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         .limit(1);
 
       if (!currentSubscription[0]) {
-        return createErrorResponse(
-          "app.api.v1.core.subscription.errors.not_found",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+          message: "app.api.v1.core.subscription.errors.not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       const updateData: Partial<NewSubscription> = {
@@ -171,10 +170,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         .returning();
 
       if (results.length === 0) {
-        return createErrorResponse(
-          "app.api.v1.core.subscription.errors.not_found",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+          message: "app.api.v1.core.subscription.errors.not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       const updatedSubscription = results[0];
@@ -197,11 +196,11 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       });
     } catch (error) {
       logger.error("Error updating subscription:", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.subscription.errors.database_error",
-        ErrorResponseTypes.DATABASE_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.subscription.errors.database_error",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -221,10 +220,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         .limit(1);
 
       if (!currentSubscription[0]) {
-        return createErrorResponse(
-          "app.api.v1.core.subscription.errors.not_found",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+          message: "app.api.v1.core.subscription.errors.not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       const subscription = currentSubscription[0];
@@ -263,10 +262,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         .returning();
 
       if (results.length === 0) {
-        return createErrorResponse(
-          "app.api.v1.core.subscription.errors.not_found",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+          message: "app.api.v1.core.subscription.errors.not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       return createSuccessResponse({
@@ -275,11 +274,11 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       });
     } catch (error) {
       logger.error("Error canceling subscription:", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.subscription.errors.cancel_failed",
-        ErrorResponseTypes.DATABASE_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.subscription.errors.cancel_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 

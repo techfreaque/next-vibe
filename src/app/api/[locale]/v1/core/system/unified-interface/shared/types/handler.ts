@@ -72,6 +72,8 @@ import type { CreateApiEndpoint } from "../endpoint/create";
 import type { EndpointLogger } from "../logger/endpoint";
 import type { Methods } from "./enums";
 import type { UserRole } from "../../../../user/user-roles/enum";
+import { type UnifiedField } from "./endpoint";
+import type z from "zod";
 
 // Re-export MCP types for convenience
 export type {
@@ -152,12 +154,12 @@ export interface RouteModule<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   > = CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   >,
 > {
   // HTTP method handlers (GET, POST, PUT, PATCH, DELETE)
@@ -217,12 +219,12 @@ export interface DefinitionModule<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   > = CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    DefaultRequestData
+    UnifiedField<z.ZodTypeAny>
   >,
 > {
   default?: Record<string, TEndpoint>;
@@ -497,7 +499,7 @@ export interface ApiHandlerOptions<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields,
+  TFields extends UnifiedField<z.ZodTypeAny>,
   TRequestInput = TRequestOutput,
   TResponseInput = TResponseOutput,
   TUrlVariablesInput = TUrlVariablesOutput,

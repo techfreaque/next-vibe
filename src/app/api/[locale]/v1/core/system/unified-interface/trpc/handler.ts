@@ -26,6 +26,8 @@ import type {
   TrpcHandlerReturnType as TrpcHandlerType,
 } from "./types";
 import { validateTrpcRequestData } from "./validation";
+import { type UnifiedField } from "../shared/types/endpoint";
+import type z from "zod";
 
 /**
  * Create a tRPC procedure
@@ -42,7 +44,7 @@ export function createTRPCHandler<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields,
+  TFields extends UnifiedField<z.ZodTypeAny>,
 >(
   options: ApiHandlerOptions<
     TRequestOutput,

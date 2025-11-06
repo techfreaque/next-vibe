@@ -114,17 +114,13 @@ export function useEndpointRead<
 
   // Enhanced query options with initial data support
   const enhancedQueryOptions = useMemo(() => {
-    // If initial data (response) is provided, disable the initial request
-    const shouldSkipInitialRequest = Boolean(initialData);
-
-    const finalEnabled = shouldSkipInitialRequest
-      ? false
-      : (queryOptions.enabled ?? true);
+    // If initial data is provided, disable the query to prevent unnecessary fetches
+    const shouldDisableQuery = Boolean(initialData);
 
     return {
       ...queryOptions,
-      // Skip initial request if we have initial data from server
-      enabled: finalEnabled,
+      // Disable query when we have initial data from server
+      enabled: shouldDisableQuery ? false : (queryOptions.enabled ?? true),
       // Pass initial data for the query
       // This will be wrapped in a success response by useApiQuery
       initialData: initialData,

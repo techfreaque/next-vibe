@@ -38,6 +38,7 @@ import type {
   ApiHandlerOptions,
   NextHandlerReturnType,
 } from "../shared/types/handler";
+import { type UnifiedField } from "../shared/types/endpoint";
 
 // Create email handling repository instance
 const emailHandlingRepository = new EmailHandlingRepositoryImpl();
@@ -75,7 +76,7 @@ export function createNextHandler<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields,
+  TFields extends UnifiedField<z.ZodTypeAny>,
 >(
   options: ApiHandlerOptions<
     TRequestOutput,

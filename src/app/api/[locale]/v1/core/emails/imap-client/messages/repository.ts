@@ -8,9 +8,9 @@ import "server-only";
 import { and, asc, count, desc, eq, gte, ilike, lte, or } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -377,11 +377,11 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         "app.api.v1.core.emails.imapClient.messages.list.error.server",
         parsedError,
       );
-      return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.messages.list.get.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+        message: "app.api.v1.core.emails.imapClient.messages.list.get.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -404,19 +404,19 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         .limit(1);
 
       if (!message) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
       }
 
       return createSuccessResponse(this.formatMessageResponse(message));
     } catch (error) {
       logger.error("Error getting IMAP message by ID", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -443,10 +443,10 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         .limit(1);
 
       if (!existingMessage) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
       }
 
       // Prepare update data - only allow certain fields to be updated
@@ -475,19 +475,19 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         .returning();
 
       if (!updatedMessage) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
       }
 
       return createSuccessResponse(this.formatMessageResponse(updatedMessage));
     } catch (error) {
       logger.error("Error updating IMAP message", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -556,10 +556,10 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
           .limit(1);
 
         if (account.length === 0) {
-          return createErrorResponse(
-            "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
-            ErrorResponseTypes.NOT_FOUND,
-          );
+          return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
         }
 
         // Note: syncRepository methods expect full CountryLanguage format
@@ -598,10 +598,10 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
             })),
           });
         } else {
-          return createErrorResponse(
-            "app.api.v1.core.emails.imapClient.imapErrors.sync.message.failed",
-            ErrorResponseTypes.INTERNAL_ERROR,
-          );
+          return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.sync.message.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
         }
       } else {
         // Sync all accounts
@@ -638,18 +638,18 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
             })),
           });
         } else {
-          return createErrorResponse(
-            "app.api.v1.core.emails.imapClient.imapErrors.sync.message.failed",
-            ErrorResponseTypes.INTERNAL_ERROR,
-          );
+          return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.sync.message.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
         }
       }
     } catch (error) {
       logger.error("Error syncing IMAP messages", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.imapErrors.sync.post.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.sync.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -697,19 +697,19 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         .returning();
 
       if (!updatedMessage) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
       }
 
       return createSuccessResponse({ success: true });
     } catch (error) {
       logger.error("Error updating message sync status", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -738,19 +738,19 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         .returning();
 
       if (!updatedMessage) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
       }
 
       return createSuccessResponse({ success: true });
     } catch (error) {
       logger.error("Error updating message read status", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }

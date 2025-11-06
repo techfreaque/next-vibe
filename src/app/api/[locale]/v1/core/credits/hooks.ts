@@ -8,12 +8,12 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { useToast } from "next-vibe-ui//hooks/use-toast";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { handleCheckoutRedirect } from "@/app/api/[locale]/v1/core/payment/utils/redirect";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
-import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
+import { apiClient, queryClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
@@ -66,8 +66,7 @@ export function useCredits(
     definitions,
     {
       read: {
-        // Pass initial data to disable initial fetch and use server data
-        // useEndpointRead automatically disables initial fetch when initialData is provided
+        // Pass initial data - this will populate the cache properly
         initialData: initialData ?? undefined,
         queryOptions: {
           refetchOnWindowFocus: true,
@@ -91,13 +90,6 @@ export function useCredits(
         definitions.GET,
         (oldData: EndpointData | undefined) => {
           if (!oldData?.success || !oldData.data) {
-            logger.warn(
-              "Credits optimistic update skipped - no existing data",
-              {
-                feature,
-                creditCost,
-              },
-            );
             return oldData;
           }
 
@@ -105,14 +97,6 @@ export function useCredits(
 
           // Ensure we don't go negative
           if (data.total < creditCost) {
-            logger.warn(
-              "Credits optimistic update skipped - insufficient credits",
-              {
-                feature,
-                creditCost,
-                currentTotal: data.total,
-              },
-            );
             return oldData;
           }
 
@@ -145,23 +129,6 @@ export function useCredits(
 
           const newTotal = newFree + newExpiring + newPermanent;
 
-          logger.debug("Credits optimistically updated", {
-            feature,
-            creditCost,
-            before: {
-              total: data.total,
-              free: data.free,
-              expiring: data.expiring,
-              permanent: data.permanent,
-            },
-            after: {
-              total: newTotal,
-              free: newFree,
-              expiring: newExpiring,
-              permanent: newPermanent,
-            },
-          });
-
           return {
             success: true,
             data: {
@@ -173,9 +140,11 @@ export function useCredits(
             },
           };
         },
+        {}, // requestData - must match useEndpointRead default
+        {}, // urlPathParams - must match useEndpointRead default
       );
     },
-    [logger],
+    [logger, apiClient, definitions.GET],
   );
 
   /**

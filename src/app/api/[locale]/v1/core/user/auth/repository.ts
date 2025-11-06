@@ -15,9 +15,9 @@ import {
 } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
   throwErrorResponse,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -712,11 +712,11 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorSigningJwt",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.errors.jwt_signing_failed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.user.auth.errors.jwt_signing_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -740,19 +740,19 @@ class AuthRepositoryImpl implements AuthRepository {
       // Validate the payload structure
       if (!payload.id || typeof payload.id !== "string") {
         logger.debug("app.api.v1.core.user.auth.debug.invalidTokenPayload");
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.invalid_token_signature",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
+        return fail({
+          message: "app.api.v1.core.user.auth.errors.invalid_token_signature",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
       }
 
       // Validate leadId is present
       if (!payload.leadId || typeof payload.leadId !== "string") {
         logger.debug("app.api.v1.core.user.auth.debug.invalidTokenPayload");
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.invalid_token_signature",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
+        return fail({
+          message: "app.api.v1.core.user.auth.errors.invalid_token_signature",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
       }
 
       logger.debug("app.api.v1.core.user.auth.debug.jwtVerifiedSuccessfully");
@@ -766,11 +766,11 @@ class AuthRepositoryImpl implements AuthRepository {
       logger.debug("app.api.v1.core.user.auth.debug.errorVerifyingJwt", {
         error: parseError(error),
       });
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.errors.invalid_token_signature",
-        ErrorResponseTypes.UNAUTHORIZED,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.user.auth.errors.invalid_token_signature",
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -806,10 +806,10 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       // Locale is required
       if (!context.locale) {
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.missing_locale",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.user.auth.errors.missing_locale",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       // Default to Next.js platform for backward compatibility
@@ -822,21 +822,22 @@ class AuthRepositoryImpl implements AuthRepository {
       const authResult = await authHandler.authenticate(context, logger);
 
       if (!authResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.authentication_failed",
-          ErrorResponseTypes.UNAUTHORIZED,
-          { error: authResult.message },
-        );
+        return fail({
+          message: "app.api.v1.core.user.auth.errors.authentication_failed",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+          messageParams: { error: authResult.message },
+          cause: authResult,
+        });
       }
 
       const jwtPayload = authResult.data;
 
       // Ensure we have a private user (not public)
       if (jwtPayload.isPublic) {
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.user_not_authenticated",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
+        return fail({
+          message: "app.api.v1.core.user.auth.errors.user_not_authenticated",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
       }
 
       return createSuccessResponse(jwtPayload);
@@ -845,11 +846,11 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorInUnifiedGetCurrentUser",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.errors.session_retrieval_failed",
-        ErrorResponseTypes.UNAUTHORIZED,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.user.auth.errors.session_retrieval_failed",
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -1100,11 +1101,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return await handler.storeAuthToken(token, userId, leadId, logger);
     } catch (error) {
       logger.error("Error storing auth token for platform", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.errors.cookie_set_failed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.user.auth.errors.cookie_set_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -1128,11 +1129,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return await handler.clearAuthToken(logger);
     } catch (error) {
       logger.error("Error clearing auth token for platform", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.errors.cookie_clear_failed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.user.auth.errors.cookie_clear_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -1168,11 +1169,11 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorCreatingCliToken",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.errors.jwt_signing_failed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.user.auth.errors.jwt_signing_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 

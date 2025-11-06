@@ -256,14 +256,14 @@ type Test6_2_Result = Test6_2_FunctionParam extends (
 // This might fail - let's see
 const test6_2: Test6_2_Result = "✓ PASS";
 
-// Test 6.3: Constraint in nested generic (now without UnifiedField constraint)
+// Test 6.3: Constraint in nested generic
 type Test6_3_NestedGeneric<
   TFields,
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    TFields
+    UnifiedField<z.ZodTypeAny>
   >,
 > = TEndpoint;
 
@@ -275,7 +275,7 @@ type Test6_3_Result =
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    any
+    UnifiedField<z.ZodTypeAny>
   >
   ? "✓ PASS"
   : "✗ FAIL";
@@ -291,7 +291,7 @@ type Test7_1_UseApiForm = <
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    any
+    UnifiedField<z.ZodTypeAny>
   >,
 >(
   endpoint: TEndpoint,
@@ -311,7 +311,7 @@ type Test7_2_AcceptsAnyEndpoint = (
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    any
+    UnifiedField<z.ZodTypeAny>
   >,
 ) => void;
 
@@ -332,7 +332,7 @@ type Test8_1_UseApiFormCurrent = <
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    any
+    UnifiedField<z.ZodTypeAny>
   >,
 >(
   endpoint: TEndpoint,

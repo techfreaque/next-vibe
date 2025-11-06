@@ -9,9 +9,9 @@ import { spawn } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -90,7 +90,10 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       // Ensure MCP server is running
       const serverReady = await this.ensureMCPServer(logger);
       if (!serverReady) {
-        return createErrorResponse("app.api.v1.core.browser.repository.mcp.connect.failedToInitialize", ErrorResponseTypes.INTERNAL_ERROR);
+        return fail({
+          message: "app.api.v1.core.browser.repository.mcp.connect.failedToInitialize",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       // Parse arguments
@@ -103,7 +106,10 @@ export class BrowserRepositoryImpl implements BrowserRepository {
             arguments: data.arguments,
             error: parseError instanceof Error ? parseError.message : String(parseError),
           });
-          return createErrorResponse("app.api.v1.core.browser.repository.mcp.tool.call.invalidJsonArguments", ErrorResponseTypes.VALIDATION_ERROR);
+          return fail({
+            message: "app.api.v1.core.browser.repository.mcp.tool.call.invalidJsonArguments",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
       }
 
@@ -132,11 +138,11 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       });
 
       const errorMessage = error instanceof Error ? error.message : String(error);
-      return createErrorResponse(
-        "app.api.v1.core.browser.repository.mcp.tool.call.executionFailed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: errorMessage }
-      );
+      return fail({
+        message: "app.api.v1.core.browser.repository.mcp.tool.call.executionFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
     }
   }
 

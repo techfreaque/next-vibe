@@ -890,6 +890,7 @@ export function useAIStream(
                   })();
                 }
 
+                // Call the onContentDone callback for credit deduction (only once!)
                 options.onContentDone?.(eventData);
                 break;
               }

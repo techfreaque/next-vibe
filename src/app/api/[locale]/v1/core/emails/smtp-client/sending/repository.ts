@@ -8,9 +8,9 @@ import "server-only";
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type { Transporter } from "nodemailer";
@@ -438,10 +438,10 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
           data.selectionCriteria.campaignType === CampaignType.LEAD_CAMPAIGN;
 
         if (isLeadCampaign) {
-          return createErrorResponse(
-            "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
-            ErrorResponseTypes.NOT_FOUND,
-            {
+          return fail({
+        message: "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: {
               campaignType: data.selectionCriteria.campaignType,
               emailJourneyVariant:
                 data.selectionCriteria.emailJourneyVariant || "null",
@@ -450,15 +450,15 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
               country: data.selectionCriteria.country,
               language: data.selectionCriteria.language,
             },
-          );
+      });
         } else {
-          return createErrorResponse(
-            "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
-            ErrorResponseTypes.NOT_FOUND,
-            {
+          return fail({
+        message: "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: {
               campaignType: data.selectionCriteria.campaignType,
             },
-          );
+      });
         }
       }
 
@@ -511,13 +511,13 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       return fallbackResult; // Return the last error
     } catch (error) {
       logger.error("Critical error in email sending", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-        ErrorResponseTypes.EMAIL_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 
@@ -596,15 +596,15 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         });
       } catch (error) {
         const errorMessage = parseError(error).message;
-        lastError = createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-          ErrorResponseTypes.EMAIL_ERROR,
-          {
+        lastError = fail({
+        message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
             error: errorMessage,
             accountId: account.id,
             attempt: attempt.toString(),
           },
-        );
+      });
 
         const isRetryable = this.isRetryableError(errorMessage);
         if (!isRetryable || attempt === maxRetries) {
@@ -621,13 +621,13 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
 
     return (
       lastError ||
-      createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-        ErrorResponseTypes.EMAIL_ERROR,
-        {
+      fail({
+        message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
           accountId: account.id,
         },
-      )
+      })
     );
   }
 
@@ -654,11 +654,12 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         const rateLimitCheck = await this.checkRateLimit(account, logger);
         if (!rateLimitCheck.success) {
           // Convert rate limit error to proper SMTP send error
-          return createErrorResponse(
-            rateLimitCheck.message,
-            rateLimitCheck.errorType,
-            rateLimitCheck.messageParams,
-          );
+          return fail({
+            message: rateLimitCheck.message,
+            errorType: rateLimitCheck.errorType,
+            messageParams: rateLimitCheck.messageParams,
+            cause: rateLimitCheck,
+          });
         }
 
         // Log rate limit status for monitoring
@@ -709,14 +710,14 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
           rejectedReason,
         );
 
-        return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.sending.errors.rejected.title",
-          ErrorResponseTypes.EMAIL_ERROR,
-          {
+        return fail({
+        message: "app.api.v1.core.emails.smtpClient.sending.errors.rejected.title",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
             recipient: params.to,
             reason: rejectedReason,
           },
-        );
+      });
       }
 
       // Check if no recipients were accepted
@@ -728,13 +729,13 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
           "app.api.v1.core.emails.smtpClient.sending.errors.no_recipients.defaultReason",
         );
 
-        return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.sending.errors.no_recipients.title",
-          ErrorResponseTypes.EMAIL_ERROR,
-          {
+        return fail({
+        message: "app.api.v1.core.emails.smtpClient.sending.errors.no_recipients.title",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
             recipient: params.to,
           },
-        );
+      });
       }
 
       // Record email in database for rate limiting and tracking
@@ -799,15 +800,15 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         await this.updateAccountHealth(account.id, false, logger, errorMessage);
       }
 
-      return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-        ErrorResponseTypes.EMAIL_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
           error: parseError(error).message,
           accountId: account.id,
           accountName: account.name,
         },
-      );
+      });
     }
   }
 
@@ -874,17 +875,17 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       const canSend = remainingCapacity > 0;
 
       if (!canSend) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.sending.errors.rate_limit.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          {
+        return fail({
+        message: "app.api.v1.core.emails.smtpClient.sending.errors.rate_limit.title",
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        messageParams: {
             accountName: account.name,
             limit: account.rateLimitPerHour,
             current: emailsSentThisHour,
             timeWindow: "hour",
             remainingCapacity: 0,
           },
-        );
+      });
       }
 
       return createSuccessResponse({
@@ -1085,13 +1086,13 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       });
     } catch (error) {
       logger.error("Error getting total sending capacity", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.sending.errors.capacity.title",
-        ErrorResponseTypes.EMAIL_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.emails.smtpClient.sending.errors.capacity.title",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 
