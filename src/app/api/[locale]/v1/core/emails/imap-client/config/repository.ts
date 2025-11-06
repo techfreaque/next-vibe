@@ -90,7 +90,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
 
       // For now, return the default configuration
       // NOTE: These fields should be stored in a separate table or extend the current schema
-      logger.vibe("📧 IMAP config: Using defaults", messageParams: {
+      logger.vibe("📧 IMAP config: Using defaults", {
         host: DEFAULT_IMAP_CONFIG.host,
         port: DEFAULT_IMAP_CONFIG.port,
       });
@@ -102,16 +102,15 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Failed to get IMAP configuration", messageParams: {
+      logger.error("Failed to get IMAP configuration", {
         error: parsedError.message,
       });
 
       return fail({
-          message: 
-        "app.api.v1.core.emails.imapClient.config.errors.internal.title",
+        message: "app.api.v1.core.emails.imapClient.config.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -122,7 +121,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
     logger: EndpointLogger,
   ): ResponseType<ConfigUpdateResponseOutput> {
     try {
-      logger.debug("Updating IMAP configuration", messageParams: {
+      logger.debug("Updating IMAP configuration", {
         host: data.host,
         port: data.port,
         username: data.username,
@@ -130,7 +129,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
 
       // For now, just log the update.
       // NOTE: Store in database when schema is aligned
-      logger.vibe("📧 IMAP config update requested", messageParams: {
+      logger.vibe("📧 IMAP config update requested", {
         host: data.host,
         port: data.port,
       });
@@ -143,17 +142,16 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Failed to update IMAP configuration", messageParams: {
+      logger.error("Failed to update IMAP configuration", {
         error: parsedError.message,
         data,
       });
 
       return fail({
-          message: 
-        "app.api.v1.core.emails.imapClient.config.errors.internal.title",
+        message: "app.api.v1.core.emails.imapClient.config.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -163,7 +161,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
       logger.debug("Default IMAP configuration created");
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Failed to create default IMAP configuration", messageParams: {
+      logger.error("Failed to create default IMAP configuration", {
         error: parsedError.message,
       });
     }

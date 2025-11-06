@@ -62,7 +62,7 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapSyncPostResponseOutput>> {
     try {
-      logger.info("Starting IMAP sync operation", messageParams: {
+      logger.info("Starting IMAP sync operation", {
         accountIds: data.accountIds,
         userId: user.id,
       });
@@ -77,10 +77,9 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
 
         if (accountsToSync.length !== data.accountIds.length) {
           return fail({
-          message: 
-            "app.api.v1.core.emails.imapClient.sync.errors.validation.title",
+            message: "app.api.v1.core.emails.imapClient.sync.errors.validation.title",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          });
         }
       } else {
         // Sync all enabled accounts
@@ -117,7 +116,7 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
       // Process each account
       for (const account of accountsToSync) {
         try {
-          logger.info("Processing account", messageParams: {
+          logger.info("Processing account", {
             accountId: account.id,
             email: account.email,
           });
@@ -184,10 +183,10 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
             })
             .where(eq(imapAccounts.id, account.id));
 
-          logger.info("Account sync completed", messageParams: { accountId: account.id });
+          logger.info("Account sync completed", { accountId: account.id });
         } catch (error) {
           const parsedError = parseError(error);
-          logger.error("Error syncing account", messageParams: {
+          logger.error("Error syncing account", {
             accountId: account.id,
             error: parsedError,
           });
@@ -220,11 +219,10 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
       const parsedError = parseError(error);
       logger.error("Error in IMAP sync operation", parsedError);
       return fail({
-          message: 
-        "app.api.v1.core.emails.imapClient.sync.errors.server.title",
+        message: "app.api.v1.core.emails.imapClient.sync.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -239,7 +237,7 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
     logger: EndpointLogger,
   ): ResponseType<ImapSyncGetResponseOutput> {
     try {
-      logger.info("Getting IMAP sync status", messageParams: { userId: user.id });
+      logger.info("Getting IMAP sync status", { userId: user.id });
 
       // Since GET returns same type as POST, return an empty sync result
       // In a real implementation, this might fetch recent sync statistics
@@ -257,11 +255,10 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
       const parsedError = parseError(error);
       logger.error("Error getting IMAP sync status", parsedError);
       return fail({
-          message: 
-        "app.api.v1.core.emails.imapClient.sync.errors.server.title",
+        message: "app.api.v1.core.emails.imapClient.sync.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 }

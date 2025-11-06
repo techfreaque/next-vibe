@@ -19,7 +19,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import { executeQuery } from "./query-executor";
 import type { ApiMutationOptions, ApiQueryOptions } from "./types";
 import { buildQueryKey } from "./query-key-builder";
-import { type UnifiedField } from "../../shared/types/endpoint";
+import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 
 // Create a single QueryClient instance
 const queryClient = new QueryClient({
@@ -163,13 +163,7 @@ export interface ApiStore {
    * This is the ONLY way to update query data - no Zustand involved
    */
   updateEndpointData: <
-    TEndpoint extends CreateApiEndpoint<
-      string,
-      Methods,
-      readonly (typeof UserRoleValue)[],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      any
-    >,
+    TEndpoint extends CreateApiEndpointAny,
   >(
     endpoint: TEndpoint,
     updater: (
@@ -317,13 +311,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
    * This is useful for optimistic updates or updating cache after mutations/streams
    */
   updateEndpointData: <
-    TEndpoint extends CreateApiEndpoint<
-      string,
-      Methods,
-      readonly (typeof UserRoleValue)[],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      any
-    >,
+    TEndpoint extends CreateApiEndpointAny,
   >(
     endpoint: TEndpoint,
     updater: (
@@ -570,8 +558,8 @@ export const apiClient = {
    * );
    */
   updateEndpointData: <
-    TEndpoint extends CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], UnifiedField<z.ZodTypeAny>>,
-  >(
+    TEndpoint extends CreateApiEndpointAny
+   >(
     endpoint: TEndpoint,
     updater: (
       oldData:

@@ -57,7 +57,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ExecuteImapSyncResponseOutput>> {
-    logger.info("tasks.imap_sync.start", messageParams: {
+    logger.info("tasks.imap_sync.start", {
       maxAccountsPerRun: data.config.maxAccountsPerRun ?? 0,
       enableFolderSync: data.config.enableFolderSync ?? false,
       enableMessageSync: data.config.enableMessageSync ?? false,
@@ -101,17 +101,17 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
         logger.info("tasks.imap_sync.completed", result.summary);
         return createSuccessResponse({ result });
       } else {
-        logger.error("tasks.imap_sync.failed", messageParams: {
+        logger.error("tasks.imap_sync.failed", {
           error: syncResult.message,
         });
         return fail({
-          message: 
-          "app.api.v1.core.emails.error.default",
+          message: "app.api.v1.core.emails.error.default",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        );
+          cause: syncResult,
+        });
       }
     } catch (error) {
-      logger.error("tasks.imap_sync.failed", messageParams: {
+      logger.error("tasks.imap_sync.failed", {
         error:
           error instanceof Error
             ? error.message
@@ -119,10 +119,9 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
       });
 
       return fail({
-          message: 
-        "app.api.v1.core.emails.error.default",
+        message: "app.api.v1.core.emails.error.default",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 
@@ -146,10 +145,9 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
         error instanceof Error ? error.message : String(error),
       );
       return fail({
-          message: 
-        "app.api.v1.core.emails.error.default",
+        message: "app.api.v1.core.emails.error.default",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      });
     }
   }
 }

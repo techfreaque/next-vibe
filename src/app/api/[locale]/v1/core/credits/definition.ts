@@ -162,7 +162,7 @@ const { GET } = createEndpoint({
 });
 
 export { GET };
-const definitions = { GET };
+const definitions = { GET } as const;
 export default definitions;
 
 export type CreditsGetResponseOutput = typeof GET.types.ResponseOutput;

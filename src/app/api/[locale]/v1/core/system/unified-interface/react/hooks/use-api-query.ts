@@ -4,14 +4,13 @@ import type { QueryKey } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 import type {
   ErrorResponseType,
-  SuccessResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
   createSuccessResponse,
 } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { useMemo } from "react";
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
@@ -162,7 +161,7 @@ export function useApiQuery<
     // initialData populates the cache and respects staleTime
     // This allows optimistic updates to work because data is in the cache
     initialData: initialData
-      ? (): SuccessResponseType<TEndpoint["TResponseOutput"]> => createSuccessResponse(initialData)
+      ? (): ResponseType<TEndpoint["TResponseOutput"]> => createSuccessResponse(initialData)
       : undefined,
   });
 

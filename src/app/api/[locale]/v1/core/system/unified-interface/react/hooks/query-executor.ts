@@ -249,7 +249,7 @@ export async function executeQuery<
 
     // Call onSuccess callback if provided
     if (options.onSuccess) {
-      const onSuccessResult = options.onSuccess({
+      const onSuccessResult = await options.onSuccess({
         requestData,
         urlPathParams: pathParams,
         responseData: (response.success

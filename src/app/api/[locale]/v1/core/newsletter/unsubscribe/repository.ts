@@ -66,7 +66,6 @@ export class NewsletterUnsubscribeRepositoryImpl
             email: data.email,
             errorType: leadUpdateResult.errorType,
             message: leadUpdateResult.message,
-            cause: leadUpdateResult,
           },
         );
       } else {

@@ -21,6 +21,7 @@ import {
 import type { ApiEndpoint, CreateApiEndpoint } from "../../endpoint/create";
 import type {
   ArrayField,
+  CreateApiEndpointAny,
   ObjectField,
   PrimitiveField,
   UnifiedField,
@@ -258,25 +259,15 @@ const test6_2: Test6_2_Result = "✓ PASS";
 
 // Test 6.3: Constraint in nested generic
 type Test6_3_NestedGeneric<
-  TFields,
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
-  >,
+  _TFields,
+  TEndpoint extends CreateApiEndpointAny,
 > = TEndpoint;
 
 type Test6_3_Result =
   Test6_3_NestedGeneric<
     Test5_1_LoginFields,
     Test5_2_LoginEndpoint
-  > extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
-  >
+  > extends CreateApiEndpointAny
   ? "✓ PASS"
   : "✗ FAIL";
 const test6_3: Test6_3_Result = "✓ PASS";
@@ -287,12 +278,7 @@ const test6_3: Test6_3_Result = "✓ PASS";
 
 // Test 7.1: Simplified useApiForm signature (with any instead of UnifiedField)
 type Test7_1_UseApiForm = <
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
-  >,
+  TEndpoint extends CreateApiEndpointAny,
 >(
   endpoint: TEndpoint,
 ) => void;
@@ -328,12 +314,7 @@ const test7_2: Test7_2_Result = "✓ PASS";
 
 // Test 8.1: Current useApiForm signature with any
 type Test8_1_UseApiFormCurrent = <
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
-  >,
+  TEndpoint extends CreateApiEndpointAny,
 >(
   endpoint: TEndpoint,
 ) => void;

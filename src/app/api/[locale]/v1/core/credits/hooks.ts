@@ -8,12 +8,12 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { useToast } from "next-vibe-ui//hooks/use-toast";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import { handleCheckoutRedirect } from "@/app/api/[locale]/v1/core/payment/utils/redirect";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
-import { apiClient, queryClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
+import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
@@ -81,13 +81,13 @@ export function useCredits(
    * Deduct credits optimistically following the correct priority order
    */
   const deductCredits = useCallback(
-    (creditCost: number, feature: string) => {
-      if (creditCost <= 0 || !definitions.GET) {
+    (creditCost: number, _feature: string) => {
+      if (creditCost <= 0) {
         return;
       }
 
       apiClient.updateEndpointData(
-        definitions.GET,
+         definitions.GET,
         (oldData: EndpointData | undefined) => {
           if (!oldData?.success || !oldData.data) {
             return oldData;
@@ -140,11 +140,9 @@ export function useCredits(
             },
           };
         },
-        {}, // requestData - must match useEndpointRead default
-        {}, // urlPathParams - must match useEndpointRead default
       );
     },
-    [logger, apiClient, definitions.GET],
+    [], // apiClient and definitions.GET are stable references
   );
 
   /**
