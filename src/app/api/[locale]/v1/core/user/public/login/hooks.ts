@@ -201,11 +201,6 @@ export function useLogin(
           "app.api.v1.core.user.public.login.process.failed",
           parseError(error),
         );
-        toast({
-          title: t("app.api.v1.core.user.public.login.errors.title"),
-          description: t("app.api.v1.core.user.public.login.errors.auth_error"),
-          variant: "destructive",
-        });
       }
     },
     [logger, toast, t, router, locale],
@@ -221,6 +216,11 @@ export function useLogin(
         parseError(data.error),
       );
       if (data.error?.message) {
+                toast({
+          title: t("app.api.v1.core.user.public.login.errors.title"),
+          description: t("app.api.v1.core.user.public.login.errors.auth_error"),
+          variant: "destructive",
+        });
         setErrorMessage(data.error.message);
       }
     },

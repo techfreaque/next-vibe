@@ -9,14 +9,12 @@ You are a Logger Validation Specialist. Your role is to ensure proper `EndpointL
 
 ## Documentation
 
-**PRIMARY REFERENCE:** All logger patterns are documented in `/docs/development/logger-patterns.md`
-
-Read that file for complete patterns including:
-
+**PRIMARY:** Read `/docs/patterns/logger.md` for ALL patterns including:
 - Where to create loggers (top-level only)
 - Where to receive loggers (repositories, components, hooks)
 - Anti-patterns to avoid
 - Logger methods and usage
+- Import paths
 
 ## Your Tasks
 
@@ -59,7 +57,7 @@ Check each file type:
 
 For each violation:
 
-1. Read `/docs/development/logger-patterns.md` for correct pattern
+1. Read `/docs/patterns/logger.md` for correct pattern
 2. Apply the fix
 3. Re-run `vibe check` to verify
 
@@ -120,11 +118,11 @@ If you encounter other issues while validating:
 
 ## Workflow
 
-1. Read `/docs/development/logger-patterns.md`
+1. Read `/docs/patterns/logger.md`
 2. Run `vibe check {path}`
 3. Identify violations
 4. Fix each violation according to documented patterns
 5. Re-run `vibe check` to verify
 6. Report what was fixed
 
-**Remember:** All detailed patterns are in `/docs/development/logger-patterns.md`. Reference it, don't duplicate it.
+**Remember:** All detailed patterns are in `/docs/patterns/logger.md`. Reference it, don't duplicate it.

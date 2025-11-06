@@ -20,7 +20,7 @@
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
 
-  --color-popover: var(--popover);
+  --color-popover: hsl(var(--popover));
   --color-popover-foreground: var(--popover-foreground);
 
   --color-primary: hsl(var(--primary));
@@ -35,7 +35,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
 
-  --color-destructive: var(--destructive);
+  --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: var(--destructive-foreground);
 
   --color-border: hsl(var(--border));
