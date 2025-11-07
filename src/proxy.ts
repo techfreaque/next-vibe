@@ -37,7 +37,6 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     supportedLanguages: availableLanguages,
     supportedCountries: availableCountries,
     allowMixedLocales: true,
-    excludePaths: ["/_next/"],
   });
 }
 
@@ -46,10 +45,8 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
  */
 export const config = {
   matcher: [
-    // Match all API routes
-    "/api/:locale/v1/:path*",
     // Match all paths except static files and API routes
     "/",
-    "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)",
+    "/((?!api|_next/static|_next/image|image|favicon.ico|robots.txt|sitemap.xml).*)",
   ],
 };

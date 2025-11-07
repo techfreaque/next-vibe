@@ -42,11 +42,6 @@ export interface LanguageMiddlewareOptions {
    * Cookie name for storing the preferred locale
    */
   cookieName?: string;
-
-  /**
-   * Paths to exclude from locale detection
-   */
-  excludePaths?: (string | RegExp)[];
 }
 
 /**
@@ -65,28 +60,12 @@ export function detectLocale(
     supportedCountries = [],
     allowMixedLocales = false,
     cookieName = LOCALE_COOKIE_NAME,
-    excludePaths = [],
   } = options;
 
   const path = request.nextUrl.pathname;
 
   // Skip for API routes - they have their own locale structure /api/[locale]/...
   if (isApiRoute(path)) {
-    return null;
-  }
-
-  // Skip for excluded paths
-  for (const excludePath of excludePaths) {
-    if (
-      (typeof excludePath === "string" && path.startsWith(excludePath)) ||
-      (excludePath instanceof RegExp && excludePath.test(path))
-    ) {
-      return null;
-    }
-  }
-
-  // Skip for static files
-  if (shouldSkipPath(path)) {
     return null;
   }
 
