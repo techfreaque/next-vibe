@@ -181,8 +181,8 @@ export const translations = {
       description: "Default AI model for this thread",
     },
     defaultTone: {
-      label: "Default Tone",
-      description: "Default persona/tone for this thread",
+      label: "Default Persona",
+      description: "Default persona for this thread",
     },
     systemPrompt: {
       label: "System Prompt",

@@ -23,6 +23,7 @@ import type {
   CheckoutSessionResult,
   CustomerResult,
   PaymentProvider,
+  WebhookData,
   WebhookEvent,
 } from "../types";
 
@@ -191,11 +192,44 @@ export class StripeProvider implements PaymentProvider {
         env.STRIPE_WEBHOOK_SECRET,
       );
 
+      // Extract common fields from Stripe event data
+      const eventData = event.data.object;
+      const webhookData: WebhookData = {
+        id: "id" in eventData ? String(eventData.id) : event.id,
+      };
+
+      // Add optional fields if they exist
+      if ("metadata" in eventData && typeof eventData.metadata === "object" && eventData.metadata) {
+        webhookData.metadata = Object.fromEntries(
+          Object.entries(eventData.metadata).map(([k, v]) => [k, String(v)])
+        );
+      }
+      if ("customer" in eventData) {
+        webhookData.customer = typeof eventData.customer === "string" ? eventData.customer : null;
+      }
+      if ("status" in eventData && typeof eventData.status === "string") {
+        webhookData.status = eventData.status;
+      }
+      if ("cancel_at_period_end" in eventData && typeof eventData.cancel_at_period_end === "boolean") {
+        webhookData.cancel_at_period_end = eventData.cancel_at_period_end;
+      }
+      if ("current_period_start" in eventData && typeof eventData.current_period_start === "number") {
+        webhookData.current_period_start = eventData.current_period_start;
+      }
+      if ("current_period_end" in eventData && typeof eventData.current_period_end === "number") {
+        webhookData.current_period_end = eventData.current_period_end;
+      }
+      if ("amount_total" in eventData && typeof eventData.amount_total === "number") {
+        webhookData.amount_total = eventData.amount_total;
+      }
+      if ("subscription" in eventData) {
+        webhookData.subscription = typeof eventData.subscription === "string" ? eventData.subscription : undefined;
+      }
+
       return createSuccessResponse<WebhookEvent>({
         id: event.id,
         type: event.type,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data: event.data.object as any,
+        data: webhookData,
       });
     } catch (error) {
       logger.error("Failed to verify Stripe webhook", {

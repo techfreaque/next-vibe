@@ -274,13 +274,27 @@ export function useChat(
 
   // Compute active thread messages
   const activeThreadMessages = useMemo(() => {
-    if (!activeThreadId) {
+    if (!activeThreadId || activeThreadId === "new") {
+      logger.debug("Chat: activeThreadMessages - no active thread", {
+        activeThreadId,
+      });
       return [];
     }
-    return Object.values(messages)
-      .filter((msg) => msg.threadId === activeThreadId)
-      .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-  }, [activeThreadId, messages]);
+
+    const filtered = Object.values(messages).filter(
+      (msg) => msg.threadId === activeThreadId,
+    );
+
+    logger.debug("Chat: activeThreadMessages computed", {
+      activeThreadId,
+      totalMessagesInStore: Object.keys(messages).length,
+      filteredCount: filtered.length,
+      allThreadIdsInStore: [...new Set(Object.values(messages).map((m) => m.threadId))],
+      currentRootFolderId,
+    });
+
+    return filtered.toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  }, [activeThreadId, messages, logger, currentRootFolderId]);
 
   return {
     // State

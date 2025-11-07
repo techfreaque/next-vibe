@@ -2,6 +2,7 @@ import { translations as invoiceTranslations } from "../../invoice/i18n/de";
 import { translations as portalTranslations } from "../../portal/i18n/de";
 import { translations as refundTranslations } from "../../refund/i18n/de";
 import { translations as stripeProviderTranslations } from "../../providers/stripe/i18n/de";
+import { translations as nowpaymentsProviderTranslations } from "../../providers/nowpayments/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -11,7 +12,7 @@ export const translations: typeof enTranslations = {
   refund: refundTranslations,
   providers: {
     stripe: stripeProviderTranslations,
-    nowpayments: "NOWPayments",
+    nowpayments: nowpaymentsProviderTranslations,
   },
 
   // Main payment domain
@@ -292,6 +293,11 @@ export const translations: typeof enTranslations = {
     label: "Preis-ID",
     description: "Stripe-Preiskennzeichnung für das Produkt",
     placeholder: "price_1234567890",
+  },
+  provider: {
+    label: "Zahlungsanbieter",
+    description: "Wählen Sie Ihre Zahlungsmethode",
+    placeholder: "Zahlungsanbieter auswählen",
   },
 
   // Enum translations

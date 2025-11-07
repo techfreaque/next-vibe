@@ -77,7 +77,7 @@ export function useMessageLoader(
                 role: message.role,
                 content: message.content,
                 model: message.model,
-                persona: null, // Persona is not returned by API, will be resolved from model
+                persona: message.persona ?? null,
                 parentId: message.parentId,
                 depth: message.depth,
                 authorId: message.authorId,

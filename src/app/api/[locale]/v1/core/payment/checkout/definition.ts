@@ -21,6 +21,11 @@ import {
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { BillingInterval, SubscriptionPlan } from "../../subscription/enum";
+import {
+  PaymentProvider,
+  PaymentProviderDB,
+  PaymentProviderOptions,
+} from "../enum";
 
 /**
  * POST endpoint for creating subscription checkout sessions
@@ -100,6 +105,23 @@ const { POST } = createEndpoint({
           ],
         },
         z.enum(BillingInterval).default(BillingInterval.MONTHLY),
+      ),
+
+      provider: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label:
+            "app.api.v1.core.subscription.checkout.form.fields.provider.label" as const,
+          description:
+            "app.api.v1.core.subscription.checkout.form.fields.provider.description" as const,
+          placeholder:
+            "app.api.v1.core.subscription.checkout.form.fields.provider.placeholder" as const,
+          layout: { columns: 12 },
+          validation: { required: false },
+          options: PaymentProviderOptions,
+        },
+        z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
       ),
 
       metadata: requestDataField(

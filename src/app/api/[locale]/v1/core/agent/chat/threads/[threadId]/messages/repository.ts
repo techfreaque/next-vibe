@@ -361,7 +361,7 @@ export async function createToolMessage(params: {
   });
 }
 
-export async function handleEditOperation<T extends { parentMessageId?: string | null; content: string; role: ChatMessageRole }>(
+export async function handleEditOperation<T extends { parentMessageId?: string | null; threadId?: string | null; content: string; role: ChatMessageRole }>(
   data: T,
   userId: string | undefined,
   logger: EndpointLogger,
@@ -371,9 +371,24 @@ export async function handleEditOperation<T extends { parentMessageId?: string |
   content: string;
   role: ChatMessageRole;
 } | null> {
+  // If no parentMessageId, this is branching from the first message (creating a second root message)
+  // In this case, we need threadId to be provided
   if (!data.parentMessageId) {
-    logger.error("Edit operation requires parentMessageId");
-    return null;
+    logger.debug("Edit operation without parentMessageId - creating second root message", {
+      threadId: data.threadId,
+    });
+
+    if (!data.threadId) {
+      logger.error("Edit operation requires either parentMessageId or threadId");
+      return null;
+    }
+
+    return {
+      threadId: data.threadId,
+      parentMessageId: null,
+      content: data.content,
+      role: data.role,
+    };
   }
 
   const parentMessage = await getParentMessage(
@@ -577,6 +592,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
           authorId: msg.authorId,
           isAI: msg.isAI,
           model: msg.model,
+          persona: msg.persona ?? null,
           tokens: msg.tokens,
           sequenceId: msg.sequenceId ?? null,
           sequenceIndex: msg.sequenceIndex ?? 0,

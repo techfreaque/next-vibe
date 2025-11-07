@@ -8,6 +8,14 @@ export const translations = {
       userSubscription: "User Subscription Credits",
       leadFree: "Lead Free Tier Credits",
     },
+    transactionType: {
+      purchase: "Purchase",
+      subscription: "Subscription",
+      usage: "Usage",
+      expiry: "Expiry",
+      freeTier: "Free Tier",
+      monthlyReset: "Monthly Reset",
+    },
   },
   expire: {
     task: {
@@ -31,6 +39,10 @@ export const translations = {
     stripeCustomerFailed: "Failed to create Stripe customer",
     checkoutFailed: "Failed to create checkout session",
     mergeFailed: "Failed to merge lead credits",
+    monthlyResetFailed: "Failed to reset monthly credits",
+    noLeadsToMerge: "No leads provided to merge",
+    oldestLeadNotFound: "Could not find oldest lead in cluster",
+    transactionFailed: "Failed to create transaction record",
   },
   get: {
     title: "Get Credit Balance",

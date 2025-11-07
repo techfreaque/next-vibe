@@ -290,10 +290,10 @@ export function ChatArea({
 
       {/* Logo - Only show in linear view (ChatGPT style) */}
       {viewMode === "linear" && messages.length > 0 && (
-        <Div className="w-full h-0">
+        <Div className="w-full md:h-0 h-auto">
           <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15 space-y-5">
             <Div className="flex bg-card backdrop-blur-xl rounded-lg p-2 shadow-sm border border-border/20 w-fit">
-              <Logo locale={locale} pathName="" size="h-10" />
+              <Logo locale={locale} disabled size="h-10" />
             </Div>
           </Div>
         </Div>

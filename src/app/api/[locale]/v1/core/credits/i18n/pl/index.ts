@@ -8,6 +8,14 @@ export const translations: typeof enTranslations = {
       userSubscription: "Kredyty subskrypcji użytkownika",
       leadFree: "Darmowe kredyty leada",
     },
+    transactionType: {
+      purchase: "Zakup",
+      subscription: "Subskrypcja",
+      usage: "Użycie",
+      expiry: "Wygaśnięcie",
+      freeTier: "Darmowy",
+      monthlyReset: "Miesięczne odnowienie",
+    },
   },
   expire: {
     task: {
@@ -31,6 +39,10 @@ export const translations: typeof enTranslations = {
     stripeCustomerFailed: "Nie udało się utworzyć klienta Stripe",
     checkoutFailed: "Nie udało się utworzyć sesji płatności",
     mergeFailed: "Nie udało się połączyć kredytów leada",
+    monthlyResetFailed: "Nie udało się odnowić miesięcznych kredytów",
+    noLeadsToMerge: "Brak leadów do połączenia",
+    oldestLeadNotFound: "Nie znaleziono najstarszego leada w klastrze",
+    transactionFailed: "Nie udało się utworzyć rekordu transakcji",
   },
   get: {
     title: "Pobierz saldo kredytów",

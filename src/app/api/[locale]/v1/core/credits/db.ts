@@ -3,12 +3,13 @@
  * Drizzle ORM schema definitions for credit system
  */
 
-import { integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
 import { leads } from "../leads/db";
 import { users } from "../user/db";
+import { CreditTransactionTypeDB } from "./enum";
 
 /**
  * User Credits Table
@@ -39,10 +40,14 @@ export const creditTransactions = pgTable("credit_transactions", {
   amount: integer("amount").notNull(), // Negative for deductions
   balanceAfter: integer("balance_after").notNull(),
   type: text("type", {
-    enum: ["purchase", "subscription", "usage", "expiry", "free_tier"],
+    enum: CreditTransactionTypeDB,
   }).notNull(),
   modelId: text("model_id"), // For usage transactions
   messageId: uuid("message_id"), // For usage transactions
+  metadata: jsonb("metadata")
+    .$type<Record<string, string | number | boolean | null>>()
+    .notNull()
+    .default({}),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

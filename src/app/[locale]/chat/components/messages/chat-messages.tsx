@@ -125,8 +125,18 @@ export function ChatMessages({
       messageMap.set(msg.id, msg);
     }
 
+    // Get the current thread ID from the first persisted message
+    // All persisted messages should have the same threadId since they're already filtered
+    const currentThreadId = messages[0]?.threadId;
+
     // Override with streaming messages (they have the latest content)
+    // IMPORTANT: Only merge streaming messages that belong to the current thread
     for (const streamMsg of Object.values(streamingMessages)) {
+      // Skip streaming messages from other threads
+      if (currentThreadId && streamMsg.threadId !== currentThreadId) {
+        continue;
+      }
+
       const existingMsg = messageMap.get(streamMsg.messageId);
       if (existingMsg) {
         // Update existing message with streaming content
@@ -370,7 +380,7 @@ export function ChatMessages({
       {/* Inner container with consistent padding and dynamic bottom padding */}
       <Div
         id={DOM_IDS.MESSAGES_CONTENT}
-        className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15 space-y-5"
+        className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-5 md:pt-15 space-y-5"
         style={{
           paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,
         }}

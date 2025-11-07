@@ -26,6 +26,11 @@ export const translations = {
         description: "Select billing frequency",
         placeholder: "Choose billing interval",
       },
+      provider: {
+        label: "Payment Provider",
+        description: "Choose how you want to pay",
+        placeholder: "Select payment provider",
+      },
       metadata: {
         label: "Metadata",
         description: "Additional metadata for the checkout session",

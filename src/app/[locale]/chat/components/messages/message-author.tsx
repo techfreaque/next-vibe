@@ -24,8 +24,8 @@ interface MessageAuthorProps {
   edited?: boolean;
   compact?: boolean;
   className?: string;
-  /** Persona/tone used for this message */
-  tone?: string | null;
+  /** Persona used for this message */
+  persona?: string | null;
   locale: CountryLanguage;
   rootFolderId: DefaultFolderId;
 }
@@ -40,7 +40,7 @@ export function MessageAuthorInfo({
   edited = false,
   compact = false,
   className,
-  tone,
+  persona,
   locale,
   rootFolderId = "private",
 }: MessageAuthorProps): JSX.Element {
@@ -69,8 +69,8 @@ export function MessageAuthorInfo({
         : t("app.chat.messages.user");
   }
 
-  // Get persona name if tone is provided
-  const personaName = tone ? getPersonaById(tone)?.name : null;
+  // Get persona name if persona is provided
+  const personaName = persona ? getPersonaById(persona)?.name : null;
 
   return (
     <Div className={cn("flex items-center gap-2", className)}>

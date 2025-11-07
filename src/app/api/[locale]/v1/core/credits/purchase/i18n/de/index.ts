@@ -13,6 +13,11 @@ export const translations: typeof enTranslations = {
       description: "Anzahl der zu kaufenden Credit-Pakete (1-10)",
       placeholder: "Anzahl eingeben (1-10)",
     },
+    provider: {
+      label: "Zahlungsanbieter",
+      description: "Wählen Sie, wie Sie bezahlen möchten",
+      placeholder: "Zahlungsanbieter auswählen",
+    },
     checkoutUrl: {
       content: "Checkout-URL",
     },

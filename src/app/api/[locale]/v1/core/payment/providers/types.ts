@@ -54,11 +54,35 @@ export interface CheckoutSession {
   amount_total?: number | null;
 }
 
-export interface WebhookEvent {
+/**
+ * Base type for webhook data objects
+ * All provider webhook data must have an id
+ */
+export interface WebhookData {
+  id: string;
+  metadata?: {
+    userId?: string;
+    planId?: string;
+    billingInterval?: string;
+    provider?: string;
+    type?: string;
+    totalCredits?: string;
+    subscriptionPlanId?: string;
+    [key: string]: string | undefined;
+  };
+  customer?: string | null;
+  status?: string;
+  cancel_at_period_end?: boolean;
+  current_period_start?: number;
+  current_period_end?: number;
+  amount_total?: number | null;
+  subscription?: string;
+}
+
+export interface WebhookEvent<T extends WebhookData = WebhookData> {
   id: string;
   type: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: CheckoutSession | Record<string, any>;
+  data: T;
 }
 
 export interface PaymentProvider {

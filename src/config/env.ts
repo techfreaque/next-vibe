@@ -155,6 +155,10 @@ export const envSchema = envClientSchema.extend({
   BRAVE_SEARCH_API_KEY: z.string(),
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
   STRIPE_SECRET_KEY: z.string().min(1),
+
+  // NOWPayments configuration
+  NOWPAYMENTS_API_KEY: z.string().min(1),
+  NOWPAYMENTS_IPN_SECRET: z.string().min(1),
   // Lead campaigns email configuration
   LEADS_EMAIL_FROM_EMAIL: z.email(),
   LEADS_EMAIL_HOST: z.string(),

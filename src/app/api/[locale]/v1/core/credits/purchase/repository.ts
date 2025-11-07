@@ -18,6 +18,7 @@ import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { ProductIds } from "../../products/repository-client";
 import { getPaymentProvider } from "../../payment/providers";
+import { PaymentProvider } from "../../payment/enum";
 import { SubscriptionStatus } from "../../subscription/enum";
 import type {
   CreditsPurchasePostRequestOutput,
@@ -115,8 +116,17 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
         );
       }
 
-      // Default to stripe provider
-      const provider = getPaymentProvider("stripe");
+      // Get payment provider from request data or default to stripe
+      const providerKey = data.provider === PaymentProvider.NOWPAYMENTS
+        ? "nowpayments"
+        : "stripe";
+      const provider = getPaymentProvider(providerKey);
+
+      logger.debug("Using payment provider", {
+        providerKey,
+        providerName: provider.name,
+        requestedProvider: data.provider,
+      });
 
       logger.debug("About to ensure customer");
 

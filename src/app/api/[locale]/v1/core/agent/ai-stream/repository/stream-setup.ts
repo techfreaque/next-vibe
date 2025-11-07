@@ -29,6 +29,7 @@ import {
   handleAnswerAsAiOperation,
 } from "../../chat/threads/[threadId]/messages/repository";
 import type { AiStreamPostRequestOutput } from "../definition";
+import { buildSystemPrompt } from "../system-prompt-builder";
 
 export interface StreamSetupResult {
   userId: string | undefined;
@@ -374,7 +375,18 @@ export async function setupAiStream(params: {
     }
   }
 
-  let systemPrompt = data.systemPrompt || "";
+  // Build complete system prompt from persona and formatting instructions
+  const systemPrompt = await buildSystemPrompt({
+    personaId: data.persona,
+    userId,
+    logger,
+  });
+
+  logger.debug("System prompt built", {
+    systemPromptLength: systemPrompt.length,
+    hasPersona: !!data.persona,
+  });
+
   const messages = await params.buildMessageContext({
     operation: data.operation,
     threadId: effectiveThreadId,

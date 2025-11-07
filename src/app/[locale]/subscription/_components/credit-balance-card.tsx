@@ -25,7 +25,11 @@ import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatDate } from "./types";
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/v1/core/products/repository-client";
+import {
+  TOTAL_MODEL_COUNT,
+  productsRepository,
+  ProductIds,
+} from "@/app/api/[locale]/v1/core/products/repository-client";
 import { type CreditsGetResponseOutput } from "@/app/api/[locale]/v1/core/credits/definition";
 
 interface CreditBalanceCardProps {
@@ -58,6 +62,12 @@ export function CreditBalanceCard({
     creditsEndpoint.read.response.data
       ? creditsEndpoint.read.response.data
       : initialCredits;
+
+  // Get subscription credits from products repository
+  const subscriptionProduct = productsRepository.getProduct(
+    ProductIds.SUBSCRIPTION,
+    locale,
+  );
 
   return (
     <motion.div
@@ -106,6 +116,9 @@ export function CreditBalanceCard({
               <Div className="text-xs text-amber-600 dark:text-amber-400 mt-1">
                 {t(
                   "app.subscription.subscription.balance.expiring.description",
+                  {
+                    subCredits: subscriptionProduct.credits,
+                  },
                 )}
               </Div>
             </Div>

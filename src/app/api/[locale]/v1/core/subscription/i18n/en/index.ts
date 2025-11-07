@@ -258,6 +258,7 @@ export const translations = {
       canceled: "Canceled",
       unpaid: "Unpaid",
       paused: "Paused",
+      canceling: "Canceling",
     },
     billing: {
       monthly: "Monthly",

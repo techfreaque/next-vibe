@@ -27,6 +27,7 @@ export { BarChart2 } from "./BarChart2";
 export { BarChart3 } from "./BarChart3";
 export { BarChart3Icon } from "./BarChart3Icon";
 export { Bell } from "./Bell";
+export { Bitcoin } from "./Bitcoin";
 export { Bold } from "./Bold";
 export { Book } from "./Book";
 export { BookOpen } from "./BookOpen";

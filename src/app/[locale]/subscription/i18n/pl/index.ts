@@ -8,6 +8,20 @@ export const translations: typeof enTranslations = {
     billingInterval: "Okres rozliczeniowy",
     currentPeriodStart: "Początek bieżącego okresu",
     nextBillingDate: "Następna data rozliczenia",
+    endsOn: "Subskrypcja kończy się",
+    cancellation: {
+      title: "Subskrypcja zaplanowana do anulowania",
+      description: "Twoja subskrypcja zakończy się {{date}}. Zachowasz dostęp do tego czasu.",
+    },
+    manage: {
+      stripe: {
+        button: "Zarządzaj subskrypcją",
+      },
+      nowpayments: {
+        button: "Zobacz szczegóły subskrypcji",
+        info: "Twoja subskrypcja jest zarządzana przez e-mail. Sprawdź swoją skrzynkę odbiorczą w poszukiwaniu linków do płatności i szczegółów subskrypcji od NOWPayments.",
+      },
+    },
     balance: {
       title: "Saldo kredytów",
       description:
@@ -76,6 +90,14 @@ export const translations: typeof enTranslations = {
         description:
           "Zaloguj się lub utwórz konto, aby kupić kredyty i subskrypcje.",
       },
+      provider: {
+        stripe: {
+          description: "Karty kredytowe/debetowe",
+        },
+        nowpayments: {
+          description: "Kryptowaluta",
+        },
+      },
       subscription: {
         badge: "Dostępne dla wszystkich",
         title: "Subskrypcja miesięczna",
@@ -88,6 +110,7 @@ export const translations: typeof enTranslations = {
           bestFor: "Idealne dla regularnych użytkowników AI",
         },
         button: "Subskrybuj teraz",
+        buttonAlreadySubscribed: "Już zasubskrybowano",
       },
       pack: {
         title: "Pakiety kredytów",
@@ -129,6 +152,7 @@ export const translations: typeof enTranslations = {
         usage: "Użycie",
         expiry: "Wygaśnięcie",
         free_tier: "Darmowy poziom",
+        monthly_reset: "Miesięczne odnowienie",
       },
     },
     tabs: {

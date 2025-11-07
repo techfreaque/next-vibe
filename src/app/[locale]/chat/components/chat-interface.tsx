@@ -25,6 +25,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types"
 import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
+import { useDisablePullToRefresh } from "../hooks/use-disable-pull-to-refresh";
 import type { ModelId } from "../types";
 import { ChatArea } from "./layout/chat-area";
 import { SidebarWrapper } from "./layout/sidebar-wrapper";
@@ -97,6 +98,9 @@ export function ChatInterface({
 
   // Track the last message count to detect new messages
   const lastMessageCountRef = useRef<number>(0);
+
+  // Disable pull-to-refresh on mobile browsers
+  useDisablePullToRefresh();
 
   // Delete confirmation dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);

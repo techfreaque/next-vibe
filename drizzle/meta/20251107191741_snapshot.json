@@ -1,5 +1,5 @@
 {
-  "id": "8ae8da26-d69d-4a1c-b5c5-ed97649c2df6",
+  "id": "18e562d0-96fe-4f0f-86de-913a80304f59",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1258,6 +1258,13 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
         },
         "created_at": {
           "name": "created_at",
@@ -3622,6 +3629,13 @@
           "notNull": true,
           "default": 20
         },
+        "monthly_period_start": {
+          "name": "monthly_period_start",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -5485,6 +5499,12 @@
           "notNull": true,
           "default": false
         },
+        "cancel_at": {
+          "name": "cancel_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "canceled_at": {
           "name": "canceled_at",
           "type": "timestamp with time zone",
@@ -5534,7 +5554,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'stripe'"
+          "default": "'app.api.v1.core.payment.enums.paymentProvider.stripe'"
         },
         "provider_subscription_id": {
           "name": "provider_subscription_id",

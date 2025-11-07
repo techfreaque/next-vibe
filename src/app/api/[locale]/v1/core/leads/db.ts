@@ -241,6 +241,7 @@ export const leadCredits = pgTable("lead_credits", {
     .notNull()
     .references(() => leads.id, { onDelete: "cascade" }),
   amount: integer("amount").notNull().default(20), // Free tier starts with 20
+  monthlyPeriodStart: timestamp("monthly_period_start").defaultNow().notNull(), // Track when current monthly period started
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

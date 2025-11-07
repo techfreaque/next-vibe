@@ -150,7 +150,7 @@ export function useMessageOperations(
 
         let parentMessageId: string | null = null;
         let messageHistory:
-          | Array<{ role: "user" | "assistant" | "system"; content: string }>
+          | Array<{ role: ChatMessageRole; content: string }>
           | undefined;
 
         if (threadIdToUse) {
@@ -174,15 +174,7 @@ export function useMessageOperations(
             });
 
             if (currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
-              messageHistory = threadMessages
-                .filter((msg) => msg.role !== "tool")
-                .map((msg) => ({
-                  role: msg.role.toLowerCase() as
-                    | "user"
-                    | "assistant"
-                    | "system",
-                  content: msg.content,
-                }));
+              messageHistory = threadMessages;
               logger.debug(
                 "Message operations: Built message history for incognito mode",
                 {
@@ -279,7 +271,7 @@ export function useMessageOperations(
 
       try {
         let messageHistory:
-          | Array<{ role: "user" | "assistant" | "system"; content: string }>
+          | Array<{ role: ChatMessageRole; content: string }>
           | undefined;
 
         if (currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
@@ -292,13 +284,7 @@ export function useMessageOperations(
           );
 
           if (messageIndex !== -1 && messageIndex > 0) {
-            const contextMessages = threadMessages.slice(0, messageIndex);
-            messageHistory = contextMessages
-              .filter((msg) => msg.role !== "tool")
-              .map((msg) => ({
-                role: msg.role.toLowerCase() as "user" | "assistant" | "system",
-                content: msg.content,
-              }));
+            messageHistory = threadMessages.slice(0, messageIndex);
             logger.debug(
               "Message operations: Built message history for incognito retry",
               {
@@ -369,10 +355,7 @@ export function useMessageOperations(
 
       try {
         let messageHistory:
-          | Array<{
-              role: "user" | "assistant" | "system";
-              content: string;
-            }>
+          | Array<{ role: ChatMessageRole; content: string }>
           | undefined;
 
         const branchParentId = message.parentId;
@@ -388,16 +371,7 @@ export function useMessageOperations(
             );
 
             if (parentIndex !== -1) {
-              const contextMessages = threadMessages.slice(0, parentIndex + 1);
-              messageHistory = contextMessages
-                .filter((msg) => msg.role !== "tool")
-                .map((msg) => ({
-                  role: msg.role.toLowerCase() as
-                    | "user"
-                    | "assistant"
-                    | "system",
-                  content: msg.content,
-                }));
+              messageHistory = threadMessages.slice(0, parentIndex + 1);
             }
           }
         }
@@ -462,7 +436,7 @@ export function useMessageOperations(
 
       try {
         let messageHistory:
-          | Array<{ role: "user" | "assistant" | "system"; content: string }>
+          | Array<{ role: ChatMessageRole; content: string }>
           | undefined;
 
         if (currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
@@ -475,13 +449,7 @@ export function useMessageOperations(
           );
 
           if (parentIndex !== -1) {
-            const contextMessages = threadMessages.slice(0, parentIndex + 1);
-            messageHistory = contextMessages
-              .filter((msg) => msg.role !== "tool")
-              .map((msg) => ({
-                role: msg.role.toLowerCase() as "user" | "assistant" | "system",
-                content: msg.content,
-              }));
+            messageHistory = threadMessages.slice(0, parentIndex + 1);
           }
         }
 

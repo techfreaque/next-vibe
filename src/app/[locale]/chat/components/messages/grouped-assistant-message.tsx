@@ -67,7 +67,7 @@ export function GroupedAssistantMessage({
   const { primary, continuations } = group;
 
   // Get persona for assistant messages
-  const tone =
+  const persona =
     primary.role === "assistant" || primary.role === "user"
       ? primary.persona
       : null;
@@ -98,7 +98,7 @@ export function GroupedAssistantMessage({
 
   return (
     <Div className="flex items-start gap-3">
-      <Div className="flex-1 max-w-[90%] sm:max-w-[85%] group/message">
+      <Div className="flex-1 group/message">
         {/* Author info - shown once for the entire sequence */}
         {showAuthor && (
           <Div className="mb-2">
@@ -110,7 +110,7 @@ export function GroupedAssistantMessage({
               model={primary.model}
               timestamp={primary.createdAt}
               edited={primary.edited}
-              tone={tone}
+              persona={persona}
               locale={locale}
               rootFolderId={rootFolderId}
               compact

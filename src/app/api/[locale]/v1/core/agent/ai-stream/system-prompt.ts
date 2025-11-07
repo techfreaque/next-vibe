@@ -19,4 +19,4 @@ export const formattingInstructions = [
  * Default prompt when user wants AI to answer to an AI message
  */
 export const CONTINUE_CONVERSATION_PROMPT =
-  "Answer to the previous AI message, add extra context, call out issues, and potentially drive the conversation in a different direction.";
+  "Respond to the previous AI message naturally, as if you were a user engaging with it. Provide your thoughts, feedback, or follow-up based on what was said. Do not ask questions or try to drive the conversation - simply respond to what the AI said.";

@@ -14,20 +14,23 @@ import logoWhite from "./unbottled-icon-white.png";
 
 export function Logo({
   locale,
-  pathName,
+  pathName = "",
   className,
   linkClassName,
   size = "h-7",
+  disabled
 }: {
   locale: CountryLanguage;
-  pathName: string;
+  pathName?: string;
   className?: string;
   linkClassName?: string;
   size?: string;
+  disabled?: boolean;
 }): JSX.Element {
   const { t } = simpleT(locale);
+  const Component = disabled ? Div : Link; 
   return (
-    <Link
+    <Component
       href={`/${locale}${pathName}`}
       className={cn(
         "inline-flex items-center gap-1.5 no-underline! hover:no-underline!",
@@ -64,6 +67,6 @@ export function Logo({
       >
         {t("config.appName")}
       </span>
-    </Link>
+    </Component>
   );
 }

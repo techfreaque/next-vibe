@@ -11,14 +11,15 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { creditTransactions } from "@/app/api/[locale]/v1/core/credits/db";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
-import { productsRepository, ProductIds } from "../../products/repository-client";
-import { leadCredits, leadLinks, leads, userLeads } from "../db";
+import { leadLinks, leads, userLeads } from "../db";
 import { LeadSource, LeadStatus } from "../enum";
+import { creditTransactionManager } from "../../credits/repository";
 
 /**
  * Client information for lead creation
@@ -217,7 +218,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         return createSuccessResponse(undefined);
       }
 
-      // Check if user has any leads (to determine if this should be primary)
+      // Get all existing leads for this user
       const existingLeads = await db
         .select()
         .from(userLeads)
@@ -233,17 +234,40 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         return createSuccessResponse(undefined);
       }
 
-      const isPrimary = existingLeads.length === 0;
-
-      // Merge credits before linking
-      await this.mergeLeadCredits(leadId, userId, locale, logger);
-
-      // Create the link
+      // Create the link (isPrimary set to false - will be deprecated)
       await db.insert(userLeads).values({
         userId,
         leadId,
-        isPrimary,
+        isPrimary: false,
       });
+
+      // Update all existing transactions for this lead to include userId
+      // This ensures transaction history shows up for logged-in users
+      await db
+        .update(creditTransactions)
+        .set({ userId })
+        .where(eq(creditTransactions.leadId, leadId));
+
+      logger.debug("Updated transactions with userId", {
+        leadId,
+        userId,
+      });
+
+      // If user has other leads, merge credits using cluster resolver
+      if (existingLeads.length > 0) {
+        const allLeadIds = [...existingLeads.map((l) => l.leadId), leadId];
+        const mergeResult = await creditTransactionManager.mergeCreditsIntoOldest(
+          allLeadIds,
+          logger,
+        );
+
+        if (!mergeResult.success) {
+          logger.error("Failed to merge credits after linking lead to user", {
+            userId,
+            leadId,
+          });
+        }
+      }
 
       // Update lead status to SIGNED_UP if not already
       await db
@@ -258,7 +282,6 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
       logger.debug("app.api.v1.core.leads.auth.link.created", {
         leadId,
         userId,
-        isPrimary,
       });
 
       return createSuccessResponse(undefined);
@@ -530,148 +553,9 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
   }
 
   /**
-   * Merge lead credits when linking a lead to a user
-   * Calculates total usage across all user's leads and updates primary lead credits
-   * Deletes duplicate credit records
-   */
-  private async mergeLeadCredits(
-    newLeadId: string,
-    userId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<void> {
-    try {
-      // Get free tier credits from products repository
-      const freeCredits = productsRepository.getProduct(
-        ProductIds.FREE_TIER,
-        locale,
-      ).credits;
-
-      // Get all existing leads for this user
-      const existingUserLeads = await db
-        .select()
-        .from(userLeads)
-        .where(eq(userLeads.userId, userId));
-
-      if (existingUserLeads.length === 0) {
-        // First lead for this user, no merging needed
-        logger.debug("app.api.v1.core.leads.auth.mergeCredits.firstLead", {
-          leadId: newLeadId,
-          userId,
-        });
-        return;
-      }
-
-      // Get primary lead
-      const primaryUserLead = existingUserLeads.find((ul) => ul.isPrimary);
-      if (!primaryUserLead) {
-        logger.error(
-          "app.api.v1.core.leads.auth.mergeCredits.noPrimaryLead",
-          {
-            userId,
-          },
-        );
-        return;
-      }
-
-      // Get all lead IDs including the new one
-      const allLeadIds = [
-        ...existingUserLeads.map((ul) => ul.leadId),
-        newLeadId,
-      ];
-
-      // Get all credit records for these leads
-      const allCredits = await db
-        .select()
-        .from(leadCredits)
-        .where(
-          sql`${leadCredits.leadId} IN ${sql.raw(`(${allLeadIds.map((id) => `'${id}'`).join(",")})`)}`,
-        );
-
-      if (allCredits.length === 0) {
-        logger.debug("app.api.v1.core.leads.auth.mergeCredits.noCredits", {
-          userId,
-          leadIds: allLeadIds,
-        });
-        return;
-      }
-
-      // Calculate total initial credits (freeCredits per lead)
-      const totalInitialCredits = allCredits.length * freeCredits;
-
-      // Calculate total remaining credits
-      const totalRemainingCredits = allCredits.reduce(
-        (sum, credit) => sum + credit.amount,
-        0,
-      );
-
-      // Calculate total used credits
-      const totalUsedCredits = totalInitialCredits - totalRemainingCredits;
-
-      // Calculate final credits: freeCredits (initial for one lead) - total used
-      const finalCredits = Math.max(0, freeCredits - totalUsedCredits);
-
-      logger.debug("app.api.v1.core.leads.auth.mergeCredits.calculation", {
-        userId,
-        totalLeads: allCredits.length,
-        totalInitialCredits,
-        totalRemainingCredits,
-        totalUsedCredits,
-        finalCredits,
-      });
-
-      // Update primary lead credits
-      const primaryLeadCredit = allCredits.find(
-        (c) => c.leadId === primaryUserLead.leadId,
-      );
-
-      if (primaryLeadCredit) {
-        await db
-          .update(leadCredits)
-          .set({
-            amount: finalCredits,
-            updatedAt: new Date(),
-          })
-          .where(eq(leadCredits.id, primaryLeadCredit.id));
-      } else {
-        // Create credit record for primary lead if it doesn't exist
-        await db.insert(leadCredits).values({
-          leadId: primaryUserLead.leadId,
-          amount: finalCredits,
-        });
-      }
-
-      // Delete all other credit records (including the new lead's credits)
-      const creditsToDelete = allCredits
-        .filter((c) => c.leadId !== primaryUserLead.leadId)
-        .map((c) => c.id);
-
-      if (creditsToDelete.length > 0) {
-        await db
-          .delete(leadCredits)
-          .where(
-            sql`${leadCredits.id} IN ${sql.raw(`(${creditsToDelete.map((id) => `'${id}'`).join(",")})`)}`,
-          );
-      }
-
-      logger.debug("app.api.v1.core.leads.auth.mergeCredits.success", {
-        userId,
-        primaryLeadId: primaryUserLead.leadId,
-        finalCredits,
-        deletedCredits: creditsToDelete.length,
-      });
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.mergeCredits.error",
-        parseError(error).message,
-      );
-      // Don't fail the linking process if credit merge fails
-    }
-  }
-
-  /**
    * Link two leadIds together (e.g., cookie leadId + email campaign leadId)
    * This creates a bidirectional link so we can find all related leads
+   * IMPORTANT: Now also triggers credit merge into oldest lead
    */
   async linkLeads(
     primaryLeadId: string,
@@ -729,6 +613,29 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         linkedLeadId,
         reason,
       });
+
+      // Merge credits into oldest lead
+      // Get all linked leads to find the complete cluster
+      const allLinkedLeadIds = await this.getAllLinkedLeadIds(
+        primaryLeadId,
+        locale,
+        logger,
+      );
+
+      // Trigger credit merge with all linked lead IDs
+      const mergeResult = await creditTransactionManager.mergeCreditsIntoOldest(
+        allLinkedLeadIds,
+        logger,
+      );
+
+      if (!mergeResult.success) {
+        logger.error("Failed to merge credits after linking leads", {
+          primaryLeadId,
+          linkedLeadId,
+          allLinkedLeadIds,
+        });
+        // Don't fail the link operation if credit merge fails
+      }
 
       return createSuccessResponse(undefined);
     } catch (error) {

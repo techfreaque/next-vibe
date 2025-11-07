@@ -34,21 +34,14 @@ import type {
 } from "../system/unified-interface/shared/server-only/credits/handler";
 import { BaseCreditHandler } from "../system/unified-interface/shared/server-only/credits/handler";
 import { creditTransactions, userCredits } from "./db";
-import { CreditTypeIdentifier, type CreditTypeIdentifierValue } from "./enum";
+import {
+  CreditTransactionType,
+  type CreditTransactionTypeValue,
+  CreditTypeIdentifier,
+  type CreditTypeIdentifierValue,
+} from "./enum";
 
 export type { CreditBalance };
-
-/**
- * In-memory cache for credit identifier lookups
- * Reduces redundant database queries for subscription status checks
- * Cache expires after 30 seconds
- */
-interface CreditIdentifierCacheEntry {
-  userId?: string;
-  leadId?: string;
-  creditType: CreditTypeIdentifierValue;
-  timestamp: number;
-}
 
 /**
  * Credit Transaction Interface
@@ -57,7 +50,7 @@ export interface CreditTransactionOutput {
   id: string;
   amount: number;
   balanceAfter: number;
-  type: "purchase" | "subscription" | "usage" | "expiry" | "free_tier";
+  type: CreditTransactionTypeValue;
   modelId: string | null;
   messageId: string | null;
   createdAt: string;
@@ -155,14 +148,362 @@ export interface CreditRepositoryInterface {
     feature: string,
     logger: EndpointLogger,
   ): Promise<{ success: boolean; messageId?: string }>;
-
-  // Merge credits when leads are linked
-  mergeLeadCredits(
-    primaryLeadId: string,
-    linkedLeadIds: string[],
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>>;
 }
+
+/**
+ * Central Credit Transaction Manager
+ * Handles monthly credit rotation and proper credit merging
+ */
+class CreditTransactionManager {
+  /**
+   * Check if a month has passed since the last credit period start
+   * Returns true if we need to reset credits for this lead
+   */
+  private hasMonthPassed(lastPeriodStart: Date): boolean {
+    const now = new Date();
+    const lastStart = new Date(lastPeriodStart);
+
+    // Calculate months difference
+    const monthsDiff =
+      (now.getFullYear() - lastStart.getFullYear()) * 12 +
+      (now.getMonth() - lastStart.getMonth());
+
+    return monthsDiff >= 1;
+  }
+
+  /**
+   * Ensure monthly credits are current for a lead
+   * If a month has passed, create a new transaction and reset the period
+   * Returns the current credit amount after any monthly reset
+   */
+  async ensureMonthlyCredits(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<number>> {
+    try {
+      // Get current lead credit record
+      const [credit] = await db
+        .select()
+        .from(leadCredits)
+        .where(eq(leadCredits.leadId, leadId))
+        .limit(1);
+
+      // If no credit record exists, it will be created by getLeadBalance
+      if (!credit) {
+        return createSuccessResponse(0);
+      }
+
+      // Check if a month has passed
+      if (!this.hasMonthPassed(credit.monthlyPeriodStart)) {
+        // No reset needed, return current amount
+        return createSuccessResponse(credit.amount);
+      }
+
+      // Month has passed - reset credits
+      const freeCredits = productsRepository.getProduct(
+        ProductIds.FREE_TIER,
+        "en-GLOBAL",
+      ).credits;
+
+      const now = new Date();
+      const previousPeriodStart = credit.monthlyPeriodStart;
+
+      // Check if we already created a monthly reset transaction for this period
+      // to prevent duplicate transactions in case of concurrent requests
+      const [existingResetTransaction] = await db
+        .select()
+        .from(creditTransactions)
+        .where(
+          and(
+            eq(creditTransactions.leadId, leadId),
+            eq(creditTransactions.type, CreditTransactionType.MONTHLY_RESET),
+            sql`${creditTransactions.metadata}->>'previousPeriodStart' = ${previousPeriodStart.toISOString()}`,
+          ),
+        )
+        .limit(1);
+
+      if (existingResetTransaction) {
+        // Transaction already exists, just return current balance
+        logger.debug("Monthly reset transaction already exists for this period", {
+          leadId,
+          transactionId: existingResetTransaction.id,
+        });
+        return createSuccessResponse(credit.amount);
+      }
+
+      // Update the credit record with new period start
+      await db
+        .update(leadCredits)
+        .set({
+          amount: freeCredits,
+          monthlyPeriodStart: now,
+          updatedAt: now,
+        })
+        .where(eq(leadCredits.id, credit.id));
+
+      // Create transaction record for monthly reset
+      await db.insert(creditTransactions).values({
+        leadId,
+        amount: freeCredits,
+        balanceAfter: freeCredits,
+        type: CreditTransactionType.MONTHLY_RESET,
+        metadata: {
+          previousPeriodStart: previousPeriodStart.toISOString(),
+          newPeriodStart: now.toISOString(),
+          resetReason: "monthly_rotation",
+        },
+      });
+
+      logger.info("Monthly credits reset for lead", {
+        leadId,
+        previousPeriodStart,
+        newBalance: freeCredits,
+      });
+
+      return createSuccessResponse(freeCredits);
+    } catch (error) {
+      logger.error("Failed to ensure monthly credits", parseError(error), {
+        leadId,
+      });
+      return createErrorResponse(
+        "app.api.v1.core.credits.errors.monthlyResetFailed",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Find the oldest lead among a group of leads
+   * This ensures we always merge into the oldest lead to preserve history
+   */
+  private async findOldestLead(leadIds: string[]): Promise<string | null> {
+    if (leadIds.length === 0) {
+      return null;
+    }
+    if (leadIds.length === 1) {
+      return leadIds[0];
+    }
+
+    const leadsData = await db
+      .select({
+        id: leads.id,
+        createdAt: leads.createdAt,
+      })
+      .from(leads)
+      .where(inArray(leads.id, leadIds))
+      .orderBy(leads.createdAt);
+
+    return leadsData[0]?.id ?? null;
+  }
+
+  /**
+   * Merge credits from multiple leads into the oldest lead
+   * Preserves all transaction history
+   * Deletes only duplicate leadCredits records, never transactions
+   *
+   * Returns the oldest leadId that became the merge target
+   */
+  async mergeCreditsIntoOldest(
+    leadIds: string[],
+    logger: EndpointLogger,
+  ): Promise<ResponseType<string>> {
+    try {
+      if (leadIds.length === 0) {
+        return createErrorResponse(
+          "app.api.v1.core.credits.errors.noLeadsToMerge",
+          ErrorResponseTypes.BAD_REQUEST,
+        );
+      }
+
+      if (leadIds.length === 1) {
+        return createSuccessResponse(leadIds[0]);
+      }
+
+      // Find the oldest lead (merge target)
+      const oldestLeadId = await this.findOldestLead(leadIds);
+      if (!oldestLeadId) {
+        return createErrorResponse(
+          "app.api.v1.core.credits.errors.oldestLeadNotFound",
+          ErrorResponseTypes.INTERNAL_ERROR,
+        );
+      }
+
+      const otherLeadIds = leadIds.filter((id) => id !== oldestLeadId);
+
+      logger.info("Starting credit merge into oldest lead", {
+        oldestLeadId,
+        otherLeadIds,
+        totalLeads: leadIds.length,
+      });
+
+      // Get free tier credits amount
+      const freeCredits = productsRepository.getProduct(
+        ProductIds.FREE_TIER,
+        "en-GLOBAL",
+      ).credits;
+
+      // Get all credit records for these leads
+      const allCredits = await db
+        .select()
+        .from(leadCredits)
+        .where(inArray(leadCredits.leadId, leadIds));
+
+      // Get oldest lead's current period start
+      const [oldestCredit] = await db
+        .select()
+        .from(leadCredits)
+        .where(eq(leadCredits.leadId, oldestLeadId))
+        .limit(1);
+
+      const oldestPeriodStart = oldestCredit?.monthlyPeriodStart ?? new Date();
+
+      // Calculate spent IN CURRENT PERIOD ONLY
+      // Get all USAGE transactions for this period across all leads
+      let totalSpentThisPeriod = 0;
+
+      for (const leadId of leadIds) {
+        const credit = allCredits.find((c) => c.leadId === leadId);
+        const periodStart = credit?.monthlyPeriodStart ?? oldestPeriodStart;
+
+        // Get usage transactions since this lead's period started
+        const usageTransactions = await db
+          .select({ amount: creditTransactions.amount })
+          .from(creditTransactions)
+          .where(
+            and(
+              eq(creditTransactions.leadId, leadId),
+              eq(creditTransactions.type, CreditTransactionType.USAGE),
+              gte(creditTransactions.createdAt, periodStart),
+            ),
+          );
+
+        const spentThisPeriod = usageTransactions.reduce(
+          (sum, t) => sum + Math.abs(t.amount),
+          0,
+        );
+        totalSpentThisPeriod += spentThisPeriod;
+      }
+
+      // Calculate merged balance: max(0, freeCredits - totalSpentThisPeriod)
+      const mergedBalance = Math.max(0, freeCredits - totalSpentThisPeriod);
+
+      logger.info("Calculated merged credits", {
+        oldestLeadId,
+        totalSpentThisPeriod,
+        mergedBalance,
+        periodStart: oldestPeriodStart,
+      });
+
+      // Update or create oldest lead credit record
+      const [existingOldestCredit] = await db
+        .select()
+        .from(leadCredits)
+        .where(eq(leadCredits.leadId, oldestLeadId))
+        .limit(1);
+
+      if (existingOldestCredit) {
+        await db
+          .update(leadCredits)
+          .set({
+            amount: mergedBalance,
+            monthlyPeriodStart: existingOldestCredit.monthlyPeriodStart, // Keep original period
+            updatedAt: new Date(),
+          })
+          .where(eq(leadCredits.id, existingOldestCredit.id));
+      } else {
+        await db.insert(leadCredits).values({
+          leadId: oldestLeadId,
+          amount: mergedBalance,
+          monthlyPeriodStart: new Date(),
+        });
+      }
+
+      // Delete credit records for other leads
+      if (otherLeadIds.length > 0) {
+        await db
+          .delete(leadCredits)
+          .where(inArray(leadCredits.leadId, otherLeadIds));
+
+        logger.debug("Deleted duplicate credit records", {
+          deletedLeadIds: otherLeadIds,
+          count: otherLeadIds.length,
+        });
+      }
+
+      // Update all credit transactions to point to oldest lead (preserve history)
+      if (otherLeadIds.length > 0) {
+        await db
+          .update(creditTransactions)
+          .set({ leadId: oldestLeadId })
+          .where(inArray(creditTransactions.leadId, otherLeadIds));
+
+        logger.debug("Updated credit transactions to oldest lead", {
+          oldestLeadId,
+          updatedFromLeadIds: otherLeadIds,
+          count: otherLeadIds.length,
+        });
+      }
+
+      logger.info("Credit merge completed successfully", {
+        oldestLeadId,
+        mergedFrom: otherLeadIds,
+        totalSpentThisPeriod,
+        mergedBalance,
+      });
+
+      return createSuccessResponse(oldestLeadId);
+    } catch (error) {
+      logger.error("Failed to merge credits into oldest", parseError(error), {
+        leadIds,
+      });
+      return createErrorResponse(
+        "app.api.v1.core.credits.errors.mergeFailed",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Create a transaction record with full metadata
+   */
+  async createTransaction(
+    params: {
+      userId?: string;
+      leadId?: string;
+      amount: number;
+      balanceAfter: number;
+      type: CreditTransactionTypeValue;
+      modelId?: string;
+      messageId?: string;
+      metadata?: Record<string, string | number | boolean | null>;
+    },
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    try {
+      await db.insert(creditTransactions).values({
+        userId: params.userId ?? null,
+        leadId: params.leadId ?? null,
+        amount: params.amount,
+        balanceAfter: params.balanceAfter,
+        type: params.type,
+        modelId: params.modelId ?? null,
+        messageId: params.messageId ?? null,
+        metadata: params.metadata ?? {},
+      });
+
+      return createSuccessResponse(undefined);
+    } catch (error) {
+      logger.error("Failed to create transaction", parseError(error), params);
+      return createErrorResponse(
+        "app.api.v1.core.credits.errors.transactionFailed",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+}
+
+// Create singleton instance
+export const creditTransactionManager = new CreditTransactionManager();
 
 /**
  * Credit Repository Implementation
@@ -191,11 +532,11 @@ class CreditRepository
         logger,
       );
       if (identifierResult.success && identifierResult.data.userId) {
-        return await this.getUserBalance(identifier.userId);
+        return await this.getUserBalance(identifier.userId, logger);
       }
     }
 
-    return await this.getLeadBalanceAsBalance(identifier.leadId);
+    return await this.getLeadBalanceAsBalance(identifier.leadId, logger);
   }
 
   /**
@@ -205,6 +546,7 @@ class CreditRepository
    */
   private async getUserBalance(
     userId: string,
+    logger?: EndpointLogger,
   ): Promise<ResponseType<CreditBalance>> {
     try {
       // Query credits, filtering out expired ones
@@ -254,7 +596,7 @@ class CreditRepository
         .limit(1);
 
       if (userLead) {
-        const leadBalanceResult = await this.getLeadBalance(userLead.leadId);
+        const leadBalanceResult = await this.getLeadBalance(userLead.leadId, logger);
         if (leadBalanceResult.success) {
           const leadCredits = leadBalanceResult.data;
           total += leadCredits;
@@ -282,8 +624,9 @@ class CreditRepository
    */
   private async getLeadBalanceAsBalance(
     leadId: string,
+    logger?: EndpointLogger,
   ): Promise<ResponseType<CreditBalance>> {
-    const result = await this.getLeadBalance(leadId);
+    const result = await this.getLeadBalance(leadId, logger);
     if (!result.success) {
       return result as ResponseType<CreditBalance>;
     }
@@ -300,8 +643,9 @@ class CreditRepository
   /**
    * Get lead's current credit balance
    * If lead has no credits, create initial free credits from products repository
+   * Also handles monthly credit rotation automatically
    */
-  async getLeadBalance(leadId: string): Promise<ResponseType<number>> {
+  async getLeadBalance(leadId: string, logger?: EndpointLogger): Promise<ResponseType<number>> {
     try {
       const credits = await db
         .select()
@@ -320,6 +664,7 @@ class CreditRepository
         await db.insert(leadCredits).values({
           leadId,
           amount: freeCredits,
+          monthlyPeriodStart: new Date(),
         });
 
         // Create transaction record
@@ -327,10 +672,25 @@ class CreditRepository
           leadId,
           amount: freeCredits,
           balanceAfter: freeCredits,
-          type: "free_tier",
+          type: CreditTransactionType.FREE_TIER,
+          metadata: {
+            initialCreation: true,
+            periodStart: new Date().toISOString(),
+          },
         });
 
         return createSuccessResponse(freeCredits);
+      }
+
+      // Check if monthly rotation is needed (if logger provided)
+      if (logger) {
+        const monthlyResult = await creditTransactionManager.ensureMonthlyCredits(
+          leadId,
+          logger,
+        );
+        if (monthlyResult.success) {
+          return createSuccessResponse(monthlyResult.data);
+        }
       }
 
       return createSuccessResponse(credits[0].amount);
@@ -355,8 +715,8 @@ class CreditRepository
       // Public users only have leadId and always use lead credits
       // Private users have id and leadId, may use either based on subscription
       if (user.isPublic) {
-        // Public users always use lead credits
-        return await this.getLeadBalanceAsBalance(user.leadId);
+        // Public users always use lead credits (with monthly rotation)
+        return await this.getLeadBalanceAsBalance(user.leadId, logger);
       }
 
       // Private user - check if they have multiple linked leads and merge if needed
@@ -366,33 +726,21 @@ class CreditRepository
         .where(eq(userLeads.userId, user.id));
 
       if (allUserLeads.length > 1) {
-        // Find primary lead
-        const primaryLead = allUserLeads.find((l) => l.isPrimary);
-        const primaryLeadId = primaryLead?.leadId ?? allUserLeads[0].leadId;
-
-        // Get all other lead IDs
-        const linkedLeadIds = allUserLeads
-          .filter((l) => l.leadId !== primaryLeadId)
-          .map((l) => l.leadId);
-
         // Merge credits (idempotent - safe to call multiple times)
-        const mergeResult = await this.mergeLeadCredits(
-          primaryLeadId,
-          linkedLeadIds,
+        const mergeResult = await creditTransactionManager.mergeCreditsIntoOldest(
+          allUserLeads.map((l) => l.leadId),
           logger,
         );
 
         if (!mergeResult.success) {
           logger.error("Failed to merge credits for user with multiple leads", {
             userId: user.id,
-            primaryLeadId,
-            linkedLeadIds,
+            allLeadIds: allUserLeads.map((l) => l.leadId),
           });
         } else {
           logger.debug("Credits merged for user with multiple leads", {
             userId: user.id,
-            primaryLeadId,
-            linkedLeadIds,
+            allLeadIds: allUserLeads.map((l) => l.leadId),
           });
         }
       }
@@ -445,7 +793,7 @@ class CreditRepository
       // If user has no subscription → return combined user credits + lead credits
       if (creditType === CreditTypeIdentifier.LEAD_FREE && effectiveLeadId) {
         // Get lead credits (free credits)
-        const leadBalanceResult = await this.getLeadBalance(effectiveLeadId);
+        const leadBalanceResult = await this.getLeadBalance(effectiveLeadId, logger);
 
         if (!leadBalanceResult.success) {
           return leadBalanceResult;
@@ -454,7 +802,7 @@ class CreditRepository
         const leadBalance = leadBalanceResult.data;
 
         // Also check for permanent credits in userCredits table
-        const userCreditsResult = await this.getUserBalance(user.id);
+        const userCreditsResult = await this.getUserBalance(user.id, logger);
 
         if (!userCreditsResult.success) {
           // If we can't get user credits, just return lead credits
@@ -521,16 +869,13 @@ class CreditRepository
       if (existingLead.length > 0) {
         const leadId = existingLead[0].id;
 
-        // Get credit balance
-        const credits = await db
-          .select()
-          .from(leadCredits)
-          .where(eq(leadCredits.leadId, leadId))
-          .limit(1);
+        // Get credit balance - use getLeadBalance to ensure credits exist and handle monthly rotation
+        const balanceResult = await this.getLeadBalance(leadId, logger);
+        const credits = balanceResult.success ? balanceResult.data : 0;
 
         return createSuccessResponse({
           leadId,
-          credits: credits[0]?.amount ?? 0,
+          credits,
         });
       }
 
@@ -549,25 +894,9 @@ class CreditRepository
         })
         .returning();
 
-      // Create initial free tier credits from products repository
-      const freeTier = productsRepository.getProduct(
-        ProductIds.FREE_TIER,
-        locale,
-      );
-      const freeCredits = freeTier.credits;
-
-      await db.insert(leadCredits).values({
-        leadId: newLead.id,
-        amount: freeCredits,
-      });
-
-      // Create transaction record
-      await db.insert(creditTransactions).values({
-        leadId: newLead.id,
-        amount: freeCredits,
-        balanceAfter: freeCredits,
-        type: "free_tier",
-      });
+      // Use getLeadBalance to create initial credits with proper duplicate prevention
+      const balanceResult = await this.getLeadBalance(newLead.id, logger);
+      const freeCredits = balanceResult.success ? balanceResult.data : 0;
 
       logger.debug("Created new lead with free tier credits", {
         leadId: newLead.id,
@@ -635,7 +964,7 @@ class CreditRepository
   ): Promise<ResponseType<void>> {
     try {
       // Get current balance
-      const balanceResult = await this.getLeadBalance(leadId);
+      const balanceResult = await this.getLeadBalance(leadId, logger);
       if (!balanceResult.success) {
         return balanceResult;
       }
@@ -654,7 +983,7 @@ class CreditRepository
         leadId,
         amount,
         balanceAfter: newBalance,
-        type: "free_tier",
+        type: CreditTransactionType.FREE_TIER,
       });
 
       return createSuccessResponse(undefined);
@@ -682,6 +1011,13 @@ class CreditRepository
     expiresAt?: Date,
   ): Promise<ResponseType<void>> {
     try {
+      // Get PRIMARY leadId for this user to include in transaction
+      const [primaryUserLead] = await db
+        .select({ leadId: userLeads.leadId })
+        .from(userLeads)
+        .where(and(eq(userLeads.userId, userId), eq(userLeads.isPrimary, true)))
+        .limit(1);
+
       await db.insert(userCredits).values({
         userId,
         amount,
@@ -689,16 +1025,18 @@ class CreditRepository
         expiresAt: expiresAt ?? null,
       });
 
+      // Create transaction with BOTH userId AND leadId for proper querying
       await db.insert(creditTransactions).values({
         userId,
+        leadId: primaryUserLead?.leadId ?? null, // Include leadId if available
         amount,
         balanceAfter: amount,
         type:
           type === "subscription"
-            ? "subscription"
+            ? CreditTransactionType.SUBSCRIPTION
             : type === "free"
-              ? "free_tier"
-              : "purchase",
+              ? CreditTransactionType.FREE_TIER
+              : CreditTransactionType.PURCHASE,
       });
 
       return createSuccessResponse(undefined);
@@ -828,12 +1166,13 @@ class CreditRepository
         const balanceResult = await this.getBalance(identifier, logger);
         const newBalance = balanceResult.success ? balanceResult.data.total : 0;
 
-        // Create transaction record
+        // Create transaction record with BOTH userId AND leadId for proper querying
         await db.insert(creditTransactions).values({
           userId: identifier.userId,
+          leadId: identifier.leadId, // CRITICAL: Include leadId for transaction history queries
           amount: -amount,
           balanceAfter: newBalance,
-          type: "usage",
+          type: CreditTransactionType.USAGE,
           modelId,
           messageId,
         });
@@ -864,7 +1203,7 @@ class CreditRepository
           leadId: identifier.leadId,
           amount: -amount,
           balanceAfter: newAmount,
-          type: "usage",
+          type: CreditTransactionType.USAGE,
           modelId,
           messageId,
         });
@@ -881,12 +1220,14 @@ class CreditRepository
 
   /**
    * Get transaction history by userId
-   * Includes transactions from all leads linked to this user
+   * Uses cluster resolver to find canonical (oldest) lead
+   * After credit merging, only the oldest lead retains transaction history
    */
   async getTransactions(
     userId: string,
     limit: number,
     offset: number,
+    logger?: EndpointLogger,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
@@ -894,24 +1235,36 @@ class CreditRepository
     }>
   > {
     try {
-      // Get all leadIds linked to this user
-      const userLeadLinks = await db
-        .select({ leadId: userLeads.leadId })
-        .from(userLeads)
-        .where(eq(userLeads.userId, userId));
+      // Use cluster resolver to find canonical lead for this user
+      const { getCanonicalLeadForUser } = await import(
+        "../leads/cluster-resolver"
+      );
+      const canonicalLeadId = await getCanonicalLeadForUser(userId, logger);
 
-      const leadIds = userLeadLinks.map((link) => link.leadId);
+      logger?.debug("Getting transactions for user", {
+        userId,
+        canonicalLeadId,
+      });
 
-      // Fetch transactions where userId matches OR leadId matches any of user's leads
+      if (!canonicalLeadId) {
+        logger?.warn("No canonical lead found for user, returning empty", {
+          userId,
+        });
+        return createSuccessResponse({
+          transactions: [],
+          totalCount: 0,
+        });
+      }
+
+      // Fetch transactions for the canonical lead
+      // Query by BOTH userId AND leadId to catch all transactions
       const transactions = await db
         .select()
         .from(creditTransactions)
         .where(
           or(
             eq(creditTransactions.userId, userId),
-            leadIds.length > 0
-              ? inArray(creditTransactions.leadId, leadIds)
-              : sql`false`,
+            eq(creditTransactions.leadId, canonicalLeadId),
           ),
         )
         .orderBy(desc(creditTransactions.createdAt))
@@ -924,11 +1277,15 @@ class CreditRepository
         .where(
           or(
             eq(creditTransactions.userId, userId),
-            leadIds.length > 0
-              ? inArray(creditTransactions.leadId, leadIds)
-              : sql`false`,
+            eq(creditTransactions.leadId, canonicalLeadId),
           ),
         );
+
+      logger?.debug("Found transactions for user", {
+        userId,
+        canonicalLeadId,
+        count,
+      });
 
       return createSuccessResponse({
         transactions: transactions.map((t) => ({
@@ -1069,29 +1426,47 @@ class CreditRepository
         };
       } else {
         // User has no active subscription → use lead credits
-        // Get primary lead for user
-        const [userLead] = await db
+        // Get PRIMARY lead for user (the one with isPrimary=true)
+        const [primaryUserLead] = await db
           .select()
           .from(userLeads)
-          .where(eq(userLeads.userId, userId))
+          .where(and(eq(userLeads.userId, userId), eq(userLeads.isPrimary, true)))
           .limit(1);
 
-        if (!userLead) {
-          logger.error("No lead found for user", { userId });
-          return createErrorResponse(
-            "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
-            ErrorResponseTypes.NOT_FOUND,
-          );
-        }
+        if (!primaryUserLead) {
+          // Fallback: try to get any lead for this user
+          const [anyUserLead] = await db
+            .select()
+            .from(userLeads)
+            .where(eq(userLeads.userId, userId))
+            .limit(1);
 
-        logger.debug("Using lead credits (non-subscription)", {
-          userId,
-          leadId: userLead.leadId,
-        });
-        result = {
-          leadId: userLead.leadId,
-          creditType: CreditTypeIdentifier.LEAD_FREE,
-        };
+          if (!anyUserLead) {
+            logger.error("No lead found for user", { userId });
+            return createErrorResponse(
+              "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
+              ErrorResponseTypes.NOT_FOUND,
+            );
+          }
+
+          logger.warn("Using non-primary lead for user (primary not found)", {
+            userId,
+            leadId: anyUserLead.leadId,
+          });
+          result = {
+            leadId: anyUserLead.leadId,
+            creditType: CreditTypeIdentifier.LEAD_FREE,
+          };
+        } else {
+          logger.debug("Using lead credits (non-subscription)", {
+            userId,
+            leadId: primaryUserLead.leadId,
+          });
+          result = {
+            leadId: primaryUserLead.leadId,
+            creditType: CreditTypeIdentifier.LEAD_FREE,
+          };
+        }
       }
 
       return createSuccessResponse(result);
@@ -1251,142 +1626,6 @@ class CreditRepository
         error: parseError(error),
         sessionId: session.id,
       });
-    }
-  }
-
-  /**
-   * Merge credits when leads are linked
-   * Sums up spent credits from all linked leads and consolidates into primary lead
-   * Deletes duplicate lead credit records after merging
-   *
-   * Logic:
-   * 1. Calculate total spent credits from all leads (initial free credits - current balance)
-   * 2. Set primary lead balance to max(0, free credits - totalSpent)
-   * 3. Delete credit records for linked leads
-   * 4. Create transaction records for the merge
-   */
-  async mergeLeadCredits(
-    primaryLeadId: string,
-    linkedLeadIds: string[],
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>> {
-    try {
-      if (linkedLeadIds.length === 0) {
-        logger.debug("No linked leads to merge", { primaryLeadId });
-        return createSuccessResponse(undefined);
-      }
-
-      // Get free tier credits from products repository
-      const freeCredits = productsRepository.getProduct(
-        ProductIds.FREE_TIER,
-        "en-GLOBAL",
-      ).credits;
-
-      // Get all lead IDs including primary
-      const allLeadIds = [primaryLeadId, ...linkedLeadIds];
-
-      logger.debug("Starting credit merge", {
-        primaryLeadId,
-        linkedLeadIds,
-        totalLeads: allLeadIds.length,
-      });
-
-      // Get all lead credit records
-      const allCredits = await db
-        .select()
-        .from(leadCredits)
-        .where(inArray(leadCredits.leadId, allLeadIds));
-
-      // Calculate total spent credits across all leads
-      // Each lead starts with free credits, so spent = freeCredits - current balance
-      let totalSpent = 0;
-      const creditDetails: Array<{
-        leadId: string;
-        balance: number;
-        spent: number;
-      }> = [];
-
-      for (const leadId of allLeadIds) {
-        const credit = allCredits.find((c) => c.leadId === leadId);
-        const currentBalance = credit?.amount ?? freeCredits; // Default to free credits if no record exists
-        const spent = freeCredits - currentBalance;
-        totalSpent += spent;
-        creditDetails.push({ leadId, balance: currentBalance, spent });
-      }
-
-      // Calculate merged balance: max(0, freeCredits - totalSpent)
-      // If they spent 10 each (2 leads), totalSpent = 20, so balance = 0
-      const mergedBalance = Math.max(0, freeCredits - totalSpent);
-
-      logger.info("Calculated merged credits", {
-        primaryLeadId,
-        totalSpent,
-        mergedBalance,
-        creditDetails,
-      });
-
-      // Update or create primary lead credit record
-      const [existingPrimaryCredit] = await db
-        .select()
-        .from(leadCredits)
-        .where(eq(leadCredits.leadId, primaryLeadId))
-        .limit(1);
-
-      if (existingPrimaryCredit) {
-        await db
-          .update(leadCredits)
-          .set({
-            amount: mergedBalance,
-            updatedAt: new Date(),
-          })
-          .where(eq(leadCredits.id, existingPrimaryCredit.id));
-      } else {
-        await db.insert(leadCredits).values({
-          leadId: primaryLeadId,
-          amount: mergedBalance,
-        });
-      }
-
-      // Delete credit records for linked leads
-      if (linkedLeadIds.length > 0) {
-        await db
-          .delete(leadCredits)
-          .where(inArray(leadCredits.leadId, linkedLeadIds));
-
-        logger.debug("Deleted credit records for linked leads", {
-          linkedLeadIds,
-          count: linkedLeadIds.length,
-        });
-      }
-
-      // Create transaction record for the merge
-      await db.insert(creditTransactions).values({
-        leadId: primaryLeadId,
-        amount: 0, // No new credits added, just consolidation
-        balanceAfter: mergedBalance,
-        type: "free_tier",
-        modelId: null,
-        messageId: null,
-      });
-
-      logger.info("Credit merge completed successfully", {
-        primaryLeadId,
-        linkedLeadIds,
-        totalSpent,
-        mergedBalance,
-      });
-
-      return createSuccessResponse(undefined);
-    } catch (error) {
-      logger.error("Failed to merge lead credits", {
-        error: parseError(error),
-        primaryLeadId,
-        linkedLeadIds,
-      });
-      return createErrorResponse(
-        "app.api.v1.core.credits.errors.mergeFailed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
     }
   }
 }

@@ -28,6 +28,11 @@ export const translations: typeof enTranslations = {
         description: "Abrechnungshäufigkeit auswählen",
         placeholder: "Abrechnungsintervall auswählen",
       },
+      provider: {
+        label: "Zahlungsanbieter",
+        description: "Wählen Sie, wie Sie bezahlen möchten",
+        placeholder: "Zahlungsanbieter auswählen",
+      },
       metadata: {
         label: "Metadaten",
         description: "Zusätzliche Metadaten für die Checkout-Sitzung",

@@ -17,6 +17,7 @@ import {
   SubscriptionStatus,
   SubscriptionStatusDB,
 } from "./enum";
+import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
 
 /**
  * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys
@@ -48,6 +49,7 @@ export const subscriptions = pgTable("subscriptions", {
 
   // Cancellation information
   cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+  cancelAt: timestamp("cancel_at", { withTimezone: true }), // When subscription will be canceled (Stripe cancel_at)
   canceledAt: timestamp("canceled_at", { withTimezone: true }),
   endedAt: timestamp("ended_at", { withTimezone: true }),
   cancellationReason: text("cancellation_reason", {
@@ -65,7 +67,7 @@ export const subscriptions = pgTable("subscriptions", {
   interval: text("interval").notNull().default("month"),
 
   // Payment provider info
-  provider: text("provider").notNull().default("stripe"),
+  provider: text("provider", { enum: PaymentProviderDB }).notNull().default(PaymentProvider.STRIPE),
   providerSubscriptionId: text("provider_subscription_id").unique(),
 
   // Provider-specific IDs (for managing recurring subscriptions)

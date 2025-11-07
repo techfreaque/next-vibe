@@ -11,6 +11,11 @@ export const translations = {
       description: "Number of credit packs to purchase (1-10)",
       placeholder: "Enter quantity (1-10)",
     },
+    provider: {
+      label: "Payment Provider",
+      description: "Choose how you want to pay",
+      placeholder: "Select payment provider",
+    },
     checkoutUrl: {
       content: "Checkout URL",
     },

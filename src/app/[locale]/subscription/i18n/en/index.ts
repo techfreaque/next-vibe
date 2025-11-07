@@ -6,6 +6,20 @@ export const translations = {
     billingInterval: "Billing Interval",
     currentPeriodStart: "Current Period Start",
     nextBillingDate: "Next Billing Date",
+    endsOn: "Subscription Ends On",
+    cancellation: {
+      title: "Subscription Scheduled for Cancellation",
+      description: "Your subscription will end on {{date}}. You will retain access until then.",
+    },
+    manage: {
+      stripe: {
+        button: "Manage Subscription",
+      },
+      nowpayments: {
+        button: "View Subscription Details",
+        info: "Your subscription is managed via email. Please check your inbox for payment links and subscription details from NOWPayments.",
+      },
+    },
     balance: {
       title: "Credit Balance",
       description:
@@ -74,6 +88,14 @@ export const translations = {
         description:
           "Please sign in or create an account to purchase credits or subscribe.",
       },
+      provider: {
+        stripe: {
+          description: "Credit/Debit Cards",
+        },
+        nowpayments: {
+          description: "Cryptocurrency",
+        },
+      },
       subscription: {
         badge: "Best Value",
         title: "Monthly Subscription",
@@ -86,6 +108,7 @@ export const translations = {
           bestFor: "Perfect for regular AI users",
         },
         button: "Subscribe Now",
+        buttonAlreadySubscribed: "Already Subscribed",
       },
       pack: {
         title: "Extra Credit Packs",
@@ -126,6 +149,7 @@ export const translations = {
         usage: "Usage",
         expiry: "Expiry",
         free_tier: "Free Tier",
+        monthly_reset: "Monthly Reset",
       },
     },
     tabs: {

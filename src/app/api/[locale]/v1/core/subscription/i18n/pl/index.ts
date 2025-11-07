@@ -260,6 +260,7 @@ export const translations: typeof enTranslations = {
       canceled: "Anulowany",
       unpaid: "Nieopłacony",
       paused: "Wstrzymany",
+      canceling: "Anulowanie",
     },
     billing: {
       monthly: "Miesięczny",

@@ -19,6 +19,7 @@ import type { NewSubscription } from "./db";
 import { subscriptions } from "./db";
 import type { SubscriptionGetResponseOutput } from "./definition";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
+import { PaymentProvider } from "../payment/enum";
 import { subscriptionRepository } from "./repository";
 
 /**
@@ -44,7 +45,7 @@ function createLocalSubscriptionSeed(
     cancellationReason: null,
     trialStart: null,
     trialEnd: null,
-    provider: "stripe",
+    provider: PaymentProvider.STRIPE,
     providerSubscriptionId: null,
     providerPriceId: null,
     providerProductId: null,
@@ -53,6 +54,9 @@ function createLocalSubscriptionSeed(
     ...overrides,
   };
 }
+
+
+const ENABLED = false
 
 /**
  * Development seed function for subscription module
@@ -63,6 +67,9 @@ export async function dev(
 ): Promise<void> {
   logger.debug("🌱 Seeding subscription data for development environment");
 
+  if (!ENABLED) {
+    return;
+  }
   try {
     // NOTE: Demo user intentionally does NOT get a subscription by default
     // This allows testing the subscription purchase flow
@@ -219,8 +226,14 @@ export async function dev(
             `✅ Created premium subscription for admin user: ${adminCreatedSubscription.id}`,
           );
           adminSubscriptionData = {
-            ...adminCreatedSubscription,
+            id: adminCreatedSubscription.id,
+            userId: adminCreatedSubscription.userId,
             plan: adminCreatedSubscription.planId,
+            billingInterval: adminCreatedSubscription.billingInterval,
+            status: adminCreatedSubscription.status,
+            cancelAtPeriodEnd: adminCreatedSubscription.cancelAtPeriodEnd,
+            provider: adminCreatedSubscription.provider,
+            providerSubscriptionId: adminCreatedSubscription.providerSubscriptionId || undefined,
             currentPeriodStart:
               adminCreatedSubscription.currentPeriodStart?.toISOString() ?? "",
             currentPeriodEnd:
@@ -353,8 +366,14 @@ export async function dev(
             `✅ Created subscription for low credits user: ${createdSubscription.id}`,
           );
           subscription = {
-            ...createdSubscription,
+            id: createdSubscription.id,
+            userId: createdSubscription.userId,
             plan: createdSubscription.planId,
+            billingInterval: createdSubscription.billingInterval,
+            status: createdSubscription.status,
+            cancelAtPeriodEnd: createdSubscription.cancelAtPeriodEnd,
+            provider: createdSubscription.provider,
+            providerSubscriptionId: createdSubscription.providerSubscriptionId || undefined,
             currentPeriodStart:
               createdSubscription.currentPeriodStart?.toISOString() ?? "",
             currentPeriodEnd:

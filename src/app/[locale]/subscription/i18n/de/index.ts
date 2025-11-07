@@ -8,6 +8,20 @@ export const translations: typeof enTranslations = {
     billingInterval: "Abrechnungsintervall",
     currentPeriodStart: "Aktueller Zeitraum Start",
     nextBillingDate: "Nächstes Abrechnungsdatum",
+    endsOn: "Abonnement endet am",
+    cancellation: {
+      title: "Abonnement zur Kündigung vorgemerkt",
+      description: "Ihr Abonnement endet am {{date}}. Sie behalten bis dahin den Zugriff.",
+    },
+    manage: {
+      stripe: {
+        button: "Abonnement verwalten",
+      },
+      nowpayments: {
+        button: "Abonnement-Details anzeigen",
+        info: "Ihr Abonnement wird per E-Mail verwaltet. Bitte überprüfen Sie Ihren Posteingang auf Zahlungslinks und Abonnementdetails von NOWPayments.",
+      },
+    },
     balance: {
       title: "Credit-Guthaben",
       description:
@@ -76,6 +90,14 @@ export const translations: typeof enTranslations = {
         description:
           "Bitte melden Sie sich an oder erstellen Sie ein Konto, um Credits und Abonnements zu kaufen.",
       },
+      provider: {
+        stripe: {
+          description: "Kredit-/Debitkarten",
+        },
+        nowpayments: {
+          description: "Kryptowährung",
+        },
+      },
       subscription: {
         badge: "Für alle zugänglich",
         title: "Monatsabonnement",
@@ -88,6 +110,7 @@ export const translations: typeof enTranslations = {
           bestFor: "Perfekt für regelmäßige KI-Nutzer",
         },
         button: "Jetzt abonnieren",
+        buttonAlreadySubscribed: "Bereits abonniert",
       },
       pack: {
         title: "Credit-Pakete",
@@ -128,6 +151,7 @@ export const translations: typeof enTranslations = {
         usage: "Nutzung",
         expiry: "Ablauf",
         free_tier: "Kostenlose Stufe",
+        monthly_reset: "Monatliche Zurücksetzung",
       },
     },
     tabs: {

@@ -22,6 +22,7 @@ import type { JwtPrivatePayloadType } from "../../user/auth/types";
 import { getPaymentProvider } from "../providers";
 import { ProductIds } from "../../products/repository-client";
 import { BillingInterval } from "../../subscription/enum";
+import { PaymentProvider } from "../enum";
 import type {
   CheckoutRequestOutput,
   CheckoutResponseOutput,
@@ -62,26 +63,57 @@ export class SubscriptionCheckoutRepositoryImpl
         userId: user.id,
         planId: data.planId,
         billingInterval: data.billingInterval,
+        provider: data.provider,
         locale,
       });
 
-      // Default to stripe provider
+      // Get payment provider from request data or default to stripe
       logger.debug("Step 3: Getting payment provider");
-      const provider = getPaymentProvider("stripe");
-      logger.debug("Step 4: Payment provider retrieved", { providerName: provider.name });
+      const providerKey = data.provider === PaymentProvider.NOWPAYMENTS
+        ? "nowpayments"
+        : "stripe";
+      const provider = getPaymentProvider(providerKey);
+      logger.debug("Step 4: Payment provider retrieved", {
+        providerName: provider.name,
+        providerKey,
+        requestedProvider: data.provider,
+      });
+
+      // Check if user already has an active subscription
+      logger.debug("Step 5: Checking for existing subscription");
+      const { subscriptionRepository } = await import("../../subscription/repository");
+      const existingSubscription = await subscriptionRepository.getSubscription(
+        user.id,
+        logger
+      );
+
+      if (existingSubscription.success && existingSubscription.data) {
+        const { SubscriptionStatus } = await import("../../subscription/enum");
+        if (existingSubscription.data.status === SubscriptionStatus.ACTIVE) {
+          logger.warn("User already has active subscription", {
+            userId: user.id,
+            subscriptionId: existingSubscription.data.id,
+          });
+          return createErrorResponse(
+            "app.api.v1.core.payment.checkout.post.errors.alreadySubscribed.title" as never,
+            ErrorResponseTypes.BAD_REQUEST,
+            { userId: user.id },
+          );
+        }
+      }
 
       // Get user details from database for customer creation
-      logger.debug("Step 5: Importing user repository");
+      logger.debug("Step 6: Importing user repository");
       const { userRepository } = await import("../../user/repository");
       const { UserDetailLevel } = await import("../../user/enum");
-      logger.debug("Step 6: Getting user by ID");
+      logger.debug("Step 7: Getting user by ID");
       const userResult = await userRepository.getUserById(
         user.id,
         UserDetailLevel.STANDARD,
         locale,
         logger
       );
-      logger.debug("Step 7: User result received", { success: userResult.success });
+      logger.debug("Step 8: User result received", { success: userResult.success });
 
       if (!userResult.success || !userResult.data) {
         return createErrorResponse(
@@ -125,6 +157,7 @@ export class SubscriptionCheckoutRepositoryImpl
             billingInterval: data.billingInterval,
             productId: ProductIds.SUBSCRIPTION,
             interval,
+            provider: data.provider || PaymentProvider.STRIPE,
           },
         },
         customerResult.data.customerId,

@@ -19,6 +19,11 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import {
+  PaymentProvider,
+  PaymentProviderDB,
+  PaymentProviderOptions,
+} from "../../payment/enum";
 
 /**
  * Purchase Credits Endpoint (POST)
@@ -62,6 +67,22 @@ const { POST } = createEndpoint({
           validation: { required: true, min: 1, max: 10 },
         },
         z.number().int().min(1).max(10),
+      ),
+
+      provider: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label:
+            "app.api.v1.core.agent.chat.credits.purchase.post.provider.label",
+          description:
+            "app.api.v1.core.agent.chat.credits.purchase.post.provider.description",
+          placeholder:
+            "app.api.v1.core.agent.chat.credits.purchase.post.provider.placeholder",
+          validation: { required: false },
+          options: PaymentProviderOptions,
+        },
+        z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
       ),
 
       // === RESPONSE FIELDS ===

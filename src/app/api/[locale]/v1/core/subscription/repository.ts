@@ -21,6 +21,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { getPaymentProvider } from "../payment/providers";
+import { stripe as getStripe } from "../payment/providers/stripe/repository";
+import type { WebhookData } from "../payment/providers/types";
 import type { NewSubscription } from "./db";
 import { subscriptions } from "./db";
 import type {
@@ -37,6 +39,7 @@ import type {
   SubscriptionPlanDB,
 } from "./enum";
 import { SubscriptionPlan, SubscriptionStatus } from "./enum";
+import { PaymentProvider, type PaymentProviderValue } from "../payment/enum";
 
 /**
  * Subscription Repository Interface
@@ -106,6 +109,9 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
           subscription.currentPeriodEnd?.toISOString() ||
           new Date().toISOString(),
         cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+        cancelAt: subscription.cancelAt?.toISOString(),
+        provider: subscription.provider,
+        providerSubscriptionId: subscription.providerSubscriptionId || undefined,
         createdAt: subscription.createdAt.toISOString(),
         updatedAt: subscription.updatedAt.toISOString(),
       });
@@ -287,14 +293,14 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
    * Called by payment repository when checkout.session.completed webhook received
    */
   async handleSubscriptionCheckout(
-    session: Stripe.Checkout.Session,
+    session: WebhookData,
     logger: EndpointLogger,
   ): Promise<void> {
     try {
       const userId = session.metadata?.userId;
       const planId = session.metadata?.planId;
       const billingInterval = session.metadata?.billingInterval;
-      const providerSubscriptionId = session.subscription as string;
+      const providerSubscriptionId = session.subscription;
 
       if (!userId || !planId || !billingInterval) {
         logger.error("Missing required metadata in checkout session", {
@@ -306,8 +312,16 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         return;
       }
 
-      const providerName = session.metadata?.provider || "stripe";
-      const provider = getPaymentProvider(providerName);
+      if (!providerSubscriptionId) {
+        logger.error("Missing provider subscription ID", {
+          sessionId: session.id,
+        });
+        return;
+      }
+
+      const providerEnum = (session.metadata?.provider as typeof PaymentProviderValue) || PaymentProvider.STRIPE;
+      const providerKey = providerEnum === PaymentProvider.NOWPAYMENTS ? "nowpayments" : "stripe";
+      const provider = getPaymentProvider(providerKey);
       const subscriptionResult = await provider.retrieveSubscription(
         providerSubscriptionId,
         logger,
@@ -329,7 +343,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
           billingInterval:
             billingInterval as (typeof BillingIntervalDB)[number],
           status: SubscriptionStatus.ACTIVE,
-          provider: providerName,
+          provider: providerEnum,
           providerSubscriptionId,
           currentPeriodStart: subscriptionResult.data.currentPeriodStart
             ? new Date(subscriptionResult.data.currentPeriodStart)
@@ -402,7 +416,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
    * Called by payment repository when invoice.payment_succeeded webhook received
    */
   async handleInvoicePaymentSucceeded(
-    invoice: Stripe.Invoice,
+    invoice: WebhookData,
     subscriptionId: string,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -570,9 +584,13 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         return;
       }
 
+      // Fetch full subscription from Stripe to get all fields (webhook events may not include all fields)
+      const stripe = getStripe();
+      const fullSubscription = await stripe.subscriptions.retrieve(stripeSubscription.id);
+
       // Map Stripe status to our status
       let status: typeof SubscriptionStatusValue;
-      switch (stripeSubscription.status) {
+      switch (fullSubscription.status) {
         case "active":
           status = SubscriptionStatus.ACTIVE;
           break;
@@ -597,19 +615,21 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         .update(subscriptions)
         .set({
           status,
-          cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+          cancelAtPeriodEnd: fullSubscription.cancel_at_period_end,
+          cancelAt: fullSubscription.cancel_at ? new Date(fullSubscription.cancel_at * 1000) : null,
           // Note: Stripe.Subscription doesn't have current_period_start/end in the type definition
           // These would need to be retrieved from the latest invoice or billing cycle
           currentPeriodStart: undefined,
           currentPeriodEnd: undefined,
           updatedAt: new Date(),
         })
-        .where(eq(subscriptions.providerSubscriptionId, stripeSubscription.id));
+        .where(eq(subscriptions.providerSubscriptionId, fullSubscription.id));
 
       logger.debug("Subscription updated successfully", {
-        subscriptionId: stripeSubscription.id,
+        subscriptionId: fullSubscription.id,
         status,
-        cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+        cancelAtPeriodEnd: fullSubscription.cancel_at_period_end,
+        cancelAt: fullSubscription.cancel_at,
       });
     } catch (error) {
       logger.error("Failed to process subscription update", {

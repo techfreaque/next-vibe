@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import {
   AlertCircle,
+  Bitcoin,
   Calendar,
+  CreditCard,
   Info,
   Sparkles,
   TrendingUp,
@@ -17,6 +20,13 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe-ui/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
@@ -33,6 +43,8 @@ import {
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { type PaymentProviderValue,
+PaymentProvider } from "@/app/api/[locale]/v1/core/payment/enum";
 import { formatPrice } from "./types";
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/v1/core/products/repository-client";
 
@@ -57,35 +69,98 @@ export function BuyCreditsTab({
 }: BuyCreditsTabProps): JSX.Element {
   const { t } = useTranslation();
 
+  // Modal and provider state
+  const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"subscription" | "credits">("subscription");
+
   // Initialize hooks
   const logger = createEndpointLogger(false, Date.now(), locale);
   const subscriptionCheckoutEndpoint = useSubscriptionCheckout(logger);
   const creditPurchaseEndpoint = useCreditPurchase(logger);
 
   const handleSubscribe = (): void => {
-    if (!subscriptionCheckoutEndpoint.create) {
-      return;
+    setModalType("subscription");
+    setIsProviderModalOpen(true);
+  };
+
+  const handleBuyCredits = (): void => {
+    setModalType("credits");
+    setIsProviderModalOpen(true);
+  };
+
+  const handleProviderSelect = (provider: typeof PaymentProviderValue): void => {
+    setIsProviderModalOpen(false);
+
+    if (modalType === "subscription") {
+      if (!subscriptionCheckoutEndpoint.create) {
+        return;
+      }
+
+      subscriptionCheckoutEndpoint.create.form.reset({
+        planId: SubscriptionPlan.SUBSCRIPTION,
+        billingInterval: BillingInterval.MONTHLY,
+        provider: provider,
+      });
+
+      void subscriptionCheckoutEndpoint.create.submitForm(undefined);
+    } else {
+      if (!creditPurchaseEndpoint.create) {
+        return;
+      }
+
+      creditPurchaseEndpoint.create.form.setValue("provider", provider);
+      void creditPurchaseEndpoint.create.submitForm(undefined);
     }
-
-    // Set form values for subscription checkout
-    subscriptionCheckoutEndpoint.create.form.reset({
-      planId: SubscriptionPlan.SUBSCRIPTION,
-      billingInterval: BillingInterval.MONTHLY,
-    });
-
-    // Submit form - redirect is handled by the hook's onSuccess callback
-    void subscriptionCheckoutEndpoint.create.submitForm(undefined);
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 }}
-      className="grid grid-cols-1 md:grid-cols-2 gap-6"
-    >
-      {/* Subscription Option */}
-      <Card className="relative overflow-hidden border-2 border-primary">
+    <>
+      {/* Payment Provider Selection Modal */}
+      <Dialog open={isProviderModalOpen} onOpenChange={setIsProviderModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {t("app.api.v1.core.subscription.checkout.form.fields.provider.label")}
+            </DialogTitle>
+            <DialogDescription>
+              {t("app.api.v1.core.subscription.checkout.form.fields.provider.description")}
+            </DialogDescription>
+          </DialogHeader>
+          <Div className="grid gap-4 py-4">
+            <Button
+              variant="outline"
+              className="h-auto p-4 justify-start"
+              onClick={() => handleProviderSelect(PaymentProvider.STRIPE)}
+            >
+              <CreditCard className="h-6 w-6 text-blue-600 mr-3" />
+              <Div className="text-left">
+                <Div className="font-semibold">{t("app.api.v1.core.payment.enums.paymentProvider.stripe")}</Div>
+                <Div className="text-sm text-muted-foreground">{t("app.subscription.subscription.buy.provider.stripe.description")}</Div>
+              </Div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto p-4 justify-start"
+              onClick={() => handleProviderSelect(PaymentProvider.NOWPAYMENTS)}
+            >
+              <Bitcoin className="h-6 w-6 text-orange-500 mr-3" />
+              <Div className="text-left">
+                <Div className="font-semibold">{t("app.api.v1.core.payment.enums.paymentProvider.nowpayments")}</Div>
+                <Div className="text-sm text-muted-foreground">{t("app.subscription.subscription.buy.provider.nowpayments.description")}</Div>
+              </Div>
+            </Button>
+          </Div>
+        </DialogContent>
+      </Dialog>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
+        {/* Subscription Option */}
+        <Card className="relative overflow-hidden border-2 border-primary">
         <CardHeader>
           <CardTitle className="text-2xl">
             {t("app.subscription.subscription.buy.subscription.title")}
@@ -159,11 +234,16 @@ export function BuyCreditsTab({
               className="w-full"
               size="lg"
               onClick={handleSubscribe}
-              disabled={subscriptionCheckoutEndpoint.create?.isSubmitting}
+              disabled={
+                subscriptionCheckoutEndpoint.create?.isSubmitting ||
+                initialSubscription?.status === SubscriptionStatus.ACTIVE
+              }
             >
               {subscriptionCheckoutEndpoint.create?.isSubmitting
                 ? "Loading..."
-                : t("app.subscription.subscription.buy.subscription.button")}
+                : initialSubscription?.status === SubscriptionStatus.ACTIVE
+                  ? t("app.subscription.subscription.buy.subscription.buttonAlreadySubscribed")
+                  : t("app.subscription.subscription.buy.subscription.button")}
             </Button>
           )}
         </CardContent>
@@ -217,7 +297,7 @@ export function BuyCreditsTab({
             initialSubscription?.status === SubscriptionStatus.ACTIVE && (
               <Form
                 form={creditPurchaseEndpoint.create.form}
-                onSubmit={creditPurchaseEndpoint.create.submitForm}
+                onSubmit={creditPurchaseEndpoint.create.onSubmit}
                 className="space-y-3"
               >
                 <Div className="w-full">
@@ -233,7 +313,8 @@ export function BuyCreditsTab({
                 </Div>
 
                 <Button
-                  type="submit"
+                  type="button"
+                  onClick={handleBuyCredits}
                   className="w-full"
                   size="lg"
                   variant="outline"
@@ -260,6 +341,7 @@ export function BuyCreditsTab({
           )}
         </CardContent>
       </Card>
-    </motion.div>
+      </motion.div>
+    </>
   );
 }

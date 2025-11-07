@@ -97,6 +97,7 @@ export default async function SubscriptionPage({
         userResponse.data.id,
         50, // limit
         0, // offset
+        logger,
       );
       history = historyResponse.success ? historyResponse.data : null;
     } else {

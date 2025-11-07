@@ -8,6 +8,14 @@ export const translations: typeof enTranslations = {
       userSubscription: "Benutzer-Abonnement-Credits",
       leadFree: "Lead-Gratis-Credits",
     },
+    transactionType: {
+      purchase: "Kauf",
+      subscription: "Abonnement",
+      usage: "Verbrauch",
+      expiry: "Ablauf",
+      freeTier: "Kostenlos",
+      monthlyReset: "Monatliche Zurücksetzung",
+    },
   },
   expire: {
     task: {
@@ -31,6 +39,10 @@ export const translations: typeof enTranslations = {
     stripeCustomerFailed: "Fehler beim Erstellen des Stripe-Kunden",
     checkoutFailed: "Fehler beim Erstellen der Checkout-Sitzung",
     mergeFailed: "Fehler beim Zusammenführen der Lead-Credits",
+    monthlyResetFailed: "Fehler beim monatlichen Zurücksetzen der Credits",
+    noLeadsToMerge: "Keine Leads zum Zusammenführen vorhanden",
+    oldestLeadNotFound: "Ältester Lead im Cluster nicht gefunden",
+    transactionFailed: "Fehler beim Erstellen des Transaktionsdatensatzes",
   },
   get: {
     title: "Credit-Guthaben abrufen",

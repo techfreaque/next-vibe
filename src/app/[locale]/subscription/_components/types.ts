@@ -5,7 +5,7 @@ import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import type { CreditTransactionOutput } from "@/app/api/[locale]/v1/core/credits/repository";
 import type { CreditBalance } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/credits/handler";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
-import { type CreditTransaction } from "@/app/api/[locale]/v1/core/credits/db";
+import { CreditTransactionType } from "@/app/api/[locale]/v1/core/credits/enum";
 import { type TranslationKey } from "@/i18n/core/static-types";
 
 export interface SubscriptionClientContentProps {
@@ -20,19 +20,21 @@ export interface SubscriptionClientContentProps {
 }
 
 export const getTransactionTypeKey = (
-  type: CreditTransaction["type"],
+  type: CreditTransactionOutput["type"],
 ): TranslationKey => {
   switch (type) {
-    case "purchase":
+    case CreditTransactionType.PURCHASE:
       return "app.subscription.subscription.history.types.purchase";
-    case "subscription":
+    case CreditTransactionType.SUBSCRIPTION:
       return "app.subscription.subscription.history.types.subscription";
-    case "usage":
+    case CreditTransactionType.USAGE:
       return "app.subscription.subscription.history.types.usage";
-    case "expiry":
+    case CreditTransactionType.EXPIRY:
       return "app.subscription.subscription.history.types.expiry";
-    case "free_tier":
+    case CreditTransactionType.FREE_TIER:
       return "app.subscription.subscription.history.types.free_tier";
+    case CreditTransactionType.MONTHLY_RESET:
+      return "app.subscription.subscription.history.types.monthly_reset";
     default:
       return "app.subscription.subscription.history.types.usage"; // fallback
   }

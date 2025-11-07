@@ -3,7 +3,6 @@
  * Validates credit availability before AI requests
  */
 
-import { eq } from "drizzle-orm";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -12,9 +11,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { getModelCost } from "@/app/api/[locale]/v1/core/agent/chat/model-access/costs";
-import { userLeads } from "@/app/api/[locale]/v1/core/leads/db";
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
-import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -80,20 +77,21 @@ class CreditValidator implements CreditValidatorInterface {
     try {
       const cost = getModelCost(modelId);
 
-      // Get primary lead for user
-      const [userLead] = await db
-        .select()
-        .from(userLeads)
-        .where(eq(userLeads.userId, userId))
-        .limit(1);
+      // Use cluster resolver to find canonical lead for user
+      const { getCanonicalLeadForUser } = await import(
+        "@/app/api/[locale]/v1/core/leads/cluster-resolver"
+      );
+      const canonicalLeadId = await getCanonicalLeadForUser(userId, logger);
 
-      if (!userLead) {
-        logger.error("No lead found for user", { userId });
+      if (!canonicalLeadId) {
+        logger.error("No canonical lead found for user", { userId });
         return createErrorResponse(
           "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
+
+      const userLead = { leadId: canonicalLeadId };
 
       // Use repository method to determine credit source and get balance
       const identifierResult = await creditRepository.getCreditIdentifierBySubscription(
@@ -166,8 +164,8 @@ class CreditValidator implements CreditValidatorInterface {
     try {
       const cost = getModelCost(modelId);
 
-      // Get lead's balance
-      const balanceResult = await creditRepository.getLeadBalance(leadId);
+      // Get lead's balance (with monthly rotation)
+      const balanceResult = await creditRepository.getLeadBalance(leadId, logger);
       if (!balanceResult.success) {
         return createErrorResponse(
           "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",

@@ -28,6 +28,11 @@ export const translations: typeof enTranslations = {
         description: "Wybierz częstotliwość rozliczeń",
         placeholder: "Wybierz okres rozliczeniowy",
       },
+      provider: {
+        label: "Dostawca płatności",
+        description: "Wybierz sposób płatności",
+        placeholder: "Wybierz dostawcę płatności",
+      },
       metadata: {
         label: "Metadane",
         description: "Dodatkowe metadane dla sesji płatności",

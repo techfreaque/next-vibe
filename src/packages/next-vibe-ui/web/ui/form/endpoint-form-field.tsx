@@ -45,6 +45,8 @@ import {
 import { Switch } from "../switch";
 import { TagsField } from "../tags-field";
 import { Textarea } from "../textarea";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../tooltip";
+import { Info } from "../icons/Info";
 import type {
   EndpointFormFieldProps as EndpointFormFieldPropsType,
   FieldConfig,
@@ -54,7 +56,6 @@ import type {
 } from "./endpoint-form-field-types";
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -267,40 +268,6 @@ function getFieldStyleClassName(
 }
 
 /**
- * Render label with required indicators
- */
-function renderLabel(
-  config: FieldConfig,
-  isRequired: boolean,
-  theme: RequiredFieldTheme,
-  labelClassName: string,
-  t: TFunction,
-): JSX.Element | null {
-  const { style } = theme;
-
-  return config.label ? (
-    <div className="flex items-center gap-2">
-      <span className={labelClassName}>
-        {t(config.label)}
-        {style === "asterisk" && isRequired && (
-          <span className="text-blue-600 dark:text-blue-400 ml-1 font-bold">
-            *
-          </span>
-        )}
-      </span>
-      {style === "badge" && isRequired && (
-        <Badge
-          variant="secondary"
-          className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
-        >
-          {t("packages.nextVibeUi.web.common.required")}
-        </Badge>
-      )}
-    </div>
-  ) : null;
-}
-
-/**
  * Render field input based on type
  */
 function renderFieldInput<
@@ -402,18 +369,18 @@ function renderFieldInput<
             disabled={disabled || config.disabled}
             className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
           />
-          {(config.checkboxLabel || config.checkboxLabelJsx) && (
-            <Label
-              htmlFor={field.name}
-              className="text-sm font-normal cursor-pointer leading-relaxed"
-            >
-              {config.checkboxLabelJsx
-                ? config.checkboxLabelJsx
-                : config.checkboxLabel
-                  ? t(config.checkboxLabel)
+          <Label
+            htmlFor={field.name}
+            className="text-sm font-normal cursor-pointer leading-relaxed"
+          >
+            {config.checkboxLabelJsx
+              ? config.checkboxLabelJsx
+              : config.checkboxLabel
+                ? t(config.checkboxLabel)
+                : config.label
+                  ? t(config.label)
                   : null}
-            </Label>
-          )}
+          </Label>
         </div>
       );
 
@@ -693,20 +660,49 @@ export function EndpointFormField<
         );
 
         const styleClassName = getFieldStyleClassName(validationState, theme);
+        const { style } = theme;
+
+        // For checkbox/switch, skip the top label since they have inline labels
+        const skipTopLabel = config.type === "checkbox" || config.type === "switch";
 
         return (
           <FormItem
             className={cn(styleClassName.containerClassName, className)}
           >
-            <FormLabel className={styleClassName.labelClassName}>
-              {renderLabel(
-                config,
-                isRequired,
-                theme,
-                styleClassName.labelClassName,
-                t,
-              )}
-            </FormLabel>
+            {!skipTopLabel && (
+              <div className="flex flex-row items-start gap-2">
+                <FormLabel className={cn(styleClassName.labelClassName, "flex items-center gap-1.5")}>
+                  <span>{config.label && t(config.label)}</span>
+                  {config.label && style === "asterisk" && isRequired && (
+                    <span className="text-blue-600 dark:text-blue-400 font-bold">
+                      *
+                    </span>
+                  )}
+                  {config.description && (
+                    <TooltipProvider delayDuration={300}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button type="button" className="cursor-help inline-flex">
+                            <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-[250px]">
+                          <span className="text-sm">{t(config.description)}</span>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </FormLabel>
+                {style === "badge" && isRequired && (
+                  <Badge
+                    variant="secondary"
+                    className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
+                  >
+                    {t("packages.nextVibeUi.web.common.required")}
+                  </Badge>
+                )}
+              </div>
+            )}
 
             <FormControl>
               {renderFieldInput(
@@ -717,12 +713,6 @@ export function EndpointFormField<
                 config.disabled,
               )}
             </FormControl>
-
-            {config.description && !fieldState.error && (
-              <FormDescription className={styleClassName.descriptionClassName}>
-                {t(config.description)}
-              </FormDescription>
-            )}
 
             {fieldState.error && (
               <div className={styleClassName.errorClassName}>

@@ -211,6 +211,14 @@ const { GET } = createEndpoint({
               },
               z.string().nullable(),
             ),
+            persona: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.persona.content" as const,
+              },
+              z.string().nullable(),
+            ),
             tokens: responseField(
               {
                 type: WidgetType.TEXT,
@@ -290,6 +298,7 @@ const { GET } = createEndpoint({
             authorId: "770e8400-e29b-41d4-a716-446655440000",
             isAI: false,
             model: null,
+            persona: null,
             tokens: null,
             sequenceId: null,
             sequenceIndex: 0,
@@ -307,6 +316,7 @@ const { GET } = createEndpoint({
             authorId: "770e8400-e29b-41d4-a716-446655440000",
             isAI: true,
             model: "gpt-4o",
+            persona: null,
             tokens: 150,
             sequenceId: null,
             sequenceIndex: 0,

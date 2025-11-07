@@ -1,7 +1,6 @@
 import * as CheckboxPrimitive from "@rn-primitives/checkbox";
 import { styled } from "nativewind";
 import * as React from "react";
-import { Platform } from "react-native";
 
 import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
@@ -31,7 +30,7 @@ const Checkbox = React.forwardRef<
       onCheckedChange={handleCheckedChange}
       disabled={isDisabled}
       className={cn(
-        "web:peer h-4 w-4 native:h-[20] native:w-[20] shrink-0 rounded-sm native:rounded border border-primary web:ring-offset-background web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        "web:peer h-5 w-5 native:h-5 native:w-5 shrink-0 rounded-sm native:rounded border border-primary web:ring-offset-background web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
         isChecked && "bg-primary",
         className,
       )}
@@ -40,7 +39,7 @@ const Checkbox = React.forwardRef<
         className={cn("flex items-center justify-center text-current")}
       >
         <Check
-          size={Platform.OS === "web" ? 16 : 12}
+          size={14}
           className="text-primary-foreground"
         />
       </StyledCheckboxIndicator>

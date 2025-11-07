@@ -1,7 +1,6 @@
 import { Environment } from "next-vibe/shared/utils";
 import type { ReactNode } from "react";
 
-import { translationsKeyMode } from "@/config/debug";
 import { envClient } from "@/config/env-client";
 
 import { languageConfig } from "..";
@@ -69,49 +68,22 @@ function navigateTranslationPath(
   isUsingFallback: boolean,
   context?: string,
 ): TranslationElement | string | undefined {
-  let value: TranslationElement | undefined = startValue;
+  // Import shared navigation logic
+  const { navigateTranslationObject } = require("./shared-translation-utils");
+  const value = navigateTranslationObject(startValue, keys);
 
-  for (const k of keys) {
-    if (value === undefined) {
-      break;
-    }
-
-    // Handle array access
-    if (Array.isArray(value)) {
-      const index = Number(k);
-      if (!Number.isNaN(index) && index >= 0 && index < value.length) {
-        value = value[index] as TranslationElement;
-      } else {
-        // Only log if using fallback or if we're not about to try fallback
-        if (isUsingFallback || language === fallbackLanguage) {
-          logTranslationError(
-            isUsingFallback ? "fallback_missing" : "missing",
-            `${fullKey} (invalid array index: ${k})`,
-            context,
-          );
-        }
-        value = undefined;
-        break;
-      }
-    }
-    // Handle object access
-    else if (typeof value === "object" && k in value) {
-      value = value[k] as TranslationElement;
-    } else {
-      // Only log if using fallback or if we're not about to try fallback
-      if (isUsingFallback || language === fallbackLanguage) {
-        logTranslationError(
-          isUsingFallback ? "fallback_missing" : "missing",
-          fullKey,
-          context,
-        );
-      }
-      value = undefined;
-      break;
+  // Handle error logging for missing keys
+  if (value === undefined) {
+    if (isUsingFallback || language === fallbackLanguage) {
+      logTranslationError(
+        isUsingFallback ? "fallback_missing" : "missing",
+        fullKey,
+        context,
+      );
     }
   }
 
-  return value;
+  return value as TranslationElement | string | undefined;
 }
 
 /**
@@ -183,42 +155,16 @@ export function processTranslationValue<K extends TranslationKey>(
   params?: TParams,
   context?: string,
 ): string {
-  // If value is undefined, return the key as fallback
-  if (value === undefined) {
-    return `${key}${params ? ` (${JSON.stringify(params)})` : ""}`;
+  // Import shared processing logic
+  const { processTranslationValue: sharedProcess } = require("./shared-translation-utils");
+  const result = sharedProcess(value, key, params, context);
+
+  // Log error if value was not a string (only for global translations)
+  if (value !== undefined && value !== null && typeof value !== "string") {
+    logTranslationError("invalid_type", key, context);
   }
 
-  // If value is a string, process parameters
-  if (typeof value === "string") {
-    let translationValue: string = value;
-    if (params) {
-      Object.entries(params).forEach(([paramKey, paramValue]) => {
-        translationValue = translationValue.replace(
-          new RegExp(`{{${paramKey}}}`, "g"),
-          String(paramValue),
-        );
-      });
-    }
-    if (translationsKeyMode) {
-      // we wanna return urls remote and local as is
-      if (
-        translationValue.startsWith("http://") ||
-        translationValue.startsWith("/") ||
-        translationValue.startsWith("https://")
-      ) {
-        return translationValue;
-      }
-
-      return params ? `${key} (${Object.keys(params).join(", ")})` : `${key}`;
-    }
-    return translationValue;
-  }
-
-  // Handle non-string values
-  logTranslationError("invalid_type", key, context);
-
-  // Return the key as fallback
-  return key;
+  return result;
 }
 
 /**

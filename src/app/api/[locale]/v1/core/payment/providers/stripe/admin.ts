@@ -235,16 +235,36 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         customerPortalUrl: session.url,
       });
     } catch (error) {
-      const parsedError = parseError(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      // Check for Stripe portal configuration error
+      if (errorMessage.includes("No configuration provided") ||
+          errorMessage.includes("default configuration has not been created")) {
+        logger.warn("payment.portal.error.notConfigured", {
+          errorMessage,
+          userId,
+        });
+
+        return createErrorResponse(
+          "app.api.v1.core.payment.portal.post.errors.notConfigured.title",
+          ErrorResponseTypes.INTERNAL_ERROR,
+          {
+            error: "Stripe Customer Portal is not configured. Please configure it in Stripe Dashboard.",
+            configUrl: "https://dashboard.stripe.com/test/settings/billing/portal"
+          },
+        );
+      }
+
       logger.error("payment.portal.error.failed", {
-        error: parsedError.message,
+        errorMessage,
+        errorStack: error instanceof Error ? error.stack : undefined,
         userId,
       });
 
       return createErrorResponse(
         "app.api.v1.core.payment.portal.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
+        { error: errorMessage },
       );
     }
   }

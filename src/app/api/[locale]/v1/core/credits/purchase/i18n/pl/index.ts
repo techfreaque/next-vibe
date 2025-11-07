@@ -12,6 +12,11 @@ export const translations: typeof enTranslations = {
       description: "Liczba pakietów kredytów do zakupu (1-10)",
       placeholder: "Wprowadź ilość (1-10)",
     },
+    provider: {
+      label: "Dostawca płatności",
+      description: "Wybierz sposób płatności",
+      placeholder: "Wybierz dostawcę płatności",
+    },
     checkoutUrl: {
       content: "URL płatności",
     },

@@ -27,9 +27,8 @@ import { ChatMessageRoleOptions, ChatMessageRole } from "../chat/enum";
 /**
  * Chat message schema
  */
-// Accept SDK-native lowercase roles to avoid downstream conversions
 const chatMessageSchema = z.object({
-  role: z.enum(["user", "assistant", "system"]),
+  role: z.enum(ChatMessageRole),
   content: z.string().min(1).max(10000),
 });
 
@@ -253,19 +252,6 @@ const { POST } = createEndpoint({
         },
         z.coerce.number().min(1).max(10000).default(1000),
       ),
-      systemPrompt: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label: "app.api.v1.core.agent.chat.aiStream.post.systemPrompt.label",
-          description:
-            "app.api.v1.core.agent.chat.aiStream.post.systemPrompt.description",
-          layout: { columns: 12 },
-          placeholder:
-            "app.api.v1.core.agent.chat.aiStream.post.systemPrompt.placeholder",
-        },
-        z.string().max(10000).optional(),
-      ),
       tools: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -422,7 +408,7 @@ const { POST } = createEndpoint({
         temperature: 0.7,
         maxTokens: 1000,
       },
-      withSystemPrompt: {
+      withPersona: {
         operation: "send",
         rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
         subFolderId: null,
@@ -431,11 +417,9 @@ const { POST } = createEndpoint({
         content: "Write a marketing email for our new product launch",
         role: ChatMessageRole.USER,
         model: ModelId.GPT_5,
-        persona: null,
+        persona: "professional",
         temperature: 0.8,
         maxTokens: 1500,
-        systemPrompt:
-          "You are a professional marketing copywriter specializing in email campaigns.",
       },
       retry: {
         operation: "retry",
@@ -458,7 +442,7 @@ const { POST } = createEndpoint({
         totalTokens: 245,
         finishReason: "stop",
       },
-      withSystemPrompt: {
+      withPersona: {
         success: true,
         messageId: "msg_456e7890-e89b-12d3-a456-426614174001",
         totalTokens: 387,

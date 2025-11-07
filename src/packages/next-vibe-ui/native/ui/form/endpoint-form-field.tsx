@@ -56,7 +56,6 @@ import { TagsField } from "../tags-field";
 import { Textarea } from "../textarea";
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -64,6 +63,8 @@ import {
 } from "./form";
 import { Div } from "../div";
 import { Span } from "../span";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../tooltip";
+import { Info } from "../icons/Info";
 
 // Default theme for required fields
 const DEFAULT_THEME: RequiredFieldTheme = {
@@ -269,7 +270,7 @@ function getFieldStyleClassName(
 }
 
 /**
- * Render label with required indicators
+ * Render label with required indicators and optional info tooltip
  */
 function renderLabel(
   config: FieldConfig,
@@ -297,6 +298,20 @@ function renderLabel(
         >
           {t("packages.nextVibeUi.web.common.required")}
         </Badge>
+      )}
+      {config.description && (
+        <TooltipProvider delayDuration={300}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Div className="cursor-help inline-flex items-center">
+                <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+              </Div>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-[250px]">
+              <Span className="text-sm">{t(config.description)}</Span>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       )}
     </Div>
   ) : null;
@@ -749,12 +764,6 @@ export function EndpointFormField<
                 )}
               </Div>
             </FormControl>
-
-            {config.description && !fieldState.error && (
-              <FormDescription className={styleClassName.descriptionClassName}>
-                {t(config.description)}
-              </FormDescription>
-            )}
 
             {fieldState.error && (
               <Div className={styleClassName.errorClassName}>

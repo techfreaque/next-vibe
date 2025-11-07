@@ -117,6 +117,7 @@ CREATE TABLE "credit_transactions" (
 	"type" text NOT NULL,
 	"model_id" text,
 	"message_id" uuid,
+	"metadata" jsonb DEFAULT '{}'::jsonb NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
@@ -396,6 +397,7 @@ CREATE TABLE "lead_credits" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"lead_id" uuid NOT NULL,
 	"amount" integer DEFAULT 20 NOT NULL,
+	"monthly_period_start" timestamp DEFAULT now() NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -657,6 +659,7 @@ CREATE TABLE "subscriptions" (
 	"current_period_start" timestamp with time zone,
 	"current_period_end" timestamp with time zone,
 	"cancel_at_period_end" boolean DEFAULT false NOT NULL,
+	"cancel_at" timestamp with time zone,
 	"canceled_at" timestamp with time zone,
 	"ended_at" timestamp with time zone,
 	"cancellation_reason" text,
@@ -664,7 +667,7 @@ CREATE TABLE "subscriptions" (
 	"trial_end" timestamp with time zone,
 	"product_id" text DEFAULT 'subscription' NOT NULL,
 	"interval" text DEFAULT 'month' NOT NULL,
-	"provider" text DEFAULT 'stripe' NOT NULL,
+	"provider" text DEFAULT 'app.api.v1.core.payment.enums.paymentProvider.stripe' NOT NULL,
 	"provider_subscription_id" text,
 	"provider_price_id" text,
 	"provider_product_id" text,

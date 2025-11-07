@@ -40,14 +40,14 @@ export function UserMessageBubble({
   rootFolderId,
   currentUserId,
 }: UserMessageBubbleProps): JSX.Element {
-  const tone =
+  const persona =
     message.role === "user" || message.role === "assistant"
       ? message.persona
       : undefined;
 
   return (
     <Div className="flex justify-end">
-      <Div className="max-w-[90%] sm:max-w-[85%] group/message">
+      <Div className="md:max-w-[75%] group/message">
         {/* Author info (for multi-user mode) */}
         {showAuthor && (
           <Div className="mb-2 flex justify-end">
@@ -59,7 +59,7 @@ export function UserMessageBubble({
               model={message.model}
               timestamp={message.createdAt}
               edited={message.edited}
-              tone={tone}
+              persona={persona}
               locale={locale}
               compact
               rootFolderId={rootFolderId}

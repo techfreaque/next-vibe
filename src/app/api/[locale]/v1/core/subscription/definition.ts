@@ -28,6 +28,7 @@ import {
   SubscriptionPlanOptions,
   SubscriptionStatus,
 } from "./enum";
+import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
 
 /**
  * GET endpoint for retrieving subscription
@@ -119,6 +120,29 @@ const { GET } = createEndpoint({
         },
         z.boolean(),
       ),
+      cancelAt: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.subscription.response.cancelAt" as const,
+        },
+        z.string().optional(),
+      ),
+      provider: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.v1.core.subscription.response.provider" as const,
+        },
+        z.enum(PaymentProviderDB),
+      ),
+      providerSubscriptionId: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.subscription.response.providerSubscriptionId" as const,
+        },
+        z.string().optional(),
+      ),
       createdAt: responseField(
         {
           type: WidgetType.TEXT,
@@ -201,6 +225,8 @@ const { GET } = createEndpoint({
         currentPeriodStart: "2024-01-01T00:00:00Z",
         currentPeriodEnd: "2024-02-01T00:00:00Z",
         cancelAtPeriodEnd: false,
+        provider: PaymentProvider.STRIPE,
+        providerSubscriptionId: "sub_123456789",
         createdAt: "2024-01-01T00:00:00Z",
         updatedAt: "2024-01-01T00:00:00Z",
       },
