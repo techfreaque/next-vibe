@@ -17,16 +17,10 @@ function preventPullToRefresh(e: TouchEvent): void {
  */
 export function useDisablePullToRefresh(): void {
   useEffect(() => {
-    // Add event listener with passive: false to allow preventDefault
-    document.addEventListener("touchstart", preventPullToRefresh, {
-      passive: false,
-    });
-
     // Also prevent overscroll behavior via CSS
     document.body.style.overscrollBehavior = "none";
 
     return (): void => {
-      document.removeEventListener("touchstart", preventPullToRefresh);
       document.body.style.overscrollBehavior = "";
     };
   }, []);
