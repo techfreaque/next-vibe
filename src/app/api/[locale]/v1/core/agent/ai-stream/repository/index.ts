@@ -663,14 +663,59 @@ class AiStreamRepository implements IAiStreamRepository {
   /**
    * Handle Uncensored.ai model streaming
    * Uncensored.ai doesn't support streaming, so we use direct API call
+   * and convert the response to SSE events
    */
-  private async handleUncensoredAiStream(
-    messages: Array<{ role: "user" | "assistant" | "system"; content: string }>,
-    temperature: number,
-    maxTokens: number,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse> {
+  private async handleUncensoredAiStream(params: {
+    messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
+    temperature: number;
+    maxTokens: number;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+    // Context needed for SSE events
+    threadId: string;
+    isNewThread: boolean;
+    rootFolderId: DefaultFolderId;
+    subFolderId: string | null;
+    content: string;
+    operation: "send" | "retry" | "edit" | "answer-as-ai";
+    userMessageId: string;
+    effectiveRole: ChatMessageRole;
+    effectiveParentMessageId: string | null | undefined;
+    messageDepth: number;
+    effectiveContent: string;
+    model: ModelId;
+    persona: string | undefined;
+    isIncognito: boolean;
+    userId: string | undefined;
+    // Credit deduction
+    modelCost: number;
+    user: JwtPayloadType;
+  }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse> {
+    const {
+      messages,
+      temperature,
+      maxTokens,
+      locale,
+      logger,
+      threadId,
+      isNewThread,
+      rootFolderId,
+      subFolderId,
+      content,
+      operation,
+      userMessageId,
+      effectiveRole,
+      effectiveParentMessageId,
+      messageDepth,
+      effectiveContent,
+      model,
+      persona,
+      isIncognito,
+      userId,
+      modelCost,
+      user,
+    } = params;
+
     if (!env.UNCENSORED_AI_API_KEY) {
       logger.error("Uncensored.ai API key not configured");
       return {
@@ -681,15 +726,190 @@ class AiStreamRepository implements IAiStreamRepository {
       };
     }
 
-    const response = await handleUncensoredAI(
-      env.UNCENSORED_AI_API_KEY,
-      messages,
-      temperature,
-      maxTokens,
-      locale,
-    );
+    // Bind shared methods (same as OpenRouter implementation)
+    const encoder = new TextEncoder();
+    const emitInitialEvents = this.emitInitialEvents.bind(this);
+    const emitContentDelta = this.emitContentDelta.bind(this);
+    const createAssistantMessage = this.createAssistantMessage.bind(this);
+    const finalizeAssistantMessage = this.finalizeAssistantMessage.bind(this);
+    const deductCredits = this.deductCreditsAfterCompletion.bind(this);
 
-    return createStreamingResponse(response);
+    // Create SSE stream
+    const stream = new ReadableStream({
+      async start(controller): Promise<void> {
+        try {
+          // Emit initial events (thread creation and user message) - SHARED LOGIC
+          emitInitialEvents({
+            isNewThread,
+            threadId,
+            rootFolderId,
+            subFolderId,
+            content,
+            operation,
+            userMessageId,
+            effectiveRole,
+            effectiveParentMessageId,
+            messageDepth,
+            effectiveContent,
+            controller,
+            encoder,
+            logger,
+          });
+
+          // Calculate initial parent and depth for AI message - SAME AS OPENROUTER
+          const initialAiParentId =
+            operation === "answer-as-ai" || operation === "retry"
+              ? (effectiveParentMessageId ?? null)
+              : userMessageId;
+          const initialAiDepth =
+            operation === "answer-as-ai" || operation === "retry"
+              ? messageDepth
+              : messageDepth + 1;
+
+          // Track message sequencing - SAME AS OPENROUTER
+          const sequenceId = crypto.randomUUID();
+          let sequenceIndex = 0;
+
+          // Track current parent/depth - SAME AS OPENROUTER
+          const currentParentId = initialAiParentId;
+          const currentDepth = initialAiDepth;
+
+          // Don't create ASSISTANT message yet - create it when content arrives (SAME AS OPENROUTER)
+          let currentAssistantMessageId: string | null = null;
+          let currentAssistantContent = "";
+
+          // Call Uncensored AI API
+          logger.info("[Uncensored AI] Calling API");
+          const response = await handleUncensoredAI(
+            env.UNCENSORED_AI_API_KEY,
+            messages,
+            temperature,
+            maxTokens,
+            locale,
+          );
+
+          // Read the complete response
+          const responseText = await response.text();
+          logger.info("[Uncensored AI] Received response", {
+            length: responseText.length,
+          });
+
+          // Parse the response - it's in Vercel AI SDK format: 0:"text"\n
+          let fullContent = "";
+          const lines = responseText.split("\n").filter((line) => line.trim());
+          for (const line of lines) {
+            // Parse format: 0:"text"
+            const match = line.match(/^0:"(.*)"/);
+            if (match) {
+              // Unescape the JSON string
+              const chunk = JSON.parse(`"${match[1]}"`);
+              fullContent += chunk;
+            }
+          }
+
+          logger.info("[Uncensored AI] Parsed content", {
+            length: fullContent.length,
+          });
+
+          // Stream content in chunks to simulate streaming
+          const chunkSize = 20;
+          for (let i = 0; i < fullContent.length; i += chunkSize) {
+            const chunk = fullContent.slice(i, i + chunkSize);
+
+            // Create ASSISTANT message on first chunk - SAME AS OPENROUTER
+            if (!currentAssistantMessageId) {
+              const result = await createAssistantMessage({
+                initialContent: chunk,
+                threadId,
+                parentId: currentParentId,
+                depth: currentDepth,
+                model,
+                persona,
+                sequenceId,
+                sequenceIndex,
+                isIncognito,
+                userId,
+                controller,
+                encoder,
+                logger,
+              });
+              currentAssistantMessageId = result.messageId;
+              currentAssistantContent = result.content;
+
+              logger.debug("[Uncensored AI] ASSISTANT message created", {
+                messageId: currentAssistantMessageId,
+              });
+            } else {
+              // Emit content delta for subsequent chunks - SHARED LOGIC
+              currentAssistantContent += chunk;
+              emitContentDelta({
+                messageId: currentAssistantMessageId,
+                delta: chunk,
+                controller,
+                encoder,
+              });
+            }
+          }
+
+          // Finalize ASSISTANT message - SHARED LOGIC
+          if (currentAssistantMessageId) {
+            await finalizeAssistantMessage({
+              currentAssistantMessageId,
+              currentAssistantContent,
+              isInReasoningBlock: false,
+              streamResult: {
+                finishReason: "stop",
+                usage: { totalTokens: 0 },
+              },
+              isIncognito,
+              controller,
+              encoder,
+              logger,
+            });
+          }
+
+          logger.info("[Uncensored AI] Stream completed", {
+            messageId: currentAssistantMessageId,
+            contentLength: fullContent.length,
+          });
+
+          // Deduct credits AFTER successful completion (not optimistically) - SAME AS OPENROUTER
+          await deductCredits({
+            modelCost,
+            user,
+            model,
+            logger,
+          });
+
+          controller.close();
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          logger.error("[Uncensored AI] Stream error", {
+            error: errorMessage,
+          });
+
+          // Emit error event
+          const errorEvent = createStreamEvent.error({
+            code: "UNCENSORED_AI_ERROR",
+            message: errorMessage,
+          });
+          controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
+          controller.close();
+        }
+      },
+    });
+
+    logger.info("[Uncensored AI] Returning streaming response");
+    return createStreamingResponse(
+      new Response(stream, {
+        headers: {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          Connection: "keep-alive",
+        },
+      }),
+    );
   }
 
   /**
@@ -751,13 +971,30 @@ class AiStreamRepository implements IAiStreamRepository {
     try {
       // Special handling for Uncensored.ai - doesn't support streaming
       if (isUncensoredAIModel(data.model)) {
-        return await this.handleUncensoredAiStream(
+        return await this.handleUncensoredAiStream({
           messages,
-          data.temperature,
-          data.maxTokens,
+          temperature: data.temperature,
+          maxTokens: data.maxTokens,
           locale,
           logger,
-        );
+          threadId: threadResultThreadId,
+          isNewThread,
+          rootFolderId: data.rootFolderId,
+          subFolderId: data.subFolderId || null,
+          content: data.content,
+          operation: data.operation,
+          userMessageId,
+          effectiveRole,
+          effectiveParentMessageId,
+          messageDepth,
+          effectiveContent,
+          model: data.model,
+          persona: data.persona,
+          isIncognito,
+          userId,
+          modelCost,
+          user,
+        });
       }
 
       const provider = createOpenRouter({

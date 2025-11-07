@@ -228,7 +228,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.aiStream.post.persona.description",
           layout: { columns: 4 },
         },
-        z.string().nullable().optional(),
+        z.string(),
       ),
       temperature: requestDataField(
         {
@@ -404,7 +404,7 @@ const { POST } = createEndpoint({
         content: "Hello, can you help me write a professional email?",
         role: ChatMessageRole.USER,
         model: ModelId.GPT_5_MINI,
-        persona: null,
+        persona: "default",
         temperature: 0.7,
         maxTokens: 1000,
       },
