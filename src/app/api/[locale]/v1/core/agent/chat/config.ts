@@ -130,8 +130,8 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     color: "amber", // Premium gold/amber for public 1A
     rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN], // Visible to all
     rolesManage: [UserRole.ADMIN], // Only admins can manage folder
-    rolesCreateThread: [UserRole.CUSTOMER, UserRole.ADMIN], // Only authenticated users can create threads in root public folder
-    rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN], // Everyone can post
+    rolesCreateThread: [UserRole.ADMIN], // Only authenticated users can create threads in root public folder
+    rolesPost: [UserRole.ADMIN], // Everyone can post
     rolesModerate: [UserRole.PARTNER_ADMIN, UserRole.ADMIN], // Moderators and admins can moderate
     rolesAdmin: [UserRole.ADMIN], // Only admins can delete
   },

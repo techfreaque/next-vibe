@@ -23,6 +23,7 @@ import { Countries, Languages } from "@/i18n/core/config";
 
 import { emails } from "../../emails/messages/db";
 import type { JwtPayloadType } from "../../user/auth/types";
+import { leadAuthRepository } from "../auth/repository";
 import { leads } from "../db";
 import {
   EmailCampaignStage,
@@ -1142,6 +1143,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
   /**
    * Handle click tracking
+   * Links tracking leadId with current user's leadId for attribution
    */
   async handleClickTracking(
     data: ClickTrackingRequestOutput,
@@ -1150,10 +1152,12 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ClickTrackingResult>> {
     try {
-      const { id: leadId, campaignId, url } = data;
+      const { id: trackingLeadId, campaignId, url } = data;
       const isLoggedIn = !user.isPublic;
+      const currentLeadId = user.leadId;
       let engagementRecorded = false;
       let leadStatusUpdated = false;
+      let leadsLinked = false;
 
       const clientInfo: ClientInfo = {
         userAgent: "",
@@ -1162,17 +1166,71 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         timestamp: new Date().toISOString(),
       };
 
+      // Link tracking leadId with current user's leadId (lead-to-lead or lead-to-user tracking)
+      if (trackingLeadId !== currentLeadId) {
+        try {
+          // If user is logged in, link tracking lead to their user account
+          if (isLoggedIn && user.id) {
+            await leadAuthRepository.linkLeadToUser(
+              trackingLeadId,
+              user.id,
+              locale,
+              logger,
+            );
+            leadsLinked = true;
+            logger.debug(
+              "app.api.v1.core.leads.tracking.click.linkedToUser",
+              {
+                trackingLeadId,
+                userId: user.id,
+                currentLeadId,
+              },
+            );
+          } else {
+            // For anonymous users, create lead-to-lead link
+            await leadAuthRepository.linkLeads(
+              currentLeadId,
+              trackingLeadId,
+              "tracking_click",
+              {
+                campaignId: campaignId || "",
+                url,
+                timestamp: new Date().toISOString(),
+              },
+              locale,
+              logger,
+            );
+            leadsLinked = true;
+            logger.debug(
+              "app.api.v1.core.leads.tracking.click.linkedLeads",
+              {
+                currentLeadId,
+                trackingLeadId,
+              },
+            );
+          }
+        } catch (error) {
+          logger.error(
+            "app.api.v1.core.leads.tracking.click.linkFailed",
+            parseError(error).message,
+          );
+          // Don't fail the tracking if linking fails
+        }
+      }
+
       // Record email click engagement if campaign is present
       if (campaignId) {
         const clickResult = await this.recordEngagement(
           {
-            leadId,
+            leadId: trackingLeadId,
             campaignId,
             engagementType: EngagementTypes.EMAIL_CLICK,
             metadata: {
               destinationUrl: url,
               trackingMethod: "redirect",
               isLoggedIn,
+              currentLeadId,
+              leadsLinked,
             },
           },
           clientInfo,
@@ -1186,12 +1244,12 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       if (isLoggedIn) {
         try {
           const leadResult = await leadsRepository.getLeadByIdInternal(
-            leadId,
+            trackingLeadId,
             logger,
           );
           if (leadResult.success) {
             await leadsRepository.updateLeadInternal(
-              leadId,
+              trackingLeadId,
               {
                 status: LeadStatus.SIGNED_UP,
               },
@@ -1210,7 +1268,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       return createSuccessResponse({
         success: true,
         redirectUrl: url,
-        responseLeadId: leadId,
+        responseLeadId: trackingLeadId,
         responseCampaignId: campaignId,
         engagementRecorded,
         leadStatusUpdated,

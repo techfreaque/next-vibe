@@ -1,16 +1,13 @@
 /**
  * Next.js Middleware
  *
- * This file implements the middleware for the application using the next-vibe middleware system.
+ * This file implements the middleware for the application.
  */
 
 import type { NextRequest, NextResponse } from "next/server";
 
 // we have to use relative paths as vercel cant resolve import aliases from here
-import {
-  createLanguageMiddleware,
-  createMiddleware,
-} from "./app/api/[locale]/v1/core/system/middleware";
+import { middleware } from "./app/api/[locale]/v1/core/system/middleware";
 import type { languageDefaults } from "./i18n";
 import type { Countries, CountryLanguage, Languages } from "./i18n/core/config";
 
@@ -34,23 +31,15 @@ const allSupportedLocales: CountryLanguage[] = [
  * Middleware implementation
  */
 export async function proxy(request: NextRequest): Promise<NextResponse> {
-  return await composedMiddleware(request);
-}
-
-/**
- * Create the composed middleware function
- */
-const composedMiddleware = createMiddleware([
-  // Language detection and redirection with country-language format
-  createLanguageMiddleware({
+  return await middleware(request, {
     supportedLocales: allSupportedLocales,
     defaultLocale,
     supportedLanguages: availableLanguages,
     supportedCountries: availableCountries,
-    allowMixedLocales: true, // Enable support for mixed language-country combinations
+    allowMixedLocales: true,
     excludePaths: ["/_next/"],
-  }),
-]);
+  });
+}
 
 /**
  * Middleware configuration

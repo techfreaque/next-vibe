@@ -225,6 +225,35 @@ class AuthRepositoryImpl implements AuthRepository {
     if (userId) {
       return await this.getLeadIdForUser(userId, locale, logger);
     }
+
+    // For public users, use the platform handler to check cookies first
+    // This prevents creating duplicate leads on every page load
+    const { cookies } = await import("next/headers");
+    const { LEAD_ID_COOKIE_NAME } = await import("@/config/constants");
+    const cookieStore = await cookies();
+    const existingLeadId = cookieStore.get(LEAD_ID_COOKIE_NAME)?.value;
+
+    // Use leadAuthRepository to validate and reuse existing leadId
+    const { leadAuthRepository } = await import("../../leads/auth/repository");
+
+    if (existingLeadId) {
+      const isValid = await leadAuthRepository.validateLeadId(
+        existingLeadId,
+        locale,
+        logger,
+      );
+      if (isValid) {
+        logger.debug("Reusing existing leadId from cookie for public user", {
+          leadId: existingLeadId,
+        });
+        return existingLeadId;
+      }
+      logger.debug("Invalid leadId in cookie, creating new one", {
+        invalidLeadId: existingLeadId,
+      });
+    }
+
+    // No valid leadId in cookie, create a new one
     return await this.getLeadIdForPublicUser(locale, logger);
   }
 

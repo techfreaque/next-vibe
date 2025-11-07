@@ -5,12 +5,12 @@
  */
 
 import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { LOCALE_COOKIE_NAME } from "@/config/constants";
-import type { MiddlewareFunction, MiddlewareHandler } from "../core/types";
+
+import { isApiRoute, shouldSkipPath } from "../utils";
 
 export interface LanguageMiddlewareOptions {
   /**
@@ -50,14 +50,14 @@ export interface LanguageMiddlewareOptions {
 }
 
 /**
- * Creates a language middleware handler
- *
- * @param options Language middleware options
- * @returns A middleware handler
+ * Detect locale from request
+ * Returns null if path already has valid locale or should be skipped
+ * Returns locale string if redirect is needed
  */
-export function createLanguageMiddleware(
+export function detectLocale(
+  request: NextRequest,
   options: LanguageMiddlewareOptions,
-): MiddlewareHandler {
+): CountryLanguage | null {
   const {
     supportedLocales,
     defaultLocale,
@@ -67,6 +67,28 @@ export function createLanguageMiddleware(
     cookieName = LOCALE_COOKIE_NAME,
     excludePaths = [],
   } = options;
+
+  const path = request.nextUrl.pathname;
+
+  // Skip for API routes - they have their own locale structure /api/[locale]/...
+  if (isApiRoute(path)) {
+    return null;
+  }
+
+  // Skip for excluded paths
+  for (const excludePath of excludePaths) {
+    if (
+      (typeof excludePath === "string" && path.startsWith(excludePath)) ||
+      (excludePath instanceof RegExp && excludePath.test(path))
+    ) {
+      return null;
+    }
+  }
+
+  // Skip for static files
+  if (shouldSkipPath(path)) {
+    return null;
+  }
 
   // Create a combined set of supported locales
   const allSupportedLocales = [...supportedLocales];
@@ -87,144 +109,97 @@ export function createLanguageMiddleware(
     }
   }
 
-  const handler: MiddlewareFunction = (request: NextRequest) => {
-    const path = request.nextUrl.pathname;
+  // Check if the path already has a locale prefix
+  const pathParts = path.split("/").filter(Boolean);
+  const pathFirstPart = pathParts[0] || "";
 
-    // Skip for excluded paths
-    for (const excludePath of excludePaths) {
+  // Check if the path starts with a valid locale
+  const isValidLocalePrefix =
+    pathFirstPart &&
+    allSupportedLocales.some((locale) => {
+      const normalizedLocale = locale.toLowerCase();
+      const normalizedPathPart = pathFirstPart.toLowerCase();
+      return normalizedPathPart === normalizedLocale;
+    });
+
+  // If the path already has a valid locale prefix, no redirect needed
+  if (isValidLocalePrefix) {
+    return null;
+  }
+
+  // Check for user's preferred locale from cookie
+  const cookieLocale = request.cookies.get(cookieName)?.value as CountryLanguage | undefined;
+
+  // Check if cookie locale is valid
+  let validCookieLocale = false;
+  if (cookieLocale) {
+    if (supportedLocales.includes(cookieLocale)) {
+      validCookieLocale = true;
+    } else if (allowMixedLocales) {
+      const [lang, country] = cookieLocale.split("-");
       if (
-        (typeof excludePath === "string" && path.startsWith(excludePath)) ||
-        (excludePath instanceof RegExp && excludePath.test(path))
+        lang &&
+        country &&
+        supportedLanguages.includes(lang) &&
+        supportedCountries.includes(country)
       ) {
-        return NextResponse.next();
-      }
-    }
-
-    // Skip for static files, images, and Next.js internals
-    if (
-      path.includes("/_next/") ||
-      path.includes("/static/") ||
-      path.includes("/images/") ||
-      path.match(/\\.(ico|png|jpg|jpeg|svg|css|js|woff|woff2|ttf|eot)$/) ||
-      path === "/favicon.ico" ||
-      path === "/robots.txt" ||
-      path === "/sitemap.xml"
-    ) {
-      return NextResponse.next();
-    }
-
-    // Check if the path already has a locale prefix
-    const pathParts = path.split("/").filter(Boolean);
-    const pathFirstPart = pathParts[0] || "";
-
-    // Check if the path starts with a valid locale
-    const isValidLocalePrefix =
-      pathFirstPart &&
-      allSupportedLocales.some((locale) => {
-        const normalizedLocale = locale.toLowerCase();
-        const normalizedPathPart = pathFirstPart.toLowerCase();
-        return normalizedPathPart === normalizedLocale;
-      });
-
-    // If the path already has a valid locale prefix, continue without any redirection
-    if (isValidLocalePrefix) {
-      return NextResponse.next();
-    }
-
-    // Only perform locale detection if there's no locale in the URL
-    // First check for user's preferred locale from cookie
-    const cookieLocale = request.cookies.get(cookieName)?.value;
-
-    // Check if cookie locale is valid (it's in our supported locales or a valid mixed locale)
-    let validCookieLocale = false;
-    if (cookieLocale) {
-      // Check if it's in our standard supported locales
-      if (supportedLocales.includes(cookieLocale as CountryLanguage)) {
         validCookieLocale = true;
       }
-      // If mixed locales are allowed, validate the cookie locale format and parts
-      else if (allowMixedLocales) {
-        const [lang, country] = cookieLocale.split("-");
-        if (
-          lang &&
-          country &&
-          supportedLanguages.includes(lang) &&
-          supportedCountries.includes(country)
-        ) {
-          validCookieLocale = true;
-        }
-      }
+    }
+  }
+
+  // Use cookie locale if available and valid
+  if (cookieLocale && validCookieLocale) {
+    return cookieLocale;
+  }
+
+  // Fallback to Accept-Language header
+  const acceptLanguage = request.headers.get("accept-language") || "";
+  let detectedLocale = defaultLocale;
+
+  // Try to find a matching locale from Accept-Language header
+  for (const lang of acceptLanguage.split(",")) {
+    const headerLocale = lang.split(";")[0].trim();
+
+    // Try exact match
+    if (allSupportedLocales.includes(headerLocale as CountryLanguage)) {
+      detectedLocale = headerLocale as CountryLanguage;
+      break;
     }
 
-    // Use cookie locale if available and valid
-    if (cookieLocale && validCookieLocale) {
-      // Prepare new path with locale prefix from cookie
-      const newPath =
-        path === "/" ? `/${cookieLocale}` : `/${cookieLocale}${path}`;
-      return NextResponse.redirect(new URL(newPath, request.url));
-    }
-
-    // Fallback to Accept-Language header if no valid cookie is set
-    const acceptLanguage = request.headers.get("accept-language") || "";
-    let detectedLocale = defaultLocale;
-
-    // Try to find a matching locale from Accept-Language header
-    for (const lang of acceptLanguage.split(",")) {
-      const headerLocale = lang.split(";")[0].trim();
-
-      // Try exact match (e.g., "en-US")
-      if (allSupportedLocales.includes(headerLocale as CountryLanguage)) {
-        detectedLocale = headerLocale as CountryLanguage;
-        break;
-      }
-
-      // If mixed locales are allowed, validate the header locale
-      if (allowMixedLocales) {
-        const [langPart, countryPart] = headerLocale.split("-");
-        if (
-          langPart &&
-          countryPart &&
-          supportedLanguages.includes(langPart) &&
-          supportedCountries.includes(countryPart.toLowerCase())
-        ) {
-          detectedLocale =
-            `${langPart}-${countryPart.toLowerCase()}` as CountryLanguage;
-          break;
-        }
-      }
-
-      // Try to match just the language part with a supported country (e.g., "en" to "en-US")
-      const langPart = headerLocale.split("-")[0];
-
-      // Special handling for "en" language - prefer "en-GLOBAL" if available
-      if (langPart === "en" && supportedLocales.includes("en-GLOBAL")) {
-        detectedLocale = "en-GLOBAL";
-        break;
-      }
-
-      const matchingLocale = supportedLocales.find((locale) =>
-        locale.startsWith(`${langPart}-`),
-      );
-
-      if (matchingLocale) {
-        detectedLocale = matchingLocale;
+    // If mixed locales are allowed, validate the header locale
+    if (allowMixedLocales) {
+      const [langPart, countryPart] = headerLocale.split("-");
+      if (
+        langPart &&
+        countryPart &&
+        supportedLanguages.includes(langPart) &&
+        supportedCountries.includes(countryPart.toLowerCase())
+      ) {
+        detectedLocale =
+          `${langPart}-${countryPart.toLowerCase()}` as CountryLanguage;
         break;
       }
     }
 
-    // Prepare new path with locale prefix
-    const newPath =
-      path === "/" ? `/${detectedLocale}` : `/${detectedLocale}${path}`;
+    // Try to match just the language part
+    const langPart = headerLocale.split("-")[0];
 
-    // Redirect to the locale prefixed route
-    return NextResponse.redirect(new URL(newPath, request.url));
-  };
+    // Special handling for "en" language - prefer "en-GLOBAL" if available
+    if (langPart === "en" && supportedLocales.includes("en-GLOBAL")) {
+      detectedLocale = "en-GLOBAL";
+      break;
+    }
 
-  return {
-    handler,
-    options: {
-      // Skip for API routes and static files
-      matcher: (path) => !path.startsWith("/api/") && !path.includes("/_next/"),
-    },
-  };
+    const matchingLocale = supportedLocales.find((locale) =>
+      locale.startsWith(`${langPart}-`),
+    );
+
+    if (matchingLocale) {
+      detectedLocale = matchingLocale;
+      break;
+    }
+  }
+
+  return detectedLocale;
 }

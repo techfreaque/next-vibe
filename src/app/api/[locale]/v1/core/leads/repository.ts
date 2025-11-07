@@ -1367,16 +1367,25 @@ class LeadsRepositoryImpl implements LeadsRepository {
               .limit(1);
 
             if (!existingRelationship) {
+              // Check if user has any existing leads to determine isPrimary
+              const existingUserLeads = await tx
+                .select()
+                .from(userLeads)
+                .where(eq(userLeads.userId, options.userId));
+
+              const isPrimary = existingUserLeads.length === 0;
+
               // Create user-lead relationship record only if it doesn't exist
               await tx.insert(userLeads).values({
                 userId: options.userId,
                 leadId: existingLead.id,
-                isPrimary: true,
+                isPrimary,
               });
 
               logger.debug("User-lead relationship created (internal)", {
                 userId: options.userId,
                 leadId: existingLead.id,
+                isPrimary,
               });
             } else {
               logger.debug("User-lead relationship already exists (internal)", {

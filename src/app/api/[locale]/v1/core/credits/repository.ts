@@ -50,9 +50,6 @@ interface CreditIdentifierCacheEntry {
   timestamp: number;
 }
 
-const creditIdentifierCache = new Map<string, CreditIdentifierCacheEntry>();
-const CACHE_TTL_MS = 30 * 1000; // 30 seconds
-
 /**
  * Credit Transaction Interface
  */
@@ -1044,22 +1041,6 @@ class CreditRepository
     }>
   > {
     try {
-      // Check cache first
-      const cacheKey = `${userId}:${leadId}`;
-      const cached = creditIdentifierCache.get(cacheKey);
-      if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-        logger.debug("Using cached credit identifier", {
-          userId,
-          creditType: cached.creditType,
-          cacheAge: Date.now() - cached.timestamp,
-        });
-        return createSuccessResponse({
-          userId: cached.userId,
-          leadId: cached.leadId,
-          creditType: cached.creditType,
-        });
-      }
-
       // Check if user has an active subscription
       const [subscription] = await db
         .select()
@@ -1112,12 +1093,6 @@ class CreditRepository
           creditType: CreditTypeIdentifier.LEAD_FREE,
         };
       }
-
-      // Cache the result
-      creditIdentifierCache.set(cacheKey, {
-        ...result,
-        timestamp: Date.now(),
-      });
 
       return createSuccessResponse(result);
     } catch (error) {

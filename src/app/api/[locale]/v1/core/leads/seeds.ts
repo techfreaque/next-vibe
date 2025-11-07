@@ -538,7 +538,7 @@ async function generateLeadEngagements(
   }
 
   if (engagements.length > 0) {
-    await db.insert(leadEngagements).values(engagements);
+    // await db.insert(leadEngagements).values(engagements);
     logger.debug(`✅ Generated ${engagements.length} lead engagements`);
   }
 }
@@ -611,7 +611,7 @@ async function generateEmailCampaigns(
   }
 
   if (campaigns.length > 0) {
-    await db.insert(emailCampaigns).values(campaigns);
+    // await db.insert(emailCampaigns).values(campaigns);
     logger.debug(`✅ Generated ${campaigns.length} email campaigns`);
   }
 }
@@ -623,26 +623,26 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   logger.debug("🌱 Seeding development leads...");
 
   // Clear existing development leads to avoid duplicates
-  await db.delete(leads).where(sql`${leads.metadata}->>'generated' = 'true'`);
+  // await db.delete(leads).where(sql`${leads.metadata}->>'generated' = 'true'`);
 
   // Generate random leads using the defined constant
-  const sampleLeads: NewLead[] = Array.from(
-    { length: RANDOM_LEADS_COUNT },
-    (_, index) => generateRandomLead(index),
-  );
+  // const sampleLeads: NewLead[] = Array.from(
+  //   { length: RANDOM_LEADS_COUNT },
+  //   (_, index) => generateRandomLead(index),
+  // );
 
-  // Insert sample leads
-  const insertedLeads = await db
-    .insert(leads)
-    .values(sampleLeads)
-    .returning({ id: leads.id });
-  const leadIds = insertedLeads.map((lead) => lead.id);
+  // // Insert sample leads
+  // const insertedLeads = await db
+  //   .insert(leads)
+  //   .values(sampleLeads)
+  //   .returning({ id: leads.id });
+  // const leadIds = insertedLeads.map((lead) => lead.id);
 
-  logger.debug(`✅ Seeded ${sampleLeads.length} development leads`);
+  // logger.debug(`✅ Seeded ${sampleLeads.length} development leads`);
 
-  // Generate related data
-  await generateLeadEngagements(leadIds, logger);
-  await generateEmailCampaigns(leadIds, logger);
+  // // Generate related data
+  // await generateLeadEngagements(leadIds, logger);
+  // await generateEmailCampaigns(leadIds, logger);
 }
 
 /**
