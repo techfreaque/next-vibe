@@ -28,7 +28,7 @@ const { GET } = createEndpoint({
     "app.api.v1.core.system.unifiedInterface.mcp.tools.get.description" as const,
   category: "app.api.v1.core.system.unifiedInterface.mcp.tools.category" as const,
   tags: ["app.api.v1.core.system.unifiedInterface.mcp.tools.tags.mcp" as const],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.WEB_OFF] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF] as const,
 
   fields: objectField(
     {

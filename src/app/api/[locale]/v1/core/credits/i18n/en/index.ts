@@ -43,6 +43,8 @@ export const translations = {
     noLeadsToMerge: "No leads provided to merge",
     oldestLeadNotFound: "Could not find oldest lead in cluster",
     transactionFailed: "Failed to create transaction record",
+    not_implemented_on_native:
+      "{{method}} is not implemented on native platform. Please use the web version for this operation.",
   },
   get: {
     title: "Get Credit Balance",

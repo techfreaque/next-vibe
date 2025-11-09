@@ -92,7 +92,7 @@ config.transformer = {
 
 // Apply NativeWind BEFORE custom resolveRequest so resolution happens after transformation
 const nativeWindConfig = withNativeWind(config, {
-  input: './src/app/api/[locale]/v1/core/system/unified-interface/react-native/global.css',
+  input: './src/app-native/global.css',
   // Running from workspace root now, so projectRoot is already correct
   inlineRem: false,
 });

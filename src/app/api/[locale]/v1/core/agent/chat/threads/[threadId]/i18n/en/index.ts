@@ -4,6 +4,10 @@ import { translations as permissionsTranslations } from "../../permissions/i18n/
 export const translations = {
   messages: messagesTranslations,
   permissions: permissionsTranslations,
+  errors: {
+    not_implemented_on_native:
+      "{{method}} is not implemented on native platform. Please use the web version for this operation.",
+  },
   get: {
     title: "Get Chat Thread",
     description: "Retrieve a specific chat thread by ID",

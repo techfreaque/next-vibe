@@ -29,7 +29,7 @@ import { SttLanguageOptions, SttProviderOptions } from "./enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "agent", "speech-to-text"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
+  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC, UserRole.AI_TOOL_OFF],
   credits: 2, // Cost 2 credits per STT conversion
 
   title: "app.api.v1.core.agent.speechToText.post.title",

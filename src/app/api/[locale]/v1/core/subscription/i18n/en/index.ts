@@ -177,6 +177,8 @@ export const translations = {
     cancel_failed: "Failed to cancel subscription",
     user_not_found: "User not found",
     stripe_customer_creation_failed: "Failed to create Stripe customer",
+    not_implemented_on_native:
+      "{{method}} is not implemented on native platform. Please use the web version for this operation.",
   },
 
   // Cancel operation

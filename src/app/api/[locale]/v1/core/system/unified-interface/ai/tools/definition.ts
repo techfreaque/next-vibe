@@ -38,7 +38,7 @@ const { GET } = createEndpoint({
     "app.api.v1.core.system.unifiedInterface.ai.tools.get.description" as const,
   category: "app.api.v1.core.system.unifiedInterface.ai.tools.category" as const,
   tags: ["app.api.v1.core.system.unifiedInterface.ai.tools.tags.tools" as const],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.AI_TOOL_OFF] as const,
 
   fields: objectField(
     {
