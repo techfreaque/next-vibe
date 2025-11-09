@@ -9,7 +9,7 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
@@ -148,7 +148,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         userId,
       });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message: t("app.api.v1.core.payment.invoice.success.created"),
         invoice: {
@@ -229,7 +229,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         userId,
       });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message: t("app.api.v1.core.payment.portal.success.created"),
         customerPortalUrl: session.url,
@@ -246,11 +246,13 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         });
 
         return createErrorResponse(
-          "app.api.v1.core.payment.portal.post.errors.notConfigured.title",
+          "app.api.v1.core.payment.errors.server.title",
           ErrorResponseTypes.INTERNAL_ERROR,
           {
-            error: "Stripe Customer Portal is not configured. Please configure it in Stripe Dashboard.",
-            configUrl: "https://dashboard.stripe.com/test/settings/billing/portal"
+            error:
+              "Stripe Customer Portal is not configured. Please configure it in Stripe Dashboard.",
+            configUrl:
+              "https://dashboard.stripe.com/test/settings/billing/portal",
           },
         );
       }
@@ -344,7 +346,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         userId,
       });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message: t("app.api.v1.core.payment.refund.success.created"),
         refund: {

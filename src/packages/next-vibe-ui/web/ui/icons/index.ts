@@ -95,6 +95,7 @@ export { Gift } from "./Gift";
 export { GitBranch } from "./GitBranch";
 export { Globe } from "./Globe";
 export { GraduationCap } from "./GraduationCap";
+export { Grid3x3 } from "./Grid3x3";
 export { GripVertical } from "./GripVertical";
 export { Handshake } from "./Handshake";
 export { Hash } from "./Hash";

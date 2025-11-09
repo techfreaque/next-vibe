@@ -8,7 +8,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -173,7 +173,7 @@ export class ResetTaskManagementRepositoryImpl
         success: result.success,
       });
 
-      return createSuccessResponse({
+      return success({
         success: result.success,
         taskName: "all-tasks",
         status: result.success ? "completed" : "failed",

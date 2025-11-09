@@ -2,15 +2,6 @@
 
 import { useEffect } from "react";
 
-// Prevent pull-to-refresh on mobile browsers
-function preventPullToRefresh(e: TouchEvent): void {
-  // Only prevent if we're at the top of the page
-  const scrollableElement = document.documentElement || document.body;
-  if (scrollableElement.scrollTop === 0) {
-    e.preventDefault();
-  }
-}
-
 /**
  * Hook to disable pull-to-refresh behavior on mobile browsers
  * This prevents the annoying browser refresh when users try to scroll up at the top of the page

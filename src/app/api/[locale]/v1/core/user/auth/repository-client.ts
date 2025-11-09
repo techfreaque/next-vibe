@@ -18,7 +18,7 @@ import { AUTH_STATUS_COOKIE_NAME } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -84,7 +84,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       });
       setCookie(AUTH_STATUS_COOKIE_NAME, "1");
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error("Error setting auth status", parseError(error));
       return createErrorResponse(
@@ -111,7 +111,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       }
       deleteCookie(AUTH_STATUS_COOKIE_NAME);
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error("Error removing auth status", parseError(error));
       return createErrorResponse(
@@ -147,7 +147,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
         hasStatus,
       });
 
-      return createSuccessResponse(hasStatus);
+      return success(hasStatus);
     } catch (error) {
       logger.error("Error in hasAuthStatus", parseError(error));
       return createErrorResponse(

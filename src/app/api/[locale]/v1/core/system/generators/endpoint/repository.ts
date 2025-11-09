@@ -10,7 +10,7 @@ import { join } from "node:path";
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -91,7 +91,7 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
         `Generated endpoint file with ${definitionFiles.length} endpoints in ${duration}ms`,
       );
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message:
           "app.api.v1.core.system.generators.endpoints.success.generated",

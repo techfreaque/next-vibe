@@ -4,7 +4,7 @@
  */
 
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -25,12 +25,12 @@ export const { GET, POST, tools } = endpointsHandler({
       // For authenticated users, return default + custom personas
       if (userId) {
         const personas = await repository.getAllPersonas(userId);
-        return createSuccessResponse({ personas });
+        return success({ personas });
       }
 
       // For public/lead users, return only default personas
       const defaultPersonas = repository.getDefaultPersonas();
-      return createSuccessResponse({ personas: defaultPersonas });
+      return success({ personas: defaultPersonas });
     },
   },
   [Methods.POST]: {
@@ -60,7 +60,7 @@ export const { GET, POST, tools } = endpointsHandler({
         metadata: {},
       });
 
-      return createSuccessResponse({ id: persona.id });
+      return success({ id: persona.id });
     },
   },
 });

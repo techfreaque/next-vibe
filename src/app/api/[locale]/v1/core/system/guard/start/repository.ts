@@ -9,7 +9,7 @@ import * as path from "node:path";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -658,7 +658,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
       guardId: guardId,
     };
 
-    return createSuccessResponse(response);
+    return success(response);
   }
 
   private startAllGuards(
@@ -691,7 +691,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
       guardId: mockGuards[0]?.guardId || "guard_unknown",
     };
 
-    return createSuccessResponse(response);
+    return success(response);
   }
 }
 

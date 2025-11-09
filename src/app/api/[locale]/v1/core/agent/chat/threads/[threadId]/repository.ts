@@ -8,7 +8,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -142,7 +142,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           updatedAt: thread.updatedAt.toISOString(),
         },
       };
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       logger.error("Error getting thread by ID", parseError(error));
       return fail({
@@ -287,7 +287,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           updatedAt: updatedThread.updatedAt.toISOString(),
         },
       };
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       logger.error("Error updating thread", parseError(error));
       return fail({
@@ -378,7 +378,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
 
       logger.debug("Thread deleted successfully", { threadId });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         deletedId: threadId,
       });

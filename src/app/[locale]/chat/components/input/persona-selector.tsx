@@ -39,6 +39,10 @@ interface PersonaSelectorProps {
   onModelChange?: (model: ModelId) => void;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  className?: string;
+  buttonClassName?: string;
+  triggerSize?: "default" | "sm" | "lg" | "icon";
+  showTextAt?: "always" | "sm" | "md" | "lg" | "never";
 }
 
 const STORAGE_KEY_PERSONAS = "chat-personas";
@@ -53,6 +57,10 @@ export function PersonaSelector({
   onModelChange,
   locale,
   logger,
+  className,
+  buttonClassName,
+  triggerSize,
+  showTextAt,
 }: PersonaSelectorProps): JSX.Element {
   const { t } = simpleT(locale);
   const defaultIcon = t("app.chat.personaSelector.defaultIcon");
@@ -265,6 +273,10 @@ export function PersonaSelector({
           provider: t("app.chat.personaSelector.grouping.bySource"),
           utility: t("app.chat.personaSelector.grouping.byCategory"),
         }}
+        className={className}
+        buttonClassName={buttonClassName}
+        triggerSize={triggerSize}
+        showTextAt={showTextAt}
       />
 
       {/* Add Custom Persona Dialog */}

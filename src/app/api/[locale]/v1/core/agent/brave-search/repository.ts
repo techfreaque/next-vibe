@@ -537,7 +537,7 @@ class BraveSearchRepository implements IBraveSearchRepository {
     },
     logger: EndpointLogger,
   ): Promise<ResponseType<BraveSearchGetResponseOutput>> {
-    const { fail, createSuccessResponse, ErrorResponseTypes } = await import(
+    const { fail, success, ErrorResponseTypes } = await import(
       "next-vibe/shared/types/response.schema"
     );
 
@@ -555,14 +555,14 @@ class BraveSearchRepository implements IBraveSearchRepository {
       const searchResults = await searchService.search(query, options);
 
       if (searchResults.results.length === 0) {
-        return createSuccessResponse({
+        return success({
           success: false,
           message: `${SEARCH_MESSAGES.NO_RESULTS_PREFIX}: ${query}`,
           results: [],
         });
       }
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message: `${SEARCH_MESSAGES.FOUND_RESULTS_PREFIX} ${searchResults.results.length} ${SEARCH_MESSAGES.FOUND_RESULTS_SUFFIX}: ${query}`,
         results: searchResults.results.map((result) => ({

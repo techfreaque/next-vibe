@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -124,7 +124,7 @@ export class ManifestRepositoryImpl implements ManifestRepository {
       });
 
       return await Promise.resolve(
-        createSuccessResponse({ response: manifest }),
+        success({ response: manifest }),
       );
     } catch (error) {
       const parsedError = parseError(error);

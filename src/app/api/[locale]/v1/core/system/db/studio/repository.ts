@@ -8,7 +8,7 @@ import { spawn } from "node:child_process";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -134,7 +134,7 @@ export class StudioRepositoryImpl implements StudioRepositoryInterface {
         duration,
       };
 
-      return await Promise.resolve(createSuccessResponse(response));
+      return await Promise.resolve(success(response));
     } catch (error) {
       const duration = Date.now() - startTime;
       const parsedError = parseError(error);

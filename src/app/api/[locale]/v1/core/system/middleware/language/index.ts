@@ -10,8 +10,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { LOCALE_COOKIE_NAME } from "@/config/constants";
 
-import { isApiRoute, shouldSkipPath } from "../utils";
-
 export interface LanguageMiddlewareOptions {
   /**
    * Supported country-language combinations
@@ -64,30 +62,6 @@ export function detectLocale(
 
   const path = request.nextUrl.pathname;
 
-  // Skip for API routes - they have their own locale structure /api/[locale]/...
-  if (isApiRoute(path)) {
-    return null;
-  }
-
-  // Create a combined set of supported locales
-  const allSupportedLocales = [...supportedLocales];
-
-  // If mixed locales are allowed, add all possible language-country combinations
-  if (
-    allowMixedLocales &&
-    supportedLanguages.length > 0 &&
-    supportedCountries.length > 0
-  ) {
-    for (const lang of supportedLanguages) {
-      for (const country of supportedCountries) {
-        const mixedLocale = `${lang}-${country}` as CountryLanguage;
-        if (!allSupportedLocales.includes(mixedLocale)) {
-          allSupportedLocales.push(mixedLocale);
-        }
-      }
-    }
-  }
-
   // Check if the path already has a locale prefix
   const pathParts = path.split("/").filter(Boolean);
   const pathFirstPart = pathParts[0] || "";
@@ -95,7 +69,7 @@ export function detectLocale(
   // Check if the path starts with a valid locale
   const isValidLocalePrefix =
     pathFirstPart &&
-    allSupportedLocales.some((locale) => {
+    supportedLocales.some((locale) => {
       const normalizedLocale = locale.toLowerCase();
       const normalizedPathPart = pathFirstPart.toLowerCase();
       return normalizedPathPart === normalizedLocale;
@@ -141,7 +115,7 @@ export function detectLocale(
     const headerLocale = lang.split(";")[0].trim();
 
     // Try exact match
-    if (allSupportedLocales.includes(headerLocale as CountryLanguage)) {
+    if (supportedLocales.includes(headerLocale as CountryLanguage)) {
       detectedLocale = headerLocale as CountryLanguage;
       break;
     }

@@ -13,7 +13,7 @@ import path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -67,7 +67,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
     try {
       const status = await this.checkInstallationStatus();
 
-      return createSuccessResponse({
+      return success({
         success: true,
         installed: status.installed,
         version: status.version,

@@ -10,7 +10,7 @@ import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -227,7 +227,7 @@ async function executeCsvProcessor(
     };
 
     logger.info("tasks.csv_processor.completed", result.summary);
-    return createSuccessResponse(result);
+    return success(result);
   } catch (error) {
     logger.error("tasks.csv_processor.failed", {
       error:
@@ -250,7 +250,7 @@ async function validateCsvProcessor(): Promise<ResponseType<boolean>> {
   try {
     // Basic validation - check if database is accessible
     await db.select().from(csvImportJobs).limit(1);
-    return createSuccessResponse(true);
+    return success(true);
   } catch {
     return createErrorResponse(
       "app.api.v1.core.leads.import.post.errors.server.title",
@@ -264,7 +264,7 @@ async function validateCsvProcessor(): Promise<ResponseType<boolean>> {
  */
 function rollbackCsvProcessor(): ResponseType<boolean> {
   // No rollback needed for CSV processor
-  return createSuccessResponse(true);
+  return success(true);
 }
 
 /**

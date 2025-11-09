@@ -35,8 +35,9 @@ export interface SelectorOption<T = string> {
   icon: IconValue;
   group?: string;
   groupIcon?: IconValue;
-  utilities?: string[];
-  utilityIcons?: Record<string, IconValue>;
+  utilities?: string[]; // Utility names (translated keys)
+  utilityIcons?: Record<string, IconValue>; // Map of utility name to icon
+  utilityOrders?: Record<string, number>; // Map of utility name to order
 }
 
 type GroupMode = "provider" | "utility";
@@ -56,6 +57,10 @@ interface SelectorBaseProps<T = string> {
     provider: string;
     utility: string;
   };
+  className?: string;
+  buttonClassName?: string;
+  triggerSize?: "default" | "sm" | "lg" | "icon";
+  showTextAt?: "always" | "sm" | "md" | "lg" | "never";
 }
 
 /**
@@ -83,12 +88,16 @@ export function SelectorBase<T extends string = string>({
   addNewLabel = "Add New",
   locale,
   groupModeLabels,
+  className,
+  buttonClassName,
+  triggerSize = "sm",
+  showTextAt = "sm",
 }: SelectorBaseProps<T>): JSX.Element {
   const { t } = simpleT(locale);
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [groupMode, setGroupMode] = useState<GroupMode>("provider");
+  const [groupMode, setGroupMode] = useState<GroupMode>("utility");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
   // Use custom labels or default translation keys
@@ -174,16 +183,21 @@ export function SelectorBase<T extends string = string>({
         }
       }
 
+      // Track utility order for each group
+      const utilityOrderMap = new Map<string, number>();
+
       optionsToGroup.forEach((option) => {
         if (option.utilities && option.utilities.length > 0) {
-          option.utilities.forEach((utilityKey) => {
-            // Use utility key directly as name (no translation)
-            const utilityName = utilityKey;
+          option.utilities.forEach((utilityName) => {
             if (!grouped[utilityName]) {
               grouped[utilityName] = {
                 options: [],
-                icon: utilityIconsMap[utilityKey],
+                icon: utilityIconsMap[utilityName],
               };
+              // Store the order for this utility from utilityOrders map
+              if (option.utilityOrders && option.utilityOrders[utilityName] !== undefined) {
+                utilityOrderMap.set(utilityName, option.utilityOrders[utilityName]);
+              }
             }
             grouped[utilityName].options.push(option);
           });
@@ -197,7 +211,34 @@ export function SelectorBase<T extends string = string>({
         }
       });
 
-      return grouped;
+      // Sort groups by utility order
+      const sortedGroups: Record<
+        string,
+        { options: SelectorOption<T>[]; icon?: IconValue }
+      > = {};
+
+      // Sort group names by their utility order, "Others" goes last
+      const groupNames = Object.keys(grouped).toSorted((a, b) => {
+        const othersKey = t("app.chat.selectorBase.others");
+        // "Others" always goes last
+        if (a === othersKey) {
+          return 1;
+        }
+        if (b === othersKey) {
+          return -1;
+        }
+
+        // Sort by utility order from utilityOrders map
+        const orderA = utilityOrderMap.get(a) ?? Number.MAX_SAFE_INTEGER;
+        const orderB = utilityOrderMap.get(b) ?? Number.MAX_SAFE_INTEGER;
+        return orderA - orderB;
+      });
+
+      groupNames.forEach((name) => {
+        sortedGroups[name] = grouped[name];
+      });
+
+      return sortedGroups;
     }
   }, [filteredOptions, groupMode, sortOrder, t]);
 
@@ -220,8 +261,11 @@ export function SelectorBase<T extends string = string>({
         <Button
           type="button"
           variant="ghost"
-          size="sm"
-          className="h-auto min-h-9 gap-2 px-3 py-1 hover:bg-accent text-sm font-normal touch-manipulation"
+          size={triggerSize}
+          className={cn(
+            "h-auto min-h-9 gap-2 px-3 py-1 hover:bg-accent text-sm font-normal touch-manipulation",
+            buttonClassName,
+          )}
           title={selectedOption?.name}
         >
           {selectedOption ? (
@@ -229,9 +273,27 @@ export function SelectorBase<T extends string = string>({
               <Span className="flex items-center justify-center w-4 h-4 flex-shrink-0">
                 {renderIcon(selectedOption.icon)}
               </Span>
-              <Span className="hidden min-[550px]:inline max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left break-words line-clamp-2">
-                {selectedOption.name}
-              </Span>
+              {/* Text visibility based on showTextAt prop */}
+              {showTextAt === "always" && (
+                <Span className="max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left break-words line-clamp-2">
+                  {selectedOption.name}
+                </Span>
+              )}
+              {showTextAt === "sm" && (
+                <Span className="hidden min-[480px]:inline max-w-[100px] min-[480px]:max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left break-words line-clamp-2">
+                  {selectedOption.name}
+                </Span>
+              )}
+              {showTextAt === "md" && (
+                <Span className="hidden min-[580px]:inline max-w-[100px] min-[580px]:max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left break-words line-clamp-2">
+                  {selectedOption.name}
+                </Span>
+              )}
+              {showTextAt === "lg" && (
+                <Span className="hidden min-[680px]:inline max-w-[100px] min-[680px]:max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left break-words line-clamp-2">
+                  {selectedOption.name}
+                </Span>
+              )}
             </>
           ) : (
             <Span className="text-muted-foreground">{placeholder}</Span>
@@ -243,28 +305,31 @@ export function SelectorBase<T extends string = string>({
         className={cn(
           "p-0",
           showAll
-            ? "w-[95vw] sm:w-[90vw] max-w-[700px]"
-            : "w-[95vw] sm:w-[400px] max-w-[450px]",
+            ? "w-[100vw] sm:w-[90vw] max-w-[700px]"
+            : "w-[100vw] sm:w-[400px] max-w-[450px]",
+          className,
         )}
         align="start"
         sideOffset={4}
       >
         <Div className="flex flex-col max-h-[75dvh] sm:max-h-[600px]">
-          {/* Search Bar */}
-          <Div className="p-2.5 sm:p-3 border-b flex-shrink-0">
-            <Div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t("app.chat.selectorBase.searchPlaceholder", {
-                  item: placeholder.toLowerCase(),
-                })}
-                className="pl-9 h-10 sm:h-9 text-base sm:text-sm touch-manipulation"
-                autoComplete="off"
-              />
+          {/* Search Bar - Only show when in showAll mode */}
+          {showAll && (
+            <Div className="p-2.5 sm:p-3 border-b flex-shrink-0">
+              <Div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t("app.chat.selectorBase.searchPlaceholder", {
+                    item: placeholder.toLowerCase(),
+                  })}
+                  className="pl-9 h-10 sm:h-9 text-base sm:text-sm touch-manipulation"
+                  autoComplete="off"
+                />
+              </Div>
             </Div>
-          </Div>
+          )}
 
           {/* Group Mode & Sort Controls - Only visible when showAll */}
           {showAll && (
@@ -473,7 +538,7 @@ export function SelectorBase<T extends string = string>({
                           {renderIcon(groupData.icon, ICON_SIZE_SMALL)}
                         </Span>
                       )}
-                      {group}
+                      {groupMode === "utility" ? t(group as Parameters<typeof t>[0]) : group}
                     </Div>
                     <Div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
                       {groupData.options.map((option) => (

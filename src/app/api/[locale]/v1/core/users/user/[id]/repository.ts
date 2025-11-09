@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -99,7 +99,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         });
       }
 
-      return createSuccessResponse({
+      return success({
         userProfile: {
           basicInfo: {
             id: foundUser.id,
@@ -223,7 +223,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         });
       }
 
-      return createSuccessResponse({
+      return success({
         id: updatedUser.id,
         leadId: null,
         email: updatedUser.email,
@@ -279,7 +279,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
 
       logger.debug("User deleted successfully", { userId: data.id });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message: "app.api.v1.core.users.user.delete.success.title",
         deletedAt: new Date().toISOString(),

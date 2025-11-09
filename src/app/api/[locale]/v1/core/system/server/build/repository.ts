@@ -6,7 +6,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -128,7 +128,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
                 duration: Date.now() - startTime,
                 errors,
               };
-              return createSuccessResponse(response);
+              return success(response);
             }
           }
         } catch (generatorError) {
@@ -141,7 +141,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               duration: Date.now() - startTime,
               errors,
             };
-            return createSuccessResponse(response);
+            return success(response);
           }
         }
       }
@@ -256,7 +256,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         errors: errors.length > 0 ? errors : undefined,
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       const parsedError = parseError(error);
 

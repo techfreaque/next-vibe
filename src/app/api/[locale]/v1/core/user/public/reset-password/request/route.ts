@@ -5,7 +5,7 @@
  * It connects the API endpoint definition with its implementation and email template.
  */
 
-import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
 
 // Logger is available via handler parameters
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
@@ -29,7 +29,7 @@ export const { POST, tools } = endpointsHandler({
         email: data.emailInput.email,
       });
       // We handle token creation in the email template
-      return createSuccessResponse({
+      return success({
         response: {
           success: true,
           message:

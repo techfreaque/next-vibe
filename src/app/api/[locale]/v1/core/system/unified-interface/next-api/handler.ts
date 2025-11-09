@@ -5,7 +5,7 @@
 
 import type { NextRequest } from "next/server";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   isStreamingResponse,
   type ResponseType,
@@ -196,7 +196,7 @@ export function createNextHandler<
             },
             logger,
           );
-          return createSuccessResponse(undefined);
+          return success(undefined);
         },
         logger,
       });

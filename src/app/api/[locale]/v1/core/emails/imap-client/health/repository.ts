@@ -9,7 +9,7 @@ import { and, count, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -97,7 +97,7 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
       const activeConnections = await this.getActiveConnections();
       const lastSyncTime = this.getLastSyncTime(accounts);
 
-      return createSuccessResponse({
+      return success({
         accountsHealthy: syncedAccounts,
         accountsTotal: totalAccounts,
         connectionsActive: activeConnections,

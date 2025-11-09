@@ -11,7 +11,7 @@ import "server-only";
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -301,7 +301,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
 
       outputLines.push(GENERATION_SUCCESS);
 
-      return createSuccessResponse({
+      return success({
         success: true,
         generationCompleted: true,
         output: outputLines.join("\n"),

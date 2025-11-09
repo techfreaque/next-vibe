@@ -2,7 +2,7 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
@@ -137,7 +137,7 @@ export const branchRepository = {
         threadId: urlPathParams.threadId,
       });
 
-      return createSuccessResponse({
+      return success({
         message: {
           id: newMessage.id,
           threadId: newMessage.threadId,

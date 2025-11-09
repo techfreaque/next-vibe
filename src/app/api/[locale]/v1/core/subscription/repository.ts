@@ -8,7 +8,7 @@ import "server-only";
 import { desc, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -96,7 +96,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       }
 
       const subscription = results[0];
-      return createSuccessResponse({
+      return success({
         id: subscription.id,
         userId: subscription.userId,
         plan: subscription.planId,
@@ -183,7 +183,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       }
 
       const updatedSubscription = results[0];
-      return createSuccessResponse({
+      return success({
         id: updatedSubscription.id,
         userId: updatedSubscription.userId,
         responsePlan: updatedSubscription.planId,
@@ -274,7 +274,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         });
       }
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message: t("app.api.v1.core.subscription.cancel.success"),
       });
@@ -585,8 +585,8 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       }
 
       // Fetch full subscription from Stripe to get all fields (webhook events may not include all fields)
-      const stripe = getStripe();
-      const fullSubscription = await stripe.subscriptions.retrieve(stripeSubscription.id);
+      const fullSubscription =
+        await getStripe.subscriptions.retrieve(stripeSubscription.id);
 
       // Map Stripe status to our status
       let status: typeof SubscriptionStatusValue;

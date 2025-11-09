@@ -6,7 +6,7 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   errorResponseSchema,
   ErrorResponseTypes,
   fail,
@@ -89,7 +89,7 @@ export async function createHTTPSuccessResponse<TResponse>({
       });
     }
   }
-  return NextResponse.json(createSuccessResponse(validationResult.data), {
+  return NextResponse.json(success(validationResult.data), {
     status,
   });
 }
@@ -190,7 +190,7 @@ export async function validatePostRequest<T>(
       });
     }
 
-    return createSuccessResponse(validationResult.data);
+    return success(validationResult.data);
   } catch (error) {
     // For JSON parsing errors, use a specific error message
     return fail({
@@ -280,7 +280,7 @@ export function validateGetRequest<T extends ZodSchema>(
     }
 
     if (validationResult.success) {
-      return createSuccessResponse(validationResult.data);
+      return success(validationResult.data);
     } else {
       logger.error(
         `Query parameter validation error: ${validationResult.message}`,

@@ -13,7 +13,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "../../../shared/types/response.schema";
@@ -219,7 +219,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         const tsFiles = findTypeScriptFiles(config.targetPath || ".");
 
         if (tsFiles.length === 0) {
-          return createSuccessResponse({
+          return success({
             success: true,
             issues: [],
           });
@@ -430,7 +430,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         issues,
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       const duration = Date.now() - startTime;
       const parsedError = parseError(error);
@@ -536,7 +536,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         hasCode && typeof error.code === "number" ? error.code : 0;
       if (errorCode === 2 || errors.length > 0) {
         // TypeScript compilation errors - treat as successful response with issues
-        return createSuccessResponse(response);
+        return success(response);
       }
 
       return fail({

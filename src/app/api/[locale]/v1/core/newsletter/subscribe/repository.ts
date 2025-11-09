@@ -8,7 +8,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -165,7 +165,7 @@ export class NewsletterSubscribeRepositoryImpl
               subscriptionId: existingSubscription.id,
             },
           );
-          return createSuccessResponse({
+          return success({
             success: true,
             message: t(
               "app.api.v1.core.newsletter.subscribe.response.alreadySubscribed",
@@ -195,7 +195,7 @@ export class NewsletterSubscribeRepositoryImpl
           })
           .where(eq(newsletterSubscriptions.email, data.email));
 
-        return createSuccessResponse({
+        return success({
           success: true,
           message: t("app.api.v1.core.newsletter.subscribe.response.success"),
           leadId,
@@ -232,7 +232,7 @@ export class NewsletterSubscribeRepositoryImpl
         },
       );
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message: t("app.api.v1.core.newsletter.subscribe.response.success"),
         leadId,

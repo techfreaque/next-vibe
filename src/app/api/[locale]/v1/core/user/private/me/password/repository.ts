@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -199,7 +199,7 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         return setPasswordResponse as ResponseType<PasswordPostResponseOutput>;
       }
 
-      return createSuccessResponse<PasswordPostResponseOutput>({
+      return success<PasswordPostResponseOutput>({
         response: {
           success: true,
           message: "app.api.v1.core.user.private.me.password.success.updated",
@@ -281,7 +281,7 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         })
         .where(eq(users.id, userId));
 
-      return createSuccessResponse(null);
+      return success(null);
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.private.me.password.debug.errorSettingPassword",

@@ -2,7 +2,7 @@ import { Button, Section, Text } from "@react-email/components";
 import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -197,7 +197,7 @@ export const renderResetPasswordMail: EmailFunctionType<
 
     const translatedAppName = t("config.appName");
 
-    return createSuccessResponse({
+    return success({
       toEmail: requestData.emailInput.email,
       toName: user.publicName,
       subject: t(

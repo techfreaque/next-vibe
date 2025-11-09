@@ -9,7 +9,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -159,7 +159,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
         dryRun: data.dryRun,
       });
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to execute pulse cycle", {

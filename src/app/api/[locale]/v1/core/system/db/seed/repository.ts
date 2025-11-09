@@ -6,7 +6,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -74,7 +74,7 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
           duration,
         };
 
-        return createSuccessResponse(response);
+        return success(response);
       }
 
       // Execute real seeds using the seed manager
@@ -129,7 +129,7 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
         duration,
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       logger.error("❌ Database seeding failed:", parseError(error));
       parseError(error);

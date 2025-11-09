@@ -11,7 +11,7 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -216,7 +216,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       const totalPages = Math.ceil(totalCount / limit);
 
-      return createSuccessResponse({
+      return success({
         folders: folders.map((folder) => this.formatFolderResponse(folder)),
         pagination: {
           page,
@@ -266,7 +266,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
       });
       }
 
-      return createSuccessResponse(this.formatFolderResponse(folder));
+      return success(this.formatFolderResponse(folder));
     } catch (error) {
       logger.error(
         "app.api.v1.core.emails.imapClient.folders.get.error.server",
@@ -346,7 +346,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
             duration: typeof result.duration === "number" ? result.duration : 0,
             success: true,
           };
-          return createSuccessResponse(syncResults);
+          return success(syncResults);
         } else {
           return fail({
         message: "app.api.v1.core.emails.imapClient.imapErrors.sync.folder.failed",
@@ -396,7 +396,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         .where(eq(imapFolders.accountId, data.accountId))
         .orderBy(imapFolders.path);
 
-      return createSuccessResponse({
+      return success({
         folders: folders.map((folder) => this.formatFolderResponse(folder)),
         pagination: {
           page: 1,
@@ -457,7 +457,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
       });
       }
 
-      return createSuccessResponse({ success: true });
+      return success({ success: true });
     } catch (error) {
       logger.error(
         "app.api.v1.core.emails.imapClient.folders.updateSyncStatus.error.server",
@@ -508,7 +508,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
       });
       }
 
-      return createSuccessResponse({ success: true });
+      return success({ success: true });
     } catch (error) {
       logger.error(
         "app.api.v1.core.emails.imapClient.folders.updateCounts.error.server",

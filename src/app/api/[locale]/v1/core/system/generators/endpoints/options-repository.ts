@@ -9,7 +9,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -178,7 +178,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
           );
       }
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       return createErrorResponse(
         "app.api.v1.core.shared.errorTypes.internal_error",
@@ -197,7 +197,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
   ): Promise<ResponseType<boolean>> {
     try {
       const validation = this.validateOptionValue(name, value);
-      return Promise.resolve(createSuccessResponse(validation.valid));
+      return Promise.resolve(success(validation.valid));
     } catch (error) {
       return Promise.resolve(
         createErrorResponse(
@@ -215,7 +215,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
   generateHelp(category?: string): Promise<ResponseType<string>> {
     try {
       const help = this.generateOptionsHelp(category);
-      return Promise.resolve(createSuccessResponse(help));
+      return Promise.resolve(success(help));
     } catch (error) {
       return Promise.resolve(
         createErrorResponse(

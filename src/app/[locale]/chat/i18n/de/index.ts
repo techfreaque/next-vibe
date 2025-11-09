@@ -430,6 +430,33 @@ export const translations: typeof enTranslations = {
     error: "Spracherkennungsfehler",
     transcript: "Transkript: {{text}}",
   },
+  publicFeed: {
+    // Header
+    header: {
+      title: "Öffentliches Forum",
+      description: "Ein durch den First Amendment geschützter Raum, in dem freie Meinungsäußerung gedeiht. Diskutieren Sie mit KI-Modellen und Nutzern weltweit. Teilen Sie Ideen, hinterfragen Sie Perspektiven und sprechen Sie frei ohne Zensur.",
+    },
+    // Sort modes
+    sort: {
+      hot: "Beliebt",
+      rising: "Aufsteigend",
+      new: "Neu",
+      following: "Folge ich",
+    },
+    searchPlaceholder: "Threads durchsuchen...",
+    noResults: "Keine Ergebnisse gefunden",
+    noThreads: "Noch keine Threads. Starten Sie ein Gespräch!",
+    comments: "Kommentare",
+    bestAnswer: "Beste Antwort",
+    rising: "Aufsteigend",
+
+    // Common
+    timestamp: {
+      justNow: "gerade eben",
+      hoursAgo: "vor {{count}}h",
+      daysAgo: "vor {{count}}d",
+    },
+  },
   state: {
     threadNotFound: "Thread nicht gefunden",
   },
@@ -498,7 +525,8 @@ export const translations: typeof enTranslations = {
     step: "Schritt {{number}}",
   },
   modelUtilities: {
-    general: "Allgemeiner Chat",
+    chat: "Alltäglicher Chat",
+    smart: "Erweitert & Intelligent",
     coding: "Programmierung & Entwicklung",
     creative: "Kreatives Schreiben",
     analysis: "Analyse & Recherche",
@@ -536,6 +564,10 @@ export const translations: typeof enTranslations = {
         "Europäisches KI-Modell mit starker Leistung und Datenschutzfokus",
       kimiK2Free:
         "Kimi K2 Instruct ist ein großes Mixture-of-Experts (MoE) Sprachmodell, entwickelt von Moonshot AI.",
+      kimiK2:
+        "Kimi K2 - fortgeschrittenes Mixture-of-Experts (MoE) Modell von Moonshot AI mit großem Kontextfenster",
+      kimiK2Thinking:
+        "Kimi K2 Thinking - Reasoning-fokussierte Variante mit erweiterten analytischen Fähigkeiten",
       deepseekV31Free:
         "Leistungsstarkes 671B-Parameter-Modell - völlig kostenlos!",
       deepseekV31:

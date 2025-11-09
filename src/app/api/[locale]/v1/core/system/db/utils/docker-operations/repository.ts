@@ -9,7 +9,7 @@ import { spawn } from "node:child_process";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -113,7 +113,7 @@ export class DockerOperationsRepositoryImpl
         success: result.success,
       });
 
-      return createSuccessResponse({
+      return success({
         success: result.success,
         output: result.output,
         error: result.error,
@@ -160,7 +160,7 @@ export class DockerOperationsRepositoryImpl
 
       logger.info(`🗄️  Docker Compose down completed: ${result.success}`);
 
-      return createSuccessResponse(result.success);
+      return success(result.success);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("🗄️ Docker Compose down failed", parsedError);
@@ -204,7 +204,7 @@ export class DockerOperationsRepositoryImpl
 
       logger.info("🗄️  Docker Compose up completed:", result.success);
 
-      return createSuccessResponse(result.success);
+      return success(result.success);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("🗄️  Docker Compose up failed", parsedError);

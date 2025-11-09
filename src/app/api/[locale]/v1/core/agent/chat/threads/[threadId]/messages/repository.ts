@@ -8,7 +8,7 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -602,7 +602,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         };
       });
 
-      return createSuccessResponse({ messages: mappedMessages });
+      return success({ messages: mappedMessages });
     } catch (error) {
       logger.error("Error listing messages", parseError(error));
       return fail({
@@ -778,7 +778,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         threadId: data.threadId,
       });
 
-      return createSuccessResponse({
+      return success({
         id: message.id,
         createdAt: message.createdAt.toISOString(),
       });

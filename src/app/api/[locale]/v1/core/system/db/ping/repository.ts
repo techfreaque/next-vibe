@@ -7,7 +7,7 @@ import { sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -54,7 +54,7 @@ export class DatabasePingRepositoryImpl implements DatabasePingRepository {
         waitingClients: connectionInfo.waitingClients,
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       return createErrorResponse(
         "app.api.v1.core.system.db.ping.post.errors.network.title",

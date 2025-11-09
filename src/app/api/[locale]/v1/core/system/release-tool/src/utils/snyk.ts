@@ -6,7 +6,7 @@ import { join } from "node:path";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -48,7 +48,7 @@ export function runSnykTest(
       stdio: "inherit",
     });
     logger.info(`Snyk vulnerability test passed for ${packageName}`);
-    return createSuccessResponse(undefined);
+    return success(undefined);
   } catch (error) {
     logger.error(
       `Snyk vulnerability test failed for ${packageName}:`,
@@ -138,7 +138,7 @@ export function runSnykMonitor(
     });
 
     logger.info(`Snyk monitor completed successfully for ${packageName}`);
-    return createSuccessResponse(undefined);
+    return success(undefined);
   } catch (error) {
     logger.error(`Snyk monitor failed for ${packageName}:`, parseError(error));
     return createErrorResponse(

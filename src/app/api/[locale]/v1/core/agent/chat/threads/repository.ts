@@ -18,7 +18,7 @@ import {
   or,
 } from "drizzle-orm";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
@@ -129,7 +129,7 @@ async function verifyExistingThread(params: {
     });
   }
 
-  return createSuccessResponse(threadId);
+  return success(threadId);
 }
 
 /**
@@ -646,7 +646,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         threadIds: threads.map((t) => t.id),
       });
 
-      return createSuccessResponse({
+      return success({
         response: {
           threads,
           totalCount: total,
@@ -816,7 +816,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
 
       logger.debug("Thread created successfully", { threadId: thread.id });
 
-      return createSuccessResponse({
+      return success({
         response: {
           thread,
         },

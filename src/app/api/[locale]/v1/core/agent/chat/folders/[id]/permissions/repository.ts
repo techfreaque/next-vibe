@@ -3,7 +3,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -76,7 +76,7 @@ export async function getFolderPermissions(
 
     logger.info("GET permissions response data", responseData);
 
-    return createSuccessResponse(responseData);
+    return success(responseData);
   } catch {
     return fail({
       message:
@@ -195,7 +195,7 @@ export async function updateFolderPermissions(
     });
 
     // Return updated values (use provided values or keep existing)
-    return createSuccessResponse({
+    return success({
       response: {
         rolesView: rolesView ?? existingFolder.rolesView,
         rolesManage: rolesManage ?? existingFolder.rolesManage,

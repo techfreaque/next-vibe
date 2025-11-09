@@ -20,7 +20,7 @@ import {
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import {
@@ -331,7 +331,7 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         generatedAt: new Date().toISOString(),
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       logger.error("Error fetching user statistics", parseError(error));
       return createErrorResponse(

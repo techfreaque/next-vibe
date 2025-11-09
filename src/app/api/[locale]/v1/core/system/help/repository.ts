@@ -8,7 +8,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -57,13 +57,13 @@ class HelpRepository {
 
         const response = this.formatCommandHelp(command);
         logger.info("Command help generated successfully");
-        return createSuccessResponse(response);
+        return success(response);
       }
 
       // Show general help with usage information
       const response = this.formatGeneralHelp();
       logger.info("General help generated successfully");
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to generate help information", parsedError);

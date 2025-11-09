@@ -10,7 +10,7 @@ import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -214,7 +214,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
         .where(eq(smtpAccounts.status, SmtpAccountStatus.ACTIVE));
 
       if (accounts.length === 0) {
-        return createSuccessResponse({
+        return success({
           totalCapacity: 0,
           remainingCapacity: 0,
         });
@@ -237,7 +237,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
         // but still counts toward total capacity
       }
 
-      return createSuccessResponse({
+      return success({
         totalCapacity,
         remainingCapacity: totalRemainingCapacity,
       });
@@ -297,7 +297,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
 
       await this.updateAccountHealth(data.accountId, true, logger);
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message:
           "app.api.v1.core.emails.smtpClient.sending.success.connectionTest",
@@ -493,7 +493,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
     if (this.transportCache.has(cacheKey)) {
       const cachedTransport = this.transportCache.get(cacheKey);
       if (cachedTransport) {
-        return createSuccessResponse(cachedTransport);
+        return success(cachedTransport);
       }
     }
 
@@ -520,7 +520,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
       await transport.verify();
 
       this.transportCache.set(cacheKey, transport);
-      return createSuccessResponse(transport);
+      return success(transport);
     } catch (error) {
       logger.error("Error creating SMTP transport", {
         accountId: account.id,
@@ -805,7 +805,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
         accountName: account.name,
       });
 
-      return createSuccessResponse({
+      return success({
         messageId: result.messageId,
         accountId: account.id,
         accountName: account.name,
@@ -856,7 +856,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
     try {
       // If no rate limit is set, allow unlimited sending
       if (!account.rateLimitPerHour) {
-        return createSuccessResponse({
+        return success({
           canSend: true,
           remainingCapacity: Number.MAX_SAFE_INTEGER,
           currentUsage: 0,
@@ -901,7 +901,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
         );
       }
 
-      return createSuccessResponse({
+      return success({
         canSend,
         remainingCapacity,
         currentUsage: emailsSentThisHour,
@@ -909,7 +909,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
     } catch (error) {
       logger.error("Error checking rate limit", parseError(error));
       // On error, allow limited sending to be safe
-      return createSuccessResponse({
+      return success({
         canSend: true,
         remainingCapacity: 10, // Conservative fallback
         currentUsage: 0,

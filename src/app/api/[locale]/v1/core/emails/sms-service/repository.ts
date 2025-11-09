@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -80,7 +80,7 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
         provider: result.provider,
       });
 
-      return createSuccessResponse({
+      return success({
         result: {
           success: true,
           messageId: result.messageId,

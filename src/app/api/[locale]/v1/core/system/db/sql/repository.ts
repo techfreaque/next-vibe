@@ -6,7 +6,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -57,7 +57,7 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
         };
 
         logger.info("SQL query completed successfully");
-        return createSuccessResponse(response);
+        return success(response);
       }
 
       const response: SqlResponseOutput = {
@@ -68,7 +68,7 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
         queryType,
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       parseError(error);
 

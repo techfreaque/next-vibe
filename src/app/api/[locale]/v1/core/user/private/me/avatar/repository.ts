@@ -6,7 +6,7 @@
 import { revalidatePath } from "next/cache";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
@@ -136,7 +136,7 @@ export class AvatarRepositoryImpl implements AvatarRepository {
       revalidatePath(`/dashboard/profile`);
       revalidatePath(`/profile`);
 
-      return createSuccessResponse<AvatarPostResponseOutput>({
+      return success<AvatarPostResponseOutput>({
         response: {
           success: true,
           message: "app.api.v1.core.user.private.me.avatar.success.uploaded",
@@ -212,7 +212,7 @@ export class AvatarRepositoryImpl implements AvatarRepository {
       revalidatePath(`/dashboard/profile`);
       revalidatePath(`/profile`);
 
-      return createSuccessResponse<AvatarDeleteResponseOutput>({
+      return success<AvatarDeleteResponseOutput>({
         success: true,
         message: "app.api.v1.core.user.private.me.avatar.success.deleted",
         nextSteps: [

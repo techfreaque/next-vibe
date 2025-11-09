@@ -6,7 +6,7 @@
 import { Button, Section } from "@react-email/components";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { Span } from "next-vibe-ui/ui/span";
@@ -411,7 +411,7 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
       );
     }
 
-    return createSuccessResponse({
+    return success({
       toEmail: contactClientRepository.getSupportEmail(locale),
       toName: t("config.appName"),
       subject: t(
@@ -456,7 +456,7 @@ export const renderBatchDeleteNotificationMail: EmailFunctionType<
       );
     }
 
-    return createSuccessResponse({
+    return success({
       toEmail: contactClientRepository.getSupportEmail(locale),
       toName: t("config.appName"),
       subject: t(

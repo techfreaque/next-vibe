@@ -6,7 +6,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -120,7 +120,7 @@ export class SchemaVerifyRepositoryImpl
         fixedIssues: fixedIssues.length > 0 ? fixedIssues : undefined,
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       parseError(error);
 

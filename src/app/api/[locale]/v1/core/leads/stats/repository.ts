@@ -21,7 +21,7 @@ import {
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
@@ -193,7 +193,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         topPerformingSources,
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       const errorDetails = parseError(error);
       logger.error("Error getting leads stats", {

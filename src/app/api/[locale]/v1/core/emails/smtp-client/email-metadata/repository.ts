@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -114,7 +114,7 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
         subject: data.params.subject,
       });
 
-      return createSuccessResponse({ success: true });
+      return success({ success: true });
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to store email metadata", parsedError.message, {
@@ -211,7 +211,7 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
         emailId: data.params.emailId,
       });
 
-      return createSuccessResponse({ success: true });
+      return success({ success: true });
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to update email engagement", parsedError.message, {

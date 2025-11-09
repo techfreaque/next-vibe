@@ -32,7 +32,8 @@ export enum ModelId {
   MISTRAL_NEMO = "mistral-nemo",
   DEEPSEEK_R1_DISTILL = "deepseek-r1-distill",
   QWEN_2_5_7B = "qwen-2-5-7b",
-  KIMI_K2_FREE = "kimi-k2-free",
+  KIMI_K2 = "kimi-k2",
+  KIMI_K2_THINKING = "kimi-k2-thinking",
   DEEPSEEK_V31 = "deepseek-v3.1",
   DEEPSEEK_R1 = "deepseek-r1",
   QWEN3_235B_FREE = "qwen3_235b-free",
@@ -47,6 +48,19 @@ export enum ModelId {
   VENICE_UNCENSORED = "venice-uncensored-free",
   DOLPHIN_3_0_MISTRAL_24B = "dolphin-3.0-mistral-24b",
 }
+
+export const DEFAULT_MODEL = ModelId.GPT_5_NANO;
+
+export const DEFAULT_FAVORITES: ModelId[] = [
+  ModelId.UNCENSORED_LM_V1_1,
+  ModelId.GPT_5_NANO,
+  ModelId.GPT_5,
+  ModelId.CLAUDE_HAIKU_4_5,
+  ModelId.CLAUDE_SONNET_4_5,
+  ModelId.KIMI_K2,
+  ModelId.KIMI_K2_THINKING,
+];
+
 
 /**
  * Configuration interface for AI model options.
@@ -156,8 +170,8 @@ export const modelOptions: ModelOption[] = [
     creditCost: 5,
     utilities: [
       ModelUtility.UNCENSORED,
-      ModelUtility.GENERAL,
       ModelUtility.CREATIVE,
+      ModelUtility.SMART,
     ],
     supportsTools: true,
   },
@@ -198,7 +212,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiZendesk,
     openRouterModel: "z-ai/glm-4.5-air",
     creditCost: 1,
-    utilities: [ModelUtility.GENERAL, ModelUtility.FAST],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
   },
   {
@@ -211,7 +225,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiZendesk,
     openRouterModel: "z-ai/glm-4.6",
     creditCost: 5,
-    utilities: [ModelUtility.GENERAL],
+    utilities: [ModelUtility.SMART],
     supportsTools: true,
   },
   {
@@ -237,7 +251,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiAnthropic,
     openRouterModel: "anthropic/claude-haiku-4.5",
     creditCost: 3,
-    utilities: [ModelUtility.GENERAL, ModelUtility.FAST, ModelUtility.CODING],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.CODING],
     supportsTools: true,
   },
   {
@@ -251,7 +265,7 @@ export const modelOptions: ModelOption[] = [
     openRouterModel: "anthropic/claude-sonnet-4.5",
     creditCost: 10,
     utilities: [
-      ModelUtility.GENERAL,
+      ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
       ModelUtility.CREATIVE,
@@ -269,7 +283,7 @@ export const modelOptions: ModelOption[] = [
     openRouterModel: "openai/gpt-5-pro",
     creditCost: 20, // Premium model
     utilities: [
-      ModelUtility.GENERAL,
+      ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.CREATIVE,
       ModelUtility.ANALYSIS,
@@ -287,7 +301,7 @@ export const modelOptions: ModelOption[] = [
     openRouterModel: "openai/gpt-5-codex",
     creditCost: 10, // Premium model
     utilities: [
-      ModelUtility.GENERAL,
+      ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.CREATIVE,
     ],
@@ -304,7 +318,7 @@ export const modelOptions: ModelOption[] = [
     openRouterModel: "openai/gpt-5",
     creditCost: 10, // Premium model
     utilities: [
-      ModelUtility.GENERAL,
+      ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.CREATIVE,
     ],
@@ -320,7 +334,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiOpenai,
     openRouterModel: "openai/gpt-5-mini",
     creditCost: 3,
-    utilities: [ModelUtility.GENERAL, ModelUtility.FAST],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
   },
   {
@@ -333,7 +347,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiOpenai,
     openRouterModel: "openai/gpt-5-nano",
     creditCost: 2, // Basic model
-    utilities: [ModelUtility.GENERAL, ModelUtility.FAST],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
   },
   {
@@ -346,21 +360,34 @@ export const modelOptions: ModelOption[] = [
     icon: SiOpenai,
     openRouterModel: "openai/gpt-oss-120b",
     creditCost: 1,
-    utilities: [ModelUtility.GENERAL, ModelUtility.CODING],
+    utilities: [ModelUtility.CHAT, ModelUtility.CODING],
     supportsTools: true,
   },
   {
-    id: ModelId.KIMI_K2_FREE,
+    id: ModelId.KIMI_K2,
     name: "Kimi K2",
     provider: "moonshotAI",
-    description: "app.chat.models.descriptions.kimiK2Free",
+    description: "app.chat.models.descriptions.kimiK2",
     parameterCount: 1000,
-    contextWindow: 33000,
-    creditCost: 0, // Free model
-    utilities: [ModelUtility.GENERAL, ModelUtility.FAST],
+    contextWindow: 256000,
+    creditCost: 4,
+    utilities: [ModelUtility.SMART, ModelUtility.FAST, ModelUtility.CODING, ModelUtility.ANALYSIS, ModelUtility.CREATIVE],
     icon: MoonIcon,
-    openRouterModel: "moonshotai/kimi-k2:free",
-    supportsTools: false, // OpenRouter reports: "No endpoints found that support tool use"
+    openRouterModel: "moonshotai/kimi-k2-0905",
+    supportsTools: true, // OpenRouter reports: "No endpoints found that support tool use"
+  },
+  {
+    id: ModelId.KIMI_K2_THINKING,
+    name: "Kimi K2 Thinking",
+    provider: "moonshotAI",
+    description: "app.chat.models.descriptions.kimiK2Thinking",
+    parameterCount: 1000,
+    contextWindow: 256000,
+    creditCost: 8,
+    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS, ModelUtility.CREATIVE],
+    icon: MoonIcon,
+    openRouterModel: "moonshotai/kimi-k2-thinking",
+    supportsTools: true, // OpenRouter reports: "No endpoints found that support tool use"
   },
   {
     id: ModelId.GEMINI_FLASH_2_5_LITE,
@@ -372,7 +399,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiGooglegemini,
     openRouterModel: "google/gemini-2.5-flash-lite",
     creditCost: 1,
-    utilities: [ModelUtility.GENERAL, ModelUtility.FAST],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
   },
   {
@@ -385,7 +412,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiGooglegemini,
     openRouterModel: "google/gemini-2.5-flash",
     creditCost: 2,
-    utilities: [ModelUtility.GENERAL],
+    utilities: [ModelUtility.CHAT],
     supportsTools: true,
   },
   {
@@ -398,7 +425,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiGooglegemini,
     openRouterModel: "google/gemini-2.5-flash-pro",
     creditCost: 10,
-    utilities: [ModelUtility.GENERAL, ModelUtility.CODING],
+    utilities: [ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
   },
   {
@@ -411,7 +438,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiMistralai,
     openRouterModel: "mistralai/mistral-nemo:free",
     creditCost: 0, // Free model
-    utilities: [ModelUtility.GENERAL, ModelUtility.FAST],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
   },
   {
@@ -424,7 +451,7 @@ export const modelOptions: ModelOption[] = [
     icon: "🐋",
     openRouterModel: "deepseek/deepseek-chat-v3.1",
     creditCost: 5,
-    utilities: [ModelUtility.GENERAL, ModelUtility.CODING],
+    utilities: [ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
   },
   {
@@ -437,7 +464,7 @@ export const modelOptions: ModelOption[] = [
     icon: "🐋",
     openRouterModel: "deepseek/deepseek-r1-0528",
     creditCost: 6,
-    utilities: [ModelUtility.GENERAL, ModelUtility.CODING],
+    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS],
     supportsTools: true,
   },
 
@@ -451,7 +478,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiAlibabadotcom,
     openRouterModel: "qwen/qwen3-235b-a22b:free",
     creditCost: 0, // Free model
-    utilities: [ModelUtility.GENERAL, ModelUtility.CODING],
+    utilities: [ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
   },
   {
@@ -477,7 +504,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiAlibabadotcom,
     openRouterModel: "qwen/qwen-2.5-7b-instruct",
     creditCost: 2, // Pro model
-    utilities: [ModelUtility.GENERAL],
+    utilities: [ModelUtility.CHAT],
     supportsTools: true,
   },
   {
@@ -490,7 +517,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiX,
     openRouterModel: "x-ai/grok-4",
     creditCost: 10,
-    utilities: [ModelUtility.GENERAL, ModelUtility.CODING],
+    utilities: [ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
   },
   {
@@ -503,7 +530,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiX,
     openRouterModel: "x-ai/grok-4-fast",
     creditCost: 2,
-    utilities: [ModelUtility.GENERAL, ModelUtility.FAST],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
   },
 ];

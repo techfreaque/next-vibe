@@ -9,7 +9,7 @@ import { eq, inArray } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -90,7 +90,7 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
       }
 
       if (accountsToSync.length === 0) {
-        return createSuccessResponse({
+        return success({
           accountsProcessed: 0,
           foldersProcessed: 0,
           messagesProcessed: 0,
@@ -211,7 +211,7 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
       const endTime = new Date();
       const duration = endTime.getTime() - startTime.getTime();
 
-      return createSuccessResponse({
+      return success({
         ...results,
         duration,
       });
@@ -241,7 +241,7 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
 
       // Since GET returns same type as POST, return an empty sync result
       // In a real implementation, this might fetch recent sync statistics
-      return createSuccessResponse({
+      return success({
         accountsProcessed: 0,
         foldersProcessed: 0,
         messagesProcessed: 0,

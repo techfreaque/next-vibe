@@ -12,7 +12,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -102,7 +102,7 @@ export class UnifiedTaskRunnerRepositoryImpl
 
       switch (data.action) {
         case "status":
-          return createSuccessResponse({
+          return success({
             success: true,
             actionResult: data.action,
             message:
@@ -112,7 +112,7 @@ export class UnifiedTaskRunnerRepositoryImpl
 
         case "start":
           this.isRunning = true;
-          return createSuccessResponse({
+          return success({
             success: true,
             actionResult: data.action,
             message:
@@ -122,7 +122,7 @@ export class UnifiedTaskRunnerRepositoryImpl
 
         case "stop":
           await this.stop(locale);
-          return createSuccessResponse({
+          return success({
             success: true,
             actionResult: data.action,
             message:
@@ -133,7 +133,7 @@ export class UnifiedTaskRunnerRepositoryImpl
         case "restart":
           await this.stop(locale);
           this.isRunning = true;
-          return createSuccessResponse({
+          return success({
             success: true,
             actionResult: data.action,
             message:
@@ -172,7 +172,7 @@ export class UnifiedTaskRunnerRepositoryImpl
 
     // Check if task is already running (overlap prevention)
     if (this.isTaskRunning(taskName)) {
-      return createSuccessResponse({
+      return success({
         status: CronTaskStatus.SKIPPED,
         reason:
           "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.reasons.previousInstanceRunning",
@@ -218,7 +218,7 @@ export class UnifiedTaskRunnerRepositoryImpl
       }
 
       this.markTaskAsCompleted(taskName);
-      return createSuccessResponse({
+      return success({
         status: CronTaskStatus.COMPLETED,
         message:
           "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.messages.taskCompleted",
@@ -260,7 +260,7 @@ export class UnifiedTaskRunnerRepositoryImpl
         cronUser: this.cronUser,
       });
       this.markTaskAsCompleted(taskName);
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       const errorMsg = parseError(error).message;
       this.markTaskAsFailed(taskName, errorMsg);
@@ -340,7 +340,7 @@ export class UnifiedTaskRunnerRepositoryImpl
 
       this.logger.debug("Task runner startup initiated");
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       const errorMsg = parseError(error).message;
 
@@ -497,7 +497,7 @@ export class UnifiedTaskRunnerRepositoryImpl
       setTimeout(resolve, 10);
     });
 
-    return createSuccessResponse(undefined);
+    return success(undefined);
   }
 
   getStatus(): {

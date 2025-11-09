@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui//ui/badge";
 import { Button } from "next-vibe-ui//ui/button";
 import { Span } from "next-vibe-ui//ui/span";
@@ -36,21 +37,20 @@ export function ToolsButton({
       disabled={disabled}
       variant="outline"
       size="sm"
-      className={
-        activeToolCount > 0
-          ? "relative inline-flex items-center justify-center gap-2 h-9 px-3 border-primary/50 bg-primary/5"
-          : "relative inline-flex items-center justify-center gap-2 h-9 px-3"
-      }
+      className={cn(
+        "relative inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 h-8 sm:h-9 px-1.5 sm:px-2 md:px-3",
+        activeToolCount > 0 && "border-primary/50 bg-primary/5",
+      )}
       title={t("app.chat.toolsButton.title")}
     >
-      <Wrench className="h-4 w-4 shrink-0" />
-      <Span className="hidden sm:inline">
+      <Wrench className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+      <Span className="hidden min-[680px]:inline text-xs">
         {t("app.chat.toolsButton.tools")}
       </Span>
       {activeToolCount > 0 && (
         <Badge
           variant="default"
-          className="h-5 min-w-5 px-1.5 text-xs font-medium bg-primary text-primary-foreground"
+          className="h-4 min-w-4 sm:h-5 sm:min-w-5 px-1 sm:px-1.5 text-[10px] sm:text-xs font-medium bg-primary text-primary-foreground"
         >
           {activeToolCount}
         </Badge>

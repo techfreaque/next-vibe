@@ -9,7 +9,7 @@ import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -226,7 +226,7 @@ export class UserListRepositoryImpl implements UserListRepository {
         resultsCount: usersList.length,
       });
 
-      return createSuccessResponse({
+      return success({
         response: {
           totalCount: total,
           pageCount: totalPages,

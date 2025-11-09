@@ -4,6 +4,7 @@ import {
   Image,
   MessageSquare,
   Sparkles,
+  Lightbulb,
   Zap,
 } from 'next-vibe-ui/ui/icons';
 
@@ -16,7 +17,8 @@ import type { IconComponent } from "./icons";
  */
 export enum ModelUtility {
   UNCENSORED = "uncensored",
-  GENERAL = "general",
+  CHAT = "chat",
+  SMART = "smart",
   CODING = "coding",
   CREATIVE = "creative",
   ANALYSIS = "analysis",
@@ -43,42 +45,47 @@ export const MODEL_UTILITIES: Record<ModelUtility, ModelUtilityConfig> = {
     icon: Image,
     order: 0,
   },
-
-  [ModelUtility.GENERAL]: {
-    id: ModelUtility.GENERAL,
-    titleKey: "app.chat.modelUtilities.general",
-    icon: MessageSquare,
+  [ModelUtility.FAST]: {
+    id: ModelUtility.FAST,
+    titleKey: "app.chat.modelUtilities.fast",
+    icon: Zap,
     order: 1,
+  },
+  [ModelUtility.CHAT]: {
+    id: ModelUtility.CHAT,
+    titleKey: "app.chat.modelUtilities.chat",
+    icon: MessageSquare,
+    order: 2,
+  },
+  [ModelUtility.SMART]: {
+    id: ModelUtility.SMART,
+    titleKey: "app.chat.modelUtilities.smart",
+    icon: Lightbulb,
+    order: 3,
   },
   [ModelUtility.CODING]: {
     id: ModelUtility.CODING,
     titleKey: "app.chat.modelUtilities.coding",
     icon: Code,
-    order: 2,
+    order: 4,
   },
   [ModelUtility.CREATIVE]: {
     id: ModelUtility.CREATIVE,
     titleKey: "app.chat.modelUtilities.creative",
     icon: Sparkles,
-    order: 3,
+    order: 5,
   },
   [ModelUtility.ANALYSIS]: {
     id: ModelUtility.ANALYSIS,
     titleKey: "app.chat.modelUtilities.analysis",
     icon: FileText,
-    order: 4,
-  },
-  [ModelUtility.FAST]: {
-    id: ModelUtility.FAST,
-    titleKey: "app.chat.modelUtilities.fast",
-    icon: Zap,
-    order: 5,
+    order: 6,
   },
   [ModelUtility.VISION]: {
     id: ModelUtility.VISION,
     titleKey: "app.chat.modelUtilities.vision",
     icon: Image,
-    order: 6,
+    order: 7,
   },
   [ModelUtility.IMAGE_GEN]: {
     id: ModelUtility.IMAGE_GEN,

@@ -422,6 +422,33 @@ export const translations = {
     error: "Speech recognition error",
     transcript: "Transcript: {{text}}",
   },
+  publicFeed: {
+    // Header
+    header: {
+      title: "Public Forum",
+      description: "A First Amendment protected space where free speech thrives. Engage with AI models and users worldwide. Share ideas, challenge perspectives, and speak freely without censorship.",
+    },
+    // Sort modes
+    sort: {
+      hot: "Hot",
+      rising: "Rising",
+      new: "New",
+      following: "Following",
+    },
+    searchPlaceholder: "Search threads...",
+    noResults: "No results found",
+    noThreads: "No threads yet. Start a conversation!",
+    comments: "comments",
+    bestAnswer: "Best Answer",
+    rising: "Rising",
+
+    // Common
+    timestamp: {
+      justNow: "just now",
+      hoursAgo: "{{count}}h ago",
+      daysAgo: "{{count}}d ago",
+    },
+  },
   state: {
     threadNotFound: "Thread not found",
   },
@@ -515,7 +542,8 @@ export const translations = {
     step: "Step {{number}}",
   },
   modelUtilities: {
-    general: "General Chat",
+    chat: "Everyday Chat",
+    smart: "Advanced & Smart",
     coding: "Coding & Development",
     creative: "Creative Writing",
     analysis: "Analysis & Research",
@@ -549,6 +577,10 @@ export const translations = {
         "European AI model with strong performance and privacy focus",
       kimiK2Free:
         "Kimi K2 Instruct is a large-scale Mixture-of-Experts (MoE) language model developed by Moonshot AI.",
+      kimiK2:
+        "Kimi K2 - advanced Mixture-of-Experts (MoE) model by Moonshot AI with large context window",
+      kimiK2Thinking:
+        "Kimi K2 Thinking - reasoning-focused variant with enhanced analytical capabilities",
       deepseekV31Free: "Powerful 671B parameter model - completely free!",
       deepseekV31: "Powerful 671B parameter model with advanced capabilities",
       qwen3235bFree:

@@ -11,7 +11,7 @@ import { AUTH_TOKEN_COOKIE_NAME } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -93,7 +93,7 @@ export class SessionRepositoryImpl implements SessionRepository {
         .where(eq(sessions.token, token));
 
       if (results.length > 0) {
-        return createSuccessResponse(results[0]);
+        return success(results[0]);
       }
 
       // If not found in database and it looks like a JWT token, handle as CLI token
@@ -109,7 +109,7 @@ export class SessionRepositoryImpl implements SessionRepository {
           expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
           createdAt: new Date(),
         };
-        return createSuccessResponse(mockSession);
+        return success(mockSession);
       }
 
       // Token not found in database and not a JWT
@@ -148,7 +148,7 @@ export class SessionRepositoryImpl implements SessionRepository {
         ),
       );
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       // Note: Logger not available for internal cleanup methods
       return fail({
@@ -190,7 +190,7 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       // Session extended successfully
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       // Note: Logger not available for internal session methods
       return fail({
@@ -223,7 +223,7 @@ export class SessionRepositoryImpl implements SessionRepository {
       });
       }
 
-      return createSuccessResponse(results[0]);
+      return success(results[0]);
     } catch (error) {
       // Note: Logger not available for internal session methods
       return fail({
@@ -249,7 +249,7 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       await db.delete(sessions).where(eq(sessions.userId, userId));
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       // Note: Logger not available for internal session methods
       return fail({
@@ -301,7 +301,7 @@ export class SessionRepositoryImpl implements SessionRepository {
       });
       }
 
-      return createSuccessResponse({
+      return success({
         userId: session.userId,
         expiresAt: session.expiresAt,
         token,

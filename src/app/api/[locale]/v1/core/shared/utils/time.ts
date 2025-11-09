@@ -1,6 +1,6 @@
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   type ResponseType,
 } from "../types/response.schema";
@@ -23,7 +23,7 @@ export function timeToSeconds(
       },
     );
   }
-  return createSuccessResponse(hours * 3600 + minutes * 60);
+  return success(hours * 3600 + minutes * 60);
 }
 
 export type SimpleTimeFormat = `${number}:${number}`;
@@ -47,7 +47,7 @@ export function secondsToTime(seconds: number): ResponseType<SimpleTimeFormat> {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
 
-  return createSuccessResponse(
+  return success(
     `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}` as SimpleTimeFormat,
   );
 }

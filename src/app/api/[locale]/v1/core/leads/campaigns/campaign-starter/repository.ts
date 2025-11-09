@@ -9,7 +9,7 @@ import { and, eq, gte, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -159,7 +159,7 @@ export class CampaignStarterRepositoryImpl
             totalRemainingCapacity,
           },
         );
-        return createSuccessResponse(undefined);
+        return success(undefined);
       }
 
       // Query for NEW leads in this locale that are old enough to start campaigns
@@ -181,7 +181,7 @@ export class CampaignStarterRepositoryImpl
       const localeLeads = await query.limit(adjustedLeadsPerRun);
 
       if (localeLeads.length === 0) {
-        return createSuccessResponse(undefined);
+        return success(undefined);
       }
 
       // Process each lead
@@ -238,7 +238,7 @@ export class CampaignStarterRepositoryImpl
         }
       }
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error("Failed to process locale leads", {
         error: parseError(error),
@@ -303,7 +303,7 @@ export class CampaignStarterRepositoryImpl
         });
       }
 
-      return createSuccessResponse(count);
+      return success(count);
     } catch (error) {
       logger.error("Failed to count failed leads", {
         error: parseError(error),
@@ -367,7 +367,7 @@ export class CampaignStarterRepositoryImpl
         failedStates,
       });
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error("Failed to mark failed leads as processed", {
         error: parseError(error),

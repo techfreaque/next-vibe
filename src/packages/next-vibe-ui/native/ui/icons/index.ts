@@ -102,6 +102,7 @@ export { GitBranch } from "./GitBranch";
 export { Github } from "./Github";
 export { Globe } from "./Globe";
 export { GraduationCap } from "./GraduationCap";
+export { Grid3x3 } from "./Grid3x3";
 export { GripVertical } from "./GripVertical";
 export { Hash } from "./Hash";
 export { Heart } from "./Heart";

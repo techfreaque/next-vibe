@@ -2,7 +2,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
@@ -58,7 +58,7 @@ export async function getFolder(
       });
     }
 
-    return createSuccessResponse({
+    return success({
       response: {
         folder: {
           id: folder.id,
@@ -201,7 +201,7 @@ export async function updateFolder(
       });
     }
 
-    return createSuccessResponse({
+    return success({
       response: {
         folder: {
           id: updatedFolder.id,
@@ -281,7 +281,7 @@ export async function deleteFolder(
     // Delete the folder (cascade will handle child folders and threads)
     await db.delete(chatFolders).where(eq(chatFolders.id, id));
 
-    return createSuccessResponse({
+    return success({
       response: {
         success: true,
         deletedFolderId: id,

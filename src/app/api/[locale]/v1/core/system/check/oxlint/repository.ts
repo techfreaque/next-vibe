@@ -11,7 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
-import { createSuccessResponse } from "../../../shared/types/response.schema";
+import { success } from "../../../shared/types/response.schema";
 import { parseError } from "../../../shared/utils/parse-error";
 import type { OxlintRequestOutput, OxlintResponseOutput } from "./definition";
 import {
@@ -184,7 +184,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       logger.debug(`Found ${filesToLint.length} files to lint`);
 
       if (filesToLint.length === 0) {
-        return createSuccessResponse({
+        return success({
           success: true,
           issues: [],
           duration: Date.now() - startTime,
@@ -227,7 +227,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         success: mergedResult.success,
       });
 
-      return createSuccessResponse(mergedResult);
+      return success(mergedResult);
     } catch (error) {
       const duration = Date.now() - startTime;
       const errorMessage = parseError(error).message;
@@ -244,7 +244,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
 
       const errorSummary = this.generateSummary(errorIssues);
 
-      return createSuccessResponse({
+      return success({
         success: false,
         issues: errorIssues,
         duration,

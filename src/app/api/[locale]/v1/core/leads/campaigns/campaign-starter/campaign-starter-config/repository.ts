@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -238,13 +238,13 @@ class CampaignStarterConfigRepositoryImpl
       if (existingConfig) {
         const config = await this.formatConfigResponse(existingConfig);
         logger.debug("Found existing config in database", { environment });
-        return createSuccessResponse(config);
+        return success(config);
       }
 
       // If no config exists, return default config with default cron settings
       const combinedConfig = getDefaultConfigWithCron();
       logger.debug("No config found, returning default", { environment });
-      return createSuccessResponse(combinedConfig);
+      return success(combinedConfig);
     } catch (error) {
       logger.error("Error fetching campaign starter config", parseError(error));
       return createErrorResponse(
@@ -315,7 +315,7 @@ class CampaignStarterConfigRepositoryImpl
       };
       await this.saveCronTaskSettings(cronSettings);
 
-      return createSuccessResponse(data);
+      return success(data);
     } catch (error) {
       logger.error("Error updating campaign starter config", parseError(error));
       return createErrorResponse(
@@ -352,7 +352,7 @@ class CampaignStarterConfigRepositoryImpl
 
       if (existingConfig) {
         const config = await this.formatConfigResponse(existingConfig);
-        return createSuccessResponse(config);
+        return success(config);
       }
 
       // Config doesn't exist, create it with default values
@@ -370,12 +370,12 @@ class CampaignStarterConfigRepositoryImpl
       logger.debug("Created default config in database", { environment });
 
       // Return combined config
-      return createSuccessResponse(defaultConfigWithCron);
+      return success(defaultConfigWithCron);
     } catch (error) {
       logger.error("Error ensuring config exists", parseError(error));
       // Fall back to default config with default cron settings if database operation fails
       const defaultConfig = getDefaultConfigWithCron();
-      return createSuccessResponse(defaultConfig);
+      return success(defaultConfig);
     }
   }
 }

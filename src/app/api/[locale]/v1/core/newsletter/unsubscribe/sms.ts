@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -79,7 +79,7 @@ export class NewsletterUnsubscribeSmsServiceImpl
             userId: user?.id,
           },
         );
-        return createSuccessResponse({
+        return success({
           messageId: "",
           sent: false,
         });
@@ -117,7 +117,7 @@ export class NewsletterUnsubscribeSmsServiceImpl
         );
       }
 
-      return createSuccessResponse({
+      return success({
         messageId: smsResult.data.result.messageId,
         sent: true,
       });
@@ -155,7 +155,7 @@ export class NewsletterUnsubscribeSmsServiceImpl
             unsubscribeEmail: unsubscribeData.email,
           },
         );
-        return createSuccessResponse({
+        return success({
           messageId: "",
           sent: false,
         });
@@ -197,7 +197,7 @@ export class NewsletterUnsubscribeSmsServiceImpl
         );
       }
 
-      return createSuccessResponse({
+      return success({
         messageId: smsResult.data.result.messageId,
         sent: true,
       });

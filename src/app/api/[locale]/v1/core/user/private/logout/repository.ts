@@ -9,7 +9,7 @@ import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -118,7 +118,7 @@ export class LogoutRepositoryImpl implements LogoutRepository {
       }
 
       // Return success with proper response structure
-      return createSuccessResponse({
+      return success({
         success: true,
         message: "app.api.v1.core.user.private.logout.success.message",
         sessionsCleaned: 1, // We cleaned one session

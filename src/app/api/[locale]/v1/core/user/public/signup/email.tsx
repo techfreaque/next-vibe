@@ -1,7 +1,7 @@
 import { Button, Section, Text } from "@react-email/components";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type React from "react";
@@ -170,7 +170,7 @@ export const renderRegisterMail: EmailFunctionType<
   }
   const user = userResponse.data;
 
-  return createSuccessResponse({
+  return success({
     toEmail: user.email,
     toName: user.privateName,
     subject: t("app.api.v1.core.user.public.signup.email.subject", {
@@ -543,7 +543,7 @@ export const renderAdminSignupNotification: EmailFunctionType<
   }
   const user = userResponse.data;
 
-  return createSuccessResponse({
+  return success({
     toEmail: contactClientRepository.getSupportEmail(locale),
     toName: t("config.appName"),
     subject: t(

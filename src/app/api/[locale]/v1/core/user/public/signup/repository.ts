@@ -9,7 +9,7 @@ import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -221,7 +221,7 @@ export class SignupRepositoryImpl implements SignupRepository {
         }
       }
 
-      return createSuccessResponse<SignupPostResponseOutput>({
+      return success<SignupPostResponseOutput>({
         response: {
           success: true,
           message: "app.api.v1.core.user.public.signup.success.message",
@@ -285,7 +285,7 @@ export class SignupRepositoryImpl implements SignupRepository {
         available: !isEmailTaken.data,
       });
 
-      return createSuccessResponse<SignupGetResponseOutput>({
+      return success<SignupGetResponseOutput>({
         response: {
           available: !isEmailTaken.data, // false if taken, true if available
           message: isEmailTaken.data
@@ -418,7 +418,7 @@ export class SignupRepositoryImpl implements SignupRepository {
         );
       }
 
-      return createSuccessResponse(userResponse.data);
+      return success(userResponse.data);
     } catch (error) {
       logger.error("User creation error", parseError(error));
       return createErrorResponse(
@@ -450,7 +450,7 @@ export class SignupRepositoryImpl implements SignupRepository {
         locale,
         logger,
       );
-      return createSuccessResponse(existingUserResponse.success); // true if email exists
+      return success(existingUserResponse.success); // true if email exists
     } catch (error) {
       logger.error("Error checking email registration", parseError(error));
       return createErrorResponse(

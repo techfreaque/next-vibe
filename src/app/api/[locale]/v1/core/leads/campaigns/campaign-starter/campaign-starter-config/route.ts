@@ -7,7 +7,7 @@ import "server-only";
 
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -33,7 +33,7 @@ export const { GET, PUT, tools } = endpointsHandler({
       );
       // Wrap the response data in the expected structure
       if (result.success && result.data) {
-        return createSuccessResponse({
+        return success({
           response: result.data,
         });
       }
@@ -54,7 +54,7 @@ export const { GET, PUT, tools } = endpointsHandler({
       );
       // Wrap the response data in the expected structure
       if (result.success && result.data) {
-        return createSuccessResponse({
+        return success({
           response: result.data,
         });
       }

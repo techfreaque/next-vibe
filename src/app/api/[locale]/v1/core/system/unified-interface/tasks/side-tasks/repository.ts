@@ -8,7 +8,7 @@ import { count, desc, eq, sql } from "drizzle-orm";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -135,7 +135,7 @@ export class SideTasksRepository implements ISideTasksRepository {
       logger.debug("Successfully fetched all side tasks", {
         count: tasks.length,
       });
-      return createSuccessResponse(tasks);
+      return success(tasks);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch all side tasks", {
@@ -164,7 +164,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         id,
         found: !!task[0],
       });
-      return createSuccessResponse(task[0] || null);
+      return success(task[0] || null);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch side task by ID", {
@@ -189,7 +189,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .from(sideTasks)
         .where(eq(sideTasks.name, name))
         .limit(1);
-      return createSuccessResponse(task[0] || null);
+      return success(task[0] || null);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -212,7 +212,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         id: newTask.id,
         name: newTask.name,
       });
-      return createSuccessResponse(newTask);
+      return success(newTask);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to create side task", {
@@ -247,7 +247,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         });
       }
 
-      return createSuccessResponse(updatedTask);
+      return success(updatedTask);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -262,7 +262,7 @@ export class SideTasksRepository implements ISideTasksRepository {
   async deleteTask(id: string): Promise<ResponseType<void>> {
     try {
       await db.delete(sideTasks).where(eq(sideTasks.id, id));
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -282,7 +282,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .insert(sideTaskExecutions)
         .values(execution)
         .returning();
-      return createSuccessResponse(newExecution as SideTaskExecutionRecord);
+      return success(newExecution as SideTaskExecutionRecord);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -313,7 +313,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         });
       }
 
-      return createSuccessResponse(updatedExecution);
+      return success(updatedExecution);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -338,7 +338,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .orderBy(desc(sideTaskExecutions.startedAt))
         .limit(limit);
 
-      return createSuccessResponse(executions);
+      return success(executions);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -361,7 +361,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .orderBy(desc(sideTaskExecutions.startedAt))
         .limit(limit);
 
-      return createSuccessResponse(executions);
+      return success(executions);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -381,7 +381,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .insert(sideTaskHealthChecks)
         .values(healthCheck)
         .returning();
-      return createSuccessResponse(newHealthCheck as SideTaskHealthCheckRecord);
+      return success(newHealthCheck as SideTaskHealthCheckRecord);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -404,7 +404,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .orderBy(desc(sideTaskHealthChecks.createdAt))
         .limit(1);
 
-      return createSuccessResponse(healthCheck[0] || null);
+      return success(healthCheck[0] || null);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -429,7 +429,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .orderBy(desc(sideTaskHealthChecks.createdAt))
         .limit(limit);
 
-      return createSuccessResponse(healthChecks);
+      return success(healthChecks);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -472,7 +472,7 @@ export class SideTasksRepository implements ISideTasksRepository {
           )`,
         );
 
-      return createSuccessResponse({
+      return success({
         totalTasks: stats.totalTasks,
         runningTasks: stats.runningTasks,
         healthyTasks: healthStats?.healthyTasks || 0,
@@ -498,7 +498,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         return stats;
       }
 
-      return createSuccessResponse<SideTasksStatusResponseOutput>(stats.data);
+      return success<SideTasksStatusResponseOutput>(stats.data);
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
@@ -525,7 +525,7 @@ export class SideTasksRepository implements ISideTasksRepository {
           if (!tasksResult.success) {
             return tasksResult;
           }
-          return createSuccessResponse({
+          return success({
             data: tasksResult.data,
             count: tasksResult.data.length,
           });
@@ -535,7 +535,7 @@ export class SideTasksRepository implements ISideTasksRepository {
           if (!statsResult.success) {
             return statsResult;
           }
-          return createSuccessResponse({
+          return success({
             data: statsResult.data,
           });
         }

@@ -9,7 +9,7 @@ import { spawn } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -124,7 +124,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
         executionId,
       });
 
-      return createSuccessResponse({
+      return success({
         success: result.success,
         result: result.success ? result.result : result.error,
         status: [result.success ? BrowserToolStatus.COMPLETED : BrowserToolStatus.FAILED],

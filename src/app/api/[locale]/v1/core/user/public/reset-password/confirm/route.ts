@@ -7,7 +7,7 @@
 
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -57,7 +57,7 @@ export const { POST, tools } = endpointsHandler({
       }
 
       // Return structured response matching definition
-      return createSuccessResponse({
+      return success({
         response: {
           success: true,
           message:

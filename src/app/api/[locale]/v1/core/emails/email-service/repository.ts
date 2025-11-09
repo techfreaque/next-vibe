@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -129,7 +129,7 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
         to: data.recipientInfo.to,
       });
 
-      return createSuccessResponse({
+      return success({
         result: {
           success: true,
           messageId: smtpResult.messageId,

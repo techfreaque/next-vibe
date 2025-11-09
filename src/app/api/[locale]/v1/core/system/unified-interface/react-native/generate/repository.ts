@@ -11,7 +11,7 @@ import { dirname, join, relative } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -115,7 +115,7 @@ class GenerateExpoIndexesRepositoryImpl
         },
       );
 
-      return createSuccessResponse({
+      return success({
         success: result.errors.length === 0,
         created: result.created,
         skipped: result.skipped,

@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -159,7 +159,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
           return;
         });
 
-      return createSuccessResponse(responseData);
+      return success(responseData);
     } catch (error) {
       logger.error("Error creating user", parseError(error));
       return createErrorResponse(

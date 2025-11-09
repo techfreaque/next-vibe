@@ -6,7 +6,7 @@
 import "server-only";
 
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
@@ -224,7 +224,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
         logger,
       });
 
-      return createSuccessResponse({
+      return success({
         response: {
           success: true,
           audioUrl,

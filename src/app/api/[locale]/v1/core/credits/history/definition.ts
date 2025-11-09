@@ -121,6 +121,7 @@ const { GET } = createEndpoint({
                 "usage",
                 "expiry",
                 "free_tier",
+                "monthly_reset",
               ]),
             ),
 

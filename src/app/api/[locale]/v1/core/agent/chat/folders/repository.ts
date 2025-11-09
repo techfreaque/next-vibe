@@ -2,7 +2,7 @@ import "server-only";
 
 import { and, desc, eq, isNull, or } from "drizzle-orm";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
@@ -292,7 +292,7 @@ export class ChatFoldersRepositoryImpl
         ? await this.computeRootFolderPermissions(rootFolderId, user, logger)
         : { canCreateThread: false, canCreateFolder: false };
 
-      return createSuccessResponse({
+      return success({
         rootFolderPermissions,
         folders: foldersWithPermissions,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -427,7 +427,7 @@ export class ChatFoldersRepositoryImpl
         });
       }
 
-      return createSuccessResponse({
+      return success({
         response: {
           folder: {
             id: newFolder.id,

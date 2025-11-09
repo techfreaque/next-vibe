@@ -7,7 +7,7 @@ import "server-only";
 
 import { desc, eq } from "drizzle-orm";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
@@ -233,7 +233,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         mode: data.mode,
       });
 
-      return createSuccessResponse({
+      return success({
         priceId: data.priceId,
         mode: data.mode,
         sessionUrl: session.url || "",
@@ -303,7 +303,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         paymentMethodCount: userPaymentMethods.length,
       });
 
-      return createSuccessResponse({
+      return success({
         priceId: userTransactions[0]?.providerSessionId || "",
         mode: userTransactions[0]?.mode || CheckoutMode.PAYMENT,
         sessionUrl: "",
@@ -359,7 +359,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     // Route to correct provider
     if (subscription[0].provider === PaymentProvider.NOWPAYMENTS) {
       // For NOWPayments, return info that they manage via email
-      return createSuccessResponse({
+      return success({
         success: true,
         customerPortalUrl: null,
         message: "NOWPayments subscriptions are managed via email. Please check your inbox for payment links and subscription details.",
@@ -433,7 +433,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         logger.debug("Webhook already processed, skipping", {
           eventId: event.id,
         });
-        return createSuccessResponse({ received: true });
+        return success({ received: true });
       }
 
       // Record webhook event
@@ -483,7 +483,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         .set({ processed: true, processedAt: new Date() })
         .where(eq(paymentWebhooks.providerEventId, event.id));
 
-      return createSuccessResponse({ received: true });
+      return success({ received: true });
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("payment.webhook.error.processingFailed", {
@@ -692,8 +692,13 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         subscriptionId: data.id,
       });
 
-      const { subscriptionRepository } = await import("../subscription/repository");
-      await subscriptionRepository.handleSubscriptionUpdated(data, logger);
+      const { subscriptionRepository } = await import(
+        "../subscription/repository"
+      );
+      await subscriptionRepository.handleSubscriptionUpdated(
+        data as unknown as Stripe.Subscription,
+        logger,
+      );
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {
         logger.error("Failed to process subscription updated", {

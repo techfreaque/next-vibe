@@ -9,7 +9,7 @@ import { render } from "@react-email/render";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -203,7 +203,7 @@ class TestEmailRepository {
           sentAt: sentAt.toISOString(),
         });
 
-        return createSuccessResponse({
+        return success({
           result: {
             success: true,
             messageId,

@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   createErrorResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -173,7 +173,7 @@ export class SubscriptionCheckoutRepositoryImpl
         userId: user.id,
       });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         sessionId: session.data.sessionId,
         checkoutUrl: session.data.checkoutUrl,

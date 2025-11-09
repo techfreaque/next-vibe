@@ -6,7 +6,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -206,7 +206,7 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
 
       const sessionData = session.data;
 
-      return createSuccessResponse({
+      return success({
         checkoutUrl: sessionData.checkoutUrl,
         sessionId: sessionData.sessionId,
         totalAmount,

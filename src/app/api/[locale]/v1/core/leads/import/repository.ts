@@ -12,7 +12,7 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -348,7 +348,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
 
       if (existingLead.length > 0) {
         if (config.skipDuplicates) {
-          return createSuccessResponse({
+          return success({
             created: false,
             updated: false,
             duplicate: true,
@@ -394,13 +394,13 @@ export class LeadsImportRepository implements ILeadsImportRepository {
             email: data.email,
           });
 
-          return createSuccessResponse({
+          return success({
             created: false,
             updated: true,
             duplicate: false,
           });
         } else {
-          return createSuccessResponse({
+          return success({
             created: false,
             updated: false,
             duplicate: true,
@@ -429,7 +429,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
         email: data.email,
       });
 
-      return createSuccessResponse({
+      return success({
         created: true,
         updated: false,
         duplicate: false,
@@ -507,7 +507,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
 
       // Map the generic result to the leads-specific response format
       if (result.success) {
-        return createSuccessResponse({
+        return success({
           batchId: result.data.batchId,
           totalRows: result.data.totalRows,
           successfulImports: result.data.successfulImports,
@@ -558,7 +558,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
     }
 
     // Transform the response to match the expected format
-    return createSuccessResponse({
+    return success({
       jobs: {
         items: response.data.jobs.map((job) => ({
           id: job.id,
@@ -635,7 +635,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
       return response;
     }
 
-    return createSuccessResponse({
+    return success({
       job: {
         info: {
           id: response.data.id,
@@ -691,7 +691,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
       return response;
     }
 
-    return createSuccessResponse({
+    return success({
       result: response.data,
     });
   }

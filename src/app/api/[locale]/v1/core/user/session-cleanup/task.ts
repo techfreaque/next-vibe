@@ -7,7 +7,7 @@ import "server-only";
 
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
@@ -164,5 +164,5 @@ export const validate = async (
  */
 export function rollback(): ResponseType<boolean> {
   // This task only deletes expired data, so rollback is not applicable
-  return createSuccessResponse(true);
+  return success(true);
 }

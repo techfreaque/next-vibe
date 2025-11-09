@@ -10,7 +10,7 @@ import { join } from "node:path";
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -94,7 +94,7 @@ class RouteHandlersGeneratorRepositoryImpl
         `Generated route handlers file with ${routeFiles.length} routes in ${duration}ms`,
       );
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message:
           "app.api.v1.core.system.generators.endpoints.success.generated",

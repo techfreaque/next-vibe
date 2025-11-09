@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -82,7 +82,7 @@ export async function readSessionFile(
       expiresAt: sessionData.expiresAt,
     });
 
-    return createSuccessResponse(sessionData);
+    return success(sessionData);
   } catch (error) {
     const parsedError = parseError(error);
 
@@ -142,7 +142,7 @@ export async function writeSessionFile(
       userId: sessionData.userId,
     });
 
-    return createSuccessResponse(undefined);
+    return success(undefined);
   } catch (error) {
     const parsedError = parseError(error);
     logger.error("Error writing session file", parsedError);
@@ -167,7 +167,7 @@ export async function deleteSessionFile(
     await fs.unlink(sessionPath);
 
     logger.debug("Session file deleted successfully", { path: sessionPath });
-    return createSuccessResponse(undefined);
+    return success(undefined);
   } catch (error) {
     const parsedError = parseError(error);
 
@@ -177,7 +177,7 @@ export async function deleteSessionFile(
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.NO_SUCH_FILE);
     if (isFileNotFoundError) {
       logger.debug("Session file not found - already logged out");
-      return createSuccessResponse(undefined);
+      return success(undefined);
     }
 
     logger.error("Error deleting session file", parsedError);

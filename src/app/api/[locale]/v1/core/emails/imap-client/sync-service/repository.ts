@@ -12,7 +12,7 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -221,11 +221,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       }
 
       const duration = Date.now() - startTime;
-      const success = errors.length === 0;
+      const isSuccessful = errors.length === 0;
 
       const result: SyncResult = {
-        success,
-        message: success
+        success: isSuccessful,
+        message: isSuccessful
           ? "app.api.v1.core.emails.imapClient.imap.sync.messages.accounts.success"
           : "app.api.v1.core.emails.imapClient.imap.sync.messages.accounts.successWithErrors",
         results: {
@@ -244,15 +244,14 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       };
 
       logger.debug("Completed sync for all accounts");
-      return createSuccessResponse({ result });
+      return success({ result });
     } catch (error) {
       logger.error("Error in syncAllAccounts", parseError(error));
 
       return fail({
-          message: 
-        "app.api.v1.core.emails.imapClient.imapErrors.sync.failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-      );
+        message: "app.api.v1.core.emails.imapClient.imapErrors.sync.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -288,10 +287,10 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       );
       if (!connectionResult.success) {
         return fail({
-          message: 
-          "app.api.v1.core.emails.imapClient.imapErrors.connection.test.failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-        );
+          message:
+            "app.api.v1.core.emails.imapClient.imapErrors.connection.test.failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       // Sync folders
@@ -365,11 +364,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       }
 
       const duration = Date.now() - startTime;
-      const success = errors.length === 0;
+      const isSuccessful = errors.length === 0;
 
       const result: SyncResult = {
-        success,
-        message: success
+        success: isSuccessful,
+        message: isSuccessful
           ? "app.api.v1.core.emails.imapClient.imap.sync.messages.account.success"
           : "app.api.v1.core.emails.imapClient.imap.sync.messages.account.successWithErrors",
         results: {
@@ -388,7 +387,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       };
 
       logger.debug(`Completed sync for account: ${data.account.email}`);
-      return createSuccessResponse({ result });
+      return success({ result });
     } catch (error) {
       logger.error(
         `Error syncing account ${data.account.email}`,
@@ -396,10 +395,10 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       );
 
       return fail({
-          message: 
-        "app.api.v1.core.emails.imapClient.imapErrors.sync.account.failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-      );
+        message:
+          "app.api.v1.core.emails.imapClient.imapErrors.sync.account.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -431,10 +430,10 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
 
       if (!remoteFoldersResult.success) {
         return fail({
-          message: 
-          "app.api.v1.core.emails.imapClient.imapErrors.connection.folders.list.failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-        );
+          message:
+            "app.api.v1.core.emails.imapClient.imapErrors.connection.folders.list.failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       const remoteFolders = remoteFoldersResult.data.folders;
@@ -517,11 +516,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       }
 
       const duration = Date.now() - startTime;
-      const success = errors.length === 0;
+      const isSuccessful = errors.length === 0;
 
       const result: SyncResult = {
-        success,
-        message: success
+        success: isSuccessful,
+        message: isSuccessful
           ? "app.api.v1.core.emails.imapClient.imap.sync.messages.folders.success"
           : "app.api.v1.core.emails.imapClient.imap.sync.messages.folders.successWithErrors",
         results: {
@@ -540,7 +539,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       };
 
       logger.debug(`Completed folder sync for account: ${data.account.email}`);
-      return createSuccessResponse({ result });
+      return success({ result });
     } catch (error) {
       logger.error(
         `Error syncing folders for account ${data.account.email}`,
@@ -548,10 +547,10 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       );
 
       return fail({
-          message: 
-        "app.api.v1.core.emails.imapClient.imapErrors.sync.folder.failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-      );
+        message:
+          "app.api.v1.core.emails.imapClient.imapErrors.sync.folder.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -587,10 +586,10 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
         );
       if (!remoteMessagesResponse.success) {
         return fail({
-          message: 
-          "app.api.v1.core.emails.imapClient.imapErrors.connection.messages.list.failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-        );
+          message:
+            "app.api.v1.core.emails.imapClient.imapErrors.connection.messages.list.failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
       const remoteMessages = remoteMessagesResponse.data.messages;
 
@@ -673,11 +672,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       }
 
       const duration = Date.now() - startTime;
-      const success = errors.length === 0;
+      const isSuccessful = errors.length === 0;
 
       const result: SyncResult = {
-        success,
-        message: success
+        success: isSuccessful,
+        message: isSuccessful
           ? "app.api.v1.core.emails.imapClient.imap.sync.messages.messages.success"
           : "app.api.v1.core.emails.imapClient.imap.sync.messages.messages.successWithErrors",
         results: {
@@ -696,7 +695,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       };
 
       logger.debug(`Completed message sync for folder: ${data.folder.name}`);
-      return createSuccessResponse({ result });
+      return success({ result });
     } catch (error) {
       logger.error(
         `Error syncing messages for folder ${data.folder.name}`,
@@ -704,10 +703,10 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       );
 
       return fail({
-          message: 
-        "app.api.v1.core.emails.imapClient.imapErrors.sync.message.failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-      );
+        message:
+          "app.api.v1.core.emails.imapClient.imapErrors.sync.message.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }

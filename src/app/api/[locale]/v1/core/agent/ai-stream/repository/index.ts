@@ -587,10 +587,10 @@ class AiStreamRepository implements IAiStreamRepository {
     currentAssistantMessageId: string;
     currentAssistantContent: string;
     isInReasoningBlock: boolean;
-    streamResult: Pick<
-      ReturnType<typeof streamText>,
-      "finishReason" | "usage"
-    >;
+    streamResult: {
+      finishReason: Awaited<ReturnType<typeof streamText>["finishReason"]>;
+      usage: Awaited<ReturnType<typeof streamText>["usage"]>;
+    };
     isIncognito: boolean;
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;

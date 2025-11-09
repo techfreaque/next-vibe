@@ -11,7 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
-import { createSuccessResponse } from "../../../shared/types/response.schema";
+import { success } from "../../../shared/types/response.schema";
 import { parseError } from "../../../shared/utils/parse-error";
 import type { LintRequestOutput, LintResponseOutput } from "./definition";
 
@@ -147,7 +147,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       logger.debug(`Found ${filesToLint.length} files to lint`);
 
       if (filesToLint.length === 0) {
-        return createSuccessResponse({
+        return success({
           success: true,
           issues: [],
           duration: Date.now() - startTime,
@@ -190,7 +190,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         success: mergedResult.success,
       });
 
-      return createSuccessResponse(mergedResult);
+      return success(mergedResult);
     } catch (error) {
       const duration = Date.now() - startTime;
       const errorMessage = parseError(error).message;
@@ -207,7 +207,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
 
       const errorSummary = this.generateSummary(errorIssues);
 
-      return createSuccessResponse({
+      return success({
         success: false,
         issues: errorIssues,
         duration,

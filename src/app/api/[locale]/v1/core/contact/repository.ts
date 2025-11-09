@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -108,7 +108,7 @@ export class contactRepository {
         leadId,
       });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         messageId: contact.id,
         status: [ContactStatus.NEW],
@@ -171,7 +171,7 @@ export class contactRepository {
         });
       }
 
-      return createSuccessResponse({
+      return success({
         success: true,
         messageId: contact.id,
         status: [data.status || ContactStatus.NEW],

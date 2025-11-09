@@ -13,7 +13,7 @@ import path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -69,7 +69,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
       const status = await this.checkInstallationStatus();
 
       if (!status.installed) {
-        return createSuccessResponse({
+        return success({
           success: true,
           installed: false,
           message: t(
@@ -88,7 +88,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
       // Verify uninstallation
       const newStatus = await this.checkInstallationStatus();
 
-      return createSuccessResponse({
+      return success({
         success: !newStatus.installed,
         installed: newStatus.installed,
         message: !newStatus.installed

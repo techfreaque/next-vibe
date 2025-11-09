@@ -11,7 +11,7 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -232,7 +232,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
       );
     }
 
-    return createSuccessResponse({ success: true });
+    return success({ success: true });
   }
 }
 

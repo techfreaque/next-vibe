@@ -9,7 +9,7 @@ import Imap from "imap";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -289,7 +289,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             });
 
             resolveOnce(
-              createSuccessResponse({
+              success({
                 success: true,
                 message:
                   "app.api.v1.core.emails.imapClient.imap.connection.test.success" as const,
@@ -387,7 +387,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
           existingConnection.state === "authenticated"
         ) {
           logger.debug("Reusing existing IMAP connection",  { connectionKey });
-          return createSuccessResponse(existingConnection);
+          return success(existingConnection);
         }
       }
 
@@ -425,7 +425,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
               connectionKey,
             });
 
-            resolve(createSuccessResponse(connection));
+            resolve(success(connection));
           });
 
           imap.once("error", (err: Error) => {
@@ -478,7 +478,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
         setTimeout(() => resolve(), 100);
       });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message:
           "app.api.v1.core.emails.imapClient.imap.connection.test.success",
@@ -575,7 +575,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
         imap.connect();
       });
 
-      return createSuccessResponse({ folders });
+      return success({ folders });
     } catch (error) {
       logger.error("Error listing IMAP folders", parseError(error));
       return fail({
@@ -734,7 +734,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
         },
       );
 
-      return createSuccessResponse({ messages });
+      return success({ messages });
     } catch (error) {
       logger.error("Error listing IMAP messages", parseError(error));
       return fail({
@@ -827,7 +827,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
       logger.debug("All IMAP connections closed");
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message:
           "app.api.v1.core.emails.imapClient.imap.connection.test.success",

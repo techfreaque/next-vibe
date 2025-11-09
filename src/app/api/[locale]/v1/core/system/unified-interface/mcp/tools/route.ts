@@ -1,4 +1,4 @@
-import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
@@ -17,7 +17,7 @@ export const { GET, tools } = endpointsHandler({
         logger,
         locale,
       );
-      return createSuccessResponse(toolsData);
+      return success(toolsData);
     },
   },
 });

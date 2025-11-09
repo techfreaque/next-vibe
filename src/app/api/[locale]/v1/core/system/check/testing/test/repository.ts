@@ -9,7 +9,7 @@
 import type { ResponseType as ApiResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -99,7 +99,7 @@ class TestRepositoryImpl implements TestRepositoryInterface {
       };
 
       logger.info("system.check.testing.test.execute.success", { duration });
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       const duration = Date.now() - startTime;
       const parsedError = parseError(error);

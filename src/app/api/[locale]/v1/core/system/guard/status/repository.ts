@@ -9,7 +9,7 @@ import * as path from "node:path";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -105,7 +105,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
       activeGuards: mockGuard.isRunning ? 1 : 0,
     };
 
-    return createSuccessResponse(response);
+    return success(response);
   }
 
   private getStatusByProject(
@@ -126,7 +126,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
         activeGuards: 0,
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     }
 
     // Mock guard data based on project
@@ -154,7 +154,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
       activeGuards: 0,
     };
 
-    return createSuccessResponse(response);
+    return success(response);
   }
 
   private getAllGuardStatus(
@@ -188,7 +188,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
       activeGuards: activeCount,
     };
 
-    return createSuccessResponse(response);
+    return success(response);
   }
 }
 

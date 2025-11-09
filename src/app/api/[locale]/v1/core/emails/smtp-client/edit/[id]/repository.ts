@@ -9,7 +9,7 @@ import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -122,7 +122,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
         userId: user.id,
       });
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       logger.error("Error getting SMTP account", parseError(error));
       return createErrorResponse(
@@ -244,7 +244,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
         userId: user.id,
       });
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       logger.error("Error updating SMTP account", parseError(error));
 

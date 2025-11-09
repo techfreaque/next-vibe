@@ -89,7 +89,7 @@ export function throwErrorResponse(
  * @param data - The response data
  * @returns A standardized success response
  */
-export function createSuccessResponse<TResponse>(
+export function success<TResponse>(
   data: TResponse,
 ): ResponseType<TResponse> {
   return {

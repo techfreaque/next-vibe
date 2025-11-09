@@ -11,7 +11,7 @@ import { migrate as drizzleMigrate } from "drizzle-orm/node-postgres/migrator";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -85,7 +85,7 @@ export class DatabaseMigrateSyncRepositoryImpl
           "app.api.v1.core.system.db.migrateSync.messages.dryRunComplete",
         );
 
-        return createSuccessResponse({
+        return success({
           success: true,
           output,
           trackingCleared: false,
@@ -124,7 +124,7 @@ export class DatabaseMigrateSyncRepositoryImpl
         migrationsProcessed: migrationFiles.length,
       });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         output,
         trackingCleared,

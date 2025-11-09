@@ -162,7 +162,7 @@ vibe dev
 
    ```typescript
    // ✅ GOOD
-   return createSuccessResponse({ userId: "123" });
+   return success({ userId: "123" });
 
    // ❌ BAD
    return { userId: "123" };  // Not type-safe

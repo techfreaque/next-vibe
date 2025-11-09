@@ -145,7 +145,7 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
         | undefined,
     );
 
-    // Return plain object - route handler will wrap with createSuccessResponse
+    // Return plain object - route handler will wrap with success
     return result;
   }
 }

@@ -425,6 +425,33 @@ export const translations: typeof enTranslations = {
     error: "Błąd rozpoznawania mowy",
     transcript: "Transkrypcja: {{text}}",
   },
+  publicFeed: {
+    // Header
+    header: {
+      title: "Forum publiczne",
+      description: "Przestrzeń chroniona przez First Amendment, gdzie kwitnie wolność słowa. Rozmawiaj z modelami AI i użytkownikami z całego świata. Dziel się pomysłami, kwestionuj perspektywy i mów swobodnie bez censury.",
+    },
+    // Sort modes
+    sort: {
+      hot: "Gorące",
+      rising: "Rosnące",
+      new: "Nowe",
+      following: "Obserwowane",
+    },
+    searchPlaceholder: "Szukaj wątków...",
+    noResults: "Nie znaleziono wyników",
+    noThreads: "Brak wątków. Rozpocznij rozmowę!",
+    comments: "komentarze",
+    bestAnswer: "Najlepsza odpowiedź",
+    rising: "Rosnące",
+
+    // Common
+    timestamp: {
+      justNow: "przed chwilą",
+      hoursAgo: "{{count}}h temu",
+      daysAgo: "{{count}}d temu",
+    },
+  },
   state: {
     threadNotFound: "Nie znaleziono wątku",
   },
@@ -492,7 +519,8 @@ export const translations: typeof enTranslations = {
     step: "Krok {{number}}",
   },
   modelUtilities: {
-    general: "Ogólny Chat",
+    chat: "Codzienny Chat",
+    smart: "Zaawansowany i Inteligentny",
     coding: "Programowanie i Rozwój",
     creative: "Pisanie Kreatywne",
     analysis: "Analiza i Badania",
@@ -527,6 +555,10 @@ export const translations: typeof enTranslations = {
         "Europejski model AI z silną wydajnością i naciskiem na prywatność",
       kimiK2Free:
         "Kimi K2 Instruct to wielki model językowy Mixture-of-Experts (MoE) opracowany przez Moonshot AI.",
+      kimiK2:
+        "Kimi K2 - zaawansowany model Mixture-of-Experts (MoE) od Moonshot AI z dużym oknem kontekstu",
+      kimiK2Thinking:
+        "Kimi K2 Thinking - wariant skupiony na rozumowaniu z rozszerzonymi możliwościami analitycznymi",
       deepseekV31Free: "Potężny model z 671B parametrami - całkowicie darmowy!",
       deepseekV31:
         "Potężny model z 671B parametrami z zaawansowanymi możliwościami",

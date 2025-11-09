@@ -12,7 +12,7 @@ import {
 } from "@react-email/components";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
@@ -229,7 +229,7 @@ export const renderCompanyMail: EmailFunctionType<
   never
 > = ({ requestData, locale, t }) => {
   try {
-    return createSuccessResponse({
+    return success({
       toEmail: contactClientRepository.getSupportEmail(locale),
       toName: t("config.appName"),
       subject: t("app.api.v1.core.contact.email.partner.subject", {
@@ -263,7 +263,7 @@ export const renderPartnerMail: EmailFunctionType<
   never
 > = ({ requestData, locale, t, user }) => {
   try {
-    return createSuccessResponse({
+    return success({
       toEmail: requestData.email,
       toName: requestData.name,
       subject: t("app.api.v1.core.contact.email.partner.subject", {

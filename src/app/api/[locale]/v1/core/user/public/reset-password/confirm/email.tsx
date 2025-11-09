@@ -2,7 +2,7 @@ import { Section, Text } from "@react-email/components";
 import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type React from "react";
@@ -166,7 +166,7 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
   }
   const user = userResponse.data;
   const appName = t("config.appName");
-  return createSuccessResponse({
+  return success({
     toEmail: requestData.verification.email,
     toName: user.publicName,
     subject: t(

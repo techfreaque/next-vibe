@@ -17,7 +17,7 @@ import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   throwErrorResponse,
 } from "next-vibe/shared/types/response.schema";
@@ -177,7 +177,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
       );
 
       logger.debug("Auth token stored successfully");
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error("Error storing auth token", parseError(error));
       return createErrorResponse(
@@ -196,7 +196,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
       await storage.removeItem(AUTH_EXPIRES_AT_STORAGE_KEY);
 
       logger.debug("Auth token cleared successfully");
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error("Error clearing auth token", parseError(error));
       return createErrorResponse(

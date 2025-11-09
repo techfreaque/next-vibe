@@ -3,7 +3,7 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -143,7 +143,7 @@ export const pathRepository = {
         pathLength: path.length,
       });
 
-      return createSuccessResponse({
+      return success({
         messages: path.map((msg) => ({
           id: msg.id,
           threadId: msg.threadId,

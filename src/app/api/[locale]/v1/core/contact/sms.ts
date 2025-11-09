@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -63,7 +63,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         logger.debug("app.api.v1.core.contact.sms.admin.phone.missing", {
           contactEmail: contactData.email,
         });
-        return createSuccessResponse({
+        return success({
           messageId: "",
           sent: false,
         });
@@ -99,7 +99,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         );
       }
 
-      return createSuccessResponse({
+      return success({
         messageId: smsResult.data.result.messageId,
         sent: true,
       });
@@ -134,7 +134,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
           contactEmail: contactData.email,
           userId: user?.id,
         });
-        return createSuccessResponse({
+        return success({
           messageId: "",
           sent: false,
         });
@@ -166,7 +166,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         );
       }
 
-      return createSuccessResponse({
+      return success({
         messageId: smsResult.data.result.messageId,
         sent: true,
       });

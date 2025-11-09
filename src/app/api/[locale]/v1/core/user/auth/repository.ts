@@ -15,7 +15,7 @@ import {
 } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
   throwErrorResponse,
@@ -735,7 +735,7 @@ class AuthRepositoryImpl implements AuthRepository {
       logger.debug("app.api.v1.core.user.auth.debug.jwtSignedSuccessfully", {
         userId: payload.id,
       });
-      return createSuccessResponse(token);
+      return success(token);
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorSigningJwt",
@@ -786,7 +786,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       logger.debug("app.api.v1.core.user.auth.debug.jwtVerifiedSuccessfully");
 
-      return createSuccessResponse({
+      return success({
         isPublic: false,
         id: payload.id,
         leadId: payload.leadId,
@@ -869,7 +869,7 @@ class AuthRepositoryImpl implements AuthRepository {
         });
       }
 
-      return createSuccessResponse(jwtPayload);
+      return success(jwtPayload);
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorInUnifiedGetCurrentUser",

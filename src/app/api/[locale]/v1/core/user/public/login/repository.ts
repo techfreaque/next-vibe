@@ -10,9 +10,9 @@ import type { NextRequest } from "next/server";
 import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { verifyPassword } from "next-vibe/shared/utils/password";
@@ -157,10 +157,10 @@ export class LoginRepositoryImpl implements LoginRepository {
           ipAddress: ipAddress,
         });
 
-        return createErrorResponse(
-          "app.api.v1.core.user.public.login.errors.account_locked",
-          ErrorResponseTypes.FORBIDDEN,
-        );
+        return fail({
+          message: "app.api.v1.core.user.public.login.errors.account_locked",
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       // Find user by email
@@ -183,10 +183,11 @@ export class LoginRepositoryImpl implements LoginRepository {
           ipAddress: ipAddress,
         });
 
-        return createErrorResponse(
-          "app.api.v1.core.user.public.login.errors.invalid_credentials",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
+        return fail({
+          message: "app.api.v1.core.user.public.login.errors.invalid_credentials",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+          cause: userResponse,
+        });
       }
 
       const currentPassword = await db
@@ -208,10 +209,10 @@ export class LoginRepositoryImpl implements LoginRepository {
           ipAddress: ipAddress,
         });
 
-        return createErrorResponse(
-          "app.api.v1.core.user.public.login.errors.invalid_credentials",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
+        return fail({
+          message: "app.api.v1.core.user.public.login.errors.invalid_credentials",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
       }
 
       // Check if two-factor auth is required (if implemented)
@@ -219,10 +220,10 @@ export class LoginRepositoryImpl implements LoginRepository {
         logger.debug("Login requires 2FA", { email });
         // Here you would implement 2FA flow
         // This is a placeholder for the actual implementation
-        return createErrorResponse(
-          "app.api.v1.core.user.public.login.errors.two_factor_required",
-          ErrorResponseTypes.TWO_FACTOR_REQUIRED,
-        );
+        return fail({
+          message: "app.api.v1.core.user.public.login.errors.two_factor_required",
+          errorType: ErrorResponseTypes.TWO_FACTOR_REQUIRED,
+        });
       }
 
       // Track successful login attempt
@@ -262,14 +263,14 @@ export class LoginRepositoryImpl implements LoginRepository {
 
       return sessionResponse;
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.user.public.login.errors.auth_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.user.public.login.errors.auth_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           email,
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 
@@ -362,11 +363,12 @@ export class LoginRepositoryImpl implements LoginRepository {
         logger,
       );
       if (!userResponse.success) {
-        return createErrorResponse(
-          "app.api.v1.core.user.public.login.errors.user_not_found",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId },
-        );
+        return fail({
+          message: "app.api.v1.core.user.public.login.errors.user_not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: { userId },
+          cause: userResponse,
+        });
       }
 
       // Get leadId from cookie (the one the user had before logging in)
@@ -466,7 +468,7 @@ export class LoginRepositoryImpl implements LoginRepository {
 
       // Return session data
       logger.debug("Login response data", { responseData });
-      const finalResponse = createSuccessResponse(responseData);
+      const finalResponse = success(responseData);
       logger.debug("Login final response");
       return finalResponse;
     } catch (error) {
@@ -474,14 +476,14 @@ export class LoginRepositoryImpl implements LoginRepository {
         userId,
         error: parseError(error).message,
       });
-      return createErrorResponse(
-        "app.api.v1.core.user.public.login.errors.session_creation_failed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.user.public.login.errors.session_creation_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           userId,
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 
@@ -533,11 +535,12 @@ export class LoginRepositoryImpl implements LoginRepository {
           logger,
         );
         if (!user.success) {
-          return createErrorResponse(
-            "app.api.v1.core.user.public.login.errors.user_not_found",
-            ErrorResponseTypes.NOT_FOUND,
-            { userId: email },
-          );
+          return fail({
+            message: "app.api.v1.core.user.public.login.errors.user_not_found",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+            messageParams: { userId: email },
+            cause: user,
+          });
         }
         // Apply user-specific settings if they exist
         options.requireTwoFactor = user.data.requireTwoFactor === true;
@@ -550,16 +553,16 @@ export class LoginRepositoryImpl implements LoginRepository {
         }
       }
 
-      return createSuccessResponse(options);
+      return success(options);
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.user.public.login.errors.auth_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+        message: "app.api.v1.core.user.public.login.errors.auth_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           email: email || "unknown",
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 

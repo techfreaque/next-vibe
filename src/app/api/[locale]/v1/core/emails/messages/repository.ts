@@ -9,7 +9,7 @@ import { and, count, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -249,7 +249,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
         },
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       logger.error("Error fetching emails", parseError(error));
       return createErrorResponse(
@@ -315,7 +315,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
         updatedAt: emailResult.updatedAt.toISOString(),
       };
 
-      return createSuccessResponse({ email });
+      return success({ email });
     } catch (error) {
       logger.error("Error fetching email by ID", parseError(error));
       return createErrorResponse(
@@ -351,7 +351,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
         );
       }
 
-      return createSuccessResponse({ id: result.id });
+      return success({ id: result.id });
     } catch (error) {
       logger.error("Error creating email record", parseError(error));
       return createErrorResponse(

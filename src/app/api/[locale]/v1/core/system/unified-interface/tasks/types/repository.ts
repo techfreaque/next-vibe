@@ -14,7 +14,7 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -459,7 +459,7 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
       const totalTypes = Object.keys(types).length;
       const timestamp = new Date().toISOString();
 
-      return createSuccessResponse({
+      return success({
         success: true,
         types,
         metadata: {
@@ -503,7 +503,7 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
       });
 
       logger.debug("Successfully validated all task types");
-      return createSuccessResponse(true);
+      return success(true);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to validate task types", {
@@ -572,7 +572,7 @@ export interface TaskStatus { /* ... */ }`;
       }
 
       logger.debug("Successfully exported task types", { format });
-      return createSuccessResponse(exportedTypes);
+      return success(exportedTypes);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to export task types", {

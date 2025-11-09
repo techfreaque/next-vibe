@@ -430,7 +430,7 @@ const { POST } = createEndpoint({
         content: "Can you try that again with more detail?",
         role: ChatMessageRole.USER,
         model: ModelId.CLAUDE_SONNET_4_5,
-        persona: null,
+        persona: "default",
         temperature: 0.7,
         maxTokens: 1200,
       },

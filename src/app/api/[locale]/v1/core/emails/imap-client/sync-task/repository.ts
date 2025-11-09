@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -99,7 +99,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
         };
 
         logger.info("tasks.imap_sync.completed", result.summary);
-        return createSuccessResponse({ result });
+        return success({ result });
       } else {
         logger.error("tasks.imap_sync.failed", {
           error: syncResult.message,
@@ -138,7 +138,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
       // Basic validation - check if IMAP sync service is available
       // For now, we'll just return true since we don't have a health check method
       // In a real implementation, this would check service availability
-      return createSuccessResponse({ isValid: true });
+      return success({ isValid: true });
     } catch (error) {
       logger.error(
         "IMAP sync validation failed",

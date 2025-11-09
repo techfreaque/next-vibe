@@ -7,7 +7,7 @@
 import { count, desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
@@ -106,7 +106,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         .orderBy(desc(pulseHealth.updatedAt))
         .limit(1);
 
-      return createSuccessResponse<PulseHealth | null>((health[0] as PulseHealth) || null);
+      return success<PulseHealth | null>((health[0] as PulseHealth) || null);
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
@@ -136,7 +136,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         .where(eq(pulseHealth.id, currentHealthResponse.data.id))
         .returning();
 
-      return createSuccessResponse<PulseHealth>(updatedHealth as PulseHealth);
+      return success<PulseHealth>(updatedHealth as PulseHealth);
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
@@ -154,7 +154,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         .insert(pulseHealth)
         .values(health)
         .returning();
-      return createSuccessResponse<PulseHealth>(newHealth as PulseHealth);
+      return success<PulseHealth>(newHealth as PulseHealth);
     } catch (error) {
       logger.error("Failed to create health record", parseError(error));
       return fail({
@@ -174,7 +174,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         .insert(pulseExecutions)
         .values(execution)
         .returning();
-      return createSuccessResponse(newExecution as PulseExecution);
+      return success(newExecution as PulseExecution);
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
@@ -203,7 +203,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         });
       }
 
-      return createSuccessResponse(updatedExecution as PulseExecution);
+      return success(updatedExecution as PulseExecution);
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
@@ -223,7 +223,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         .orderBy(desc(pulseExecutions.startedAt))
         .limit(limit);
 
-      return createSuccessResponse(executions as PulseExecution[]);
+      return success(executions as PulseExecution[]);
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
@@ -244,7 +244,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         .where(eq(pulseExecutions.id, id))
         .limit(1);
 
-      return createSuccessResponse((execution[0] as PulseExecution) || null);
+      return success((execution[0] as PulseExecution) || null);
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
@@ -263,7 +263,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         .insert(pulseNotifications)
         .values(notification)
         .returning();
-      return createSuccessResponse(newNotification as PulseNotification);
+      return success(newNotification as PulseNotification);
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
@@ -283,7 +283,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         .where(eq(pulseNotifications.sent, false))
         .orderBy(pulseNotifications.createdAt);
 
-      return createSuccessResponse(notifications as PulseNotification[]);
+      return success(notifications as PulseNotification[]);
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
@@ -311,7 +311,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         });
       }
 
-      return createSuccessResponse(updatedNotification as PulseNotification);
+      return success(updatedNotification as PulseNotification);
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
@@ -349,7 +349,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         })
         .from(pulseExecutions);
 
-      return createSuccessResponse({
+      return success({
         currentStatus: currentHealth?.status || "UNKNOWN",
         totalExecutions: execStats.totalExecutions,
         successRate: currentHealth?.successRate || 0,
@@ -425,7 +425,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         isDryRun: options.dryRun || false,
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
@@ -492,7 +492,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         );
       }
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
@@ -553,7 +553,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         updatedAt: health.updatedAt.toISOString(),
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,

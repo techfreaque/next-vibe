@@ -12,7 +12,7 @@ import { jwtVerify, SignJWT } from "jose";
 import { RESET_TOKEN_EXPIRY } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -150,7 +150,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
           ),
         );
 
-      return createSuccessResponse(results.length > 0 ? results[0] : null);
+      return success(results.length > 0 ? results[0] : null);
     } catch (error) {
       logger.error("Error finding valid reset token", {
         error: parseError(error),
@@ -177,7 +177,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         .from(passwordResets)
         .where(eq(passwordResets.userId, userId));
 
-      return createSuccessResponse(results.length > 0 ? results[0] : null);
+      return success(results.length > 0 ? results[0] : null);
     } catch (error) {
       logger.error("Error finding reset by user ID", {
         error: parseError(error),
@@ -200,7 +200,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
   ): Promise<ResponseType<null>> {
     try {
       await db.delete(passwordResets).where(eq(passwordResets.token, token));
-      return createSuccessResponse(null);
+      return success(null);
     } catch (error) {
       logger.error("Error deleting reset token", {
         error: parseError(error),
@@ -223,7 +223,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
   ): Promise<ResponseType<null>> {
     try {
       await db.delete(passwordResets).where(eq(passwordResets.userId, userId));
-      return createSuccessResponse(null);
+      return success(null);
     } catch (error) {
       logger.error("Error deleting reset by user ID", {
         error: parseError(error),
@@ -251,7 +251,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
             lt(passwordResets.expiresAt, now),
           ),
         );
-      return createSuccessResponse(null);
+      return success(null);
     } catch (error) {
       logger.error("Error deleting expired reset tokens", {
         error: parseError(error),
@@ -322,7 +322,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         }
       }
 
-      return createSuccessResponse(token);
+      return success(token);
     } catch (error) {
       logger.error("Error generating JWT token", {
         error: parseError(error),
@@ -382,7 +382,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
       });
         }
 
-        return createSuccessResponse({
+        return success({
           email: payload.email,
           userId: payload.userId,
         });
@@ -466,7 +466,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
       });
       }
 
-      return createSuccessResponse(passwordResetResponse.data.userId);
+      return success(passwordResetResponse.data.userId);
     } catch (error) {
       logger.error("Error verifying password reset token", {
         error: parseError(error),
@@ -516,7 +516,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
       // Delete the used token
       await this.deleteByToken(token, logger);
 
-      return createSuccessResponse(null);
+      return success(null);
     } catch (error) {
       logger.error("Error resetting password with token", {
         error: parseError(error),
@@ -546,7 +546,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
 
       // We don't want to reveal if the email exists or not for security reasons
       // So we always return a success message
-      return createSuccessResponse(
+      return success(
         "app.api.v1.core.user.auth.resetPassword.emailSent",
       );
     } catch (error) {
@@ -628,7 +628,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         userId: resetPayload.userId,
         email,
       });
-      return createSuccessResponse(
+      return success(
         "app.api.v1.core.user.auth.resetPassword.success",
       );
     } catch (error) {

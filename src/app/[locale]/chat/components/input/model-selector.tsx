@@ -6,7 +6,8 @@ import React, { useMemo } from "react";
 import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import { MODEL_UTILITIES } from "@/app/api/[locale]/v1/core/agent/chat/model-access/model-utilities";
 import {
-  ModelId,
+DEFAULT_FAVORITES,
+  type ModelId,
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
@@ -22,30 +23,23 @@ interface ModelSelectorProps {
   onChange: (value: ModelId) => void;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  className?: string;
+  buttonClassName?: string;
+  triggerSize?: "default" | "sm" | "lg" | "icon";
+  showTextAt?: "always" | "sm" | "md" | "lg" | "never";
 }
 
 const STORAGE_KEY = "chat-favorite-models";
-
-const DEFAULT_FAVORITES: ModelId[] = [
-  ModelId.UNCENSORED_LM_V1_1,
-  ModelId.GPT_5_NANO,
-  ModelId.GPT_5_MINI,
-  ModelId.GPT_5,
-  ModelId.GPT_5_CODEX,
-  ModelId.GPT_OSS_120B,
-  ModelId.CLAUDE_HAIKU_4_5,
-  ModelId.CLAUDE_SONNET_4_5,
-  ModelId.GROK_4_FAST,
-  ModelId.GROK_4,
-  ModelId.DEEPSEEK_V31,
-  ModelId.GEMINI_FLASH_2_5_LITE,
-];
 
 export function ModelSelector({
   value,
   onChange,
   locale,
   logger,
+  className,
+  buttonClassName,
+  triggerSize,
+  showTextAt,
 }: ModelSelectorProps): JSX.Element {
   const { t } = simpleT(locale);
   const [favorites, toggleFavorite] = useFavorites(
@@ -69,13 +63,19 @@ export function ModelSelector({
                 count: model.creditCost,
               });
 
-      // Build utility icons for this model - pass icon values directly
+      // Build utility data for this model
       const utilityIconsMap: Record<string, IconValue> = {};
+      const utilityOrdersMap: Record<string, number> = {};
+      const utilityTitleKeys: string[] = [];
+
       if (model.utilities) {
         model.utilities.forEach((utilityId) => {
           const utility = MODEL_UTILITIES[utilityId];
           if (utility) {
-            utilityIconsMap[utilityId] = utility.icon;
+            // Use titleKey for grouping (will be translated by t() in UI)
+            utilityTitleKeys.push(utility.titleKey);
+            utilityIconsMap[utility.titleKey] = utility.icon;
+            utilityOrdersMap[utility.titleKey] = utility.order;
           }
         });
       }
@@ -93,8 +93,9 @@ export function ModelSelector({
         icon: model.icon,
         group: provider.name,
         groupIcon: provider.icon,
-        utilities: model.utilities,
+        utilities: utilityTitleKeys,
         utilityIcons: utilityIconsMap,
+        utilityOrders: utilityOrdersMap,
       };
     });
   }, [t]);
@@ -108,6 +109,10 @@ export function ModelSelector({
       onToggleFavorite={toggleFavorite}
       placeholder={t("app.chat.modelSelector.placeholder")}
       locale={locale}
+      className={className}
+      buttonClassName={buttonClassName}
+      triggerSize={triggerSize}
+      showTextAt={showTextAt}
     />
   );
 }

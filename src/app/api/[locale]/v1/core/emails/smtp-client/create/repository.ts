@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -117,7 +117,7 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
         userId: user.isPublic ? "public" : user.id,
       });
 
-      return createSuccessResponse(responseAccount);
+      return success(responseAccount);
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Error creating SMTP account", parseError(error));

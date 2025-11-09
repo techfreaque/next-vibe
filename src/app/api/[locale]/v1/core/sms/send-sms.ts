@@ -3,7 +3,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -266,5 +266,5 @@ export async function batchSendSms(
   }
 
   logger.info("Batch SMS sent successfully", { count: messages.length });
-  return createSuccessResponse({ results });
+  return success({ results });
 }

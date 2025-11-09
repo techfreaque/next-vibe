@@ -8,7 +8,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -59,7 +59,7 @@ export class NewsletterStatusRepositoryImpl
         logger.debug("No subscription found for email", {
           email: data.email,
         });
-        return createSuccessResponse({
+        return success({
           subscribed: false,
           status: NewsletterSubscriptionStatus.UNSUBSCRIBED,
         });
@@ -79,7 +79,7 @@ export class NewsletterStatusRepositoryImpl
         },
       );
 
-      return createSuccessResponse({
+      return success({
         subscribed: isSubscribed,
         status: subscription.status,
       });

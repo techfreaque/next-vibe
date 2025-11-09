@@ -62,25 +62,25 @@ export function SearchToggle({
   return (
     <Div
       className={cn(
-        "inline-flex items-center justify-center gap-2 text-sm min-h-9 h-auto transition-colors",
-        "border border-input rounded-md px-3 py-2",
+        "inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 text-sm h-8 sm:h-9 transition-colors",
+        "border border-input rounded-md px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2",
         enabled && "border-primary/50 bg-primary/5",
         disabled && "opacity-50 cursor-not-allowed",
       )}
       title={titleText}
     >
-      <Search className="h-4 w-4 shrink-0" />
-      <Span className="hidden sm:inline">
+      <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+      <Span className="hidden min-[680px]:inline text-xs">
         {t("app.chat.searchToggle.search")}
       </Span>
       <Switch
         checked={enabled}
         onCheckedChange={handleChange}
         disabled={disabled}
-        className="h-4 w-7 data-[state=checked]:bg-primary"
+        className="h-3.5 w-6 sm:h-4 sm:w-7 data-[state=checked]:bg-primary"
       />
       {enabled && (
-        <Span className="hidden lg:inline text-[10px] opacity-75">
+        <Span className="hidden xl:inline text-[10px] opacity-75">
           {t("app.chat.searchToggle.creditIndicator")}
         </Span>
       )}

@@ -7,9 +7,9 @@ import type { SQL } from "drizzle-orm";
 import { and, count, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -428,10 +428,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
           .limit(1);
 
         if (existingLead.length > 0) {
-          return createErrorResponse(
-            "app.api.v1.core.leads.leadsErrors.leads.post.error.duplicate.title",
-            ErrorResponseTypes.CONFLICT,
-          );
+          return fail({
+            message: "app.api.v1.core.leads.leadsErrors.leads.post.error.duplicate.title",
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
         }
       }
 
@@ -473,7 +473,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         note: "Lead marked as NOT_STARTED - campaign starter cron will process it",
       });
 
-      return createSuccessResponse({
+      return success({
         lead: {
           summary: {
             id: createdLead.id,
@@ -501,11 +501,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
       });
     } catch (error) {
       logger.error("Error creating lead", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.leads.post.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.leads.leadsErrors.leads.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -540,19 +539,19 @@ class LeadsRepositoryImpl implements LeadsRepository {
         .limit(1);
 
       if (!lead) {
-        return createErrorResponse(
-          "app.api.v1.core.leads.leadsErrors.leads.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+          message: "app.api.v1.core.leads.leadsErrors.leads.get.error.not_found.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
-      return createSuccessResponse(this.formatLeadResponse(lead));
+      return success(this.formatLeadResponse(lead));
     } catch (error) {
       logger.error("Error fetching lead by tracking ID", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -575,20 +574,19 @@ class LeadsRepositoryImpl implements LeadsRepository {
         .limit(1);
 
       if (!lead) {
-        return createErrorResponse(
-          "app.api.v1.core.leads.leadsErrors.leads.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+          message: "app.api.v1.core.leads.leadsErrors.leads.get.error.not_found.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
-      return createSuccessResponse(this.formatLeadResponse(lead));
+      return success(this.formatLeadResponse(lead));
     } catch (error) {
       logger.error("Error fetching lead by email", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -611,10 +609,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
         // Get current lead to check current status
         const currentLeadResult = await this.getLeadByIdInternal(id, logger);
         if (!currentLeadResult.success) {
-          return createErrorResponse(
-            "app.api.v1.core.leads.leadsErrors.leads.patch.error.not_found.title",
-            ErrorResponseTypes.NOT_FOUND,
-          );
+          return fail({
+            message: "app.api.v1.core.leads.leadsErrors.leads.patch.error.not_found.title",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
         }
 
         const currentStatus = currentLeadResult.data.lead.basicInfo.status;
@@ -627,10 +625,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
             currentStatus,
             newStatus,
           });
-          return createErrorResponse(
-            "app.api.v1.core.leads.leadsErrors.batch.update.error.default",
-            ErrorResponseTypes.BAD_REQUEST,
-          );
+          return fail({
+            message: "app.api.v1.core.leads.leadsErrors.batch.update.error.default",
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
         }
 
         logger.debug("Lead status transition validated", {
@@ -644,10 +642,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
       return await this.updateLeadInternal(id, data, logger);
     } catch (error) {
       logger.error("Error updating lead", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.leads.patch.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.leads.leadsErrors.leads.patch.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -804,7 +802,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         resultsCount: leadsList.length,
       });
 
-      return createSuccessResponse({
+      return success({
         response: {
           leads: leadsList.map((lead) => this.formatLeadResponse(lead)),
           total,
@@ -815,10 +813,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
       });
     } catch (error) {
       logger.error("Error listing leads", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -959,17 +957,19 @@ class LeadsRepositoryImpl implements LeadsRepository {
         whereClause = eq(leads.email, data.email);
         email = data.email;
       } else {
-        return createErrorResponse(
+        return fail({
+            message: 
           "app.api.v1.core.leads.leadsErrors.leadsUnsubscribe.post.error.validation.title",
-          ErrorResponseTypes.BAD_REQUEST,
-        );
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
       }
 
       if (!email) {
-        return createErrorResponse(
+        return fail({
+            message: 
           "app.api.v1.core.leads.leadsErrors.leads.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       // 1. Unsubscribe the lead
@@ -984,10 +984,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
         .returning();
 
       if (!updatedLead) {
-        return createErrorResponse(
+        return fail({
+            message: 
           "app.api.v1.core.leads.leadsErrors.leads.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       // 2. Also unsubscribe from newsletter
@@ -998,7 +999,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         email,
       });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message:
           "app.api.v1.core.leads.leadsErrors.leadsUnsubscribe.post.success.description",
@@ -1009,10 +1010,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
         "Error unsubscribing lead and newsletter",
         parseError(error),
       );
-      return createErrorResponse(
+      return fail({
+            message: 
         "app.api.v1.core.leads.leadsErrors.leadsUnsubscribe.post.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -1098,7 +1100,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         logger.debug("No lead found for email during newsletter unsubscribe", {
           email,
         });
-        return createSuccessResponse({
+        return success({
           success: true,
           leadFound: false,
         });
@@ -1126,7 +1128,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         });
       }
 
-      return createSuccessResponse({
+      return success({
         success: true,
         leadFound: true,
       });
@@ -1135,10 +1137,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
         "Error updating lead status on newsletter unsubscribe",
         parseError(error).message,
       );
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -1160,20 +1162,22 @@ class LeadsRepositoryImpl implements LeadsRepository {
         .limit(1);
 
       if (!lead) {
-        return createErrorResponse(
+        return fail({
+            message: 
           "app.api.v1.core.leads.leadsErrors.leads.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
-      return createSuccessResponse(this.formatLeadDetailResponse(lead));
+      return success(this.formatLeadDetailResponse(lead));
     } catch (error) {
       logger.error("Error fetching lead by ID (internal)", parseError(error));
-      return createErrorResponse(
+      return fail({
+            message: 
         "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -1219,21 +1223,23 @@ class LeadsRepositoryImpl implements LeadsRepository {
         .returning();
 
       if (!updatedLead) {
-        return createErrorResponse(
+        return fail({
+            message: 
           "app.api.v1.core.leads.leadsErrors.leads.patch.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       logger.debug("Lead updated successfully (internal)", { id });
 
-      return createSuccessResponse(this.formatLeadDetailResponse(updatedLead));
+      return success(this.formatLeadDetailResponse(updatedLead));
     } catch (error) {
       logger.error("Error updating lead (internal)", parseError(error));
-      return createErrorResponse(
+      return fail({
+            message: 
         "app.api.v1.core.leads.leadsErrors.leads.patch.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -1275,10 +1281,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
             .limit(1);
 
           if (!existingLead) {
-            return createErrorResponse(
-              "app.api.v1.core.leads.leadsErrors.leads.patch.error.not_found.title",
-              ErrorResponseTypes.NOT_FOUND,
-            );
+            return fail({
+            message: "app.api.v1.core.leads.leadsErrors.leads.patch.error.not_found.title",
+              errorType: ErrorResponseTypes.NOT_FOUND,
+            });
           }
 
           // Check if lead is already converted to a user
@@ -1288,7 +1294,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
               existingUserId: existingLead.convertedUserId,
               newUserId: options.userId,
             });
-            return createSuccessResponse(this.formatLeadResponse(existingLead));
+            return success(this.formatLeadResponse(existingLead));
           }
 
           // Prepare update data
@@ -1315,10 +1321,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
               .limit(1);
 
             if (duplicateLead && duplicateLead.id !== existingLead.id) {
-              return createErrorResponse(
-                "app.api.v1.core.leads.leadsErrors.leads.post.error.duplicate.title",
-                ErrorResponseTypes.CONFLICT,
-              );
+              return fail({
+            message: "app.api.v1.core.leads.leadsErrors.leads.post.error.duplicate.title",
+                errorType: ErrorResponseTypes.CONFLICT,
+              });
             }
 
             updateData.email = options.email.toLowerCase().trim();
@@ -1403,7 +1409,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
             .where(eq(leads.id, existingLead.id))
             .returning();
 
-          return createSuccessResponse(this.formatLeadResponse(updatedLead));
+          return success(this.formatLeadResponse(updatedLead));
         },
       );
 
@@ -1418,10 +1424,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
       return result;
     } catch (error) {
       logger.error("Error converting lead (internal)", parseError(error));
-      return createErrorResponse(
+      return fail({
+            message: 
         "app.api.v1.core.leads.leadsErrors.leads.patch.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -1455,10 +1462,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
         .limit(1);
 
       if (!lead) {
-        return createErrorResponse(
+        return fail({
+            message: 
           "app.api.v1.core.leads.leadsErrors.leadsEngagement.post.error.validation.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       // Create the engagement record
@@ -1475,10 +1483,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
         .returning();
 
       if (!engagement) {
-        return createErrorResponse(
+        return fail({
+            message: 
           "app.api.v1.core.leads.leadsErrors.leadsEngagement.post.error.server.title",
-          ErrorResponseTypes.DATABASE_ERROR,
-        );
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+        });
       }
 
       // Update lead engagement counters
@@ -1531,7 +1540,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         engagementType: data.engagementType,
       });
 
-      return createSuccessResponse<LeadEngagementResponseOutput>({
+      return success<LeadEngagementResponseOutput>({
         id: engagement.id,
         responseEngagementType: engagement.engagementType,
         responseCampaignId: engagement.campaignId || undefined,
@@ -1544,10 +1553,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
       });
     } catch (error) {
       logger.error("Error recording engagement", parseError(error));
-      return createErrorResponse(
+      return fail({
+            message: 
         "app.api.v1.core.leads.leadsErrors.leadsEngagement.post.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -1662,7 +1672,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         fileName,
       });
 
-      return createSuccessResponse({
+      return success({
         fileName,
         fileContent,
         mimeType:
@@ -1672,10 +1682,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
       });
     } catch (error) {
       logger.error("Error exporting leads", parseError(error));
-      return createErrorResponse(
+      return fail({
+            message: 
         "app.api.v1.core.leads.leadsErrors.leadsExport.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -2039,7 +2050,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
           currentCampaignStage: lead.currentCampaignStage,
         }));
 
-        return createSuccessResponse({
+        return success({
           success: true,
           totalMatched: matchingLeads.length,
           totalProcessed: 0,
@@ -2119,7 +2130,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         errors: errors.length,
       });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         totalMatched: matchingLeads.length,
         totalProcessed: matchingLeads.length,
@@ -2128,10 +2139,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
       });
     } catch (error) {
       logger.error("Error in batch update", parseError(error));
-      return createErrorResponse(
+      return fail({
+            message: 
         "app.api.v1.core.leads.leadsErrors.batch.update.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -2211,10 +2223,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       // Validation: confirmDelete must be true for actual deletion
       if (!dryRun && !confirmDelete) {
-        return createErrorResponse(
+        return fail({
+            message: 
           "app.api.v1.core.leads.leadsErrors.batch.update.error.validation.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
-        );
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
       }
 
       // Build the query using the same logic as list endpoint and batchUpdateLeads
@@ -2416,7 +2429,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
           currentCampaignStage: lead.currentCampaignStage,
         }));
 
-        return createSuccessResponse({
+        return success({
           success: true,
           totalMatched: matchingLeads.length,
           totalProcessed: 0,
@@ -2474,7 +2487,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         deletionMatch: totalDeleted === matchingLeads.length,
       });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         totalMatched: matchingLeads.length,
         totalProcessed: matchingLeads.length,
@@ -2483,10 +2496,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
       });
     } catch (error) {
       logger.error("Error in batch delete", parseError(error));
-      return createErrorResponse(
+      return fail({
+            message: 
         "app.api.v1.core.leads.leadsErrors.batch.update.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }

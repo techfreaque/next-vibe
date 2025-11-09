@@ -9,7 +9,7 @@ import "server-only";
 import { createHmac } from "node:crypto";
 import { eq } from "drizzle-orm";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
@@ -142,11 +142,22 @@ export class NOWPaymentsProvider implements PaymentProvider {
   name = "nowpayments";
   private apiKey: string;
   private ipnSecret: string;
-  private apiUrl = "https://api.nowpayments.io/v1";
+  private apiUrl: string;
 
   constructor() {
     this.apiKey = env.NOWPAYMENTS_API_KEY;
     this.ipnSecret = env.NOWPAYMENTS_IPN_SECRET;
+    this.apiUrl = env.NOWPAYMENTS_API_URL;
+  }
+
+  /**
+   * Get authentication headers for NOWPayments API
+   * Uses Authorization: Bearer header for authentication
+   */
+  private getAuthHeaders(): Record<string, string> {
+    return {
+      "Authorization": `Bearer ${this.apiKey}`,
+    };
   }
 
   /**
@@ -180,7 +191,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         email,
       });
 
-      return createSuccessResponse<CustomerResult>({
+      return success<CustomerResult>({
         customerId: userId,
       });
     } catch (error) {
@@ -295,7 +306,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": this.apiKey,
+        ...this.getAuthHeaders(),
       },
       body: JSON.stringify(invoiceData),
     });
@@ -325,7 +336,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       currency: invoice.price_currency,
     });
 
-    return createSuccessResponse<CheckoutSessionResult>({
+    return success<CheckoutSessionResult>({
       sessionId: invoice.id,
       checkoutUrl: invoice.invoice_url,
       providerPriceId: invoice.price_amount,
@@ -368,7 +379,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": this.apiKey,
+          ...this.getAuthHeaders(),
         },
         body: JSON.stringify(planData),
       });
@@ -386,10 +397,13 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
     if (!planResponse.ok) {
       const errorText = await planResponse.text();
-      logger.error("NOWPayments plan creation error", {
+      logger.error("NOWPayments plan creation error - FULL DETAILS", {
         status: planResponse.status,
         statusText: planResponse.statusText,
-        error: errorText,
+        errorText: errorText,
+        requestUrl: `${this.apiUrl}/subscriptions/plans`,
+        requestBody: JSON.stringify(planData),
+        headers: { "x-api-key": `${this.apiKey.substring(0, 10)}...` },
       });
       return fail({
         message:
@@ -417,7 +431,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": this.apiKey,
+        ...this.getAuthHeaders(),
       },
       body: JSON.stringify(subscriptionData),
     });
@@ -447,7 +461,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
     // Return the subscription ID as session ID
     // The user will receive payment links via email
-    return createSuccessResponse<CheckoutSessionResult>({
+    return success<CheckoutSessionResult>({
       sessionId: subscription.id.toString(),
       checkoutUrl: params.successUrl, // User receives link via email
       providerPriceId: plan.id.toString(),
@@ -511,7 +525,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       const paymentType = payload.subscription_id ? "subscription" : "credit_pack";
 
       // Return standardized webhook event
-      return createSuccessResponse<WebhookEvent>({
+      return success<WebhookEvent>({
         id: payload.payment_id,
         type: eventType,
         data: {
@@ -560,7 +574,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         {
           method: "GET",
           headers: {
-            "x-api-key": this.apiKey,
+            ...this.getAuthHeaders(),
           },
         },
       );
@@ -588,7 +602,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         {
           method: "GET",
           headers: {
-            "x-api-key": this.apiKey,
+            ...this.getAuthHeaders(),
           },
         },
       );
@@ -623,7 +637,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       // For now, we'll need to look up in our database
       const userId = ""; // This needs to be populated from DB lookup
 
-      return createSuccessResponse({
+      return success({
         userId,
         currentPeriodStart,
         currentPeriodEnd,
@@ -655,7 +669,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         {
           method: "DELETE",
           headers: {
-            "x-api-key": this.apiKey,
+            ...this.getAuthHeaders(),
           },
         },
       );
@@ -677,7 +691,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
       logger.info("Canceled NOWPayments subscription", { subscriptionId });
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error("Failed to cancel NOWPayments subscription", {
         error: parseError(error),
@@ -742,7 +756,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       const response = await fetch(`${this.apiUrl}/payment/${paymentId}`, {
         method: "GET",
         headers: {
-          "x-api-key": this.apiKey,
+          ...this.getAuthHeaders(),
         },
       });
 
@@ -767,7 +781,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         status: paymentStatus.payment_status,
       });
 
-      return createSuccessResponse(paymentStatus);
+      return success(paymentStatus);
     } catch (error) {
       logger.error("Failed to get NOWPayments payment status", {
         error: parseError(error),
@@ -818,7 +832,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         {
           method: "GET",
           headers: {
-            "x-api-key": this.apiKey,
+            ...this.getAuthHeaders(),
           },
         },
       );
@@ -844,7 +858,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         filters,
       });
 
-      return createSuccessResponse(subscriptions);
+      return success(subscriptions);
     } catch (error) {
       logger.error("Failed to list NOWPayments subscriptions", {
         error: parseError(error),

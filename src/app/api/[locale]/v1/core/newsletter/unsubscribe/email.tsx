@@ -6,7 +6,7 @@
 import { Button, Hr, Section } from "@react-email/components";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
@@ -238,7 +238,7 @@ export const renderUnsubscribeConfirmationMail: EmailFunctionType<
   never
 > = ({ requestData, locale, t }) => {
   try {
-    return createSuccessResponse({
+    return success({
       toEmail: requestData.email,
       toName: requestData.email,
       subject: t("app.api.v1.core.newsletter.email.unsubscribe.subject"),
@@ -266,7 +266,7 @@ export const renderAdminUnsubscribeNotificationMail: EmailFunctionType<
   never
 > = ({ requestData, locale, t }) => {
   try {
-    return createSuccessResponse({
+    return success({
       toEmail: contactClientRepository.getSupportEmail(locale),
       toName: t("config.appName"),
       subject: t(

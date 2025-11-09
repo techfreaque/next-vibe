@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -141,7 +141,7 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
       updatedAt: lead.updatedAt.toISOString(),
     }));
 
-    return createSuccessResponse({
+    return success({
       response: {
         leads: transformedLeads,
         total: responseData.total,

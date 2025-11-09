@@ -9,7 +9,7 @@ import { and, asc, count, desc, eq, ilike, ne, or } from "drizzle-orm";
 import Imap from "imap";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -333,7 +333,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
         email: createdAccount.email,
       });
 
-      return createSuccessResponse({
+      return success({
         account: this.formatAccountForCreate(createdAccount),
       });
     } catch (error) {
@@ -438,7 +438,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       const totalPages = Math.ceil(totalCount / limit);
 
-      return createSuccessResponse({
+      return success({
         accounts: accounts.map((account) => this.formatAccountForList(account)),
         pagination: {
           total: totalCount,
@@ -485,7 +485,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
         });
       }
 
-      return createSuccessResponse({
+      return success({
         account: this.formatAccountForGet(account),
       });
     } catch (error) {
@@ -578,7 +578,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
         email: updatedAccount.email,
       });
 
-      return createSuccessResponse({
+      return success({
         account: this.formatAccountForPut(updatedAccount),
       });
     } catch (error) {
@@ -626,7 +626,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       logger.debug("IMAP account deleted successfully", { id: data.id });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message:
           "app.api.v1.core.emails.imapClient.imapErrors.accounts.delete.success.title",
@@ -771,7 +771,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
             });
 
             resolveOnce(
-              createSuccessResponse({
+              success({
                 success: true,
                 message:
                   "app.api.v1.core.emails.imapClient.imap.connection.test.success",

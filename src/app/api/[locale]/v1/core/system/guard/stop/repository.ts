@@ -6,7 +6,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -107,7 +107,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
       totalStopped: 1,
     };
 
-    return createSuccessResponse(response);
+    return success(response);
   }
 
   private stopByProject(
@@ -144,7 +144,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
       totalStopped: 1,
     };
 
-    return createSuccessResponse(response);
+    return success(response);
   }
 
   private stopAllGuards(
@@ -174,7 +174,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
       totalStopped: mockGuards.length,
     };
 
-    return createSuccessResponse(response);
+    return success(response);
   }
 }
 

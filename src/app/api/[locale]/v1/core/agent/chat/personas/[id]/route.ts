@@ -4,7 +4,7 @@
  */
 
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -33,7 +33,7 @@ export const { GET, PATCH, tools } = endpointsHandler({
         });
       }
 
-      return createSuccessResponse({ persona });
+      return success({ persona });
     },
   },
   [Methods.PATCH]: {
@@ -69,7 +69,7 @@ export const { GET, PATCH, tools } = endpointsHandler({
         });
       }
 
-      return createSuccessResponse({ success: true });
+      return success({ success: true });
     },
   },
 });

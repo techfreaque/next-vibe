@@ -4,7 +4,7 @@ import path from "node:path";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -183,7 +183,7 @@ export class TranslationReorganizeRepositoryImpl {
           );
         }
 
-        return createSuccessResponse({
+        return success({
           response: {
             success: true,
             summary: {
@@ -325,7 +325,7 @@ export class TranslationReorganizeRepositoryImpl {
             ),
           );
 
-          return createSuccessResponse({
+          return success({
             response: {
               success: true,
               summary: {
@@ -358,7 +358,7 @@ export class TranslationReorganizeRepositoryImpl {
         ),
       );
 
-      return createSuccessResponse({
+      return success({
         response: {
           success: true,
           summary: {
@@ -602,7 +602,7 @@ export class TranslationReorganizeRepositoryImpl {
 
       // If validation only, just check the backup and return
       if (request.validateOnly) {
-        return createSuccessResponse({
+        return success({
           success: true,
           message: t(
             "app.api.v1.core.system.translations.restoreBackup.post.messages.validationSuccessful",
@@ -626,7 +626,7 @@ export class TranslationReorganizeRepositoryImpl {
       // Perform the restore
       this.restoreFromBackup(request.backupPath, logger);
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message: t(
           "app.api.v1.core.system.translations.restoreBackup.post.messages.restoreSuccessful",
@@ -1493,7 +1493,7 @@ export class TranslationReorganizeRepositoryImpl {
       // Get available languages
       const languages: string[] = ["en", "de", "pl"];
 
-      return createSuccessResponse({
+      return success({
         success: true,
         stats: {
           totalKeys: allKeys.size,

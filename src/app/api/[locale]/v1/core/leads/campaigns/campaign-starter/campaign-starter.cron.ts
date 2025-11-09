@@ -9,7 +9,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -133,7 +133,7 @@ export async function execute(
     const currentHour = now.getUTCHours();
 
     if (!config.enabledDays.includes(currentDay)) {
-      return createSuccessResponse({
+      return success({
         leadsProcessed: 0,
         leadsStarted: 0,
         leadsSkipped: 0,
@@ -146,7 +146,7 @@ export async function execute(
       currentHour < config.enabledHours.start ||
       currentHour > config.enabledHours.end
     ) {
-      return createSuccessResponse({
+      return success({
         leadsProcessed: 0,
         leadsStarted: 0,
         leadsSkipped: 0,
@@ -217,7 +217,7 @@ export async function execute(
     const executionTimeMs = Date.now() - startTime;
     result.executionTimeMs = executionTimeMs;
 
-    return createSuccessResponse(result);
+    return success(result);
   } catch (error) {
     const executionTimeMs = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -285,7 +285,7 @@ export function validate(
       );
     }
 
-    return createSuccessResponse(true);
+    return success(true);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error("Campaign starter validation error", {
@@ -313,5 +313,5 @@ export function rollback(
   logger.info(
     "Rollback not applicable for campaign starter - status changes are tracked in database",
   );
-  return createSuccessResponse(true);
+  return success(true);
 }

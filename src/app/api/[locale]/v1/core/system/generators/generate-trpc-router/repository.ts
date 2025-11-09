@@ -6,7 +6,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -52,7 +52,7 @@ export class GenerateTrpcRouterRepositoryImpl
         generationStats: result.generationStats,
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       return createErrorResponse(
         ErrorResponseTypes.INTERNAL_ERROR.errorKey,

@@ -12,7 +12,7 @@ import { z } from "zod";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -283,7 +283,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         offset,
       });
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to retrieve cron tasks", parsedError);
@@ -391,7 +391,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       logger.vibe("🚀 Successfully created cron task");
       logger.debug("Created task response", response);
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to create cron task", parsedError);

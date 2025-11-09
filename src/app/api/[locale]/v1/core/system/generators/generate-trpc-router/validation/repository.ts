@@ -10,7 +10,7 @@ import * as path from "node:path";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -207,7 +207,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
           ? { success: result, errors: [], warnings: [], routeFiles: [] }
           : result;
 
-      return createSuccessResponse({
+      return success({
         success: normalizedResult.success,
         operation: operation.toString(),
         result: normalizedResult,

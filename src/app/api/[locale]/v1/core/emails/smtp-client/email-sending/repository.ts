@@ -9,7 +9,7 @@ import { render } from "@react-email/render";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -184,7 +184,7 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
       });
 
       // Return the SMTP result with account information
-      return createSuccessResponse({
+      return success({
         result: {
           messageId: emailResponse.data.messageId,
           accountId: emailResponse.data.accountId,

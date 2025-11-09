@@ -8,7 +8,7 @@ import "server-only";
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -777,7 +777,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         accountName: account.name,
       });
 
-      return createSuccessResponse({
+      return success({
         messageId: result.messageId,
         accountId: account.id,
         accountName: account.name,
@@ -829,7 +829,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
     try {
       // If no rate limit is set, allow unlimited sending
       if (!account.rateLimitPerHour) {
-        return createSuccessResponse({
+        return success({
           canSend: true,
           remainingCapacity: Number.MAX_SAFE_INTEGER,
           currentUsage: 0,
@@ -888,7 +888,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       });
       }
 
-      return createSuccessResponse({
+      return success({
         canSend,
         remainingCapacity,
         currentUsage: emailsSentThisHour,
@@ -896,7 +896,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
     } catch (error) {
       logger.error("Error checking rate limit", parseError(error));
       // On error, allow limited sending to be safe
-      return createSuccessResponse({
+      return success({
         canSend: true,
         remainingCapacity: 10, // Conservative fallback
         currentUsage: 0,
@@ -1057,7 +1057,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         .where(eq(smtpAccounts.status, SmtpAccountStatus.ACTIVE));
 
       if (accounts.length === 0) {
-        return createSuccessResponse({
+        return success({
           totalCapacity: 0,
           remainingCapacity: 0,
         });
@@ -1080,7 +1080,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         // but still counts toward total capacity
       }
 
-      return createSuccessResponse({
+      return success({
         totalCapacity,
         remainingCapacity: totalRemainingCapacity,
       });

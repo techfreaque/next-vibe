@@ -8,7 +8,7 @@ import "server-only";
 import { and, asc, count, desc, eq, gte, ilike, lte, or } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -362,7 +362,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       const totalPages = Math.ceil(totalCount / limit);
 
-      return createSuccessResponse({
+      return success({
         messages: messages.map((message) =>
           this.formatMessageResponse(message),
         ),
@@ -410,7 +410,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
       });
       }
 
-      return createSuccessResponse(this.formatMessageResponse(message));
+      return success(this.formatMessageResponse(message));
     } catch (error) {
       logger.error("Error getting IMAP message by ID", parseError(error));
       return fail({
@@ -481,7 +481,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
       });
       }
 
-      return createSuccessResponse(this.formatMessageResponse(updatedMessage));
+      return success(this.formatMessageResponse(updatedMessage));
     } catch (error) {
       logger.error("Error updating IMAP message", parseError(error));
       return fail({
@@ -504,7 +504,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     if (!result.success) {
       return result;
     }
-    return createSuccessResponse({
+    return success({
       message: result.data,
     });
   }
@@ -522,7 +522,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     if (!result.success) {
       return result;
     }
-    return createSuccessResponse({
+    return success({
       message: result.data,
     });
   }
@@ -577,7 +577,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
         if (syncResult.success) {
           const rawErrors = syncResult.data.result?.results?.errors ?? [];
-          return createSuccessResponse({
+          return success({
             success: true,
             message:
               "app.api.v1.core.emails.imapClient.messages.sync.response.success.message",
@@ -617,7 +617,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
         if (syncResult.success) {
           const rawErrors = syncResult.data.result?.results?.errors ?? [];
-          return createSuccessResponse({
+          return success({
             success: true,
             message:
               "app.api.v1.core.emails.imapClient.messages.sync.response.success.message",
@@ -703,7 +703,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
       });
       }
 
-      return createSuccessResponse({ success: true });
+      return success({ success: true });
     } catch (error) {
       logger.error("Error updating message sync status", parseError(error));
       return fail({
@@ -744,7 +744,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
       });
       }
 
-      return createSuccessResponse({ success: true });
+      return success({ success: true });
     } catch (error) {
       logger.error("Error updating message read status", parseError(error));
       return fail({

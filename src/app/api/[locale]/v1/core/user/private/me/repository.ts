@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
@@ -128,7 +128,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       }
 
       logger.debug("Successfully retrieved user profile", { userId });
-      return createSuccessResponse({
+      return success({
         user: userResponse.data,
       });
     } catch (error) {
@@ -260,7 +260,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       );
 
       // Return the correct response structure
-      return createSuccessResponse({
+      return success({
         response: {
           success: true,
           message: "app.api.v1.core.user.private.me.update.success.message",
@@ -332,7 +332,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
 
       logger.debug("Successfully deleted user account", { userId });
 
-      return createSuccessResponse({
+      return success({
         exists: true,
       });
     } catch (error) {

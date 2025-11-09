@@ -9,7 +9,7 @@ import * as path from "node:path";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -97,7 +97,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       totalDestroyed: 0,
     };
 
-    return createSuccessResponse(response);
+    return success(response);
   }
 
   private destroyByGuardId(
@@ -123,7 +123,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       totalDestroyed: 1,
     };
 
-    return createSuccessResponse(response);
+    return success(response);
   }
 
   private destroyByProject(
@@ -164,7 +164,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       totalDestroyed: 1,
     };
 
-    return createSuccessResponse(response);
+    return success(response);
   }
 
   private destroyAllGuards(
@@ -191,7 +191,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       totalDestroyed: mockGuards.length,
     };
 
-    return createSuccessResponse(response);
+    return success(response);
   }
 }
 

@@ -8,7 +8,7 @@ import "server-only";
 
 import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { creditTransactions } from "@/app/api/[locale]/v1/core/credits/db";
@@ -215,7 +215,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
           leadId,
           userId,
         });
-        return createSuccessResponse(undefined);
+        return success(undefined);
       }
 
       // Get all existing leads for this user
@@ -231,7 +231,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
           leadId,
           userId,
         });
-        return createSuccessResponse(undefined);
+        return success(undefined);
       }
 
       // Create the link (isPrimary set to false - will be deprecated)
@@ -284,13 +284,13 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         userId,
       });
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error(
         "app.api.v1.core.leads.auth.link.error",
         parseError(error).message,
       );
-      return createSuccessResponse(undefined);
+      return success(undefined);
     }
   }
 
@@ -524,7 +524,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
     );
     // Return success to maintain backward compatibility
     // Platform handlers will manage lead ID storage
-    return createSuccessResponse(undefined);
+    return success(undefined);
   }
 
   /**
@@ -571,7 +571,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         logger.debug("app.api.v1.core.leads.auth.linkLeads.sameId", {
           leadId: primaryLeadId,
         });
-        return createSuccessResponse(undefined);
+        return success(undefined);
       }
 
       // Check if link already exists (either direction)
@@ -597,7 +597,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
           primaryLeadId,
           linkedLeadId,
         });
-        return createSuccessResponse(undefined);
+        return success(undefined);
       }
 
       // Create the link
@@ -637,13 +637,13 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         // Don't fail the link operation if credit merge fails
       }
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error(
         "app.api.v1.core.leads.auth.linkLeads.error",
         parseError(error).message,
       );
-      return createSuccessResponse(undefined);
+      return success(undefined);
     }
   }
 

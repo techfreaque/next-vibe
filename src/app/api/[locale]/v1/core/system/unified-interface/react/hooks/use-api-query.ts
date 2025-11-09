@@ -6,7 +6,7 @@ import type {
   ErrorResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { useMemo } from "react";
@@ -161,7 +161,7 @@ export function useApiQuery<
     // initialData populates the cache and respects staleTime
     // This allows optimistic updates to work because data is in the cache
     initialData: initialData
-      ? (): ResponseType<TEndpoint["TResponseOutput"]> => createSuccessResponse(initialData)
+      ? (): ResponseType<TEndpoint["TResponseOutput"]> => success(initialData)
       : undefined,
   });
 
@@ -223,7 +223,7 @@ export function useApiQuery<
       status,
       refetch: async () => {
         const result = await query.refetch();
-        return result.data ?? responseData ?? createSuccessResponse(undefined as never);
+        return result.data ?? responseData ?? success(undefined as never);
       },
       remove: () => {
         // React Query v5 doesn't have remove on the query result

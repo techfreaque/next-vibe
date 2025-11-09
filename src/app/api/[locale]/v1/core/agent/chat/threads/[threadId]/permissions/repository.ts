@@ -3,7 +3,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -70,7 +70,7 @@ export async function getThreadPermissions(
     }
 
     // Return permissions as-is (null, [], or [roles...])
-    return createSuccessResponse({
+    return success({
       rolesView: thread.rolesView,
       rolesEdit: thread.rolesEdit,
       rolesPost: thread.rolesPost,
@@ -192,7 +192,7 @@ export async function updateThreadPermissions(
     });
 
     // Return updated values (use provided values or keep existing)
-    return createSuccessResponse({
+    return success({
       response: {
         rolesView: rolesView ?? existingThread.rolesView,
         rolesEdit: rolesEdit ?? existingThread.rolesEdit,

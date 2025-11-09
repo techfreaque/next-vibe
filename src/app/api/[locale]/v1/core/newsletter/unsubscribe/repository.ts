@@ -8,7 +8,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -103,7 +103,7 @@ export class NewsletterUnsubscribeRepositoryImpl
           email: data.email,
         });
 
-        return createSuccessResponse({
+        return success({
           success: true,
           message: t("app.api.v1.core.newsletter.unsubscribe.response.success"),
         });
@@ -113,7 +113,7 @@ export class NewsletterUnsubscribeRepositoryImpl
         logger.debug("User already unsubscribed from newsletter", {
           email: data.email,
         });
-        return createSuccessResponse({
+        return success({
           success: true,
           message: t("app.api.v1.core.newsletter.unsubscribe.response.success"),
         });
@@ -135,7 +135,7 @@ export class NewsletterUnsubscribeRepositoryImpl
         subscriptionId: subscription.id,
       });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message: t("app.api.v1.core.newsletter.unsubscribe.response.success"),
       });

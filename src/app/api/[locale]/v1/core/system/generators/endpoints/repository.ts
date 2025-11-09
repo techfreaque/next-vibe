@@ -9,7 +9,7 @@ import "server-only";
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -206,7 +206,7 @@ export class FunctionalGeneratorsRepositoryImpl
       const duration = Date.now() - startTime;
       output.push(`🏁 Completed in ${duration}ms`);
 
-      return createSuccessResponse({
+      return success({
         success: true,
         generatorsRun,
         generatorsSkipped,
@@ -238,7 +238,7 @@ export class FunctionalGeneratorsRepositoryImpl
         );
       }
 
-      return createSuccessResponse(true);
+      return success(true);
     } catch (error) {
       return createErrorResponse(
         "app.api.v1.core.system.generators.endpoints.post.errors.server.title",

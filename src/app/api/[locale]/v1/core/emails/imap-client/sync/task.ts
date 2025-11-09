@@ -9,7 +9,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -102,7 +102,7 @@ async function executeImapSync(
 
     if (syncResult.success && syncResult.data) {
       logger.info("tasks.imap_sync.completed", syncResult.data.result.summary);
-      return createSuccessResponse(syncResult.data.result);
+      return success(syncResult.data.result);
     } else {
       logger.error("tasks.imap_sync.failed", {
         error: syncResult.message,
@@ -145,7 +145,7 @@ function validateImapSync(
     );
 
     if (validationResult.success && validationResult.data) {
-      return createSuccessResponse(validationResult.data.isValid);
+      return success(validationResult.data.isValid);
     } else {
       return createErrorResponse(
         "app.api.v1.core.emails.error.default",
@@ -165,7 +165,7 @@ function validateImapSync(
  */
 function rollbackImapSync(): ResponseType<boolean> {
   // No rollback needed for IMAP sync
-  return createSuccessResponse(true);
+  return success(true);
 }
 
 /**

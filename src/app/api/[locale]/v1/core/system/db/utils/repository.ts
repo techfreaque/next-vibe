@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -128,7 +128,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
       };
 
       logger.info(`Database health check completed with status: ${status}`);
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       logger.error("Database health check failed:", parseError(error));
       return createErrorResponse(
@@ -149,7 +149,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
       // eslint-disable-next-line i18next/no-literal-string
       await db.execute("SELECT 1");
       logger.debug("Database connection test successful");
-      return createSuccessResponse(true);
+      return success(true);
     } catch (error) {
       logger.error("Database connection test failed:", parseError(error));
       return createErrorResponse(
@@ -185,7 +185,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
       };
 
       logger.debug("Database statistics retrieved successfully");
-      return createSuccessResponse(stats);
+      return success(stats);
     } catch (error) {
       logger.error(
         "Failed to retrieve database statistics:",
@@ -214,11 +214,11 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
         docker.on("close", (code) => {
           const isAvailable = code === 0;
           logger.debug(`Docker availability check completed: ${isAvailable}`);
-          resolve(createSuccessResponse(isAvailable));
+          resolve(success(isAvailable));
         });
 
         docker.on("error", () => {
-          resolve(createSuccessResponse(false));
+          resolve(success(false));
         });
       });
     } catch (error) {
@@ -275,7 +275,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
 
         if (resetResult.success) {
           logger.info(`Database ${operation.toLowerCase()} completed`);
-          return createSuccessResponse(true);
+          return success(true);
         } else {
           const { t } = simpleT(locale);
           const errorMessage = t(

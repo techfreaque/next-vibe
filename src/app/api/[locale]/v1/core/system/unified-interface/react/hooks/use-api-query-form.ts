@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -593,7 +593,7 @@ export function useApiQueryForm<
               response !== null &&
               "success" in response
               ? response
-              : createSuccessResponse(response);
+              : success(response);
 
           // Call the onSuccess callback if provided and the result is successful
           if (result.success && options.onSuccess) {

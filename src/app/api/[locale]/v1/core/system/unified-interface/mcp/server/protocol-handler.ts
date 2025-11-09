@@ -125,7 +125,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
           );
       }
 
-      return this.createSuccessResponse(request.id || null, result);
+      return this.success(request.id || null, result);
     } catch (error) {
       const parsedError = parseError(error);
       this.logger.error("[MCP Protocol] Request handling failed", {
@@ -246,7 +246,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   /**
    * Create success response
    */
-  private createSuccessResponse(
+  private success(
     id: string | number | null,
     // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types

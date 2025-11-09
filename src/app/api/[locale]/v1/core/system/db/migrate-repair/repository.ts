@@ -10,7 +10,7 @@ import { sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -99,7 +99,7 @@ export class DatabaseMigrateRepairRepositoryImpl
         );
         logger.info("No repair needed - migrations up to date");
 
-        return createSuccessResponse({
+        return success({
           success: true,
           output,
           hasTable: migrationState.hasTable,
@@ -119,7 +119,7 @@ export class DatabaseMigrateRepairRepositoryImpl
         );
         logger.info("Dry run completed - no changes made");
 
-        return createSuccessResponse({
+        return success({
           success: true,
           output,
           hasTable: migrationState.hasTable,
@@ -153,7 +153,7 @@ export class DatabaseMigrateRepairRepositoryImpl
 
       logger.info("Migration repair completed successfully", { repairedCount });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         output,
         hasTable: true,

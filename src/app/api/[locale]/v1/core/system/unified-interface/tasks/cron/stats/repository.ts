@@ -7,7 +7,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -110,7 +110,7 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
         stats: response.data,
       });
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       const errorDetails = parseError(error);
       logger.error("Failed to get cron statistics", {

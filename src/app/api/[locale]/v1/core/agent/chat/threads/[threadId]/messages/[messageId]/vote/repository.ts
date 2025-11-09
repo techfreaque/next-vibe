@@ -2,7 +2,7 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
@@ -183,7 +183,7 @@ export const voteRepository = {
         downvotes,
       });
 
-      return createSuccessResponse({
+      return success({
         upvotes,
         downvotes,
         userVote: newVoteType,

@@ -8,7 +8,7 @@ import inquirer from "inquirer";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -60,7 +60,7 @@ export function getPackageJson(
         { path: packageJsonPath },
       );
     }
-    return createSuccessResponse(parsedJson);
+    return success(parsedJson);
   } catch (error) {
     logger.error("Error reading package.json", parseError(error));
     return createErrorResponse(
@@ -96,7 +96,7 @@ export async function updateDependencies(
 
     if (!shouldUpdate) {
       logger.info(`Skipping dependency updates for ${pkg.directory}`);
-      return createSuccessResponse(undefined);
+      return success(undefined);
     }
   }
 
@@ -134,7 +134,7 @@ export async function updateDependencies(
 
       env: { ...process.env },
     });
-    return createSuccessResponse(undefined);
+    return success(undefined);
   } catch (error) {
     logger.error(
       `Error updating dependencies for ${pkg.directory}. Continuing with release process.`,
@@ -216,7 +216,7 @@ export function updatePackageVersion(
       logger.info("release.config.ts not found. Skipping config update.");
     }
 
-    return createSuccessResponse(undefined);
+    return success(undefined);
   } catch (error) {
     logger.error("Error updating package version", parseError(error));
     return createErrorResponse(

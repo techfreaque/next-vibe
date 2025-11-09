@@ -63,7 +63,7 @@ export class MCPToolsRepositoryImpl extends BaseToolsRepositoryImpl<
 
     this.logResult(logger, result, tools.length, tools[0]);
 
-    // Return plain object - route handler will wrap with createSuccessResponse
+    // Return plain object - route handler will wrap with success
     return result;
   }
 }

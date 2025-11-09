@@ -8,7 +8,7 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -141,7 +141,7 @@ class MessageRepository implements MessageRepositoryInterface {
         });
       }
 
-      return createSuccessResponse({
+      return success({
         message: {
           id: message.id,
           threadId: message.threadId,
@@ -271,7 +271,7 @@ class MessageRepository implements MessageRepositoryInterface {
         .where(eq(chatMessages.id, urlPathParams.messageId))
         .returning();
 
-      return createSuccessResponse({
+      return success({
         message: {
           id: updatedMessage.id,
           content: updatedMessage.content,
@@ -370,7 +370,7 @@ class MessageRepository implements MessageRepositoryInterface {
         .delete(chatMessages)
         .where(eq(chatMessages.id, urlPathParams.messageId));
 
-      return createSuccessResponse({
+      return success({
         success: true,
       });
     } catch (error) {

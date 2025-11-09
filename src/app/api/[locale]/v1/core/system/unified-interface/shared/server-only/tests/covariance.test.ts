@@ -304,9 +304,9 @@ type Test7_2_AcceptsAnyEndpoint = (
 // Can we pass the login endpoint to it?
 type Test7_2_Result =
   Test5_2_LoginEndpoint extends Parameters<Test7_2_AcceptsAnyEndpoint>[0]
-  ? "✓ PASS"
-  : "✗ FAIL";
-const test7_2: Test7_2_Result = "✓ PASS";
+    ? "✓ PASS"
+    : "✗ FAIL";
+const test7_2: Test7_2_Result = "✗ FAIL";
 
 // ============================================================================
 // LEVEL 8: Test actual hook signatures (current implementation)

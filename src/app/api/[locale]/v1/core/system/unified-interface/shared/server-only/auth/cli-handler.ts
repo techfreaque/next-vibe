@@ -2,7 +2,7 @@ import { jwtVerify, SignJWT } from "jose";
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -75,7 +75,7 @@ export class CliAuthHandler extends BaseAuthHandler {
             errorType: ErrorResponseTypes.UNAUTHORIZED,
           });
         }
-        return createSuccessResponse(context.jwtPayload);
+        return success(context.jwtPayload);
       }
 
       // Try to read from session file
@@ -86,7 +86,7 @@ export class CliAuthHandler extends BaseAuthHandler {
           logger,
         );
         if (verifyResult.success) {
-          return createSuccessResponse(verifyResult.data);
+          return success(verifyResult.data);
         }
       }
 
@@ -99,7 +99,7 @@ export class CliAuthHandler extends BaseAuthHandler {
           logger,
         );
         if (userResult.success) {
-          return createSuccessResponse(userResult.data);
+          return success(userResult.data);
         }
       }
 
@@ -109,7 +109,7 @@ export class CliAuthHandler extends BaseAuthHandler {
         context.locale,
         logger,
       );
-      return createSuccessResponse(this.createPublicUser(leadId || ""));
+      return success(this.createPublicUser(leadId || ""));
     } catch (error) {
       logger.error("CLI/MCP authentication failed", parseError(error));
       const leadId = await this.getLeadIdFromDb(
@@ -117,7 +117,7 @@ export class CliAuthHandler extends BaseAuthHandler {
         context.locale,
         logger,
       );
-      return createSuccessResponse(this.createPublicUser(leadId || ""));
+      return success(this.createPublicUser(leadId || ""));
     }
   }
 
@@ -147,7 +147,7 @@ export class CliAuthHandler extends BaseAuthHandler {
         });
       }
 
-      return createSuccessResponse({
+      return success({
         isPublic: false,
         id: payload.id,
         leadId: payload.leadId,
@@ -180,7 +180,7 @@ export class CliAuthHandler extends BaseAuthHandler {
         .setExpirationTime(`${AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS}s`)
         .sign(this.secretKey);
 
-      return createSuccessResponse(token);
+      return success(token);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("JWT signing failed", parsedError);
@@ -343,7 +343,7 @@ export class CliAuthHandler extends BaseAuthHandler {
       const user = userResult.data;
       const leadId = await this.getLeadIdFromDb(user.id, locale, logger);
 
-      return createSuccessResponse(
+      return success(
         this.createPrivateUser(user.id, leadId || ""),
       );
     } catch (error) {

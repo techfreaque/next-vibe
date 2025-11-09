@@ -6,7 +6,7 @@ import { resolve } from "node:path";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -70,7 +70,7 @@ export async function loadConfig(
     }
 
     logger.info("Successfully loaded config", { path: resolvedConfigPath });
-    return createSuccessResponse(importedModule.default);
+    return success(importedModule.default);
   } catch (error) {
     logger.error("Error loading config", {
       ...parseError(error),

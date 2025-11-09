@@ -24,12 +24,18 @@ import { _simpleT } from "@/i18n/core/shared";
 import { Logo } from "../../../_components/logo";
 import type { ChatContextValue } from "../../features/chat/context";
 import { DOM_IDS, LAYOUT } from "../../lib/config/constants";
-import type { ChatMessage, ChatThread, ModelId, ViewMode } from "../../types";
+import type {
+  ChatMessage,
+  ChatThread,
+  ModelId,
+  ViewMode,
+} from "../../types";
 import { AIToolsModal } from "../ai-tools-modal";
-import { ChatInput } from "../input/chat-input";
+import { ChatInputV2 } from "../input/chat-input-v2";
 import { ChatMessages } from "../messages/chat-messages";
 import { SuggestedPrompts } from "../messages/suggested-prompts";
 import { ViewModeToggle } from "../messages/view-mode-toggle";
+import { PublicFeed } from "../public-feed";
 
 interface ChatAreaProps {
   locale: CountryLanguage;
@@ -255,9 +261,10 @@ export function ChatArea({
 
       {/* View Mode Toggle & Screenshot - Positioned absolutely at top right (matching TopBar style) */}
       {/* z-40: Above input (z-20), below sidebar on mobile (z-50), below top bar (z-50) */}
-      {/* Only show when there are messages in the thread */}
+      {/* Show when there are messages in thread */}
       {messages.length > 0 && (onViewModeChange || onScreenshot) && (
         <Div className="absolute top-4 right-4 z-40 flex gap-1">
+          {/* Thread view mode toggle (only when there are messages) */}
           {onViewModeChange && (
             <ViewModeToggle
               mode={viewMode}
@@ -265,6 +272,8 @@ export function ChatArea({
               locale={locale}
             />
           )}
+
+          {/* Screenshot button */}
           {onScreenshot && (
             <Button
               variant="ghost"
@@ -328,8 +337,11 @@ export function ChatArea({
             logger={logger}
             currentUserId={currentUserId}
           />
+        ) : rootFolderId === "public" && !chat.currentSubFolderId ? (
+          // Public folder root (no subfolder) - show feed view
+          <PublicFeed chat={chat} locale={locale} />
         ) : (
-          // Empty state for new threads - show suggestions
+          // Empty state for new threads - show suggestions (including public subfolders)
           <Div
             className="h-full overflow-y-auto scroll-smooth scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full"
             id={DOM_IDS.MESSAGES_CONTAINER}
@@ -363,7 +375,7 @@ export function ChatArea({
         className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
       >
         <Div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pointer-events-auto">
-          <ChatInput
+          <ChatInputV2
             ref={inputRef}
             value={input}
             onChange={onInputChange}

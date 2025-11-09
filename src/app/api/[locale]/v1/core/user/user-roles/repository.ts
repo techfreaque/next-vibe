@@ -8,7 +8,7 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -118,7 +118,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
           createdAt: new Date(),
           updatedAt: new Date(),
         };
-        return createSuccessResponse([cliRole]);
+        return success([cliRole]);
       }
 
       const results = await db
@@ -126,7 +126,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
         .from(userRoles)
         .where(eq(userRoles.userId, userId));
 
-      return createSuccessResponse(results);
+      return success(results);
     } catch (error) {
       const parsedError = parseError(error);
 
@@ -190,7 +190,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
             createdAt: new Date(),
             updatedAt: new Date(),
           };
-          return createSuccessResponse(cliRole);
+          return success(cliRole);
         } else {
           return fail({
         message: "app.api.v1.core.user.userRoles.errors.not_found",
@@ -213,7 +213,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
       });
       }
 
-      return createSuccessResponse(results[0]);
+      return success(results[0]);
     } catch (error) {
       logger.error(
         "Error finding user role by user ID and role",
@@ -274,7 +274,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
       });
       }
 
-      return createSuccessResponse(results[0]);
+      return success(results[0]);
     } catch (error) {
       logger.error("Error adding role to user", parseError(error));
       return fail({
@@ -308,7 +308,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
         .where(and(eq(userRoles.userId, userId), eq(userRoles.role, role)))
         .returning({ id: userRoles.id });
 
-      return createSuccessResponse(results.length > 0);
+      return success(results.length > 0);
     } catch (error) {
       logger.error("Error removing role from user", parseError(error));
       return fail({
@@ -339,7 +339,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
         logger,
       );
 
-      return createSuccessResponse(existingRoleResult.success);
+      return success(existingRoleResult.success);
     } catch (error) {
       logger.error("Error checking if user has role", parseError(error));
       return fail({
@@ -364,7 +364,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       await db.delete(userRoles).where(eq(userRoles.userId, userId));
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error("Error deleting user roles by user ID", parseError(error));
       return fail({
@@ -398,7 +398,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
       }
 
       const roleValues = rolesResult.data.map((r) => r.role);
-      return createSuccessResponse(roleValues);
+      return success(roleValues);
     } catch (error) {
       logger.error("Error getting user role values", parseError(error));
       return fail({

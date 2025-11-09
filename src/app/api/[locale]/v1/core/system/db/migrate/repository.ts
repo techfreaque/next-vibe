@@ -12,7 +12,7 @@ import { migrate as drizzleMigrate } from "drizzle-orm/node-postgres/migrator";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -124,7 +124,7 @@ export class DatabaseMigrationRepositoryImpl
         duration,
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       const duration = Date.now() - startTime;
       const parsedError = parseError(error);
@@ -294,7 +294,7 @@ export class DatabaseMigrationRepositoryImpl
 
       if (options.dryRun) {
         message = t("app.api.v1.core.system.db.migrate.messages.repairDryRun");
-        return createSuccessResponse({ repaired: false, message });
+        return success({ repaired: false, message });
       }
 
       if (options.reset) {
@@ -305,7 +305,7 @@ export class DatabaseMigrationRepositoryImpl
       }
 
       // Repair logic would be implemented here
-      return createSuccessResponse({ repaired: true, message });
+      return success({ repaired: true, message });
     } catch (error) {
       return createErrorResponse(
         "app.api.v1.core.system.db.migrate.post.errors.network.title",
@@ -339,7 +339,7 @@ export class DatabaseMigrationRepositoryImpl
       }
 
       // Production migration logic would be implemented here
-      return createSuccessResponse({ migrated: true, message });
+      return success({ migrated: true, message });
     } catch (error) {
       return createErrorResponse(
         "app.api.v1.core.system.db.migrate.post.errors.network.title",
@@ -368,7 +368,7 @@ export class DatabaseMigrationRepositoryImpl
       );
 
       // Sync logic would be implemented here
-      return createSuccessResponse({ synced: true, message });
+      return success({ synced: true, message });
     } catch (error) {
       return createErrorResponse(
         "app.api.v1.core.system.db.migrate.post.errors.network.title",

@@ -8,7 +8,7 @@ import "server-only";
 import { and, desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -135,7 +135,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         duplicates: results.duplicateEmails,
       });
 
-      return createSuccessResponse({
+      return success({
         batchId: batch.id,
         totalRows: rows.length,
         successfulImports: results.successfulImports,
@@ -216,7 +216,7 @@ export class ImportRepositoryImpl implements ImportRepository {
       });
       }
 
-      return createSuccessResponse({
+      return success({
         batchId: createdJob.id,
         totalRows,
         successfulImports: 0,
@@ -268,7 +268,7 @@ export class ImportRepositoryImpl implements ImportRepository {
       }
 
       const jobData = job[0];
-      return createSuccessResponse({
+      return success({
         id: jobData.id,
         fileName: jobData.fileName,
         status: jobData.status,
@@ -323,7 +323,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         job.status === CsvImportJobStatus.COMPLETED ||
         job.status === CsvImportJobStatus.FAILED
       ) {
-        return createSuccessResponse({ processed: 0, hasMore: false });
+        return success({ processed: 0, hasMore: false });
       }
 
       // Update status to processing if it's pending
@@ -356,7 +356,7 @@ export class ImportRepositoryImpl implements ImportRepository {
           })
           .where(eq(csvImportJobs.id, jobId));
 
-        return createSuccessResponse({ processed: 0, hasMore: false });
+        return success({ processed: 0, hasMore: false });
       }
 
       // Process the batch
@@ -403,7 +403,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         })
         .where(eq(csvImportJobs.id, jobId));
 
-      return createSuccessResponse({
+      return success({
         processed: batchRows.length,
         hasMore,
       });
@@ -630,7 +630,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         },
       }));
 
-      return createSuccessResponse({ jobs: transformedJobs });
+      return success({ jobs: transformedJobs });
     } catch (error) {
       logger.error("Error listing import jobs", parseError(error).message);
       return fail({
@@ -703,7 +703,7 @@ export class ImportRepositoryImpl implements ImportRepository {
       }
 
       const job = updatedJobs[0];
-      return createSuccessResponse({
+      return success({
         id: job.id,
         fileName: job.fileName,
         status: job.status,
@@ -761,7 +761,7 @@ export class ImportRepositoryImpl implements ImportRepository {
       // Delete the job
       await db.delete(csvImportJobs).where(eq(csvImportJobs.id, jobId));
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message:
           "app.admin.leads.leadsErrors.leadsImport.delete.success.description",
@@ -829,7 +829,7 @@ export class ImportRepositoryImpl implements ImportRepository {
             })
             .where(eq(csvImportJobs.id, jobId));
 
-          return createSuccessResponse({
+          return success({
             success: true,
             message:
               "app.admin.leads.leadsErrors.leadsImport.post.success.job_stopped",
@@ -855,7 +855,7 @@ export class ImportRepositoryImpl implements ImportRepository {
             })
             .where(eq(csvImportJobs.id, jobId));
 
-          return createSuccessResponse({
+          return success({
             success: true,
             message:
               "app.admin.leads.leadsErrors.leadsImport.post.success.job_queued_retry",

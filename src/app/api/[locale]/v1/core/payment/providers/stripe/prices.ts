@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -119,7 +119,7 @@ export class StripePriceManager {
         stripeProductId: stripeProduct.id,
       });
 
-      return createSuccessResponse<StripePriceResult>({
+      return success<StripePriceResult>({
         priceId: stripePrice.id,
         productId: stripeProduct.id,
       });

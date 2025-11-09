@@ -14,7 +14,7 @@ import { join } from "node:path";
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -107,7 +107,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       const duration = Date.now() - startTime;
       const tasksFound = taskFiles.length + taskRunnerFiles.length;
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message: `Generated task index with ${tasksFound} task files in ${duration}ms`,
         tasksFound,

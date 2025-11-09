@@ -10,7 +10,7 @@ import { join } from "node:path";
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -92,7 +92,7 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
 
       logger.info(`Generated seeds file with ${seedFiles.length} seeds in ${duration}ms`);
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message: "app.api.v1.core.system.generators.seeds.success.generated",
         seedsFound: seedFiles.length,

@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -95,7 +95,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
         port: DEFAULT_IMAP_CONFIG.port,
       });
 
-      return createSuccessResponse({
+      return success({
         ...DEFAULT_IMAP_CONFIG,
         message:
           "app.api.v1.core.emails.imapClient.config.get.response.message",
@@ -134,7 +134,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
         port: data.port,
       });
 
-      return createSuccessResponse({
+      return success({
         ...DEFAULT_IMAP_CONFIG,
         ...data,
         message:

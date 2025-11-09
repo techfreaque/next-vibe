@@ -7,7 +7,7 @@ import { join } from "node:path";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -56,7 +56,7 @@ export function runTests(
   const pkgPath = `${packagePath}/package.json`;
   if (!existsSync(pkgPath)) {
     logger.info(`No package.json found in ${packagePath}, skipping tests.`);
-    return createSuccessResponse(undefined);
+    return success(undefined);
   }
 
   // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Output parsing requires 'unknown' for flexible data formats
@@ -74,13 +74,13 @@ export function runTests(
     logger.info(
       `No test script found in package.json at ${pkgPath}, skipping tests.`,
     );
-    return createSuccessResponse(undefined);
+    return success(undefined);
   }
 
   try {
     // eslint-disable-next-line i18next/no-literal-string
     execSync(`yarn test`, { stdio: "inherit", cwd: packagePath });
-    return createSuccessResponse(undefined);
+    return success(undefined);
   } catch (error) {
     logger.error(`Tests failed in ${packagePath}`, parseError(error));
     return createErrorResponse(
@@ -119,7 +119,7 @@ export const lint = (
         cwd: cwd,
       });
     }
-    return createSuccessResponse(undefined);
+    return success(undefined);
   } catch (error) {
     if (hasStdout(error)) {
       lintOutput = error.stdout.toString();
@@ -152,7 +152,7 @@ export const typecheck = (
   const tsconfigPath = join(cwd, "tsconfig.json");
   if (!existsSync(tsconfigPath)) {
     logger.info(`No tsconfig.json found in ${cwd}, skipping typecheck.`);
-    return createSuccessResponse(undefined);
+    return success(undefined);
   }
 
   try {
@@ -199,7 +199,7 @@ export const typecheck = (
       }
     }
     logger.info(`TypeScript type checking passed for ${cwd}`);
-    return createSuccessResponse(undefined);
+    return success(undefined);
   } catch (error) {
     logger.error(
       `TypeScript type checking failed in ${cwd}. Aborting release.`,
@@ -220,7 +220,7 @@ export const build = (
   try {
     // eslint-disable-next-line i18next/no-literal-string
     execSync(`yarn build`, { stdio: "inherit", cwd });
-    return createSuccessResponse(undefined);
+    return success(undefined);
   } catch (error) {
     logger.error(`Build failed in ${cwd}`, parseError(error));
     return createErrorResponse(
@@ -285,5 +285,5 @@ function getPackageJson(
       { path: cwd },
     );
   }
-  return createSuccessResponse(parsedJson);
+  return success(parsedJson);
 }

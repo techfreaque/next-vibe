@@ -5,7 +5,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -67,7 +67,7 @@ export class DatabaseMigrateProdRepositoryImpl
           "app.api.v1.core.system.db.migrateProd.messages.dryRunComplete",
         );
 
-        return createSuccessResponse({
+        return success({
           success: true,
           output,
           environment: this.getEnvironment(),
@@ -131,7 +131,7 @@ export class DatabaseMigrateProdRepositoryImpl
 
       logger.info("Production migration completed successfully");
 
-      return createSuccessResponse({
+      return success({
         success: true,
         output,
         environment: this.getEnvironment(),

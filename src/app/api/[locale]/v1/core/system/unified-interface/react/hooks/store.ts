@@ -4,7 +4,7 @@ import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
 import { create } from "zustand";
 
@@ -258,7 +258,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
     // Get the updated data from React Query cache
     const data = queryClient.getQueryData<ResponseType<TResponse>>(queryKey);
-    return data ?? createSuccessResponse(undefined);
+    return data ?? success(undefined);
   },
 
   // OLD executeQuery IMPLEMENTATION REMOVED - lines 321-1029

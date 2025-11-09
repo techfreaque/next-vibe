@@ -11,7 +11,7 @@ import { and, eq, ne } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -234,7 +234,7 @@ async function executeNewsletterUnsubscribeSync(
     };
 
     logger.info("tasks.newsletter_unsubscribe_sync.completed", result);
-    return createSuccessResponse(result);
+    return success(result);
   } catch (error) {
     const executionTimeMs = Date.now() - startTime;
     logger.error("tasks.newsletter_unsubscribe_sync.failed", {
@@ -262,7 +262,7 @@ async function validateNewsletterUnsubscribeSync(): Promise<
     // Basic validation - check if database tables are accessible
     await db.select().from(leads).limit(1);
     await db.select().from(newsletterSubscriptions).limit(1);
-    return createSuccessResponse(true);
+    return success(true);
   } catch {
     return createErrorResponse(
       "app.api.v1.core.newsletter.error.default",
@@ -276,7 +276,7 @@ async function validateNewsletterUnsubscribeSync(): Promise<
  */
 function rollbackNewsletterUnsubscribeSync(): ResponseType<boolean> {
   // No rollback needed for status sync task
-  return createSuccessResponse(true);
+  return success(true);
 }
 
 /**

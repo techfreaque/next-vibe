@@ -6,7 +6,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -64,7 +64,7 @@ export class StripeProvider implements PaymentProvider {
       }
 
       if (user.stripeCustomerId) {
-        return createSuccessResponse<CustomerResult>({
+        return success<CustomerResult>({
           customerId: user.stripeCustomerId,
         });
       }
@@ -85,7 +85,7 @@ export class StripeProvider implements PaymentProvider {
         stripeCustomerId: customer.id,
       });
 
-      return createSuccessResponse<CustomerResult>({
+      return success<CustomerResult>({
         customerId: customer.id,
       });
     } catch (error) {
@@ -164,7 +164,7 @@ export class StripeProvider implements PaymentProvider {
         interval: params.interval,
       });
 
-      return createSuccessResponse<CheckoutSessionResult>({
+      return success<CheckoutSessionResult>({
         sessionId: session.id,
         checkoutUrl: session.url || "",
         // Return provider IDs so they can be saved with subscription
@@ -226,7 +226,7 @@ export class StripeProvider implements PaymentProvider {
         webhookData.subscription = typeof eventData.subscription === "string" ? eventData.subscription : undefined;
       }
 
-      return createSuccessResponse<WebhookEvent>({
+      return success<WebhookEvent>({
         id: event.id,
         type: event.type,
         data: webhookData,
@@ -296,7 +296,7 @@ export class StripeProvider implements PaymentProvider {
         intervalCount,
       });
 
-      return createSuccessResponse({
+      return success({
         userId: subscription.metadata?.userId || "",
         currentPeriodStart: currentPeriodStart * 1000, // Convert to milliseconds
         currentPeriodEnd: currentPeriodEnd * 1000, // Convert to milliseconds
@@ -320,7 +320,7 @@ export class StripeProvider implements PaymentProvider {
 
       logger.info("Canceled Stripe subscription", { subscriptionId });
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error("Failed to cancel Stripe subscription", {
         error: parseError(error),

@@ -7,7 +7,7 @@ import "server-only";
 
 import { and, count, eq, ilike, not, or } from "drizzle-orm";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
@@ -214,7 +214,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       // If minimal detail level is requested and we already have the data, return it
       if (detailLevel === UserDetailLevel.MINIMAL) {
-        return createSuccessResponse<UserType<T>>(verifiedUser as UserType<T>);
+        return success<UserType<T>>(verifiedUser as UserType<T>);
       }
 
       // Type guard to check if user has ID property
@@ -317,7 +317,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       };
 
       if (detailLevel === UserDetailLevel.STANDARD) {
-        return createSuccessResponse<ExtendedUserType<T>>(
+        return success<ExtendedUserType<T>>(
           standardUser as ExtendedUserType<T>,
         );
       }
@@ -328,7 +328,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         stripeCustomerId: user.stripeCustomerId,
       };
 
-      return createSuccessResponse<ExtendedUserType<T>>(
+      return success<ExtendedUserType<T>>(
         completeUser as ExtendedUserType<T>,
       );
     } catch (error) {
@@ -397,7 +397,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         .from(users)
         .where(eq(users.id, userId))
         .limit(1);
-      return createSuccessResponse(results.length > 0);
+      return success(results.length > 0);
     } catch (error) {
       logger.error("Error checking if user exists", parseError(error));
       return fail({
@@ -421,7 +421,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         .from(users)
         .where(eq(users.email, email))
         .limit(1);
-      return createSuccessResponse(results.length > 0);
+      return success(results.length > 0);
     } catch (error) {
       logger.error("Error checking if email exists", parseError(error));
       return fail({
@@ -447,7 +447,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         .where(and(eq(users.email, email), not(eq(users.id, excludeUserId))))
         .limit(1);
 
-      return createSuccessResponse(results.length > 0);
+      return success(results.length > 0);
     } catch (error) {
       logger.error(
         "Error checking if email exists by other user",
@@ -539,7 +539,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         mappedResults.push(standardUser);
       }
 
-      return createSuccessResponse(mappedResults);
+      return success(mappedResults);
     } catch (error) {
       logger.error("Error searching users", parseError(error));
       return fail({
@@ -607,7 +607,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         mappedResults.push(standardUser);
       }
 
-      return createSuccessResponse(mappedResults);
+      return success(mappedResults);
     } catch (error) {
       logger.error("Error getting all users", parseError(error));
       return fail({
@@ -654,7 +654,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       const result = await countQuery;
       const totalCount = result[0]?.count || 0;
 
-      return createSuccessResponse(totalCount);
+      return success(totalCount);
     } catch (error) {
       logger.error("Error getting user search count", parseError(error));
       return fail({
@@ -709,7 +709,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         userRoles: [],
       };
 
-      return createSuccessResponse(standardUser);
+      return success(standardUser);
     } catch (error) {
       logger.error(
         "Error creating user with hashed password",
@@ -800,7 +800,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
             : new Date(user.updatedAt).toISOString(),
     }));
 
-    return createSuccessResponse({
+    return success({
       users: serializedUsers,
       pagination: {
         currentPage,

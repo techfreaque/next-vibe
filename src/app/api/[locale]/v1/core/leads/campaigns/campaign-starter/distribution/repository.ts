@@ -9,7 +9,7 @@ import { and, eq, gte, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -89,7 +89,7 @@ export class DistributionRepositoryImpl implements DistributionRepository {
         runsPerWeek,
       };
 
-      return createSuccessResponse(result);
+      return success(result);
     } catch (error) {
       logger.error("Distribution calculation failed", parseError(error));
       return createErrorResponse(
@@ -174,7 +174,7 @@ export class DistributionRepositoryImpl implements DistributionRepository {
         adjustedLeadsPerRun: 0, // Will be set by caller
       };
 
-      return createSuccessResponse(result);
+      return success(result);
     } catch (error) {
       logger.error("Locale quota calculation failed", parseError(error));
       return createErrorResponse(

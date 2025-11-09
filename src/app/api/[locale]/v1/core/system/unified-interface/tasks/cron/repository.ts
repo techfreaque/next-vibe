@@ -7,7 +7,7 @@
 import { count, desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
@@ -106,7 +106,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         .from(cronTasks)
         .orderBy(desc(cronTasks.createdAt));
       logger.info(`Successfully fetched ${tasks.length} cron tasks`);
-      return createSuccessResponse(tasks as CronTask[]);
+      return success(tasks as CronTask[]);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch cron tasks", {
@@ -133,7 +133,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         .limit(1);
       const result: CronTask | null = (task[0] as CronTask) || null;
       logger.info(`Cron task ${result ? "found" : "not found"}`, { id });
-      return createSuccessResponse<CronTask | null>(result);
+      return success<CronTask | null>(result);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch cron task by ID", {
@@ -161,7 +161,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         .limit(1);
       const result: CronTask | null = (task[0] as CronTask) || null;
       logger.info(`Cron task ${result ? "found" : "not found"}`, { name });
-      return createSuccessResponse<CronTask | null>(result);
+      return success<CronTask | null>(result);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch cron task by name", {
@@ -187,7 +187,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         id: newTask.id,
         name: newTask.name,
       });
-      return createSuccessResponse(newTask as CronTask);
+      return success(newTask as CronTask);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to create cron task", {
@@ -222,7 +222,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         });
       }
 
-      return createSuccessResponse(updatedTask as CronTask);
+      return success(updatedTask as CronTask);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to update cron task", {
@@ -246,7 +246,7 @@ export class CronTasksRepository implements ICronTasksRepository {
       logger.debug("Deleting cron task", { id });
       await db.delete(cronTasks).where(eq(cronTasks.id, id));
       logger.info("Successfully deleted cron task", { id });
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to delete cron task", {
@@ -274,7 +274,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         .insert(cronTaskExecutions)
         .values(execution)
         .returning();
-      return createSuccessResponse(newExecution as CronTaskExecution);
+      return success(newExecution as CronTaskExecution);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to create cron execution", {
@@ -313,7 +313,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         });
       }
 
-      return createSuccessResponse(updatedExecution as CronTaskExecution);
+      return success(updatedExecution as CronTaskExecution);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to update cron execution", {
@@ -343,7 +343,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         .orderBy(desc(cronTaskExecutions.startedAt))
         .limit(limit);
 
-      return createSuccessResponse(executions as CronTaskExecution[]);
+      return success(executions as CronTaskExecution[]);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch cron executions by task ID", {
@@ -372,7 +372,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         .orderBy(desc(cronTaskExecutions.startedAt))
         .limit(limit);
 
-      return createSuccessResponse(executions as CronTaskExecution[]);
+      return success(executions as CronTaskExecution[]);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch recent cron executions", {
@@ -397,7 +397,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         .select()
         .from(cronTaskSchedules)
         .orderBy(cronTaskSchedules.nextRunAt);
-      return createSuccessResponse(schedules as CronTaskSchedule[]);
+      return success(schedules as CronTaskSchedule[]);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch task schedules", {
@@ -435,7 +435,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         });
       }
 
-      return createSuccessResponse(updatedSchedule as CronTaskSchedule);
+      return success(updatedSchedule as CronTaskSchedule);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to update task schedule", {
@@ -470,7 +470,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         })
         .from(cronTasks);
 
-      return createSuccessResponse({
+      return success({
         totalTasks: stats.totalTasks,
         enabledTasks: stats.enabledTasks,
         disabledTasks: stats.disabledTasks,

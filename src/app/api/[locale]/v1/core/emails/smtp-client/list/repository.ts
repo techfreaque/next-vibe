@@ -9,7 +9,7 @@ import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -145,7 +145,7 @@ class SmtpAccountsListRepositoryImpl implements SmtpAccountsListRepository {
         totalPages,
       });
 
-      return createSuccessResponse({
+      return success({
         accounts: responseAccounts,
         pagination: {
           page,

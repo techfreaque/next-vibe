@@ -7,7 +7,7 @@ import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
@@ -151,7 +151,7 @@ export class MessageSearchRepositoryImpl
         limit,
       });
 
-      return createSuccessResponse({
+      return success({
         results: results.map((r) => ({
           id: r.id,
           content: r.content,

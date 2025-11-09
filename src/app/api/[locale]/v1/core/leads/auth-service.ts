@@ -8,7 +8,7 @@ import "server-only";
 
 import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -397,7 +397,7 @@ class LeadAuthServiceImpl {
     );
     // Return success to maintain backward compatibility
     // Platform handlers will manage lead ID storage
-    return createSuccessResponse(undefined);
+    return success(undefined);
   }
 
   /**

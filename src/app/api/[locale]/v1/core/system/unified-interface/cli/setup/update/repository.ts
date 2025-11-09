@@ -8,7 +8,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -74,7 +74,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
       );
 
       if (installResult.success && installResult.data) {
-        return createSuccessResponse({
+        return success({
           success: true,
           installed: true,
           version: installResult.data.version,
@@ -85,7 +85,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
           output: installResult.data.output,
         });
       } else {
-        return createSuccessResponse({
+        return success({
           success: false,
           installed: false,
           message: t(

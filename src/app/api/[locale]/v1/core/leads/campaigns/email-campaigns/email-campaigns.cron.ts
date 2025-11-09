@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -125,7 +125,7 @@ async function processEmailCampaignStage(
       config.maxEmailsPerRun - globalResult.emailsSent;
     if (remainingEmailQuota <= 0) {
       logger.debug("No remaining email quota for stage", { stage });
-      return createSuccessResponse(createEmptyEmailCampaignResult());
+      return success(createEmptyEmailCampaignResult());
     }
 
     const stageResult = await emailCampaignsRepository.processStage(
@@ -149,7 +149,7 @@ async function processEmailCampaignStage(
       );
     }
 
-    return createSuccessResponse(stageResult.data);
+    return success(stageResult.data);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error("Error processing stage", { stage, message: errorMessage });
@@ -174,14 +174,14 @@ function validateEmailCampaignTask(
     // Basic configuration validation
     if (!config.enabledStages || config.enabledStages.length === 0) {
       logger.warn("No enabled stages configured");
-      return createSuccessResponse(false);
+      return success(false);
     }
 
     if (config.maxEmailsPerRun <= 0) {
       logger.warn("Invalid maxEmailsPerRun configuration", {
         maxEmailsPerRun: config.maxEmailsPerRun,
       });
-      return createSuccessResponse(false);
+      return success(false);
     }
 
     // Check if we're within enabled time window
@@ -197,7 +197,7 @@ function validateEmailCampaignTask(
         currentHour,
         enabledHours: config.enabledHours,
       });
-      return createSuccessResponse(false);
+      return success(false);
     }
 
     if (!config.enabledDays.includes(currentDay)) {
@@ -205,11 +205,11 @@ function validateEmailCampaignTask(
         currentDay,
         enabledDays: config.enabledDays,
       });
-      return createSuccessResponse(false);
+      return success(false);
     }
 
     logger.debug("Email campaign task validation passed");
-    return createSuccessResponse(true);
+    return success(true);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error("Email campaign task validation failed", {
@@ -306,7 +306,7 @@ export async function execute(
       executionTimeMs,
     });
 
-    return createSuccessResponse(result);
+    return success(result);
   } catch (error) {
     const executionTimeMs = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -349,5 +349,5 @@ export function rollback(
   logger.info(
     "Rollback not applicable for email campaigns - emails are tracked in database",
   );
-  return createSuccessResponse(true);
+  return success(true);
 }

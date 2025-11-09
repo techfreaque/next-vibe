@@ -9,7 +9,7 @@ import { and, eq, isNotNull } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -77,7 +77,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
 
       if (leadsToProcess.length === 0) {
         logger.debug("No leads found for stage", { stage });
-        return createSuccessResponse(result);
+        return success(result);
       }
 
       // Process each lead
@@ -126,7 +126,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
         emailsFailed: result.emailsFailed,
       });
 
-      return createSuccessResponse(result);
+      return success(result);
     } catch (error) {
       logger.error("Failed to process stage", {
         stage,

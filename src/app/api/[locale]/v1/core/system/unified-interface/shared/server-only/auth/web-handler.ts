@@ -9,7 +9,7 @@ import {
 } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -75,7 +75,7 @@ export class WebAuthHandler extends BaseAuthHandler {
         if (leadId && leadId !== existingLeadId) {
           await this.setLeadIdCookie(leadId, logger);
         }
-        return createSuccessResponse(this.createPublicUser(leadId || ""));
+        return success(this.createPublicUser(leadId || ""));
       }
 
       // Verify token
@@ -93,7 +93,7 @@ export class WebAuthHandler extends BaseAuthHandler {
         if (leadId && leadId !== existingLeadId) {
           await this.setLeadIdCookie(leadId, logger);
         }
-        return createSuccessResponse(this.createPublicUser(leadId || ""));
+        return success(this.createPublicUser(leadId || ""));
       }
 
       // Validate session
@@ -117,10 +117,10 @@ export class WebAuthHandler extends BaseAuthHandler {
         if (leadId && leadId !== existingLeadId) {
           await this.setLeadIdCookie(leadId, logger);
         }
-        return createSuccessResponse(this.createPublicUser(leadId || ""));
+        return success(this.createPublicUser(leadId || ""));
       }
 
-      return createSuccessResponse(verifyResult.data);
+      return success(verifyResult.data);
     } catch (error) {
       logger.error(
         "Web authentication failed - clearing cookies",
@@ -136,7 +136,7 @@ export class WebAuthHandler extends BaseAuthHandler {
       if (leadId && leadId !== existingLeadId) {
         await this.setLeadIdCookie(leadId, logger);
       }
-      return createSuccessResponse(this.createPublicUser(leadId || ""));
+      return success(this.createPublicUser(leadId || ""));
     }
   }
 
@@ -166,7 +166,7 @@ export class WebAuthHandler extends BaseAuthHandler {
         });
       }
 
-      return createSuccessResponse({
+      return success({
         isPublic: false,
         id: payload.id,
         leadId: payload.leadId,
@@ -198,7 +198,7 @@ export class WebAuthHandler extends BaseAuthHandler {
         .setExpirationTime(`${AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS}s`)
         .sign(this.secretKey);
 
-      return createSuccessResponse(token);
+      return success(token);
     } catch (error) {
       logger.error("JWT signing failed", parseError(error));
       return fail({
@@ -293,7 +293,7 @@ export class WebAuthHandler extends BaseAuthHandler {
       });
 
       logger.debug("Auth token and lead ID stored in cookies");
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error("Error storing auth token", parseError(error));
       return fail({
@@ -322,7 +322,7 @@ export class WebAuthHandler extends BaseAuthHandler {
       }
 
       logger.debug("Auth token cleared from cookies");
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error("Error clearing auth token", parseError(error));
       return fail({
@@ -360,7 +360,7 @@ export class WebAuthHandler extends BaseAuthHandler {
         // No maxAge - cookie persists indefinitely
       });
 
-      return createSuccessResponse(undefined);
+      return success(undefined);
     } catch (error) {
       logger.error("Failed to set leadId cookie", parseError(error));
       return fail({

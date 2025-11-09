@@ -10,7 +10,7 @@ import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -359,7 +359,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       }
 
       // Return properly formatted response matching LeadEngagementResponseOutput
-      return createSuccessResponse({
+      return success({
         id: engagementData.id,
         responseLeadId: data.leadId,
         responseEngagementType: data.engagementType,
@@ -479,7 +479,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadId,
       });
 
-      return createSuccessResponse({
+      return success({
         leadStatusUpdated: true,
       });
     } catch (error) {
@@ -520,7 +520,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadId,
       });
 
-      return createSuccessResponse({
+      return success({
         leadStatusUpdated: true,
       });
     } catch (error) {
@@ -573,7 +573,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           leadId: existingLead[0].id,
           createdAt: existingLead[0].createdAt.toISOString(),
         });
-        return createSuccessResponse({ leadId: existingLead[0].id });
+        return success({ leadId: existingLead[0].id });
       }
 
       // Extract country and language from locale
@@ -623,7 +623,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         source: createdLead.source,
       });
 
-      return createSuccessResponse({
+      return success({
         leadId: createdLead.id,
       });
     } catch (error) {
@@ -837,7 +837,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         });
       }
 
-      return createSuccessResponse({
+      return success({
         statusChanged,
         newStatus,
         previousStatus: currentStatus,
@@ -1062,7 +1062,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       );
 
       if (result.success && result.data) {
-        return createSuccessResponse({
+        return success({
           ...result.data,
           leadCreated,
           relationshipEstablished,
@@ -1123,7 +1123,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         engagementRecorded,
       });
 
-      return createSuccessResponse({
+      return success({
         success: true,
         leadId,
         campaignId,
@@ -1265,7 +1265,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         }
       }
 
-      return createSuccessResponse({
+      return success({
         success: true,
         redirectUrl: url,
         responseLeadId: trackingLeadId,

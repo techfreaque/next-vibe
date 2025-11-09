@@ -5,7 +5,7 @@
 
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
@@ -135,7 +135,7 @@ class CreditValidator implements CreditValidatorInterface {
         creditType,
       });
 
-      return createSuccessResponse({
+      return success({
         hasCredits,
         cost,
         balance,
@@ -184,7 +184,7 @@ class CreditValidator implements CreditValidatorInterface {
         hasCredits,
       });
 
-      return createSuccessResponse({
+      return success({
         hasCredits,
         cost,
         balance,
@@ -246,7 +246,7 @@ class CreditValidator implements CreditValidatorInterface {
         hasCredits,
       });
 
-      return createSuccessResponse({
+      return success({
         leadId,
         validation: {
           hasCredits,

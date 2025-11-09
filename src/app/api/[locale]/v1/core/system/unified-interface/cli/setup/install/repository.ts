@@ -14,7 +14,7 @@ import path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -159,7 +159,7 @@ exec bun "${vibeTsPath}" "$@"
       const status = await this.checkInstallationStatus();
 
       if (status.installed && !data.force) {
-        return createSuccessResponse({
+        return success({
           success: true,
           installed: true,
           version: status.version,
@@ -285,7 +285,7 @@ exec bun "${vibeTsPath}" "$@"
       // Verify installation
       const newStatus = await this.checkInstallationStatus();
 
-      return createSuccessResponse({
+      return success({
         success: newStatus.installed,
         installed: newStatus.installed,
         version: newStatus.version,

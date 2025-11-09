@@ -6,7 +6,7 @@
 import { Button, Hr, Link, Section } from "@react-email/components";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
@@ -307,7 +307,7 @@ export const renderWelcomeMail: EmailFunctionType<
   never
 > = ({ requestData, responseData, locale, t }) => {
   try {
-    return createSuccessResponse({
+    return success({
       toEmail: requestData.email,
       toName: requestData.name || requestData.email,
       subject: t("app.api.v1.core.newsletter.email.welcome.subject"),
@@ -337,7 +337,7 @@ export const renderAdminNotificationMail: EmailFunctionType<
   never
 > = ({ requestData, locale, t }) => {
   try {
-    return createSuccessResponse({
+    return success({
       toEmail: contactClientRepository.getSupportEmail(locale),
       toName: t("config.appName"),
       subject: t("app.api.v1.core.newsletter.email.admin_notification.subject"),

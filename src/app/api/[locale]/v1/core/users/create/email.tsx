@@ -6,7 +6,7 @@
 import { Button, Hr, Section, Text } from "@react-email/components";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import React, { type JSX } from "react";
@@ -371,7 +371,7 @@ export const renderWelcomeEmail: EmailFunctionType<
       );
     }
 
-    return createSuccessResponse({
+    return success({
       toEmail: responseData.responseEmail,
       toName: responseData.responsePrivateName,
       subject: t("app.api.v1.core.users.create.email.users.welcome.subject", {
@@ -408,7 +408,7 @@ export const renderAdminNotificationEmail: EmailFunctionType<
       );
     }
 
-    return createSuccessResponse({
+    return success({
       toEmail: "admin@example.com", // Replace with actual admin email
       toName: t("config.appName"),
       subject: t("app.api.v1.core.users.create.email.users.admin.subject", {

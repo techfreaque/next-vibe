@@ -11,7 +11,7 @@ import {
   RESET_TOKEN_EXPIRY,
 } from "@/config/constants";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
@@ -167,7 +167,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
         });
       }
 
-      return createSuccessResponse(result);
+      return success(result);
     } catch (error) {
       const executionTimeMs = Date.now() - startTime;
       const errorMessage = parseError(error).message;
@@ -237,7 +237,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       }
 
       logger.debug("Session cleanup configuration validation passed");
-      return createSuccessResponse(true);
+      return success(true);
     } catch (error) {
       logger.error(
         "Session cleanup configuration validation failed",

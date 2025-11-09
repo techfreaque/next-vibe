@@ -14,7 +14,7 @@ import path from "node:path";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -151,7 +151,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
 
       logger.debug("🔌 Stripe CLI operation executed successfully!");
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       logger.error("Error processing Stripe CLI operation:", parseError(error));
       const parsedError = parseError(error);
@@ -175,7 +175,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       logger.debug("Checking Stripe CLI installation");
       const installed = this.isStripeCLIInstalled();
       logger.debug(`Stripe CLI installation status: ${installed}`);
-      return createSuccessResponse(installed);
+      return success(installed);
     } catch (error) {
       logger.error(
         "Error checking Stripe CLI installation:",
@@ -203,7 +203,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       const result = this.startStripeListener(url, undefined, false, logger);
 
       if (result.success) {
-        return createSuccessResponse(url);
+        return success(url);
       } else {
         return createErrorResponse(
           "app.api.v1.core.stripe.errors.serverError.title",
@@ -226,7 +226,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   checkAuthentication(logger: EndpointLogger): ResponseType<boolean> {
     try {
       const authenticated = this.checkStripeAuth(logger);
-      return createSuccessResponse(authenticated);
+      return success(authenticated);
     } catch (error) {
       return createErrorResponse(
         "app.api.v1.core.stripe.errors.serverError.title",

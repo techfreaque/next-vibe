@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -173,7 +173,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
         logger,
       });
 
-      return createSuccessResponse({
+      return success({
         response: {
           success: true,
           text: pollResult.data.text,
@@ -250,7 +250,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
             confidence,
           });
 
-          return createSuccessResponse({
+          return success({
             text: transcription,
             confidence,
           });

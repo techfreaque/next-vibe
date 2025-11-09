@@ -8,7 +8,7 @@ import "server-only";
 import { and, avg, count, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
@@ -219,7 +219,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
         },
       };
 
-      return createSuccessResponse(response);
+      return success(response);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch cron task history", {

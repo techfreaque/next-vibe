@@ -15,7 +15,7 @@ import {
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
-  createSuccessResponse,
+  success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import {
@@ -189,7 +189,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         deliveredEmails: statsResponse.deliveredEmails,
       });
 
-      return createSuccessResponse(statsResponse);
+      return success(statsResponse);
     } catch (error) {
       logger.error("Error generating email stats", parseError(error));
       return createErrorResponse(
