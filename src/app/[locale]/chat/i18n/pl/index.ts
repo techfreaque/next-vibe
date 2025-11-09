@@ -369,6 +369,26 @@ export const translations: typeof enTranslations = {
     sharedDescription: "Rozmowy udostępnione innym",
     publicDescription: "Rozmowy publiczne",
     incognitoDescription: "Rozmowy w trybie prywatnym",
+    accessModal: {
+      title: "Wymagane konto",
+      privateTitle: "Wątki prywatne",
+      sharedTitle: "Wątki udostępnione",
+      publicTitle: "Forum publiczne",
+      incognitoTitle: "Tryb incognito",
+      privateExplanation:
+        "Wątki prywatne to Twoja osobista przestrzeń do rozmów z AI. Wszystkie Twoje czaty są bezpiecznie przechowywane na naszych serwerach i automatycznie synchronizowane na wszystkich Twoich urządzeniach.",
+      sharedExplanation:
+        "Wątki udostępnione pozwalają tworzyć rozmowy i dzielić się nimi z innymi za pomocą bezpiecznych linków. Idealny do współpracy i dzielenia się spostrzeżeniami z zespołem lub przyjaciółmi.",
+      publicExplanation:
+        "Forum publiczne to przestrzeń chroniona przez pierwszą poprawkę, gdzie ludzie i AI angażują się w otwarty dialog. Dziel się pomysłami, kwestionuj perspektywy i uczestniczą w niecenzurowanych dyskusjach.",
+      incognitoExplanation:
+        "Tryb incognito zachowuje Twoje rozmowy całkowicie prywatne i lokalne. Twoje czaty są przechowywane tylko w Twojej przeglądarce i nigdy nie są wysyłane na nasze serwery - nawet nie są powiązane z Twoim kontem.",
+      requiresAccount:
+        "Aby uzyskać dostęp do {{folderName}}, musisz utworzyć konto lub się zalogować.",
+      loginButton: "Zaloguj się",
+      signupButton: "Zarejestruj się",
+      close: "Zamknij",
+    },
   },
   moveFolder: {
     title: "Przenieś folder",
@@ -658,9 +678,17 @@ export const translations: typeof enTranslations = {
   suggestedPrompts: {
     title: "Jak mogę Ci pomóc?",
     privateTitle: "Twój prywatny asystent AI",
+    privateDescription:
+      "Bezpiecznie przechowywane na serwerach i synchronizowane na urządzeniach.",
     sharedTitle: "Współpraca z AI",
+    sharedDescription:
+      "Twórz rozmowy i udostępniaj je innym za pomocą bezpiecznych linków.",
     publicTitle: "Dołącz do publicznego forum AI",
+    publicDescription:
+      "Przestrzeń chroniona Pierwszą Poprawką, gdzie ludzie i AI prowadzą otwarty dialog.",
     incognitoTitle: "Anonimowy czat AI",
+    incognitoDescription:
+      "Tylko w przeglądarce, nigdy na serwerach. Niepowiązane z kontem.",
     more: "Więcej",
     selectPersona: "Wybierz personę",
     noPrompts: "Brak sugestii dla tej persony",

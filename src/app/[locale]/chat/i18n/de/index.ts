@@ -370,6 +370,26 @@ export const translations: typeof enTranslations = {
     sharedDescription: "Mit anderen geteilte Unterhaltungen",
     publicDescription: "Öffentliche Unterhaltungen",
     incognitoDescription: "Unterhaltungen im privaten Modus",
+    accessModal: {
+      title: "Konto erforderlich",
+      privateTitle: "Private Threads",
+      sharedTitle: "Geteilte Threads",
+      publicTitle: "Öffentliches Forum",
+      incognitoTitle: "Inkognito-Modus",
+      privateExplanation:
+        "Private Threads sind Ihr persönlicher Bereich für Gespräche mit KI. Alle Ihre Chats werden sicher auf unseren Servern gespeichert und automatisch auf allen Ihren Geräten synchronisiert.",
+      sharedExplanation:
+        "Geteilte Threads ermöglichen es Ihnen, Gespräche zu erstellen und sie mit anderen über sichere Links zu teilen. Perfekt für die Zusammenarbeit und das Teilen von Erkenntnissen mit Ihrem Team oder Freunden.",
+      publicExplanation:
+        "Das öffentliche Forum ist ein durch den ersten Verfassungszusatz geschützter Raum, in dem Menschen und KI in offenen Dialog treten. Teilen Sie Ideen, hinterfragen Sie Perspektiven und nehmen Sie an unzensierten Diskussionen teil.",
+      incognitoExplanation:
+        "Der Inkognito-Modus hält Ihre Gespräche völlig privat und lokal. Ihre Chats werden nur in Ihrem Browser gespeichert und niemals an unsere Server gesendet - nicht einmal mit Ihrem Konto verknüpft.",
+      requiresAccount:
+        "Um auf {{folderName}} zuzugreifen, müssen Sie ein Konto erstellen oder sich anmelden.",
+      loginButton: "Anmelden",
+      signupButton: "Registrieren",
+      close: "Schließen",
+    },
   },
   moveFolder: {
     title: "Ordner verschieben",
@@ -677,9 +697,17 @@ export const translations: typeof enTranslations = {
   suggestedPrompts: {
     title: "Wie kann ich Ihnen helfen?",
     privateTitle: "Ihr privater KI-Assistent",
+    privateDescription:
+      "Sicher auf Servern gespeichert und auf Geräten synchronisiert.",
     sharedTitle: "Zusammenarbeit mit KI",
+    sharedDescription:
+      "Erstellen Sie Gespräche und teilen Sie sie mit anderen über sichere Links.",
     publicTitle: "Treten Sie dem öffentlichen KI-Forum bei",
+    publicDescription:
+      "Ein durch den Ersten Verfassungszusatz geschützter Raum, in dem Menschen und KI in einen offenen Dialog treten.",
     incognitoTitle: "Anonymer KI-Chat",
+    incognitoDescription:
+      "Nur im Browser, niemals auf Servern. Nicht mit Konto verknüpft.",
     more: "Mehr",
     selectPersona: "Persona auswählen",
     noPrompts: "Keine Vorschläge für diese Persona",

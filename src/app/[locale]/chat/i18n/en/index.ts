@@ -368,6 +368,26 @@ export const translations = {
     publicDescription:
       "Public US First Amendment protected forum for people and AI.",
     incognitoDescription: "Conversations are only stored in your browser.",
+    accessModal: {
+      title: "Account Required",
+      privateTitle: "Private Threads",
+      sharedTitle: "Shared Threads",
+      publicTitle: "Public Forum",
+      incognitoTitle: "Incognito Mode",
+      privateExplanation:
+        "Private threads are your personal space for conversations with AI. All your chats are securely stored on our servers and automatically synchronized across all your devices.",
+      sharedExplanation:
+        "Shared threads allow you to create conversations and share them with others via secure links. Perfect for collaboration and sharing insights with your team or friends.",
+      publicExplanation:
+        "The Public Forum is a First Amendment protected space where people and AI engage in open dialogue. Share ideas, challenge perspectives, and participate in uncensored discussions.",
+      incognitoExplanation:
+        "Incognito mode keeps your conversations completely private and local. Your chats are stored only in your browser and never sent to our servers - not even tied to your account.",
+      requiresAccount:
+        "To access {{folderName}}, you need to create an account or sign in.",
+      loginButton: "Login",
+      signupButton: "Sign Up",
+      close: "Close",
+    },
   },
   moveFolder: {
     title: "Move Folder",
@@ -678,9 +698,17 @@ export const translations = {
   suggestedPrompts: {
     title: "How can I help you?",
     privateTitle: "Your Private AI Assistant",
+    privateDescription:
+      "Securely stored on our servers and synced across your devices.",
     sharedTitle: "Collaborate with AI",
+    sharedDescription:
+      "Create conversations and share them with others using secure links.",
     publicTitle: "Join the Public AI Forum",
+    publicDescription:
+      "A First Amendment protected space where people and AI engage in open dialogue.",
     incognitoTitle: "Anonymous AI Chat",
+    incognitoDescription:
+      "Stored only in your browser, never on our servers. Not tied to your account.",
     more: "More",
     selectPersona: "Select a Persona",
     noPrompts: "No suggested prompts for this persona",

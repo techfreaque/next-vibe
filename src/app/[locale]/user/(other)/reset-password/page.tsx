@@ -75,7 +75,7 @@ export default async function ResetPasswordPage({
   );
 
   // Redirect to dashboard if already authenticated
-  if (verifiedUserResponse.success && verifiedUserResponse.data) {
+  if (verifiedUserResponse.success && verifiedUserResponse.data && !verifiedUserResponse.data.isPublic) {
     redirect(`/${locale}/`);
   }
 

@@ -199,9 +199,9 @@ export function ChatSidebar({
       {/* Root Folder Navigation Bar */}
       <RootFolderBar
         activeFolderId={activeRootFolderId}
-        locale={locale}
         onSelectFolder={handleSelectFolder}
         isAuthenticated={isAuthenticated}
+        locale={locale}
       />
       {/* New Chat Button */}
       <Div className="flex items-center gap-1 px-3 pb-2 min-w-max">

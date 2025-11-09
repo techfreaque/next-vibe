@@ -2,13 +2,8 @@
 
 import { Button } from "next-vibe-ui//ui/button";
 import { Div } from "next-vibe-ui//ui/div";
-import { P } from "next-vibe-ui//ui/typography";
-import { Tooltip } from "next-vibe-ui//ui/tooltip";
-import { TooltipContent } from "next-vibe-ui//ui/tooltip";
-import { TooltipProvider } from "next-vibe-ui//ui/tooltip";
-import { TooltipTrigger } from "next-vibe-ui//ui/tooltip";
 import type { JSX } from "react";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 
 import {
   DEFAULT_FOLDER_CONFIGS,
@@ -17,13 +12,14 @@ import {
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { FolderAccessModal } from "./folder-access-modal";
 
 interface RootFolderBarProps {
   activeFolderId: string | null;
-  locale: CountryLanguage;
   onSelectFolder: (folderId: string) => void;
   isAuthenticated: boolean;
+  locale: CountryLanguage;
 }
 
 /**
@@ -72,37 +68,21 @@ function getColorClasses(color: string | null, isActive: boolean): string {
   return isActive ? classes.active : classes.hover;
 }
 
-/**
- * Get tooltip color classes based on folder color
- */
-function getTooltipColorClasses(color: string | null): string {
-  if (!color) {
-    return "";
-  }
-
-  const tooltipColorMap: Record<string, string> = {
-    sky: "bg-sky-600 text-white border-sky-500",
-    teal: "bg-teal-600 text-white border-teal-500",
-    amber: "bg-amber-600 text-white border-amber-500",
-    purple: "bg-purple-600 text-white border-purple-500",
-    zinc: "bg-zinc-600 text-white border-zinc-500",
-  };
-
-  return tooltipColorMap[color] || "";
-}
 /* eslint-enable i18next/no-literal-string */
 
 export function RootFolderBar({
   activeFolderId,
-  locale,
   onSelectFolder,
   isAuthenticated,
+  locale,
 }: RootFolderBarProps): JSX.Element {
-  const { t } = simpleT(locale);
-
   // Get root folders from DEFAULT_FOLDER_CONFIGS
   // Show all folders to all users, but disable PRIVATE and SHARED for public users
   const rootFolders = DEFAULT_FOLDER_CONFIGS;
+
+  // State for modal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
   // Check if a folder is accessible to the current user
   const isFolderAccessible = useCallback(
@@ -126,6 +106,10 @@ export function RootFolderBar({
         // Only allow navigation if folder is accessible
         if (isFolderAccessible(folderId)) {
           onSelectFolder(folderId);
+        } else {
+          // Show modal explaining the folder and prompting login/signup
+          setSelectedFolderId(folderId);
+          setModalOpen(true);
         }
       }
     },
@@ -133,57 +117,41 @@ export function RootFolderBar({
   );
 
   return (
-    <Div className="overflow-x-auto">
-      <Div className="flex items-center gap-1 px-3 py-2 min-w-max">
-        <TooltipProvider delayDuration={300}>
+    <>
+      <Div className="overflow-x-auto">
+        <Div className="flex items-center gap-1 px-3 py-2 min-w-max">
           {rootFolders.map((folderConfig) => {
             const FolderIcon = getIconComponent(folderConfig.icon);
-            const folderDisplayName = t(folderConfig.translationKey);
             const isActive = folderConfig.id === activeFolderId;
             const folderColor = folderConfig.color;
-            const isAccessible = isFolderAccessible(folderConfig.id);
             const colorClasses = getColorClasses(folderColor, isActive);
 
-            const tooltipColorClasses = getTooltipColorClasses(folderColor);
-
-            const folderDescription = t(folderConfig.descriptionKey);
-
             return (
-              <Tooltip key={folderConfig.id}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={`h-11 w-11 ${colorClasses}`}
-                    data-folder-id={folderConfig.id}
-                    onClick={handleClick}
-                    disabled={!isAccessible}
-                    suppressHydrationWarning
-                  >
-                    <FolderIcon className="h-6 w-6 flex items-center justify-center" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="bottom"
-                  className={tooltipColorClasses || undefined}
-                >
-                  <Div className="text-center">
-                    <P className="font-medium">{folderDisplayName}</P>
-                    <P className="text-xs opacity-90 mt-0.5">
-                      {folderDescription}
-                    </P>
-                    {!isAccessible && (
-                      <P className="text-xs opacity-70 mt-1 font-medium">
-                        {t("app.chat.common.loginRequired")}
-                      </P>
-                    )}
-                  </Div>
-                </TooltipContent>
-              </Tooltip>
+              <Button
+                key={folderConfig.id}
+                variant="ghost"
+                size="icon"
+                className={`h-11 w-11 ${colorClasses}`}
+                data-folder-id={folderConfig.id}
+                onClick={handleClick}
+                suppressHydrationWarning
+              >
+                <FolderIcon className="h-6 w-6 flex items-center justify-center" />
+              </Button>
             );
           })}
-        </TooltipProvider>
+        </Div>
       </Div>
-    </Div>
+
+      {/* Folder Access Modal */}
+      {selectedFolderId && (
+        <FolderAccessModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          folderId={selectedFolderId}
+          locale={locale}
+        />
+      )}
+    </>
   );
 }
