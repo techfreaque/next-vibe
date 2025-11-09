@@ -37,24 +37,28 @@ export const LanguagesArr = languageConfig.languagesArr;
  * Countries Options for select fields
  * Maps country codes to translation keys for UI display
  */
-export const CountriesOptions = Object.keys(languageConfig.countries).map(
-  (key) => ({
-    value: key,
-    label: `i18n.countries.${key.toLowerCase()}` as const,
-  }),
-);
+export const CountriesOptions = [
+                    {
+                      value: Countries.GLOBAL,
+                      label: "app.common.countries.global",
+                    },
+                    { value: Countries.DE, label: "app.common.countries.de" },
+                    { value: Countries.PL, label: "app.common.countries.pl" },
+                    { value: Countries.US, label: "app.common.countries.us" },
+                  ] as const;
 
 /**
  * Languages Options for select fields
  * Maps language codes to translation keys for UI display
  */
-export const LanguagesOptions = Object.keys(languageConfig.languages).map(
-  (key) => ({
-    value: key,
-    label:
-      `i18n.languages.${languageConfig.languages[key as keyof typeof languageConfig.languages].toLowerCase()}` as const,
-  }),
-);
+export const LanguagesOptions = [
+                    {
+                      value: Languages.EN,
+                      label: "app.common.languages.en",
+                    },
+                    { value: Languages.DE, label: "app.common.languages.de" },
+                    { value: Languages.PL, label: "app.common.languages.pl" },
+] as const;
 
 /**
  * Country Filter Enum
@@ -64,8 +68,32 @@ export enum CountryFilter {
   ALL = "all",
   DE = "DE",
   PL = "PL",
+  US = "US",
   GLOBAL = "GLOBAL",
 }
+
+/**
+ * Country Filter Options for select fields
+ * Includes "all" option for filtering scenarios
+ */
+export const CountryFilterOptions = [
+  {
+    value: CountryFilter.ALL,
+    label: "app.admin.leads.leads.admin.filters.countries.all",
+  },
+  {
+    value: CountryFilter.GLOBAL,
+    label: "app.admin.leads.leads.admin.filters.countries.global",
+  },
+  {
+    value: CountryFilter.DE,
+    label: "app.admin.leads.leads.admin.filters.countries.de",
+  },
+  {
+    value: CountryFilter.PL,
+    label: "app.admin.leads.leads.admin.filters.countries.pl",
+  },
+] as const;
 
 /**
  * Language Filter Enum
@@ -77,6 +105,29 @@ export enum LanguageFilter {
   DE = "de",
   PL = "pl",
 }
+
+/**
+ * Language Filter Options for select fields
+ * Includes "all" option for filtering scenarios
+ */
+export const LanguageFilterOptions = [
+  {
+    value: LanguageFilter.ALL,
+    label: "app.admin.leads.leads.filter.all_languages",
+  },
+  {
+    value: LanguageFilter.EN,
+    label: "app.admin.leads.leads.admin.filters.languages.en",
+  },
+  {
+    value: LanguageFilter.DE,
+    label: "app.admin.leads.leads.admin.filters.languages.de",
+  },
+  {
+    value: LanguageFilter.PL,
+    label: "app.admin.leads.leads.admin.filters.languages.pl",
+  },
+] as const;
 
 /**
  * Convert country filter - handles CountryFilter and returns string or null
@@ -124,9 +175,10 @@ export const defaultLocale: CountryLanguage = `${languageDefaults.language}-${la
 export const globalCountryInfo: CountryInfo = languageConfig.countryInfo
   .GLOBAL as CountryInfo;
 export const availableCountries: readonly CountryInfo[] = [
-  languageConfig.countryInfo.DE as CountryInfo,
-  languageConfig.countryInfo.PL as CountryInfo,
-  languageConfig.countryInfo.GLOBAL as CountryInfo,
+  languageConfig.countryInfo.DE satisfies CountryInfo,
+  languageConfig.countryInfo.PL satisfies CountryInfo,
+  languageConfig.countryInfo.US satisfies CountryInfo,
+  languageConfig.countryInfo.GLOBAL satisfies CountryInfo,
 ];
 export const availableLanguages = Object.values(languageConfig.languages);
 

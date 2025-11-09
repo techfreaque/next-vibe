@@ -1,6 +1,6 @@
 import { AlertCircle } from 'next-vibe-ui/ui/icons';
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { redirect } from "next-vibe-ui/lib/redirect";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";

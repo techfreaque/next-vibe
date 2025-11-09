@@ -24,7 +24,11 @@ import {
   UserStatusFilter,
 } from "@/app/api/[locale]/v1/core/users/enum";
 import type statsEndpoints from "@/app/api/[locale]/v1/core/users/stats/definition";
-import { Countries, type CountryLanguage } from "@/i18n/core/config";
+import {
+  CountryFilterOptions,
+  type CountryLanguage,
+  LanguageFilterOptions,
+} from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface UsersStatsFiltersContainerProps {
@@ -209,17 +213,8 @@ export function UsersStatsFilters({
           name="country"
           config={{
             type: "select",
-            label: "app.admin.users.filters.status",
-            options: [
-              {
-                value: Countries.DE,
-                label: "app.admin.users.filters.statuses.active",
-              },
-              {
-                value: Countries.PL,
-                label: "app.admin.users.filters.statuses.inactive",
-              },
-            ],
+            label: "app.admin.users.filters.country",
+            options: CountryFilterOptions,
           }}
         />
 

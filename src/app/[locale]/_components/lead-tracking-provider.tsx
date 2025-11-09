@@ -20,6 +20,8 @@ import type { LeadEngagementResponseOutput } from "../../api/[locale]/v1/core/le
 const TRACKING_SESSION_KEY = "lead_tracking_session";
 const TRACKING_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 
+let lastTrackedTime = 0;
+
 /**
  * Global Lead Tracking Provider
  * Records website visits for engagement tracking with session-based deduplication
@@ -45,9 +47,7 @@ export function LeadTrackingProvider(): null {
     const initializeLeadTracking = async (): Promise<void> => {
       try {
         // Check if we've tracked recently in this session
-        const lastTracked = sessionStorage.getItem(TRACKING_SESSION_KEY);
-        if (lastTracked) {
-          const lastTrackedTime = parseInt(lastTracked, 10);
+        if (lastTrackedTime) {
           const timeSinceLastTrack = Date.now() - lastTrackedTime;
 
           if (timeSinceLastTrack < TRACKING_COOLDOWN_MS) {
@@ -95,7 +95,7 @@ export function LeadTrackingProvider(): null {
 
         if (apiResult.success) {
           // Store tracking timestamp in session storage
-          sessionStorage.setItem(TRACKING_SESSION_KEY, Date.now().toString());
+          lastTrackedTime= Date.now()
 
           logger.debug("info.leads.tracking.engagement.visit_recorded", {
             leadId: apiResult.data.responseLeadId,

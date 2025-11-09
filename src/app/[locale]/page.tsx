@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { redirect } from "next-vibe-ui/lib/redirect";
 
 import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

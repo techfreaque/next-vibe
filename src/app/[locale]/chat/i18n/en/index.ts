@@ -538,6 +538,8 @@ export const translations = {
     result: "Result",
     error: "Error",
     executing: "Executing...",
+    creditsUsed: "{{count}} credit",
+    creditsUsed_other: "{{count}} credits",
     status: {
       error: "Error",
       executing: "Executing...",

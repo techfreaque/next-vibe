@@ -55,9 +55,9 @@ interface ToolDisplayProps {
  * - All widget types (LINK_LIST, DATA_TABLE, etc.) are supported
  *
  * **UX Behavior**:
- * - Tool calls are OPEN by default when there's no content after (user needs to see what happened)
- * - Tool calls are COLLAPSED by default when there's content after (reduce wall of text)
- * - Users can always toggle open/closed manually
+ * - Tool calls are COLLAPSED by default when streaming in
+ * - Users can toggle open/closed manually
+ * - Once toggled, state is preserved in collapseState
  *
  * @param props - Component props
  * @returns Rendered tool calls or null if no tool calls
@@ -65,7 +65,7 @@ interface ToolDisplayProps {
 export function ToolDisplay({
   toolCalls,
   locale,
-  hasContent = false,
+  hasContent: _hasContent = false,
   messageId,
   collapseState,
 }: ToolDisplayProps): JSX.Element | null {
@@ -81,9 +81,8 @@ export function ToolDisplay({
     platform: "web",
   };
 
-  // Determine default open state based on whether there's content after
-  // Open by default when NO content after, collapsed when there IS content after
-  const defaultOpen = !hasContent;
+  // Tool calls should always start collapsed
+  const defaultOpen = false;
 
   return (
     <Div className="space-y-3 mb-3">

@@ -3,7 +3,7 @@
  * Main page for IMAP administration - redirects to overview
  */
 
-import { redirect } from "next/navigation";
+import { redirect } from "next-vibe-ui/lib/redirect";
 
 /**
  * IMAP Admin Main Page Component

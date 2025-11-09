@@ -25,7 +25,11 @@ import {
 import type { LeadsStatsRequestOutput } from "@/app/api/[locale]/v1/core/leads/stats/definition";
 import type statsEndpoints from "@/app/api/[locale]/v1/core/leads/stats/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
-import { CountryFilter, type CountryLanguage } from "@/i18n/core/config";
+import {
+  CountryFilter,
+  CountryFilterOptions,
+  type CountryLanguage,
+} from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface LeadsStatsFiltersContainerProps {
@@ -243,24 +247,7 @@ export function LeadsStatsFilters({
           config={{
             type: "select",
             label: "app.admin.leads.leads.admin.filters.countries.title",
-            options: [
-              {
-                value: CountryFilter.ALL,
-                label: "app.admin.leads.leads.admin.filters.countries.all",
-              },
-              {
-                value: CountryFilter.GLOBAL,
-                label: "app.admin.leads.leads.admin.filters.countries.global",
-              },
-              {
-                value: CountryFilter.DE,
-                label: "app.admin.leads.leads.admin.filters.countries.de",
-              },
-              {
-                value: CountryFilter.PL,
-                label: "app.admin.leads.leads.admin.filters.countries.pl",
-              },
-            ],
+            options: CountryFilterOptions,
           }}
         />
 

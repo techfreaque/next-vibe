@@ -25,6 +25,9 @@ const allSupportedLocales: CountryLanguage[] = [
   "de-GLOBAL",
   "en-DE",
   "en-PL",
+  "en-US",
+  "de-US",
+  "pl-US",
 ];
 
 /**

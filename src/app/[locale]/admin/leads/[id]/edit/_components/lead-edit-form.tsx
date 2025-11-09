@@ -26,7 +26,10 @@ import type { LeadDetailResponse } from "@/app/api/[locale]/v1/core/leads/types"
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { Countries } from "@/i18n/core/config";
+import {
+  CountriesOptions,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 interface LeadEditFormProps {
   lead: LeadDetailResponse;
@@ -171,14 +174,7 @@ export function LeadEditForm({
                   label: "app.admin.leads.leads.edit.form.fields.country.label",
                   placeholder:
                     "app.admin.leads.leads.edit.form.fields.country.placeholder",
-                  options: [
-                    {
-                      value: Countries.GLOBAL,
-                      label: "app.common.countries.global",
-                    },
-                    { value: Countries.DE, label: "app.common.countries.de" },
-                    { value: Countries.PL, label: "app.common.countries.pl" },
-                  ],
+                  options: CountriesOptions,
                 }}
                 control={endpoint.create.form.control}
                 theme={{
@@ -195,11 +191,7 @@ export function LeadEditForm({
                     "app.admin.leads.leads.edit.form.fields.language.label",
                   placeholder:
                     "app.admin.leads.leads.edit.form.fields.language.placeholder",
-                  options: [
-                    { value: "en", label: "app.common.languages.en" },
-                    { value: "de", label: "app.common.languages.de" },
-                    { value: "pl", label: "app.common.languages.pl" },
-                  ],
+                  options: LanguagesOptions,
                 }}
                 control={endpoint.create.form.control}
                 theme={{

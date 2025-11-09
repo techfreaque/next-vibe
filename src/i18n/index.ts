@@ -27,9 +27,10 @@ export const languageConfig = {
   countries: {
     DE: "DE" as const,
     PL: "PL" as const,
+    US: "US" as const,
     GLOBAL: "GLOBAL" as const,
   },
-  countriesArr: ["DE", "PL", "GLOBAL"] as const,
+  countriesArr: ["DE", "PL", "US", "GLOBAL"] as const,
 
   currencies: {
     EUR: "EUR" as const,
@@ -49,12 +50,14 @@ export const languageConfig = {
     currencyByCountry: {
       DE: "EUR",
       PL: "PLN",
+      US: "USD",
       GLOBAL: "USD",
     },
 
     languageByCountry: {
       DE: "de",
       PL: "pl",
+      US: "en",
       GLOBAL: "en",
     },
   },
@@ -77,6 +80,15 @@ export const languageConfig = {
       flag: "🇵🇱",
       currency: "PLN",
       symbol: "zł",
+    },
+    US: {
+      code: "US",
+      name: "United States",
+      language: "en",
+      langName: "English",
+      flag: "🇺🇸",
+      currency: "USD",
+      symbol: "$",
     },
     GLOBAL: {
       code: "GLOBAL",

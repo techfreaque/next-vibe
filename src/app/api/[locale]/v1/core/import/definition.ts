@@ -21,7 +21,12 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-import { Countries, Languages } from "@/i18n/core/config";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 import {
   CsvImportJobStatus,
@@ -198,10 +203,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                 "app.api.v1.core.import.csv.post.defaultCountry.description",
               placeholder:
                 "app.api.v1.core.import.csv.post.defaultCountry.placeholder",
-              options: Object.entries(Countries).map(([key, code]) => ({
-                label: key === "GLOBAL" ? "Global" : key,
-                value: code,
-              })),
+              options: CountriesOptions,
             },
             z.string().default("GLOBAL"),
           ),
@@ -215,10 +217,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                 "app.api.v1.core.import.csv.post.defaultLanguage.description",
               placeholder:
                 "app.api.v1.core.import.csv.post.defaultLanguage.placeholder",
-              options: Object.entries(Languages).map(([key, code]) => ({
-                label: key,
-                value: code,
-              })),
+              options: LanguagesOptions,
             },
             z.string().default("en"),
           ),

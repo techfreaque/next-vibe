@@ -58,7 +58,7 @@ export function SidebarFooter({
             >
               <Div className="flex items-center gap-2 min-w-0">
                 <Coins className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                <Span className="text-sm font-medium truncate">
+                <Span className="text-sm font-medium truncate" suppressHydrationWarning>
                   {credits.total === 1
                     ? t("app.chat.credits.credit", { count: credits.total })
                     : t("app.chat.credits.credits", { count: credits.total })}

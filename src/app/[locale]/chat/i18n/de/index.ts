@@ -949,6 +949,8 @@ export const translations: typeof enTranslations = {
     result: "Ergebnis",
     error: "Fehler",
     executing: "Wird ausgeführt...",
+    creditsUsed: "{{count}} Guthaben",
+    creditsUsed_other: "{{count}} Guthaben",
     status: {
       error: "Fehler",
       executing: "Wird ausgeführt...",

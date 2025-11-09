@@ -36,8 +36,10 @@ import { useLeadsListEndpoint } from "@/app/api/[locale]/v1/core/leads/list/hook
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import {
   CountryFilter,
+  CountryFilterOptions,
   type CountryLanguage,
   LanguageFilter,
+  LanguageFilterOptions,
 } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -362,19 +364,7 @@ export function LeadsListClient({
                       value: CountryFilter.ALL,
                       label: "app.admin.leads.leads.filter.all_countries",
                     },
-                    {
-                      value: CountryFilter.GLOBAL,
-                      label:
-                        "app.admin.leads.leads.admin.filters.countries.global",
-                    },
-                    {
-                      value: CountryFilter.DE,
-                      label: "app.admin.leads.leads.admin.filters.countries.de",
-                    },
-                    {
-                      value: CountryFilter.PL,
-                      label: "app.admin.leads.leads.admin.filters.countries.pl",
-                    },
+                    ...CountryFilterOptions.slice(1), // Skip the "ALL" option since we have a custom one above
                   ],
                 }}
                 control={leadsEndpoint.read.form.control}
@@ -394,24 +384,7 @@ export function LeadsListClient({
                   type: "select",
                   label: undefined,
                   placeholder: "app.admin.leads.leads.filter.language",
-                  options: [
-                    {
-                      value: LanguageFilter.ALL,
-                      label: "app.admin.leads.leads.filter.all_languages",
-                    },
-                    {
-                      value: LanguageFilter.EN,
-                      label: "app.admin.leads.leads.admin.filters.languages.en",
-                    },
-                    {
-                      value: LanguageFilter.DE,
-                      label: "app.admin.leads.leads.admin.filters.languages.de",
-                    },
-                    {
-                      value: LanguageFilter.PL,
-                      label: "app.admin.leads.leads.admin.filters.languages.pl",
-                    },
-                  ],
+                  options: LanguageFilterOptions,
                 }}
                 control={leadsEndpoint.read.form.control}
                 theme={{

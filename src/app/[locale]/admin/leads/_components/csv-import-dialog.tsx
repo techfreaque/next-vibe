@@ -36,7 +36,11 @@ import {
 import { useLeadsImportEndpoint } from "@/app/api/[locale]/v1/core/leads/import/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { Languages } from "@/i18n/core/config";
+import {
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface ImportResult {
@@ -328,20 +332,7 @@ export function CsvImportDialog({
                         "app.admin.leads.leads.admin.import.defaults.countryDescription",
                       placeholder:
                         "app.admin.leads.leads.admin.import.defaults.countryPlaceholder",
-                      options: [
-                        {
-                          value: "GLOBAL",
-                          label: "app.common.countries.global" as const,
-                        },
-                        {
-                          value: "DE",
-                          label: "app.common.countries.de" as const,
-                        },
-                        {
-                          value: "PL",
-                          label: "app.common.countries.pl" as const,
-                        },
-                      ],
+                      options: CountriesOptions,
                     }}
                     control={endpoint.create.form.control}
                     theme={{
@@ -361,10 +352,7 @@ export function CsvImportDialog({
                         "app.admin.leads.leads.admin.import.defaults.languageDescription",
                       placeholder:
                         "app.admin.leads.leads.admin.import.defaults.languagePlaceholder",
-                      options: Object.entries(Languages).map(([, value]) => ({
-                        value: value,
-                        label: `app.constants.languages.${value}` as const,
-                      })),
+                      options: LanguagesOptions,
                     }}
                     control={endpoint.create.form.control}
                     theme={{

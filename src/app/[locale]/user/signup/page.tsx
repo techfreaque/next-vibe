@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { redirect } from "next-vibe-ui/lib/redirect";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";

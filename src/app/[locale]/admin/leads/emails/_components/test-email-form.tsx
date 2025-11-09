@@ -31,7 +31,12 @@ import {
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
-import { Countries, Languages } from "@/i18n/core/config";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 import {
   getCountryFromLocale,
   getLanguageFromLocale,
@@ -317,20 +322,7 @@ export function TestEmailForm({
                   type: "select",
                   label:
                     "app.admin.leads.leads.admin.emails.testEmail.leadData.country.label" as const,
-                  options: [
-                    {
-                      value: Countries.GLOBAL,
-                      label: "app.common.countries.global" as const,
-                    },
-                    {
-                      value: Countries.DE,
-                      label: "app.common.countries.de" as const,
-                    },
-                    {
-                      value: Countries.PL,
-                      label: "app.common.countries.pl" as const,
-                    },
-                  ],
+                  options: CountriesOptions,
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
@@ -341,20 +333,7 @@ export function TestEmailForm({
                   type: "select",
                   label:
                     "app.admin.leads.leads.admin.emails.testEmail.leadData.language.label" as const,
-                  options: [
-                    {
-                      value: Languages.EN,
-                      label: "app.common.languages.en" as const,
-                    },
-                    {
-                      value: Languages.DE,
-                      label: "app.common.languages.de" as const,
-                    },
-                    {
-                      value: Languages.PL,
-                      label: "app.common.languages.pl" as const,
-                    },
-                  ],
+                  options: LanguagesOptions,
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}

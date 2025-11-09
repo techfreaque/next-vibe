@@ -226,7 +226,7 @@ export function RedditStyleView({
 
   return (
     <Div className="h-full overflow-y-auto scroll-smooth scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full">
-      <Div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-20 pb-8">
+      <Div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pt-20 pb-8">
         {/* Forum Header */}
         <Div className="mb-6 space-y-2">
           <Span className="text-3xl font-bold">

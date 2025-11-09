@@ -18,7 +18,12 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { Countries, Languages } from "@/i18n/core/config";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 import { UserRole } from "../../user/user-roles/enum";
 import { LeadSource, LeadSourceOptions, LeadStatus } from "../enum";
@@ -149,12 +154,7 @@ const { POST } = createEndpoint({
               placeholder:
                 "app.api.v1.core.leads.create.post.country.placeholder",
               layout: { columns: 6 },
-              options: Object.entries(Countries).map(
-                ([, value]: [string, string]) => ({
-                  value: value,
-                  label: `app.api.v1.core.leads.enums.country.${value.toLowerCase()}`,
-                }),
-              ),
+              options: CountriesOptions,
               validation: { required: true },
             },
             z.string(),
@@ -170,12 +170,7 @@ const { POST } = createEndpoint({
               placeholder:
                 "app.api.v1.core.leads.create.post.language.placeholder",
               layout: { columns: 6 },
-              options: Object.entries(Languages).map(
-                ([, value]: [string, string]) => ({
-                  value: value,
-                  label: `app.api.v1.core.leads.enums.language.${value.toLowerCase()}`,
-                }),
-              ),
+              options: LanguagesOptions,
               validation: { required: true },
             },
             z.string(),

@@ -19,7 +19,12 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-import { Countries, Languages } from "@/i18n/core/config";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 import {
   EmailCampaignStage,
@@ -135,12 +140,7 @@ const { POST } = createEndpoint({
           helpText:
             "app.api.v1.core.leads.import.post.defaultCountry.helpText" as const,
           layout: { columns: 6 },
-          options: Object.entries(Countries).map(
-            ([, value]: [string, string]) => ({
-              value: value,
-              label: `app.api.v1.core.leads.enums.country.${value.toLowerCase()}`,
-            }),
-          ),
+          options: CountriesOptions,
         },
         z.enum(Countries),
       ),
@@ -155,12 +155,7 @@ const { POST } = createEndpoint({
           helpText:
             "app.api.v1.core.leads.import.post.defaultLanguage.helpText" as const,
           layout: { columns: 6 },
-          options: Object.entries(Languages).map(
-            ([, value]: [string, string]) => ({
-              value: value,
-              label: `app.api.v1.core.leads.enums.language.${value.toLowerCase()}`,
-            }),
-          ),
+          options: LanguagesOptions,
         },
         z.enum(Languages),
       ),

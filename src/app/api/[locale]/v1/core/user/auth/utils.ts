@@ -4,7 +4,7 @@
  */
 import "server-only";
 
-import { redirect } from "next/navigation";
+import { redirect } from "next-vibe-ui/lib/redirect";
 import { parseError } from "next-vibe/shared/utils";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

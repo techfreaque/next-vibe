@@ -1,7 +1,7 @@
 import { ArrowLeft } from 'next-vibe-ui/ui/icons';
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect } from "next-vibe-ui/lib/redirect";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

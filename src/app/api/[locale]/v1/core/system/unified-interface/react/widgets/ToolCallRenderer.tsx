@@ -31,6 +31,7 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import type { ToolCall } from "@/app/api/[locale]/v1/core/agent/chat/db";
+import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { WidgetRenderContext } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/ui/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -126,12 +127,13 @@ export function ToolCallRenderer({
     }
   };
 
-  // Get display name
-  const displayName = toolCall.displayName || toolCall.toolName;
+  // Get display name and translate if it's a translation key
+  const rawDisplayName = toolCall.displayName || toolCall.toolName;
+  const displayName = t(rawDisplayName);
 
-  // Get credits display
+  // Get credits display with translation
   const creditsDisplay = toolCall.creditsUsed
-    ? `${toolCall.creditsUsed} credits`
+    ? t("app.chat.toolCall.creditsUsed", { count: toolCall.creditsUsed })
     : null;
 
   return (
@@ -158,13 +160,14 @@ export function ToolCallRenderer({
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               )}
 
-              {/* Tool Icon */}
-              {toolCall.icon && (
-                <Span className="text-lg">{toolCall.icon}</Span>
-              )}
-
-              {/* Tool Name */}
-              <Span className="font-medium text-sm">{displayName}</Span>
+              {/* Tool Icon and Name - show icon with name, or just name if no icon */}
+              <Div className="flex items-center gap-2">
+                {toolCall.icon && (() => {
+                  const IconComponent = getIconComponent(toolCall.icon);
+                  return <IconComponent className="h-4 w-4 text-muted-foreground" />;
+                })()}
+                <Span className="font-medium text-sm">{displayName}</Span>
+              </Div>
 
               {/* Loading Indicator */}
               {isLoading && (

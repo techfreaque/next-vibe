@@ -7,7 +7,7 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
-import { redirect } from "next/navigation";
+import { redirect } from "next-vibe-ui/lib/redirect";
 import type { NextRequest } from "next/server";
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,

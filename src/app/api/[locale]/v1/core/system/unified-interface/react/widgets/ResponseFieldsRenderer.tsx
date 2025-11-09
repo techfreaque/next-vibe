@@ -98,7 +98,10 @@ function renderResponseField(
   field: ToolCallWidgetMetadata["responseFields"][number],
   result: ToolCallResult | null,
   context: WidgetRenderContext,
+  locale: CountryLanguage,
 ): JSX.Element | null {
+  const { t } = simpleT(locale);
+
   // Handle null result
   if (!result) {
     return null;
@@ -115,34 +118,39 @@ function renderResponseField(
   // Transform data for widget type
   const transformedData = transformDataForWidget(field.widgetType, fieldValue);
 
+  // Translate label if it's a translation key
+  const translatedLabel = field.label ? t(field.label) : undefined;
+
   // Create proper metadata structure
   const metadata: ResponseFieldMetadata = {
     name: field.name,
     type: FieldDataType.TEXT, // Default type, will be inferred from value
     widgetType: field.widgetType,
     value: transformedData as RenderableValue,
-    label: field.label,
+    label: translatedLabel,
     description: field.description,
     config: field.layout as ResponseFieldMetadata["config"],
   };
 
   // Use WidgetRenderer to render the field
   return (
-    <Div key={field.name} className="space-y-2">
+    <Div key={field.name} className="space-y-1">
       {/* Field Label (if provided) */}
-      {field.label && (
-        <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          {field.label}
+      {translatedLabel && (
+        <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
+          {translatedLabel}
         </Span>
       )}
 
       {/* Widget Renderer */}
-      <WidgetRenderer
-        widgetType={field.widgetType}
-        data={transformedData as RenderableValue}
-        metadata={metadata}
-        context={context}
-      />
+      <Div className="pl-0">
+        <WidgetRenderer
+          widgetType={field.widgetType}
+          data={transformedData as RenderableValue}
+          metadata={metadata}
+          context={context}
+        />
+      </Div>
     </Div>
   );
 }
@@ -211,7 +219,7 @@ export function ResponseFieldsRenderer({
   return (
     <Div className="space-y-3">
       {widgetMetadata.responseFields.map((field) =>
-        renderResponseField(field, result, context),
+        renderResponseField(field, result, context, locale),
       )}
     </Div>
   );

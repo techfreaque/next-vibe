@@ -323,6 +323,8 @@ export async function createToolMessage(params: {
   userId: string | undefined;
   sequenceId: string | null;
   sequenceIndex: number;
+  model: string;
+  persona: string;
   logger: EndpointLogger;
 }): Promise<void> {
   const metadata: Record<
@@ -348,6 +350,8 @@ export async function createToolMessage(params: {
     sequenceId: params.sequenceId,
     sequenceIndex: params.sequenceIndex,
     isAI: true,
+    model: params.model,
+    persona: params.persona,
     metadata,
   });
 

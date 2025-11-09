@@ -1612,6 +1612,8 @@ class AiStreamRepository implements IAiStreamRepository {
                       userId,
                       sequenceId,
                       sequenceIndex: currentToolCallData.sequenceIndex,
+                      model: data.model,
+                      persona: data.persona,
                       logger,
                     });
                   }

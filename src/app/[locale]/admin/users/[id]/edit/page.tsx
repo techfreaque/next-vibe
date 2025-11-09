@@ -3,7 +3,7 @@
  * Server-side initial data loading with client-side form management
  */
 
-import { redirect } from "next/navigation";
+import { redirect } from "next-vibe-ui/lib/redirect";
 import { Div } from "next-vibe-ui/ui/div";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type React from "react";

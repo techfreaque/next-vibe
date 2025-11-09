@@ -111,6 +111,7 @@ export const translations = {
       global: "Global",
       de: "Germany",
       pl: "Poland",
+      us: "United States",
     },
     languages: {
       en: "English",
