@@ -235,10 +235,19 @@ export function FolderList({
   // If no active root folder, show message (shouldn't happen in normal flow)
   // Get direct children (subfolders) of the active root folder
   // Filter folders where parentId is null (direct children of root folder)
-  const childFolders = Object.values(chat.folders).filter(
-    (folder) =>
-      folder.rootFolderId === activeRootFolderId && folder.parentId === null,
-  );
+  const childFolders = Object.values(chat.folders)
+    .filter(
+      (folder) =>
+        folder.rootFolderId === activeRootFolderId && folder.parentId === null,
+    )
+    .toSorted((a, b) => {
+      // First sort by sortOrder
+      if (a.sortOrder !== b.sortOrder) {
+        return a.sortOrder - b.sortOrder;
+      }
+      // If sortOrder is the same, use createdAt as tiebreaker for stable ordering
+      return a.createdAt.getTime() - b.createdAt.getTime();
+    });
 
   // Get threads in the active root folder (not in any subfolder)
   const childThreads = Object.values(chat.threads).filter(
@@ -344,12 +353,14 @@ export function FolderList({
         </>
       )}
 
-      {/* Empty state */}
-      {childFolders.length === 0 && childThreads.length === 0 && (
-        <P className="px-4 py-8 text-center text-sm text-muted-foreground">
-          {t("app.chat.folderList.emptyFolder")}
-        </P>
-      )}
+      {/* Empty state - only show after data has loaded to prevent flickering */}
+      {chat.isDataLoaded &&
+        childFolders.length === 0 &&
+        childThreads.length === 0 && (
+          <P className="px-4 py-8 text-center text-sm text-muted-foreground">
+            {t("app.chat.folderList.emptyFolder")}
+          </P>
+        )}
     </Div>
   );
 }
@@ -528,7 +539,14 @@ function FolderItem({
         f.parentId === folder.parentId &&
         f.rootFolderId === folder.rootFolderId,
     )
-    .toSorted((a, b) => a.sortOrder - b.sortOrder);
+    .toSorted((a, b) => {
+      // First sort by sortOrder
+      if (a.sortOrder !== b.sortOrder) {
+        return a.sortOrder - b.sortOrder;
+      }
+      // If sortOrder is the same, use createdAt as tiebreaker for stable ordering
+      return a.createdAt.getTime() - b.createdAt.getTime();
+    });
   const currentIndex = siblingFolders.findIndex((f) => f.id === folder.id);
   const canMoveUp = currentIndex > 0;
   const canMoveDown = currentIndex < siblingFolders.length - 1;
@@ -742,7 +760,14 @@ function FolderItem({
           {/* Child folders */}
           {Object.values(chat.folders)
             .filter((f) => f.parentId === folder.id)
-            .toSorted((a, b) => a.sortOrder - b.sortOrder)
+            .toSorted((a, b) => {
+              // First sort by sortOrder
+              if (a.sortOrder !== b.sortOrder) {
+                return a.sortOrder - b.sortOrder;
+              }
+              // If sortOrder is the same, use createdAt as tiebreaker for stable ordering
+              return a.createdAt.getTime() - b.createdAt.getTime();
+            })
             .map((childFolder) => (
               <FolderItem
                 key={childFolder.id}

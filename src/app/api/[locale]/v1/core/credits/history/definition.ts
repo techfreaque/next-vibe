@@ -5,6 +5,10 @@
 
 import { z } from "zod";
 
+import {
+  CreditTransactionType,
+  CreditTransactionTypeDB,
+} from "@/app/api/[locale]/v1/core/credits/enum";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
   objectField,
@@ -115,14 +119,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.credits.history.get.transaction.type.content",
               },
-              z.enum([
-                "purchase",
-                "subscription",
-                "usage",
-                "expiry",
-                "free_tier",
-                "monthly_reset",
-              ]),
+              z.enum(CreditTransactionTypeDB),
             ),
 
             modelId: responseField(
@@ -246,7 +243,7 @@ const { GET } = createEndpoint({
             id: "123e4567-e89b-12d3-a456-426614174000",
             amount: -5,
             balanceAfter: 1495,
-            type: "usage" as const,
+            type: CreditTransactionType.USAGE,
             modelId: "gpt-4",
             messageId: "msg-123e4567-e89b-12d3-a456-426614174000",
             createdAt: "2025-10-16T12:00:00.000Z",
@@ -255,7 +252,7 @@ const { GET } = createEndpoint({
             id: "223e4567-e89b-12d3-a456-426614174000",
             amount: 500,
             balanceAfter: 1500,
-            type: "purchase" as const,
+            type: CreditTransactionType.PURCHASE,
             modelId: null,
             messageId: null,
             createdAt: "2025-10-15T10:00:00.000Z",

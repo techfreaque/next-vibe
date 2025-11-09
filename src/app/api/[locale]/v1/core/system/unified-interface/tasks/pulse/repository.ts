@@ -438,7 +438,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
    * Record a pulse execution for health tracking
    */
   async recordPulseExecution(
-    success: boolean,
+    isSuccessful: boolean,
     executionTimeMs: number,
   ): Promise<ResponseType<void>> {
     try {
@@ -450,14 +450,16 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         // Create initial health record
         await this.createHealthRecord(
           {
-            status: success ? PulseHealthStatus.HEALTHY : PulseHealthStatus.WARNING,
+            status: isSuccessful
+              ? PulseHealthStatus.HEALTHY
+              : PulseHealthStatus.WARNING,
             lastPulseAt: new Date(),
-            consecutiveFailures: success ? 0 : 1,
+            consecutiveFailures: isSuccessful ? 0 : 1,
             avgExecutionTimeMs: executionTimeMs,
-            successRate: success ? 10000 : 0, // Basis points
+            successRate: isSuccessful ? 10000 : 0, // Basis points
             totalExecutions: 1,
-            totalSuccesses: success ? 1 : 0,
-            totalFailures: success ? 0 : 1,
+            totalSuccesses: isSuccessful ? 1 : 0,
+            totalFailures: isSuccessful ? 0 : 1,
             metadata: {},
             alertsSent: 0,
             lastAlertAt: null,
@@ -469,8 +471,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         // Update existing health record
         const health = currentHealthResponse.data;
         const newTotalExecutions = health.totalExecutions + 1;
-        const newTotalSuccesses = health.totalSuccesses + (success ? 1 : 0);
-        const newTotalFailures = health.totalFailures + (success ? 0 : 1);
+        const newTotalSuccesses =
+          health.totalSuccesses + (isSuccessful ? 1 : 0);
+        const newTotalFailures = health.totalFailures + (isSuccessful ? 0 : 1);
         const newSuccessRate = Math.round(
           (newTotalSuccesses / newTotalExecutions) * 10000,
         );
@@ -478,7 +481,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         await this.updateHealth(
           {
             lastPulseAt: new Date(),
-            consecutiveFailures: success ? 0 : health.consecutiveFailures + 1,
+            consecutiveFailures: isSuccessful
+              ? 0
+              : health.consecutiveFailures + 1,
             avgExecutionTimeMs: Math.round(
               (health.avgExecutionTimeMs || 0 + executionTimeMs) / 2,
             ),
@@ -486,7 +491,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
             totalExecutions: newTotalExecutions,
             totalSuccesses: newTotalSuccesses,
             totalFailures: newTotalFailures,
-            status: success ? PulseHealthStatus.HEALTHY : PulseHealthStatus.WARNING,
+            status: isSuccessful
+              ? PulseHealthStatus.HEALTHY
+              : PulseHealthStatus.WARNING,
           },
           {} as EndpointLogger,
         );

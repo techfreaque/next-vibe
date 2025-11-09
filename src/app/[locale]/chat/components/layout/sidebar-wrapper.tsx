@@ -178,35 +178,47 @@ export function SidebarWrapper({
         return;
       }
 
-      // Get sibling folders (same parent and rootFolderId)
-      const siblings = Object.values(chat.folders)
+      // Get all sibling folders (same parent and rootFolderId), including current folder
+      const allSiblings = Object.values(chat.folders)
         .filter(
           (f) =>
             f.rootFolderId === folder.rootFolderId &&
-            f.parentId === folder.parentId &&
-            f.id !== folderId,
+            f.parentId === folder.parentId,
         )
-        .toSorted((a, b) => a.sortOrder - b.sortOrder);
+        .toSorted((a, b) => {
+          // First sort by sortOrder
+          if (a.sortOrder !== b.sortOrder) {
+            return a.sortOrder - b.sortOrder;
+          }
+          // If sortOrder is the same, use createdAt as tiebreaker for stable ordering
+          return a.createdAt.getTime() - b.createdAt.getTime();
+        });
 
-      const currentIndex = siblings.findIndex(
-        (f) => f.sortOrder > folder.sortOrder,
-      );
-      const actualCurrentIndex =
-        currentIndex === -1 ? siblings.length : currentIndex;
+      // Find current folder's index in the sorted list
+      const currentIndex = allSiblings.findIndex((f) => f.id === folderId);
 
-      if (direction === "up" && actualCurrentIndex > 0) {
-        // Swap with previous sibling
-        const prevSibling = siblings[actualCurrentIndex - 1];
+      if (currentIndex === -1) {
+        logger.error("Folder not found in siblings list", { folderId });
+        return;
+      }
+
+      if (direction === "up" && currentIndex > 0) {
+        // Move folder up by swapping positions with previous sibling
+        const prevSibling = allSiblings[currentIndex - 1];
         if (prevSibling) {
-          void onUpdateFolder(folderId, { sortOrder: prevSibling.sortOrder });
-          void onUpdateFolder(prevSibling.id, { sortOrder: folder.sortOrder });
+          // Reassign sortOrder values to ensure they are different
+          // Give the current folder the previous sibling's position
+          void onUpdateFolder(folderId, { sortOrder: currentIndex - 1 });
+          void onUpdateFolder(prevSibling.id, { sortOrder: currentIndex });
         }
-      } else if (direction === "down" && actualCurrentIndex < siblings.length) {
-        // Swap with next sibling
-        const nextSibling = siblings[actualCurrentIndex];
+      } else if (direction === "down" && currentIndex < allSiblings.length - 1) {
+        // Move folder down by swapping positions with next sibling
+        const nextSibling = allSiblings[currentIndex + 1];
         if (nextSibling) {
-          void onUpdateFolder(folderId, { sortOrder: nextSibling.sortOrder });
-          void onUpdateFolder(nextSibling.id, { sortOrder: folder.sortOrder });
+          // Reassign sortOrder values to ensure they are different
+          // Give the current folder the next sibling's position
+          void onUpdateFolder(folderId, { sortOrder: currentIndex + 1 });
+          void onUpdateFolder(nextSibling.id, { sortOrder: currentIndex });
         }
       }
     },

@@ -132,6 +132,7 @@ interface ChatState {
 
   // UI state
   isLoading: boolean;
+  isDataLoaded: boolean;
 
   // Settings (persisted to localStorage)
   settings: ChatSettings;
@@ -158,6 +159,7 @@ interface ChatState {
 
   // Loading state
   setLoading: (loading: boolean) => void;
+  setDataLoaded: (loaded: boolean) => void;
 
   // Reset
   reset: () => void;
@@ -261,6 +263,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   messages: {},
   folders: {},
   isLoading: false,
+  isDataLoaded: false,
 
   // Use default settings for SSR - will be hydrated from localStorage after mount
   settings: getDefaultSettings(),
@@ -408,6 +411,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
       isLoading: loading,
     }),
 
+  setDataLoaded: (loaded: boolean): void =>
+    set({
+      isDataLoaded: loaded,
+    }),
+
   // Reset
   reset: (): void => {
     const defaultSettings = getDefaultSettings();
@@ -417,6 +425,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       messages: {},
       folders: {},
       isLoading: false,
+      isDataLoaded: false,
       settings: defaultSettings,
     });
   },

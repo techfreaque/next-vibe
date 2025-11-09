@@ -419,7 +419,7 @@ Violations may result in:
 - Temporary ban
 - Permanent ban
 
-Report issues to: max@tfq.at
+Report issues to: max@a42.ch
 
 ---
 
@@ -437,7 +437,7 @@ See [LICENSE](LICENSE) and [src/packages/LICENSE](src/packages/LICENSE) for deta
 
 - **Documentation issues?** Open an issue
 - **Need help?** Ask in discussions
-- **Have questions?** Email max@tfq.at
+- **Have questions?** Email max@a42.ch
 
 ---
 

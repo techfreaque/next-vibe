@@ -278,6 +278,7 @@ export function useDataLoader(
   addThread: (thread: ChatThread) => void,
   addMessage: (message: ChatMessage) => void,
   addFolder: (folder: ChatFolder) => void,
+  setDataLoaded: (loaded: boolean) => void,
 ): void {
   const dataLoadedRef = useRef(false);
 
@@ -308,6 +309,9 @@ export function useDataLoader(
         loadThreadsFromServer(logger, locale, addThread),
         loadFoldersFromServer(logger, locale, addFolder),
       ]);
+
+      // Mark data as loaded
+      setDataLoaded(true);
     };
 
     void loadData();

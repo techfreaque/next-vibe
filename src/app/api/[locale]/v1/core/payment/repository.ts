@@ -695,8 +695,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       const { subscriptionRepository } = await import(
         "../subscription/repository"
       );
+      // The webhook data is actually a Stripe.Subscription object from the event
       await subscriptionRepository.handleSubscriptionUpdated(
-        data as unknown as Stripe.Subscription,
+        data as Stripe.Subscription,
         logger,
       );
     } catch (error) {

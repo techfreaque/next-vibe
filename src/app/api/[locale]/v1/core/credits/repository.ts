@@ -112,6 +112,7 @@ export interface CreditRepositoryInterface {
     userId: string,
     limit: number,
     offset: number,
+    logger?: EndpointLogger,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];

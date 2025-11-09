@@ -47,6 +47,7 @@ export interface UseChatReturn {
   activeThread: ChatThread | null;
   activeThreadMessages: ChatMessage[];
   isLoading: boolean;
+  isDataLoaded: boolean;
   isStreaming: boolean;
 
   // Current context (passed as props from URL, not from store)
@@ -165,6 +166,7 @@ export function useChat(
   const messages = useChatStore((state) => state.messages);
   const folders = useChatStore((state) => state.folders);
   const isLoading = useChatStore((state) => state.isLoading);
+  const isDataLoaded = useChatStore((state) => state.isDataLoaded);
 
   // Get store instances
   const chatStore = useChatStore();
@@ -193,6 +195,7 @@ export function useChat(
     chatStore.addThread,
     chatStore.addMessage,
     chatStore.addFolder,
+    chatStore.setDataLoaded,
   );
 
   useMessageLoader(
@@ -306,6 +309,7 @@ export function useChat(
     activeThread,
     activeThreadMessages,
     isLoading,
+    isDataLoaded,
     isStreaming: streamStore.isStreaming,
 
     // Current context (from URL props)

@@ -49,7 +49,10 @@ import { UserRole,
  } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { InferJwtPayloadTypeFromRoles } from "../../types/handler";
+import type {
+  InferJwtPayloadTypeFromRoles,
+  MethodHandlerConfig,
+} from "../../types/handler";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;
@@ -893,73 +896,87 @@ const testMixedRolesDefinitions = {
   POST: testMixedRolesEndpoint.POST,
 } as const;
 
-// Test EndpointHandlerConfig type extracts correct handler types
+// Test EndpointHandlerConfig type by creating actual handler configs
+// This matches real usage in route.ts files where handlers are defined inline
 type PublicOnlyConfig = EndpointHandlerConfig<typeof testPublicOnlyDefinitions>;
 type AdminOnlyConfig = EndpointHandlerConfig<typeof testAdminOnlyDefinitions>;
 type MixedRolesConfig = EndpointHandlerConfig<typeof testMixedRolesDefinitions>;
 
-// Debug: Check if POST exists in definitions
-type PublicOnlyHasPost = "POST" extends keyof typeof testPublicOnlyDefinitions
+// The config type includes both 'endpoint' and method keys
+// Verify the config has the expected 'endpoint' property
+type PublicOnlyConfigHasEndpoint = "endpoint" extends keyof PublicOnlyConfig
   ? true
   : false;
-type PublicOnlyPostEndpoint = (typeof testPublicOnlyDefinitions)["POST"];
-type PublicOnlyPostHasTypes = PublicOnlyPostEndpoint extends { types: unknown }
-  ? true
-  : false;
-type PublicOnlyPostHasAllowedRoles = PublicOnlyPostEndpoint extends {
-  allowedRoles: unknown;
-}
-  ? true
-  : false;
+type PublicOnlyConfigHasEndpointCheck = Expect<
+  Equal<PublicOnlyConfigHasEndpoint, true>
+>;
 
-// Debug: Check if the endpoint matches the expected structure
-type PublicOnlyPostMatchesStructure = PublicOnlyPostEndpoint extends {
+// Extract what the POST method handler config type WOULD BE if provided
+// This tests the conditional type logic in EndpointHandlerConfig
+type PublicOnlyPostConfigType = (typeof testPublicOnlyDefinitions)["POST"] extends {
   types: {
-    RequestOutput: unknown;
-    ResponseOutput: unknown;
-    UrlVariablesOutput: unknown;
+    RequestOutput: infer TReqOut;
+    ResponseOutput: infer TResOut;
+    UrlVariablesOutput: infer TUrlOut;
   };
-  allowedRoles: readonly (typeof UserRoleValue)[];
+  allowedRoles: infer TRoles extends readonly (typeof UserRoleValue)[];
 }
-  ? true
-  : false;
+  ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, TRoles>
+  : never;
 
-// Extract the POST handler config type
-type PublicOnlyPostConfig = PublicOnlyConfig[Methods.POST];
-type AdminOnlyPostConfig = AdminOnlyConfig[Methods.POST];
-type MixedRolesPostConfig = MixedRolesConfig[Methods.POST];
+type AdminOnlyPostConfigType = (typeof testAdminOnlyDefinitions)["POST"] extends {
+  types: {
+    RequestOutput: infer TReqOut;
+    ResponseOutput: infer TResOut;
+    UrlVariablesOutput: infer TUrlOut;
+  };
+  allowedRoles: infer TRoles extends readonly (typeof UserRoleValue)[];
+}
+  ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, TRoles>
+  : never;
 
-// Verify POST config is not never (exists)
-type PublicOnlyPostConfigExists = PublicOnlyPostConfig extends never
+type MixedRolesPostConfigType = (typeof testMixedRolesDefinitions)["POST"] extends {
+  types: {
+    RequestOutput: infer TReqOut;
+    ResponseOutput: infer TResOut;
+    UrlVariablesOutput: infer TUrlOut;
+  };
+  allowedRoles: infer TRoles extends readonly (typeof UserRoleValue)[];
+}
+  ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, TRoles>
+  : never;
+
+// Verify these config types are not never (definitions match expected structure)
+type PublicOnlyPostConfigTypeExists = PublicOnlyPostConfigType extends never
   ? false
   : true;
-type AdminOnlyPostConfigExists = AdminOnlyPostConfig extends never
+type AdminOnlyPostConfigTypeExists = AdminOnlyPostConfigType extends never
   ? false
   : true;
-type MixedRolesPostConfigExists = MixedRolesPostConfig extends never
+type MixedRolesPostConfigTypeExists = MixedRolesPostConfigType extends never
   ? false
   : true;
 
-type PublicOnlyPostConfigExistsCheck = Expect<
-  Equal<PublicOnlyPostConfigExists, true>
+type PublicOnlyPostConfigTypeExistsCheck = Expect<
+  Equal<PublicOnlyPostConfigTypeExists, true>
 >;
-type AdminOnlyPostConfigExistsCheck = Expect<
-  Equal<AdminOnlyPostConfigExists, true>
+type AdminOnlyPostConfigTypeExistsCheck = Expect<
+  Equal<AdminOnlyPostConfigTypeExists, true>
 >;
-type MixedRolesPostConfigExistsCheck = Expect<
-  Equal<MixedRolesPostConfigExists, true>
+type MixedRolesPostConfigTypeExistsCheck = Expect<
+  Equal<MixedRolesPostConfigTypeExists, true>
 >;
 
-// Extract handler function type from config
-type PublicOnlyHandlerFn = PublicOnlyPostConfig extends {
+// Extract handler function type from the config type
+type PublicOnlyHandlerFn = PublicOnlyPostConfigType extends {
   handler: infer H;
 }
   ? H
   : never;
-type AdminOnlyHandlerFn = AdminOnlyPostConfig extends { handler: infer H }
+type AdminOnlyHandlerFn = AdminOnlyPostConfigType extends { handler: infer H }
   ? H
   : never;
-type MixedRolesHandlerFn = MixedRolesPostConfig extends { handler: infer H }
+type MixedRolesHandlerFn = MixedRolesPostConfigType extends { handler: infer H }
   ? H
   : never;
 

@@ -859,7 +859,11 @@ class AiStreamRepository implements IAiStreamRepository {
               isInReasoningBlock: false,
               streamResult: {
                 finishReason: "stop",
-                usage: { totalTokens: 0 },
+                usage: {
+                  inputTokens: 0,
+                  outputTokens: 0,
+                  totalTokens: 0,
+                },
               },
               isIncognito,
               controller,
@@ -1658,22 +1662,26 @@ class AiStreamRepository implements IAiStreamRepository {
 
             logger.info("[AI Stream] Finished processing fullStream");
 
+            // Wait for completion to get final usage stats
+            const usage = await streamResult.usage;
+            const finishReason = await streamResult.finishReason;
+
             // NEW ARCHITECTURE: Finalize current ASSISTANT message if exists
             if (currentAssistantMessageId && currentAssistantContent) {
               await finalizeAssistantMessage({
                 currentAssistantMessageId,
                 currentAssistantContent,
                 isInReasoningBlock,
-                streamResult,
+                streamResult: {
+                  finishReason,
+                  usage,
+                },
                 isIncognito,
                 controller,
                 encoder,
                 logger,
               });
             }
-
-            // Wait for completion to get final usage stats
-            const usage = await streamResult.usage;
 
             logger.info("[AI Stream] Stream completed", {
               totalTokens: usage.totalTokens,

@@ -40,11 +40,11 @@
     "typescript",
     "tailwindcss"
   ],
-  "author": "Marcus Brandstaetter <max@tfq.at>",
+  "author": "Marcus Brandstaetter <max@a42.ch>",
   "contributors": [
     {
       "name": "Marcus Brandstaetter - Anywhere Widgets",
-      "email": "max@tfq.at"
+      "email": "max@a42.ch"
     }
   ],
   "optionalDependencies": {

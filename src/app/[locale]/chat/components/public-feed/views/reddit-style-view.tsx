@@ -113,7 +113,7 @@ export function RedditStyleView({
         title: thread.title ?? "Untitled Thread",
         category,
         timestamp: thread.createdAt,
-        authorId: thread.createdBy ?? null,
+        authorId: thread.userId,
         authorName: "u/anonymous",
         modelNames,
         messageCount: messages.length,

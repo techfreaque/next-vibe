@@ -968,43 +968,6 @@ AI: git add . && git commit -m "Add user suspension endpoint"
 
 **The framework won't let AI make mistakes.**
 
----
-
-## 📖 Example: Unbottled.ai
-
-### Commercial Application Built in This Repository
-
-**[Unbottled.ai](./docs/examples/unbottled-ai/UNBOTTLED_AI.md)** is a full-featured AI chat platform built in this same codebase:
-
-- **Same Repository** - Unbottled.ai and NextVibe share this codebase
-- **Reference Implementation** - Demonstrates NextVibe's production capabilities
-- **MIT Licensed** - All Unbottled.ai code (outside `core/`) is MIT
-- **Development Funding** - Revenue finances NextVibe's open-source development
-
-**Features:**
-
-- 40+ AI models (GPT-4, Claude, Gemini, etc.)
-- Advanced folder system (private, incognito, shared, public)
-- Credit management and payments (Stripe + crypto)
-- Email integration and campaigns
-- Lead tracking & CRM
-- Newsletter system
-
-**When you fork this repository:**
-
-- ✅ You get the framework core (`core/` - GPL-3.0)
-- ✅ You get ALL Unbottled.ai code (MIT licensed)
-- ✅ You can study, modify, or replace Unbottled.ai features
-- ✅ You can build your own commercial application
-
-**What's NOT included:**
-
-- ❌ Unbottled.ai logo and branding (not in repo)
-- ❌ Unbottled.ai name and trademarks (proprietary)
-
-**Simple licensing:** Only `core/` folder is GPL-3.0. Everything else is MIT (except logo/name).
-
-**See [docs/examples/unbottled-ai/UNBOTTLED_AI.md](./docs/examples/unbottled-ai/UNBOTTLED_AI.md) for full details.**
 
 ---
 
@@ -1027,13 +990,13 @@ AI: git add . && git commit -m "Add user suspension endpoint"
 - 🔄 More examples
 - 🔄 Interactive tutorials
 
-### 📋 Milestone 3: React Native Support (Planned)
+### 📋 Milestone 3: React Native Support (in Progress)
 
-- 📋 Single codebase for Web + Native
-- 📋 NativeWind integration
-- 📋 Expo Router auto-generation
-- 📋 Platform-specific overrides
-- 📋 Full UI component parity
+- 🔄 Single codebase for Web + Native
+- ✅ NativeWind integration
+- ✅ Expo Router auto-generation
+- 🔄 Platform-specific overrides
+- 🔄 Full UI component parity
 
 ### 📋 Milestone 4: Component Colocation (Planned)
 
@@ -1153,9 +1116,9 @@ See [LICENSE](LICENSE) for MIT license details and [src/packages/LICENSE](src/pa
 ## 👥 Team
 
 **Creator & Lead Developer:**
-Marcus Brandstätter ([max@tfq.at](mailto:max@tfq.at))
+Marcus Brandstätter ([max@a42.ch](mailto:max@a42.ch))
 
-**AI Development Partners:**
+**AI Development Contributors:**
 
 - Augment
 - Claude Code
@@ -1183,7 +1146,7 @@ NextVibe stands on the shoulders of giants:
 - **Documentation**: [./docs/](./docs/)
 - **Issues**: [GitHub Issues](https://github.com/techfreaque/next-vibe/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/techfreaque/next-vibe/discussions)
-- **Email**: <max@tfq.at>
+- **Email**: <max@a42.ch>
 
 ---
 
@@ -1221,7 +1184,6 @@ Fork it. Build with it. Share your creations.
 - [Getting Started](#-quick-start)
 - [Revolutionary Features](#-revolutionary-features)
 - [Documentation](./docs/)
-- [Example: Unbottled.ai](./docs/examples/unbottled-ai/UNBOTTLED_AI.md)
 - [Vibe CLI](#%EF%B8%8F-vibe-cli)
 - [Contributing](#-contributing)
 - [License](#-license)
