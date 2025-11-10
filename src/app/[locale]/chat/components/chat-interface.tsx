@@ -29,7 +29,6 @@ import type { ModelId } from "../types";
 import { ChatArea } from "./layout/chat-area";
 import { SidebarWrapper } from "./layout/sidebar-wrapper";
 import { TopBar } from "./layout/top-bar";
-import { SearchModal } from "./search-modal";
 
 // Utility functions
 const isValidInput = (input: string): boolean => input.trim().length > 0;

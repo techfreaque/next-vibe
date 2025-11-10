@@ -730,7 +730,6 @@ class AiStreamRepository implements IAiStreamRepository {
     const encoder = new TextEncoder();
     const emitInitialEvents = this.emitInitialEvents.bind(this);
     const emitContentDelta = this.emitContentDelta.bind(this);
-    const createAssistantMessage = this.createAssistantMessage.bind(this);
     const finalizeAssistantMessage = this.finalizeAssistantMessage.bind(this);
     const deductCredits = this.deductCreditsAfterCompletion.bind(this);
 

@@ -11,7 +11,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
 import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
@@ -27,7 +27,7 @@ import {
   getIdColor,
   getShortId,
 } from "../../lib/utils/formatting";
-import { formatPostNumber, getPostNumber } from "../../lib/utils/post-numbers";
+import { formatPostNumber } from "../../lib/utils/post-numbers";
 import type { ChatMessage, ChatThread, ModelId } from "../../types";
 import { MessageEditor } from "./message-editor";
 import { groupMessagesBySequence } from "./message-grouping";
@@ -98,7 +98,6 @@ function getPostsByUserId(
  */
 function renderContentWithReferences(
   content: string,
-  postNumberToMessageId: Record<number, string>,
   onMessageClick?: (messageId: string) => void,
 ): JSX.Element {
   const parts: JSX.Element[] = [];
@@ -120,7 +119,7 @@ function renderContentWithReferences(
 
     // Add the reference as a clickable link
     const postNumber = parseInt(match[1], 10);
-    const messageId = postNumberToMessageId[postNumber];
+    const messageId = postNumber.split("-")[0];
 
     parts.push(
       <Button
@@ -317,8 +316,6 @@ interface FlatMessageProps {
   message: ChatMessage;
   index: number;
   postNum: number;
-  postNumberMap: Record<string, number>;
-  postNumberToMessageId: Record<number, string>;
   messages: ChatMessage[];
   messageGroup?: ReturnType<typeof groupMessagesBySequence>[0];
   personas: Record<string, { id: string; name: string; icon: string }>;
@@ -355,8 +352,6 @@ interface FlatMessageProps {
 function FlatMessage({
   message,
   postNum,
-  postNumberMap,
-  postNumberToMessageId,
   messages,
   messageGroup,
   personas,
@@ -554,7 +549,7 @@ function FlatMessage({
           if (!parentMsg) {
             return null;
           }
-          const parentPostNum = postNumberMap[parentMsg.id];
+          const parentPostNum = parentMsg.id.split("-")[0];
           return (
             <Div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
               <Span>{t("app.chat.flatView.replyingTo")}</Span>
@@ -742,7 +737,6 @@ function FlatMessage({
                       msgIndex > 0 && "mt-3",
                     )}
                   >
-                    {/* NEW ARCHITECTURE: Tool calls are separate TOOL messages now */}
                     <Markdown
                       content={msg.content}
                       messageId={msg.id}
@@ -757,21 +751,12 @@ function FlatMessage({
                       msgIndex > 0 && "mt-3",
                     )}
                   >
-                    {renderContentWithReferences(
-                      msg.content,
-                      postNumberToMessageId,
-                      (msgId): void => {
-                        const targetPostNum = postNumberMap[msgId];
-
-                        const element = document.getElementById(
-                          `${targetPostNum}`,
-                        );
-                        element?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "center",
-                        });
-                      },
-                    )}
+                             <Markdown
+                    content={msg.content}
+                    messageId={msg.id}
+                    hasContentAfter={true}
+                    collapseState={true}
+                  />
                   </Div>
                 )}
               </React.Fragment>
@@ -828,7 +813,7 @@ function FlatMessage({
         <Div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
           <Span>{t("app.chat.flatView.replies")}</Span>
           {directReplies.map((reply) => {
-            const replyPostNum = postNumberMap[reply.id];
+            const replyPostNum = reply.id.split("-")[0];
             return (
               <Span
                 key={reply.id}
@@ -939,19 +924,6 @@ function FlatMessage({
               </Button>
             )}
 
-            {/* Quote */}
-            {onInsertQuote && (
-              <Button
-                variant="ghost"
-                size="unset"
-                onClick={onInsertQuote}
-                className="text-primary hover:text-primary/80 hover:underline transition-colors"
-                title={t("app.chat.flatView.actions.insertQuote")}
-              >
-                [{t("app.chat.flatView.actions.insertQuote")}]
-              </Button>
-            )}
-
             {/* Copy Link */}
             <Button
               variant="ghost"
@@ -1036,31 +1008,9 @@ export function FlatMessageView({
     }
   }
 
-  // Build post number maps
-  const [postNumberMap, setPostNumberMap] = useState<Record<string, number>>({});
-  const [postNumberToMessageId, setPostNumberToMessageId] = useState<Record<number, string>>({});
-
-  useEffect(() => {
-    async function loadPostNumbers(): Promise<void> {
-      const messageIds = messages.map((m) => m.id);
-      const numMap: Record<string, number> = {};
-      const idMap: Record<number, string> = {};
-
-      for (const id of messageIds) {
-        const postNum = await getPostNumber(id, logger);
-        numMap[id] = postNum;
-        idMap[postNum] = id;
-      }
-
-      setPostNumberMap(numMap);
-      setPostNumberToMessageId(idMap);
-    }
-    void loadPostNumbers();
-  }, [messages, logger]);
-
   // Find message by post number for preview
   const previewMessage = hoveredRef
-    ? messages.find((m) => postNumberMap[m.id]?.toString() === hoveredRef)
+    ? messages.find((m) => m.id.split("-")[0] === hoveredRef)
     : null;
 
   return (
@@ -1106,9 +1056,7 @@ export function FlatMessageView({
             key={message.id}
             message={message}
             index={index}
-            postNum={postNumberMap[message.id]}
-            postNumberMap={postNumberMap}
-            postNumberToMessageId={postNumberToMessageId}
+            postNum={message.id.split("-")[0]}
             messages={messages}
             messageGroup={group}
             personas={personas}
