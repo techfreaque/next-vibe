@@ -1,6 +1,4 @@
-import { Settings } from "lucide-react-native";
+import { Settings as SettingsIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Settings);
-export { Settings };
+export const Settings = styled(SettingsIcon);

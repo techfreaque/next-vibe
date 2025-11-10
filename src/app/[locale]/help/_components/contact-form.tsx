@@ -122,7 +122,7 @@ export default function ContactForm({
 
         <Button
           type="submit"
-          className="w-full bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+          className="w-full bg-blue-600"
           disabled={isSubmitting}
         >
           {isSubmitting ? (

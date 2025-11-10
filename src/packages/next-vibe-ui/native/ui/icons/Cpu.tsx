@@ -1,6 +1,4 @@
-import { Cpu } from "lucide-react-native";
+import { Cpu as CpuIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Cpu);
-export { Cpu };
+export const Cpu = styled(CpuIcon);

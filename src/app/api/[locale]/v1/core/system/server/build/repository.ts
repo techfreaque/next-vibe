@@ -5,7 +5,6 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
   success,
   ErrorResponseTypes,
   fail,
@@ -172,10 +171,10 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
           if (!data.force) {
             return fail({
-              message:
+          message:
                 "app.api.v1.core.system.server.build.post.errors.nextjs_build_failed.title",
-              errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              messageParams: {
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                        messageParams: {
                 error: parsedError.message,
               },
             });
@@ -204,11 +203,12 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
             if (!migrateResult.success) {
               errors.push(MESSAGES.FAILED_PROD_MIGRATIONS);
               if (!data.force) {
-                return createErrorResponse(
-                  "app.api.v1.core.shared.errorTypes.database_error",
-                  ErrorResponseTypes.DATABASE_ERROR,
-                  { error: MESSAGES.FAILED_PROD_MIGRATIONS },
-                );
+                return fail({
+          message: "app.api.v1.core.shared.errorTypes.database_error",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                            messageParams: { error: MESSAGES.FAILED_PROD_MIGRATIONS },
+                  cause: migrateResult,
+                });
               }
             }
           }
@@ -232,14 +232,15 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
           errors.push(errorMsg);
           if (!data.force) {
-            return createErrorResponse(
-              "app.api.v1.core.shared.errorTypes.database_error",
-              ErrorResponseTypes.DATABASE_ERROR,
-              {
+            return fail({
+          message: "app.api.v1.core.shared.errorTypes.database_error",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                        messageParams: {
                 error: errorMsg,
                 details: parsedError.message,
                 suggestion: MESSAGES.DB_START_SUGGESTION,
               },
+              }
             );
           }
         }
@@ -263,12 +264,13 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
       errors.push(`${MESSAGES.BUILD_FAILED}: ${parsedError.message}`);
 
       // Return error response with proper structure
-      return createErrorResponse(
-        "app.api.v1.core.shared.errorTypes.internal_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.shared.errorTypes.internal_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           error: parsedError.message,
         },
+        }
       );
     }
   }

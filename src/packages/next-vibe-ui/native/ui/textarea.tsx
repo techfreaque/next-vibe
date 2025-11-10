@@ -1,11 +1,14 @@
 import * as React from "react";
 import type { TextInputProps } from "react-native";
-import { TextInput } from "react-native";
+import { TextInput, View } from "react-native";
+import { styled } from "nativewind";
 
 import type { TextareaProps as WebTextareaProps } from "@/packages/next-vibe-ui/web/ui/textarea";
 
 import { cn } from "../lib/utils";
-import { Div } from "./div";
+
+// Styled View for NativeWind - TextInput cannot be styled (animations not supported)
+const StyledView = styled(View);
 
 // Native textarea props combine web interface with native TextInput props
 export type TextareaProps = WebTextareaProps &
@@ -37,25 +40,19 @@ const Textarea = React.forwardRef<
     const isEditable = editable !== undefined ? editable : !disabled;
 
     return (
-      <Div
+      <StyledView
         className={cn(
-          // Wrapper handles: border, background, padding, rounded corners, min-height
-          "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2",
+          "flex min-h-[80px] w-full flex-row rounded-md border border-input bg-background px-3 py-2 shadow-sm",
           !isEditable && "opacity-50",
           className,
         )}
+        pointerEvents="box-none"
       >
         <TextInput
           ref={ref}
-          style={[
-            {
-              outlineWidth: 0,
-              // TextInput handles: text color, size, flex - NO border/background (wrapper handles that)
-              flex: 1,
-            },
-            style,
-          ]}
-          placeholderTextColor="rgb(var(--muted-foreground))"
+          className="flex-1 text-base text-foreground"
+          style={style}
+          placeholderTextColor="hsl(var(--muted-foreground))"
           multiline={multiline}
           numberOfLines={lines}
           textAlignVertical="top"
@@ -63,7 +60,7 @@ const Textarea = React.forwardRef<
           editable={isEditable}
           {...props}
         />
-      </Div>
+      </StyledView>
     );
   },
 );

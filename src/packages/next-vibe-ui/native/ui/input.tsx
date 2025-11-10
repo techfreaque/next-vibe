@@ -1,11 +1,14 @@
 import type { TextInputProps } from "react-native";
-import { TextInput } from "react-native";
+import { TextInput, View } from "react-native";
+import { styled } from "nativewind";
 
 import { cn } from "next-vibe/shared/utils/utils";
 
 // Import all public types from web version (web is source of truth)
 import type { InputProps as WebInputProps } from "@/packages/next-vibe-ui/web/ui/input";
-import { Div } from "./div";
+
+// Styled View for NativeWind - TextInput cannot be styled (animations not supported)
+const StyledView = styled(View);
 
 // Native input props combine web interface with native TextInput props
 // Exclude conflicting event handlers - onKeyPress has different signatures on web/native
@@ -22,25 +25,22 @@ export function Input({
   ...props
 }: NativeInputProps): React.JSX.Element {
   return (
-    <Div
+    <StyledView
       className={cn(
-        // Wrapper handles: border, background, padding, rounded corners
-        "flex h-10 native:h-12 w-full rounded-md border border-input bg-background px-3 py-2",
+        "flex h-9 w-full rounded-md border border-input bg-background shadow-sm",
         disabled && "opacity-50",
         className,
       )}
     >
       <TextInput
-        className={cn(
-          // Input handles: text color, size, flex - NO border/background (wrapper handles that)
-          "flex-1 text-base lg:text-sm native:text-lg native:leading-[1.25] text-foreground border-0",
-        )}
-        style={{ outlineWidth: 0 }} // Remove any default outline/border
-        placeholderTextColor="rgb(var(--muted-foreground))"
+        className="flex-1 px-3 text-sm text-foreground"
+        placeholderTextColor="hsl(var(--muted-foreground))"
         onChangeText={onChangeText}
         editable={editable ?? !disabled}
+        scrollEnabled={false}
+        multiline={false}
         {...props}
       />
-    </Div>
+    </StyledView>
   );
 }

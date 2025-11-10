@@ -56,12 +56,12 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer {
   }
 
   render(field: ResponseFieldMetadata, context: WidgetRenderContext): string {
-    const t = context.translate;
+    const t = context.t;
     const data = field.value;
 
     if (!Array.isArray(data) || data.length === 0) {
       const successMsg = this.styleText(
-        t("app.api.v1.core.system.check.codeQuality.noIssues" as never),
+        t("app.api.v1.core.system.check.codeQuality.noIssues"),
         "green",
         context,
       );

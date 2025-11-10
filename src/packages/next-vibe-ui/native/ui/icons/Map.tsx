@@ -1,6 +1,4 @@
-import { Map } from "lucide-react-native";
+import { Map as MapIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Map);
-export { Map };
+export const Map = styled(MapIcon);

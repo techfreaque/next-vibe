@@ -94,7 +94,7 @@ export function validateCliRequestData<
         success: false,
         message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
-        errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
+          errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
         messageParams: {
           error: urlValidation.message,
         },
@@ -112,7 +112,7 @@ export function validateCliRequestData<
         success: false,
         message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
-        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
         },
@@ -135,7 +135,7 @@ export function validateCliRequestData<
       success: false,
       message:
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
-      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
     };
   }
 }
@@ -209,9 +209,9 @@ export function validateGetRequestData<TSchema extends z.ZodTypeAny>(
         messageParams: validationResult.messageParams,
       });
       return fail({
-        message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
-        messageParams: {
+          message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
+                  messageParams: {
           error: validationResult.message,
         },
         cause: validationResult,
@@ -225,9 +225,9 @@ export function validateGetRequestData<TSchema extends z.ZodTypeAny>(
       error: parsedError.message,
     });
     return fail({
-      message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
-      errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
-      messageParams: {
+          message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
+                messageParams: {
         error: parsedError.message,
       },
     });
@@ -306,9 +306,9 @@ export async function validatePostRequestData<TSchema extends z.ZodTypeAny>(
         messageParams: validationResult.messageParams,
       });
       return fail({
-        message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-        messageParams: {
+          message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+                  messageParams: {
           error: validationResult.message,
         },
         cause: validationResult,
@@ -322,9 +322,9 @@ export async function validatePostRequestData<TSchema extends z.ZodTypeAny>(
       error: parsedError.message,
     });
     return fail({
-      message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
-      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-      messageParams: {
+          message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+                messageParams: {
         error: parsedError.message,
       },
     });
@@ -368,10 +368,10 @@ export async function validateNextRequestData<
         );
     if (!urlValidation.success) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
-        errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
-        messageParams: {
+          errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
+                  messageParams: {
           error: urlValidation.message,
         },
         cause: urlValidation,
@@ -386,9 +386,9 @@ export async function validateNextRequestData<
 
     if (!requestValidation.success) {
       return fail({
-        message: requestValidation.message,
-        errorType: requestValidation.errorType,
-        messageParams: requestValidation.messageParams,
+          message: requestValidation.message,
+          errorType: requestValidation.errorType,
+                  messageParams: requestValidation.messageParams,
         cause: requestValidation,
       });
     }
@@ -409,7 +409,7 @@ export async function validateNextRequestData<
       success: false,
       message:
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
-      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
     };
   }
 }
@@ -456,7 +456,7 @@ export function validateTrpcRequestData<
       success: false,
       message:
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
-      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
     };
   }
 }

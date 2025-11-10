@@ -9,20 +9,16 @@ import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/sha
 import definitions from "./definition";
 import { chatFoldersRepository } from "./repository";
 
-// The return type mismatch between repository methods and endpointsHandler is a known
-// limitation of the type system. The handlers work correctly at runtime.
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: ({ data, user, locale, logger }) =>
-      chatFoldersRepository.getFolders(data, user, locale, logger) as any,
+      chatFoldersRepository.getFolders(data, user, locale, logger),
   },
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, user, locale, logger }) =>
-      chatFoldersRepository.createFolder(data, user, locale, logger) as any,
+      chatFoldersRepository.createFolder(data, user, locale, logger) ,
   },
 });
-/* eslint-enable @typescript-eslint/no-explicit-any */

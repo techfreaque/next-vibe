@@ -3,7 +3,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -94,19 +94,19 @@ export async function sendTestRequest<
       | ResponseType<TResponseOutput>
       | undefined;
     if (!responseData) {
-      return createErrorResponse(
-        "app.api.v1.core.system.check.testing.test.errors.internal.title",
-        ErrorResponseTypes.NO_RESPONSE_DATA,
-        { endpoint: endpoint.path.join("/") },
-      );
+      return fail({
+          message: "app.api.v1.core.system.check.testing.test.errors.internal.title",
+          errorType: ErrorResponseTypes.NO_RESPONSE_DATA,
+                  messageParams: { endpoint: endpoint.path.join("/") },
+      });
     }
     // TODO parse response schema
     return responseData;
   } catch (error) {
-    return createErrorResponse(
-      "app.api.v1.core.system.check.testing.test.errors.internal.title",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { error: parseError(error).message },
-    );
+    return fail({
+          message: "app.api.v1.core.system.check.testing.test.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { error: parseError(error).message },
+    });
   }
 }

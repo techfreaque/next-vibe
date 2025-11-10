@@ -1,6 +1,4 @@
-import { Gift } from "lucide-react-native";
+import { Gift as GiftIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Gift);
-export { Gift };
+export const Gift = styled(GiftIcon);

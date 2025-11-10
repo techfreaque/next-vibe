@@ -11,7 +11,7 @@ import { sql } from "drizzle-orm";
 import { migrate as drizzleMigrate } from "drizzle-orm/node-postgres/migrator";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -129,15 +129,15 @@ export class DatabaseMigrationRepositoryImpl
       const duration = Date.now() - startTime;
       const parsedError = parseError(error);
 
-      return createErrorResponse(
-        "app.api.v1.core.system.db.migrate.post.errors.network.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           error: parsedError.message,
           output: output.trim(),
           duration,
         },
-      );
+      });
     }
   }
 
@@ -307,11 +307,11 @@ export class DatabaseMigrationRepositoryImpl
       // Repair logic would be implemented here
       return success({ repaired: true, message });
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.system.db.migrate.post.errors.network.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -341,11 +341,11 @@ export class DatabaseMigrationRepositoryImpl
       // Production migration logic would be implemented here
       return success({ migrated: true, message });
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.system.db.migrate.post.errors.network.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -370,11 +370,11 @@ export class DatabaseMigrationRepositoryImpl
       // Sync logic would be implemented here
       return success({ synced: true, message });
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.system.db.migrate.post.errors.network.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 }

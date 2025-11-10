@@ -1,6 +1,4 @@
-import { Bell } from "lucide-react-native";
+import { Bell as BellIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Bell);
-export { Bell };
+export const Bell = styled(BellIcon);

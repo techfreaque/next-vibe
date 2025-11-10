@@ -75,6 +75,10 @@ export const translations = {
           widgets: {
             common: {
               noDataAvailable: "No data available",
+              noIssuesFound: "No issues found",
+              invalidDataFormat: "Invalid data format",
+              info: "Info",
+              items: "items",
               andMoreItems: "and {count} more items",
               affectedFiles: "Affected Files",
               summary: "Summary",

@@ -1,6 +1,4 @@
-import { Pin } from "lucide-react-native";
+import { Pin as PinIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Pin);
-export { Pin };
+export const Pin = styled(PinIcon);

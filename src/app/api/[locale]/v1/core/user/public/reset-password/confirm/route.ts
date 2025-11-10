@@ -6,7 +6,7 @@
  */
 
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -38,10 +38,10 @@ export const { POST, tools } = endpointsHandler({
 
       // Validate passwords match
       if (data.newPassword.password !== data.newPassword.confirmPassword) {
-        return createErrorResponse(
-          "app.api.v1.core.user.public.resetPassword.confirm.errors.validation.passwordsDoNotMatch",
-          ErrorResponseTypes.VALIDATION_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.user.public.resetPassword.confirm.errors.validation.passwordsDoNotMatch",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
       }
 
       // Reset the password

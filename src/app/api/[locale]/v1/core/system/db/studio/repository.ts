@@ -7,7 +7,7 @@ import { spawn } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -108,15 +108,15 @@ export class StudioRepositoryImpl implements StudioRepositoryInterface {
       // Log the exit status
       if (exitResult.error) {
         return await Promise.resolve(
-          createErrorResponse(
-            "app.api.v1.core.system.db.studio.post.errors.server.title",
-            ErrorResponseTypes.INTERNAL_ERROR,
-            {
+          fail({
+          message: "app.api.v1.core.system.db.studio.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                      messageParams: {
               error: exitResult.error.message,
               output: `Failed to start Drizzle Studio: ${exitResult.error.message}`,
               duration,
             },
-          ),
+          }),
         );
       } else if (exitResult.code !== null && exitResult.code !== 0) {
         logger.info(`Drizzle Studio exited with code ${exitResult.code}`);
@@ -142,15 +142,15 @@ export class StudioRepositoryImpl implements StudioRepositoryInterface {
       logger.error("Failed to start Drizzle Studio", { error: parsedError });
 
       return await Promise.resolve(
-        createErrorResponse(
-          "app.api.v1.core.system.db.studio.post.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          {
+        fail({
+          message: "app.api.v1.core.system.db.studio.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                    messageParams: {
             error: parsedError.message,
             output: `Failed to start Drizzle Studio: ${parsedError.message}`,
             duration,
           },
-        ),
+        }),
       );
     }
   }

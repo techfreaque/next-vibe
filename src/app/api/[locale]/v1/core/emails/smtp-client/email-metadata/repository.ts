@@ -8,7 +8,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -123,14 +123,14 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
         error: parsedError.message,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.emailMetadata.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.emails.smtpClient.emailMetadata.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           recipient: data.params.recipientEmail,
           error: parsedError.message,
         },
-      );
+      });
     }
   }
 
@@ -219,14 +219,14 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
         error: parsedError.message,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.emailMetadata.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.emails.smtpClient.emailMetadata.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           emailId: data.params.emailId,
           error: parsedError.message,
         },
-      );
+      });
     }
   }
 }

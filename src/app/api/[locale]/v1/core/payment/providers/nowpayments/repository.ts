@@ -182,7 +182,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           message:
             "app.api.v1.core.payment.providers.nowpayments.errors.userNotFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
+                    messageParams: { userId },
         });
       }
 
@@ -200,10 +200,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         userId,
       });
       return fail({
-        message:
+          message:
           "app.api.v1.core.payment.providers.nowpayments.errors.customerCreationFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message, userId },
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(error).message, userId },
       });
     }
   }
@@ -237,7 +237,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           message:
             "app.api.v1.core.payment.providers.nowpayments.errors.productNotFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { productId: params.productId },
+                    messageParams: { productId: params.productId },
         });
       }
 
@@ -253,7 +253,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           message:
             "app.api.v1.core.payment.providers.nowpayments.errors.userEmailRequired.title",
           errorType: ErrorResponseTypes.BAD_REQUEST,
-          messageParams: { userId: params.userId },
+                    messageParams: { userId: params.userId },
         });
       }
 
@@ -275,10 +275,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         userId: params.userId,
       });
       return fail({
-        message:
+          message:
           "app.api.v1.core.payment.providers.nowpayments.errors.checkoutCreationFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -319,10 +319,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         error: errorText,
       });
       return fail({
-        message:
+          message:
           "app.api.v1.core.payment.providers.nowpayments.errors.invoiceCreationFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: errorText },
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: errorText },
       });
     }
 
@@ -388,10 +388,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         error: parseError(fetchError),
       });
       return fail({
-        message:
+          message:
           "app.api.v1.core.payment.providers.nowpayments.errors.planCreationFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(fetchError).message },
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(fetchError).message },
       });
     }
 
@@ -406,10 +406,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         headers: { "x-api-key": `${this.apiKey.substring(0, 10)}...` },
       });
       return fail({
-        message:
+          message:
           "app.api.v1.core.payment.providers.nowpayments.errors.planCreationFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: errorText },
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: errorText },
       });
     }
 
@@ -443,10 +443,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         error: errorText,
       });
       return fail({
-        message:
+          message:
           "app.api.v1.core.payment.providers.nowpayments.errors.subscriptionCreationFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: errorText },
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: errorText },
       });
     }
 
@@ -501,7 +501,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           message:
             "app.api.v1.core.payment.providers.nowpayments.errors.webhookVerificationFailed.title",
           errorType: ErrorResponseTypes.BAD_REQUEST,
-          messageParams: { error: "Invalid signature" },
+                    messageParams: { error: "Invalid signature" },
         });
       }
 
@@ -547,10 +547,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         error: parseError(error),
       });
       return fail({
-        message:
+          message:
           "app.api.v1.core.payment.providers.nowpayments.errors.webhookVerificationFailed.title",
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-        messageParams: { error: parseError(error).message },
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -590,7 +590,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           message:
             "app.api.v1.core.payment.providers.nowpayments.errors.subscriptionRetrievalFailed.title",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: { error: errorText },
+                    messageParams: { error: errorText },
         });
       }
 
@@ -648,10 +648,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         subscriptionId,
       });
       return fail({
-        message:
+          message:
           "app.api.v1.core.payment.providers.nowpayments.errors.subscriptionRetrievalFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -685,7 +685,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           message:
             "app.api.v1.core.payment.providers.nowpayments.errors.subscriptionCancellationFailed.title",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: { error: errorText },
+                    messageParams: { error: errorText },
         });
       }
 
@@ -698,10 +698,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         subscriptionId,
       });
       return fail({
-        message:
+          message:
           "app.api.v1.core.payment.providers.nowpayments.errors.subscriptionCancellationFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -770,7 +770,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           message:
             "app.api.v1.core.payment.providers.nowpayments.errors.paymentStatusFailed.title",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: { error: errorText },
+                    messageParams: { error: errorText },
         });
       }
 
@@ -788,10 +788,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         paymentId,
       });
       return fail({
-        message:
+          message:
           "app.api.v1.core.payment.providers.nowpayments.errors.paymentStatusFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -847,7 +847,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           message:
             "app.api.v1.core.payment.providers.nowpayments.errors.subscriptionListFailed.title",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: { error: errorText },
+                    messageParams: { error: errorText },
         });
       }
 
@@ -864,10 +864,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         error: parseError(error),
       });
       return fail({
-        message:
+          message:
           "app.api.v1.core.payment.providers.nowpayments.errors.subscriptionListFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }

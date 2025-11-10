@@ -189,7 +189,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         roles = [
           UserRole.CUSTOMER,
         ] as (typeof UserRoleValue)[keyof typeof UserRoleValue][],
-        detailLevel = UserDetailLevel.MINIMAL as T,
+        detailLevel = UserDetailLevel.MINIMAL,
       } = options;
 
       logger.debug("Getting user by auth", {
@@ -214,7 +214,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       // If minimal detail level is requested and we already have the data, return it
       if (detailLevel === UserDetailLevel.MINIMAL) {
-        return success<UserType<T>>(verifiedUser as UserType<T>);
+        return success(verifiedUser) as ResponseType<UserType<T>>;
       }
 
       // Type guard to check if user has ID property
@@ -317,9 +317,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       };
 
       if (detailLevel === UserDetailLevel.STANDARD) {
-        return success<ExtendedUserType<T>>(
-          standardUser as ExtendedUserType<T>,
-        );
+        return success(standardUser) as ResponseType<ExtendedUserType<T>>;
       }
 
       // For complete detail level, add additional profile data
@@ -328,9 +326,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         stripeCustomerId: user.stripeCustomerId,
       };
 
-      return success<ExtendedUserType<T>>(
-        completeUser as ExtendedUserType<T>,
-      );
+      return success(completeUser) as ResponseType<ExtendedUserType<T>>;
     } catch (error) {
       logger.error("Error getting user by ID", parseError(error));
       return fail({

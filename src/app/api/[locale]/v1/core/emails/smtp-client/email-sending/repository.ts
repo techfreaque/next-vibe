@@ -8,7 +8,7 @@ import "server-only";
 import { render } from "@react-email/render";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -118,14 +118,14 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
       const localeMapping = mapLocaleToSelectionCriteria(data.params.locale);
       if (!localeMapping) {
         logger.error("Invalid locale format", { locale: data.params.locale });
-        return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.emailSending.email.errors.sending_failed",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.emails.smtpClient.emailSending.email.errors.sending_failed",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                    messageParams: {
             recipient: data.params.toEmail,
             error: `Invalid locale format: ${data.params.locale}`,
           },
-        );
+        });
       }
 
       const { country, language } = localeMapping;
@@ -169,11 +169,12 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
           subject: data.params.subject,
           error: emailResponse.message,
         });
-        return createErrorResponse(
-          emailResponse.message,
-          emailResponse.errorType || ErrorResponseTypes.EMAIL_ERROR,
-          emailResponse.messageParams,
-        );
+        return fail({
+          message: emailResponse.message,
+          errorType: emailResponse.errorType || ErrorResponseTypes.EMAIL_ERROR,
+                    messageParams: emailResponse.messageParams,
+          cause: emailResponse,
+        });
       }
 
       logger.debug("Enhanced email sent successfully", {
@@ -201,14 +202,14 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
         locale: data.params.locale,
         campaignType: data.params.campaignType,
       });
-      return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.emailSending.email.errors.sending_failed",
-        ErrorResponseTypes.EMAIL_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.emails.smtpClient.emailSending.email.errors.sending_failed",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                  messageParams: {
           recipient: data.params.toEmail,
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 }

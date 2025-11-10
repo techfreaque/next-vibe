@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { useState } from "react";
 import {
   AlertCircle,
@@ -153,7 +153,7 @@ export function BuyCreditsTab({
         </DialogContent>
       </Dialog>
 
-      <motion.div
+      <MotionDiv
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
@@ -341,7 +341,7 @@ export function BuyCreditsTab({
           )}
         </CardContent>
       </Card>
-      </motion.div>
+      </MotionDiv>
     </>
   );
 }

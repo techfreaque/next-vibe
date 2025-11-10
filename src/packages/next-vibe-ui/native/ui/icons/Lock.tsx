@@ -1,6 +1,4 @@
-import { Lock } from "lucide-react-native";
+import { Lock as LockIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Lock);
-export { Lock };
+export const Lock = styled(LockIcon);

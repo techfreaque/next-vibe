@@ -1,8 +1,5 @@
-import React from "react";
-import Svg, { Rect } from "react-native-svg";
+// TODO: lucide-react-native doesn't have React brand icon, using Atom as placeholder
+import { Atom as SiReactIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-export const SiReact = ({ className }: { className?: string }): JSX.Element => (
-  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
-    <Rect width="24" height="24" fill="#61DAFB" />
-  </Svg>
-);
+export const SiReact = styled(SiReactIcon);

@@ -1,6 +1,4 @@
-import { ArchiveRestore } from "lucide-react-native";
+import { ArchiveRestore as ArchiveRestoreIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(ArchiveRestore);
-export { ArchiveRestore };
+export const ArchiveRestore = styled(ArchiveRestoreIcon);

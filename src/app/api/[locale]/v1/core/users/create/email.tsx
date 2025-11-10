@@ -5,7 +5,7 @@
 
 import { Button, Hr, Section, Text } from "@react-email/components";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -365,10 +365,10 @@ export const renderWelcomeEmail: EmailFunctionType<
 > = ({ responseData, locale, t }) => {
   try {
     if (!responseData) {
-      return createErrorResponse(
-        "app.api.v1.core.users.create.email.users.errors.missing_data",
-        ErrorResponseTypes.VALIDATION_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.users.create.email.users.errors.missing_data",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
     }
 
     return success({
@@ -384,10 +384,10 @@ export const renderWelcomeEmail: EmailFunctionType<
       }),
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.users.create.email.users.error.general.internal_server_error",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+          message: "app.api.v1.core.users.create.email.users.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };
 
@@ -402,10 +402,10 @@ export const renderAdminNotificationEmail: EmailFunctionType<
 > = ({ responseData, locale, t }) => {
   try {
     if (!responseData) {
-      return createErrorResponse(
-        "app.api.v1.core.users.create.email.users.errors.missing_data",
-        ErrorResponseTypes.VALIDATION_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.users.create.email.users.errors.missing_data",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
     }
 
     return success({
@@ -421,9 +421,9 @@ export const renderAdminNotificationEmail: EmailFunctionType<
       }),
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.users.create.email.users.error.general.internal_server_error",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+          message: "app.api.v1.core.users.create.email.users.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };

@@ -8,7 +8,7 @@ import "server-only";
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -103,16 +103,16 @@ export class SignupRepositoryImpl implements SignupRepository {
         logger.debug("Registration failed: Passwords do not match", {
           email: data.personalInfo.email,
         });
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.validation_failed",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.user.auth.errors.validation_failed",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                    messageParams: {
             field: "confirmPassword",
-            message: t(
+                    message: t(
               "app.api.v1.core.user.public.signup.fields.confirmPassword.validation.mismatch",
             ),
           },
-        );
+        });
       }
 
       // Check if email already exists
@@ -125,14 +125,14 @@ export class SignupRepositoryImpl implements SignupRepository {
         return emailCheckResponse;
       }
       if (emailCheckResponse.data) {
-        return createErrorResponse(
-          "app.api.v1.core.user.public.signup.errors.conflict.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.user.public.signup.errors.conflict.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                    messageParams: {
             field: "email",
-            message: t("app.api.v1.core.user.errors.emailAlreadyInUse"),
+                    message: t("app.api.v1.core.user.errors.emailAlreadyInUse"),
           },
-        );
+        });
       }
 
       // Create the user account
@@ -246,11 +246,11 @@ export class SignupRepositoryImpl implements SignupRepository {
     } catch (error) {
       logger.error("Registration error", parseError(error));
       const parsedError = parseError(error);
-      return createErrorResponse(
-        "app.api.v1.core.user.public.signup.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { email: data.personalInfo.email, error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.user.public.signup.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { email: data.personalInfo.email, error: parsedError.message },
+      });
     }
   }
 
@@ -296,11 +296,11 @@ export class SignupRepositoryImpl implements SignupRepository {
     } catch (error) {
       logger.error("Error checking email availability", parseError(error));
       const parsedError = parseError(error);
-      return createErrorResponse(
-        "app.api.v1.core.user.public.signup.emailCheck.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { email: data.email, error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.user.public.signup.emailCheck.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { email: data.email, error: parsedError.message },
+      });
     }
   }
 
@@ -345,20 +345,20 @@ export class SignupRepositoryImpl implements SignupRepository {
         logger.debug("Registration failed: Email already registered", {
           email,
         });
-        return createErrorResponse(
-          "app.api.v1.core.user.public.signup.errors.conflict.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          { email },
-        );
+        return fail({
+          message: "app.api.v1.core.user.public.signup.errors.conflict.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                    messageParams: { email },
+        });
       }
 
       // Validate password confirmation
       if (password !== confirmPassword) {
         logger.debug("Registration failed: Passwords do not match", { email });
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.validation_failed",
-          ErrorResponseTypes.VALIDATION_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.user.auth.errors.validation_failed",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
       }
 
       // Create user data object
@@ -421,14 +421,14 @@ export class SignupRepositoryImpl implements SignupRepository {
       return success(userResponse.data);
     } catch (error) {
       logger.error("User creation error", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.user.public.signup.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.user.public.signup.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           email: userInput.personalInfo.email,
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 
@@ -453,11 +453,11 @@ export class SignupRepositoryImpl implements SignupRepository {
       return success(existingUserResponse.success); // true if email exists
     } catch (error) {
       logger.error("Error checking email registration", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.user.public.signup.emailCheck.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message, email },
-      );
+      return fail({
+          message: "app.api.v1.core.user.public.signup.emailCheck.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message, email },
+      });
     }
   }
 

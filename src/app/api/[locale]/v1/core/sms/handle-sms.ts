@@ -7,7 +7,7 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -79,11 +79,11 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
           if (!result.success) {
             if (!smsData.ignoreErrors) {
               errors.push(
-                createErrorResponse(
-                  "app.api.v1.core.sms.sms.error.rendering_failed",
-                  ErrorResponseTypes.SMS_ERROR,
-                  { error: result.message },
-                ),
+                fail({
+                  message: "app.api.v1.core.sms.sms.error.rendering_failed",
+                  errorType: ErrorResponseTypes.SMS_ERROR,
+                  messageParams: { error: result.message },
+                }),
               );
             }
             return;
@@ -130,11 +130,11 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
 
             if (!batchResult.success && !smsData.ignoreErrors) {
               errors.push(
-                createErrorResponse(
-                  "app.api.v1.core.sms.sms.error.batch_send_failed",
-                  ErrorResponseTypes.SMS_ERROR,
-                  { error: batchResult.message },
-                ),
+                fail({
+                  message: "app.api.v1.core.sms.sms.error.batch_send_failed",
+                  errorType: ErrorResponseTypes.SMS_ERROR,
+                  messageParams: { error: batchResult.message },
+                }),
               );
             }
           } else {
@@ -152,11 +152,11 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
 
             if (!smsData.ignoreErrors && !smsResponse.success) {
               errors.push(
-                createErrorResponse(
-                  "app.api.v1.core.sms.sms.error.send_failed",
-                  ErrorResponseTypes.SMS_ERROR,
-                  { error: smsResponse.message },
-                ),
+                fail({
+                  message: "app.api.v1.core.sms.sms.error.send_failed",
+                  errorType: ErrorResponseTypes.SMS_ERROR,
+                  messageParams: { error: smsResponse.message },
+                }),
               );
             }
           }
@@ -166,11 +166,11 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
 
           if (!smsData.ignoreErrors) {
             errors.push(
-              createErrorResponse(
-                "app.api.v1.core.sms.sms.error.rendering_failed",
-                ErrorResponseTypes.SMS_ERROR,
-                { error: parsedError.message },
-              ),
+              fail({
+                message: "app.api.v1.core.sms.sms.error.rendering_failed",
+                errorType: ErrorResponseTypes.SMS_ERROR,
+                messageParams: { error: parsedError.message },
+              }),
             );
           }
         }
@@ -179,11 +179,11 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
   } catch (error) {
     logger.error("Error sending SMS:", parseError(error));
     errors.push(
-      createErrorResponse(
-        "app.api.v1.core.sms.sms.error.delivery_failed",
-        ErrorResponseTypes.SMS_ERROR,
-        { error: parseError(error).message },
-      ),
+      fail({
+        message: "app.api.v1.core.sms.sms.error.delivery_failed",
+        errorType: ErrorResponseTypes.SMS_ERROR,
+        messageParams: { error: parseError(error).message },
+      }),
     );
   }
 
@@ -199,11 +199,11 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
       errorCount: errors.length,
       errors: errors.map((e) => e.message),
     });
-    return createErrorResponse(
-      "app.api.v1.core.sms.sms.error.delivery_failed",
-      ErrorResponseTypes.SMS_ERROR,
-      { errorCount: errors.length },
-    );
+    return fail({
+      message: "app.api.v1.core.sms.sms.error.delivery_failed",
+      errorType: ErrorResponseTypes.SMS_ERROR,
+      messageParams: { errorCount: errors.length },
+    });
   }
 
   return { success: true, data: undefined };

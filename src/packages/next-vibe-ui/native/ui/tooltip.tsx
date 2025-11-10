@@ -13,7 +13,7 @@ import type {
 } from "../../web/ui/tooltip";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
-const TEXT_CLASS_CONTENT = "text-sm native:text-base text-popover-foreground";
+const TEXT_CLASS_CONTENT = "text-sm text-base text-popover-foreground";
 /* eslint-enable i18next/no-literal-string */
 
 export type {
@@ -36,8 +36,8 @@ const TooltipContent = React.forwardRef<
       style={Platform.OS !== "web" ? StyleSheet.absoluteFill : undefined}
     >
       <Animated.View
-        entering={Platform.select({ web: undefined, default: FadeIn })}
-        exiting={Platform.select({ web: undefined, default: FadeOut })}
+        entering={FadeIn}
+        exiting={FadeOut}
       >
         <TextClassContext.Provider
           value={TEXT_CLASS_CONTENT}
@@ -49,7 +49,7 @@ const TooltipContent = React.forwardRef<
             align={align}
             alignOffset={alignOffset}
             className={cn(
-              "z-50 overflow-hidden rounded-md border border-border bg-popover px-3 py-1.5 shadow-md shadow-foreground/5 web:animate-in web:fade-in-0 web:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+              "z-50 overflow-hidden rounded-md border border-border bg-popover px-3 py-1.5 shadow-md shadow-foreground/5 animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
               className,
             )}
           />

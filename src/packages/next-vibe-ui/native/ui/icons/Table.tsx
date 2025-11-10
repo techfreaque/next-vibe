@@ -1,6 +1,4 @@
-import { Table } from "lucide-react-native";
+import { Table as TableIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Table);
-export { Table };
+export const Table = styled(TableIcon);

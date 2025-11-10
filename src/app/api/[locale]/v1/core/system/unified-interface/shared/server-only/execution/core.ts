@@ -130,10 +130,10 @@ export async function executeHandler<
 
     // Return a standardized error response
     return fail({
-      message:
+          message:
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: {
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: {
         error: parsedError.message,
       },
     });
@@ -165,9 +165,9 @@ export async function authenticateUser<
 
     if (!user) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.unauthorized",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
 
@@ -188,15 +188,15 @@ export async function authenticateUser<
     );
 
     return fail({
-      message:
+          message:
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.unauthorized",
-      errorType: ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
       cause: parsedError
         ? fail({
           message:
             "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
+                    messageParams: {
             error: parsedError.message,
           },
         })
@@ -227,9 +227,9 @@ export async function authenticateTypedUser<
 
     if (!user) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.unauthorized",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
 
@@ -247,15 +247,15 @@ export async function authenticateTypedUser<
     });
 
     return fail({
-      message:
+          message:
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.unauthorized",
-      errorType: ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
       cause: parsedError
         ? fail({
           message:
             "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
+                    messageParams: {
             error: parsedError.message,
           },
         })

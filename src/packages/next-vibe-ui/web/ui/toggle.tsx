@@ -15,9 +15,9 @@ const toggleVariants = cva(
           "border border-input bg-transparent web:hover:bg-accent active:bg-accent active:bg-accent",
       },
       size: {
-        default: "h-10 px-3 native:h-12 native:px-[12]",
-        sm: "h-9 px-2.5 native:h-10 native:px-[9]",
-        lg: "h-11 px-5 native:h-14 native:px-6",
+        default: "h-10 px-3",
+        sm: "h-9 px-2.5",
+        lg: "h-11 px-5",
       },
     },
     defaultVariants: {
@@ -28,7 +28,7 @@ const toggleVariants = cva(
 );
 
 const toggleTextVariants = cva(
-  "text-sm native:text-base text-foreground font-medium",
+  "text-sm text-foreground font-medium",
   {
     variants: {
       variant: {

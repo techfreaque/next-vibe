@@ -1,6 +1,4 @@
-import { LifeBuoy } from "lucide-react-native";
+import { LifeBuoy as LifeBuoyIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(LifeBuoy);
-export { LifeBuoy };
+export const LifeBuoy = styled(LifeBuoyIcon);

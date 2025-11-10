@@ -1,6 +1,4 @@
-import { Upload } from "lucide-react-native";
+import { Upload as UploadIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Upload);
-export { Upload };
+export const Upload = styled(UploadIcon);

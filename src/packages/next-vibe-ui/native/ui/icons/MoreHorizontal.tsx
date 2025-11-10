@@ -1,6 +1,4 @@
-import { MoreHorizontal } from "lucide-react-native";
+import { MoreHorizontal as MoreHorizontalIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(MoreHorizontal);
-export { MoreHorizontal };
+export const MoreHorizontal = styled(MoreHorizontalIcon);

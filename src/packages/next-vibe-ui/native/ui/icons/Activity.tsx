@@ -1,6 +1,4 @@
-import { Activity } from "lucide-react-native";
+import { Activity as ActivityIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Activity);
-export { Activity };
+export const Activity = styled(ActivityIcon);

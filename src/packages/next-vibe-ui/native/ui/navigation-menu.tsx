@@ -72,7 +72,7 @@ function NavigationMenuList({
   return (
     <NavigationMenuPrimitive.List
       className={cn(
-        "web:group flex flex-1 flex-row web:list-none items-center justify-center gap-1",
+        "group flex flex-1 flex-row list-none items-center justify-center gap-1",
         className,
       )}
       {...props}
@@ -113,7 +113,7 @@ function NavigationMenuTrigger({
     <NavigationMenuPrimitive.Trigger
       className={cn(
         navigationMenuTriggerStyle(),
-        "web:group gap-1.5",
+        "group gap-1.5",
         value === itemValue && "bg-accent",
         className,
       )}
@@ -124,7 +124,7 @@ function NavigationMenuTrigger({
         <ChevronDown
           size={12}
           className={cn(
-            "relative text-foreground h-3 w-3 web:transition web:duration-200",
+            "relative text-foreground h-3 w-3 transition duration-200",
           )}
           aria-hidden={true}
         />
@@ -152,10 +152,10 @@ function NavigationMenuContent({
     <NavigationMenuPrimitive.Portal hostName={portalHost}>
       <NavigationMenuPrimitive.Content
         className={cn(
-          "w-full native:border native:border-border native:rounded-lg native:shadow-lg native:bg-popover native:text-popover-foreground native:overflow-hidden",
+          "w-full border border-border rounded-lg shadow-lg bg-popover text-popover-foreground overflow-hidden",
           value === itemValue
-            ? "web:animate-in web:fade-in web:slide-in-from-right-20"
-            : "web:animate-out web:fade-out web:slide-out-to-left-20",
+            ? "animate-in fade-in slide-in-from-right-20"
+            : "animate-out fade-out slide-out-to-left-20",
           className,
         )}
         {...props}
@@ -186,7 +186,7 @@ function NavigationMenuViewport({
     <View className={cn("absolute left-0 top-full flex justify-center")}>
       <View
         className={cn(
-          "web:origin-top-center relative mt-1.5 web:h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-lg web:animate-in web:zoom-in-90",
+          "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-lg animate-in zoom-in-90",
           className,
         )}
         {...props}
@@ -215,8 +215,8 @@ function NavigationMenuIndicator({
       className={cn(
         "top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden",
         value === itemValue
-          ? "web:animate-in web:fade-in"
-          : "web:animate-out web:fade-out",
+          ? "animate-in fade-in"
+          : "animate-out fade-out",
         className,
       )}
       {...props}

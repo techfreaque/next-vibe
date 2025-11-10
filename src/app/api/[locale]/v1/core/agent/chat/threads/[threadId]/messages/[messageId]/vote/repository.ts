@@ -191,9 +191,9 @@ export const voteRepository = {
     } catch (error) {
       logger.error("Failed to record vote", parseError(error));
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   },

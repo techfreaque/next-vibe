@@ -1,6 +1,4 @@
-import { ExternalLink } from "lucide-react-native";
+import { ExternalLink as ExternalLinkIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(ExternalLink);
-export { ExternalLink };
+export const ExternalLink = styled(ExternalLinkIcon);

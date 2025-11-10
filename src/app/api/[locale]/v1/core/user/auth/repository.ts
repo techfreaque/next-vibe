@@ -742,9 +742,9 @@ class AuthRepositoryImpl implements AuthRepository {
         parseError(error),
       );
       return fail({
-        message: "app.api.v1.core.user.auth.errors.jwt_signing_failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.user.auth.errors.jwt_signing_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -796,9 +796,9 @@ class AuthRepositoryImpl implements AuthRepository {
         error: parseError(error),
       });
       return fail({
-        message: "app.api.v1.core.user.auth.errors.invalid_token_signature",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.user.auth.errors.invalid_token_signature",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -854,7 +854,7 @@ class AuthRepositoryImpl implements AuthRepository {
         return fail({
           message: "app.api.v1.core.user.auth.errors.authentication_failed",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-          messageParams: { error: authResult.message },
+                    messageParams: { error: authResult.message },
           cause: authResult,
         });
       }
@@ -876,9 +876,9 @@ class AuthRepositoryImpl implements AuthRepository {
         parseError(error),
       );
       return fail({
-        message: "app.api.v1.core.user.auth.errors.session_retrieval_failed",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.user.auth.errors.session_retrieval_failed",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -1131,9 +1131,9 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (error) {
       logger.error("Error storing auth token for platform", parseError(error));
       return fail({
-        message: "app.api.v1.core.user.auth.errors.cookie_set_failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.user.auth.errors.cookie_set_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -1159,9 +1159,9 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (error) {
       logger.error("Error clearing auth token for platform", parseError(error));
       return fail({
-        message: "app.api.v1.core.user.auth.errors.cookie_clear_failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.user.auth.errors.cookie_clear_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -1199,9 +1199,9 @@ class AuthRepositoryImpl implements AuthRepository {
         parseError(error),
       );
       return fail({
-        message: "app.api.v1.core.user.auth.errors.jwt_signing_failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.user.auth.errors.jwt_signing_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }

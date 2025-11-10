@@ -106,6 +106,10 @@ export const translations = {
       description: "Checkout session response data",
     },
     errors: {
+      alreadySubscribed: {
+        title: "Already Subscribed",
+        description: "You already have an active subscription",
+      },
       validation: {
         title: "Validation Error",
         description: "Invalid checkout parameters",

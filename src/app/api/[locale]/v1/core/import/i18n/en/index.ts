@@ -378,7 +378,7 @@ export const translations = {
     },
 
     // === ERROR TYPES ===
-    errorType: {
+          errorType: {
       validation: {
         label: "Validation Error",
         description: "Data doesn't meet required format or rules",

@@ -218,7 +218,7 @@ export async function createErrorMessage(params: {
   parentId: string | null;
   depth: number;
   userId: string | undefined;
-  errorType: string;
+          errorType: string;
   errorDetails?: Record<string, string | number | boolean | null>;
   sequenceId?: string | null;
   sequenceIndex?: number;
@@ -232,7 +232,7 @@ export async function createErrorMessage(params: {
     | null
     | Record<string, string | number | boolean | null>
   > = {
-    errorType: params.errorType,
+          errorType: params.errorType,
   };
 
   if (params.errorDetails) {
@@ -256,7 +256,7 @@ export async function createErrorMessage(params: {
   params.logger.info("Created ERROR message", {
     messageId: params.messageId,
     threadId: params.threadId,
-    errorType: params.errorType,
+          errorType: params.errorType,
     userId: params.userId ?? "public",
   });
 }
@@ -566,7 +566,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
             msg.metadata.toolCall &&
             typeof msg.metadata.toolCall === "object"
           ) {
-            toolCalls = [msg.metadata.toolCall as ToolCall];
+            toolCalls = [msg.metadata.toolCall];
           }
           // Fallback: check if metadata has individual tool call fields (old format)
           else if (msg.metadata.toolName) {
@@ -610,10 +610,10 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
     } catch (error) {
       logger.error("Error listing messages", parseError(error));
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.server.title" as const,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -732,10 +732,10 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
 
         if (!parentMessage) {
           return fail({
-            message:
+          message:
               "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.validation.title",
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: {
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                      messageParams: {
               error:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.validation.parentNotFound",
             },
@@ -789,10 +789,10 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
     } catch (error) {
       logger.error("Error creating message", parseError(error));
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }

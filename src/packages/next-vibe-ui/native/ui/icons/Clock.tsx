@@ -1,6 +1,4 @@
-import { Clock } from "lucide-react-native";
+import { Clock as ClockIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Clock);
-export { Clock };
+export const Clock = styled(ClockIcon);

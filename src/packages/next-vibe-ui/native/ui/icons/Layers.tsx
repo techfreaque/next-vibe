@@ -1,6 +1,4 @@
-import { Layers } from "lucide-react-native";
+import { Layers as LayersIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Layers);
-export { Layers };
+export const Layers = styled(LayersIcon);

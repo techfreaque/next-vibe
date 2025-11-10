@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -32,11 +32,11 @@ export function runSnykTest(
       "Snyk CLI not found. Please install it with: npm install -g snyk",
       parseError(error),
     );
-    return createErrorResponse(
-      "app.api.v1.core.system.releaseTool.snyk.cliNotFound",
-      ErrorResponseTypes.NOT_FOUND,
-      { packageName },
-    );
+    return fail({
+          message: "app.api.v1.core.system.releaseTool.snyk.cliNotFound",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                messageParams: { packageName },
+    });
   }
 
   try {
@@ -54,11 +54,11 @@ export function runSnykTest(
       `Snyk vulnerability test failed for ${packageName}:`,
       parseError(error),
     );
-    return createErrorResponse(
-      "app.api.v1.core.system.releaseTool.snyk.testFailed",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { packageName, error: String(error) },
-    );
+    return fail({
+          message: "app.api.v1.core.system.releaseTool.snyk.testFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { packageName, error: String(error) },
+    });
   }
 }
 
@@ -81,11 +81,11 @@ export function runSnykMonitor(
       "Snyk CLI not found. Please install it with: npm install -g snyk",
       parseError(error),
     );
-    return createErrorResponse(
-      "app.api.v1.core.system.releaseTool.snyk.cliNotFound",
-      ErrorResponseTypes.NOT_FOUND,
-      { packageName },
-    );
+    return fail({
+          message: "app.api.v1.core.system.releaseTool.snyk.cliNotFound",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                messageParams: { packageName },
+    });
   }
 
   // Check if required environment variables are set
@@ -96,11 +96,11 @@ export function runSnykMonitor(
       "SNYK_TOKEN environment variable is required for Snyk monitoring",
       undefined,
     );
-    return createErrorResponse(
-      "app.api.v1.core.system.releaseTool.snyk.tokenRequired",
-      ErrorResponseTypes.INVALID_FORMAT_ERROR,
-      { packageName },
-    );
+    return fail({
+          message: "app.api.v1.core.system.releaseTool.snyk.tokenRequired",
+          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+                messageParams: { packageName },
+    });
   }
 
   if (!env["SNYK_ORG_KEY"]) {
@@ -108,11 +108,11 @@ export function runSnykMonitor(
       "SNYK_ORG_KEY environment variable is required for Snyk monitoring",
       undefined,
     );
-    return createErrorResponse(
-      "app.api.v1.core.system.releaseTool.snyk.orgKeyRequired",
-      ErrorResponseTypes.INVALID_FORMAT_ERROR,
-      { packageName },
-    );
+    return fail({
+          message: "app.api.v1.core.system.releaseTool.snyk.orgKeyRequired",
+          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+                messageParams: { packageName },
+    });
   }
 
   try {
@@ -141,11 +141,11 @@ export function runSnykMonitor(
     return success(undefined);
   } catch (error) {
     logger.error(`Snyk monitor failed for ${packageName}:`, parseError(error));
-    return createErrorResponse(
-      "app.api.v1.core.system.releaseTool.snyk.monitorFailed",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { packageName, error: String(error) },
-    );
+    return fail({
+          message: "app.api.v1.core.system.releaseTool.snyk.monitorFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { packageName, error: String(error) },
+    });
   }
 }
 

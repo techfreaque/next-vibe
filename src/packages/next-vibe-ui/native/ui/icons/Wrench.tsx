@@ -1,6 +1,4 @@
-import { Wrench } from "lucide-react-native";
+import { Wrench as WrenchIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Wrench);
-export { Wrench };
+export const Wrench = styled(WrenchIcon);

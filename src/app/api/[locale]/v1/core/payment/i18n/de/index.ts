@@ -1,3 +1,4 @@
+import { translations as checkoutTranslations } from "../../checkout/i18n/de";
 import { translations as invoiceTranslations } from "../../invoice/i18n/de";
 import { translations as portalTranslations } from "../../portal/i18n/de";
 import { translations as refundTranslations } from "../../refund/i18n/de";
@@ -7,6 +8,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   // Import sub-domain translations
+  checkout: checkoutTranslations,
   invoice: invoiceTranslations,
   portal: portalTranslations,
   refund: refundTranslations,

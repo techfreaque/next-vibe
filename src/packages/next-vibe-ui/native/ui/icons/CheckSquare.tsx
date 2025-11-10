@@ -1,6 +1,4 @@
-import { CheckSquare } from "lucide-react-native";
+import { CheckSquare as CheckSquareIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(CheckSquare);
-export { CheckSquare };
+export const CheckSquare = styled(CheckSquareIcon);

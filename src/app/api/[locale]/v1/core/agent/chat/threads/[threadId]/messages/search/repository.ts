@@ -165,9 +165,9 @@ export class MessageSearchRepositoryImpl
     } catch (error) {
       logger.error("Failed to search messages", parseError(error));
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.errors.serverError.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

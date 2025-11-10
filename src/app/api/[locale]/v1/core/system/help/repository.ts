@@ -7,7 +7,7 @@
 /* eslint-disable i18next/no-literal-string */
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -48,11 +48,11 @@ class HelpRepository {
         );
 
         if (!command) {
-          return createErrorResponse(
-            "app.api.v1.core.system.help.post.errors.notFound.title",
-            ErrorResponseTypes.NOT_FOUND,
-            { command: data.command },
-          );
+          return fail({
+          message: "app.api.v1.core.system.help.post.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                      messageParams: { command: data.command },
+          });
         }
 
         const response = this.formatCommandHelp(command);
@@ -67,11 +67,11 @@ class HelpRepository {
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to generate help information", parsedError);
-      return createErrorResponse(
-        "app.api.v1.core.system.help.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.help.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
+      });
     }
   }
 

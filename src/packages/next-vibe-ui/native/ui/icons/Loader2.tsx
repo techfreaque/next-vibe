@@ -1,6 +1,4 @@
-import { Loader2 } from "lucide-react-native";
+import { Loader2 as Loader2Icon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Loader2);
-export { Loader2 };
+export const Loader2 = styled(Loader2Icon);

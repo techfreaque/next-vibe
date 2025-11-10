@@ -1,6 +1,4 @@
-import { Bug } from "lucide-react-native";
+import { Bug as BugIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Bug);
-export { Bug };
+export const Bug = styled(BugIcon);

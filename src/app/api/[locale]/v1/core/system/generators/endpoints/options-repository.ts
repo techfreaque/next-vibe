@@ -8,7 +8,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -104,15 +104,15 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
 
     // Validate user permissions
     if (!user?.id) {
-      return createErrorResponse(
-        "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
-        ErrorResponseTypes.UNAUTHORIZED,
-        {
+      return fail({
+          message: "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        messageParams: {
           error: t(
             "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.description",
           ),
         },
-      );
+      });
     }
 
     try {
@@ -167,24 +167,24 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
           ];
           break;
         default:
-          return createErrorResponse(
-            "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
-            ErrorResponseTypes.INTERNAL_ERROR,
-            {
+          return fail({
+            message: "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: {
               error: t(
                 "app.api.v1.core.system.generators.endpoints.post.errors.server.description",
               ),
             },
-          );
+          });
       }
 
       return success(response);
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.shared.errorTypes.internal_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+        message: "app.api.v1.core.shared.errorTypes.internal_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -200,11 +200,11 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
       return Promise.resolve(success(validation.valid));
     } catch (error) {
       return Promise.resolve(
-        createErrorResponse(
-          "app.api.v1.core.shared.errorTypes.validation_error",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          { error: parseError(error).message },
-        ),
+        fail({
+          message: "app.api.v1.core.shared.errorTypes.validation_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { error: parseError(error).message },
+        }),
       );
     }
   }
@@ -218,11 +218,11 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
       return Promise.resolve(success(help));
     } catch (error) {
       return Promise.resolve(
-        createErrorResponse(
-          "app.api.v1.core.shared.errorTypes.internal_error",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          { error: parseError(error).message },
-        ),
+        fail({
+          message: "app.api.v1.core.shared.errorTypes.internal_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { error: parseError(error).message },
+        }),
       );
     }
   }

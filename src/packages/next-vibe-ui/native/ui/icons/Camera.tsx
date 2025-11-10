@@ -1,6 +1,4 @@
-import { Camera } from "lucide-react-native";
+import { Camera as CameraIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Camera);
-export { Camera };
+export const Camera = styled(CameraIcon);

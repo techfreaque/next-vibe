@@ -8,7 +8,7 @@ import "server-only";
 import { and, eq, gte, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -92,10 +92,10 @@ export class DistributionRepositoryImpl implements DistributionRepository {
       return success(result);
     } catch (error) {
       logger.error("Distribution calculation failed", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -177,10 +177,10 @@ export class DistributionRepositoryImpl implements DistributionRepository {
       return success(result);
     } catch (error) {
       logger.error("Locale quota calculation failed", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 

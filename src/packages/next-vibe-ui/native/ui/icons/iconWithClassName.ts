@@ -1,11 +1,11 @@
 import type { LucideIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
 /**
- * NativeWind v5 cssInterop is not available yet
- * TODO: Re-enable when NativeWind v5 stable is released
+ * Apply NativeWind className support to Lucide icons
+ * Uses styled() from nativewind to enable className processing
  */
-export function iconWithClassName(icon: LucideIcon): void {
-  // cssInterop is not available in NativeWind v5 preview
-  // Icons will work but className styling may not apply
-  void icon;
+export function iconWithClassName(icon: LucideIcon): LucideIcon {
+  // Apply styled() wrapper to enable className support and return it
+  return styled(icon) as LucideIcon;
 }

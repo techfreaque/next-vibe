@@ -118,9 +118,9 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     } catch (error) {
       logger.error("Error getting subscription:", parseError(error));
       return fail({
-        message: "app.api.v1.core.subscription.errors.database_error",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.subscription.errors.database_error",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -133,8 +133,8 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
   ): Promise<ResponseType<SubscriptionPostResponseOutput>> {
     // This should be called from checkout flow after payment provider confirms
     return fail({
-      message: "app.api.v1.core.subscription.errors.use_checkout_flow",
-      errorType: ErrorResponseTypes.BAD_REQUEST,
+          message: "app.api.v1.core.subscription.errors.use_checkout_flow",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
 
@@ -203,9 +203,9 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     } catch (error) {
       logger.error("Error updating subscription:", parseError(error));
       return fail({
-        message: "app.api.v1.core.subscription.errors.database_error",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.subscription.errors.database_error",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -281,9 +281,9 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     } catch (error) {
       logger.error("Error canceling subscription:", parseError(error));
       return fail({
-        message: "app.api.v1.core.subscription.errors.cancel_failed",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.subscription.errors.cancel_failed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }

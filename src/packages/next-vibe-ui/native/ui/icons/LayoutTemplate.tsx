@@ -1,6 +1,4 @@
-import { LayoutTemplate } from "lucide-react-native";
+import { LayoutTemplate as LayoutTemplateIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(LayoutTemplate);
-export { LayoutTemplate };
+export const LayoutTemplate = styled(LayoutTemplateIcon);

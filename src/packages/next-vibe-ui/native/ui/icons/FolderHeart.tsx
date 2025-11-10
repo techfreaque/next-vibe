@@ -1,6 +1,4 @@
-import { FolderHeart } from "lucide-react-native";
+import { FolderHeart as FolderHeartIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(FolderHeart);
-export { FolderHeart };
+export const FolderHeart = styled(FolderHeartIcon);

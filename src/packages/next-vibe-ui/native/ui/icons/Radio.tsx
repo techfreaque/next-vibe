@@ -1,6 +1,4 @@
-import { Radio } from "lucide-react-native";
+import { Radio as RadioIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Radio);
-export { Radio };
+export const Radio = styled(RadioIcon);

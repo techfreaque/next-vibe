@@ -12,7 +12,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -30,11 +30,11 @@ import type { UserRolesRepository } from "./repository";
  */
 class UserRolesRepositoryNativeImpl implements UserRolesRepository {
   private createNotImplementedError<T>(method: string): ResponseType<T> {
-    return createErrorResponse(
-      "app.api.v1.core.user.userRoles.errors.endpoint_not_created",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { method },
-    );
+    return fail({
+          message: "app.api.v1.core.user.userRoles.errors.endpoint_not_created",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { method },
+    });
   }
 
   async findByUserId(

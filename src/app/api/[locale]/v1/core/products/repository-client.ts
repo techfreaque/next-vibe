@@ -226,12 +226,8 @@ export class ProductsRepositoryImpl implements ProductsRepository {
       credits: definition.credits,
       country,
       status: definition.status || "active",
-      deprecatedAt: ("deprecatedAt" in definition
-        ? definition.deprecatedAt
-        : undefined) as Date | undefined,
-      replacedBy: ("replacedBy" in definition
-        ? definition.replacedBy
-        : undefined) as ProductIds | undefined,
+      deprecatedAt: ("deprecatedAt" in definition ? definition.deprecatedAt : undefined) as Date | undefined,
+      replacedBy: ("replacedBy" in definition ? definition.replacedBy : undefined) as ProductIds | undefined,
     };
   }
 
@@ -262,8 +258,7 @@ export class ProductsRepositoryImpl implements ProductsRepository {
    */
   isDeprecated(productId: ProductIds): boolean {
     const definition = productDefinitions[productId];
-    const status = (definition.status || "active") as "active" | "deprecated";
-    return status === "deprecated";
+    return definition.status === "deprecated";
   }
 
   /**
@@ -271,10 +266,7 @@ export class ProductsRepositoryImpl implements ProductsRepository {
    */
   getReplacementProduct(productId: ProductIds): ProductIds | null {
     const definition = productDefinitions[productId];
-    const replacedBy = (
-      "replacedBy" in definition ? definition.replacedBy : undefined
-    ) as ProductIds | undefined;
-    return replacedBy || null;
+    return ("replacedBy" in definition ? definition.replacedBy || null : null) as ProductIds | null;
   }
 
   /**

@@ -73,10 +73,10 @@ class GenerateExpoIndexesRepositoryImpl
     // Validate user permissions
     if (!user?.id) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.reactNative.generate.post.errors.unauthorized.title",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-        messageParams: {
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+                  messageParams: {
           error: t(
             "app.api.v1.core.system.unifiedInterface.reactNative.generate.post.errors.unauthorized.description",
           ),
@@ -91,7 +91,7 @@ class GenerateExpoIndexesRepositoryImpl
           message:
             "app.api.v1.core.system.unifiedInterface.reactNative.generate.post.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: {
+                    messageParams: {
             error: t(
               "app.api.v1.core.system.unifiedInterface.reactNative.generate.post.errors.notFound.description",
             ),
@@ -125,10 +125,10 @@ class GenerateExpoIndexesRepositoryImpl
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.reactNative.generate.post.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           error: parsedError.message,
         },
       });

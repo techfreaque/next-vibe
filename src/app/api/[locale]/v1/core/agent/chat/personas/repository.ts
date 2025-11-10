@@ -94,9 +94,9 @@ export async function createCustomPersona(
   const [persona] = await db
     .insert(customPersonas)
     .values({
-      ...data,
+      ...(data as typeof customPersonas.$inferInsert),
       source: "my" as const,
-    } as typeof customPersonas.$inferInsert)
+    })
     .returning();
 
   return persona;

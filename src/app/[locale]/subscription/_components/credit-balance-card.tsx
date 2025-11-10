@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import {
   AlertCircle,
   Calendar,
@@ -70,7 +70,7 @@ export function CreditBalanceCard({
   );
 
   return (
-    <motion.div
+    <MotionDiv
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
@@ -179,6 +179,6 @@ export function CreditBalanceCard({
           </Div>
         </CardContent>
       </Card>
-    </motion.div>
+    </MotionDiv>
   );
 }

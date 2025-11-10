@@ -11,7 +11,7 @@ import {
   Text as Span,
 } from "@react-email/components";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -246,10 +246,10 @@ export const renderCompanyMail: EmailFunctionType<
       }),
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.contact.error.general.internal_server_error",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+          message: "app.api.v1.core.contact.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };
 
@@ -282,9 +282,9 @@ export const renderPartnerMail: EmailFunctionType<
       }),
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.contact.error.general.internal_server_error",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+          message: "app.api.v1.core.contact.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };

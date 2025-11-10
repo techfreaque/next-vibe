@@ -11,7 +11,7 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { useToast } from "next-vibe-ui/hooks/use-toast";
@@ -148,10 +148,10 @@ export function useCheckout(logger: EndpointLogger): {
     metadata?: Record<string, string>,
   ): Promise<ResponseType<CheckoutResponseOutput>> => {
     if (!endpoint.create) {
-      return createErrorResponse(
-        "app.api.v1.core.subscription.checkout.error",
-        ErrorResponseTypes.UNKNOWN_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.subscription.checkout.error",
+          errorType: ErrorResponseTypes.UNKNOWN_ERROR,
+      });
     }
 
     return new Promise((resolve) => {
@@ -173,29 +173,29 @@ export function useCheckout(logger: EndpointLogger): {
           },
           onError: ({ error }) => {
             resolve(
-              createErrorResponse(
-                error.message ?? "app.api.v1.core.subscription.checkout.error",
-                ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                error.messageParams,
-              ),
+              fail({
+          message: error.message ?? "app.api.v1.core.subscription.checkout.error",
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                          messageParams: error.messageParams,
+              }),
             );
           },
         });
       } catch (error) {
         if (error instanceof Error) {
           resolve(
-            createErrorResponse(
-              "app.api.v1.core.subscription.checkout.error",
-              ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-              { error: error.message },
-            ),
+            fail({
+          message: "app.api.v1.core.subscription.checkout.error",
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                        messageParams: { error: error.message },
+            }),
           );
         } else {
           resolve(
-            createErrorResponse(
-              "app.api.v1.core.subscription.checkout.error",
-              ErrorResponseTypes.UNKNOWN_ERROR,
-            ),
+            fail({
+          message: "app.api.v1.core.subscription.checkout.error",
+          errorType: ErrorResponseTypes.UNKNOWN_ERROR,
+            }),
           );
         }
       }

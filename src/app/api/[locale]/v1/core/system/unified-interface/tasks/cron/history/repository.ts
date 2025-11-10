@@ -198,7 +198,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
               ? {
                   message: (exec.error as { message: string }).message,
                   messageParams: (exec.error as { messageParams?: Record<string, string> }).messageParams,
-                  errorType: (exec.error as { errorType: { errorKey: string } }).errorType.errorKey,
+          errorType: (exec.error as { errorType: { errorKey: string } }).errorType.errorKey,
                 }
               : null,
             environment: exec.environment,
@@ -230,10 +230,10 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
       });
 
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.history.get.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           error: parsedError.message,
           taskId: data.taskId || "unknown",
           limit: data.limit || 50,

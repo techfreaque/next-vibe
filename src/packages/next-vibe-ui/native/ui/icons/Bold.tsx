@@ -1,6 +1,4 @@
-import { Bold } from "lucide-react-native";
+import { Bold as BoldIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Bold);
-export { Bold };
+export const Bold = styled(BoldIcon);

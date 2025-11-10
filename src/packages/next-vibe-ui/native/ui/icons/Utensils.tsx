@@ -1,6 +1,4 @@
-import { Utensils } from "lucide-react-native";
+import { Utensils as UtensilsIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Utensils);
-export { Utensils };
+export const Utensils = styled(UtensilsIcon);

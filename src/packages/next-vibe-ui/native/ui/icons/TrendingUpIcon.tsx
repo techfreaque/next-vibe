@@ -1,2 +1,4 @@
-// Icon alias
-export { TrendingUp as TrendingUpIcon } from "./TrendingUp";
+import { TrendingUpIcon as TrendingUpIconIcon } from "lucide-react-native";
+import { styled } from "nativewind";
+
+export const TrendingUpIcon = styled(TrendingUpIconIcon);

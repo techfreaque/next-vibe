@@ -1,6 +1,4 @@
-import { Newspaper } from "lucide-react-native";
+import { Newspaper as NewspaperIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Newspaper);
-export { Newspaper };
+export const Newspaper = styled(NewspaperIcon);

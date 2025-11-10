@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
@@ -49,7 +49,7 @@ export function LoginFormNew({
   const { isAccountLocked, loginOptions, alert } = loginResult;
 
   return (
-    <motion.div
+    <MotionDiv
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -86,6 +86,6 @@ export function LoginFormNew({
           </EndpointFormRenderer>
         </CardContent>
       </Card>
-    </motion.div>
+    </MotionDiv>
   );
 }

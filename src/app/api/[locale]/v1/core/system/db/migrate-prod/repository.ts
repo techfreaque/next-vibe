@@ -4,7 +4,7 @@
  */
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -87,11 +87,11 @@ export class DatabaseMigrateProdRepositoryImpl
       logger.info("Generating Drizzle migrations");
       const generateResult = await this.generateMigrations(logger);
       if (!generateResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          { error: generateResult.error || UNKNOWN_ERROR },
-        );
+        return fail({
+          message: "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                    messageParams: { error: generateResult.error || UNKNOWN_ERROR },
+        });
       }
       migrationsGenerated = true;
 
@@ -99,11 +99,11 @@ export class DatabaseMigrateProdRepositoryImpl
       logger.info("Applying migrations to production database");
       const applyResult = await this.applyMigrations(logger);
       if (!applyResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          { error: applyResult.error || UNKNOWN_ERROR },
-        );
+        return fail({
+          message: "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                    messageParams: { error: applyResult.error || UNKNOWN_ERROR },
+        });
       }
       migrationsApplied = true;
 
@@ -114,11 +114,11 @@ export class DatabaseMigrateProdRepositoryImpl
         logger.info("Running production seeding");
         const seedResult = await this.runProductionSeeding(logger);
         if (!seedResult.success) {
-          return createErrorResponse(
-            "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
-            ErrorResponseTypes.INTERNAL_ERROR,
-            { error: seedResult.error || UNKNOWN_ERROR },
-          );
+          return fail({
+          message: "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                      messageParams: { error: seedResult.error || UNKNOWN_ERROR },
+          });
         }
         seedingCompleted = true;
       }
@@ -142,11 +142,11 @@ export class DatabaseMigrateProdRepositoryImpl
       });
     } catch (error) {
       logger.error("Production migration failed", { error: String(error) });
-      return createErrorResponse(
-        "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: String(error) },
-      );
+      return fail({
+          message: "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: String(error) },
+      });
     }
   }
 

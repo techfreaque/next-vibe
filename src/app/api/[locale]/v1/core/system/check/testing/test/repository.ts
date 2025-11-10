@@ -8,7 +8,7 @@
 
 import type { ResponseType as ApiResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -109,15 +109,15 @@ class TestRepositoryImpl implements TestRepositoryInterface {
         parseError(error),
       );
 
-      return createErrorResponse(
-        "app.api.v1.core.system.check.testing.test.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.system.check.testing.test.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           error: parsedError.message,
           output: output.trim(),
           duration,
         },
-      );
+      });
     }
   }
 }

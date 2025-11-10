@@ -77,8 +77,8 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
 
         if (accountsToSync.length !== data.accountIds.length) {
           return fail({
-            message: "app.api.v1.core.emails.imapClient.sync.errors.validation.title",
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          message: "app.api.v1.core.emails.imapClient.sync.errors.validation.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
       } else {
@@ -219,9 +219,9 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
       const parsedError = parseError(error);
       logger.error("Error in IMAP sync operation", parsedError);
       return fail({
-        message: "app.api.v1.core.emails.imapClient.sync.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
+          message: "app.api.v1.core.emails.imapClient.sync.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
       });
     }
   }
@@ -255,9 +255,9 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
       const parsedError = parseError(error);
       logger.error("Error getting IMAP sync status", parsedError);
       return fail({
-        message: "app.api.v1.core.emails.imapClient.sync.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
+          message: "app.api.v1.core.emails.imapClient.sync.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
       });
     }
   }

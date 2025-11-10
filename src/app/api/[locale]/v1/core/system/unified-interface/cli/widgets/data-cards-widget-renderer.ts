@@ -65,13 +65,13 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
   }
 
   render(field: ResponseFieldMetadata, context: WidgetRenderContext): string {
-    const t = context.translate;
+    const t = context.t;
     const data = field.value;
 
     if (!Array.isArray(data) || data.length === 0) {
       return context.renderEmptyState(
         t(
-          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable" as never,
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
         ),
       );
     }
@@ -466,7 +466,7 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
     counts: Record<string, number>,
     context: WidgetRenderContext,
   ): string {
-    const t = context.translate;
+    const t = context.t;
     const totalCount = Object.values(counts).reduce(
       (sum, count) => sum + count,
       0,
@@ -475,7 +475,7 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
     if (totalCount === 0) {
       const icon = context.options.useEmojis ? SEVERITY_ICONS.SUCCESS : "";
       const text = t(
-        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound" as never,
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
       );
       return this.styleText(`${icon}${text}`, "green", context);
     }

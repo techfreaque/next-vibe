@@ -5,7 +5,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -95,10 +95,11 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
             userId,
           },
         );
-        return createErrorResponse(
-          "app.api.v1.core.credits.purchase.post.errors.noActiveSubscription.title",
-          ErrorResponseTypes.FORBIDDEN,
-        );
+        return fail({
+          message: "app.api.v1.core.credits.purchase.post.errors.noActiveSubscription.title",
+          errorType: ErrorResponseTypes.FORBIDDEN,
+          cause: subscriptionResult,
+        });
       }
 
       const subscription = subscriptionResult.data;
@@ -110,10 +111,10 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
             subscriptionStatus: subscription.status,
           },
         );
-        return createErrorResponse(
-          "app.api.v1.core.credits.purchase.post.errors.noActiveSubscription.title",
-          ErrorResponseTypes.FORBIDDEN,
-        );
+        return fail({
+          message: "app.api.v1.core.credits.purchase.post.errors.noActiveSubscription.title",
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       // Get payment provider from request data or default to stripe
@@ -218,11 +219,11 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
         userId,
         quantity: data.quantity,
       });
-      return createErrorResponse(
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.server.title",
-        ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.agent.chat.credits.purchase.post.errors.server.title",
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 }

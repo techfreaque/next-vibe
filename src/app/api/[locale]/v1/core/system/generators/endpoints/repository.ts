@@ -8,7 +8,7 @@ import "server-only";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -214,11 +214,11 @@ export class FunctionalGeneratorsRepositoryImpl
         results,
       });
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -231,20 +231,20 @@ export class FunctionalGeneratorsRepositoryImpl
     try {
       // Basic validation - could be expanded
       if (options.rootDir && !options.rootDir.trim()) {
-        return createErrorResponse(
-          "app.api.v1.core.system.generators.endpoints.post.errors.validation.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          { error: "Root directory cannot be empty" },
-        );
+        return fail({
+          message: "app.api.v1.core.system.generators.endpoints.post.errors.validation.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                    messageParams: { error: "Root directory cannot be empty" },
+        });
       }
 
       return success(true);
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 

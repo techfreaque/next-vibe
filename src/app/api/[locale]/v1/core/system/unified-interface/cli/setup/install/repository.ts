@@ -143,10 +143,10 @@ exec bun "${vibeTsPath}" "$@"
     // Validate user permissions for CLI installation
     if (!user?.id) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-        messageParams: {
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+                  messageParams: {
           error: t(
             "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.description",
           ),
@@ -181,7 +181,7 @@ exec bun "${vibeTsPath}" "$@"
           message:
             "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
+                    messageParams: {
             error:
               // eslint-disable-next-line i18next/no-literal-string
               "Bun is not installed or not in PATH. Please install Bun first: curl -fsSL https://bun.sh/install | bash",
@@ -215,7 +215,7 @@ exec bun "${vibeTsPath}" "$@"
           message:
             "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
+                    messageParams: {
             // eslint-disable-next-line i18next/no-literal-string
             error: `vibe-runtime.ts not found at ${vibeTsPath}`,
 
@@ -248,7 +248,7 @@ exec bun "${vibeTsPath}" "$@"
           message:
             "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
+                    messageParams: {
             // eslint-disable-next-line i18next/no-literal-string
             error: `Failed to create directory`,
 
@@ -302,10 +302,10 @@ exec bun "${vibeTsPath}" "$@"
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           // eslint-disable-next-line i18next/no-literal-string
           error: "CLI installation failed",
 

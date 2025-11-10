@@ -1,6 +1,4 @@
-import { Home } from "lucide-react-native";
+import { Home as HomeIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Home);
-export { Home };
+export const Home = styled(HomeIcon);

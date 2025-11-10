@@ -1,6 +1,4 @@
-import { Inbox } from "lucide-react-native";
+import { Inbox as InboxIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Inbox);
-export { Inbox };
+export const Inbox = styled(InboxIcon);

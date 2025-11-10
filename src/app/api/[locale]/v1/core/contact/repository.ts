@@ -98,7 +98,7 @@ export class contactRepository {
         return fail({
           message: "app.api.v1.core.contact.errors.repositoryCreateFailed",
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: { email: data.email },
+                    messageParams: { email: data.email },
         });
       }
 
@@ -120,9 +120,9 @@ export class contactRepository {
         parsedError,
       );
       return fail({
-        message: "app.api.v1.core.contact.errors.repositoryCreateFailed",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.contact.errors.repositoryCreateFailed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: {
           email: data.email,
           error: parsedError.message,
           details: "app.api.v1.core.contact.errors.repositoryCreateDetails",
@@ -164,7 +164,7 @@ export class contactRepository {
         return fail({
           message: "app.api.v1.core.contact.errors.repositoryCreateFailed",
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: {
+                    messageParams: {
             email: data.email,
             error: "app.api.v1.core.contact.errors.noContactReturned",
           },
@@ -183,9 +183,9 @@ export class contactRepository {
         parsedError,
       );
       return fail({
-        message: "app.api.v1.core.contact.errors.repositoryCreateFailed",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.contact.errors.repositoryCreateFailed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: {
           email: data.email,
           error: parsedError.message,
         },

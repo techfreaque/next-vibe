@@ -8,7 +8,7 @@ import "server-only";
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -66,10 +66,10 @@ export class LogoutRepositoryImpl implements LogoutRepository {
 
     try {
       if (!user.id) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.logout.errors.invalid_user.title",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.logout.errors.invalid_user.title",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
       }
       const userId = user.id;
       logger.debug("app.api.v1.core.user.private.logout.debug.loggingOutUser", {
@@ -106,13 +106,14 @@ export class LogoutRepositoryImpl implements LogoutRepository {
           parseError(error),
         );
         // Use a specific error for session deletion failure
-        return createErrorResponse(
-          "app.api.v1.core.user.private.logout.errors.session_deletion_failed.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.user.private.logout.errors.session_deletion_failed.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                    messageParams: {
             resourceType: "user.sessions",
             userId,
             error: parseError(error).message,
+          },
           },
         );
       }
@@ -132,12 +133,13 @@ export class LogoutRepositoryImpl implements LogoutRepository {
         "app.api.v1.core.user.private.logout.debug.errorDuringLogoutProcess",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.user.private.logout.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.user.private.logout.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           userId: user.id ?? "unknown",
           error: parseError(error).message,
+        },
         },
       );
     }

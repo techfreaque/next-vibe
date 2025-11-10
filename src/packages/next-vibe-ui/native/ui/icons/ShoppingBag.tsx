@@ -1,6 +1,4 @@
-import { ShoppingBag } from "lucide-react-native";
+import { ShoppingBag as ShoppingBagIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(ShoppingBag);
-export { ShoppingBag };
+export const ShoppingBag = styled(ShoppingBagIcon);

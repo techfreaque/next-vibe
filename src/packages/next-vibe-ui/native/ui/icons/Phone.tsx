@@ -1,6 +1,4 @@
-import { Phone } from "lucide-react-native";
+import { Phone as PhoneIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Phone);
-export { Phone };
+export const Phone = styled(PhoneIcon);

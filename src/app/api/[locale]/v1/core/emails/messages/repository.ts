@@ -8,7 +8,7 @@ import "server-only";
 import { and, count, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -252,11 +252,11 @@ class EmailsRepositoryImpl implements EmailsRepository {
       return success(response);
     } catch (error) {
       logger.error("Error fetching emails", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.messages.list.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.emails.messages.list.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -282,10 +282,10 @@ class EmailsRepositoryImpl implements EmailsRepository {
         .where(eq(emails.id, emailId));
 
       if (!emailResult) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.messages.id.get.errors.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+          message: "app.api.v1.core.emails.messages.id.get.errors.not_found.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       const email = {
@@ -318,11 +318,11 @@ class EmailsRepositoryImpl implements EmailsRepository {
       return success({ email });
     } catch (error) {
       logger.error("Error fetching email by ID", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.messages.id.get.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.emails.messages.id.get.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -345,20 +345,20 @@ class EmailsRepositoryImpl implements EmailsRepository {
         .returning({ id: emails.id });
 
       if (!result) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.messages.list.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.emails.messages.list.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       return success({ id: result.id });
     } catch (error) {
       logger.error("Error creating email record", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.messages.list.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.emails.messages.list.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 }

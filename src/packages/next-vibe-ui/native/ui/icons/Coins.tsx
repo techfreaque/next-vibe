@@ -1,6 +1,4 @@
-import { Coins as LucideCoins } from "lucide-react-native";
-
+import { Coins as CoinsIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const Coins = styled(LucideCoins);
-export default Coins;
+export const Coins = styled(CoinsIcon);

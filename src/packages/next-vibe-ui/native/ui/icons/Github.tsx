@@ -1,6 +1,4 @@
-import { Github } from "lucide-react-native";
+import { Github as GithubIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Github);
-export { Github };
+export const Github = styled(GithubIcon);

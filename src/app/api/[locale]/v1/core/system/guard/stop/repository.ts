@@ -5,7 +5,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -63,21 +63,21 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
         return this.stopAllGuards(data.force || false, logger);
       }
 
-      return createErrorResponse(
-        "app.api.v1.core.system.guard.stop.errors.validation.title",
-        ErrorResponseTypes.VALIDATION_ERROR,
-        { error: "Either projectPath, guardId, or stopAll must be specified" }, // eslint-disable-line i18next/no-literal-string
-      );
+      return fail({
+          message: "app.api.v1.core.system.guard.stop.errors.validation.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                  messageParams: { error: "Either projectPath, guardId, or stopAll must be specified" }, // eslint-disable-line i18next/no-literal-string
+      });
     } catch (error) {
       logger.error("Guard stop failed", parseError(error));
       const parsedError =
         error instanceof Error ? error : new Error(String(error));
 
-      return createErrorResponse(
-        "app.api.v1.core.system.guard.stop.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.guard.stop.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
+      });
     }
   }
 

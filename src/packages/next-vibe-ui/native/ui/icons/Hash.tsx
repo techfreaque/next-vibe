@@ -1,5 +1,4 @@
-import { Hash as LucideHash } from "lucide-react-native";
+import { Hash as HashIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-export const Hash = iconWithClassName(LucideHash);
+export const Hash = styled(HashIcon);

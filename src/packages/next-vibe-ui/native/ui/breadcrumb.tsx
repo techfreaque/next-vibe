@@ -46,7 +46,7 @@ export function BreadcrumbList({
   return (
     <View
       className={cn(
-        "flex flex-row flex-wrap items-center gap-1.5 text-sm text-muted-foreground native:gap-2.5",
+        "flex flex-row flex-wrap items-center gap-1.5 text-sm text-muted-foreground gap-2.5",
         className,
       )}
     >

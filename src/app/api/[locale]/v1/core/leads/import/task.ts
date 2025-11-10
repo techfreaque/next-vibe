@@ -9,7 +9,7 @@ import "server-only";
 import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -236,9 +236,9 @@ async function executeCsvProcessor(
           : "tasks.csv_processor.unknown_error",
     });
 
-    return createErrorResponse(
-      "app.api.v1.core.leads.import.post.errors.server.title",
-      ErrorResponseTypes.INTERNAL_ERROR,
+    return fail({
+      message: "app.api.v1.core.leads.import.post.errors.server.title",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR, }
     );
   }
 }
@@ -252,9 +252,9 @@ async function validateCsvProcessor(): Promise<ResponseType<boolean>> {
     await db.select().from(csvImportJobs).limit(1);
     return success(true);
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.leads.import.post.errors.server.title",
-      ErrorResponseTypes.INTERNAL_ERROR,
+    return fail({
+          message: "app.api.v1.core.leads.import.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,}
     );
   }
 }
@@ -298,10 +298,11 @@ const csvProcessorTask: Task = {
     const result = await executeCsvProcessor(context);
 
     if (!result.success) {
-      return createErrorResponse(
-        "app.api.v1.core.leads.import.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.import.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          cause: result,
+        });
     }
     // Returns void implicitly on success
   },

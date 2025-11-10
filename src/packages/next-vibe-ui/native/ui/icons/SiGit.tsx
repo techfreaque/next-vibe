@@ -1,8 +1,5 @@
-import React from "react";
-import Svg, { Rect } from "react-native-svg";
+// TODO: lucide-react-native doesn't have Git brand icon, using GitBranch as placeholder
+import { GitBranch as SiGitIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-export const SiGit = ({ className }: { className?: string }): JSX.Element => (
-  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
-    <Rect width="24" height="24" fill="#F05032" />
-  </Svg>
-);
+export const SiGit = styled(SiGitIcon);

@@ -1,6 +1,4 @@
-import { Printer } from "lucide-react-native";
+import { Printer as PrinterIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Printer);
-export { Printer };
+export const Printer = styled(PrinterIcon);

@@ -1,6 +1,4 @@
-import { CircleUserRound } from "lucide-react-native";
+import { CircleUserRound as CircleUserRoundIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(CircleUserRound);
-export { CircleUserRound };
+export const CircleUserRound = styled(CircleUserRoundIcon);

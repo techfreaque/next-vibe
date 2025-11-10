@@ -1,7 +1,7 @@
 import { Button, Section, Text } from "@react-email/components";
 import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -169,11 +169,12 @@ export const renderResetPasswordMail: EmailFunctionType<
     );
     if (!userResponse.success) {
       // will not get sent to the user as ignoreError is true
-      return createErrorResponse(
-        "app.api.v1.core.emails.errors.no_email",
-        ErrorResponseTypes.NOT_FOUND,
-        { email: requestData.emailInput.email },
-      );
+      return fail({
+          message: "app.api.v1.core.emails.errors.no_email",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                  messageParams: { email: requestData.emailInput.email },
+        cause: userResponse,
+      });
     }
 
     const user = userResponse.data;
@@ -185,11 +186,12 @@ export const renderResetPasswordMail: EmailFunctionType<
       logger,
     );
     if (!tokenResponse.success) {
-      return createErrorResponse(
-        "app.api.v1.core.emails.errors.email_generation_failed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { email: requestData.emailInput.email },
-      );
+      return fail({
+          message: "app.api.v1.core.emails.errors.email_generation_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { email: requestData.emailInput.email },
+        cause: tokenResponse,
+      });
     }
 
     const token = tokenResponse.data;
@@ -218,13 +220,13 @@ export const renderResetPasswordMail: EmailFunctionType<
     // TODO: Replace with proper logger when email function interface supports it
     logger.error("Error generating password reset email", parseError(error));
     const parsedError = parseError(error);
-    return createErrorResponse(
-      "app.api.v1.core.emails.errors.email_generation_failed",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      {
+    return fail({
+          message: "app.api.v1.core.emails.errors.email_generation_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: {
         email: requestData.emailInput.email,
         errorMessage: parsedError.message,
       },
-    );
+    });
   }
 };

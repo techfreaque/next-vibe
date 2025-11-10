@@ -61,7 +61,12 @@ import {
   FormLabel,
   FormMessage,
 } from "./form";
+import { View } from "react-native";
+import { styled } from "nativewind";
 import { Div } from "../div";
+
+// Styled View for proper NativeWind support
+const StyledView = styled(View);
 import { Span } from "../span";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../tooltip";
 import { Info } from "../icons/Info";
@@ -282,15 +287,29 @@ function renderLabel(
   const { style } = theme;
 
   return config.label ? (
-    <Div className="flex items-center gap-2">
-      <Span className={labelClassName}>
-        {t(config.label)}
+    <StyledView className="flex flex-row items-center gap-2">
+      <StyledView className="flex flex-row items-center gap-1.5">
+        <Span className={labelClassName}>{t(config.label)}</Span>
         {style === "asterisk" && isRequired && (
-          <Span className="text-blue-600 dark:text-blue-400 ml-1 font-bold">
+          <Span className="text-blue-600 dark:text-blue-400 font-bold">
             *
           </Span>
         )}
-      </Span>
+        {config.description && (
+          <TooltipProvider delayDuration={300}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <StyledView className="cursor-help">
+                  <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                </StyledView>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-[250px]">
+                <Span className="text-sm">{t(config.description)}</Span>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </StyledView>
       {style === "badge" && isRequired && (
         <Badge
           variant="secondary"
@@ -299,21 +318,7 @@ function renderLabel(
           {t("packages.nextVibeUi.web.common.required")}
         </Badge>
       )}
-      {config.description && (
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Div className="cursor-help inline-flex items-center">
-                <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-              </Div>
-            </TooltipTrigger>
-            <TooltipContent className="max-w-[250px]">
-              <Span className="text-sm">{t(config.description)}</Span>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-    </Div>
+    </StyledView>
   ) : null;
 }
 
@@ -378,27 +383,32 @@ function renderFieldInput<
         />
       );
 
-    case "select":
+    case "select": {
+      // Find the selected option to get the proper label
+      const selectedOption = config.options.find(
+        (opt) => opt.value === field.value,
+      );
+      const selectedValue = selectedOption
+        ? {
+            value: String(selectedOption.value),
+            label: t(selectedOption.label, selectedOption.labelParams),
+          }
+        : undefined;
+
       return (
         <Select
           // Force re-render when value changes
           key={`${field.name}-${String(field.value) || "empty"}`}
-          onValueChange={(selectedOption) => {
+          onValueChange={(option) => {
             // Extract the value from the Option object
             const value =
-              typeof selectedOption === "string"
-                ? selectedOption
-                : selectedOption?.value;
+              typeof option === "string" ? option : option?.value;
             field.onChange(value);
           }}
-          value={
-            field.value
-              ? { value: String(field.value), label: String(field.value) }
-              : undefined
-          }
+          value={selectedValue}
           disabled={disabled || config.disabled}
         >
-          <SelectTrigger className={cn(inputClassName, "h-10")}>
+          <SelectTrigger className={inputClassName}>
             <SelectValue
               placeholder={config.placeholder ? t(config.placeholder) : ""}
             />
@@ -417,6 +427,7 @@ function renderFieldInput<
           </SelectContent>
         </Select>
       );
+    }
 
     case "checkbox":
       return (
@@ -622,21 +633,18 @@ function renderFieldInput<
               multiselectValue.length <= config.maxSelections;
 
             return (
-              <Div key={option.value} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id={`${field.name}-${option.value}`}
+              <Div key={option.value} className="flex flex-row items-center space-x-2">
+                <Checkbox
                   checked={isSelected}
                   disabled={isDisabled || (!isSelected && !canSelect)}
-                  onChange={(e) => {
-                    const newValue = e.target.checked
+                  onCheckedChange={(checked) => {
+                    const newValue = checked
                       ? [...multiselectValue, option.value]
                       : multiselectValue.filter((v) => v !== option.value);
                     field.onChange(newValue);
                   }}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label
+                <Label
                   htmlFor={`${field.name}-${option.value}`}
                   className={cn(
                     "text-sm font-normal cursor-pointer",
@@ -644,7 +652,7 @@ function renderFieldInput<
                   )}
                 >
                   {t(option.label)}
-                </label>
+                </Label>
               </Div>
             );
           })}
@@ -665,7 +673,7 @@ function renderFieldInput<
           onChangeText={(text: string) => field.onChange(text)}
           onBlur={field.onBlur}
           disabled={disabled || false}
-          className={cn(inputClassName, "h-10")}
+          className={inputClassName}
           placeholder={t("packages.nextVibeUi.web.common.unknownFieldType")}
         />
       );
@@ -754,15 +762,13 @@ export function EndpointFormField<
             </FormLabel>
 
             <FormControl>
-              <Div className={styleClassName.inputClassName}>
-                {renderFieldInput(
-                  config,
-                  field,
-                  styleClassName.inputClassName,
-                  t,
-                  config.disabled,
-                )}
-              </Div>
+              {renderFieldInput(
+                config,
+                field,
+                styleClassName.inputClassName,
+                t,
+                config.disabled,
+              )}
             </FormControl>
 
             {fieldState.error && (

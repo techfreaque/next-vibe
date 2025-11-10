@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import {
   BarChart3,
   CheckCircle2,
@@ -94,7 +94,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
     >
       <Div className="container px-4 md:px-6">
         <Div className="text-center mb-16">
-          <motion.div
+          <MotionDiv
             className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-600 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400 mb-4"
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : { opacity: 0 }}
@@ -103,30 +103,30 @@ const Process: FC<ProcessProps> = ({ locale }) => {
             <Span className="font-medium">
               {t("app.story._components.home.process.badge")}
             </Span>
-          </motion.div>
+          </MotionDiv>
 
-          <motion.h2
+          <MotionDiv
             className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600"
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             {t("app.story._components.home.process.title")}{" "}
-          </motion.h2>
+          </MotionDiv>
 
-          <motion.p
+          <MotionDiv
             className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-xl"
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             {t("app.story._components.home.process.subtitle")}
-          </motion.p>
+          </MotionDiv>
         </Div>
 
         <Div className="space-y-24 relative">
           {steps.map((step, index) => (
-            <motion.div
+            <MotionDiv
               // eslint-disable-next-line i18next/no-literal-string
               key={`step_${index}_${step.title}`}
               className={`relative ${index % 2 === 0 ? "" : "md:flex-row-reverse"} md:flex items-center gap-8 lg:gap-16`}
@@ -264,11 +264,11 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                   )}
                 </Div>
               </Div>
-            </motion.div>
+            </MotionDiv>
           ))}
         </Div>
 
-        <motion.div
+        <MotionDiv
           className="mt-20 text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -293,7 +293,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
               {t("app.story._components.home.process.getStarted")}
             </Link>
           </Div>
-        </motion.div>
+        </MotionDiv>
       </Div>
     </section>
   );

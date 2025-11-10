@@ -1,6 +1,4 @@
-import { Paperclip } from "lucide-react-native";
+import { Paperclip as PaperclipIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Paperclip);
-export { Paperclip };
+export const Paperclip = styled(PaperclipIcon);

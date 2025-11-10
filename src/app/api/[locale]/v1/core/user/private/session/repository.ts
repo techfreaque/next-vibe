@@ -114,16 +114,16 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       // Token not found in database and not a JWT
       return fail({
-        message: "app.api.v1.core.user.private.session.errors.session_not_found",
-        errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { token },
+          message: "app.api.v1.core.user.private.session.errors.session_not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                  messageParams: { token },
       });
     } catch (error) {
       // Note: Logger not available for internal session methods
       return fail({
-        message: "app.api.v1.core.user.private.session.errors.session_lookup_failed",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.user.private.session.errors.session_lookup_failed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: {
           token,
           error: parseError(error).message,
         },
@@ -152,9 +152,9 @@ export class SessionRepositoryImpl implements SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal cleanup methods
       return fail({
-        message: "app.api.v1.core.user.private.session.errors.expired_sessions_delete_failed",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.user.private.session.errors.expired_sessions_delete_failed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: {
           error: parseError(error).message,
         },
       });
@@ -182,9 +182,9 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       if (result.length === 0) {
         return fail({
-        message: "app.api.v1.core.user.private.session.errors.session_not_found",
-        errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { token },
+          message: "app.api.v1.core.user.private.session.errors.session_not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: { token },
       });
       }
 
@@ -194,9 +194,9 @@ export class SessionRepositoryImpl implements SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal session methods
       return fail({
-        message: "app.api.v1.core.user.private.session.errors.session_lookup_failed",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.user.private.session.errors.session_lookup_failed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: {
           token,
           error: parseError(error).message,
         },
@@ -217,9 +217,9 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       if (results.length === 0) {
         return fail({
-        message: "app.api.v1.core.user.private.session.errors.session_creation_failed",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { userId: data.userId, operation: "create" },
+          message: "app.api.v1.core.user.private.session.errors.session_creation_failed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                    messageParams: { userId: data.userId, operation: "create" },
       });
       }
 
@@ -227,9 +227,9 @@ export class SessionRepositoryImpl implements SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal session methods
       return fail({
-        message: "app.api.v1.core.user.private.session.errors.session_creation_database_error",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.user.private.session.errors.session_creation_database_error",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: {
           userId: data.userId,
           operation: "create",
           error: parseError(error).message,
@@ -253,9 +253,9 @@ export class SessionRepositoryImpl implements SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal session methods
       return fail({
-        message: "app.api.v1.core.user.private.session.errors.user_sessions_delete_failed",
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.user.private.session.errors.user_sessions_delete_failed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: {
           userId,
           error: parseError(error).message,
         },
@@ -277,9 +277,9 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       if (!token) {
         return fail({
-        message: "app.api.v1.core.user.private.session.errors.session_not_found",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-        messageParams: { reason: SessionErrorReason.NO_TOKEN_IN_COOKIES },
+          message: "app.api.v1.core.user.private.session.errors.session_not_found",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+                    messageParams: { reason: SessionErrorReason.NO_TOKEN_IN_COOKIES },
       });
       }
 
@@ -295,9 +295,9 @@ export class SessionRepositoryImpl implements SessionRepository {
       // Check if session is expired
       if (session.expiresAt <= now) {
         return fail({
-        message: "app.api.v1.core.user.private.session.errors.expired",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-        messageParams: { expiresAt: session.expiresAt.toISOString() },
+          message: "app.api.v1.core.user.private.session.errors.expired",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+                    messageParams: { expiresAt: session.expiresAt.toISOString() },
       });
       }
 
@@ -309,9 +309,9 @@ export class SessionRepositoryImpl implements SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal session methods
       return fail({
-        message: "app.api.v1.core.user.private.session.errors.session_lookup_failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: error instanceof Error ? error.message : String(error) },
+          message: "app.api.v1.core.user.private.session.errors.session_lookup_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: error instanceof Error ? error.message : String(error) },
       });
     }
   }

@@ -1,8 +1,5 @@
-import React from "react";
-import Svg, { Rect } from "react-native-svg";
+// TODO: lucide-react-native doesn't have Linux brand icon, using Server as placeholder
+import { Server as SiLinuxIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-export const SiLinux = ({ className }: { className?: string }): JSX.Element => (
-  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
-    <Rect width="24" height="24" fill="#FCC624" />
-  </Svg>
-);
+export const SiLinux = styled(SiLinuxIcon);

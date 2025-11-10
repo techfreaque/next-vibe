@@ -76,6 +76,10 @@ export const translations: typeof enTranslations = {
           widgets: {
             common: {
               noDataAvailable: "Keine Daten verfügbar",
+              noIssuesFound: "Keine Probleme gefunden",
+              invalidDataFormat: "Ungültiges Datenformat",
+              info: "Info",
+              items: "Elemente",
               andMoreItems: "und {count} weitere Elemente",
               affectedFiles: "Betroffene Dateien",
               summary: "Zusammenfassung",

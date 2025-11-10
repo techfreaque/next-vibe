@@ -18,7 +18,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -42,11 +42,11 @@ import type {
  */
 class ThreadByIdRepositoryNativeImpl implements ThreadByIdRepositoryInterface {
   private createNotImplementedError<T>(method: string): ResponseType<T> {
-    return createErrorResponse(
-      "app.api.v1.core.agent.chat.threads.threadId.errors.not_implemented_on_native",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { method },
-    );
+    return fail({
+          message: "app.api.v1.core.agent.chat.threads.threadId.errors.not_implemented_on_native",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { method },
+    });
   }
 
   async getThreadById(
@@ -75,7 +75,7 @@ class ThreadByIdRepositoryNativeImpl implements ThreadByIdRepositoryInterface {
     // Error response - preserve all error information
     return {
       success: false,
-      errorType: response.errorType,
+          errorType: response.errorType,
       message: response.message,
       messageParams: response.messageParams,
     };

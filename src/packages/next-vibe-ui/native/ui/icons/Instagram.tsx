@@ -1,6 +1,4 @@
-import { Instagram } from "lucide-react-native";
+import { Instagram as InstagramIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Instagram);
-export { Instagram };
+export const Instagram = styled(InstagramIcon);

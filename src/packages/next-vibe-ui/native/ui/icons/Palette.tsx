@@ -1,6 +1,4 @@
-import { Palette } from "lucide-react-native";
+import { Palette as PaletteIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Palette);
-export { Palette };
+export const Palette = styled(PaletteIcon);

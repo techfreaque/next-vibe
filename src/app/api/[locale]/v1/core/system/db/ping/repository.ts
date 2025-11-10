@@ -6,7 +6,7 @@
 import { sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -56,11 +56,11 @@ export class DatabasePingRepositoryImpl implements DatabasePingRepository {
 
       return success(response);
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.system.db.ping.post.errors.network.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: String(error) },
-      );
+      return fail({
+          message: "app.api.v1.core.system.db.ping.post.errors.network.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: String(error) },
+      });
     }
   }
 

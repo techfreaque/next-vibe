@@ -199,11 +199,11 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         // Single file - create temporary tsconfig that includes only this file
         if (!config.tempConfigFile) {
           return fail({
-            message:
+          message:
               "app.api.v1.core.system.check.typecheck.errors.noTsFiles.title",
-            errorType: ErrorResponseTypes.NOT_FOUND,
-            messageParams: {
-              message:
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                      messageParams: {
+                      message:
                 "app.api.v1.core.system.check.typecheck.errors.noTsFiles.message",
             },
           });
@@ -227,11 +227,11 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
         if (!config.tempConfigFile) {
           return fail({
-            message:
+          message:
               "app.api.v1.core.system.check.typecheck.errors.noTsFiles.title",
-            errorType: ErrorResponseTypes.NOT_FOUND,
-            messageParams: {
-              message:
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                      messageParams: {
+                      message:
                 "app.api.v1.core.system.check.typecheck.errors.noTsFiles.message",
             },
           });
@@ -252,8 +252,8 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
           message:
             "app.api.v1.core.system.check.typecheck.errors.invalidCommand.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            message:
+                    messageParams: {
+                    message:
               "app.api.v1.core.system.check.typecheck.errors.invalidCommand.message",
           },
         });
@@ -294,10 +294,10 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
             parsedExecError,
           );
           return fail({
-            message:
+          message:
               "app.api.v1.core.system.check.typecheck.errors.internal.title",
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: {
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                      messageParams: {
               error: parsedExecError.message,
             },
           });
@@ -540,9 +540,9 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       }
 
       return fail({
-        message: "app.api.v1.core.system.check.typecheck.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.system.check.typecheck.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           error: parsedError.message,
           output: output.trim(),
           duration: duration.toString(),

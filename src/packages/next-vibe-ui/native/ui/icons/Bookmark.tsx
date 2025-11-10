@@ -1,6 +1,4 @@
-import { Bookmark } from "lucide-react-native";
+import { Bookmark as BookmarkIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Bookmark);
-export { Bookmark };
+export const Bookmark = styled(BookmarkIcon);

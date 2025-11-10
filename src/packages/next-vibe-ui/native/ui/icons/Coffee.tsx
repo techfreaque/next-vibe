@@ -1,6 +1,4 @@
-import { Coffee } from "lucide-react-native";
+import { Coffee as CoffeeIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Coffee);
-export { Coffee };
+export const Coffee = styled(CoffeeIcon);

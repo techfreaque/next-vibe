@@ -1,2 +1,4 @@
-// Radix UI icon alias
-export { Search as MagnifyingGlassIcon } from "./Search";
+import { Search as MagnifyingGlassIconIcon } from "lucide-react-native";
+import { styled } from "nativewind";
+
+export const MagnifyingGlassIcon = styled(MagnifyingGlassIconIcon);

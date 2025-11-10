@@ -1,6 +1,6 @@
 import { Button, Section, Text } from "@react-email/components";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -162,11 +162,12 @@ export const renderRegisterMail: EmailFunctionType<
     logger,
   );
   if (!userResponse.success) {
-    return createErrorResponse(
-      "app.api.v1.core.user.errors.not_found",
-      ErrorResponseTypes.NOT_FOUND,
-      { email: requestData.personalInfo.email },
-    );
+    return fail({
+          message: "app.api.v1.core.user.errors.not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                messageParams: { email: requestData.personalInfo.email },
+      cause: userResponse,
+    });
   }
   const user = userResponse.data;
 
@@ -535,11 +536,12 @@ export const renderAdminSignupNotification: EmailFunctionType<
     logger,
   );
   if (!userResponse.success) {
-    return createErrorResponse(
-      "app.api.v1.core.user.errors.not_found",
-      ErrorResponseTypes.NOT_FOUND,
-      { email: requestData.personalInfo.email },
-    );
+    return fail({
+          message: "app.api.v1.core.user.errors.not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                messageParams: { email: requestData.personalInfo.email },
+      cause: userResponse,
+    });
   }
   const user = userResponse.data;
 

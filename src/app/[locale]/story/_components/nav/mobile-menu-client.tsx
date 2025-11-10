@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { cn } from "next-vibe/shared/utils";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
@@ -93,7 +93,7 @@ export function MobileMenuClient({
 
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div
+          <MotionDiv
             className="fixed h-[80vh] inset-0 top-16 z-50 bg-background/98 backdrop-blur-sm md:hidden overflow-y-auto"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -287,7 +287,7 @@ export function MobileMenuClient({
                 })}
               </Div>
             </Div>
-          </motion.div>
+          </MotionDiv>
         )}
       </AnimatePresence>
     </>

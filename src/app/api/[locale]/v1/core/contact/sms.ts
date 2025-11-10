@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -93,10 +93,11 @@ export class ContactSmsServiceImpl implements ContactSmsService {
       );
 
       if (!smsResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.contact.error.general.internal_server_error",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.contact.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          cause: smsResult,
+        });
       }
 
       return success({
@@ -108,10 +109,10 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         "app.api.v1.core.contact.sms.admin.send.error",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.contact.error.general.internal_server_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.contact.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -160,10 +161,11 @@ export class ContactSmsServiceImpl implements ContactSmsService {
       );
 
       if (!smsResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.contact.error.general.internal_server_error",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.contact.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          cause: smsResult,
+        });
       }
 
       return success({
@@ -175,10 +177,10 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         "app.api.v1.core.contact.sms.confirmation.send.error",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.contact.error.general.internal_server_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.contact.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 

@@ -106,8 +106,8 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
     }
 
     if (Array.isArray(value)) {
-      const itemsText = context.translate(
-        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.items" as never,
+      const itemsText = context.t(
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.items",
       );
       return `[${value.length} ${itemsText}]`;
     }

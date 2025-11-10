@@ -34,7 +34,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
 
   render(field: ResponseFieldMetadata, context: WidgetRenderContext): string {
     const data = field.value;
-    const t = context.translate;
+    const t = context.t;
 
     if (!Array.isArray(data) || data.length === 0) {
       return context.renderEmptyState(
@@ -325,7 +325,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
     data: RenderableValue[],
     context: WidgetRenderContext,
   ): string {
-    const t = context.translate;
+    const t = context.t;
 
     if (data.length === 0) {
       return context.renderEmptyState(
@@ -344,7 +344,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
     ) {
       return context.renderEmptyState(
         t(
-          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.invalidDataFormat" as never,
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.invalidDataFormat",
         ),
       );
     }

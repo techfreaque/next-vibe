@@ -8,7 +8,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
   type ResponseType,
@@ -104,10 +104,10 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
   ): Promise<ResponseType<MeGetResponseOutput>> {
     try {
       if (!user.id) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.get.errors.unauthorized.title",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.get.errors.unauthorized.title",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
       }
       const userId: string = user.id; // We know it exists due to check above
       logger.debug("Getting user profile", { userId });
@@ -120,11 +120,12 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
         logger,
       );
       if (!userResponse.success) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.get.errors.internal.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId },
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.get.errors.internal.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: { userId },
+          cause: userResponse,
+        });
       }
 
       logger.debug("Successfully retrieved user profile", { userId });
@@ -134,11 +135,11 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
     } catch (error) {
       logger.error("Error getting user profile", parseError(error));
       const parsedError = parseError(error);
-      return createErrorResponse(
-        "app.api.v1.core.user.private.me.get.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { userId: user.id ?? "unknown", error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.user.private.me.get.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { userId: user.id ?? "unknown", error: parsedError.message },
+      });
     }
   }
 
@@ -160,10 +161,10 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
 
     try {
       if (!user.id) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.update.errors.unauthorized.title",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.update.errors.unauthorized.title",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
       }
       const userId: string = user.id;
       logger.debug("Updating user profile", { userId, data });
@@ -176,11 +177,12 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
         logger,
       );
       if (!userResponse.success) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.update.errors.unauthorized.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId },
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.update.errors.unauthorized.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: { userId },
+          cause: userResponse,
+        });
       }
 
       const currentUser = userResponse.data;
@@ -194,14 +196,14 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
         );
 
         if (emailExistsResponse.success && emailExistsResponse.data) {
-          return createErrorResponse(
-            "app.api.v1.core.user.auth.errors.validation_failed",
-            ErrorResponseTypes.VALIDATION_ERROR,
-            {
+          return fail({
+          message: "app.api.v1.core.user.auth.errors.validation_failed",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                      messageParams: {
               field: "email",
-              message: t("app.api.v1.core.user.errors.emailAlreadyInUse"),
+                      message: t("app.api.v1.core.user.errors.emailAlreadyInUse"),
             },
-          );
+          });
         }
       }
 
@@ -248,10 +250,11 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
         logger,
       );
       if (!updatedUserResponse.success) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.update.errors.internal.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.update.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          cause: updatedUserResponse,
+        });
       }
 
       // Create list of changed fields
@@ -279,11 +282,11 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
     } catch (error) {
       logger.error("Error updating user profile", parseError(error));
       const parsedError = parseError(error);
-      return createErrorResponse(
-        "app.api.v1.core.user.private.me.update.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { userId: user.id ?? "unknown", error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.user.private.me.update.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { userId: user.id ?? "unknown", error: parsedError.message },
+      });
     }
   }
 
@@ -303,10 +306,10 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
   ): Promise<ResponseType<MeDeleteResponseOutput>> {
     try {
       if (!user.id) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.delete.errors.unauthorized.title",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.delete.errors.unauthorized.title",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
       }
       const userId: string = user.id;
       logger.debug("Deleting user account", { userId });
@@ -319,11 +322,12 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
         logger,
       );
       if (!userResponse.success) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.delete.errors.unauthorized.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId },
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.delete.errors.unauthorized.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: { userId },
+          cause: userResponse,
+        });
       }
 
       // Delete user from database
@@ -338,11 +342,11 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
     } catch (error) {
       logger.error("Error deleting user account", parseError(error));
       const parsedError = parseError(error);
-      return createErrorResponse(
-        "app.api.v1.core.user.private.me.delete.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { userId: user.id ?? "unknown", error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.user.private.me.delete.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { userId: user.id ?? "unknown", error: parsedError.message },
+      });
     }
   }
 }

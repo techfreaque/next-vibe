@@ -1,6 +1,4 @@
-import { GalleryHorizontal } from "lucide-react-native";
+import { GalleryHorizontal as GalleryHorizontalIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(GalleryHorizontal);
-export { GalleryHorizontal };
+export const GalleryHorizontal = styled(GalleryHorizontalIcon);

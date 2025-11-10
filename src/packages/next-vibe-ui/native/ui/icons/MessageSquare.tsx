@@ -1,6 +1,4 @@
-import { MessageSquare } from "lucide-react-native";
+import { MessageSquare as MessageSquareIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(MessageSquare);
-export { MessageSquare };
+export const MessageSquare = styled(MessageSquareIcon);

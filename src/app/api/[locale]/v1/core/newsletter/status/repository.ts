@@ -91,9 +91,9 @@ export class NewsletterStatusRepositoryImpl
       });
 
       return fail({
-        message: "app.api.v1.core.newsletter.status.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
+          message: "app.api.v1.core.newsletter.status.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
       });
     }
   }

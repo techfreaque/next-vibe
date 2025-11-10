@@ -1,2 +1,4 @@
-// Radix UI icon alias
-export { ArrowRight as ArrowRightIcon } from "./ArrowRight";
+import { ArrowRightIcon as ArrowRightIconIcon } from "lucide-react-native";
+import { styled } from "nativewind";
+
+export const ArrowRightIcon = styled(ArrowRightIconIcon);

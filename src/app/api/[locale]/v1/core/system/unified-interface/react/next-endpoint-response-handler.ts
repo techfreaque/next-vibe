@@ -229,7 +229,7 @@ export function createNextHandler<
       // Handle unexpected errors - error details are included in messageParams
       return createHTTPErrorResponse({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parseError(error).message,
         },

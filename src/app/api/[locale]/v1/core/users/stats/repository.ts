@@ -19,7 +19,7 @@ import {
 } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -334,11 +334,11 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       return success(response);
     } catch (error) {
       logger.error("Error fetching user statistics", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.users.list.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.users.list.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 

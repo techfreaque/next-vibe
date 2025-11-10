@@ -9,7 +9,7 @@ import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -109,13 +109,13 @@ class RouteHandlersGeneratorRepositoryImpl
         duration,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           duration,
         },
-      );
+      });
     }
   }
 

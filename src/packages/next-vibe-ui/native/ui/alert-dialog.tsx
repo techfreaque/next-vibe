@@ -1,6 +1,6 @@
 import * as AlertDialogPrimitive from "@rn-primitives/alert-dialog";
 import * as React from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import { cn } from "../lib/utils";
@@ -18,31 +18,6 @@ const AlertDialog = AlertDialogPrimitive.Root;
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
 
 const AlertDialogPortal = AlertDialogPrimitive.Portal;
-
-interface AlertDialogOverlayWebProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-const AlertDialogOverlayWeb = ({
-  className,
-  children,
-}: AlertDialogOverlayWebProps): React.ReactNode => {
-  const { open } = AlertDialogPrimitive.useRootContext();
-  return (
-    <AlertDialogPrimitive.Overlay
-      className={cn(
-        "z-50 bg-black/80 flex justify-center items-center p-2 absolute top-0 right-0 bottom-0 left-0",
-        open
-          ? "web:animate-in web:fade-in-0"
-          : "web:animate-out web:fade-out-0",
-        className,
-      )}
-    >
-      {children}
-    </AlertDialogPrimitive.Overlay>
-  );
-};
 
 interface AlertDialogOverlayNativeProps {
   className?: string;
@@ -72,10 +47,7 @@ const AlertDialogOverlayNative = ({
   );
 };
 
-const AlertDialogOverlay = Platform.select({
-  web: AlertDialogOverlayWeb,
-  default: AlertDialogOverlayNative,
-});
+const AlertDialogOverlay = AlertDialogOverlayNative;
 
 interface AlertDialogContentProps {
   className?: string;
@@ -95,10 +67,10 @@ const AlertDialogContent = React.forwardRef<
         <AlertDialogPrimitive.Content
           ref={ref}
           className={cn(
-            "z-50 max-w-lg gap-4 border border-border bg-background p-6 shadow-lg shadow-foreground/10 web:duration-200 rounded-lg",
+            "z-50 max-w-lg gap-4 border border-border bg-background p-6 shadow-lg shadow-foreground/10 duration-200 rounded-lg",
             open
-              ? "web:animate-in web:fade-in-0 web:zoom-in-95"
-              : "web:animate-out web:fade-out-0 web:zoom-out-95",
+              ? "animate-in fade-in-0 zoom-in-95"
+              : "animate-out fade-out-0 zoom-out-95",
             className,
           )}
         >
@@ -140,7 +112,7 @@ const AlertDialogTitle = React.forwardRef<
   <AlertDialogPrimitive.Title
     ref={ref}
     className={cn(
-      "text-lg native:text-xl text-foreground font-semibold",
+      "text-lg text-xl text-foreground font-semibold",
       className,
     )}
   >
@@ -155,7 +127,7 @@ const AlertDialogDescription = React.forwardRef<
 >(({ className, children }, ref) => (
   <AlertDialogPrimitive.Description
     ref={ref}
-    className={cn("text-sm native:text-base text-muted-foreground", className)}
+    className={cn("text-sm text-base text-muted-foreground", className)}
   >
     {children}
   </AlertDialogPrimitive.Description>

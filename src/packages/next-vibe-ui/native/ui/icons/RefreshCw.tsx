@@ -1,6 +1,4 @@
-import { RefreshCw } from "lucide-react-native";
+import { RefreshCw as RefreshCwIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(RefreshCw);
-export { RefreshCw };
+export const RefreshCw = styled(RefreshCwIcon);

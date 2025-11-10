@@ -289,9 +289,9 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       logger.error("Failed to retrieve cron tasks", parsedError);
 
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -406,9 +406,9 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       }
 
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

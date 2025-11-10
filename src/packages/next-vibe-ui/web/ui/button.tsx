@@ -37,7 +37,7 @@ export const buttonVariants = cva(
 );
 
 export const buttonTextVariants = cva(
-  "web:whitespace-nowrap text-sm native:text-base font-medium text-foreground web:transition-colors",
+  "text-sm font-medium text-foreground",
   {
     variants: {
       variant: {
@@ -52,7 +52,7 @@ export const buttonTextVariants = cva(
       size: {
         default: "",
         sm: "",
-        lg: "native:text-lg",
+        lg: "",
         icon: "",
         unset: "",
       },

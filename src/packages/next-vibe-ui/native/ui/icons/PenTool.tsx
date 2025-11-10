@@ -1,6 +1,4 @@
-import { PenTool } from "lucide-react-native";
+import { PenTool as PenToolIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(PenTool);
-export { PenTool };
+export const PenTool = styled(PenToolIcon);

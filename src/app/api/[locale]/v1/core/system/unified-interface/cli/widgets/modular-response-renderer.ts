@@ -69,7 +69,7 @@ export class ModularCLIResponseRenderer {
     const context: WidgetRenderContext = {
       options: this.options,
       depth: 0,
-      translate: (key: TranslationKey, params) => t(key, params),
+      t: (key: TranslationKey, params) => t(key, params),
       formatValue: (field, value) => this.formatFieldValue(field, value),
       getFieldIcon: (type) => this.getFieldIcon(type),
       renderEmptyState: (message) => this.renderEmptyState(message),
@@ -94,7 +94,7 @@ export class ModularCLIResponseRenderer {
     const result: string[] = [];
 
     if (container.title) {
-      const title = context.translate(container.title as never);
+      const title = context.t(container.title);
       // eslint-disable-next-line i18next/no-literal-string
       const titleIcon = "📋 ";
       const titleWithIcon = titleIcon + title;
@@ -104,7 +104,7 @@ export class ModularCLIResponseRenderer {
     }
 
     if (container.description) {
-      const description = context.translate(container.description as never);
+      const description = context.t(container.description);
       result.push(`   ${description}`);
       result.push("");
     }
@@ -169,7 +169,6 @@ export class ModularCLIResponseRenderer {
         if (this.looksLikeIssuesList(value)) {
           const field: ResponseFieldMetadata = {
             name: key,
-            label: this.formatLabel(key),
             type: FieldDataType.ARRAY,
             widgetType: WidgetType.GROUPED_LIST,
             value: value as RenderableValue,
@@ -180,7 +179,7 @@ export class ModularCLIResponseRenderer {
           const rendered = this.widgetRegistry.render(field, context);
           result.push(rendered);
         } else {
-          // Generic array rendering
+          // Generic array rendering - use formatted field name directly
           const label = this.formatLabel(key);
           const formattedArray = this.formatter.formatArray(value);
           result.push(`${label}: ${formattedArray}`);

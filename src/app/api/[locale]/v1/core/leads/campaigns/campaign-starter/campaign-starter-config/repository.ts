@@ -6,7 +6,7 @@
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -247,10 +247,10 @@ class CampaignStarterConfigRepositoryImpl
       return success(combinedConfig);
     } catch (error) {
       logger.error("Error fetching campaign starter config", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -318,10 +318,10 @@ class CampaignStarterConfigRepositoryImpl
       return success(data);
     } catch (error) {
       logger.error("Error updating campaign starter config", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 

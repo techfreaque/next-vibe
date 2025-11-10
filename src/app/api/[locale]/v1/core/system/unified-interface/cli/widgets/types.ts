@@ -10,7 +10,8 @@ import type {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TFunction,
+TranslationKey } from "@/i18n/core/static-types";
 
 /**
  * Valid primitive values that can be rendered
@@ -63,9 +64,9 @@ export interface ResponseFieldMetadata {
   type: FieldDataType;
   widgetType: WidgetType;
   value: RenderableValue;
-  label?: string;
-  title?: string;
-  description?: string;
+  label?: TranslationKey;
+  title?: TranslationKey;
+  description?: TranslationKey;
   required?: boolean;
   schema?: z.ZodTypeAny;
   // Additional metadata for rendering
@@ -75,7 +76,7 @@ export interface ResponseFieldMetadata {
   choices?: string[];
   columns?: Array<{
     key: string;
-    label: string;
+    label: TranslationKey;
     type: FieldDataType;
     width?: string;
     sortable?: boolean;
@@ -97,8 +98,8 @@ export interface ResponseFieldMetadata {
  */
 export interface ResponseContainerMetadata {
   type: WidgetType;
-  title?: string;
-  description?: string;
+  title?: TranslationKey;
+  description?: TranslationKey;
   layout?: {
     columns?: number;
     spacing?: string;
@@ -123,10 +124,7 @@ export interface CLIRenderingOptions {
 export interface WidgetRenderContext {
   options: CLIRenderingOptions;
   depth: number;
-  translate: (
-    key: TranslationKey,
-    params?: Record<string, string | number>,
-  ) => string;
+  t: TFunction;
   formatValue: (field: ResponseFieldMetadata, value: RenderableValue) => string;
   getFieldIcon: (type: FieldDataType) => string;
   renderEmptyState: (message: string) => string;

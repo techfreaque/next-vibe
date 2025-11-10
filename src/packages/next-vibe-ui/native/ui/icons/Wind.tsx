@@ -1,6 +1,4 @@
-import { Wind } from "lucide-react-native";
+import { Wind as WindIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Wind);
-export { Wind };
+export const Wind = styled(WindIcon);

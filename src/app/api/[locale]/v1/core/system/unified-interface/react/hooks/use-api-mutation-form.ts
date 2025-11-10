@@ -282,9 +282,9 @@ export function useApiForm<
         const errorResponse = isErrorResponseType(error)
           ? error
           : fail({
-              message:
+          message:
                 "app.api.v1.core.system.unifiedInterface.react.hooks.mutationForm.post.errors.mutation_failed.title",
-              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
             });
 
         setError(errorResponse);
@@ -304,10 +304,10 @@ export function useApiForm<
 
       // Create an error response for form validation errors
       const errorResponse = fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.react.hooks.mutationForm.post.errors.validation_error.title",
-        errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: { formErrors: JSON.stringify(errors) },
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                  messageParams: { formErrors: JSON.stringify(errors) },
       });
 
       // Set the error in the form state so it's displayed

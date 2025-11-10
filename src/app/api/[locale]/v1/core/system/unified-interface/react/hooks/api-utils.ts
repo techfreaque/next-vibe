@@ -5,11 +5,11 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import type z from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
+import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 
 /**
  * Check if an object contains File instances (recursively)
@@ -84,19 +84,13 @@ export function objectToFormData(
  * Core function to call an API endpoint
  * Handles request validation, authentication, and response parsing
  */
-export async function callApi<TResponseOutput>(
-  endpoint: {
-    readonly TResponseOutput: TResponseOutput;
-    readonly requestSchema: z.ZodTypeAny;
-    readonly responseSchema: z.ZodType<TResponseOutput>;
-    readonly method: Methods;
-    readonly path: readonly string[];
-    readonly requiresAuthentication: () => boolean;
-  },
+export async function callApi<  TEndpoint extends CreateApiEndpointAny
+>(
+  endpoint: TEndpoint,
   endpointUrl: string,
   postBody: string | FormData | undefined,
   logger: EndpointLogger,
-): Promise<ResponseType<TResponseOutput>> {
+): Promise<ResponseType<TEndpoint["TResponseOutput"]>> {
   try {
     // Prepare headers - don't set Content-Type for FormData (browser will set it with boundary)
     const headers: HeadersInit =
@@ -137,7 +131,7 @@ export async function callApi<TResponseOutput>(
 
     // Make the API call
     const response = await fetch(endpointUrl, options);
-    const json = (await response.json()) as ResponseType<TResponseOutput>;
+    const json = (await response.json()) as ResponseType<TEndpoint["TResponseOutput"]>; 
 
     // Handle API response
     if (!response.ok) {
@@ -148,10 +142,10 @@ export async function callApi<TResponseOutput>(
 
       // Fallback error when server doesn't return proper error format
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.react.hooks.apiUtils.errors.http_error",
-        errorType: ErrorResponseTypes.HTTP_ERROR,
-        messageParams: {
+          errorType: ErrorResponseTypes.HTTP_ERROR,
+                  messageParams: {
           statusCode: response.status,
           url: endpointUrl,
         },
@@ -172,8 +166,8 @@ export async function callApi<TResponseOutput>(
           message:
             "app.api.v1.core.system.unifiedInterface.react.hooks.apiUtils.errors.validation_error",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
-            message: validationResponse.message,
+                    messageParams: {
+                    message: validationResponse.message,
           },
         });
       }
@@ -191,20 +185,20 @@ export async function callApi<TResponseOutput>(
 
     // Fallback error when server returns success but no data
     return fail({
-      message:
+          message:
         "app.api.v1.core.system.unifiedInterface.react.hooks.apiUtils.errors.internal_error",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: {
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: {
         url: endpointUrl,
       },
     });
   } catch (error) {
     // Fallback error when request fails completely
     return fail({
-      message:
+          message:
         "app.api.v1.core.system.unifiedInterface.react.hooks.apiUtils.errors.internal_error",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: {
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: {
         error: parseError(error).message,
         endpoint: endpoint.path.join("/"),
       },

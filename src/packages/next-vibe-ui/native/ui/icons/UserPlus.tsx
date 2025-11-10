@@ -1,6 +1,4 @@
-import { UserPlus } from "lucide-react-native";
+import { UserPlus as UserPlusIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(UserPlus);
-export { UserPlus };
+export const UserPlus = styled(UserPlusIcon);

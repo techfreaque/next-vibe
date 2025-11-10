@@ -1,6 +1,4 @@
-import { Database } from "lucide-react-native";
+import { Database as DatabaseIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Database);
-export { Database };
+export const Database = styled(DatabaseIcon);

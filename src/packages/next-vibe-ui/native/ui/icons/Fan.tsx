@@ -1,6 +1,4 @@
-import { Fan } from "lucide-react-native";
+import { Fan as FanIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Fan);
-export { Fan };
+export const Fan = styled(FanIcon);

@@ -58,7 +58,7 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
         return fail({
           message: "app.api.v1.core.emails.smsService.errors.invalid_phone.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { phoneNumber: data.to },
+                    messageParams: { phoneNumber: data.to },
         });
       }
 
@@ -95,9 +95,9 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
         parseError(error),
       );
       return fail({
-        message: "app.api.v1.core.emails.smsService.errors.send.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.emails.smsService.errors.send.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }

@@ -84,7 +84,7 @@ export function useStreamSync(deps: StreamSyncDeps): void {
             content: streamMsg.content,
             tokens: streamMsg.totalTokens || null,
             toolCalls: streamMsg.toolCalls || null,
-            errorType: streamMsg.error
+          errorType: streamMsg.error
               ? t("app.api.v1.core.agent.chat.aiStream.errorTypes.streamError")
               : null,
             errorMessage: streamMsg.error || null,

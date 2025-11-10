@@ -1,6 +1,4 @@
-import { Linkedin } from "lucide-react-native";
+import { Linkedin as LinkedinIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Linkedin);
-export { Linkedin };
+export const Linkedin = styled(LinkedinIcon);

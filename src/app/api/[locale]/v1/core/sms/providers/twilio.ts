@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
@@ -48,17 +48,17 @@ export function getTwilioProvider(): SmsProvider {
       try {
         // Validate credentials
         if (!accountSid) {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.missing_recipient",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+          message: "app.api.v1.core.sms.sms.error.missing_recipient",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
 
         if (!authToken) {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.missing_recipient",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+          message: "app.api.v1.core.sms.sms.error.missing_recipient",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
 
         // Cache API base URL
@@ -72,29 +72,29 @@ export function getTwilioProvider(): SmsProvider {
 
         // Type guard for params
         if (!params || typeof params !== "object") {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.invalid_phone_format",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+          message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
 
         logger.debug("Sending SMS via Twilio", { to: params.to });
 
         // Validate required parameters
         if (!params.to) {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.invalid_phone_format",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+          message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
 
         // From phone number fallback with nullish coalescing
         const fromNumber = params.from ?? env.SMS_FROM_NUMBER;
         if (!fromNumber) {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.invalid_phone_format",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+          message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
 
         if (
@@ -102,10 +102,10 @@ export function getTwilioProvider(): SmsProvider {
           typeof params.message !== "string" ||
           params.message.trim() === ""
         ) {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.empty_message",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+          message: "app.api.v1.core.sms.sms.error.empty_message",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
 
         // Prepare request body
@@ -181,14 +181,14 @@ export function getTwilioProvider(): SmsProvider {
           const errorCode =
             errorData.code ?? errorData.error_code ?? response.status;
 
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.delivery_failed",
-            ErrorResponseTypes.SMS_ERROR,
-            {
+          return fail({
+          message: "app.api.v1.core.sms.sms.error.delivery_failed",
+          errorType: ErrorResponseTypes.SMS_ERROR,
+                      messageParams: {
               error: errorMessage,
               errorCode,
             },
-          );
+          });
         }
 
         // Parse successful response
@@ -225,13 +225,13 @@ export function getTwilioProvider(): SmsProvider {
         const errorMessage =
           // eslint-disable-next-line i18next/no-literal-string -- Technical error message from exception
           error instanceof Error ? error.message : "Unknown error";
-        return createErrorResponse(
-          "app.api.v1.core.sms.sms.error.delivery_failed",
-          ErrorResponseTypes.SMS_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.sms.sms.error.delivery_failed",
+          errorType: ErrorResponseTypes.SMS_ERROR,
+                    messageParams: {
             error: errorMessage,
           },
-        );
+        });
       }
     },
   };

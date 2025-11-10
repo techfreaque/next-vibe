@@ -1,2 +1,4 @@
-// Icon alias
-export { BarChart3 as BarChart3Icon } from "./BarChart3";
+import { BarChart3Icon as BarChart3IconIcon } from "lucide-react-native";
+import { styled } from "nativewind";
+
+export const BarChart3Icon = styled(BarChart3IconIcon);

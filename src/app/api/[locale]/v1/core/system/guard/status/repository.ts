@@ -8,7 +8,7 @@ import * as path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -70,11 +70,11 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
       const parsedError =
         error instanceof Error ? error : new Error(String(error));
 
-      return createErrorResponse(
-        "app.api.v1.core.system.guard.status.post.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.guard.status.post.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
+      });
     }
   }
 

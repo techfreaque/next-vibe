@@ -1,6 +1,4 @@
-import { CreditCard } from "lucide-react-native";
+import { CreditCard as CreditCardIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(CreditCard);
-export { CreditCard };
+export const CreditCard = styled(CreditCardIcon);

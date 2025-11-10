@@ -40,7 +40,8 @@ function hasProperty<T extends string>(obj: any, prop: T): obj is Record<T, any>
  * to avoid issues with Zod v4 internal type changes
  */
 function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Access Zod internal _def - this is a Zod internal structure
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
   const schemaDef = (schema as any)._def;
 
   if (!schemaDef || typeof schemaDef.typeName !== "string") {
@@ -60,22 +61,25 @@ function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
 
   // Handle ZodOptional - has unwrap() method
   if (schemaDef.typeName === "ZodOptional" && hasProperty(schema, "unwrap")) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const unwrapped = stripTransformsAndRefinements((schema as any).unwrap());
+    // Zod internal method access - unwrap() is not in public API
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+    const unwrapped = stripTransformsAndRefinements((schema as any).unwrap() as z.ZodTypeAny);
     return unwrapped.optional();
   }
 
   // Handle ZodNullable - has unwrap() method
   if (schemaDef.typeName === "ZodNullable" && hasProperty(schema, "unwrap")) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const unwrapped = stripTransformsAndRefinements((schema as any).unwrap());
+    // Zod internal method access - unwrap() is not in public API
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+    const unwrapped = stripTransformsAndRefinements((schema as any).unwrap() as z.ZodTypeAny);
     return unwrapped.nullable();
   }
 
   // Handle ZodDefault - has removeDefault() method
   if (schemaDef.typeName === "ZodDefault" && hasProperty(schema, "removeDefault")) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const innerSchema = stripTransformsAndRefinements((schema as any).removeDefault());
+    // Zod internal method access - removeDefault() is not in public API
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+    const innerSchema = stripTransformsAndRefinements((schema as any).removeDefault() as z.ZodTypeAny);
     // Get the default value from _def
     const defaultValue = schemaDef.defaultValue;
     const resolvedDefault = typeof defaultValue === "function" ? defaultValue() : defaultValue;
@@ -84,7 +88,8 @@ function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
 
   // Handle ZodObject - recursively strip from all properties
   if (schemaDef.typeName === "ZodObject" && hasProperty(schema, "shape")) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // Zod internal property access - shape is not in public API for ZodTypeAny
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
     const shape = (schema as any).shape as Record<string, z.ZodTypeAny>;
     const strippedShape: Record<string, z.ZodTypeAny> = {};
 
@@ -97,7 +102,8 @@ function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
 
   // Handle ZodArray - has element property
   if (schemaDef.typeName === "ZodArray" && hasProperty(schema, "element")) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // Zod internal property access - element is not in public API for ZodTypeAny
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
     const element = (schema as any).element as z.ZodTypeAny;
     const stripped = stripTransformsAndRefinements(element);
     return z.array(stripped);
@@ -105,7 +111,8 @@ function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
 
   // Handle ZodUnion - has options property
   if (schemaDef.typeName === "ZodUnion" && hasProperty(schema, "options")) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // Zod internal property access - options is not in public API for ZodTypeAny
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
     const options = (schema as any).options as z.ZodTypeAny[];
     const strippedOptions = options.map((option) =>
       stripTransformsAndRefinements(option),

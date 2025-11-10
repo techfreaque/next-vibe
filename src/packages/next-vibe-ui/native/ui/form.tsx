@@ -150,7 +150,7 @@ function FormLabel({
 }: React.ComponentPropsWithoutRef<typeof Label>): JSX.Element {
   const { error, formItemNativeID } = useFormField();
   const labelClassName = cn(
-    "pb-1 native:pb-2 px-px",
+    "pb-1 pb-2 px-px",
     error && "text-destructive",
     className,
   );
@@ -373,7 +373,7 @@ function FormDatePicker({
   } = useFormField();
 
   const buttonClassName = "flex-row gap-3 justify-start px-3 relative";
-  const clearButtonClassName = "absolute right-0 active:opacity-70 native:pr-3";
+  const clearButtonClassName = "absolute right-0 active:opacity-70 pr-3";
   const bottomSheetViewClassName = "pt-2";
 
   return (
@@ -517,7 +517,7 @@ FormCombobox.displayName = "FormCombobox";
  * @example
  *  <SelectTrigger className='w-[250px]'>
       <SelectValue
-        className='text-foreground text-sm native:text-lg'
+        className='text-foreground text-sm text-lg'
         placeholder='Select a fruit'
       />
     </SelectTrigger>

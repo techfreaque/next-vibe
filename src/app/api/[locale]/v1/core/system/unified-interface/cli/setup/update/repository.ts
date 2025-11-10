@@ -58,11 +58,12 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
           message:
             "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
+                    messageParams: {
             error: t(
               "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.errors.server.description",
             ),
           },
+          cause: uninstallResult,
         });
       }
 
@@ -96,10 +97,10 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
     } catch (err) {
       const parsedError = parseError(err);
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           error: parsedError.message,
         },
       });

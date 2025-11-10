@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -98,9 +98,9 @@ export class NewsletterSubscribeSmsServiceImpl
       );
 
       if (!smsResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.newsletter.error.general.internal_server_error",
-          ErrorResponseTypes.INTERNAL_ERROR,
+        return fail({
+          message: "app.api.v1.core.newsletter.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR, }
         );
       }
 
@@ -110,9 +110,9 @@ export class NewsletterSubscribeSmsServiceImpl
       });
     } catch (error) {
       logger.error("Error sending newsletter welcome SMS", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.newsletter.error.general.internal_server_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
+      return fail({
+        message: "app.api.v1.core.newsletter.error.general.internal_server_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR, }
       );
     }
   }
@@ -170,9 +170,9 @@ export class NewsletterSubscribeSmsServiceImpl
       );
 
       if (!smsResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.newsletter.error.general.internal_server_error",
-          ErrorResponseTypes.INTERNAL_ERROR,
+        return fail({
+          message: "app.api.v1.core.newsletter.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR, }
         );
       }
 
@@ -182,9 +182,9 @@ export class NewsletterSubscribeSmsServiceImpl
       });
     } catch (error) {
       logger.error("Error sending admin notification SMS", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.newsletter.error.general.internal_server_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
+      return fail({
+        message: "app.api.v1.core.newsletter.error.general.internal_server_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR, }
       );
     }
   }

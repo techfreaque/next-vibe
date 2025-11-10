@@ -8,7 +8,7 @@ import "server-only";
 import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -88,11 +88,11 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
         .limit(1);
 
       if (!account) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { accountId: urlPathParams.id },
-        );
+        return fail({
+          message: "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: { accountId: urlPathParams.id },
+      });
       }
 
       // Transform to response format - match endpoint definition exactly
@@ -125,11 +125,11 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
       return success(response);
     } catch (error) {
       logger.error("Error getting SMTP account", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -157,11 +157,11 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
         .limit(1);
 
       if (!existingAccount) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { accountId: data.id },
-        );
+        return fail({
+          message: "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: { accountId: data.id },
+      });
       }
 
       // Check if setting as default and unset other defaults for overlapping campaign types
@@ -207,14 +207,14 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
         .returning();
 
       if (!updatedAccount) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
             error:
               "app.api.v1.core.emails.smtpClient.edit.id.errors.server.description",
           },
-        );
+      });
       }
 
       // Transform to response format - match endpoint definition exactly
@@ -254,18 +254,18 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
         errorMessage.includes("unique") ||
         errorMessage.includes("duplicate")
       ) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.edit.id.errors.conflict.title",
-          ErrorResponseTypes.CONFLICT,
-          { error: errorMessage },
-        );
+        return fail({
+          message: "app.api.v1.core.emails.smtpClient.edit.id.errors.conflict.title",
+          errorType: ErrorResponseTypes.CONFLICT,
+        messageParams: { error: errorMessage },
+      });
       }
 
-      return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: errorMessage },
-      );
+      return fail({
+          message: "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
     }
   }
 }

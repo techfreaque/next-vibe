@@ -1,7 +1,4 @@
-import { Share2 } from "lucide-react-native";
+import { Share as ShareIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Share2);
-// Share is an alias for Share2
-export const Share = Share2;
+export const Share = styled(ShareIcon);

@@ -1,6 +1,4 @@
-import { FileText } from "lucide-react-native";
+import { FileText as FileTextIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(FileText);
-export { FileText };
+export const FileText = styled(FileTextIcon);

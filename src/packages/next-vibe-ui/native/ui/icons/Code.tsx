@@ -1,6 +1,4 @@
-import { Code } from "lucide-react-native";
+import { Code as CodeIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Code);
-export { Code };
+export const Code = styled(CodeIcon);

@@ -1,6 +1,4 @@
-import { Star } from "lucide-react-native";
+import { Star as StarIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Star);
-export { Star };
+export const Star = styled(StarIcon);

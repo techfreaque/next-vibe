@@ -17,10 +17,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
  */
 export async function withTransaction<T>(
   logger: EndpointLogger,
-  fn: Parameters<typeof db.transaction>[0],
+  fn: (tx: Parameters<Parameters<typeof db.transaction>[0]>[0]) => Promise<T>,
 ): Promise<T> {
   try {
-    return (await db.transaction(fn)) as T;
+    return await db.transaction(fn);
   } catch (error) {
     logger.error("Transaction error", parseError(error));
     // Re-throw the error to maintain compatibility with Drizzle's transaction API

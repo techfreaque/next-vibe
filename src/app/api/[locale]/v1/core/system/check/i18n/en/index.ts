@@ -12,4 +12,7 @@ export const translations = {
   },
   typecheck: typecheckTranslations,
   vibeCheck: vibeCheckTranslations,
+  codeQuality: {
+    noIssues: "No code quality issues found",
+  },
 };

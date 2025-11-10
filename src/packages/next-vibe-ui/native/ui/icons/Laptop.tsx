@@ -1,6 +1,4 @@
-import { Laptop } from "lucide-react-native";
+import { Laptop as LaptopIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Laptop);
-export { Laptop };
+export const Laptop = styled(LaptopIcon);

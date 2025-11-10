@@ -1,6 +1,4 @@
-import { Scale } from "lucide-react-native";
+import { Scale as ScaleIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Scale);
-export { Scale };
+export const Scale = styled(ScaleIcon);

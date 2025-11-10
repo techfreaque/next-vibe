@@ -107,8 +107,8 @@ export class BrowserRepositoryImpl implements BrowserRepository {
             error: parseError instanceof Error ? parseError.message : String(parseError),
           });
           return fail({
-            message: "app.api.v1.core.browser.repository.mcp.tool.call.invalidJsonArguments",
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          message: "app.api.v1.core.browser.repository.mcp.tool.call.invalidJsonArguments",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
       }
@@ -139,9 +139,9 @@ export class BrowserRepositoryImpl implements BrowserRepository {
 
       const errorMessage = error instanceof Error ? error.message : String(error);
       return fail({
-        message: "app.api.v1.core.browser.repository.mcp.tool.call.executionFailed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage },
+          message: "app.api.v1.core.browser.repository.mcp.tool.call.executionFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: errorMessage },
       });
     }
   }

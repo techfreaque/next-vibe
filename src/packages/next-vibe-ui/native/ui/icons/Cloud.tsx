@@ -1,6 +1,4 @@
-import { Cloud } from "lucide-react-native";
+import { Cloud as CloudIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Cloud);
-export { Cloud };
+export const Cloud = styled(CloudIcon);

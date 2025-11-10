@@ -1,6 +1,4 @@
-import { Square } from "lucide-react-native";
+import { Square as SquareIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Square);
-export { Square };
+export const Square = styled(SquareIcon);

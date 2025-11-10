@@ -1,6 +1,4 @@
-import { Mic } from "lucide-react-native";
+import { Mic as MicIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Mic);
-export { Mic };
+export const Mic = styled(MicIcon);

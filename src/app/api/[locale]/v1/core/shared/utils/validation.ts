@@ -4,7 +4,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 
 import type { ResponseType } from "../types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "../types/response.schema";
 import { parseError } from "./parse-error";
@@ -35,20 +35,20 @@ export function validateData<TSchema extends z.ZodType>(
         })),
         allErrors: result.error.issues,
         formattedErrors,
-        errorType: typeof result.error,
+          errorType: typeof result.error,
         errorConstructor: result.error?.constructor?.name,
         hasIssues: "issues" in result.error,
         fullError: JSON.stringify(result.error, null, 2),
       };
       logger.error("Validation error details", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.shared.errorTypes.validation_error",
-        ErrorResponseTypes.VALIDATION_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.shared.errorTypes.validation_error",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                  messageParams: {
           error: formattedErrors.join(", "),
           errorCount: error.errorCount,
         },
-      );
+      });
     }
 
     // For API responses, don't wrap the response in a success object, return the data directly
@@ -56,11 +56,11 @@ export function validateData<TSchema extends z.ZodType>(
   } catch (error) {
     const parsedError = parseError(error);
     logger.error("Unexpected validation error", parsedError);
-    return createErrorResponse(
-      "app.api.v1.core.shared.errorTypes.validation_error",
-      ErrorResponseTypes.VALIDATION_ERROR,
-      { error: parsedError.message },
-    );
+    return fail({
+          message: "app.api.v1.core.shared.errorTypes.validation_error",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                messageParams: { error: parsedError.message },
+    });
   }
 }
 

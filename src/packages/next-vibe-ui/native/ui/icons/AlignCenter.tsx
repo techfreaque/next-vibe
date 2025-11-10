@@ -1,6 +1,4 @@
-import { AlignCenter } from "lucide-react-native";
+import { AlignCenter as AlignCenterIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(AlignCenter);
-export { AlignCenter };
+export const AlignCenter = styled(AlignCenterIcon);

@@ -8,7 +8,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -71,11 +71,11 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         .limit(1);
 
       if (!foundUser) {
-        return createErrorResponse(
-          "app.api.v1.core.users.user.errors.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId: data.id },
-        );
+        return fail({
+          message: "app.api.v1.core.users.user.errors.not_found.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: { userId: data.id },
+        });
       }
 
       logger.debug("User found successfully", { userId: foundUser.id });
@@ -132,11 +132,11 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
     } catch (error) {
       logger.error("Error getting user by ID", parseError(error));
       const parsedError = parseError(error);
-      return createErrorResponse(
-        "app.api.v1.core.users.user.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.users.user.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -157,11 +157,11 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         .limit(1);
 
       if (!existingUser) {
-        return createErrorResponse(
-          "app.api.v1.core.users.user.errors.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId: userId },
-        );
+        return fail({
+          message: "app.api.v1.core.users.user.errors.not_found.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: { userId: userId },
+        });
       }
 
       // Prepare update data
@@ -196,10 +196,10 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         .returning();
 
       if (!updatedUser) {
-        return createErrorResponse(
-          "app.api.v1.core.users.user.errors.internal.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.users.user.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       logger.debug("User updated successfully", { userId });
@@ -239,11 +239,11 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
     } catch (error) {
       logger.error("Error updating user", parseError(error));
       const parsedError = parseError(error);
-      return createErrorResponse(
-        "app.api.v1.core.users.user.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.users.user.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -267,11 +267,11 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         .limit(1);
 
       if (!existingUser) {
-        return createErrorResponse(
-          "app.api.v1.core.users.user.errors.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId: data.id },
-        );
+        return fail({
+          message: "app.api.v1.core.users.user.errors.not_found.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: { userId: data.id },
+        });
       }
 
       // Delete user
@@ -287,11 +287,11 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
     } catch (error) {
       logger.error("Error deleting user", parseError(error));
       const parsedError = parseError(error);
-      return createErrorResponse(
-        "app.api.v1.core.users.user.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.users.user.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
+      });
     }
   }
 }

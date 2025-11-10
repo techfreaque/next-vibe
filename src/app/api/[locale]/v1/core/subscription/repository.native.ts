@@ -18,7 +18,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -44,11 +44,11 @@ import type {
  */
 class SubscriptionRepositoryNativeImpl implements SubscriptionRepository {
   private createNotImplementedError<T>(method: string): ResponseType<T> {
-    return createErrorResponse(
-      "app.api.v1.core.subscription.errors.not_implemented_on_native",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { method },
-    );
+    return fail({
+          message: "app.api.v1.core.subscription.errors.not_implemented_on_native",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { method },
+    });
   }
 
   async getSubscription(
@@ -75,7 +75,7 @@ class SubscriptionRepositoryNativeImpl implements SubscriptionRepository {
     // Error response - preserve all error information
     return {
       success: false,
-      errorType: response.errorType,
+          errorType: response.errorType,
       message: response.message,
       messageParams: response.messageParams,
     };

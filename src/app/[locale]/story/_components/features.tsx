@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import {
   BarChart3,
   Brush,
@@ -128,40 +128,40 @@ export default function Features({
       ref={ref}
     >
       <Div className="text-center mb-16">
-        <motion.p
+        <MotionDiv
           className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2"
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
           {t("app.story._components.home.features.subtitle")}
-        </motion.p>
-        <motion.h2
+        </MotionDiv>
+        <MotionDiv
           className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4"
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           {t("app.story._components.home.features.title")}
-        </motion.h2>
-        <motion.p
+        </MotionDiv>
+        <MotionDiv
           className="mx-auto max-w-[800px] text-gray-500 dark:text-gray-400 md:text-xl"
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           {t("app.story._components.home.features.description")}
-        </motion.p>
+        </MotionDiv>
       </Div>
 
-      <motion.div
+      <MotionDiv
         className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
         variants={container}
         initial="hidden"
         animate={inView ? "show" : "hidden"}
       >
         {features.map((feature, index) => (
-          <motion.div key={index} variants={item}>
+          <MotionDiv key={index} variants={item}>
             <Card className="h-full border-2 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-lg group">
               <CardHeader>
                 <Div className="mb-2 p-2 w-14 h-14 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors duration-300">
@@ -177,9 +177,9 @@ export default function Features({
                 </CardDescription>
               </CardContent>
             </Card>
-          </motion.div>
+          </MotionDiv>
         ))}
-      </motion.div>
+      </MotionDiv>
     </Div>
   );
 }

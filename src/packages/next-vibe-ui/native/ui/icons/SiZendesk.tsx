@@ -1,8 +1,5 @@
-import React from "react";
-import Svg, { Rect } from "react-native-svg";
+// TODO: lucide-react-native doesn't have Zendesk brand icon, using Headphones as placeholder
+import { Headphones as SiZendeskIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-export const SiZendesk = ({ className }: { className?: string }): JSX.Element => (
-  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
-    <Rect width="24" height="24" fill="#03363D" />
-  </Svg>
-);
+export const SiZendesk = styled(SiZendeskIcon);

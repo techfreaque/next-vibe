@@ -1,7 +1,7 @@
 import { Section, Text } from "@react-email/components";
 import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -159,10 +159,11 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
     logger,
   );
   if (!userResponse.success) {
-    return createErrorResponse(
-      "app.api.v1.core.emails.errors.no_email",
-      ErrorResponseTypes.NOT_FOUND,
-    );
+    return fail({
+          message: "app.api.v1.core.emails.errors.no_email",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+      cause: userResponse,
+    });
   }
   const user = userResponse.data;
   const appName = t("config.appName");

@@ -1,6 +1,4 @@
-import { Globe } from "lucide-react-native";
+import { Globe as GlobeIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Globe);
-export { Globe };
+export const Globe = styled(GlobeIcon);

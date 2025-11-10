@@ -1,6 +1,4 @@
-import { MousePointer } from "lucide-react-native";
+import { MousePointer as MousePointerIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(MousePointer);
-export { MousePointer };
+export const MousePointer = styled(MousePointerIcon);

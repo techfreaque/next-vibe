@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Calendar, Coins, Info, Sparkles, Zap } from 'next-vibe-ui/ui/icons';
 import {
   Card,
@@ -41,7 +41,7 @@ export function OverviewTab({
   const { t } = useTranslation();
 
   return (
-    <motion.div
+    <MotionDiv
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
@@ -233,6 +233,6 @@ export function OverviewTab({
           </Div>
         </CardContent>
       </Card>
-    </motion.div>
+    </MotionDiv>
   );
 }

@@ -42,7 +42,6 @@ import {
   canManageThreadPermissions,
 } from "../permissions/permissions";
 import { ThreadStatus } from "../enum";
-import type { PersonaId } from "../personas/config";
 import { validateNotIncognito } from "../validation";
 import type { DefaultFolderId } from "../config";
 import type {
@@ -90,8 +89,8 @@ async function verifyExistingThread(params: {
     if (!existing?.id) {
       logger.error("Thread not found", { threadId, userId });
       return fail({
-        message: "app.api.v1.core.agent.chat.threads.get.errors.notFound.title",
-        errorType: ErrorResponseTypes.NOT_FOUND,
+          message: "app.api.v1.core.agent.chat.threads.get.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
@@ -115,9 +114,9 @@ async function verifyExistingThread(params: {
         rootFolderId: existing.rootFolderId,
       });
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.threads.get.errors.forbidden.title",
-        errorType: ErrorResponseTypes.FORBIDDEN,
+          errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
 
@@ -301,7 +300,7 @@ export async function ensureThread({
       userId: userId ?? null,
       leadId: leadId ?? null,
       title,
-      rootFolderId: rootFolderId as DefaultFolderId,
+      rootFolderId,
       folderId: subFolderId ?? null,
       // rolesRead, rolesWrite, rolesModerate, rolesAdmin are NOT set
       // They default to [] which means inherit from parent folder
@@ -658,9 +657,9 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
     } catch (error) {
       logger.error("Error listing threads", parseError(error));
       return fail({
-        message: "app.api.v1.core.agent.chat.threads.get.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.agent.chat.threads.get.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -722,11 +721,11 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
 
         if (!folderResult) {
           return fail({
-            message:
+          message:
               "app.api.v1.core.agent.chat.threads.post.errors.notFound.title",
-            errorType: ErrorResponseTypes.NOT_FOUND,
-            messageParams: {
-              message: "Folder not found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                      messageParams: {
+                      message: "Folder not found",
             },
           });
         }
@@ -766,8 +765,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.post.errors.forbidden.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
-          messageParams: {
-            message: "Cannot create thread in this location",
+                    messageParams: {
+                    message: "Cannot create thread in this location",
           },
         });
       }
@@ -787,7 +786,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         folderId: data.thread?.subFolderId ?? null,
         status: ThreadStatus.ACTIVE,
         defaultModel: data.thread?.model ?? null,
-        defaultPersona: (data.thread?.persona as PersonaId | null) ?? null,
+        defaultPersona: data.thread?.persona ?? null,
         systemPrompt: data.thread?.systemPrompt ?? null,
         pinned: false,
         archived: false,
@@ -824,9 +823,9 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
     } catch (error) {
       logger.error("Error creating thread", parseError(error));
       return fail({
-        message: "app.api.v1.core.agent.chat.threads.post.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.agent.chat.threads.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }

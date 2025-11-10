@@ -1,6 +1,4 @@
-import { Filter } from "lucide-react-native";
+import { Filter as FilterIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Filter);
-export { Filter };
+export const Filter = styled(FilterIcon);

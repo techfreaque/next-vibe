@@ -1,6 +1,4 @@
-import { Mail } from "lucide-react-native";
+import { Mail as MailIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Mail);
-export { Mail };
+export const Mail = styled(MailIcon);

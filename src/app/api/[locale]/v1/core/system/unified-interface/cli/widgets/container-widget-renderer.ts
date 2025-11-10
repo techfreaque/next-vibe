@@ -66,9 +66,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
 
     // Add container title if present
     if (field.label) {
-      const title = field.label.includes(".")
-        ? context.translate(field.label as never)
-        : field.label;
+      const title = context.t(field.label);
       const defaultIcon = context.options.useEmojis ? "📊 " : "";
       const titleIcon = config.icon || defaultIcon;
       const titleWithIcon = titleIcon + title;
@@ -78,9 +76,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
 
     // Add container description if present
     if (field.description) {
-      const description = field.description.includes(".")
-        ? context.translate(field.description as never)
-        : field.description;
+      const description = context.t(field.description);
       result.push(`   ${description}`);
       result.push("");
     }

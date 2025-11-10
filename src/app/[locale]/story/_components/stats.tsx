@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -55,7 +55,7 @@ export function Stats({ locale }: { locale: CountryLanguage }): JSX.Element {
       <Div className="container">
         <Div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-white">
           {stats.map((stat, index) => (
-            <motion.div
+            <MotionDiv
               key={index}
               className="text-center"
               initial={{ opacity: 0, y: 20 }}
@@ -67,7 +67,7 @@ export function Stats({ locale }: { locale: CountryLanguage }): JSX.Element {
                 {stat.suffix}
               </Div>
               <P className="text-blue-100">{stat.title}</P>
-            </motion.div>
+            </MotionDiv>
           ))}
         </Div>
       </Div>

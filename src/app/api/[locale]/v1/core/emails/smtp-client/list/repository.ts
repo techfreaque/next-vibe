@@ -8,7 +8,7 @@ import "server-only";
 import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -156,11 +156,11 @@ class SmtpAccountsListRepositoryImpl implements SmtpAccountsListRepository {
       });
     } catch (error) {
       logger.error("Error getting SMTP accounts", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.list.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.emails.smtpClient.list.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 }

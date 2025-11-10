@@ -1,6 +1,4 @@
-import { MessageCircle } from "lucide-react-native";
+import { MessageCircle as MessageCircleIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(MessageCircle);
-export { MessageCircle };
+export const MessageCircle = styled(MessageCircleIcon);

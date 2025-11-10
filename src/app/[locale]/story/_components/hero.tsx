@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { ArrowDown, Play } from 'next-vibe-ui/ui/icons';
 import { Button } from "next-vibe-ui/ui/button";
 import { Span } from "next-vibe-ui/ui/span";
@@ -19,35 +19,10 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
     <Div className="w-full relative">
       {/* Background elements */}
       <Div className="absolute inset-0 bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-900 dark:from-gray-900 dark:to-background -z-10" />
-      <Div className="absolute top-0 right-0 -z-10 opacity-70 dark:opacity-30">
-        <svg
-          width="800"
-          height="800"
-          viewBox="0 0 800 800"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <circle cx="400" cy="400" r="400" fill="url(#paint0_radial)" />
-          <defs>
-            <radialGradient
-              id="paint0_radial"
-              cx="0"
-              cy="0"
-              r="1"
-              gradientUnits="userSpaceOnUse"
-              gradientTransform="translate(400 400) rotate(90) scale(400)"
-            >
-              <stop stopColor="#0EA5E9" />
-              <stop offset="1" stopColor="#0EA5E9" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-        </svg>
-      </Div>
 
       <Div className="container px-4 md:px-6 py-20 md:py-32">
         <Div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-center">
-          <motion.div
+          <MotionDiv
             className="flex flex-col justify-center space-y-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -86,7 +61,7 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
               </Button>
             </Div>
 
-          </motion.div>
+          </MotionDiv>
 
         </Div>
       </Div>

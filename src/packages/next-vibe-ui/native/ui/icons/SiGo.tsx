@@ -1,8 +1,5 @@
-import React from "react";
-import Svg, { Rect } from "react-native-svg";
+// TODO: lucide-react-native doesn't have Go brand icon, using Code as placeholder
+import { Code as SiGoIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-export const SiGo = ({ className }: { className?: string }): React.JSX.Element => (
-  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
-    <Rect width="24" height="24" fill="#00ADD8" />
-  </Svg>
-);
+export const SiGo = styled(SiGoIcon);

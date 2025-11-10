@@ -1,6 +1,4 @@
-import { Compass } from "lucide-react-native";
+import { Compass as CompassIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Compass);
-export { Compass };
+export const Compass = styled(CompassIcon);

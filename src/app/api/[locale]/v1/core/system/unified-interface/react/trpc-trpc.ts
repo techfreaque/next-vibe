@@ -145,7 +145,7 @@ export function createCustomerProcedure(
  * Helper to convert next-vibe error types to tRPC errors
  */
 export function convertToTRPCError(
-  errorType: (typeof ErrorResponseTypes)[keyof typeof ErrorResponseTypes],
+          errorType: (typeof ErrorResponseTypes)[keyof typeof ErrorResponseTypes],
   message: string,
 ): TRPCError {
   switch (errorType) {

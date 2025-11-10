@@ -108,7 +108,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         return fail({
           message: "app.api.v1.core.payment.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-          messageParams: {
+                    messageParams: {
             error: t("app.api.v1.core.payment.errors.unauthorized.description"),
           },
         });
@@ -132,7 +132,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         return fail({
           message: "app.api.v1.core.payment.create.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId: user.id },
+                    messageParams: { userId: user.id },
         });
       }
 
@@ -144,7 +144,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         return fail({
           message: "app.api.v1.core.payment.create.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
+                    messageParams: {
             error: t("app.api.v1.core.payment.errors.customerNotFound"),
           },
         });
@@ -249,9 +249,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       });
 
       return fail({
-        message: "app.api.v1.core.payment.create.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
+          message: "app.api.v1.core.payment.create.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
       });
     }
   }
@@ -271,7 +271,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         return fail({
           message: "app.api.v1.core.payment.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-          messageParams: {
+                    messageParams: {
             error: t("app.api.v1.core.payment.errors.unauthorized.description"),
           },
         });
@@ -318,9 +318,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       });
 
       return fail({
-        message: "app.api.v1.core.payment.get.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
+          message: "app.api.v1.core.payment.get.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
       });
     }
   }
@@ -351,8 +351,8 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     if (!subscription[0]) {
       logger.error("No subscription found for user", { userId });
       return fail({
-        message: "app.api.v1.core.payment.errors.notFound.title",
-        errorType: ErrorResponseTypes.NOT_FOUND,
+          message: "app.api.v1.core.payment.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
@@ -410,7 +410,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         return fail({
           message: "app.api.v1.core.stripe.errors.webhookVerificationFailed.title",
           errorType: ErrorResponseTypes.BAD_REQUEST,
-          messageParams: { error: verificationResult.message },
+                    messageParams: { error: verificationResult.message },
         });
       }
 
@@ -491,9 +491,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       });
 
       return fail({
-        message: "app.api.v1.core.payment.errors.server.title",
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-        messageParams: { error: parsedError.message },
+          message: "app.api.v1.core.payment.errors.server.title",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+                  messageParams: { error: parsedError.message },
       });
     }
   }

@@ -1,6 +1,4 @@
-import { PieChart } from "lucide-react-native";
+import { PieChart as PieChartIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(PieChart);
-export { PieChart };
+export const PieChart = styled(PieChartIcon);

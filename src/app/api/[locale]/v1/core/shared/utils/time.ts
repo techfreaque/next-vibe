@@ -1,5 +1,5 @@
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
   type ResponseType,
@@ -15,13 +15,13 @@ export function timeToSeconds(
 ): ResponseType<number> {
   const [hours, minutes] = timeStr.split(":").map(Number);
   if (hours === undefined || minutes === undefined) {
-    return createErrorResponse(
-      "app.api.v1.core.shared.utils.time.errors.invalid_time_format.title",
-      ErrorResponseTypes.VALIDATION_ERROR,
-      {
+    return fail({
+          message: "app.api.v1.core.shared.utils.time.errors.invalid_time_format.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                messageParams: {
         inputValue: timeStr,
       },
-    );
+    });
   }
   return success(hours * 3600 + minutes * 60);
 }
@@ -33,21 +33,21 @@ export type SimpleTimeFormat = `${number}:${number}`;
  * @param seconds - Seconds since midnight
  * @returns Success response with time string or error response
  */
-export function secondsToTime(seconds: number): ResponseType<SimpleTimeFormat> {
+export function secondsToTime(seconds: number): ResponseType<string> {
   if (seconds < 0 || seconds >= 86_400) {
-    return createErrorResponse(
-      "app.api.v1.core.shared.utils.time.errors.invalid_time_range.title",
-      ErrorResponseTypes.VALIDATION_ERROR,
-      {
+    return fail({
+          message: "app.api.v1.core.shared.utils.time.errors.invalid_time_range.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                messageParams: {
         inputValue: seconds,
       },
-    );
+    });
   }
 
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
 
-  return success(
-    `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}` as SimpleTimeFormat,
-  );
+  const timeString = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+
+  return success(timeString);
 }

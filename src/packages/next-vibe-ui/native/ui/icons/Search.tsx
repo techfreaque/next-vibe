@@ -1,6 +1,4 @@
-import { Search } from "lucide-react-native";
+import { Search as SearchIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Search);
-export { Search };
+export const Search = styled(SearchIcon);

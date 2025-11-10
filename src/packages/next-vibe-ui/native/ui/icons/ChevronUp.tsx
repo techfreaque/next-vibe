@@ -1,6 +1,4 @@
-import { ChevronUp } from "lucide-react-native";
+import { ChevronUp as ChevronUpIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(ChevronUp);
-export { ChevronUp };
+export const ChevronUp = styled(ChevronUpIcon);

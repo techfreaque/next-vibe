@@ -1,6 +1,4 @@
-import { Megaphone } from "lucide-react-native";
+import { Megaphone as MegaphoneIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Megaphone);
-export { Megaphone };
+export const Megaphone = styled(MegaphoneIcon);

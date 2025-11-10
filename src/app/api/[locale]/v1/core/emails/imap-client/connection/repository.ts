@@ -223,10 +223,11 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             username: config.username,
           });
           return fail({
-          message: 
+          message:
             "app.api.v1.core.emails.imapClient.imapErrors.validation.account.username.required",
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,}
-          );
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+          
         }
 
         // Validate port range
@@ -236,10 +237,11 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             port: config.port,
           });
           return fail({
-          message: 
+          message:
             "app.api.v1.core.emails.imapClient.imapErrors.validation.account.port.invalid",
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,}
-          );
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+          
         }
 
         // Validate host format (basic check)
@@ -249,10 +251,9 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             host: config.host,
           });
           return fail({
-          message: 
-            "app.api.v1.core.emails.imapClient.imapErrors.validation.account.host.invalid",
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,}
-          );
+          message: "app.api.v1.core.emails.imapClient.imapErrors.validation.account.host.invalid",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
         }
 
         // Implement actual IMAP connection test using node-imap
@@ -320,10 +321,11 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
             resolveOnce(
               fail({
-          message: 
+          message:
                 "app.api.v1.core.emails.imapClient.imapErrors.connection.test.failed",
-                errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,}
-              ),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          })
+              
             );
           });
 
@@ -331,10 +333,10 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
           setTimeout(() => {
             resolveOnce(
               fail({
-          message: 
+          message:
                 "app.api.v1.core.emails.imapClient.imap.connection.test.timeout",
-                errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,}
-              ),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          })
             );
           }, 15000);
 
@@ -344,19 +346,17 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
         logger.error("IMAP connection test failed", parseError(error));
 
         return fail({
-          message: 
-          "app.api.v1.core.emails.imapClient.imap.connection.test.failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-        );
+          message: "app.api.v1.core.emails.imapClient.imap.connection.test.failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
     } catch (error) {
       logger.error("IMAP connection test failed", parseError(error));
 
       return fail({
-          message: 
-        "app.api.v1.core.emails.imapClient.imap.connection.test.failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-      );
+        message: "app.api.v1.core.emails.imapClient.imap.connection.test.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -446,10 +446,10 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
     } catch (error) {
       logger.error("Failed to connect to IMAP server", parseError(error));
       return fail({
-          message: 
+          message:
         "app.api.v1.core.emails.imapClient.imapErrors.connection.failed",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,}
-      );
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          });
     }
   }
 
@@ -486,10 +486,10 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
     } catch (error) {
       logger.error("Error closing IMAP connection", parseError(error));
       return fail({
-          message: 
+          message:
         "app.api.v1.core.emails.imapClient.imapErrors.connection.close.failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-      );
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
     }
   }
 
@@ -579,10 +579,10 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
     } catch (error) {
       logger.error("Error listing IMAP folders", parseError(error));
       return fail({
-          message: 
+          message:
         "app.api.v1.core.emails.imapClient.imapErrors.connection.folders.list.failed",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,}
-      );
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          });
     }
   }
 
@@ -738,10 +738,10 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
     } catch (error) {
       logger.error("Error listing IMAP messages", parseError(error));
       return fail({
-          message: 
-        "app.api.v1.core.emails.imapClient.imapErrors.connection.messages.list.failed",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,}
-      );
+        message:
+          "app.api.v1.core.emails.imapClient.imapErrors.connection.messages.list.failed",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
     }
   }
 
@@ -835,10 +835,10 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
     } catch (error) {
       logger.error("Error closing IMAP connections", parseError(error));
       return fail({
-          message: 
-        "app.api.v1.core.emails.imapClient.imapErrors.connection.close.failed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-      );
+        message:
+          "app.api.v1.core.emails.imapClient.imapErrors.connection.close.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }

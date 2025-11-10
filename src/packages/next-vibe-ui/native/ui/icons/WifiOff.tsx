@@ -1,6 +1,4 @@
-import { WifiOff } from "lucide-react-native";
+import { WifiOff as WifiOffIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(WifiOff);
-export { WifiOff };
+export const WifiOff = styled(WifiOffIcon);

@@ -1,6 +1,4 @@
-import { Brain } from "lucide-react-native";
+import { Brain as BrainIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Brain);
-export { Brain };
+export const Brain = styled(BrainIcon);

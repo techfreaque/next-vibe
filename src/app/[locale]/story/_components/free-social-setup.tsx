@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import {
   CheckCircle,
   Facebook,
@@ -128,7 +128,7 @@ export default function FreeSocialSetup({
     >
       <Div className="max-w-6xl mx-auto">
         <Div className="text-center mb-16">
-          <motion.div
+          <MotionDiv
             className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-4"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={
@@ -138,30 +138,30 @@ export default function FreeSocialSetup({
           >
             <CheckCircle className="h-4 w-4" />
             {t("app.story._components.home.freeSocialSetup.badge")}
-          </motion.div>
+          </MotionDiv>
 
-          <motion.h2
+          <MotionDiv
             className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4"
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             {t("app.story._components.home.freeSocialSetup.title")}
-          </motion.h2>
+          </MotionDiv>
 
-          <motion.p
+          <MotionDiv
             className="mx-auto max-w-[800px] text-gray-600 dark:text-gray-300 md:text-xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             {t("app.story._components.home.freeSocialSetup.description")}
-          </motion.p>
+          </MotionDiv>
         </Div>
 
         <Div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left side - Benefits */}
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, x: -50 }}
             animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
             transition={{ duration: 0.6, delay: 0.3 }}
@@ -189,7 +189,7 @@ export default function FreeSocialSetup({
               <CardContent>
                 <Div className="space-y-4">
                   {benefits.map((benefit, index) => (
-                    <motion.div
+                    <MotionDiv
                       // eslint-disable-next-line i18next/no-literal-string
                       key={`benefit_${index}_${benefit}`}
                       className="flex items-start gap-3"
@@ -203,11 +203,11 @@ export default function FreeSocialSetup({
                       <Span className="text-gray-700 dark:text-gray-300">
                         {benefit}
                       </Span>
-                    </motion.div>
+                    </MotionDiv>
                   ))}
                 </Div>
 
-                <motion.div
+                <MotionDiv
                   className="mt-8"
                   initial={{ opacity: 0, y: 20 }}
                   animate={
@@ -223,30 +223,30 @@ export default function FreeSocialSetup({
                       {t("app.story._components.home.freeSocialSetup.cta")}
                     </Button>
                   </Link>
-                </motion.div>
+                </MotionDiv>
               </CardContent>
             </Card>
-          </motion.div>
+          </MotionDiv>
 
           {/* Right side - Social Platforms */}
-          <motion.div
+          <MotionDiv
             className="space-y-6"
             variants={container}
             initial="hidden"
             animate={inView ? "show" : "hidden"}
           >
-            <motion.h3
+            <MotionDiv
               className="text-2xl font-semibold text-center mb-8"
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
               {t("app.story._components.home.freeSocialSetup.platforms.title")}
-            </motion.h3>
+            </MotionDiv>
 
             <Div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-4">
               {socialPlatforms.map((platform) => (
-                <motion.div
+                <MotionDiv
                   key={platform.name}
                   variants={item}
                   className="flex flex-col items-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow duration-300"
@@ -257,11 +257,11 @@ export default function FreeSocialSetup({
                   <Span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     {platform.name}
                   </Span>
-                </motion.div>
+                </MotionDiv>
               ))}
             </Div>
 
-            <motion.p
+            <MotionDiv
               className="text-center text-gray-600 dark:text-gray-400 text-sm mt-6"
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : { opacity: 0 }}
@@ -270,8 +270,8 @@ export default function FreeSocialSetup({
               {t(
                 "app.story._components.home.freeSocialSetup.platforms.subtitle",
               )}
-            </motion.p>
-          </motion.div>
+            </MotionDiv>
+          </MotionDiv>
         </Div>
       </Div>
     </Div>

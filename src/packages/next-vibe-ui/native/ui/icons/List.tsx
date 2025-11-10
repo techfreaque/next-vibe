@@ -1,6 +1,4 @@
-import { List } from "lucide-react-native";
+import { List as ListIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(List);
-export { List };
+export const List = styled(ListIcon);

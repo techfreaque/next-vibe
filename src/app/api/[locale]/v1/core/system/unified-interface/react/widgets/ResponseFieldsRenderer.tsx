@@ -118,16 +118,13 @@ function renderResponseField(
   // Transform data for widget type
   const transformedData = transformDataForWidget(field.widgetType, fieldValue);
 
-  // Translate label if it's a translation key
-  const translatedLabel = field.label ? t(field.label as Parameters<typeof t>[0]) : undefined;
-
   // Create proper metadata structure
   const metadata: ResponseFieldMetadata = {
     name: field.name,
     type: FieldDataType.TEXT, // Default type, will be inferred from value
     widgetType: field.widgetType,
     value: transformedData as RenderableValue,
-    label: translatedLabel,
+    label: field.label,
     description: field.description,
     config: field.layout as ResponseFieldMetadata["config"],
   };
@@ -136,9 +133,9 @@ function renderResponseField(
   return (
     <Div key={field.name} className="space-y-1">
       {/* Field Label (if provided) */}
-      {translatedLabel && (
+      {field.label && (
         <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
-          {translatedLabel}
+          {t(field.label)}
         </Span>
       )}
 

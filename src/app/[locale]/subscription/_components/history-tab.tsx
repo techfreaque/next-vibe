@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { History } from 'next-vibe-ui/ui/icons';
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
@@ -35,7 +35,7 @@ export function HistoryTab({
   const { t } = useTranslation();
 
   return (
-    <motion.div
+    <MotionDiv
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
@@ -122,6 +122,6 @@ export function HistoryTab({
           )}
         </CardContent>
       </Card>
-    </motion.div>
+    </MotionDiv>
   );
 }

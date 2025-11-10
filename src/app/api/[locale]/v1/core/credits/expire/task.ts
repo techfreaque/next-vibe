@@ -6,7 +6,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -55,11 +55,11 @@ async function executeTask(
     };
   } catch (error) {
     logger.error("Credit expiration task crashed", parseError(error));
-    return createErrorResponse(
-      "app.api.v1.core.agent.chat.credits.expire.task.error",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { error: error instanceof Error ? error.message : String(error) },
-    );
+    return fail({
+          message: "app.api.v1.core.agent.chat.credits.expire.task.error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { error: error instanceof Error ? error.message : String(error) },
+    });
   }
 }
 
@@ -80,10 +80,11 @@ const creditExpirationTask: Task = {
     const result = await executeTask(logger);
 
     if (!result.success) {
-      return createErrorResponse(
-        "app.api.v1.core.agent.chat.credits.expire.task.error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.agent.chat.credits.expire.task.error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        cause: result,
+      });
     }
     // Returns void implicitly on success
   },

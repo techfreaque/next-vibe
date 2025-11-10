@@ -1,6 +1,4 @@
-import { Rocket } from "lucide-react-native";
+import { Rocket as RocketIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Rocket);
-export { Rocket };
+export const Rocket = styled(RocketIcon);

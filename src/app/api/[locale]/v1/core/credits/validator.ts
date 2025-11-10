@@ -4,7 +4,7 @@
  */
 
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
   type ResponseType,
@@ -85,10 +85,10 @@ class CreditValidator implements CreditValidatorInterface {
 
       if (!canonicalLeadId) {
         logger.error("No canonical lead found for user", { userId });
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+          message: "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       const userLead = { leadId: canonicalLeadId };
@@ -101,10 +101,11 @@ class CreditValidator implements CreditValidatorInterface {
       );
 
       if (!identifierResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          cause: identifierResult,
+        });
       }
 
       const { creditType } = identifierResult.data;
@@ -116,10 +117,11 @@ class CreditValidator implements CreditValidatorInterface {
       );
 
       if (!balanceResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          cause: balanceResult,
+        });
       }
 
       const balance = balanceResult.data.total;
@@ -146,10 +148,10 @@ class CreditValidator implements CreditValidatorInterface {
         userId,
         modelId,
       });
-      return createErrorResponse(
-        "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -167,10 +169,11 @@ class CreditValidator implements CreditValidatorInterface {
       // Get lead's balance (with monthly rotation)
       const balanceResult = await creditRepository.getLeadBalance(leadId, logger);
       if (!balanceResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          cause: balanceResult,
+        });
       }
 
       const balance = balanceResult.data;
@@ -195,10 +198,10 @@ class CreditValidator implements CreditValidatorInterface {
         leadId,
         modelId,
       });
-      return createErrorResponse(
-        "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -225,10 +228,11 @@ class CreditValidator implements CreditValidatorInterface {
       );
 
       if (!leadResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.credits.errors.getOrCreateLeadFailed",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.agent.chat.credits.errors.getOrCreateLeadFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          cause: leadResult,
+        });
       }
 
       const { leadId, credits } = leadResult.data;
@@ -260,10 +264,10 @@ class CreditValidator implements CreditValidatorInterface {
         ipAddress,
         modelId,
       });
-      return createErrorResponse(
-        "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }

@@ -9,7 +9,7 @@ import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -106,13 +106,13 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
         duration,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.system.generators.seeds.error.generation_failed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.system.generators.seeds.error.generation_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           duration,
         },
-      );
+      });
     }
   }
 

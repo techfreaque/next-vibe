@@ -28,7 +28,7 @@ import { TextClassContext } from "./text";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_ITEM =
-  "select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground";
+  "select-none text-sm text-lg text-popover-foreground group-focus:text-accent-foreground";
 /* eslint-enable i18next/no-literal-string */
 
 const MenubarMenu = MenubarPrimitive.Menu;
@@ -49,7 +49,7 @@ function Menubar({ className, children }: MenubarProps): JSX.Element {
       value={value}
       onValueChange={setValue}
       className={cn(
-        "flex flex-row h-10 native:h-12 items-center space-x-1 rounded-md border border-border bg-background p-1",
+        "flex flex-row h-10 h-12 items-center space-x-1 rounded-md border border-border bg-background p-1",
         className,
       )}
     >
@@ -69,7 +69,7 @@ function MenubarTrigger({
   return (
     <MenubarPrimitive.Trigger
       className={cn(
-        "flex flex-row web:cursor-default web:select-none items-center rounded-sm px-3 py-1.5 text-sm native:h-10 native:px-5 native:py-0 font-medium web:outline-none web:focus:bg-accent active:bg-accent web:focus:text-accent-foreground",
+        "flex flex-row cursor-default select-none items-center rounded-sm px-3 py-1.5 text-sm h-10 px-5 py-0 font-medium outline-none focus:bg-accent active:bg-accent focus:text-accent-foreground",
         value === itemValue && "bg-accent text-accent-foreground",
         className,
       )}
@@ -91,13 +91,13 @@ function MenubarSubTrigger({
   return (
     <TextClassContext.Provider
       value={cn(
-        "select-none text-sm native:text-lg text-primary",
-        open && "native:text-accent-foreground",
+        "select-none text-sm text-lg text-primary",
+        open && "text-accent-foreground",
       )}
     >
       <MenubarPrimitive.SubTrigger
         className={cn(
-          "flex flex-row web:cursor-default web:select-none items-center gap-2 web:focus:bg-accent active:bg-accent web:hover:bg-accent rounded-sm px-2 py-1.5 native:py-2 web:outline-none",
+          "flex flex-row cursor-default select-none items-center gap-2 focus:bg-accent active:bg-accent hover:bg-accent rounded-sm px-2 py-1.5 py-2 outline-none",
           open && "bg-accent",
           inset && "pl-8",
           className,
@@ -123,8 +123,8 @@ function MenubarSubContent({
       className={cn(
         "z-50 min-w-[8rem] overflow-hidden rounded-md border mt-1 border-border bg-popover p-1 shadow-md shadow-foreground/5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         open
-          ? "web:animate-in web:fade-in-0 web:zoom-in-95"
-          : "web:animate-out web:fade-out-0 web:zoom-out ",
+          ? "animate-in fade-in-0 zoom-in-95"
+          : "animate-out fade-out-0 zoom-out ",
         className,
       )}
     >
@@ -153,8 +153,8 @@ function MenubarContent({
         className={cn(
           "z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md shadow-foreground/5",
           value === itemValue
-            ? "web:animate-in web:fade-in-0 web:zoom-in-95"
-            : "web:animate-out web:fade-out-0 web:zoom-out-95",
+            ? "animate-in fade-in-0 zoom-in-95"
+            : "animate-out fade-out-0 zoom-out-95",
           className,
         )}
       >
@@ -174,7 +174,7 @@ function MenubarItem({
     <TextClassContext.Provider value={TEXT_CLASS_ITEM}>
       <MenubarPrimitive.Item
         className={cn(
-          "relative flex flex-row web:cursor-default items-center gap-2 rounded-sm px-2 py-1.5 native:py-2 web:outline-none web:focus:bg-accent active:bg-accent web:hover:bg-accent group",
+          "relative flex flex-row cursor-default items-center gap-2 rounded-sm px-2 py-1.5 py-2 outline-none focus:bg-accent active:bg-accent hover:bg-accent group",
           inset && "pl-8",
           className,
         )}
@@ -197,7 +197,7 @@ function MenubarCheckboxItem({
   return (
     <MenubarPrimitive.CheckboxItem
       className={cn(
-        "relative flex flex-row web:cursor-default items-center web:group rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
+        "relative flex flex-row cursor-default items-center group rounded-sm py-1.5 py-2 pl-8 pr-2 outline-none focus:bg-accent active:bg-accent",
         className,
       )}
       checked={checked ?? false}
@@ -225,7 +225,7 @@ function MenubarRadioItem({
     <MenubarPrimitive.RadioItem
       value={value ?? ""}
       className={cn(
-        "relative flex flex-row web:cursor-default web:group items-center rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
+        "relative flex flex-row cursor-default group items-center rounded-sm py-1.5 py-2 pl-8 pr-2 outline-none focus:bg-accent active:bg-accent",
         className,
       )}
     >
@@ -250,7 +250,7 @@ function MenubarLabel({
   return (
     <MenubarPrimitive.Label
       className={cn(
-        "px-2 py-1.5 text-sm native:text-base font-semibold text-foreground web:cursor-default",
+        "px-2 py-1.5 text-sm text-base font-semibold text-foreground cursor-default",
         inset && "pl-8",
         className,
       )}
@@ -277,7 +277,7 @@ const MenubarShortcut = ({
   return (
     <Span
       className={cn(
-        "ml-auto text-xs native:text-sm tracking-widest text-muted-foreground",
+        "ml-auto text-xs text-sm tracking-widest text-muted-foreground",
         className,
       )}
       {...props}

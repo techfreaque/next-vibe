@@ -134,9 +134,9 @@ export class ManifestRepositoryImpl implements ManifestRepository {
       });
 
       return fail({
-        message: "app.api.v1.core.manifest.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message, locale },
+          message: "app.api.v1.core.manifest.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message, locale },
       });
     }
   }

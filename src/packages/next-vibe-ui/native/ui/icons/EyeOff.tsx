@@ -1,6 +1,4 @@
-import { EyeOff } from "lucide-react-native";
+import { EyeOff as EyeOffIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(EyeOff);
-export { EyeOff };
+export const EyeOff = styled(EyeOffIcon);

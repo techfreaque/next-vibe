@@ -1,6 +1,4 @@
-import { Film } from "lucide-react-native";
+import { Film as FilmIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Film);
-export { Film };
+export const Film = styled(FilmIcon);

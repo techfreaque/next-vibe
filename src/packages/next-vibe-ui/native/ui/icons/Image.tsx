@@ -1,6 +1,4 @@
-import { Image } from "lucide-react-native";
+import { Image as ImageIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Image);
-export { Image };
+export const Image = styled(ImageIcon);

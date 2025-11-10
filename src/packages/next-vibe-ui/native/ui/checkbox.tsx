@@ -30,13 +30,13 @@ const Checkbox = React.forwardRef<
       onCheckedChange={handleCheckedChange}
       disabled={isDisabled}
       className={cn(
-        "web:peer h-5 w-5 native:h-5 native:w-5 shrink-0 rounded-sm native:rounded border border-primary web:ring-offset-background web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        "peer h-5 w-5 h-5 w-5 shrink-0 rounded-sm rounded border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
         isChecked && "bg-primary",
         className,
       )}
     >
       <StyledCheckboxIndicator
-        className={cn("flex items-center justify-center text-current")}
+        className={cn("flex flex-row items-center justify-center text-current")}
       >
         <Check
           size={14}

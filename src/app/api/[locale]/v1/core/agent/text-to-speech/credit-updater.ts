@@ -24,11 +24,7 @@ export function updateCreditBalanceForTTS(logger: EndpointLogger): void {
     return;
   }
 
-  // Update the credit balance using the built-in helper
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const endpoint = creditsDefinition.GET as any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  apiClient.updateEndpointData(endpoint, (oldData: any) => {
+  apiClient.updateEndpointData(creditsDefinition.GET, (oldData) => {
     if (!oldData?.success) {
       return oldData;
     }

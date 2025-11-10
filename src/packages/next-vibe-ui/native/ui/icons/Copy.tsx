@@ -1,6 +1,4 @@
-import { Copy } from "lucide-react-native";
+import { Copy as CopyIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Copy);
-export { Copy };
+export const Copy = styled(CopyIcon);

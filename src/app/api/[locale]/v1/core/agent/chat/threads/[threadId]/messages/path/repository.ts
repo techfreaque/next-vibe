@@ -162,9 +162,9 @@ export const pathRepository = {
     } catch (error) {
       logger.error("Failed to get conversation path", parseError(error));
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.errors.getFailed.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   },

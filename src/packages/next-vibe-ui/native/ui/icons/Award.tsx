@@ -1,6 +1,4 @@
-import { Award } from "lucide-react-native";
+import { Award as AwardIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Award);
-export { Award };
+export const Award = styled(AwardIcon);

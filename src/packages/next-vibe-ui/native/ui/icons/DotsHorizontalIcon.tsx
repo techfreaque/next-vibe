@@ -1,2 +1,4 @@
-// Radix UI icon alias
-export { MoreHorizontal as DotsHorizontalIcon } from "./MoreHorizontal";
+import { MoreHorizontal as DotsHorizontalIconIcon } from "lucide-react-native";
+import { styled } from "nativewind";
+
+export const DotsHorizontalIcon = styled(DotsHorizontalIconIcon);

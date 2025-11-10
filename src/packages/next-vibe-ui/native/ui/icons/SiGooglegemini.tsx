@@ -1,8 +1,5 @@
-import React from "react";
-import Svg, { Rect } from "react-native-svg";
+// TODO: lucide-react-native doesn't have Google Gemini brand icon, using Sparkles as placeholder
+import { Sparkles as SiGooglegeminiIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-export const SiGooglegemini = ({ className }: { className?: string }): JSX.Element => (
-  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
-    <Rect width="24" height="24" fill="#8E75B2" />
-  </Svg>
-);
+export const SiGooglegemini = styled(SiGooglegeminiIcon);

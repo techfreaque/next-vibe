@@ -1,6 +1,4 @@
-import { PlusCircle } from "lucide-react-native";
+import { PlusCircle as PlusCircleIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(PlusCircle);
-export { PlusCircle };
+export const PlusCircle = styled(PlusCircleIcon);

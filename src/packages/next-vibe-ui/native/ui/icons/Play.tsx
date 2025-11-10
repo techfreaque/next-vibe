@@ -1,6 +1,4 @@
-import { Play } from "lucide-react-native";
+import { Play as PlayIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Play);
-export { Play };
+export const Play = styled(PlayIcon);

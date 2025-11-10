@@ -1,6 +1,4 @@
-import { CalendarDays } from "lucide-react-native";
+import { CalendarDays as CalendarDaysIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(CalendarDays);
-export { CalendarDays };
+export const CalendarDays = styled(CalendarDaysIcon);

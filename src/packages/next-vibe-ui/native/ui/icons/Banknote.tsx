@@ -1,6 +1,4 @@
-import { Banknote } from "lucide-react-native";
+import { Banknote as BanknoteIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Banknote);
-export { Banknote };
+export const Banknote = styled(BanknoteIcon);

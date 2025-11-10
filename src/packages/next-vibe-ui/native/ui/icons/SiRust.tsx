@@ -1,8 +1,5 @@
-import React from "react";
-import Svg, { Rect } from "react-native-svg";
+// TODO: lucide-react-native doesn't have Rust brand icon, using Cog as placeholder
+import { Cog as SiRustIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-export const SiRust = ({ className }: { className?: string }): JSX.Element => (
-  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
-    <Rect width="24" height="24" fill="#000000" />
-  </Svg>
-);
+export const SiRust = styled(SiRustIcon);

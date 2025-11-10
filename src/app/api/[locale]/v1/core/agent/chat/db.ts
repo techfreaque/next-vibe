@@ -57,7 +57,6 @@ const RootFolderIdDB = [
   DEFAULT_FOLDER_IDS.INCOGNITO,
 ] as const;
 import type { ModelId } from "./model-access/models";
-import type { PersonaId } from "./personas/config";
 import {
   type CustomPersona,
   customPersonas,
@@ -348,7 +347,7 @@ export const chatThreads = pgTable(
 
     // Settings
     defaultModel: text("default_model").$type<ModelId | null>(), // ModelId
-    defaultPersona: text("default_tone").$type<PersonaId | null>(), // Persona (DB column is "default_tone" for backwards compatibility)
+    defaultPersona: text("default_tone"), // Persona ID (can be default persona or custom UUID)
     systemPrompt: text("system_prompt"),
 
     // Metadata
@@ -468,7 +467,7 @@ export const chatMessages = pgTable(
     persona: text("tone"), // Persona used (DB column is "tone" for backwards compatibility)
 
     // Error information (for error messages)
-    errorType: text("error_type"),
+          errorType: text("error_type"),
     errorMessage: text("error_message"),
     errorCode: text("error_code"),
 

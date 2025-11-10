@@ -19,7 +19,8 @@ import { useAIStreamStore } from "@/app/api/[locale]/v1/core/agent/ai-stream/hoo
 import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { _simpleT } from "@/i18n/core/shared";
+import { simpleT,
+_simpleT } from "@/i18n/core/shared";
 
 import { Logo } from "../../../_components/logo";
 import type { ChatContextValue } from "../../features/chat/context";
@@ -37,6 +38,7 @@ import { SuggestedPrompts } from "../messages/suggested-prompts";
 import { ViewModeToggle } from "../messages/view-mode-toggle";
 import { PublicFeed } from "../public-feed";
 import { envClient } from "@/config/env-client";
+import { type TranslationKey } from "@/i18n/core/static-types";
 
 interface ChatAreaProps {
   locale: CountryLanguage;
@@ -105,10 +107,7 @@ export function ChatArea({
   logger,
   currentUserId,
 }: ChatAreaProps): JSX.Element {
-  const { t } = {
-    t: (key: string, params?: Record<string, string | number>): string =>
-      _simpleT(locale, key as never, params),
-  };
+  const { t } = simpleT(locale);
   const inputContainerRef = useRef<HTMLDivElement>(null);
   const [inputHeight, setInputHeight] = useState<number>(
     LAYOUT.DEFAULT_INPUT_HEIGHT,
@@ -120,11 +119,7 @@ export function ChatArea({
   const clearError = useAIStreamStore((state) => state.clearError);
 
   // Translate error message if it's a translation key
-  const translatedError = streamError
-    ? streamError.startsWith("app.")
-      ? _simpleT(locale, streamError as never)
-      : streamError
-    : null;
+  const translatedError = streamError && t(streamError as TranslationKey);
 
   // Handle suggested prompt selection - insert into input and change persona/model
   const handleSuggestedPromptSelect = useCallback(
@@ -241,28 +236,6 @@ export function ChatArea({
 
   return (
     <Div className="flex-1 flex flex-col min-w-0 relative w-full h-full">
-      {/* Global Error Banner - Positioned at top */}
-      {/* z-50: Above everything except modals */}
-      {translatedError && (
-        <Div className="absolute top-0 left-0 right-0 z-50 mx-auto max-w-3xl px-3 sm:px-4 md:px-8 lg:px-10 pt-4">
-          <Div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg px-4 py-3 shadow-lg flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-            <Div className="flex-1 text-sm text-red-900 dark:text-red-100">
-              {translatedError}
-            </Div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={clearError}
-              className="h-6 w-6 -mr-1 -mt-1 hover:bg-red-100 dark:hover:bg-red-900/30"
-              title="Close"
-            >
-              <X className="h-4 w-4 text-red-600 dark:text-red-400" />
-            </Button>
-          </Div>
-        </Div>
-      )}
-
       {/* View Mode Toggle & Screenshot - Positioned absolutely at top right (matching TopBar style) */}
       {/* z-40: Above input (z-20), below sidebar on mobile (z-50), below top bar (z-50) */}
       {/* Show when there are messages in thread */}

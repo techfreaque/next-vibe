@@ -1,6 +1,4 @@
-import { Video } from "lucide-react-native";
+import { Video as VideoIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Video);
-export { Video };
+export const Video = styled(VideoIcon);

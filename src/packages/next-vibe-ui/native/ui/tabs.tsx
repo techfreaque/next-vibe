@@ -26,7 +26,7 @@ const TabsList = ({
 }: TabsListProps): JSX.Element => (
   <StyledTabsList
     className={cn(
-      "web:inline-flex h-11 native:h-12 items-center justify-center rounded-lg bg-muted/50 p-1 native:px-1.5 border border-border",
+      "inline-flex h-11 h-12 items-center justify-center rounded-lg bg-muted/50 p-1 px-1.5 border border-border",
       className,
     )}
     {...props}
@@ -47,7 +47,7 @@ const TabsTrigger = ({
   return (
     <TextClassContext.Provider
       value={cn(
-        "text-sm native:text-base font-medium text-muted-foreground web:transition-all",
+        "text-sm text-base font-medium text-muted-foreground transition-all",
         selectedValue === value && "text-primary-foreground",
       )}
     >
@@ -55,8 +55,8 @@ const TabsTrigger = ({
         value={value}
         disabled={disabled}
         className={cn(
-          "inline-flex items-center justify-center shadow-none web:whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium web:ring-offset-background web:transition-all web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
-          disabled && "web:pointer-events-none opacity-50",
+          "inline-flex items-center justify-center shadow-none whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          disabled && "pointer-events-none opacity-50",
           value === selectedValue &&
             "bg-primary shadow-sm",
           className,
@@ -79,7 +79,7 @@ const TabsContent = ({
   <StyledTabsContent
     value={value}
     className={cn(
-      "web:ring-offset-background web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
+      "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       className,
     )}
     {...props}

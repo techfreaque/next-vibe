@@ -1,6 +1,4 @@
-import { Network } from "lucide-react-native";
+import { Network as NetworkIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Network);
-export { Network };
+export const Network = styled(NetworkIcon);

@@ -7,7 +7,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -192,11 +192,11 @@ export class MigrationTaskManagementRepositoryImpl
           result = await this.listMigrationTasks(logger);
           break;
         default:
-          return createErrorResponse(
-            "app.api.v1.core.system.db.migrate.taskManagement.errors.validation.title",
-            ErrorResponseTypes.INTERNAL_ERROR,
-            { operation },
-          );
+          return fail({
+          message: "app.api.v1.core.system.db.migrate.taskManagement.errors.validation.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { operation },
+      });
       }
 
       logger.info("Migration task operation completed", {
@@ -224,11 +224,11 @@ export class MigrationTaskManagementRepositoryImpl
       const parsedError = parseError(error);
       logger.error("Migration task operation execution failed", parsedError);
 
-      return createErrorResponse(
-        "app.api.v1.core.system.db.migrate.taskManagement.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.db.migrate.taskManagement.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 

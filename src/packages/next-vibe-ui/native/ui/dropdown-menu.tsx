@@ -18,7 +18,7 @@ import { Span } from "./span";
 import { TextClassContext } from "./text";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
-const TEXT_CLASS_ITEM = "select-none text-sm native:text-lg text-popover-foreground web:group-focus:text-accent-foreground";
+const TEXT_CLASS_ITEM = "select-none text-sm text-lg text-popover-foreground group-focus:text-accent-foreground";
 /* eslint-enable i18next/no-literal-string */
 
 // Cross-platform type definitions for native
@@ -107,13 +107,13 @@ function DropdownMenuSubTrigger({
   return (
     <TextClassContext.Provider
       value={cn(
-        "select-none text-sm native:text-lg text-primary",
-        open && "native:text-accent-foreground",
+        "select-none text-sm text-lg text-primary",
+        open && "text-accent-foreground",
       )}
     >
       <StyledDropdownMenuSubTrigger
         className={cn(
-          "flex flex-row web:cursor-default web:select-none gap-2 items-center web:focus:bg-accent web:hover:bg-accent active:bg-accent rounded-sm px-2 py-1.5 native:py-2 web:outline-none",
+          "flex flex-row cursor-default select-none gap-2 items-center focus:bg-accent hover:bg-accent active:bg-accent rounded-sm px-2 py-1.5 py-2 outline-none",
           open && "bg-accent",
           inset && "pl-8",
           className,
@@ -143,8 +143,8 @@ function DropdownMenuSubContent({
       className={cn(
         "z-50 min-w-32 overflow-hidden rounded-md border border-border mt-1 bg-popover p-1 shadow-md shadow-foreground/5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         open
-          ? "web:animate-in web:fade-in-0 web:zoom-in-95"
-          : "web:animate-out web:fade-out-0 web:zoom-out",
+          ? "animate-in fade-in-0 zoom-in-95"
+          : "animate-out fade-out-0 zoom-out",
         className,
       )}
       {...props}
@@ -184,10 +184,10 @@ function DropdownMenuContent({
       >
         <StyledDropdownMenuContent
           className={cn(
-            "z-50 min-w-32 overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md shadow-foreground/5 web:data-[side=bottom]:slide-in-from-top-2 web:data-[side=left]:slide-in-from-right-2 web:data-[side=right]:slide-in-from-left-2 web:data-[side=top]:slide-in-from-bottom-2",
+            "z-50 min-w-32 overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md shadow-foreground/5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
             open
-              ? "web:animate-in web:fade-in-0 web:zoom-in-95"
-              : "web:animate-out web:fade-out-0 web:zoom-out-95",
+              ? "animate-in fade-in-0 zoom-in-95"
+              : "animate-out fade-out-0 zoom-out-95",
             className,
           )}
           {...props}
@@ -209,9 +209,9 @@ function DropdownMenuItem({
     >
       <StyledDropdownMenuItem
         className={cn(
-          "relative flex flex-row web:cursor-default gap-2 items-center rounded-sm px-2 py-1.5 native:py-2 web:outline-none web:focus:bg-accent active:bg-accent web:hover:bg-accent group",
+          "relative flex flex-row cursor-default gap-2 items-center rounded-sm px-2 py-1.5 py-2 outline-none focus:bg-accent active:bg-accent hover:bg-accent group",
           inset && "pl-8",
-          props.disabled && "opacity-50 web:pointer-events-none",
+          props.disabled && "opacity-50 pointer-events-none",
           className,
         )}
         {...props}
@@ -229,8 +229,8 @@ function DropdownMenuCheckboxItem({
   return (
     <StyledDropdownMenuCheckboxItem
       className={cn(
-        "relative flex flex-row web:cursor-default items-center web:group rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
-        props.disabled && "web:pointer-events-none opacity-50",
+        "relative flex flex-row cursor-default items-center group rounded-sm py-1.5 py-2 pl-8 pr-2 outline-none focus:bg-accent active:bg-accent",
+        props.disabled && "pointer-events-none opacity-50",
         className,
       )}
       {...props}
@@ -259,7 +259,7 @@ function DropdownMenuRadioItem({
   return (
     <StyledDropdownMenuRadioItem
       className={cn(
-        "relative flex flex-row web:cursor-default web:group items-center rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
+        "relative flex flex-row cursor-default group items-center rounded-sm py-1.5 py-2 pl-8 pr-2 outline-none focus:bg-accent active:bg-accent",
         className,
       )}
       {...props}
@@ -283,7 +283,7 @@ function DropdownMenuLabel({
   return (
     <StyledDropdownMenuLabel
       className={cn(
-        "px-2 py-1.5 text-sm native:text-base font-semibold text-foreground web:cursor-default",
+        "px-2 py-1.5 text-sm text-base font-semibold text-foreground cursor-default",
         inset && "pl-8",
         className,
       )}
@@ -313,7 +313,7 @@ const DropdownMenuShortcut = ({
   return (
     <Span
       className={cn(
-        "ml-auto text-xs native:text-sm tracking-widest text-muted-foreground",
+        "ml-auto text-xs text-sm tracking-widest text-muted-foreground",
         className,
       )}
       {...props}

@@ -1,6 +1,4 @@
-import { MoveLeft } from "lucide-react-native";
+import { MoveLeft as MoveLeftIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(MoveLeft);
-export { MoveLeft };
+export const MoveLeft = styled(MoveLeftIcon);

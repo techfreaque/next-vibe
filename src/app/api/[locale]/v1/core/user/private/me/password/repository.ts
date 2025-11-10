@@ -6,7 +6,7 @@
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -83,10 +83,10 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
 
       // Safely access nested properties
       if (!passwords.currentCredentials || !passwords.newCredentials) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.password.errors.invalid_request.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.password.errors.invalid_request.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
       }
 
       const currentCredentials = passwords.currentCredentials as {
@@ -102,10 +102,10 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
 
       // Validate passwords match
       if (newPassword !== confirmPassword) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.password.errors.passwords_do_not_match",
-          ErrorResponseTypes.VALIDATION_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.password.errors.passwords_do_not_match",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
       }
 
       // Get user to verify current password and 2FA status
@@ -116,11 +116,12 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         logger,
       );
       if (!userResponse.success) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.password.errors.user_not_found",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId },
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.password.errors.user_not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: { userId },
+          cause: userResponse,
+        });
       }
 
       // Verify current password
@@ -135,11 +136,11 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         .then((results) => results[0]);
 
       if (!user) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.password.errors.user_not_found",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId },
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.password.errors.user_not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: { userId },
+        });
       }
 
       // Check if current password is correct
@@ -148,10 +149,10 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         user.password,
       );
       if (!isPasswordValid) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.password.errors.incorrect_password",
-          ErrorResponseTypes.VALIDATION_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.password.errors.incorrect_password",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
       }
 
       // Check 2FA if enabled
@@ -160,13 +161,13 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         const twoFactorCode = (passwords as { twoFactorCode?: string }).twoFactorCode;
 
         if (!twoFactorCode) {
-          return createErrorResponse(
-            "app.api.v1.core.user.private.me.password.errors.two_factor_code_required",
-            ErrorResponseTypes.VALIDATION_ERROR,
-            {
-              message: "Two-factor authentication is enabled. Please provide your 2FA code."
+          return fail({
+          message: "app.api.v1.core.user.private.me.password.errors.two_factor_code_required",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                      messageParams: {
+                      message: "Two-factor authentication is enabled. Please provide your 2FA code.",
             },
-          );
+          });
         }
 
         // Verify 2FA code
@@ -178,13 +179,13 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         const is2FAValid = this.verify2FACode(twoFactorCode, user.twoFactorSecret);
 
         if (!is2FAValid) {
-          return createErrorResponse(
-            "app.api.v1.core.user.private.me.password.errors.invalid_two_factor_code",
-            ErrorResponseTypes.VALIDATION_ERROR,
-            {
-              message: "Invalid 2FA code. Please try again."
+          return fail({
+          message: "app.api.v1.core.user.private.me.password.errors.invalid_two_factor_code",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                      messageParams: {
+                      message: "Invalid 2FA code. Please try again.",
             },
-          );
+          });
         }
 
         logger.info("2FA verification successful for password change", { userId });
@@ -216,14 +217,14 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         "app.api.v1.core.user.private.me.password.debug.errorUpdatingPassword",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.user.private.me.password.errors.update_failed",
-        ErrorResponseTypes.DATABASE_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.user.private.me.password.errors.update_failed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: {
           userId,
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 
@@ -287,14 +288,14 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         "app.api.v1.core.user.private.me.password.debug.errorSettingPassword",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.user.private.me.password.errors.token_creation_failed",
-        ErrorResponseTypes.DATABASE_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.user.private.me.password.errors.token_creation_failed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: {
           userId,
           error: parseError(error).message,
         },
-      );
+      });
     }
   }
 }

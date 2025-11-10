@@ -220,8 +220,7 @@ export function useApiQueryForm<
 
   const formConfig = {
     ...restFormOptions,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(endpoint.requestSchema as any),
+    resolver: zodResolver(endpoint.requestSchema ),
   };
 
   // Generate a storage key based on the endpoint if not provided
@@ -230,8 +229,7 @@ export function useApiQueryForm<
     `query-form-${endpoint.path.join("-")}-${endpoint.method}`;
 
   // Initialize form with the proper configuration
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const formMethods = useForm<FormData>(formConfig as any);
+  const formMethods = useForm<FormData>(formConfig);
   const { watch } = formMethods;
 
   // Implement form persistence directly
@@ -338,7 +336,7 @@ export function useApiQueryForm<
           message:
             "app.api.v1.core.system.unifiedInterface.react.hooks.queryForm.errors.validation_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { formId, message: error.message },
+                    messageParams: { formId, message: error.message },
         });
         setFormErrorStore(formId, errorResponse);
       } else {
@@ -639,10 +637,10 @@ export function useApiQueryForm<
           });
 
           const errorResponse = fail({
-            message:
+          message:
               "app.api.v1.core.system.unifiedInterface.react.hooks.queryForm.errors.network_failure",
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: { formId, error: errorMessage },
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                      messageParams: { formId, error: errorMessage },
           });
 
           // Set the error in the form state
@@ -682,10 +680,10 @@ export function useApiQueryForm<
           if (options.onError) {
             // Create a proper error response for validation errors with translation key
             const errorResponse = fail({
-              message:
+          message:
                 "app.api.v1.core.system.unifiedInterface.react.hooks.queryForm.errors.validation_failed",
-              errorType: ErrorResponseTypes.VALIDATION_ERROR,
-              messageParams: { formId, errors: JSON.stringify(errors) },
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                        messageParams: { formId, errors: JSON.stringify(errors) },
             });
 
             // Call the onError callback with the validation error
@@ -715,15 +713,14 @@ export function useApiQueryForm<
   const errorMessage: string | undefined = queryErrorMessage || formErrorMessage || undefined;
 
   const result = {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    form: formMethods as any,
+    form: formMethods,
 
     // Use the query response as the primary response
     response: query.response,
 
     // Backward compatibility properties
     isSubmitSuccessful: query.isSuccess,
-    submitError: (query.error || formState.formError || undefined) as ErrorResponseType | undefined,
+    submitError: (query.error || formState.formError),
     errorMessage,
 
     // Query-specific properties (backward compatibility)
@@ -752,6 +749,5 @@ export function useApiQueryForm<
     clearSavedForm,
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return result as any;
+  return result;
 }

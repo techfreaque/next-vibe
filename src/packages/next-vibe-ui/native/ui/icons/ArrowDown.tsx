@@ -1,6 +1,4 @@
-import { ArrowDown } from "lucide-react-native";
+import { ArrowDown as ArrowDownIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(ArrowDown);
-export { ArrowDown };
+export const ArrowDown = styled(ArrowDownIcon);

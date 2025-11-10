@@ -1,6 +1,4 @@
-import { Baby } from "lucide-react-native";
+import { Baby as BabyIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Baby);
-export { Baby };
+export const Baby = styled(BabyIcon);

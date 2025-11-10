@@ -84,7 +84,7 @@ export function validateTrpcRequestData<
         success: false,
         message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
-        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: urlValidation.message,
         },
@@ -102,7 +102,7 @@ export function validateTrpcRequestData<
         success: false,
         message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
-        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
         },
@@ -123,7 +123,7 @@ export function validateTrpcRequestData<
       success: false,
       message:
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
-      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error:
           error instanceof Error

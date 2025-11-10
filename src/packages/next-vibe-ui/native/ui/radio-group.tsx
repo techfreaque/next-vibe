@@ -8,6 +8,7 @@ import type {
 
 import type { ViewPropsWithClassName, WithClassName } from "../lib/types";
 import { cn } from "next-vibe/shared/utils/utils";
+import { Check } from "./icons/Check";
 
 // Type-safe View component with className support for NativeWind
 const View = RNView as React.ComponentType<ViewPropsWithClassName>;
@@ -38,7 +39,7 @@ const RadioGroup = React.forwardRef<
   return (
     <RadioGroupPrimitive.Root
       ref={ref}
-      className={cn("web:grid gap-2", className)}
+      className={cn("grid gap-2", className)}
       value={value}
       onValueChange={
         onValueChange ?? ((() => undefined) as (value: string) => void)
@@ -57,8 +58,8 @@ const RadioGroupItem = React.forwardRef<
   NativeRadioGroupItemProps
 >(function RadioGroupItem({ className, value, disabled, id, ...props }, ref) {
   const itemClassName = cn(
-    "aspect-square h-4 w-4 native:h-5 native:w-5 rounded-full justify-center items-center border border-primary text-primary web:ring-offset-background web:focus:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
-    disabled && "web:cursor-not-allowed opacity-50",
+    "aspect-square h-5 w-5 rounded-full justify-center items-center border border-primary text-primary shadow ring-offset-background focus:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+    disabled && "opacity-50",
     className,
   );
   return (
@@ -71,8 +72,8 @@ const RadioGroupItem = React.forwardRef<
       {...props}
     >
       <RadioGroupPrimitive.Indicator asChild>
-        <View className="flex items-center justify-center">
-          <View className="aspect-square h-[9px] w-[9px] native:h-[10] native:w-[10] bg-primary rounded-full" />
+        <View className="flex flex-row items-center justify-center">
+          <Check className="h-3.5 w-3.5 fill-primary" />
         </View>
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>

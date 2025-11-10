@@ -179,7 +179,7 @@ export { Settings } from "./Settings";
 export { Share } from "./Share";
 export { Share2 } from "./Share2";
 export { Shield } from "./Shield";
-export { ShieldOff, ShieldOffIcon } from "./ShieldOff";
+export { ShieldOff } from "./ShieldOff";
 export { ShieldPlus } from "./ShieldPlus";
 export { ShoppingBag } from "./ShoppingBag";
 export { Sparkles } from "./Sparkles";

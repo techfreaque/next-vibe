@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -142,11 +142,11 @@ async function processEmailCampaignStage(
         stage,
         error: stageResult.message,
       });
-      return createErrorResponse(
-        "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { stage, error: stageResult.message },
-      );
+      return fail({
+          message: "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { stage, error: stageResult.message },
+      });
     }
 
     return success(stageResult.data);
@@ -154,11 +154,11 @@ async function processEmailCampaignStage(
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error("Error processing stage", { stage, message: errorMessage });
 
-    return createErrorResponse(
-      "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { stage, error: errorMessage },
-    );
+    return fail({
+          message: "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { stage, error: errorMessage },
+      });
   }
 }
 
@@ -216,11 +216,11 @@ function validateEmailCampaignTask(
       error: errorMessage,
     });
 
-    return createErrorResponse(
-      "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.validation.title",
-      ErrorResponseTypes.VALIDATION_ERROR,
-      { error: errorMessage },
-    );
+    return fail({
+          message: "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.validation.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        messageParams: { error: errorMessage },
+      });
   }
 }
 
@@ -317,11 +317,11 @@ export async function execute(
       executionTimeMs,
     });
 
-    return createErrorResponse(
-      "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { error: errorMessage, executionTimeMs },
-    );
+    return fail({
+          message: "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage, executionTimeMs },
+      });
   }
 }
 

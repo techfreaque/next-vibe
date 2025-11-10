@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -63,15 +63,15 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
           !data.smsNotifications.smsPhoneNumber ||
           !data.smsNotifications.smsMessage
         ) {
-          return createErrorResponse(
-            "app.api.v1.core.emails.send.errors.validation.title",
-            ErrorResponseTypes.VALIDATION_ERROR,
-            {
+          return fail({
+          message: "app.api.v1.core.emails.send.errors.validation.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                      messageParams: {
               field: "app.api.v1.core.emails.send.errors.validation.smsFields",
-              message:
+                      message:
                 "app.api.v1.core.emails.send.errors.validation.smsRequired",
             },
-          );
+          });
         }
       }
 
@@ -210,11 +210,11 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
         "Email send repository: Critical error in email send",
         parsedError,
       );
-      return createErrorResponse(
-        "app.api.v1.core.emails.send.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.emails.send.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
+      });
     }
   }
 }

@@ -1,6 +1,4 @@
-import { Monitor } from "lucide-react-native";
+import { Monitor as MonitorIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Monitor);
-export { Monitor };
+export const Monitor = styled(MonitorIcon);

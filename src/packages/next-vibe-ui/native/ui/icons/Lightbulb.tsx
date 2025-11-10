@@ -1,6 +1,4 @@
-import { Lightbulb } from "lucide-react-native";
+import { Lightbulb as LightbulbIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Lightbulb);
-export { Lightbulb };
+export const Lightbulb = styled(LightbulbIcon);

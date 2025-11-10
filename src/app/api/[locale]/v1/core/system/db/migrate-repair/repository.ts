@@ -9,7 +9,7 @@ import path from "node:path";
 import { sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -165,11 +165,11 @@ export class DatabaseMigrateRepairRepositoryImpl
       });
     } catch (error) {
       logger.error("Migration repair failed", { error: String(error) });
-      return createErrorResponse(
-        "app.api.v1.core.system.db.migrateRepair.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: String(error) },
-      );
+      return fail({
+          message: "app.api.v1.core.system.db.migrateRepair.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: String(error) },
+      });
     }
   }
 

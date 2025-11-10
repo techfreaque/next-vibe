@@ -108,6 +108,10 @@ export const translations: typeof enTranslations = {
       description: "Checkout-Sitzungsantwortdaten",
     },
     errors: {
+      alreadySubscribed: {
+        title: "Bereits abonniert",
+        description: "Sie haben bereits ein aktives Abonnement",
+      },
       validation: {
         title: "Validierungsfehler",
         description: "Ungültige Checkout-Parameter",

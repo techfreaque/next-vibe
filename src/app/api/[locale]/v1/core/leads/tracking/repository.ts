@@ -9,7 +9,7 @@ import { and, eq, gt, isNull, sql } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -19,7 +19,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { Countries, Languages } from "@/i18n/core/config";
+import { getCountryFromLocale, getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { emails } from "../../emails/messages/db";
 import type { JwtPayloadType } from "../../user/auth/types";
@@ -306,10 +306,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
       if (!result.success || !result.data) {
         return result.success
-          ? createErrorResponse(
-              "app.api.v1.core.leads.tracking.errors.default",
-              ErrorResponseTypes.INTERNAL_ERROR,
-            )
+          ? fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            })
           : result;
       }
 
@@ -375,10 +375,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         "app.api.v1.core.leads.tracking.engagement.record.error",
         parseError(error).message,
       );
-      return createErrorResponse(
-        "app.api.v1.core.leads.tracking.errors.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -487,10 +487,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         "app.api.v1.core.leads.tracking.consultation.failed",
         parseError(error).message,
       );
-      return createErrorResponse(
-        "app.api.v1.core.leads.tracking.errors.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -528,10 +528,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         "app.api.v1.core.leads.tracking.subscription.failed",
         parseError(error).message,
       );
-      return createErrorResponse(
-        "app.api.v1.core.leads.tracking.errors.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -577,7 +577,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       }
 
       // Extract country and language from locale
-      const [language, country] = locale.split("-");
+      const country = getCountryFromLocale(locale);
+      const language = getLanguageFromLocale(locale);
 
       const newLead = {
         email: `anonymous-${crypto.randomUUID()}@tracking.local`,
@@ -585,8 +586,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         contactName: "",
         phone: "",
         website: "",
-        country: (country || Countries.GLOBAL) as Countries,
-        language: (language || Languages.EN) as Languages,
+        country,
+        language,
         source: LeadSource.WEBSITE,
         status: LeadStatus.WEBSITE_USER, // Website leads are always WEBSITE_USER
         notes: "", // Will be set with proper translation key when needed
@@ -611,10 +612,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           referer: clientInfo.referer,
           locale,
         });
-        return createErrorResponse(
-          "app.api.v1.core.leads.tracking.errors.default",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       logger.debug("app.api.v1.core.leads.tracking.anonymous.created", {
@@ -631,10 +632,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         "app.api.v1.core.leads.tracking.anonymous.error",
         parseError(error).message,
       );
-      return createErrorResponse(
-        "app.api.v1.core.leads.tracking.errors.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -700,10 +701,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         logger,
       );
       if (!leadResult.success || !leadResult.data) {
-        return createErrorResponse(
-          "app.api.v1.core.leads.tracking.errors.default",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       const leadDetail = leadResult.data.lead;
@@ -799,10 +800,11 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
                   error: updateResult.message,
                 },
               );
-              return createErrorResponse(
-                "app.api.v1.core.leads.tracking.errors.default",
-                ErrorResponseTypes.INTERNAL_ERROR,
-              );
+              return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          cause: updateResult,
+              });
             }
 
             logger.debug("app.api.v1.core.leads.tracking.status.transitioned", {
@@ -848,10 +850,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadId,
         action,
       });
-      return createErrorResponse(
-        "app.api.v1.core.leads.tracking.errors.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -920,19 +922,19 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
             },
           );
         } else {
-          return createErrorResponse(
-            "app.api.v1.core.leads.tracking.errors.default",
-            ErrorResponseTypes.INTERNAL_ERROR,
-          );
+          return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
         }
       }
 
       // If we still don't have a leadId, return error
       if (!leadId) {
-        return createErrorResponse(
-          "app.api.v1.core.leads.tracking.errors.default",
-          ErrorResponseTypes.VALIDATION_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
       }
 
       // Establish lead-user relationship if user is logged in
@@ -1077,10 +1079,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           error: parseError(error),
         },
       );
-      return createErrorResponse(
-        "app.api.v1.core.leads.tracking.errors.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -1134,10 +1136,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         "app.api.v1.core.leads.tracking.pixel.failed",
         parseError(error).message,
       );
-      return createErrorResponse(
-        "app.api.v1.core.leads.tracking.errors.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -1278,10 +1280,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       logger.error("app.api.v1.core.leads.tracking.click.failed", {
         error: error instanceof Error ? error.message : String(error),
       });
-      return createErrorResponse(
-        "app.api.v1.core.leads.tracking.errors.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.tracking.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 

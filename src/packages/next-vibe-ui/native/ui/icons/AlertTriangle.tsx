@@ -1,6 +1,4 @@
-import { AlertTriangle } from "lucide-react-native";
+import { AlertTriangle as AlertTriangleIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(AlertTriangle);
-export { AlertTriangle };
+export const AlertTriangle = styled(AlertTriangleIcon);

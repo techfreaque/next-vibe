@@ -1,6 +1,4 @@
-import { Library } from "lucide-react-native";
+import { Library as LibraryIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Library);
-export { Library };
+export const Library = styled(LibraryIcon);

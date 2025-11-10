@@ -166,7 +166,7 @@ export function useEdenAISpeech({
           const errorMessage =
             error.message ?? t("app.chat.hooks.stt.transcription-failed");
           logger.error("STT: API returned error", {
-            errorType: error.errorType,
+          errorType: error.errorType,
             errorMessage: error.message,
           });
           setError(errorMessage);

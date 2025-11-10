@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { History, TrendingUp } from 'next-vibe-ui/ui/icons';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import {
@@ -102,7 +102,7 @@ export function SubscriptionClientContent({
       />
 
       {/* Header Section */}
-      <motion.div
+      <MotionDiv
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -114,7 +114,7 @@ export function SubscriptionClientContent({
         <P className="text-xl text-muted-foreground max-w-2xl mx-auto">
           {t("app.subscription.subscription.description")}
         </P>
-      </motion.div>
+      </MotionDiv>
 
       {/* Credit Balance Overview Card */}
       <CreditBalanceCard

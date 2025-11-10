@@ -1,6 +1,4 @@
-import { LineChart } from "lucide-react-native";
+import { LineChart as LineChartIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(LineChart);
-export { LineChart };
+export const LineChart = styled(LineChartIcon);

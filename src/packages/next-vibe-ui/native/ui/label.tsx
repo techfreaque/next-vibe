@@ -16,14 +16,13 @@ const Label = React.forwardRef<
   NativeLabelProps
 >(({ className, ...props }, ref) => {
   const textClassName = cn(
-    "text-sm text-foreground native:text-base font-medium leading-none web:peer-disabled:cursor-not-allowed web:peer-disabled:opacity-70 web:cursor-default",
+    "text-sm text-foreground text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-default",
     className,
   );
 
   return (
     <LabelPrimitive.Root>
-      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-      <LabelPrimitive.Text ref={ref} className={textClassName} {...(props as any)} />
+      <LabelPrimitive.Text ref={ref} className={textClassName} {...(props)} />
     </LabelPrimitive.Root>
   );
 });

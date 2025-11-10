@@ -1,6 +1,4 @@
-import { GitBranch } from "lucide-react-native";
+import { GitBranch as GitBranchIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(GitBranch);
-export { GitBranch };
+export const GitBranch = styled(GitBranchIcon);

@@ -10,7 +10,7 @@ import "server-only";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -319,11 +319,11 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       const errorMessage = parseError(error);
       outputLines.push(`❌ Generation failed: ${errorMessage}`);
 
-      return createErrorResponse(
-        "app.api.v1.core.system.generators.generateAll.post.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: errorMessage.message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.generators.generateAll.post.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: errorMessage.message },
+      });
     }
   }
 }

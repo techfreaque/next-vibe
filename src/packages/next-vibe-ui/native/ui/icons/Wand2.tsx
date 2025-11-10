@@ -1,6 +1,4 @@
-import { Wand2 } from "lucide-react-native";
+import { Wand2 as Wand2Icon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Wand2);
-export { Wand2 };
+export const Wand2 = styled(Wand2Icon);

@@ -547,7 +547,7 @@ class BraveSearchRepository implements IBraveSearchRepository {
           message:
             "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.validation.title" as const,
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { message: SEARCH_MESSAGES.QUERY_REQUIRED },
+                    messageParams: { message: SEARCH_MESSAGES.QUERY_REQUIRED },
         });
       }
 
@@ -588,10 +588,10 @@ class BraveSearchRepository implements IBraveSearchRepository {
       });
 
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { message: braveError.message },
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { message: braveError.message },
       });
     }
   }

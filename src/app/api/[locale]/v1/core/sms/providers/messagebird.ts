@@ -1,6 +1,6 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -68,37 +68,37 @@ export function getMessageBirdProvider(): SmsProvider {
       try {
         // Validate access key early
         if (!accessKey) {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.missing_aws_access_key",
-            ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          );
+          return fail({
+            message: "app.api.v1.core.sms.sms.error.missing_aws_access_key",
+            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          });
         }
 
         // Type guard for params
         if (!params || typeof params !== "object") {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.invalid_phone_format",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+            message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
 
         logger.debug("Sending SMS via MessageBird", { to: params.to });
 
         // Validate required parameters
         if (!params.to) {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.invalid_phone_format",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+            message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
 
         // From phone number fallback with nullish coalescing
         const originator = params.from ?? env.SMS_FROM_NUMBER;
         if (!originator) {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.invalid_phone_format",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+            message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
 
         if (
@@ -106,10 +106,10 @@ export function getMessageBirdProvider(): SmsProvider {
           typeof params.message !== "string" ||
           params.message.trim() === ""
         ) {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.empty_message",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+            message: "app.api.v1.core.sms.sms.error.empty_message",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
 
         // Build the request body
@@ -199,14 +199,14 @@ export function getMessageBirdProvider(): SmsProvider {
               .join(", ");
           }
 
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.delivery_failed",
-            ErrorResponseTypes.SMS_ERROR,
-            {
+          return fail({
+            message: "app.api.v1.core.sms.sms.error.delivery_failed",
+            errorType: ErrorResponseTypes.SMS_ERROR,
+            messageParams: {
               error: errorMessage,
               errorCode: response.status,
             },
-          );
+          });
         }
 
         // Parse successful response
@@ -260,13 +260,13 @@ export function getMessageBirdProvider(): SmsProvider {
       } catch (error) {
         // eslint-disable-next-line i18next/no-literal-string
         const unknownErrorMsg = "Unknown error";
-        return createErrorResponse(
-          "app.api.v1.core.sms.sms.error.delivery_failed",
-          ErrorResponseTypes.SMS_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.sms.sms.error.delivery_failed",
+          errorType: ErrorResponseTypes.SMS_ERROR,
+          messageParams: {
             error: error instanceof Error ? error.message : unknownErrorMsg,
           },
-        );
+        });
       }
     },
   };

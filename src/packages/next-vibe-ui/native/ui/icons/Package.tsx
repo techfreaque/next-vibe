@@ -1,6 +1,4 @@
-import { Package } from "lucide-react-native";
+import { Package as PackageIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Package);
-export { Package };
+export const Package = styled(PackageIcon);

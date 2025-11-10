@@ -1,6 +1,4 @@
-import { Italic } from "lucide-react-native";
+import { Italic as ItalicIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Italic);
-export { Italic };
+export const Italic = styled(ItalicIcon);

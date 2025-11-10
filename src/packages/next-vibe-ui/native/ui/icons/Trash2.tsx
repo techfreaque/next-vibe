@@ -1,6 +1,4 @@
-import { Trash2 } from "lucide-react-native";
+import { Trash2 as Trash2Icon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Trash2);
-export { Trash2 };
+export const Trash2 = styled(Trash2Icon);

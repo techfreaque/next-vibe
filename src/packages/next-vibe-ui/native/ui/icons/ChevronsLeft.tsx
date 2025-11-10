@@ -1,6 +1,4 @@
-import { ChevronsLeft } from "lucide-react-native";
+import { ChevronsLeft as ChevronsLeftIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(ChevronsLeft);
-export { ChevronsLeft };
+export const ChevronsLeft = styled(ChevronsLeftIcon);

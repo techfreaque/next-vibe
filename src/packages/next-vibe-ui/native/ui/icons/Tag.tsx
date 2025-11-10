@@ -1,6 +1,4 @@
-import { Tag } from "lucide-react-native";
+import { Tag as TagIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Tag);
-export { Tag };
+export const Tag = styled(TagIcon);

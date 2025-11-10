@@ -136,7 +136,7 @@ export async function executeMutation<
           message:
             "app.api.v1.core.system.unifiedInterface.reactNative.errors.missingUrlParam",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { paramName, endpoint: endpoint.path.join("/") },
+                    messageParams: { paramName, endpoint: endpoint.path.join("/") },
         });
 
         // Call onError callback if provided
@@ -202,9 +202,9 @@ export async function executeMutation<
     const errorMessage = serverErrorConfig?.description;
 
     const errorResponse: ErrorResponseType = fail({
-      message: errorMessage,
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: {
+          message: errorMessage,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: {
         error: parsedError.message,
         endpoint: endpoint.path.join("/"),
       },

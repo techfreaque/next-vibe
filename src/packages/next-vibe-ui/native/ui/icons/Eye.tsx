@@ -1,6 +1,4 @@
-import { Eye } from "lucide-react-native";
+import { Eye as EyeIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Eye);
-export { Eye };
+export const Eye = styled(EyeIcon);

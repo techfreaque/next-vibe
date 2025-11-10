@@ -1,6 +1,4 @@
-import { FolderClock } from "lucide-react-native";
+import { FolderClock as FolderClockIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(FolderClock);
-export { FolderClock };
+export const FolderClock = styled(FolderClockIcon);

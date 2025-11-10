@@ -1,6 +1,4 @@
-import { User } from "lucide-react-native";
+import { User as UserIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(User);
-export { User };
+export const User = styled(UserIcon);

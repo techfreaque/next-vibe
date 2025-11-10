@@ -78,9 +78,9 @@ export async function validateNextRequestData<
 
     if (!urlValidation.success) {
       return fail({
-        message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
-        messageParams: {
+          message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
+                  messageParams: {
           error: urlValidation.message,
         },
         cause: urlValidation,
@@ -96,10 +96,10 @@ export async function validateNextRequestData<
 
     if (!requestValidation.success) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
-        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-        messageParams: {
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+                  messageParams: {
           error: requestValidation.message,
         },
         cause: requestValidation,
@@ -120,7 +120,7 @@ export async function validateNextRequestData<
       success: false,
       message:
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
-      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error:
           error instanceof Error

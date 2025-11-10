@@ -59,7 +59,7 @@ export class StripeProvider implements PaymentProvider {
         return fail({
           message: "app.api.v1.core.payment.providers.stripe.errors.userNotFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
+                    messageParams: { userId },
         });
       }
 
@@ -94,9 +94,9 @@ export class StripeProvider implements PaymentProvider {
         userId,
       });
       return fail({
-        message: "app.api.v1.core.payment.providers.stripe.errors.customerCreationFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message, userId },
+          message: "app.api.v1.core.payment.providers.stripe.errors.customerCreationFailed.title",
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(error).message, userId },
       });
     }
   }
@@ -177,9 +177,9 @@ export class StripeProvider implements PaymentProvider {
         userId: params.userId,
       });
       return fail({
-        message: "app.api.v1.core.payment.providers.stripe.errors.checkoutCreationFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.payment.providers.stripe.errors.checkoutCreationFailed.title",
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -236,9 +236,9 @@ export class StripeProvider implements PaymentProvider {
         error: parseError(error),
       });
       return fail({
-        message: "app.api.v1.core.payment.providers.stripe.errors.webhookVerificationFailed.title",
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.payment.providers.stripe.errors.webhookVerificationFailed.title",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -307,9 +307,9 @@ export class StripeProvider implements PaymentProvider {
         subscriptionId,
       });
       return fail({
-        message: "app.api.v1.core.payment.providers.stripe.errors.subscriptionRetrievalFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.payment.providers.stripe.errors.subscriptionRetrievalFailed.title",
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -327,9 +327,9 @@ export class StripeProvider implements PaymentProvider {
         subscriptionId,
       });
       return fail({
-        message: "app.api.v1.core.payment.providers.stripe.errors.subscriptionCancellationFailed.title",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
+          message: "app.api.v1.core.payment.providers.stripe.errors.subscriptionCancellationFailed.title",
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }

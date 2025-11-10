@@ -1,5 +1,4 @@
-import { HelpCircle as LucideHelpCircle } from "lucide-react-native";
+import { HelpCircle as HelpCircleIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-export const HelpCircle = iconWithClassName(LucideHelpCircle);
+export const HelpCircle = styled(HelpCircleIcon);

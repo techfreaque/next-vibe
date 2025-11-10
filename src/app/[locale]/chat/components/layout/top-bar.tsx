@@ -71,7 +71,7 @@ export function TopBar({
   }, []);
 
   return (
-    <Div className="absolute top-4 left-4 z-51 flex gap-1 ">
+    <Div className="absolute top-4 left-4 z-51 flex flex-row gap-1 ">
       {/* Menu Button */}
       <Button
         variant="ghost"

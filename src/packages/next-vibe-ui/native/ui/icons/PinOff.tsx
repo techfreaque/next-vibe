@@ -1,6 +1,4 @@
-import { PinOff } from "lucide-react-native";
+import { PinOff as PinOffIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(PinOff);
-export { PinOff };
+export const PinOff = styled(PinOffIcon);

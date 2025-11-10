@@ -1,6 +1,4 @@
-import { Airplay } from "lucide-react-native";
+import { Airplay as AirplayIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Airplay);
-export { Airplay };
+export const Airplay = styled(AirplayIcon);

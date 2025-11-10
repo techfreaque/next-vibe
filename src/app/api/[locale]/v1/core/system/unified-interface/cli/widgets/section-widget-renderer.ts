@@ -49,9 +49,7 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer {
 
     // Add section title if present
     if (field.title) {
-      const title = field.title.includes(".")
-        ? context.translate(field.title as never)
-        : field.title;
+      const title = context.t(field.title);
 
       result.push("");
       result.push(this.styleText(title.toUpperCase(), "bold", context));

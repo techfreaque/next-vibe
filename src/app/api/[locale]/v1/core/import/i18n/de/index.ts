@@ -391,7 +391,7 @@ export const translations: typeof enTranslations = {
     },
 
     // === FEHLERTYPEN ===
-    errorType: {
+          errorType: {
       validation: {
         label: "Validierungsfehler",
         description:

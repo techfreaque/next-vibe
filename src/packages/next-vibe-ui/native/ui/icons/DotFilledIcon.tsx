@@ -1,6 +1,4 @@
-// Radix UI icon alias - using Circle as closest match
-import { Circle } from "lucide-react-native";
-import { iconWithClassName } from "./iconWithClassName";
+import { Circle as DotFilledIconIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-iconWithClassName(Circle);
-export { Circle as DotFilledIcon };
+export const DotFilledIcon = styled(DotFilledIconIcon);

@@ -1,6 +1,4 @@
-import { Circle } from "lucide-react-native";
+import { Circle as CircleIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Circle);
-export { Circle };
+export const Circle = styled(CircleIcon);

@@ -1,6 +1,4 @@
-import { TestTube } from "lucide-react-native";
+import { TestTube as TestTubeIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(TestTube);
-export { TestTube };
+export const TestTube = styled(TestTubeIcon);

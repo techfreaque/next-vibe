@@ -6,7 +6,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -82,11 +82,11 @@ class HelpListRepository {
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to discover commands", parsedError);
-      return createErrorResponse(
-        "app.api.v1.core.system.help.list.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.help.list.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
+      });
     }
   }
 }

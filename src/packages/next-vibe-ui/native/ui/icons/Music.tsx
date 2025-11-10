@@ -1,6 +1,4 @@
-import { Music } from "lucide-react-native";
+import { Music as MusicIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Music);
-export { Music };
+export const Music = styled(MusicIcon);

@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   success,
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -94,11 +94,11 @@ export class SubscriptionCheckoutRepositoryImpl
             userId: user.id,
             subscriptionId: existingSubscription.data.id,
           });
-          return createErrorResponse(
-            "app.api.v1.core.payment.checkout.post.errors.alreadySubscribed.title" as never,
-            ErrorResponseTypes.BAD_REQUEST,
-            { userId: user.id },
-          );
+          return fail({
+          message: "app.api.v1.core.payment.checkout.post.errors.alreadySubscribed.title",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+                      messageParams: { userId: user.id },
+          });
         }
       }
 
@@ -116,11 +116,11 @@ export class SubscriptionCheckoutRepositoryImpl
       logger.debug("Step 8: User result received", { success: userResult.success });
 
       if (!userResult.success || !userResult.data) {
-        return createErrorResponse(
-          "app.api.v1.core.payment.checkout.post.errors.notFound.title" as never,
-          ErrorResponseTypes.NOT_FOUND,
-          { userId: user.id },
-        );
+        return fail({
+          message: "app.api.v1.core.payment.checkout.post.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: { userId: user.id },
+        });
       }
 
       // Ensure customer exists with provider
@@ -177,7 +177,7 @@ export class SubscriptionCheckoutRepositoryImpl
         success: true,
         sessionId: session.data.sessionId,
         checkoutUrl: session.data.checkoutUrl,
-        message: t("app.api.v1.core.payment.checkout.post.success.description" as never),
+        message: t("app.api.v1.core.payment.checkout.post.success.description"),
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -185,14 +185,14 @@ export class SubscriptionCheckoutRepositoryImpl
       logger.error("Failed to create checkout session", {
         errorMessage,
         errorStack,
-        errorType: typeof error,
+          errorType: typeof error,
         errorConstructor: error?.constructor?.name
       });
-      return createErrorResponse(
-        "app.api.v1.core.payment.checkout.post.errors.server.title" as never,
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: errorMessage },
-      );
+      return fail({
+          message: "app.api.v1.core.payment.checkout.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: errorMessage },
+      });
     }
   }
 }

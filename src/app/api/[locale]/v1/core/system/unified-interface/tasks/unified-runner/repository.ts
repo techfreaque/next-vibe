@@ -143,10 +143,10 @@ export class UnifiedTaskRunnerRepositoryImpl
 
         default:
           return fail({
-            message:
+          message:
               "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.title",
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: { action: data.action },
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                      messageParams: { action: data.action },
           });
       }
     } catch (error) {
@@ -156,10 +156,10 @@ export class UnifiedTaskRunnerRepositoryImpl
       });
 
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -193,7 +193,7 @@ export class UnifiedTaskRunnerRepositoryImpl
           message:
             "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: errorMsg, taskName },
+                    messageParams: { error: errorMsg, taskName },
         });
       }
 
@@ -213,7 +213,7 @@ export class UnifiedTaskRunnerRepositoryImpl
           message:
             "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: errorMsg, taskName },
+                    messageParams: { error: errorMsg, taskName },
         });
       }
 
@@ -227,10 +227,10 @@ export class UnifiedTaskRunnerRepositoryImpl
       const errorMsg = parseError(error).message;
       this.markTaskAsFailed(taskName, errorMsg);
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMsg, taskName },
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: errorMsg, taskName },
       });
     }
   }
@@ -243,10 +243,10 @@ export class UnifiedTaskRunnerRepositoryImpl
 
     if (this.isTaskRunning(taskName)) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.title",
-        errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: { taskName },
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                  messageParams: { taskName },
       });
     }
 
@@ -275,10 +275,10 @@ export class UnifiedTaskRunnerRepositoryImpl
         });
       }
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMsg, taskName },
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: errorMsg, taskName },
       });
     }
   }
@@ -352,10 +352,10 @@ export class UnifiedTaskRunnerRepositoryImpl
       }
 
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMsg },
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: errorMsg },
       });
     }
   }

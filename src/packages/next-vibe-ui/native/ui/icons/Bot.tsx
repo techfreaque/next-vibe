@@ -1,6 +1,4 @@
-import { Bot } from "lucide-react-native";
+import { Bot as BotIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Bot);
-export { Bot };
+export const Bot = styled(BotIcon);

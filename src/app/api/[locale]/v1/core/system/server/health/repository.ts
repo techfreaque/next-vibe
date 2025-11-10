@@ -7,7 +7,7 @@ import { loadavg } from "node:os";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -167,11 +167,11 @@ export class HealthCheckRepositoryImpl
       const parsedError = parseError(error);
       logger.error("Health check failed", { error: parsedError.message });
 
-      return createErrorResponse(
-        "app.api.v1.core.system.server.health.get.errors.server.description",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.server.health.get.errors.server.description",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
+      });
     }
   }
 

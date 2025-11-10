@@ -10,7 +10,7 @@ import "server-only";
 import { and, eq, ne } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -245,10 +245,10 @@ async function executeNewsletterUnsubscribeSync(
       executionTimeMs,
     });
 
-    return createErrorResponse(
-      "app.api.v1.core.newsletter.error.default",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+      message: "app.api.v1.core.newsletter.error.default",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 }
 
@@ -264,10 +264,10 @@ async function validateNewsletterUnsubscribeSync(): Promise<
     await db.select().from(newsletterSubscriptions).limit(1);
     return success(true);
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.newsletter.error.default",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+      message: "app.api.v1.core.newsletter.error.default",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 }
 
@@ -309,10 +309,10 @@ const newsletterUnsubscribeSyncTask: Task = {
     const result = await executeNewsletterUnsubscribeSync(context);
 
     if (!result.success) {
-      return createErrorResponse(
-        "app.api.v1.core.newsletter.unsubscribe.sync.failed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.newsletter.unsubscribe.sync.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   },
 

@@ -1,6 +1,4 @@
-import { BookOpen } from "lucide-react-native";
+import { BookOpen as BookOpenIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(BookOpen);
-export { BookOpen };
+export const BookOpen = styled(BookOpenIcon);

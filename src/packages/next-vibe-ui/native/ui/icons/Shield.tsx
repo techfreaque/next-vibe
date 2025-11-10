@@ -1,6 +1,4 @@
-import { Shield } from "lucide-react-native";
+import { Shield as ShieldIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Shield);
-export { Shield };
+export const Shield = styled(ShieldIcon);

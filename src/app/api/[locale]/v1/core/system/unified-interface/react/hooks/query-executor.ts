@@ -9,15 +9,13 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { Methods as MethodsEnum, EndpointErrorTypes } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { envClient } from "@/config/env-client";
 
 import { callApi, containsFile, objectToFormData } from "./api-utils";
+import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 
 /**
  * Options for query execution
@@ -56,9 +54,7 @@ export interface QueryExecutorOptions<TRequest, TResponse, TUrlVariables> {
  * - State management (handled by React Query)
  */
 export async function executeQuery<
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Infrastructure: Generic endpoint type requires 'any' for TFields parameter to accept all endpoint field configurations
-  TEndpoint extends CreateApiEndpoint<string, Methods, TUserRoleValue, any>,
+  TEndpoint extends CreateApiEndpointAny,
 >({
   endpoint,
   logger,
@@ -124,9 +120,9 @@ export async function executeQuery<
       const errorMessage = validationErrorConfig?.description;
 
       const errorResponse = fail({
-        message: errorMessage,
-        errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: {
+          message: errorMessage,
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                  messageParams: {
           endpoint: endpoint.path.join("/"),
           error: requestValidation.error.message,
         },
@@ -171,9 +167,9 @@ export async function executeQuery<
           const errorMessage = validationErrorConfig?.description;
 
           const errorResponse = fail({
-            message: errorMessage,
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: {
+          message: errorMessage,
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                      messageParams: {
               paramName,
               endpoint: endpoint.path.join("/"),
             },
@@ -228,7 +224,7 @@ export async function executeQuery<
     }
 
     const response = await callApi(
-      endpoint as never,
+      endpoint ,
       endpointUrl,
       postBody,
       logger,
@@ -287,9 +283,9 @@ export async function executeQuery<
     const errorMessage = errorConfig?.description;
 
     const errorResponse = fail({
-      message: errorMessage,
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: {
+          message: errorMessage,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: {
         error: parsedError.message,
         endpoint: endpoint.path.join("/"),
       },

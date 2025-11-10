@@ -1,6 +1,4 @@
-import { Ear } from "lucide-react-native";
+import { Ear as EarIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Ear);
-export { Ear };
+export const Ear = styled(EarIcon);

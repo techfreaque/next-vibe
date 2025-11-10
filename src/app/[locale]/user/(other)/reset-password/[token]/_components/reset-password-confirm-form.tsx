@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Loader2 } from 'next-vibe-ui/ui/icons';
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { Link } from "next-vibe-ui/ui/link";
@@ -61,7 +61,7 @@ export default function ResetPasswordConfirmForm({
   // If the token is invalid
   if (tokenValid === false) {
     return (
-      <motion.div
+      <MotionDiv
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -80,14 +80,14 @@ export default function ResetPasswordConfirmForm({
             </Div>
           </CardContent>
         </Card>
-      </motion.div>
+      </MotionDiv>
     );
   }
 
   // If password reset was successful
   if (isSuccess) {
     return (
-      <motion.div
+      <MotionDiv
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -107,13 +107,13 @@ export default function ResetPasswordConfirmForm({
             </Div>
           </CardContent>
         </Card>
-      </motion.div>
+      </MotionDiv>
     );
   }
 
   // Valid token, show the form
   return (
-    <motion.div
+    <MotionDiv
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -208,6 +208,6 @@ export default function ResetPasswordConfirmForm({
           </Form>
         </CardContent>
       </Card>
-    </motion.div>
+    </MotionDiv>
   );
 }

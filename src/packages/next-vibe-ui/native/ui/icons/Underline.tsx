@@ -1,6 +1,4 @@
-import { Underline } from "lucide-react-native";
+import { Underline as UnderlineIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Underline);
-export { Underline };
+export const Underline = styled(UnderlineIcon);

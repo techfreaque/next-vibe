@@ -9,7 +9,7 @@ import * as path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -216,11 +216,11 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
       const parsedError = parseError(error);
       logger.error("TRPC validation operation execution failed", parsedError);
 
-      return createErrorResponse(
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.executionFailed.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.executionFailed.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
+      });
     }
   }
 

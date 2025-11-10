@@ -1,6 +1,4 @@
-import { RotateCcw } from "lucide-react-native";
+import { RotateCcw as RotateCcwIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(RotateCcw);
-export { RotateCcw };
+export const RotateCcw = styled(RotateCcwIcon);

@@ -1,6 +1,4 @@
-import { Atom } from "lucide-react-native";
+import { Atom as AtomIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Atom);
-export { Atom };
+export const Atom = styled(AtomIcon);

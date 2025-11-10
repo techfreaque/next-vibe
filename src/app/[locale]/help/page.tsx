@@ -102,10 +102,10 @@ export default async function ContactPage({
         </Link>
 
         <Div className="text-center mb-12">
-          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600 text-center">
             {t("app.help.pages.help.title")}
           </H1>
-          <P className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <P className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto text-center">
             {t("app.help.pages.help.subtitle")}
           </P>
         </Div>

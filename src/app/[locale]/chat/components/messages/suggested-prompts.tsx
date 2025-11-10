@@ -98,16 +98,16 @@ export function SuggestedPrompts({
   return (
     <Div className="w-full space-y-6 sm:space-y-8">
       <Div className="text-center space-y-2">
-        <H1 className="text-3xl sm:text-4xl font-semibold">
+        <H1 className="text-3xl sm:text-4xl font-semibold text-center">
           {t(getTitleKey())}
         </H1>
-        <P className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto">
+        <P className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto text-center">
           {t(getDescriptionKey())}
         </P>
       </Div>
 
       {/* Persona Tabs */}
-      <Div className="flex gap-2 justify-center flex-wrap">
+      <Div className="flex flex-row gap-2 justify-center flex-wrap">
         {FEATURED_PERSONAS.map((persona) => (
           <Button
             key={persona.id}

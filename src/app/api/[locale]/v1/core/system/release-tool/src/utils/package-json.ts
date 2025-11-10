@@ -7,7 +7,7 @@ import { join } from "node:path";
 import inquirer from "inquirer";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -40,11 +40,11 @@ export function getPackageJson(
   const packageJsonPath = join(cwd, "package.json");
   if (!existsSync(packageJsonPath)) {
     logger.error("Package.json not found", { path: packageJsonPath });
-    return createErrorResponse(
-      "app.api.v1.core.system.releaseTool.packageJson.notFound",
-      ErrorResponseTypes.NOT_FOUND,
-      { path: packageJsonPath },
-    );
+    return fail({
+          message: "app.api.v1.core.system.releaseTool.packageJson.notFound",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                messageParams: { path: packageJsonPath },
+    });
   }
 
   try {
@@ -54,20 +54,20 @@ export function getPackageJson(
     );
     if (!isPackageJson(parsedJson)) {
       logger.error("Invalid package.json format", { path: packageJsonPath });
-      return createErrorResponse(
-        "app.api.v1.core.system.releaseTool.packageJson.invalidFormat",
-        ErrorResponseTypes.INVALID_FORMAT_ERROR,
-        { path: packageJsonPath },
-      );
+      return fail({
+          message: "app.api.v1.core.system.releaseTool.packageJson.invalidFormat",
+          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+                  messageParams: { path: packageJsonPath },
+      });
     }
     return success(parsedJson);
   } catch (error) {
     logger.error("Error reading package.json", parseError(error));
-    return createErrorResponse(
-      "app.api.v1.core.system.releaseTool.packageJson.errorReading",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { error: String(error) },
-    );
+    return fail({
+          message: "app.api.v1.core.system.releaseTool.packageJson.errorReading",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { error: String(error) },
+    });
   }
 }
 
@@ -140,11 +140,11 @@ export async function updateDependencies(
       `Error updating dependencies for ${pkg.directory}. Continuing with release process.`,
       parseError(error),
     );
-    return createErrorResponse(
-      "app.api.v1.core.system.releaseTool.packageJson.errorUpdatingDeps",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { directory: pkg.directory, error: String(error) },
-    );
+    return fail({
+          message: "app.api.v1.core.system.releaseTool.packageJson.errorUpdatingDeps",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { directory: pkg.directory, error: String(error) },
+    });
   }
 }
 
@@ -219,10 +219,10 @@ export function updatePackageVersion(
     return success(undefined);
   } catch (error) {
     logger.error("Error updating package version", parseError(error));
-    return createErrorResponse(
-      "app.api.v1.core.system.releaseTool.packageJson.errorUpdatingVersion",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { directory: pkg.directory, error: String(error) },
-    );
+    return fail({
+          message: "app.api.v1.core.system.releaseTool.packageJson.errorUpdatingVersion",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { directory: pkg.directory, error: String(error) },
+    });
   }
 }

@@ -1,6 +1,4 @@
-import { Microscope } from "lucide-react-native";
+import { Microscope as MicroscopeIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Microscope);
-export { Microscope };
+export const Microscope = styled(MicroscopeIcon);

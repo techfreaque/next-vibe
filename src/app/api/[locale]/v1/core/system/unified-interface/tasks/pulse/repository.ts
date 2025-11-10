@@ -109,8 +109,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success<PulseHealth | null>((health[0] as PulseHealth) || null);
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -139,8 +139,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success<PulseHealth>(updatedHealth as PulseHealth);
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -158,8 +158,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
     } catch (error) {
       logger.error("Failed to create health record", parseError(error));
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -177,8 +177,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success(newExecution as PulseExecution);
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -206,8 +206,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success(updatedExecution as PulseExecution);
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -226,8 +226,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success(executions as PulseExecution[]);
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -247,8 +247,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success((execution[0] as PulseExecution) || null);
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -266,8 +266,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success(newNotification as PulseNotification);
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -286,8 +286,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success(notifications as PulseNotification[]);
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -314,8 +314,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success(updatedNotification as PulseNotification);
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -358,8 +358,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       });
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -428,8 +428,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success(response);
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -502,8 +502,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success(undefined);
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -563,8 +563,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success(response);
     } catch {
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

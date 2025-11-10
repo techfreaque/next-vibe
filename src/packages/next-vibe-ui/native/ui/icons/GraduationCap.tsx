@@ -1,6 +1,4 @@
-import { GraduationCap } from "lucide-react-native";
+import { GraduationCap as GraduationCapIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(GraduationCap);
-export { GraduationCap };
+export const GraduationCap = styled(GraduationCapIcon);

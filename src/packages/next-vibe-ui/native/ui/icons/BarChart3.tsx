@@ -1,6 +1,4 @@
-import { BarChart3 } from "lucide-react-native";
+import { BarChart3 as BarChart3Icon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(BarChart3);
-export { BarChart3 };
+export const BarChart3 = styled(BarChart3Icon);

@@ -1,6 +1,4 @@
-import { FolderGit } from "lucide-react-native";
+import { FolderGit as FolderGitIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(FolderGit);
-export { FolderGit };
+export const FolderGit = styled(FolderGitIcon);

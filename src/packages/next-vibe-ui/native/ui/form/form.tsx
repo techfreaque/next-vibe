@@ -6,9 +6,12 @@ import * as React from "react";
 import type { FieldPath, FieldValues } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
 import { View } from "react-native";
+import { styled } from "nativewind";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
+
+const StyledView = styled(View);
 
 // ============================================================================
 // IMPORT ALL TYPES FROM WEB - DO NOT REDEFINE ANY TYPES
@@ -119,9 +122,9 @@ const FormItem = React.forwardRef<
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <View ref={ref} className={cn("space-y-2", props.className)}>
+      <StyledView ref={ref} className={cn("space-y-2", props.className)}>
         {props.children}
-      </View>
+      </StyledView>
     </FormItemContext.Provider>
   );
 });

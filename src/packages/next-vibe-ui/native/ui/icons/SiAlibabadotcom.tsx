@@ -1,8 +1,5 @@
-import React from "react";
-import Svg, { Rect } from "react-native-svg";
+// TODO: lucide-react-native doesn't have Alibaba brand icon, using Building as placeholder
+import { Building as SiAlibabadotcomIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-export const SiAlibabadotcom = ({ className }: { className?: string }): JSX.Element => (
-  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
-    <Rect width="24" height="24" fill="#FF6A00" />
-  </Svg>
-);
+export const SiAlibabadotcom = styled(SiAlibabadotcomIcon);

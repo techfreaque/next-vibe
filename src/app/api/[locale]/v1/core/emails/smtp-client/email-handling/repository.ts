@@ -10,7 +10,7 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -71,11 +71,11 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
               if (!emailMessage.success) {
                 if (!emailData.ignoreErrors) {
                   errors.push(
-                    createErrorResponse(
-                      "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.rendering_failed",
-                      ErrorResponseTypes.EMAIL_ERROR,
-                      { error: emailMessage.message },
-                    ),
+                    fail({
+          message: "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.rendering_failed",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                      messageParams: { error: emailMessage.message },
+                    }),
                   );
                 }
                 return;
@@ -136,11 +136,11 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                   emailSendResult.messageParams,
                 );
                 errors.push(
-                  createErrorResponse(
-                    "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.send_failed",
-                    ErrorResponseTypes.EMAIL_ERROR,
-                    { error: emailSendResult.message },
-                  ),
+                  fail({
+          message: "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.send_failed",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                    messageParams: { error: emailSendResult.message },
+                  }),
                 );
               }
             } catch (error) {
@@ -169,7 +169,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                       leadId: null,
                       metadata: {
                         locale: data.locale,
-                        errorType: data.t(
+          errorType: data.t(
                           "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.email_render_exception",
                         ),
                         errorDetails: parsedError.message,
@@ -202,11 +202,11 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
               }
 
               errors.push(
-                createErrorResponse(
-                  "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.rendering_failed",
-                  ErrorResponseTypes.EMAIL_ERROR,
-                  { error: parsedError.message },
-                ),
+                fail({
+          message: "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.rendering_failed",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                  messageParams: { error: parsedError.message },
+                }),
               );
             }
           }),
@@ -214,22 +214,22 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
       } catch (error) {
         const parsedError = parseError(error);
         errors.push(
-          createErrorResponse(
-            "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.batch_send_failed",
-            ErrorResponseTypes.EMAIL_ERROR,
-            { error: parsedError.message },
-          ),
+          fail({
+          message: "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.batch_send_failed",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+            messageParams: { error: parsedError.message },
+          }),
         );
       }
     }
 
     if (errors.length) {
       logger.error("Email errors");
-      return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.batch_send_failed",
-        ErrorResponseTypes.EMAIL_ERROR,
-        { errors: errors.map((error) => error.message).join(", ") },
-      );
+      return fail({
+          message: "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.batch_send_failed",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: { errors: errors.map((error) => error.message).join(", ") },
+      });
     }
 
     return success({ success: true });

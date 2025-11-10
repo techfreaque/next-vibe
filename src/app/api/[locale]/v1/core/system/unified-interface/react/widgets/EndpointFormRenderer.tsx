@@ -10,9 +10,7 @@ import type { UseFormReturn } from "react-hook-form";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 
 /**
  * Extract all request field paths from endpoint definition
@@ -72,13 +70,7 @@ function extractRequestFieldPaths(
  * Endpoint Form Renderer Props
  */
 export interface EndpointFormRendererProps<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
+  TEndpoint extends CreateApiEndpointAny,
 > {
   /** The endpoint definition */
   endpoint: TEndpoint;
@@ -125,13 +117,7 @@ export interface EndpointFormRendererProps<
  * ```
  */
 export function EndpointFormRenderer<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
+  TEndpoint extends CreateApiEndpointAny
 >({
   endpoint,
   form,
@@ -158,7 +144,7 @@ export function EndpointFormRenderer<
         {fieldPaths.map((fieldPath) => (
           <EndpointFormField
             key={fieldPath}
-            name={fieldPath as never}
+            name={fieldPath}
             control={form.control}
             endpointFields={endpoint.fields}
             schema={endpoint.requestSchema}

@@ -1,6 +1,4 @@
-import { Archive } from "lucide-react-native";
+import { Archive as ArchiveIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Archive);
-export { Archive };
+export const Archive = styled(ArchiveIcon);

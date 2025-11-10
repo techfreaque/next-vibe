@@ -1,6 +1,4 @@
-import { Plane } from "lucide-react-native";
+import { Plane as PlaneIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Plane);
-export { Plane };
+export const Plane = styled(PlaneIcon);

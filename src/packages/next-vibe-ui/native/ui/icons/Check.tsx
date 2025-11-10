@@ -1,6 +1,4 @@
-import { Check } from "lucide-react-native";
+import { Check as CheckIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Check);
-export { Check };
+export const Check = styled(CheckIcon);

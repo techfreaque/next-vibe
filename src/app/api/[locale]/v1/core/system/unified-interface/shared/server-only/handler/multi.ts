@@ -149,6 +149,5 @@ export function endpointsHandler<const T>(
     },
     definitions,
     methods: availableMethods,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any as Prettify<EndpointsHandlerReturn<T>>;
+  } as Prettify<EndpointsHandlerReturn<T>>;
 }

@@ -60,7 +60,7 @@ function Indicator({
       <ProgressPrimitive.Indicator
         asChild
         className={cn(
-          "h-full w-full flex-1 bg-primary web:transition-all",
+          "h-full w-full flex-1 bg-primary transition-all",
           className,
         )}
       >

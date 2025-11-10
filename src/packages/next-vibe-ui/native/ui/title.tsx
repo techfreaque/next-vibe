@@ -13,12 +13,12 @@ export type { TitleProps };
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 // Native-specific size classes (override web's responsive classes)
 const sizeClasses: Record<1 | 2 | 3 | 4 | 5 | 6, string> = {
-  1: "text-4xl native:text-5xl font-bold",
-  2: "text-3xl native:text-4xl font-bold",
-  3: "text-xl native:text-2xl font-semibold",
-  4: "text-lg native:text-xl font-semibold",
-  5: "text-base native:text-lg font-medium",
-  6: "text-sm native:text-base font-medium",
+  1: "text-4xl text-5xl font-bold",
+  2: "text-3xl text-4xl font-bold",
+  3: "text-xl text-2xl font-semibold",
+  4: "text-lg text-xl font-semibold",
+  5: "text-base text-lg font-medium",
+  6: "text-sm text-base font-medium",
 };
 /* eslint-enable i18next/no-literal-string */
 

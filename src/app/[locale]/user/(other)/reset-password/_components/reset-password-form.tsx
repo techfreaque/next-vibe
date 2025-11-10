@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { ArrowLeft, CheckCircle, Loader2, Mail } from 'next-vibe-ui/ui/icons';
 import { Environment } from "next-vibe/shared/utils/env-util";
 import { Link } from "next-vibe-ui/ui/link";
@@ -48,7 +48,7 @@ export default function ResetPasswordForm({
   // Show success state when the form has been successfully submitted
   if (isSuccess) {
     return (
-      <motion.div
+      <MotionDiv
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -88,12 +88,12 @@ export default function ResetPasswordForm({
             </Div>
           </CardContent>
         </Card>
-      </motion.div>
+      </MotionDiv>
     );
   }
 
   return (
-    <motion.div
+    <MotionDiv
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -154,6 +154,6 @@ export default function ResetPasswordForm({
           </Form>
         </CardContent>
       </Card>
-    </motion.div>
+    </MotionDiv>
   );
 }

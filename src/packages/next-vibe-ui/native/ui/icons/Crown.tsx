@@ -1,6 +1,4 @@
-import { Crown } from "lucide-react-native";
+import { Crown as CrownIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Crown);
-export { Crown };
+export const Crown = styled(CrownIcon);

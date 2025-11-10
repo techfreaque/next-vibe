@@ -8,7 +8,7 @@ import * as path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -75,11 +75,11 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       const parsedError =
         error instanceof Error ? error : new Error(String(error));
 
-      return createErrorResponse(
-        "app.api.v1.core.system.guard.destroy.errors.destruction_failed.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.guard.destroy.errors.destruction_failed.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -136,11 +136,11 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
     const guardScriptPath = path.join(projectPath, ".vscode", ".guard.sh"); // eslint-disable-line i18next/no-literal-string
 
     if (!fs.existsSync(guardScriptPath)) {
-      return createErrorResponse(
-        "app.api.v1.core.system.guard.destroy.errors.guard_not_found.title",
-        ErrorResponseTypes.NOT_FOUND,
-        { error: `No guard found for project '${projectName}'` }, // eslint-disable-line i18next/no-literal-string
-      );
+      return fail({
+          message: "app.api.v1.core.system.guard.destroy.errors.guard_not_found.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                  messageParams: { error: `No guard found for project '${projectName}'` }, // eslint-disable-line i18next/no-literal-string
+      });
     }
 
     // Mock guard data based on project

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
@@ -28,7 +28,7 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
       className="container px-4 md:px-6 py-24 md:py-32"
       ref={ref}
     >
-      <motion.div
+      <MotionDiv
         className="rounded-3xl overflow-hidden relative"
         initial={{ opacity: 0, y: 20 }}
         animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -74,7 +74,7 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
             </Div>
           </Div>
         </Div>
-      </motion.div>
+      </MotionDiv>
     </section>
   );
 };

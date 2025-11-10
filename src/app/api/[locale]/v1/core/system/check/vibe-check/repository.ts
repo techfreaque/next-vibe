@@ -8,7 +8,7 @@ import "server-only";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -174,11 +174,11 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
       return success(response);
     } catch (error) {
       logger.error("Vibe check failed", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.system.check.vibeCheck.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: String(error) },
-      );
+      return fail({
+          message: "app.api.v1.core.system.check.vibeCheck.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: String(error) },
+      });
     }
   }
 }

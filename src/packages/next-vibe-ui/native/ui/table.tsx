@@ -86,7 +86,7 @@ function TableRow({
   return (
     <StyledTableRow
       className={cn(
-        "flex-row border-border border-b web:transition-colors web:hover:bg-accent web:data-[state=selected]:bg-muted",
+        "flex-row border-border border-b transition-colors hover:bg-accent data-[state=selected]:bg-muted",
         className,
       )}
       onPress={onPress}

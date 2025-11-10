@@ -1,6 +1,5 @@
 import * as SwitchPrimitives from "@rn-primitives/switch";
 import * as React from "react";
-import { Platform } from "react-native";
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -126,10 +125,7 @@ const SwitchNative = React.forwardRef<
 });
 SwitchNative.displayName = "SwitchNative";
 
-const Switch = Platform.select({
-  web: SwitchWeb,
-  default: SwitchNative,
-});
+const Switch = SwitchNative;
 
 export { Switch };
 export type { NativeSwitchProps as SwitchProps };

@@ -1,6 +1,4 @@
-import { DollarSign } from "lucide-react-native";
+import { DollarSign as DollarSignIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(DollarSign);
-export { DollarSign };
+export const DollarSign = styled(DollarSignIcon);

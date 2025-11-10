@@ -8,7 +8,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -80,10 +80,10 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
       const [createdUser] = await db.insert(users).values(newUser).returning();
 
       if (!createdUser) {
-        return createErrorResponse(
-          "app.api.v1.core.users.create.post.errors.internal.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.users.create.post.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       // Add roles if provided
@@ -162,11 +162,11 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
       return success(responseData);
     } catch (error) {
       logger.error("Error creating user", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.users.create.post.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { details: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.users.create.post.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { details: parseError(error).message },
+      });
     }
   }
 }

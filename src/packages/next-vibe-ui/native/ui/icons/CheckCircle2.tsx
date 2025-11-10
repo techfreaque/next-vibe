@@ -1,6 +1,4 @@
-import { CheckCircle2 } from "lucide-react-native";
+import { CheckCircle2 as CheckCircle2Icon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(CheckCircle2);
-export { CheckCircle2 };
+export const CheckCircle2 = styled(CheckCircle2Icon);

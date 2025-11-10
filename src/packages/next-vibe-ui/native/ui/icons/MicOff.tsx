@@ -1,6 +1,4 @@
-import { MicOff } from "lucide-react-native";
+import { MicOff as MicOffIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(MicOff);
-export { MicOff };
+export const MicOff = styled(MicOffIcon);

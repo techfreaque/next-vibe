@@ -16,7 +16,7 @@
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
   throwErrorResponse,
@@ -47,10 +47,10 @@ function createUnsupportedError<T>(
   logger: EndpointLogger,
 ): ResponseType<T> {
   logger.error(`${operation} not available on native - use HTTP endpoints`);
-  return createErrorResponse(
-    "app.api.v1.core.user.auth.errors.native.unsupported",
-    ErrorResponseTypes.INTERNAL_ERROR,
-  );
+  return fail({
+          message: "app.api.v1.core.user.auth.errors.native.unsupported",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+  });
 }
 
 class AuthRepositoryNativeImpl implements AuthRepository {
@@ -180,11 +180,11 @@ class AuthRepositoryNativeImpl implements AuthRepository {
       return success(undefined);
     } catch (error) {
       logger.error("Error storing auth token", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.errors.native.storage_failed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: String(error) },
-      );
+      return fail({
+          message: "app.api.v1.core.user.auth.errors.native.storage_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: String(error) },
+      });
     }
   }
 
@@ -199,11 +199,11 @@ class AuthRepositoryNativeImpl implements AuthRepository {
       return success(undefined);
     } catch (error) {
       logger.error("Error clearing auth token", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.errors.native.clear_failed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: String(error) },
-      );
+      return fail({
+          message: "app.api.v1.core.user.auth.errors.native.clear_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: String(error) },
+      });
     }
   }
 

@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -51,11 +51,11 @@ export async function loadConfig(
 
   if (!existsSync(resolvedConfigPath)) {
     logger.error("Config file not found", { path: resolvedConfigPath });
-    return createErrorResponse(
-      "app.api.v1.core.system.releaseTool.config.fileNotFound",
-      ErrorResponseTypes.NOT_FOUND,
-      { path: resolvedConfigPath },
-    );
+    return fail({
+          message: "app.api.v1.core.system.releaseTool.config.fileNotFound",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                messageParams: { path: resolvedConfigPath },
+    });
   }
 
   try {
@@ -63,10 +63,10 @@ export async function loadConfig(
 
     if (!isReleaseConfigModule(importedModule)) {
       logger.error("Invalid config format", { path: resolvedConfigPath });
-      return createErrorResponse(
-        "app.api.v1.core.system.releaseTool.config.invalidFormat",
-        ErrorResponseTypes.INVALID_FORMAT_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.system.releaseTool.config.invalidFormat",
+          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+      });
     }
 
     logger.info("Successfully loaded config", { path: resolvedConfigPath });
@@ -76,10 +76,10 @@ export async function loadConfig(
       ...parseError(error),
       path: resolvedConfigPath,
     });
-    return createErrorResponse(
-      "app.api.v1.core.system.releaseTool.config.errorLoading",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { error: String(error) },
-    );
+    return fail({
+          message: "app.api.v1.core.system.releaseTool.config.errorLoading",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { error: String(error) },
+    });
   }
 }

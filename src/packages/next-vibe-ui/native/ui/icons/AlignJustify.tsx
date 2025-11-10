@@ -1,6 +1,4 @@
-import { AlignJustify } from "lucide-react-native";
+import { AlignJustify as AlignJustifyIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(AlignJustify);
-export { AlignJustify };
+export const AlignJustify = styled(AlignJustifyIcon);

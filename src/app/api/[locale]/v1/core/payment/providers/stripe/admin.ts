@@ -8,7 +8,7 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
   type ResponseType,
@@ -109,11 +109,11 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       );
       if (!stripeCustomerId) {
         logger.error("payment.invoice.error.customerNotFound", { userId });
-        return createErrorResponse(
-          "app.api.v1.core.payment.invoice.post.errors.notFound.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { error: t("app.api.v1.core.payment.errors.customerNotFound") },
-        );
+        return fail({
+          message: "app.api.v1.core.payment.invoice.post.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: { error: t("app.api.v1.core.payment.errors.customerNotFound") },
+      });
       }
 
       const invoice = await stripe.invoices.create({
@@ -187,11 +187,11 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         userId,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.payment.invoice.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.payment.invoice.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -212,11 +212,11 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       );
       if (!stripeCustomerId) {
         logger.error("payment.portal.error.customerNotFound", { userId });
-        return createErrorResponse(
-          "app.api.v1.core.payment.portal.post.errors.notFound.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { error: t("app.api.v1.core.payment.errors.customerNotFound") },
-        );
+        return fail({
+          message: "app.api.v1.core.payment.portal.post.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: { error: t("app.api.v1.core.payment.errors.customerNotFound") },
+      });
       }
 
       const session = await stripe.billingPortal.sessions.create({
@@ -245,16 +245,16 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           userId,
         });
 
-        return createErrorResponse(
-          "app.api.v1.core.payment.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.payment.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
             error:
               "Stripe Customer Portal is not configured. Please configure it in Stripe Dashboard.",
             configUrl:
               "https://dashboard.stripe.com/test/settings/billing/portal",
           },
-        );
+      });
       }
 
       logger.error("payment.portal.error.failed", {
@@ -263,11 +263,11 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         userId,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.payment.portal.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: errorMessage },
-      );
+      return fail({
+          message: "app.api.v1.core.payment.portal.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
     }
   }
 
@@ -302,11 +302,11 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           transactionId: data.transactionId,
           userId,
         });
-        return createErrorResponse(
-          "app.api.v1.core.payment.refund.post.errors.notFound.title",
-          ErrorResponseTypes.NOT_FOUND,
-          { transactionId: data.transactionId },
-        );
+        return fail({
+          message: "app.api.v1.core.payment.refund.post.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: { transactionId: data.transactionId },
+      });
       }
 
       const paymentIntentId =
@@ -315,15 +315,15 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         logger.error("payment.refund.error.noPaymentIntent", {
           transactionId: data.transactionId,
         });
-        return createErrorResponse(
-          "app.api.v1.core.payment.refund.post.errors.server.title",
-          ErrorResponseTypes.BAD_REQUEST,
-          {
+        return fail({
+          message: "app.api.v1.core.payment.refund.post.errors.server.title",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        messageParams: {
             error: t(
               "app.api.v1.core.payment.refund.post.errors.server.description",
             ),
           },
-        );
+      });
       }
 
       const refund = await stripe.refunds.create({
@@ -372,11 +372,11 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         transactionId: data.transactionId,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.payment.refund.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.payment.refund.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 }

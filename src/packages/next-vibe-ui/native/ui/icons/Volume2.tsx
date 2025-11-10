@@ -1,6 +1,4 @@
-import { Volume2 } from "lucide-react-native";
+import { Volume2 as Volume2Icon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Volume2);
-export { Volume2 };
+export const Volume2 = styled(Volume2Icon);

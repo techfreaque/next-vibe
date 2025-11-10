@@ -8,7 +8,7 @@ import "server-only";
 import { and, eq, gte, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -244,9 +244,9 @@ export class CampaignStarterRepositoryImpl
         error: parseError(error),
         locale,
       });
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
-        ErrorResponseTypes.INTERNAL_ERROR,
+      return fail({
+          message: "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR, }
       );
     }
   }
@@ -309,9 +309,9 @@ export class CampaignStarterRepositoryImpl
         error: parseError(error),
         locale,
       });
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
-        ErrorResponseTypes.INTERNAL_ERROR,
+      return fail({
+          message: "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR, }
       );
     }
   }
@@ -373,9 +373,9 @@ export class CampaignStarterRepositoryImpl
         error: parseError(error),
         locale,
       });
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
-        ErrorResponseTypes.INTERNAL_ERROR,
+      return fail({
+          message: "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR, }
       );
     }
   }

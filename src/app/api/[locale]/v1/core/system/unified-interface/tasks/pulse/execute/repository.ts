@@ -168,9 +168,9 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
       });
 
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

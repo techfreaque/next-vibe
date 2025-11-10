@@ -43,18 +43,18 @@ export async function getFolder(
 
     if (!folder) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.folders.id.get.errors.notFound.title",
-        errorType: ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
     // Check if user can read this folder
     if (!(await canViewFolder(user, folder, logger))) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.folders.id.get.errors.forbidden.title",
-        errorType: ErrorResponseTypes.FORBIDDEN,
+          errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
 
@@ -83,8 +83,8 @@ export async function getFolder(
     });
   } catch {
     return fail({
-      message: "app.api.v1.core.agent.chat.folders.id.get.errors.server.title",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: "app.api.v1.core.agent.chat.folders.id.get.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
 }
@@ -109,18 +109,18 @@ export async function updateFolder(
 
     if (!existingFolder) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.folders.id.patch.errors.notFound.title",
-        errorType: ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
     // Check if user can update this folder (moderators can rename)
     if (!(await canUpdateFolder(user, existingFolder, logger))) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.folders.id.patch.errors.forbidden.title",
-        errorType: ErrorResponseTypes.FORBIDDEN,
+          errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
 
@@ -195,9 +195,9 @@ export async function updateFolder(
 
     if (!updatedFolder) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
 
@@ -226,9 +226,9 @@ export async function updateFolder(
     });
   } catch {
     return fail({
-      message:
+          message:
         "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
 }
@@ -253,9 +253,9 @@ export async function deleteFolder(
 
     if (!existingFolder) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.folders.id.delete.errors.notFound.title",
-        errorType: ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
@@ -272,9 +272,9 @@ export async function deleteFolder(
     // Check if user can delete this folder
     if (!(await canDeleteFolder(user, existingFolder, logger, foldersMap))) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.folders.id.delete.errors.forbidden.title",
-        errorType: ErrorResponseTypes.FORBIDDEN,
+          errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
 
@@ -289,9 +289,9 @@ export async function deleteFolder(
     });
   } catch {
     return fail({
-      message:
+          message:
         "app.api.v1.core.agent.chat.folders.id.delete.errors.server.title",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
 }

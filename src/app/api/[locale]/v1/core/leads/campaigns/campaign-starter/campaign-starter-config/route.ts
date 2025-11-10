@@ -6,7 +6,7 @@
 import "server-only";
 
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -37,10 +37,10 @@ export const { GET, PUT, tools } = endpointsHandler({
           response: result.data,
         });
       }
-      return createErrorResponse(
-        "app.api.v1.core.leads.error.general.internal_server_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     },
   },
   [Methods.PUT]: {
@@ -58,10 +58,10 @@ export const { GET, PUT, tools } = endpointsHandler({
           response: result.data,
         });
       }
-      return createErrorResponse(
-        "app.api.v1.core.leads.error.general.internal_server_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     },
   },
 });

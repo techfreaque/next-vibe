@@ -1,2 +1,4 @@
-// Icon alias - Radix UI compatibility
-export { ChevronLeft as ChevronLeftIcon } from "./ChevronLeft";
+import { ChevronLeftIcon as ChevronLeftIconIcon } from "lucide-react-native";
+import { styled } from "nativewind";
+
+export const ChevronLeftIcon = styled(ChevronLeftIconIcon);

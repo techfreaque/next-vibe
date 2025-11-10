@@ -96,7 +96,7 @@ function tryGetTranslation<K extends TranslationKey>(
   fallbackLanguage: Languages,
   context?: string,
 ): TranslationElement | string | undefined {
-  const keys = key.split(".");
+  const keys = key?.split(".");
   const translationsForLanguage = translations[language];
 
   if (!translationsForLanguage) {

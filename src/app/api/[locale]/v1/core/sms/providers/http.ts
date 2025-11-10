@@ -1,6 +1,6 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
@@ -124,25 +124,25 @@ export function getHttpProvider(): SmsProvider {
 
         // Validate required configuration early
         if (!apiUrl) {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.missing_aws_region",
-            ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          );
+          return fail({
+            message: "app.api.v1.core.sms.sms.error.missing_aws_region",
+            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          });
         }
 
         // Validate required parameters
         if (!params.to) {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.invalid_phone_format",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+            message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
 
         if (!params.message || params.message.trim() === "") {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.empty_message",
-            ErrorResponseTypes.VALIDATION_ERROR,
-          );
+          return fail({
+            message: "app.api.v1.core.sms.sms.error.empty_message",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
         }
 
         // Default to JSON content type
@@ -247,10 +247,10 @@ export function getHttpProvider(): SmsProvider {
 
         // Handle HTTP errors
         if (!response.ok) {
-          return createErrorResponse(
-            "app.api.v1.core.sms.sms.error.delivery_failed",
-            ErrorResponseTypes.SMS_ERROR,
-          );
+          return fail({
+            message: "app.api.v1.core.sms.sms.error.delivery_failed",
+            errorType: ErrorResponseTypes.SMS_ERROR,
+          });
         }
 
         // Parse successful response
@@ -338,13 +338,13 @@ export function getHttpProvider(): SmsProvider {
         // eslint-disable-next-line i18next/no-literal-string
         const unknownMsg = "Unknown error";
         const unknownErrorMsg = unknownMsg;
-        return createErrorResponse(
-          "app.api.v1.core.sms.sms.error.delivery_failed",
-          ErrorResponseTypes.SMS_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.sms.sms.error.delivery_failed",
+          errorType: ErrorResponseTypes.SMS_ERROR,
+        messageParams: {
             error: error instanceof Error ? error.message : unknownErrorMsg,
           },
-        );
+      });
       }
     },
   };

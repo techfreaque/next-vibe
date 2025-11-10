@@ -1,6 +1,4 @@
-import { GripVertical } from "lucide-react-native";
+import { GripVertical as GripVerticalIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(GripVertical);
-export { GripVertical };
+export const GripVertical = styled(GripVerticalIcon);

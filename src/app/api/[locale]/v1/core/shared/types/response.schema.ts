@@ -12,8 +12,8 @@ import type { TParams, TranslationKey } from "@/i18n/core/static-types";
  * @returns A standardized error response with translation key
  */
 export function createErrorResponse(
-  message: TranslationKey,
-  errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements],
+             message: TranslationKey,
+          errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements],
   messageParams?: TParams,
 ): ErrorResponseType {
   return {
@@ -38,8 +38,8 @@ export function fail({
   messageParams,
   cause,
 }: {
-  message: TranslationKey;
-  errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
+            message: TranslationKey;
+          errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
   messageParams?: TParams;
   cause?: ErrorResponseType;
 }): ErrorResponseType {
@@ -75,8 +75,8 @@ export class ErrorResponseError extends Error {
  * @throws ErrorResponseError containing the ErrorResponseType
  */
 export function throwErrorResponse(
-  message: TranslationKey,
-  errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements],
+            message: TranslationKey,
+          errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements],
   messageParams?: TParams,
 ): never {
   const errorResponse = createErrorResponse(message, errorType, messageParams);
@@ -99,7 +99,7 @@ export function success<TResponse>(
 }
 
 export function createSuccessMessageResponse(
-  message: TranslationKey,
+            message: TranslationKey,
   messageParams?: TParams,
 ): ResponseType<MessageResponseType> {
   return {
@@ -113,8 +113,8 @@ export function createSuccessMessageResponse(
 
 export const messageResponseSchema = z.object({
   // TODO TranslationKey validation here
-  message: z.string() as z.ZodType<TranslationKey>,
-  messageParams: z
+            message: z.string() as z.ZodType<TranslationKey>,
+            messageParams: z
     .record(z.string(), z.union([z.string(), z.number()]))
     .optional(),
 });
@@ -125,7 +125,7 @@ export const errorResponseSchema = z.object({
   messageParams: z
     .record(z.string(), z.union([z.string(), z.number()]))
     .optional(),
-  errorType: z.object({
+          errorType: z.object({
     errorKey: z.string(),
     errorCode: z.number(),
   }),
@@ -180,7 +180,7 @@ export interface ErrorResponseType {
   success: false;
   message: TranslationKey;
   messageParams?: TParams;
-  errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
+          errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
   cause?: ErrorResponseType;
 }
 

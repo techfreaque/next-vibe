@@ -1,6 +1,4 @@
-import { CornerDownRight } from "lucide-react-native";
+import { CornerDownRight as CornerDownRightIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(CornerDownRight);
-export { CornerDownRight };
+export const CornerDownRight = styled(CornerDownRightIcon);

@@ -1,6 +1,4 @@
-import { Edit2 } from "lucide-react-native";
+import { Edit2 as Edit2Icon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Edit2);
-export { Edit2 };
+export const Edit2 = styled(Edit2Icon);

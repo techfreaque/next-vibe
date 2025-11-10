@@ -5,7 +5,7 @@
 
 import { Button, Section } from "@react-email/components";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -405,10 +405,10 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
 > = ({ requestData, responseData, locale, t, user }) => {
   try {
     if (!responseData?.response) {
-      return createErrorResponse(
-        "app.api.v1.core.leads.batch.email.admin.batchUpdate.error.noData",
-        ErrorResponseTypes.VALIDATION_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.leads.batch.email.admin.batchUpdate.error.noData",
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
     }
 
     return success({
@@ -432,10 +432,10 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
       }),
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.leads.batch.email.error.general.internal_server_error",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+      message: "app.api.v1.core.leads.batch.email.error.general.internal_server_error",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };
 
@@ -450,10 +450,10 @@ export const renderBatchDeleteNotificationMail: EmailFunctionType<
 > = ({ requestData, responseData, locale, t, user }) => {
   try {
     if (!responseData?.response) {
-      return createErrorResponse(
-        "app.api.v1.core.leads.batch.email.admin.batchDelete.error.noData",
-        ErrorResponseTypes.VALIDATION_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.leads.batch.email.admin.batchDelete.error.noData",
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
     }
 
     return success({
@@ -477,9 +477,9 @@ export const renderBatchDeleteNotificationMail: EmailFunctionType<
       }),
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.leads.batch.email.error.general.internal_server_error",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+      message: "app.api.v1.core.leads.batch.email.error.general.internal_server_error",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };

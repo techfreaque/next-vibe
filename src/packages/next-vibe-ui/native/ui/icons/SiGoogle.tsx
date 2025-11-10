@@ -1,8 +1,5 @@
-import React from "react";
-import Svg, { Rect } from "react-native-svg";
+// TODO: lucide-react-native doesn't have Google brand icon, using Globe as placeholder
+import { Globe as SiGoogleIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-export const SiGoogle = ({ className }: { className?: string }): JSX.Element => (
-  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
-    <Rect width="24" height="24" fill="#4285F4" />
-  </Svg>
-);
+export const SiGoogle = styled(SiGoogleIcon);

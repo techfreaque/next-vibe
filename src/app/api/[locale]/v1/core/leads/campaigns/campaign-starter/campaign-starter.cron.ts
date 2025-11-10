@@ -8,7 +8,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -118,11 +118,11 @@ export async function execute(
       );
 
     if (!configResult.success || !configResult.data) {
-      return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: "Failed to load configuration" },
-      );
+      return fail({
+          message: "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: "Failed to load configuration" },
+      });
     }
 
     const config = configResult.data;
@@ -228,11 +228,11 @@ export async function execute(
       executionTimeMs,
     });
 
-    return createErrorResponse(
-      "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { error: errorMessage, executionTimeMs },
-    );
+    return fail({
+          message: "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage, executionTimeMs },
+      });
   }
 }
 
@@ -258,11 +258,11 @@ export function validate(
         errorMessage: errorMessage,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: errorMessage },
-      );
+      return fail({
+          message: "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
     }
 
     // Get typed config after successful validation
@@ -270,19 +270,19 @@ export function validate(
 
     // Validate business logic
     if (typedConfig.enabledHours.start >= typedConfig.enabledHours.end) {
-      return createErrorResponse(
-        "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: "Start hour must be less than end hour" },
-      );
+      return fail({
+          message: "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: "Start hour must be less than end hour" },
+      });
     }
 
     if (typedConfig.enabledDays.length === 0) {
-      return createErrorResponse(
-        "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: "At least one enabled day must be specified" },
-      );
+      return fail({
+          message: "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: "At least one enabled day must be specified" },
+      });
     }
 
     return success(true);
@@ -292,11 +292,11 @@ export function validate(
       message: errorMessage,
     });
 
-    return createErrorResponse(
-      "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { error: errorMessage },
-    );
+    return fail({
+          message: "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
   }
 }
 

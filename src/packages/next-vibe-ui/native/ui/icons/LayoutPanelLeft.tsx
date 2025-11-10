@@ -1,6 +1,4 @@
-import { LayoutPanelLeft } from "lucide-react-native";
+import { LayoutPanelLeft as LayoutPanelLeftIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(LayoutPanelLeft);
-export { LayoutPanelLeft };
+export const LayoutPanelLeft = styled(LayoutPanelLeftIcon);

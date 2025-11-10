@@ -3,7 +3,7 @@ import path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -382,10 +382,10 @@ export class TranslationReorganizeRepositoryImpl {
         error: errorMessage,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -588,10 +588,10 @@ export class TranslationReorganizeRepositoryImpl {
     try {
       // Validate backup path exists
       if (!fs.existsSync(request.backupPath)) {
-        return createErrorResponse(
-          "app.api.v1.core.system.translations.restoreBackup.post.messages.backupNotFound",
-          ErrorResponseTypes.NOT_FOUND,
-        );
+        return fail({
+          message: "app.api.v1.core.system.translations.restoreBackup.post.messages.backupNotFound",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
 
       // Extract backup date from path
@@ -646,10 +646,10 @@ export class TranslationReorganizeRepositoryImpl {
         backupPath: request.backupPath,
       });
 
-      return createErrorResponse(
-        "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -1508,10 +1508,10 @@ export class TranslationReorganizeRepositoryImpl {
       logger.error("Error getting translation stats", {
         error: parseError(error),
       });
-      return createErrorResponse(
-        "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 

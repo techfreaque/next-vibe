@@ -1,6 +1,4 @@
-import { X } from "lucide-react-native";
+import { X as XIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(X);
-export { X };
+export const X = styled(XIcon);

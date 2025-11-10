@@ -108,6 +108,10 @@ export const translations: typeof enTranslations = {
       description: "Dane odpowiedzi sesji płatności",
     },
     errors: {
+      alreadySubscribed: {
+        title: "Już subskrybowany",
+        description: "Masz już aktywną subskrypcję",
+      },
       validation: {
         title: "Błąd walidacji",
         description: "Nieprawidłowe parametry płatności",

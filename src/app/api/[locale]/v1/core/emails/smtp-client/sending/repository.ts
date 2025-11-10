@@ -439,9 +439,9 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
 
         if (isLeadCampaign) {
           return fail({
-        message: "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
-        errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: {
+          message: "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                      messageParams: {
               campaignType: data.selectionCriteria.campaignType,
               emailJourneyVariant:
                 data.selectionCriteria.emailJourneyVariant || "null",
@@ -453,9 +453,9 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       });
         } else {
           return fail({
-        message: "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
-        errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: {
+          message: "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                      messageParams: {
               campaignType: data.selectionCriteria.campaignType,
             },
       });
@@ -512,9 +512,9 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
     } catch (error) {
       logger.error("Critical error in email sending", parseError(error));
       return fail({
-        message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-        errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                  messageParams: {
           error: parseError(error).message,
         },
       });
@@ -597,9 +597,9 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       } catch (error) {
         const errorMessage = parseError(error).message;
         lastError = fail({
-        message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-        errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                    messageParams: {
             error: errorMessage,
             accountId: account.id,
             attempt: attempt.toString(),
@@ -622,9 +622,9 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
     return (
       lastError ||
       fail({
-        message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-        errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                  messageParams: {
           accountId: account.id,
         },
       })
@@ -655,9 +655,9 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         if (!rateLimitCheck.success) {
           // Convert rate limit error to proper SMTP send error
           return fail({
-            message: rateLimitCheck.message,
-            errorType: rateLimitCheck.errorType,
-            messageParams: rateLimitCheck.messageParams,
+          message: rateLimitCheck.message,
+          errorType: rateLimitCheck.errorType,
+                      messageParams: rateLimitCheck.messageParams,
             cause: rateLimitCheck,
           });
         }
@@ -711,9 +711,9 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         );
 
         return fail({
-        message: "app.api.v1.core.emails.smtpClient.sending.errors.rejected.title",
-        errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.emails.smtpClient.sending.errors.rejected.title",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                    messageParams: {
             recipient: params.to,
             reason: rejectedReason,
           },
@@ -730,9 +730,9 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         );
 
         return fail({
-        message: "app.api.v1.core.emails.smtpClient.sending.errors.no_recipients.title",
-        errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.emails.smtpClient.sending.errors.no_recipients.title",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                    messageParams: {
             recipient: params.to,
           },
       });
@@ -801,9 +801,9 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       }
 
       return fail({
-        message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-        errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                  messageParams: {
           error: parseError(error).message,
           accountId: account.id,
           accountName: account.name,
@@ -876,9 +876,9 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
 
       if (!canSend) {
         return fail({
-        message: "app.api.v1.core.emails.smtpClient.sending.errors.rate_limit.title",
-        errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.emails.smtpClient.sending.errors.rate_limit.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                    messageParams: {
             accountName: account.name,
             limit: account.rateLimitPerHour,
             current: emailsSentThisHour,
@@ -1087,9 +1087,9 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
     } catch (error) {
       logger.error("Error getting total sending capacity", parseError(error));
       return fail({
-        message: "app.api.v1.core.emails.smtpClient.sending.errors.capacity.title",
-        errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: {
+          message: "app.api.v1.core.emails.smtpClient.sending.errors.capacity.title",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                  messageParams: {
           error: parseError(error).message,
         },
       });

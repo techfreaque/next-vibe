@@ -128,9 +128,9 @@ export async function setupAiStream(params: {
     return {
       success: false,
       error: fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.aiStream.route.errors.authenticationRequired",
-        errorType: ErrorResponseTypes.AUTH_ERROR,
+          errorType: ErrorResponseTypes.AUTH_ERROR,
       }),
     };
   }
@@ -180,9 +180,9 @@ export async function setupAiStream(params: {
     return {
       success: false,
       error: fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.aiStream.route.errors.noIdentifier",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
       }),
     };
   }
@@ -191,9 +191,9 @@ export async function setupAiStream(params: {
     return {
       success: false,
       error: fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.aiStream.route.errors.creditValidationFailed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       }),
     };
   }
@@ -210,10 +210,10 @@ export async function setupAiStream(params: {
     return {
       success: false,
       error: fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.aiStream.route.errors.insufficientCredits",
-        errorType: ErrorResponseTypes.FORBIDDEN,
-        messageParams: {
+          errorType: ErrorResponseTypes.FORBIDDEN,
+                  messageParams: {
           cost: modelCost.toString(),
           balance: validationResult.data.balance.toString(),
         },
@@ -252,9 +252,9 @@ export async function setupAiStream(params: {
           return {
             success: false,
             error: fail({
-              message:
+          message:
                 "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
-              errorType: ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
             }),
           };
         }
@@ -276,9 +276,9 @@ export async function setupAiStream(params: {
           return {
             success: false,
             error: fail({
-              message:
+          message:
                 "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
-              errorType: ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
             }),
           };
         }
@@ -315,7 +315,7 @@ export async function setupAiStream(params: {
     });
   } catch (error) {
     logger.error("Failed to ensure thread - RAW ERROR", parseError(error), {
-      errorType: typeof error,
+          errorType: typeof error,
       errorConstructor:
         error instanceof Error ? error.constructor.name : "unknown",
     });
@@ -339,9 +339,9 @@ export async function setupAiStream(params: {
     return {
       success: false,
       error: fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
-        errorType: ErrorResponseTypes.NOT_FOUND,
+          errorType: ErrorResponseTypes.NOT_FOUND,
       }),
     };
   }

@@ -1,6 +1,4 @@
-import { Tv } from "lucide-react-native";
+import { Tv as TvIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Tv);
-export { Tv };
+export const Tv = styled(TvIcon);

@@ -8,7 +8,7 @@ import "server-only";
 import { and, eq, isNotNull } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -132,10 +132,10 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
         stage,
         error: parseError(error).message,
       });
-      return createErrorResponse(
-        "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }

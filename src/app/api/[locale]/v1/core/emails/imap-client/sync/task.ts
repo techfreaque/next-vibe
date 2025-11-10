@@ -8,7 +8,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -107,10 +107,10 @@ async function executeImapSync(
       logger.error("tasks.imap_sync.failed", {
         error: syncResult.message,
       });
-      return createErrorResponse(
-        "app.api.v1.core.emails.error.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.emails.error.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   } catch (error) {
     logger.error("tasks.imap_sync.failed", {
@@ -120,10 +120,10 @@ async function executeImapSync(
           : "tasks.imap_sync.unknown_error",
     });
 
-    return createErrorResponse(
-      "app.api.v1.core.emails.error.default",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+          message: "app.api.v1.core.emails.error.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 }
 
@@ -147,16 +147,16 @@ function validateImapSync(
     if (validationResult.success && validationResult.data) {
       return success(validationResult.data.isValid);
     } else {
-      return createErrorResponse(
-        "app.api.v1.core.emails.error.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.emails.error.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.emails.error.default",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+          message: "app.api.v1.core.emails.error.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 }
 
@@ -200,10 +200,10 @@ const imapSyncTask: Task = {
     const result = await executeImapSync(context);
 
     if (!result.success) {
-      return createErrorResponse(
-        "app.api.v1.core.emails.error.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.emails.error.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
     // Returns void implicitly on success
   },

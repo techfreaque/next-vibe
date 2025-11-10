@@ -4,7 +4,7 @@
  */
 
 import {
-  createErrorResponse,
+  fail,
   type ErrorResponseType,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -243,11 +243,11 @@ export function validateABTestConfig(config: ABTestConfig): {
 
   if (Math.abs(totalWeight - 100) > 0.01) {
     errors.push(
-      createErrorResponse(
-        "app.api.v1.core.leads.campaigns.emails.services.abTesting.invalidWeights",
-        ErrorResponseTypes.VALIDATION_ERROR,
-        { totalWeight },
-      ),
+      fail({
+        message: "app.api.v1.core.leads.campaigns.emails.services.abTesting.invalidWeights",
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        messageParams: { totalWeight },
+      }),
     );
   }
 
@@ -255,11 +255,11 @@ export function validateABTestConfig(config: ABTestConfig): {
   for (const [variant, variantConfig] of Object.entries(config.variants)) {
     if (variantConfig.weight <= 0) {
       errors.push(
-        createErrorResponse(
-          "app.api.v1.core.leads.campaigns.emails.services.abTesting.negativeWeight",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          { variant, weight: variantConfig.weight },
-        ),
+        fail({
+          message: "app.api.v1.core.leads.campaigns.emails.services.abTesting.negativeWeight",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          messageParams: { variant, weight: variantConfig.weight },
+        }),
       );
     }
   }

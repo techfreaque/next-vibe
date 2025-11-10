@@ -1,6 +1,4 @@
-import { LogOut } from "lucide-react-native";
+import { LogOut as LogOutIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(LogOut);
-export { LogOut };
+export const LogOut = styled(LogOutIcon);

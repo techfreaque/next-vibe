@@ -56,7 +56,7 @@ export async function createHTTPSuccessResponse<TResponse>({
     );
     return createHTTPErrorResponse({
       message: "app.api.v1.core.shared.errorTypes.invalid_response_error",
-      errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
+          errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
       messageParams: { message: validationResult.message },
       logger,
     });
@@ -81,7 +81,7 @@ export async function createHTTPSuccessResponse<TResponse>({
       );
       return createHTTPErrorResponse({
         message: "app.api.v1.core.shared.errorTypes.internal_error",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parseError(error).message,
         },
@@ -109,7 +109,7 @@ export function createHTTPErrorResponse({
   logger,
 }: {
   message: TranslationKey;
-  errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
+          errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
   messageParams?: TParams;
   cause?: ErrorResponseType;
   logger: EndpointLogger;
@@ -133,7 +133,7 @@ export function createHTTPErrorResponse({
   // Validate error response format
   const validationResult = validateData(
     fail({
-      message: message,
+          message: message,
       errorType,
       messageParams,
       cause,
@@ -149,9 +149,9 @@ export function createHTTPErrorResponse({
     );
     return NextResponse.json(
       fail({
-        message: "app.api.v1.core.shared.errorTypes.invalid_response_error",
-        errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
-        messageParams: { message: validationResult.message },
+          message: "app.api.v1.core.shared.errorTypes.invalid_response_error",
+          errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
+                  messageParams: { message: validationResult.message },
       }),
       { status: 500 },
     );
@@ -184,8 +184,8 @@ export async function validatePostRequest<T>(
       logger.error(`Request validation error: ${validationResult.message}`);
       // Return the actual validation error directly, not a generic wrapper
       return fail({
-        message: validationResult.message,
-        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+          message: validationResult.message,
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         cause: validationResult,
       });
     }
@@ -194,10 +194,10 @@ export async function validatePostRequest<T>(
   } catch (error) {
     // For JSON parsing errors, use a specific error message
     return fail({
-      message: "app.api.v1.core.shared.errors.invalid_request_data",
-      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-      messageParams: {
-        message: parseError(error).message,
+          message: "app.api.v1.core.shared.errors.invalid_request_data",
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+                messageParams: {
+                message: parseError(error).message,
       },
     });
   }
@@ -287,8 +287,8 @@ export function validateGetRequest<T extends ZodSchema>(
       );
       // Return the actual validation error directly, not a generic wrapper
       return fail({
-        message: validationResult.message,
-        errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
+          message: validationResult.message,
+          errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
         cause: validationResult,
       });
     }
@@ -297,10 +297,10 @@ export function validateGetRequest<T extends ZodSchema>(
       `Error validating query parameters: ${parseError(error).message}`,
     );
     return fail({
-      message: "app.api.v1.core.shared.errors.invalid_url_parameters",
-      errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
-      messageParams: {
-        message: parseError(error).message,
+          message: "app.api.v1.core.shared.errors.invalid_url_parameters",
+          errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
+                messageParams: {
+                message: parseError(error).message,
       },
     });
   }

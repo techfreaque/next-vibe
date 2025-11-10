@@ -90,13 +90,13 @@ export interface AIToolExecutionContext<
 export interface ToolCallWidgetMetadata {
   endpointId: string;
   responseFields: Array<{
-    name: string;
+    name: TranslationKey;
     widgetType: WidgetType;
-    label?: string;
-    description?: string;
+    label?: TranslationKey;
+    description?: TranslationKey;
     layout?: { [key: string]: string | number | boolean };
     validation?: { [key: string]: string | number | boolean };
-    options?: Array<{ value: string; label: string }>;
+    options?: Array<{ value: string; label: TranslationKey }>;
   }>;
   creditsUsed?: number;
   executionTime?: number;

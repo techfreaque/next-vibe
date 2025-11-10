@@ -1,7 +1,4 @@
-import { Moon } from "lucide-react-native";
+import { MoonIcon as MoonIconIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Moon);
-// MoonIcon is an alias for Moon
-export const MoonIcon = Moon;
+export const MoonIcon = styled(MoonIconIcon);

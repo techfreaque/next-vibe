@@ -1,8 +1,4 @@
-import { ShieldOff } from "lucide-react-native";
+import { ShieldOff as ShieldOffIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(ShieldOff);
-export { ShieldOff };
-// Alias for consistency
-export const ShieldOffIcon = ShieldOff;
+export const ShieldOff = styled(ShieldOffIcon);

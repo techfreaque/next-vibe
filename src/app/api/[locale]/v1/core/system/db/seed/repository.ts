@@ -5,7 +5,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -92,11 +92,11 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
       } catch (seedError) {
         const error = parseError(seedError);
         logger.error("❌ seedDatabase function failed:", error);
-        return createErrorResponse(
-          "app.api.v1.core.system.db.seed.post.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          { error: error.message },
-        );
+        return fail({
+          message: "app.api.v1.core.system.db.seed.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                    messageParams: { error: error.message },
+        });
       }
 
       const duration = Date.now() - startTime;
@@ -134,11 +134,10 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
       logger.error("❌ Database seeding failed:", parseError(error));
       parseError(error);
 
-      return createErrorResponse(
-        "app.api.v1.core.system.db.seed.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {},
-      );
+      return fail({
+          message: "app.api.v1.core.system.db.seed.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }

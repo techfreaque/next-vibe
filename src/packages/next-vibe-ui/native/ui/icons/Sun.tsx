@@ -1,6 +1,4 @@
-import { Sun } from "lucide-react-native";
+import { Sun as SunIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Sun);
-export { Sun };
+export const Sun = styled(SunIcon);

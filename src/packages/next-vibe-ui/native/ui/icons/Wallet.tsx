@@ -1,6 +1,4 @@
-import { Wallet } from "lucide-react-native";
+import { Wallet as WalletIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Wallet);
-export { Wallet };
+export const Wallet = styled(WalletIcon);

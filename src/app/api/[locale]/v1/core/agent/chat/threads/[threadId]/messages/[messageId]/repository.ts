@@ -160,9 +160,9 @@ class MessageRepository implements MessageRepositoryInterface {
     } catch (error) {
       logger.error("Error getting message:", parseError(error));
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.server.description" as const,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -282,9 +282,9 @@ class MessageRepository implements MessageRepositoryInterface {
     } catch (error) {
       logger.error("Error updating message:", parseError(error));
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.server.description" as const,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -376,9 +376,9 @@ class MessageRepository implements MessageRepositoryInterface {
     } catch (error) {
       logger.error("Error deleting message:", parseError(error));
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.server.description" as const,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

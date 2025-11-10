@@ -132,9 +132,9 @@ export const ChatInputV2 = forwardRef<HTMLTextAreaElement, ChatInputV2Props>(
         </Div>
 
         {/* Controls - ALL IN ONE LINE */}
-        <Div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 flex-nowrap">
+        <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 flex-nowrap">
           {/* Left side: Model & Persona Selectors */}
-          <Div className="flex items-center gap-0.5 sm:gap-1 md:gap-1.5 flex-1 min-w-0">
+          <Div className="flex flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 flex-1 min-w-0">
             {/* Model Selector - text hidden last (on smallest screens) */}
             <ModelSelector
               value={selectedModel}
@@ -176,7 +176,7 @@ export const ChatInputV2 = forwardRef<HTMLTextAreaElement, ChatInputV2Props>(
           </Div>
 
           {/* Right side: Speech Input & Send/Stop Button */}
-          <Div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 shrink-0">
+          <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 shrink-0">
             {/* Speech Input Button */}
             <SpeechInputButton
               onTranscript={(text) => {

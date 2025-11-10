@@ -7,7 +7,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -162,11 +162,11 @@ export class ResetTaskManagementRepositoryImpl
           result = await this.listTasks(logger);
           break;
         default:
-          return createErrorResponse(
-            "app.api.v1.core.system.db.reset.taskManagement.errors.validation.title",
-            ErrorResponseTypes.INTERNAL_ERROR,
-            { operation },
-          );
+          return fail({
+          message: "app.api.v1.core.system.db.reset.taskManagement.errors.validation.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { operation },
+      });
       }
 
       logger.info("Task operation completed", {
@@ -189,11 +189,11 @@ export class ResetTaskManagementRepositoryImpl
       const parsedError = parseError(error);
       logger.error("Task operation execution failed", parsedError);
 
-      return createErrorResponse(
-        "app.api.v1.core.system.db.reset.taskManagement.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+          message: "app.api.v1.core.system.db.reset.taskManagement.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 

@@ -74,9 +74,9 @@ export class ChatFoldersRepositoryImpl
     if (!userIdentifier) {
       logger.error("Missing user identifier", { user });
       return fail({
-        message:
+          message:
           "app.api.v1.core.agent.chat.folders.get.errors.unauthorized.title",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
 
@@ -135,7 +135,7 @@ export class ChatFoldersRepositoryImpl
       }
 
       // Map folders to response format with permission flags
-      const foldersWithPermissions = await Promise.all(
+      const foldersWithPermissionsOrNull = await Promise.all(
         visibleFolders.map(async (folder) => {
           // Compute all permission flags server-side
           const [
@@ -151,6 +151,12 @@ export class ChatFoldersRepositoryImpl
             canDeleteFolder(user, folder, logger, folderMap),
             canManageFolderPermissions(user, folder, logger, folderMap),
           ]);
+
+          // Skip folders without userId - they shouldn't exist in this context
+          if (!folder.userId) {
+            logger.warn("Folder has null userId, skipping", { folderId: folder.id });
+            return null;
+          }
 
           return {
             id: folder.id,
@@ -185,6 +191,11 @@ export class ChatFoldersRepositoryImpl
         }),
       );
 
+      // Filter out null entries (folders without userId)
+      const foldersWithPermissions = foldersWithPermissionsOrNull.filter(
+        (folder): folder is NonNullable<typeof folder> => folder !== null
+      );
+
       // Compute root folder permissions
       // If rootFolderId is specified, compute permissions for that root folder
       // Otherwise, return default permissions (no permissions)
@@ -207,13 +218,12 @@ export class ChatFoldersRepositoryImpl
       return success({
         rootFolderPermissions,
         folders: foldersWithPermissions,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      }) as any;
+      }) ;
     } catch (error) {
       logger.error("Failed to fetch folders", parseError(error));
       return fail({
-        message: "app.api.v1.core.agent.chat.folders.get.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: "app.api.v1.core.agent.chat.folders.get.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -247,19 +257,19 @@ export class ChatFoldersRepositoryImpl
         // Determine the specific error message
         if (user.isPublic) {
           return fail({
-            message:
+          message:
               "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
-            errorType: ErrorResponseTypes.FORBIDDEN,
+          errorType: ErrorResponseTypes.FORBIDDEN,
           });
         }
 
         if (folderData.rootFolderId === "incognito") {
           return fail({
-            message:
+          message:
               "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
-            errorType: ErrorResponseTypes.FORBIDDEN,
-            messageParams: {
-              message: simpleT(locale).t(
+          errorType: ErrorResponseTypes.FORBIDDEN,
+                      messageParams: {
+                      message: simpleT(locale).t(
                 "app.api.v1.core.agent.chat.folders.post.errors.forbidden.incognitoNotAllowed",
               ),
             },
@@ -268,9 +278,9 @@ export class ChatFoldersRepositoryImpl
 
         if (folderData.rootFolderId === "public") {
           return fail({
-            message:
+          message:
               "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
-            errorType: ErrorResponseTypes.FORBIDDEN,
+          errorType: ErrorResponseTypes.FORBIDDEN,
           });
         }
 
@@ -339,6 +349,15 @@ export class ChatFoldersRepositoryImpl
         });
       }
 
+      // Folders should always have a userId at creation
+      if (!newFolder.userId) {
+        logger.error("Created folder has null userId", { folderId: newFolder.id });
+        return fail({
+          message: "app.api.v1.core.agent.chat.folders.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+
       return success({
         response: {
           folder: {
@@ -366,13 +385,12 @@ export class ChatFoldersRepositoryImpl
             updatedAt: newFolder.updatedAt.toISOString(),
           },
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      }) as any;
+      });
     } catch (error) {
       logger.error("Failed to create folder", parseError(error));
       return fail({
-        message: "app.api.v1.core.agent.chat.folders.post.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: "app.api.v1.core.agent.chat.folders.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

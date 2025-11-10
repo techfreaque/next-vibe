@@ -1,6 +1,4 @@
-import { Leaf } from "lucide-react-native";
+import { Leaf as LeafIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Leaf);
-export { Leaf };
+export const Leaf = styled(LeafIcon);

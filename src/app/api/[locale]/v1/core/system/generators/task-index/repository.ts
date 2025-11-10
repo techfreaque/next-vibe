@@ -13,7 +13,7 @@ import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -86,11 +86,11 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
         logger,
       );
       if (!validationResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.system.generators.taskIndex.post.errors.validation.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          { error: validationResult.error || "Validation failed" },
-        );
+        return fail({
+          message: "app.api.v1.core.system.generators.taskIndex.post.errors.validation.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                    messageParams: { error: validationResult.error || "Validation failed" },
+        });
       }
 
       // Generate content
@@ -119,14 +119,14 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       logger.error("Task index generation failed", {
         error: parseError(error),
       });
-      return createErrorResponse(
-        "app.api.v1.core.system.generators.taskIndex.post.errors.internal.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.system.generators.taskIndex.post.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           error: `Task index generation failed: ${parseError(error).message}`,
           duration,
         },
-      );
+      });
     }
   }
 

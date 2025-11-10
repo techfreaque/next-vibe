@@ -1,6 +1,4 @@
-import { Mountain } from "lucide-react-native";
+import { Mountain as MountainIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Mountain);
-export { Mountain };
+export const Mountain = styled(MountainIcon);

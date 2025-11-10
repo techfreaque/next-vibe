@@ -79,8 +79,8 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
     if (!hasIssues) {
       // eslint-disable-next-line i18next/no-literal-string
       const icon = context.options.useEmojis ? "✨ " : "";
-      const text = context.translate(
-        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound" as never,
+      const text = context.t(
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
       );
       return `${indent}${icon}${this.styleText(text, "green", context)}`;
     }
@@ -92,10 +92,10 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
       const icon = context.options.useEmojis ? "✖ " : "";
       const errorWord =
         errors === 1
-          ? context.translate(
+          ? context.t(
               "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.error",
             )
-          : context.translate(
+          : context.t(
               "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.errors",
             );
       const text = `${errors} ${errorWord}`;
@@ -107,10 +107,10 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
       const icon = context.options.useEmojis ? "⚠ " : "";
       const warningWord =
         warnings === 1
-          ? context.translate(
+          ? context.t(
               "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.warning",
             )
-          : context.translate(
+          : context.t(
               "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.warnings",
             );
       const text = `${warnings} ${warningWord}`;
@@ -120,7 +120,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
     if (info > 0) {
       // eslint-disable-next-line i18next/no-literal-string
       const icon = context.options.useEmojis ? "ℹ " : "";
-      const text = `${info} ${context.translate("app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.info" as never)}`;
+      const text = `${info} ${context.t("app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.info")}`;
       parts.push(`${indent}${icon}${this.styleText(text, "blue", context)}`);
     }
 

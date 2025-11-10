@@ -1,6 +1,4 @@
-import { Send } from "lucide-react-native";
+import { Send as SendIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Send);
-export { Send };
+export const Send = styled(SendIcon);

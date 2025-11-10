@@ -1,6 +1,4 @@
-import { Brush } from "lucide-react-native";
+import { Brush as BrushIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Brush);
-export { Brush };
+export const Brush = styled(BrushIcon);

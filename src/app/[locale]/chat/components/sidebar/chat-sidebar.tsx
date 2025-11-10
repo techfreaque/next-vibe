@@ -204,7 +204,7 @@ export function ChatSidebar({
         locale={locale}
       />
       {/* New Chat Button */}
-      <Div className="flex items-center gap-1 px-3 pb-2 min-w-max">
+      <Div className="flex flex-row items-center gap-1 px-3 pb-2 min-w-max">
         {(() => {
           // Determine if user can create threads in current location
           // Permissions are computed server-side and passed as props
@@ -243,8 +243,8 @@ export function ChatSidebar({
         />
       </Div>
       {/* Search Bar + Fullscreen Button */}
-      <Div className="px-3 pb-3 flex gap-2  border-b border-border ">
-        <Div className="relative flex-1">
+      <Div className="px-3 pb-3 flex flex-row gap-2  border-b border-border ">
+        <Div className="relative flex-1 flex flex-row">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
           <Input
             ref={searchInputRef}

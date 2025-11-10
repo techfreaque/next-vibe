@@ -17,7 +17,7 @@
 import { AUTH_STATUS_COOKIE_NAME } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -71,10 +71,10 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
     try {
       if (envClient.platform.isServer) {
         logger.error("setAuthStatus cannot be called on the server");
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.authClient.errors.status_save_failed",
-          ErrorResponseTypes.AUTH_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.user.auth.authClient.errors.status_save_failed",
+          errorType: ErrorResponseTypes.AUTH_ERROR,
+        });
       }
 
       logger.debug("Setting auth status storage", {
@@ -87,11 +87,11 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       return success(undefined);
     } catch (error) {
       logger.error("Error setting auth status", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.authClient.errors.status_save_failed",
-        ErrorResponseTypes.AUTH_ERROR,
-        { error: String(error) },
-      );
+      return fail({
+          message: "app.api.v1.core.user.auth.authClient.errors.status_save_failed",
+          errorType: ErrorResponseTypes.AUTH_ERROR,
+                  messageParams: { error: String(error) },
+      });
     }
   }
 
@@ -104,21 +104,21 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
     try {
       if (envClient.platform.isServer) {
         logger.error("removeAuthStatus cannot be called on the server");
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.authClient.errors.status_remove_failed",
-          ErrorResponseTypes.AUTH_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.user.auth.authClient.errors.status_remove_failed",
+          errorType: ErrorResponseTypes.AUTH_ERROR,
+        });
       }
       await deleteCookie(AUTH_STATUS_COOKIE_NAME);
 
       return success(undefined);
     } catch (error) {
       logger.error("Error removing auth status", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.authClient.errors.status_remove_failed",
-        ErrorResponseTypes.AUTH_ERROR,
-        { error: String(error) },
-      );
+      return fail({
+          message: "app.api.v1.core.user.auth.authClient.errors.status_remove_failed",
+          errorType: ErrorResponseTypes.AUTH_ERROR,
+                  messageParams: { error: String(error) },
+      });
     }
   }
 
@@ -132,10 +132,10 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
     try {
       if (envClient.platform.isServer) {
         logger.error("hasAuthStatus cannot be called on the server");
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.authClient.errors.status_check_failed",
-          ErrorResponseTypes.AUTH_ERROR,
-        );
+        return fail({
+          message: "app.api.v1.core.user.auth.authClient.errors.status_check_failed",
+          errorType: ErrorResponseTypes.AUTH_ERROR,
+        });
       }
 
       const status = await getCookie(AUTH_STATUS_COOKIE_NAME);
@@ -150,11 +150,11 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       return success(hasStatus);
     } catch (error) {
       logger.error("Error in hasAuthStatus", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.authClient.errors.status_check_failed",
-        ErrorResponseTypes.AUTH_ERROR,
-        { error: String(error) },
-      );
+      return fail({
+          message: "app.api.v1.core.user.auth.authClient.errors.status_check_failed",
+          errorType: ErrorResponseTypes.AUTH_ERROR,
+                  messageParams: { error: String(error) },
+      });
     }
   }
 }

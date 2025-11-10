@@ -5,7 +5,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -82,10 +82,10 @@ export class LeadsListRepositoryImpl implements LeadsListRepository {
       } satisfies ResponseType<LeadListGetResponseTypeOutput>;
     } else {
       logger.error("Failed to list leads", { message: result.message });
-      return createErrorResponse(
-        "app.api.v1.core.leads.list.get.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.list.get.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }

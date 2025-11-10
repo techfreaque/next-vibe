@@ -11,7 +11,7 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -139,7 +139,7 @@ export interface DomainImportRepository<T extends DomainRecord> {
     ResponseType<{
       result: {
         success: boolean;
-        message: string;
+          message: string;
       };
     }>
   >;
@@ -284,17 +284,17 @@ export class LeadsImportRepository implements ILeadsImportRepository {
         data.email = row.email.trim().toLowerCase();
       } else {
         errors.push(
-          createErrorResponse(
-            "app.admin.leads.leadsErrors.leadsImport.post.error.validation.invalid_email_format",
-            ErrorResponseTypes.BAD_REQUEST,
+          fail({
+            message: "app.admin.leads.leadsErrors.leadsImport.post.error.validation.invalid_email_format",
+            errorType: ErrorResponseTypes.BAD_REQUEST, }
           ),
         );
       }
     } else {
       errors.push(
-        createErrorResponse(
-          "app.admin.leads.leadsErrors.leadsImport.post.error.validation.email_required",
-          ErrorResponseTypes.BAD_REQUEST,
+        fail({
+          message: "app.admin.leads.leadsErrors.leadsImport.post.error.validation.email_required",
+          errorType: ErrorResponseTypes.BAD_REQUEST, }
         ),
       );
     }
@@ -436,9 +436,9 @@ export class LeadsImportRepository implements ILeadsImportRepository {
       });
     } catch (error) {
       logger.error("Error creating/updating lead", parseError(error));
-      return createErrorResponse(
-        "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
+      return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR, }
       );
     }
   }
@@ -524,9 +524,9 @@ export class LeadsImportRepository implements ILeadsImportRepository {
       }
     } catch (error) {
       logger.error("Error importing leads from CSV", parseError(error));
-      return createErrorResponse(
-        "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
+      return fail({
+        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR, }
       );
     }
   }
@@ -677,7 +677,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
     ResponseType<{
       result: {
         success: boolean;
-        message: string;
+          message: string;
       };
     }>
   > {

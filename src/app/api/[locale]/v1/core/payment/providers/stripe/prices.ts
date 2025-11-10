@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -130,11 +130,11 @@ export class StripePriceManager {
         country,
         interval,
       });
-      return createErrorResponse(
-        "app.api.v1.core.payment.providers.stripe.errors.priceCreationFailed.title",
-        ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        { error: parseError(error).message, productId },
-      );
+      return fail({
+          message: "app.api.v1.core.payment.providers.stripe.errors.priceCreationFailed.title",
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                  messageParams: { error: parseError(error).message, productId },
+      });
     }
   }
 }

@@ -107,9 +107,9 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
       });
 
       return fail({
-        message: "app.api.v1.core.emails.imapClient.config.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
+          message: "app.api.v1.core.emails.imapClient.config.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
       });
     }
   }
@@ -148,9 +148,9 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
       });
 
       return fail({
-        message: "app.api.v1.core.emails.imapClient.config.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
+          message: "app.api.v1.core.emails.imapClient.config.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
       });
     }
   }

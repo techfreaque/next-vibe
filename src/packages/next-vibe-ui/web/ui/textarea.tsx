@@ -21,12 +21,12 @@ export interface TextareaBaseProps
 }
 
 export const textareaVariants = cva(
-  "flex w-full rounded-md text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 transition-[color,box-shadow] outline-none resize-none overflow-hidden",
+  "flex w-full rounded-md text-sm text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 transition-[color,box-shadow] outline-none resize-none overflow-hidden",
   {
     variants: {
       variant: {
         default:
-          "border border-input bg-transparent px-3 py-2 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+          "border border-input bg-background px-3 py-2 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
         ghost:
           "border-none bg-transparent rounded-t-md rounded-b-none focus-visible:ring-0 focus-visible:ring-offset-0 px-6 pb-4 border-b py-2 text-base shadow-xs md:text-sm",
       },

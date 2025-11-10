@@ -8,7 +8,7 @@ import "server-only";
 import { render } from "@react-email/render";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -95,14 +95,14 @@ class TestEmailRepository {
           data.emailCampaignStage,
         )
       ) {
-        return createErrorResponse(
-          "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
-          ErrorResponseTypes.NOT_FOUND,
-          {
+        return fail({
+          message: "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: {
             emailJourneyVariant: data.emailJourneyVariant,
             emailCampaignStage: data.emailCampaignStage,
           },
-        );
+        });
       }
 
       const mockLead = this.createMockLead(data, data.testEmail);
@@ -125,14 +125,14 @@ class TestEmailRepository {
       );
 
       if (!emailContent) {
-        return createErrorResponse(
-          "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
-          ErrorResponseTypes.NOT_FOUND,
-          {
+        return fail({
+          message: "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: {
             emailJourneyVariant: data.emailJourneyVariant,
             emailCampaignStage: data.emailCampaignStage,
           },
-        );
+        });
       }
 
       const unsubscribeUrl = `${env.NEXT_PUBLIC_APP_URL}/${emailLocale}/newsletter/unsubscribe/${encodeURIComponent(
@@ -175,17 +175,18 @@ class TestEmailRepository {
             error: emailResponse.message,
             errorParams: emailResponse.messageParams,
           });
-          return createErrorResponse(
-            "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
-            ErrorResponseTypes.EMAIL_ERROR,
-            {
+          return fail({
+          message: "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                      messageParams: {
               recipient: data.testEmail,
               subject: emailContent.subject,
               error:
                 emailResponse.message ||
                 "app.api.v1.core.leads.leadsErrors.testEmail.error.sendingFailed.description",
             },
-          );
+            cause: emailResponse,
+          });
         }
 
         // Email sent successfully - emailResponse.success is true
@@ -214,23 +215,23 @@ class TestEmailRepository {
         });
       } catch (error) {
         logger.error("test.email.send.error", parseError(error));
-        return createErrorResponse(
-          "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
-          ErrorResponseTypes.EMAIL_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                    messageParams: {
             recipient: data.testEmail,
             subject: emailContent.subject,
             error: parseError(error).message,
           },
-        );
+        });
       }
     } catch (error) {
       logger.error("test.email.send.server.error", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 }

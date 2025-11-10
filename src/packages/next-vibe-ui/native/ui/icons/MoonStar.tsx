@@ -1,6 +1,4 @@
-import { MoonStar } from "lucide-react-native";
+import { MoonStar as MoonStarIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(MoonStar);
-export { MoonStar };
+export const MoonStar = styled(MoonStarIcon);

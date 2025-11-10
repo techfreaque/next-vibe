@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import type { TranslationKey } from "@/i18n/core/static-types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type {
   ExtractOutput,
@@ -347,8 +348,8 @@ export class ResponseMetadataExtractor {
 
     return {
       type: containerType,
-      title,
-      description,
+      title: title as TranslationKey | undefined,
+      description: description as TranslationKey | undefined,
       layout,
       fields,
     };
@@ -399,8 +400,8 @@ export class ResponseMetadataExtractor {
         type: fieldType,
         widgetType,
         value: toRenderableValue(value),
-        label,
-        description,
+        label: label as TranslationKey | undefined,
+        description: description as TranslationKey | undefined,
         required: false,
       };
 
@@ -475,15 +476,15 @@ export class ResponseMetadataExtractor {
         }
       }
 
-      const title =
+      const title: TranslationKey | undefined =
         "title" in ui && typeof ui.title === "string" ? ui.title : undefined;
-      const label =
+      const label: TranslationKey | undefined =
         "title" in ui && typeof ui.title === "string"
           ? ui.title
           : "label" in ui && typeof ui.label === "string"
             ? ui.label
             : undefined;
-      const description =
+      const description: TranslationKey | undefined =
         "description" in ui && typeof ui.description === "string"
           ? ui.description
           : undefined;
@@ -519,7 +520,7 @@ export class ResponseMetadataExtractor {
     if ("columns" in ui && Array.isArray(ui.columns)) {
       interface ColumnType {
         key: string;
-        label: string;
+        label: TranslationKey;
         type: string;
         width?: string;
         sortable?: boolean;
@@ -569,9 +570,9 @@ export class ResponseMetadataExtractor {
       }));
     }
 
-    const regularTitle =
+    const regularTitle: TranslationKey | undefined =
       "title" in ui && typeof ui.title === "string" ? ui.title : undefined;
-    const regularLabel =
+    const regularLabel: TranslationKey | undefined =
       "title" in ui && typeof ui.title === "string"
         ? ui.title
         : "label" in ui && typeof ui.label === "string"
@@ -579,7 +580,7 @@ export class ResponseMetadataExtractor {
           : "content" in ui && typeof ui.content === "string"
             ? ui.content
             : undefined;
-    const regularDescription =
+    const regularDescription: TranslationKey | undefined =
       "description" in ui && typeof ui.description === "string"
         ? ui.description
         : undefined;
@@ -687,7 +688,7 @@ export class ResponseMetadataExtractor {
       if (arrayField && ui && "columns" in ui && Array.isArray(ui.columns)) {
         interface ColumnType {
           key: string;
-          label: string;
+          label: TranslationKey;
           type: string;
           width?: string;
           sortable?: boolean;
@@ -794,8 +795,8 @@ export class ResponseMetadataExtractor {
 
     return {
       type,
-      title,
-      description,
+      title: title as TranslationKey | undefined,
+      description: description as TranslationKey | undefined,
       layout,
       fields,
     };
@@ -871,7 +872,7 @@ export class ResponseMetadataExtractor {
     }
 
     // Extract label from ui
-    const label =
+    const label: TranslationKey | undefined =
       ui && "title" in ui && typeof ui.title === "string"
         ? ui.title
         : ui && "label" in ui && typeof ui.label === "string"
@@ -879,7 +880,7 @@ export class ResponseMetadataExtractor {
           : undefined;
 
     // Extract description from ui
-    const description =
+    const description: TranslationKey | undefined =
       ui && "description" in ui && typeof ui.description === "string"
         ? ui.description
         : undefined;

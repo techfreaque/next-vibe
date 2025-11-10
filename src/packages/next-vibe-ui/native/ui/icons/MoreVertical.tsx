@@ -1,6 +1,4 @@
-import { MoreVertical } from "lucide-react-native";
+import { MoreVertical as MoreVerticalIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(MoreVertical);
-export { MoreVertical };
+export const MoreVertical = styled(MoreVerticalIcon);

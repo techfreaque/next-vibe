@@ -1,6 +1,4 @@
-import { Minus } from "lucide-react-native";
+import { Minus as MinusIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Minus);
-export { Minus };
+export const Minus = styled(MinusIcon);

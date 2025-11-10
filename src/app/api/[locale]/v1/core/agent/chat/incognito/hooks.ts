@@ -250,7 +250,7 @@ export function useIncognitoChat(
         isAI: role === "assistant",
         model,
         persona,
-        errorType: null,
+          errorType: null,
         errorMessage: null,
         edited: false,
         tokens: null,

@@ -722,7 +722,7 @@ class AiStreamRepository implements IAiStreamRepository {
         success: false,
         message:
           "app.api.v1.core.agent.chat.aiStream.route.errors.uncensoredApiKeyMissing",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       };
     }
 
@@ -1481,7 +1481,7 @@ class AiStreamRepository implements IAiStreamRepository {
 
                 const toolCallData: ToolCall = {
                   toolName: part.toolName,
-                  displayName: endpoint?.definition.title || part.toolName,
+                  displayName: (endpoint?.definition.title || part.toolName),
                   icon: endpoint?.definition.aiTool?.icon,
                   args: validatedArgs,
                   creditsUsed: endpoint?.definition.credits ?? 0,
@@ -1589,7 +1589,7 @@ class AiStreamRepository implements IAiStreamRepository {
                       messageId: errorMessageId,
                       threadId: threadResultThreadId,
                       content: toolError,
-                      errorType: "TOOL_ERROR",
+          errorType: "TOOL_ERROR",
                       parentId: currentToolCallData.parentId,
                       depth: currentToolCallData.depth,
                       userId,
@@ -1725,7 +1725,7 @@ class AiStreamRepository implements IAiStreamRepository {
                 messageId: errorMessageId,
                 threadId: threadResultThreadId,
                 content: `Stream error: ${errorMessage}`,
-                errorType: "STREAM_ERROR",
+          errorType: "STREAM_ERROR",
                 parentId: lastParentId,
                 depth: lastDepth,
                 userId,
@@ -1783,7 +1783,7 @@ class AiStreamRepository implements IAiStreamRepository {
         success: false,
         message:
           "app.api.v1.core.agent.chat.aiStream.route.errors.streamCreationFailed",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: {
           error: errorMessage,
         },

@@ -2,7 +2,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -104,13 +104,13 @@ export async function sendSms(
       to: params.to,
       reason: validation.reason,
     });
-    return createErrorResponse(
-      "app.api.v1.core.sms.sms.error.invalid_phone_format",
-      ErrorResponseTypes.INVALID_REQUEST_ERROR,
-      {
+    return fail({
+          message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+        messageParams: {
         reason: validation.reason || "",
       },
-    );
+      });
   }
 
   try {
@@ -176,25 +176,25 @@ export async function sendSms(
       to: params.to,
       attempts: maxAttempts,
     });
-    return createErrorResponse(
-      "app.api.v1.core.sms.sms.error.delivery_failed",
-      ErrorResponseTypes.SMS_ERROR,
-      {
+    return fail({
+          message: "app.api.v1.core.sms.sms.error.delivery_failed",
+          errorType: ErrorResponseTypes.SMS_ERROR,
+        messageParams: {
         errorMessage: lastError?.message ?? "",
       },
-    );
+      });
   } catch (error) {
     logger.error(
       "app.api.v1.core.sms.sms.error.unexpected_error",
       parseError(error),
     );
-    return createErrorResponse(
-      "app.api.v1.core.sms.sms.error.unexpected_error",
-      ErrorResponseTypes.SMS_ERROR,
-      {
+    return fail({
+          message: "app.api.v1.core.sms.sms.error.unexpected_error",
+          errorType: ErrorResponseTypes.SMS_ERROR,
+        messageParams: {
         errorMessage: error instanceof Error ? error.message : "",
       },
-    );
+      });
   }
 }
 
@@ -241,13 +241,13 @@ export async function batchSendSms(
     logger.error("app.api.v1.core.sms.sms.error.all_failed", {
       totalResults: results.length,
     });
-    return createErrorResponse(
-      "app.api.v1.core.sms.sms.error.all_failed",
-      ErrorResponseTypes.SMS_ERROR,
-      {
+    return fail({
+          message: "app.api.v1.core.sms.sms.error.all_failed",
+          errorType: ErrorResponseTypes.SMS_ERROR,
+        messageParams: {
         totalResults: results.length.toString(),
       },
-    );
+      });
   }
 
   if (failureCount > 0) {
@@ -255,14 +255,14 @@ export async function batchSendSms(
       failureCount,
       totalCount: results.length,
     });
-    return createErrorResponse(
-      "app.api.v1.core.sms.sms.error.partial_failure",
-      ErrorResponseTypes.SMS_ERROR,
-      {
+    return fail({
+          message: "app.api.v1.core.sms.sms.error.partial_failure",
+          errorType: ErrorResponseTypes.SMS_ERROR,
+        messageParams: {
         failureCount: failureCount.toString(),
         totalCount: results.length.toString(),
       },
-    );
+      });
   }
 
   logger.info("Batch SMS sent successfully", { count: messages.length });

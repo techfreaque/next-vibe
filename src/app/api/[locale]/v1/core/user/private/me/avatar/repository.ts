@@ -5,7 +5,7 @@
 
 import { revalidatePath } from "next/cache";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
   type ResponseType,
@@ -79,31 +79,32 @@ export class AvatarRepositoryImpl implements AvatarRepository {
         logger,
       );
       if (!userResponse.success) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.avatar.errors.user_not_found",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId },
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.avatar.errors.user_not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: { userId },
+          cause: userResponse,
+        });
       }
 
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
       if (!allowedTypes.includes(file.type)) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.avatar.errors.invalid_file_type",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          { allowedTypes: allowedTypes.join(", "), providedType: file.type },
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.avatar.errors.invalid_file_type",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                    messageParams: { allowedTypes: allowedTypes.join(", "), providedType: file.type },
+        });
       }
 
       // Validate file size (max 5MB)
       const maxSizeBytes = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSizeBytes) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.avatar.errors.file_too_large",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          { maxSize: "5MB", providedSize: `${Math.round(file.size / 1024 / 1024)}MB` },
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.avatar.errors.file_too_large",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                    messageParams: { maxSize: "5MB", providedSize: `${Math.round(file.size / 1024 / 1024)}MB` },
+        });
       }
 
       // Convert file to base64 and store in database
@@ -153,11 +154,11 @@ export class AvatarRepositoryImpl implements AvatarRepository {
         "app.api.v1.core.user.private.me.avatar.debug.errorUploadingUserAvatar",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.user.private.me.avatar.errors.failed_to_upload_avatar",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { userId, error: String(error) },
-      );
+      return fail({
+          message: "app.api.v1.core.user.private.me.avatar.errors.failed_to_upload_avatar",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { userId, error: String(error) },
+      });
     }
   }
 
@@ -186,11 +187,12 @@ export class AvatarRepositoryImpl implements AvatarRepository {
         logger,
       );
       if (!userResponse.success) {
-        return createErrorResponse(
-          "app.api.v1.core.user.private.me.avatar.errors.user_not_found",
-          ErrorResponseTypes.NOT_FOUND,
-          { userId },
-        );
+        return fail({
+          message: "app.api.v1.core.user.private.me.avatar.errors.user_not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+                    messageParams: { userId },
+          cause: userResponse,
+        });
       }
 
       // Delete avatar from database
@@ -225,11 +227,11 @@ export class AvatarRepositoryImpl implements AvatarRepository {
         "app.api.v1.core.user.private.me.avatar.debug.errorDeletingUserAvatar",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.user.private.me.avatar.errors.failed_to_delete_avatar",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { userId, error: String(error) },
-      );
+      return fail({
+          message: "app.api.v1.core.user.private.me.avatar.errors.failed_to_delete_avatar",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { userId, error: String(error) },
+      });
     }
   }
 }

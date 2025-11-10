@@ -1,6 +1,4 @@
-import { ThumbsDown } from "lucide-react-native";
+import { ThumbsDown as ThumbsDownIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(ThumbsDown);
-export { ThumbsDown };
+export const ThumbsDown = styled(ThumbsDownIcon);

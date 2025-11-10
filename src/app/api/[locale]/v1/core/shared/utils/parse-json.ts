@@ -1,7 +1,7 @@
 import { parse } from "jsonc-parser";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
@@ -18,7 +18,8 @@ export interface JsonWithComments {
     | boolean
     | null
     | undefined
-    | JsonWithComments;
+    | JsonWithComments
+    | JsonWithComments[];
 }
 
 /**
@@ -33,24 +34,24 @@ export function parseJsonWithComments(
   try {
     const result = parse(jsonString);
     if (typeof result !== "object" || result === null) {
-      return createErrorResponse(
-        "app.api.v1.core.shared.utils.parseJsonWithComments.errors.invalid_json",
-        ErrorResponseTypes.INVALID_FORMAT_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.shared.utils.parseJsonWithComments.errors.invalid_json",
+          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+      });
     }
-    // Type guard: result is an object, cast to JsonWithComments
+    // Type guard: result is an object and matches JsonWithComments structure
     return {
       success: true,
-      data: result as JsonWithComments,
+      data: result,
     };
   } catch (error) {
-    return createErrorResponse(
-      "app.api.v1.core.shared.utils.parseJsonWithComments.errors.invalid_json",
-      ErrorResponseTypes.INVALID_FORMAT_ERROR,
-      {
+    return fail({
+          message: "app.api.v1.core.shared.utils.parseJsonWithComments.errors.invalid_json",
+          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+                messageParams: {
         error: error instanceof Error ? error.message : String(error),
       },
-    );
+    });
   }
 }
 

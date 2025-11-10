@@ -13,7 +13,7 @@ import path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -135,11 +135,11 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
           break;
         }
         default: {
-          return createErrorResponse(
-            "app.api.v1.core.stripe.errors.validation.title",
-            ErrorResponseTypes.VALIDATION_ERROR,
-            { operation: data.operation },
-          );
+          return fail({
+          message: "app.api.v1.core.stripe.errors.validation.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                      messageParams: { operation: data.operation },
+          });
         }
       }
 
@@ -155,15 +155,15 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
     } catch (error) {
       logger.error("Error processing Stripe CLI operation:", parseError(error));
       const parsedError = parseError(error);
-      return createErrorResponse(
-        "app.api.v1.core.stripe.errors.serverError.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        {
+      return fail({
+          message: "app.api.v1.core.stripe.errors.serverError.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
           operation: data.operation,
           error: parsedError.message,
           details: t("app.api.v1.core.stripe.errors.execution_failed"),
         },
-      );
+      });
     }
   }
 
@@ -181,11 +181,11 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
         "Error checking Stripe CLI installation:",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.stripe.errors.serverError.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.stripe.errors.serverError.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -205,18 +205,18 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       if (result.success) {
         return success(url);
       } else {
-        return createErrorResponse(
-          "app.api.v1.core.stripe.errors.serverError.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          { error: "stripe.errors.listener_failed" },
-        );
+        return fail({
+          message: "app.api.v1.core.stripe.errors.serverError.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                    messageParams: { error: "stripe.errors.listener_failed" },
+        });
       }
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.stripe.errors.serverError.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.stripe.errors.serverError.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -228,11 +228,11 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       const authenticated = this.checkStripeAuth(logger);
       return success(authenticated);
     } catch (error) {
-      return createErrorResponse(
-        "app.api.v1.core.stripe.errors.serverError.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.stripe.errors.serverError.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 

@@ -1,6 +1,4 @@
-import { Save } from "lucide-react-native";
+import { Save as SaveIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Save);
-export { Save };
+export const Save = styled(SaveIcon);

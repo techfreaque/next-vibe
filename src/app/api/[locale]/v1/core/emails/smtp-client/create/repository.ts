@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -75,14 +75,14 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
         .returning();
 
       if (!newAccount) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.create.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.emails.smtpClient.create.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                    messageParams: {
             error:
               "app.api.v1.core.emails.smtpClient.create.errors.server.description",
           },
-        );
+        });
       }
 
       // Transform to response format with proper nested structure
@@ -127,21 +127,21 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
         errorMessage.includes("unique") ||
         errorMessage.includes("duplicate")
       ) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.create.errors.conflict.title",
-          ErrorResponseTypes.CONFLICT,
-          {
+        return fail({
+          message: "app.api.v1.core.emails.smtpClient.create.errors.conflict.title",
+          errorType: ErrorResponseTypes.CONFLICT,
+                    messageParams: {
             error:
               "app.api.v1.core.emails.smtpClient.create.errors.conflict.description",
           },
-        );
+        });
       }
 
-      return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.create.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.emails.smtpClient.create.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 }

@@ -1,6 +1,4 @@
-import { Heart } from "lucide-react-native";
+import { Heart as HeartIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Heart);
-export { Heart };
+export const Heart = styled(HeartIcon);

@@ -1,6 +1,4 @@
-import { Server } from "lucide-react-native";
+import { Server as ServerIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Server);
-export { Server };
+export const Server = styled(ServerIcon);

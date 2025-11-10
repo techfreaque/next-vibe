@@ -1,6 +1,4 @@
-import { Gamepad } from "lucide-react-native";
+import { Gamepad as GamepadIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Gamepad);
-export { Gamepad };
+export const Gamepad = styled(GamepadIcon);

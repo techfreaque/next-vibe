@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -110,11 +110,11 @@ export class NewsletterUnsubscribeSmsServiceImpl
       );
 
       if (!smsResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          { error: smsResult.message || t("app.common.error.sending_sms") },
-        );
+        return fail({
+          message: "app.api.v1.core.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: smsResult.message || t("app.common.error.sending_sms") },
+      });
       }
 
       return success({
@@ -126,11 +126,11 @@ export class NewsletterUnsubscribeSmsServiceImpl
         "Error sending unsubscribe confirmation SMS",
         parseError(error),
       );
-      return createErrorResponse(
-        "app.api.v1.core.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
@@ -190,11 +190,11 @@ export class NewsletterUnsubscribeSmsServiceImpl
       );
 
       if (!smsResult.success) {
-        return createErrorResponse(
-          "app.api.v1.core.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          { error: t(smsResult.message) || t("app.common.error.sending_sms") },
-        );
+        return fail({
+          message: "app.api.v1.core.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: t(smsResult.message) || t("app.common.error.sending_sms") },
+      });
       }
 
       return success({
@@ -203,11 +203,11 @@ export class NewsletterUnsubscribeSmsServiceImpl
       });
     } catch (error) {
       logger.error("Error sending admin notification SMS", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 }

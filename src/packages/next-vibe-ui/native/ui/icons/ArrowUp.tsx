@@ -1,6 +1,4 @@
-import { ArrowUp } from "lucide-react-native";
+import { ArrowUp as ArrowUpIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(ArrowUp);
-export { ArrowUp };
+export const ArrowUp = styled(ArrowUpIcon);

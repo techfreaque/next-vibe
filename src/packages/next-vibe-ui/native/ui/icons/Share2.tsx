@@ -1,6 +1,4 @@
-import { Share2 } from "lucide-react-native";
+import { Share2 as Share2Icon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Share2);
-export { Share2 };
+export const Share2 = styled(Share2Icon);

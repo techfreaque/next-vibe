@@ -26,8 +26,8 @@ import { TextClassContext } from "./text";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_TRIGGER =
-  "native:text-lg font-medium web:group-hover:underline";
-const TEXT_CLASS_CONTENT = "native:text-lg";
+  "text-lg font-medium group-hover:underline";
+const TEXT_CLASS_CONTENT = "text-lg";
 /* eslint-enable i18next/no-literal-string */
 
 function Accordion<T extends AccordionProps>(props: T): React.ReactElement {
@@ -127,7 +127,7 @@ const AccordionTrigger = ({
   }));
 
   const triggerClassName = cn(
-    "flex flex-row web:flex-1 items-center justify-between py-4 web:transition-all group web:focus-visible:outline-none web:focus-visible:ring-1 web:focus-visible:ring-muted-foreground",
+    "flex flex-row flex-1 items-center justify-between py-4 transition-all group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-muted-foreground",
     className,
   );
 
@@ -169,10 +169,10 @@ const AccordionContent = ({
     <TextClassContext.Provider value={TEXT_CLASS_CONTENT}>
       <AccordionPrimitive.Content
         className={cn(
-          "overflow-hidden text-sm web:transition-all",
+          "overflow-hidden text-sm transition-all",
           isExpanded
-            ? "web:animate-accordion-down"
-            : "web:animate-accordion-up",
+            ? "animate-accordion-down"
+            : "animate-accordion-up",
         )}
       >
         <InnerContent className={cn("pb-4", className)}>

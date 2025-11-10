@@ -1,6 +1,4 @@
-import { BadgeAlert } from "lucide-react-native";
+import { BadgeAlert as BadgeAlertIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(BadgeAlert);
-export { BadgeAlert };
+export const BadgeAlert = styled(BadgeAlertIcon);

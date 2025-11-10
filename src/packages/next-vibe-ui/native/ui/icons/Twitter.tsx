@@ -1,6 +1,4 @@
-import { Twitter } from "lucide-react-native";
+import { Twitter as TwitterIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Twitter);
-export { Twitter };
+export const Twitter = styled(TwitterIcon);

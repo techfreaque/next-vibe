@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -111,14 +111,14 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
 
       // Safe access to result data since we know result.success is true
       if (!result.data) {
-        return createErrorResponse(
-          "app.api.v1.core.emails.emailService.send.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          {
+        return fail({
+          message: "app.api.v1.core.emails.emailService.send.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                    messageParams: {
             error:
               "app.api.v1.core.emails.emailService.send.errors.noData.description",
           },
-        );
+        });
       }
 
       const smtpResult: SmtpSendResult = result.data;
@@ -145,11 +145,11 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
       });
     } catch (error) {
       logger.error("Email service: Send failed", parseError(error));
-      return createErrorResponse(
-        "app.api.v1.core.emails.emailService.send.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      return fail({
+          message: "app.api.v1.core.emails.emailService.send.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parseError(error).message },
+      });
     }
   }
 }

@@ -1,6 +1,4 @@
-import { Handshake } from "lucide-react-native";
+import { Handshake as HandshakeIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Handshake);
-export { Handshake };
+export const Handshake = styled(HandshakeIcon);

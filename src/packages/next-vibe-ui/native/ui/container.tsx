@@ -31,7 +31,7 @@ export function Container({
   return (
     <View
       className={cn(
-        "mx-auto px-4 native:px-6 py-8",
+        "mx-auto px-4 px-6 py-8",
         sizeClasses[size],
         className,
       )}

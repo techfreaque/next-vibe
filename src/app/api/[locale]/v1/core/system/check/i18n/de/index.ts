@@ -13,4 +13,7 @@ export const translations: typeof enTranslations = {
   },
   typecheck: typecheckTranslations,
   vibeCheck: vibeCheckTranslations,
+  codeQuality: {
+    noIssues: "Keine Codequalitätsprobleme gefunden",
+  },
 };

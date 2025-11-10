@@ -92,11 +92,16 @@ export abstract class BaseWidgetRenderer implements WidgetRenderer {
     field: ResponseFieldMetadata,
     context: WidgetRenderContext,
   ): string {
-    const rawLabel = field.label || field.name;
-    const label = rawLabel.includes(".")
-      ? context.translate(rawLabel as never)
-      : rawLabel;
-    return this.styleText(label, "bold", context);
+    // If we have a translation key, use it
+    if (field.label) {
+      return this.styleText(context.t(field.label), "bold", context);
+    }
+    // Otherwise format the field name directly (non-i18n)
+    const formatted = field.name
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase())
+      .trim();
+    return this.styleText(formatted, "bold", context);
   }
 
   /**

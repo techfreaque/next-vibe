@@ -71,7 +71,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
   }
 
   render(field: ResponseFieldMetadata, context: WidgetRenderContext): string {
-    const t = context.translate;
+    const t = context.t;
     const data = field.value;
 
     if (!Array.isArray(data) || data.length === 0) {
@@ -136,7 +136,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     groupBy: string,
     context: WidgetRenderContext,
   ): Map<string, GroupedListItem[]> {
-    const t = context.translate;
+    const t = context.t;
     const groups = new Map<string, GroupedListItem[]>();
     const otherLabel = t(
       "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.other",
@@ -192,7 +192,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
 
     // Show truncation message if needed
     if (items.length > config.maxItemsPerGroup) {
-      const t = context.translate;
+      const t = context.t;
       const remaining = items.length - config.maxItemsPerGroup;
       const truncationMsg = this.styleText(
         t(
@@ -389,7 +389,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     config: GroupedListConfig,
     context: WidgetRenderContext,
   ): string {
-    const t = context.translate;
+    const t = context.t;
     // Skip summary if not configured
     if (!config.showGroupSummary) {
       return "";
@@ -508,7 +508,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     groups: Map<string, GroupedListItem[]>,
     context: WidgetRenderContext,
   ): string {
-    const t = context.translate;
+    const t = context.t;
     if (groups.size === 0) {
       return "";
     }
@@ -690,7 +690,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
 
       if (node.items.length > config.maxItemsPerGroup) {
         const remaining = node.items.length - config.maxItemsPerGroup;
-        const t = context.translate;
+        const t = context.t;
         const truncationMsg = this.styleText(
           t(
             "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.andMoreItems",

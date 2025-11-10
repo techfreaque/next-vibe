@@ -1,6 +1,4 @@
-import { History } from "lucide-react-native";
+import { History as HistoryIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(History);
-export { History };
+export const History = styled(HistoryIcon);

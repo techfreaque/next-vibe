@@ -72,17 +72,13 @@ function SelectTrigger({
   ...props
 }: SelectTriggerProps): JSX.Element {
   const triggerClassName = cn(
-    "flex flex-row h-10 native:h-12 items-center text-sm justify-between rounded-md border border-input bg-background px-3 py-2 web:ring-offset-background text-muted-foreground web:focus:outline-none web:focus:ring-2 web:focus:ring-ring web:focus:ring-offset-2 [&>span]:line-clamp-1",
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    props.disabled && "web:cursor-not-allowed opacity-50",
+    "flex h-10 w-full flex-row items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-base text-foreground shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
     className,
   );
   return (
     <StyledSelectTrigger className={triggerClassName} {...props}>
-      <>
-        {children}
-        <ChevronDown size={16} aria-hidden={true} />
-      </>
+      {children}
+      <ChevronDown className="h-4 w-4 opacity-50" />
     </StyledSelectTrigger>
   );
 }
@@ -99,7 +95,7 @@ const SelectScrollUpButton = ({
     return null;
   }
   const scrollButtonClassName = cn(
-    "flex web:cursor-default items-center justify-center py-1",
+    "flex items-center justify-center py-1",
     className,
   );
   return (
@@ -120,7 +116,7 @@ const SelectScrollDownButton = ({
     return null;
   }
   const scrollButtonClassName = cn(
-    "flex web:cursor-default items-center justify-center py-1",
+    "flex items-center justify-center py-1",
     className,
   );
   return (
@@ -145,8 +141,8 @@ function SelectContent({
     position === "popper" &&
       "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
     open
-      ? "web:zoom-in-95 web:animate-in web:fade-in-0"
-      : "web:zoom-out-95 web:animate-out web:fade-out-0",
+      ? "animate-in fade-in-0"
+      : "animate-out fade-out-0",
     className,
   );
   const viewportClassName = cn(
@@ -185,7 +181,7 @@ SelectContent.displayName = SelectPrimitive.Content.displayName;
 
 function SelectLabel({ className, ...props }: SelectLabelProps): JSX.Element {
   const labelClassName = cn(
-    "py-1.5 native:pb-2 pl-8 native:pl-10 pr-2 text-popover-foreground text-sm native:text-base font-semibold",
+    "py-1.5 pb-2 pl-8 pl-10 pr-2 text-popover-foreground text-sm text-base font-semibold",
     className,
   );
   return <StyledSelectLabel className={labelClassName} {...props} />;
@@ -200,15 +196,15 @@ function SelectItem({
   ...props
 }: SelectItemProps): JSX.Element {
   const itemClassName = cn(
-    "relative web:group flex flex-row w-full web:cursor-default web:select-none items-center rounded-sm py-1.5 native:py-2 pl-8 native:pl-10 pr-2 web:hover:bg-accent/50 active:bg-accent web:outline-none web:focus:bg-accent",
+    "relative flex flex-row w-full items-center rounded-sm py-1.5 py-2 pl-8 pl-10 pr-2 active:bg-accent",
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    props.disabled && "web:pointer-events-none opacity-50",
+    props.disabled && "opacity-50",
     className,
   );
   const viewClassName =
-    "absolute left-2 native:left-3.5 flex h-3.5 native:pt-px w-3.5 items-center justify-center";
+    "absolute left-2 left-3.5 flex h-3.5 pt-px w-3.5 items-center justify-center";
   const itemTextClassName =
-    "text-sm native:text-lg text-popover-foreground native:text-base web:group-focus:text-accent-foreground";
+    "text-sm text-lg text-popover-foreground text-base";
   return (
     <StyledSelectItem
       value={value as string}

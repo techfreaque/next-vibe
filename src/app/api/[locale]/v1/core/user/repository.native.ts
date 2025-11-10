@@ -18,7 +18,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
@@ -47,11 +47,11 @@ import type { UserRoleValue } from "./user-roles/enum";
  */
 class UserRepositoryNativeImpl implements UserRepository {
   private createNotImplementedError<T>(method: string): ResponseType<T> {
-    return createErrorResponse(
-      "app.api.v1.core.user.errors.not_implemented_on_native",
-      ErrorResponseTypes.INTERNAL_ERROR,
-      { method },
-    );
+    return fail({
+          message: "app.api.v1.core.user.errors.not_implemented_on_native",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { method },
+    });
   }
 
   async getUserById<
@@ -119,7 +119,7 @@ class UserRepositoryNativeImpl implements UserRepository {
     // Error response - preserve all error information
     return {
       success: false,
-      errorType: response.errorType,
+          errorType: response.errorType,
       message: response.message,
       messageParams: response.messageParams,
     };

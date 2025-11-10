@@ -142,12 +142,12 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
-    const t = context.translate;
+    const t = context.t;
     const icon = context.options.useEmojis
       ? DEFAULT_SEVERITY_ICONS.SPARKLE
       : "";
     const text = t(
-      "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound" as never,
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
     );
     return this.styleText(`${icon}${text}`, "green", context);
   }
@@ -291,7 +291,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
-    const t = context.translate;
+    const t = context.t;
     const severityCounts = this.countBySeverity(data);
     const totalCount = data.length;
 
@@ -300,7 +300,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
         ? DEFAULT_SEVERITY_ICONS.SPARKLE
         : "";
       const text = t(
-        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound" as never,
+        "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
       );
       return this.styleText(`${icon}${text}`, "green", context);
     }

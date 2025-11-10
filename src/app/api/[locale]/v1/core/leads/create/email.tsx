@@ -5,7 +5,7 @@
 
 import { Button, Hr, Section } from "@react-email/components";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -450,10 +450,10 @@ export const renderWelcomeMail: EmailFunctionType<
   try {
     // Only send welcome email if lead has email and the creation was successful
     if (!responseData?.lead?.summary?.email) {
-      return createErrorResponse(
-        "app.api.v1.core.leads.create.email.welcome.error.noEmail",
-        ErrorResponseTypes.VALIDATION_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.leads.create.email.welcome.error.noEmail",
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
     }
 
     return success({
@@ -475,10 +475,10 @@ export const renderWelcomeMail: EmailFunctionType<
       }),
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.leads.create.email.error.general.internal_server_error",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+      message: "app.api.v1.core.leads.create.email.error.general.internal_server_error",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };
 
@@ -493,10 +493,10 @@ export const renderAdminNotificationMail: EmailFunctionType<
 > = ({ responseData, locale, t, user }) => {
   try {
     if (!responseData?.lead) {
-      return createErrorResponse(
-        "app.api.v1.core.leads.create.email.admin.newLead.error.noData",
-        ErrorResponseTypes.VALIDATION_ERROR,
-      );
+      return fail({
+        message: "app.api.v1.core.leads.create.email.admin.newLead.error.noData",
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
     }
 
     return success({
@@ -523,9 +523,9 @@ export const renderAdminNotificationMail: EmailFunctionType<
       }),
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.leads.create.email.error.general.internal_server_error",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+      message: "app.api.v1.core.leads.create.email.error.general.internal_server_error",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };

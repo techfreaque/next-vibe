@@ -5,7 +5,7 @@
 
 import { Button, Hr, Link, Section } from "@react-email/components";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -320,10 +320,10 @@ export const renderWelcomeMail: EmailFunctionType<
       }),
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.newsletter.errors.email_generation_failed",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+      message: "app.api.v1.core.newsletter.errors.email_generation_failed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };
 
@@ -348,9 +348,9 @@ export const renderAdminNotificationMail: EmailFunctionType<
       }),
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.newsletter.errors.email_generation_failed",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+      message: "app.api.v1.core.newsletter.errors.email_generation_failed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };

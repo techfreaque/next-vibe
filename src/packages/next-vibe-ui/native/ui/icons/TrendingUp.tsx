@@ -1,6 +1,4 @@
-import { TrendingUp } from "lucide-react-native";
+import { TrendingUp as TrendingUpIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(TrendingUp);
-export { TrendingUp };
+export const TrendingUp = styled(TrendingUpIcon);

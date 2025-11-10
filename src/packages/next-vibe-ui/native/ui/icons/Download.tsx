@@ -1,6 +1,4 @@
-import { Download } from "lucide-react-native";
+import { Download as DownloadIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Download);
-export { Download };
+export const Download = styled(DownloadIcon);

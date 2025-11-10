@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { AlertCircle, CheckCircle, X } from 'next-vibe-ui/ui/icons';
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import { Button } from "next-vibe-ui/ui/button";
@@ -26,7 +26,7 @@ export function PaymentStatusAlert({
   }
 
   return (
-    <motion.div
+    <MotionDiv
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -55,6 +55,6 @@ export function PaymentStatusAlert({
           <X className="h-4 w-4" />
         </Button>
       </Alert>
-    </motion.div>
+    </MotionDiv>
   );
 }

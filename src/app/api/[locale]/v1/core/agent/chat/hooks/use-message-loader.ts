@@ -83,7 +83,7 @@ export function useMessageLoader(
                 authorId: message.authorId,
                 authorName: null,
                 isAI: message.isAI,
-                errorType: null,
+          errorType: null,
                 errorMessage: null,
                 edited: false,
                 tokens: message.tokens,

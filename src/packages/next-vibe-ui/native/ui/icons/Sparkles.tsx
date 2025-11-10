@@ -1,6 +1,4 @@
-import { Sparkles } from "lucide-react-native";
+import { Sparkles as SparklesIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Sparkles);
-export { Sparkles };
+export const Sparkles = styled(SparklesIcon);

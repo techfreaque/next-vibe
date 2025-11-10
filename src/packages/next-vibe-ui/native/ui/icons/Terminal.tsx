@@ -1,6 +1,4 @@
-import { Terminal } from "lucide-react-native";
+import { Terminal as TerminalIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Terminal);
-export { Terminal };
+export const Terminal = styled(TerminalIcon);

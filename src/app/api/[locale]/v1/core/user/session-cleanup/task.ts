@@ -6,7 +6,7 @@
 import "server-only";
 
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
   type ResponseType,
@@ -49,10 +49,11 @@ export async function executeTask(
 
   if (!validationResult.success) {
     logger.error("Session cleanup configuration validation failed");
-    return createErrorResponse(
-      "app.api.v1.core.user.session-cleanup.errors.default",
-      ErrorResponseTypes.VALIDATION_ERROR,
-    );
+    return fail({
+          message: "app.api.v1.core.user.session-cleanup.errors.default",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      cause: validationResult,
+    });
   }
 
   // Execute session cleanup with system user context
@@ -97,10 +98,11 @@ const sessionCleanupTask: Task = {
     const result = await executeTask(logger);
 
     if (!result.success) {
-      return createErrorResponse(
-        "app.api.v1.core.user.session-cleanup.errors.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.user.session-cleanup.errors.default",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        cause: result,
+      });
     }
     // Returns void implicitly on success
   },

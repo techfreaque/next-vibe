@@ -1,2 +1,4 @@
-// Radix UI icon alias
-export { Check as CheckIcon } from "./Check";
+import { CheckIcon as CheckIconIcon } from "lucide-react-native";
+import { styled } from "nativewind";
+
+export const CheckIcon = styled(CheckIconIcon);

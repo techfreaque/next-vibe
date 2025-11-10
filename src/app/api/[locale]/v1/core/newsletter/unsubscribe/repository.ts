@@ -64,7 +64,7 @@ export class NewsletterUnsubscribeRepositoryImpl
           "Failed to update lead status during newsletter unsubscribe",
           {
             email: data.email,
-            errorType: leadUpdateResult.errorType,
+          errorType: leadUpdateResult.errorType,
             message: leadUpdateResult.message,
           },
         );
@@ -147,9 +147,9 @@ export class NewsletterUnsubscribeRepositoryImpl
       });
 
       return fail({
-        message: "app.api.v1.core.newsletter.unsubscribe.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
+          message: "app.api.v1.core.newsletter.unsubscribe.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: parsedError.message },
       });
     }
   }

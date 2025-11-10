@@ -1,6 +1,4 @@
-import { XCircle } from "lucide-react-native";
+import { XCircle as XCircleIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(XCircle);
-export { XCircle };
+export const XCircle = styled(XCircleIcon);

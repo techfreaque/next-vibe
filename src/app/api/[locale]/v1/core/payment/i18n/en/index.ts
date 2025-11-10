@@ -1,3 +1,4 @@
+import { translations as checkoutTranslations } from "../../checkout/i18n/en";
 import { translations as invoiceTranslations } from "../../invoice/i18n/en";
 import { translations as portalTranslations } from "../../portal/i18n/en";
 import { translations as refundTranslations } from "../../refund/i18n/en";
@@ -6,6 +7,7 @@ import { translations as nowpaymentsProviderTranslations } from "../../providers
 
 export const translations = {
   // Import sub-domain translations
+  checkout: checkoutTranslations,
   invoice: invoiceTranslations,
   portal: portalTranslations,
   refund: refundTranslations,

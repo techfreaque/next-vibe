@@ -1,6 +1,4 @@
-import { Building } from "lucide-react-native";
+import { Building as BuildingIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Building);
-export { Building };
+export const Building = styled(BuildingIcon);

@@ -1,6 +1,4 @@
-import { Pause } from "lucide-react-native";
+import { Pause as PauseIcon } from "lucide-react-native";
+import { styled } from "nativewind";
 
-import { iconWithClassName } from "./iconWithClassName";
-
-iconWithClassName(Pause);
-export { Pause };
+export const Pause = styled(PauseIcon);

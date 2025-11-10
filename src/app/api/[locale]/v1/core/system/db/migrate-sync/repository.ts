@@ -10,7 +10,7 @@ import { sql } from "drizzle-orm";
 import { migrate as drizzleMigrate } from "drizzle-orm/node-postgres/migrator";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -135,11 +135,11 @@ export class DatabaseMigrateSyncRepositoryImpl
       });
     } catch (error) {
       logger.error("Migration sync failed", { error: String(error) });
-      return createErrorResponse(
-        "app.api.v1.core.system.db.migrateSync.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: String(error) },
-      );
+      return fail({
+          message: "app.api.v1.core.system.db.migrateSync.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: { error: String(error) },
+      });
     }
   }
 

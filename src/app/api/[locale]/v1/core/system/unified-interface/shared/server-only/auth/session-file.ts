@@ -58,10 +58,10 @@ export async function readSessionFile(
       !sessionData.expiresAt
     ) {
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.invalidFormat",
-        errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: { path: sessionPath },
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                  messageParams: { path: sessionPath },
       });
     }
 
@@ -70,10 +70,10 @@ export async function readSessionFile(
     if (expiresAt < new Date()) {
       logger.debug("Session expired", { expiresAt: sessionData.expiresAt });
       return fail({
-        message:
+          message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.sessionExpired",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-        messageParams: { expiresAt: sessionData.expiresAt },
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+                  messageParams: { expiresAt: sessionData.expiresAt },
       });
     }
 
@@ -93,16 +93,16 @@ export async function readSessionFile(
     if (isFileNotFoundError) {
       logger.debug("Session file not found - user not authenticated");
       return fail({
-        message: "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.notFound",
-        errorType: ErrorResponseTypes.NOT_FOUND,
+          message: "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.notFound",
+          errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
     logger.error("Error reading session file", parsedError);
     return fail({
-      message: "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.readFailed",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { error: parsedError.message },
+          message: "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.readFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { error: parsedError.message },
     });
   }
 }
@@ -129,8 +129,8 @@ export async function writeSessionFile(
       !sessionData.expiresAt
     ) {
       return fail({
-        message: "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.invalidData",
-        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          message: "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.invalidData",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
 
@@ -147,9 +147,9 @@ export async function writeSessionFile(
     const parsedError = parseError(error);
     logger.error("Error writing session file", parsedError);
     return fail({
-      message: "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.writeFailed",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { error: parsedError.message },
+          message: "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.writeFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { error: parsedError.message },
     });
   }
 }
@@ -182,9 +182,9 @@ export async function deleteSessionFile(
 
     logger.error("Error deleting session file", parsedError);
     return fail({
-      message: "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.deleteFailed",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { error: parsedError.message },
+          message: "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.deleteFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { error: parsedError.message },
     });
   }
 }

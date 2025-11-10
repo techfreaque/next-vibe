@@ -7,7 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
+  fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
@@ -99,10 +99,10 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
 
     if (!searchResult.success || !searchResult.data) {
       logger.error("Failed to search leads");
-      return createErrorResponse(
-        "app.api.v1.core.leads.list.get.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
+      return fail({
+          message: "app.api.v1.core.leads.list.get.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
 
     // Type-safe access to success response data
