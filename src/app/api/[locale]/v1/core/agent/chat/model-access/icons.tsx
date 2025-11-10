@@ -153,9 +153,9 @@ import {
   SiTypescript,
   SiX,
   SiZendesk,
-} from "next-vibe-ui//ui/icons";
+} from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
-import { Span } from "next-vibe-ui//ui/span";
+import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
 /**

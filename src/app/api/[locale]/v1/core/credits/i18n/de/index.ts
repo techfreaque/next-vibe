@@ -43,6 +43,8 @@ export const translations: typeof enTranslations = {
     noLeadsToMerge: "Keine Leads zum Zusammenführen vorhanden",
     oldestLeadNotFound: "Ältester Lead im Cluster nicht gefunden",
     transactionFailed: "Fehler beim Erstellen des Transaktionsdatensatzes",
+    not_implemented_on_native:
+      "{{method}} ist auf der nativen Plattform nicht implementiert. Bitte verwenden Sie die Web-Version für diesen Vorgang.",
   },
   get: {
     title: "Credit-Guthaben abrufen",

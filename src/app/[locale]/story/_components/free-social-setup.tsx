@@ -121,7 +121,7 @@ export default function FreeSocialSetup({
   };
 
   return (
-    <section
+    <Div
       id="free-social-setup"
       className="container px-4 md:px-6 py-24 md:py-32 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20"
       ref={ref}
@@ -187,9 +187,9 @@ export default function FreeSocialSetup({
                 </Div>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-4">
+                <Div className="space-y-4">
                   {benefits.map((benefit, index) => (
-                    <motion.li
+                    <motion.div
                       // eslint-disable-next-line i18next/no-literal-string
                       key={`benefit_${index}_${benefit}`}
                       className="flex items-start gap-3"
@@ -203,9 +203,9 @@ export default function FreeSocialSetup({
                       <Span className="text-gray-700 dark:text-gray-300">
                         {benefit}
                       </Span>
-                    </motion.li>
+                    </motion.div>
                   ))}
-                </ul>
+                </Div>
 
                 <motion.div
                   className="mt-8"
@@ -274,6 +274,6 @@ export default function FreeSocialSetup({
           </motion.div>
         </Div>
       </Div>
-    </section>
+    </Div>
   );
 }

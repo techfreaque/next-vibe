@@ -1,15 +1,17 @@
 /**
  * Storage utilities for form persistence
- * Provides type-safe localStorage operations
+ * Provides type-safe platform-agnostic storage operations
  */
 
-export function getStorageItem<T>(key: string): T | null {
+import { storage } from "next-vibe-ui/lib/storage";
+
+export async function getStorageItem<T>(key: string): Promise<T | null> {
   if (typeof window === "undefined") {
     return null;
   }
 
   try {
-    const item = window.localStorage.getItem(key);
+    const item = await storage.getItem(key);
     if (item === null) {
       return null;
     }
@@ -19,26 +21,29 @@ export function getStorageItem<T>(key: string): T | null {
   }
 }
 
-export function setStorageItem<T>(key: string, value: T): void {
+export async function setStorageItem<T>(
+  key: string,
+  value: T,
+): Promise<void> {
   if (typeof window === "undefined") {
     return;
   }
 
   try {
-    window.localStorage.setItem(key, JSON.stringify(value));
+    await storage.setItem(key, JSON.stringify(value));
   } catch {
-    // Silently fail if localStorage is not available
+    // Silently fail if storage is not available
   }
 }
 
-export function removeStorageItem(key: string): void {
+export async function removeStorageItem(key: string): Promise<void> {
   if (typeof window === "undefined") {
     return;
   }
 
   try {
-    window.localStorage.removeItem(key);
+    await storage.removeItem(key);
   } catch {
-    // Silently fail if localStorage is not available
+    // Silently fail if storage is not available
   }
 }

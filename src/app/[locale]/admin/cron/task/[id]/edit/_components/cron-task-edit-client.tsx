@@ -5,8 +5,8 @@
  * Client-side component for editing cron tasks
  */
 
-import { useRouter } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Div } from "next-vibe-ui/ui/div";
 import { H2, P } from "next-vibe-ui/ui/typography";
 import type React from "react";

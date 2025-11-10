@@ -1,10 +1,10 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Badge } from "next-vibe-ui//ui/badge";
-import { Button } from "next-vibe-ui//ui/button";
-import { Span } from "next-vibe-ui//ui/span";
-import { Wrench } from "next-vibe-ui//ui/icons/Wrench";
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
+import { Span } from "next-vibe-ui/ui/span";
+import { Wrench } from "next-vibe-ui/ui/icons/Wrench";
 import type { JSX } from "react";
 import React from "react";
 

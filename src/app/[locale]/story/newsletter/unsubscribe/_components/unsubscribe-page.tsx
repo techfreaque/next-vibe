@@ -1,8 +1,8 @@
 "use client";
 
 import { Check, Mail, Send, X } from 'next-vibe-ui/ui/icons';
-import Link from "next/link";
 import { Button } from "next-vibe-ui/ui/button";
+import { Link } from "next-vibe-ui/ui/link";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { Input } from "next-vibe-ui/ui/input";
 import { Div } from "next-vibe-ui/ui/div";
@@ -60,7 +60,7 @@ export function UnsubscribePage({
   return (
     <Div className="min-h-screen bg-red-50 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 md:px-6">
+      <Div className="relative py-20 px-4 md:px-6">
         <Div className="container mx-auto max-w-4xl text-center">
           <H1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
             {t("app.story.newsletter.unsubscribe.page.title")}
@@ -176,10 +176,10 @@ export function UnsubscribePage({
             </Div>
           </Div>
         </Div>
-      </section>
+      </Div>
 
       {/* Information Section */}
-      <section className="py-20 px-4 md:px-6 bg-white dark:bg-gray-800">
+      <Div className="py-20 px-4 md:px-6 bg-white dark:bg-gray-800">
         <Div className="container mx-auto max-w-4xl">
           <Div className="text-center mb-16">
             <H2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -224,10 +224,10 @@ export function UnsubscribePage({
             </Div>
           </Div>
         </Div>
-      </section>
+      </Div>
 
       {/* Alternative Actions Section */}
-      <section className="py-16 px-4 md:px-6">
+      <Div className="py-16 px-4 md:px-6">
         <Div className="container mx-auto max-w-4xl text-center">
           <H2 className="text-2xl md:text-3xl font-bold mb-4">
             {t("app.story.newsletter.unsubscribe.page.alternatives.title")}
@@ -262,7 +262,7 @@ export function UnsubscribePage({
             </Button>
           </Div>
         </Div>
-      </section>
+      </Div>
     </Div>
   );
 }

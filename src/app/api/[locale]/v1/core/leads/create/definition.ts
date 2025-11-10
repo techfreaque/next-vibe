@@ -19,9 +19,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import {
-  Countries,
   CountriesOptions,
-  Languages,
   LanguagesOptions,
 } from "@/i18n/core/config";
 

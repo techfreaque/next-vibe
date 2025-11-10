@@ -25,7 +25,7 @@ import { useApiQueryForm } from "./use-api-query-form";
  *
  * Features:
  * - Form validation using Zod schema
- * - Form persistence using localStorage (enabled by default)
+ * - Form persistence using platform-agnostic storage (enabled by default)
  * - API integration with error handling
  * - Auto-prefilling from saved data
  * - Debounced form submissions

@@ -1,33 +1,30 @@
 "use client";
 
-import Link from "next/link";
-import { Button } from "next-vibe-ui//ui/button";
-import { Div } from "next-vibe-ui//ui/div";
-import { Span } from "next-vibe-ui//ui/span";
+import { Button } from "next-vibe-ui/ui/button";
+import { Link } from "next-vibe-ui/ui/link";
+import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "next-vibe-ui//ui/collapsible";
-import { Coins } from "next-vibe-ui//ui/icons/Coins";
-import { ChevronDown } from "next-vibe-ui//ui/icons/ChevronDown";
-import { ChevronUp } from "next-vibe-ui//ui/icons/ChevronUp";
-import { HelpCircle } from "next-vibe-ui//ui/icons/HelpCircle";
-import { Info } from "next-vibe-ui//ui/icons/Info";
+} from "next-vibe-ui/ui/collapsible";
+import { Coins } from "next-vibe-ui/ui/icons/Coins";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
+import { HelpCircle } from "next-vibe-ui/ui/icons/HelpCircle";
+import { Info } from "next-vibe-ui/ui/icons/Info";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { UserMenu } from "./user-menu";
 
 interface SidebarFooterProps {
-  user: JwtPayloadType | undefined;
   locale: CountryLanguage;
-  logger: EndpointLogger;
   credits: {
     total: number;
     free: number;
@@ -35,13 +32,15 @@ interface SidebarFooterProps {
     permanent: number;
     expiresAt?: string | null;
   } | null;
+  user: JwtPayloadType | undefined;
+  logger: EndpointLogger;
 }
 
 export function SidebarFooter({
-  user,
   locale,
-  logger,
   credits,
+  user,
+  logger,
 }: SidebarFooterProps): JSX.Element {
   const { t } = simpleT(locale);
   const [isExpanded, setIsExpanded] = useState(false);

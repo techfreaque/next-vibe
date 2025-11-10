@@ -27,7 +27,6 @@ import type statsEndpoints from "@/app/api/[locale]/v1/core/users/stats/definiti
 import {
   CountryFilterOptions,
   type CountryLanguage,
-  LanguageFilterOptions,
 } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

@@ -1,16 +1,17 @@
 "use client";
 
 import { parseError } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui//ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui//ui/dialog";
-import { Div } from "next-vibe-ui//ui/div";
-import { Input } from "next-vibe-ui//ui/input";
-import { Label } from "next-vibe-ui//ui/label";
-import { P } from "next-vibe-ui//ui/typography";
-import { ScrollArea } from "next-vibe-ui//ui/scroll-area";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "next-vibe-ui//ui/select";
-import { Span } from "next-vibe-ui//ui/span";
-import { Textarea } from "next-vibe-ui//ui/textarea";
+import { storage } from "next-vibe-ui/lib/storage";
+import { Button } from "next-vibe-ui/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
+import { Div } from "next-vibe-ui/ui/div";
+import { Input } from "next-vibe-ui/ui/input";
+import { Label } from "next-vibe-ui/ui/label";
+import { P } from "next-vibe-ui/ui/typography";
+import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "next-vibe-ui/ui/select";
+import { Span } from "next-vibe-ui/ui/span";
+import { Textarea } from "next-vibe-ui/ui/textarea";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
@@ -95,54 +96,66 @@ export function PersonaSelector({
     icon: defaultIcon,
   });
 
-  // Load personas from localStorage
+  // Load personas from storage
   useEffect(() => {
-    const storedPersonas = localStorage.getItem(STORAGE_KEY_PERSONAS);
-    if (storedPersonas) {
-      try {
-        const parsed = JSON.parse(storedPersonas) as Persona[];
-        if (Array.isArray(parsed)) {
-          setPersonas([...DEFAULT_PERSONAS, ...parsed]);
+    async function loadPersonas(): Promise<void> {
+      const storedPersonas = await storage.getItem(STORAGE_KEY_PERSONAS);
+      if (storedPersonas) {
+        try {
+          const parsed = JSON.parse(storedPersonas) as Persona[];
+          if (Array.isArray(parsed)) {
+            setPersonas([...DEFAULT_PERSONAS, ...parsed]);
+          }
+        } catch (e) {
+          logger.error("Storage", "Failed to load personas", parseError(e));
         }
-      } catch (e) {
-        logger.error("Storage", "Failed to load personas", parseError(e));
       }
     }
+    void loadPersonas();
   }, [logger]);
 
-  // Load custom categories from localStorage
+  // Load custom categories from storage
   useEffect(() => {
-    const storedCategories = localStorage.getItem(STORAGE_KEY_CATEGORIES);
-    if (storedCategories) {
-      try {
-        const parsed = JSON.parse(storedCategories) as PersonaCategory[];
-        if (Array.isArray(parsed)) {
-          setCategories([...DEFAULT_CATEGORIES, ...parsed]);
+    async function loadCategories(): Promise<void> {
+      const storedCategories = await storage.getItem(STORAGE_KEY_CATEGORIES);
+      if (storedCategories) {
+        try {
+          const parsed = JSON.parse(storedCategories) as PersonaCategory[];
+          if (Array.isArray(parsed)) {
+            setCategories([...DEFAULT_CATEGORIES, ...parsed]);
+          }
+        } catch (e) {
+          logger.error("Storage", "Failed to load categories", parseError(e));
         }
-      } catch (e) {
-        logger.error("Storage", "Failed to load categories", parseError(e));
       }
     }
+    void loadCategories();
   }, [logger]);
 
-  // Save custom personas to localStorage
+  // Save custom personas to storage
   const savePersonas = (newPersonas: Persona[]): void => {
     const customPersonas = newPersonas.filter(
       (p) => !DEFAULT_PERSONAS.find((dp) => dp.id === p.id),
     );
-    localStorage.setItem(STORAGE_KEY_PERSONAS, JSON.stringify(customPersonas));
+    async function save(): Promise<void> {
+      await storage.setItem(STORAGE_KEY_PERSONAS, JSON.stringify(customPersonas));
+    }
+    void save();
     setPersonas(newPersonas);
   };
 
-  // Save custom categories to localStorage
+  // Save custom categories to storage
   const saveCustomCategories = (newCategories: PersonaCategory[]): void => {
     const customCategories = newCategories.filter(
       (c) => !DEFAULT_CATEGORIES.find((dc) => dc.id === c.id),
     );
-    localStorage.setItem(
-      STORAGE_KEY_CATEGORIES,
-      JSON.stringify(customCategories),
-    );
+    async function save(): Promise<void> {
+      await storage.setItem(
+        STORAGE_KEY_CATEGORIES,
+        JSON.stringify(customCategories),
+      );
+    }
+    void save();
     setCategories(newCategories);
   };
 

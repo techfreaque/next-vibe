@@ -11,11 +11,6 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import {
-  DEFAULT_FOLDER_CONFIGS,
-  type DefaultFolderId,
-  isIncognitoFolder,
-} from "@/app/api/[locale]/v1/core/agent/chat/config";
-import {
   canCreateFolder,
   canViewFolder,
   canManageFolder,
@@ -23,7 +18,6 @@ import {
   canHideFolder,
   canDeleteFolder,
   canManageFolderPermissions,
-  hasRolePermission,
 } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
@@ -63,100 +57,6 @@ export interface ChatFoldersRepositoryInterface {
 export class ChatFoldersRepositoryImpl
   implements ChatFoldersRepositoryInterface
 {
-  /**
-   * Compute permissions for a root folder (static method for server-side use)
-   * Root folders don't exist in the database, so we compute permissions based on DEFAULT_FOLDER_CONFIGS
-   *
-   * For non-public root folders (private, shared, incognito), permissions are always true
-   * For public root folder, permissions are based on user role and folder config
-   */
-  static async computeRootFolderPermissions(
-    rootFolderId: DefaultFolderId,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<{ canCreateThread: boolean; canCreateFolder: boolean }> {
-    // Get the root folder config
-    const rootConfig = DEFAULT_FOLDER_CONFIGS.find(
-      (config) => config.id === rootFolderId,
-    );
-
-    if (!rootConfig) {
-      logger.error("Root folder config not found", { rootFolderId });
-      return { canCreateThread: false, canCreateFolder: false };
-    }
-
-    // Special handling for incognito folder
-    // Incognito is localStorage-only and should allow everyone to create threads/folders locally
-    const isIncognito = isIncognitoFolder(rootFolderId);
-
-    if (isIncognito) {
-      return {
-        canCreateThread: true,
-        canCreateFolder: true,
-      };
-    }
-
-    // Admin users can always create threads and folders in any root folder
-    const userId = user.id;
-    if (userId) {
-      const { isAdmin } = await import("../permissions/permissions");
-      const isAdminUser = await isAdmin(userId, logger);
-      if (isAdminUser) {
-        return {
-          canCreateThread: true,
-          canCreateFolder: true,
-        };
-      }
-    }
-
-    // For PRIVATE and SHARED root folders with empty rolesCreateThread ([]),
-    // authenticated users should be able to create threads (owner-only semantics don't apply to root folders)
-    // For PUBLIC root folder, use the explicit rolesCreateThread configuration
-    let canCreateThreadInRoot: boolean;
-    if (
-      (rootFolderId === "private" || rootFolderId === "shared") &&
-      rootConfig.rolesCreateThread.length === 0
-    ) {
-      // Empty array for PRIVATE/SHARED means "authenticated users only"
-      canCreateThreadInRoot = !user.isPublic && !!userId;
-    } else {
-      // Use the rolesCreateThread from the root folder config
-      canCreateThreadInRoot = await hasRolePermission(
-        user,
-        rootConfig.rolesCreateThread,
-        logger,
-      );
-    }
-
-    // Check canCreateFolder permission
-    // Use canCreateFolder helper which has special logic for each root folder
-    const canCreateFolderInRoot = await canCreateFolder(
-      user,
-      rootFolderId as "private" | "shared" | "public" | "incognito",
-      logger,
-      null, // No parent folder for root level
-    );
-
-    return {
-      canCreateThread: canCreateThreadInRoot,
-      canCreateFolder: canCreateFolderInRoot,
-    };
-  }
-
-  /**
-   * Compute permissions for a root folder (instance method for backward compatibility)
-   */
-  private async computeRootFolderPermissions(
-    rootFolderId: DefaultFolderId,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<{ canCreateThread: boolean; canCreateFolder: boolean }> {
-    return ChatFoldersRepositoryImpl.computeRootFolderPermissions(
-      rootFolderId,
-      user,
-      logger,
-    );
-  }
 
   /**
    * Get all folders for the authenticated user or anonymous user (lead)
@@ -288,9 +188,21 @@ export class ChatFoldersRepositoryImpl
       // Compute root folder permissions
       // If rootFolderId is specified, compute permissions for that root folder
       // Otherwise, return default permissions (no permissions)
-      const rootFolderPermissions = rootFolderId
-        ? await this.computeRootFolderPermissions(rootFolderId, user, logger)
-        : { canCreateThread: false, canCreateFolder: false };
+      let rootFolderPermissions = { canCreateThread: false, canCreateFolder: false };
+      if (rootFolderId) {
+        const { rootFolderPermissionsRepository } = await import(
+          "./root-permissions/repository"
+        );
+        const permissionsResult = await rootFolderPermissionsRepository.getRootFolderPermissions(
+          { rootFolderId },
+          user,
+          locale,
+          logger,
+        );
+        if (permissionsResult.success) {
+          rootFolderPermissions = permissionsResult.data;
+        }
+      }
 
       return success({
         rootFolderPermissions,

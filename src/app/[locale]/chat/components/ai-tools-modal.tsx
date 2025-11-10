@@ -1,15 +1,15 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Badge } from "next-vibe-ui//ui/badge";
-import { Button } from "next-vibe-ui//ui/button";
-import { Checkbox } from "next-vibe-ui//ui/checkbox";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "next-vibe-ui//ui/dialog";
-import { Div } from "next-vibe-ui//ui/div";
-import { Input } from "next-vibe-ui//ui/input";
-import { P } from "next-vibe-ui//ui/typography";
-import { ScrollArea } from "next-vibe-ui//ui/scroll-area";
-import { Span } from "next-vibe-ui//ui/span";
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
+import { Checkbox } from "next-vibe-ui/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
+import { Div } from "next-vibe-ui/ui/div";
+import { Input } from "next-vibe-ui/ui/input";
+import { P } from "next-vibe-ui/ui/typography";
+import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
+import { Span } from "next-vibe-ui/ui/span";
 import {
   Check,
   ChevronDown,

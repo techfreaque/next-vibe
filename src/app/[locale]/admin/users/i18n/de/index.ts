@@ -177,6 +177,7 @@ export const translations: typeof enTranslations = {
       emailVerified: "E-Mail verifiziert",
       emailUnverified: "E-Mail nicht verifiziert",
     },
+    country: "Land",
     role: "Rolle",
     roles: {
       all: "Alle",

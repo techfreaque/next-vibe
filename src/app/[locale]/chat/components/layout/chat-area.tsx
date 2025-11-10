@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "next-vibe-ui//ui/button";
-import { Div } from "next-vibe-ui//ui/div";
-import { AlertCircle } from "next-vibe-ui//ui/icons/AlertCircle";
-import { Camera } from "next-vibe-ui//ui/icons/Camera";
-import { Loader2 } from "next-vibe-ui//ui/icons/Loader2";
-import { X } from "next-vibe-ui//ui/icons/X";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
+import { Camera } from "next-vibe-ui/ui/icons/Camera";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { X } from "next-vibe-ui/ui/icons/X";
 import type { JSX } from "react";
 import React, {
   useCallback,
@@ -36,6 +36,7 @@ import { ChatMessages } from "../messages/chat-messages";
 import { SuggestedPrompts } from "../messages/suggested-prompts";
 import { ViewModeToggle } from "../messages/view-mode-toggle";
 import { PublicFeed } from "../public-feed";
+import { envClient } from "@/config/env-client";
 
 interface ChatAreaProps {
   locale: CountryLanguage;
@@ -150,6 +151,9 @@ export function ChatArea({
 
   // Measure input height dynamically
   useEffect(() => {
+    if (envClient.platform.isReactNative) {
+      return;
+    }
     if (!inputContainerRef.current) {
       return;
     }
@@ -369,35 +373,37 @@ export function ChatArea({
 
       {/* Input Area - Positioned absolutely at bottom with max-width */}
       {/* z-20: Above messages, below sidebar on mobile (z-50), below top bar (z-50) */}
-      {/* Always show input, even for new threads */}
-      <Div
-        ref={inputContainerRef}
-        className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
-      >
-        <Div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pointer-events-auto">
-          <ChatInputV2
-            ref={inputRef}
-            value={input}
-            onChange={onInputChange}
-            onSubmit={onSubmit}
-            onKeyDown={onKeyDown}
-            isLoading={isLoading}
-            onStop={onStop}
-            selectedPersona={selectedPersona}
-            selectedModel={selectedModel}
-            enabledToolIds={chat.enabledToolIds}
-            onPersonaChange={onPersonaChange}
-            onModelChange={onModelChange}
-            onToolsChange={chat.setEnabledToolIds}
-            onOpenToolsModal={() => setIsToolsModalOpen(true)}
-            locale={locale}
-            logger={logger}
-            deductCredits={chat.deductCredits}
-            canPost={canPost}
-            noPermissionReason={noPermissionReason}
-          />
+      {/* Show input except when viewing public feed (public root folder without subfolder) */}
+      {!(rootFolderId === "public" && !chat.currentSubFolderId && !thread) && (
+        <Div
+          ref={inputContainerRef}
+          className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
+        >
+          <Div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pointer-events-auto">
+            <ChatInputV2
+              ref={inputRef}
+              value={input}
+              onChange={onInputChange}
+              onSubmit={onSubmit}
+              onKeyDown={onKeyDown}
+              isLoading={isLoading}
+              onStop={onStop}
+              selectedPersona={selectedPersona}
+              selectedModel={selectedModel}
+              enabledToolIds={chat.enabledToolIds}
+              onPersonaChange={onPersonaChange}
+              onModelChange={onModelChange}
+              onToolsChange={chat.setEnabledToolIds}
+              onOpenToolsModal={() => setIsToolsModalOpen(true)}
+              locale={locale}
+              logger={logger}
+              deductCredits={chat.deductCredits}
+              canPost={canPost}
+              noPermissionReason={noPermissionReason}
+            />
+          </Div>
         </Div>
-      </Div>
+      )}
 
       {/* AI Tools Modal */}
       <AIToolsModal

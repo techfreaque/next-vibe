@@ -6,8 +6,8 @@
 "use client";
 
 import { Filter, List, Plus, RefreshCw, Table, Users } from 'next-vibe-ui/ui/icons';
-import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
+import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";

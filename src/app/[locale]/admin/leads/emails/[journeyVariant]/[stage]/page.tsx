@@ -4,8 +4,8 @@
  */
 
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'next-vibe-ui/ui/icons';
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { Link } from "next-vibe-ui/ui/link";
+import { notFound } from "next-vibe-ui/lib/not-found";
 import { Div } from "next-vibe-ui/ui/div";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";

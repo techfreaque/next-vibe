@@ -5,8 +5,8 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Badge } from "next-vibe-ui/ui/badge";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Table,

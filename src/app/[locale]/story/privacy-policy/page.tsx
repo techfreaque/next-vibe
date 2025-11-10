@@ -59,7 +59,7 @@ export default async function PrivacyPolicyPage({
   const supportEmail = contactClientRepository.getSupportEmail(locale);
 
   return (
-    <main className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
+    <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
       <Div className="container max-w-4xl mx-auto py-16 px-4">
         {/* Header with icon */}
         <Div className="mb-12 text-center">
@@ -413,6 +413,6 @@ export default async function PrivacyPolicyPage({
         {/* Client component for interactive elements only */}
         <PrivacyPolicyClientInteraction locale={locale} />
       </Div>
-    </main>
+    </Div>
   );
 }

@@ -2,15 +2,15 @@
 "use client";
 
 import { useRouter } from "next-vibe-ui/hooks";
-import { AlertDialog } from "next-vibe-ui//ui/alert-dialog";
-import { AlertDialogAction } from "next-vibe-ui//ui/alert-dialog";
-import { AlertDialogCancel } from "next-vibe-ui//ui/alert-dialog";
-import { AlertDialogContent } from "next-vibe-ui//ui/alert-dialog";
-import { AlertDialogDescription } from "next-vibe-ui//ui/alert-dialog";
-import { AlertDialogFooter } from "next-vibe-ui//ui/alert-dialog";
-import { AlertDialogHeader } from "next-vibe-ui//ui/alert-dialog";
-import { AlertDialogTitle } from "next-vibe-ui//ui/alert-dialog";
-import { Div } from "next-vibe-ui//ui/div";
+import { AlertDialog } from "next-vibe-ui/ui/alert-dialog";
+import { AlertDialogAction } from "next-vibe-ui/ui/alert-dialog";
+import { AlertDialogCancel } from "next-vibe-ui/ui/alert-dialog";
+import { AlertDialogContent } from "next-vibe-ui/ui/alert-dialog";
+import { AlertDialogDescription } from "next-vibe-ui/ui/alert-dialog";
+import { AlertDialogFooter } from "next-vibe-ui/ui/alert-dialog";
+import { AlertDialogHeader } from "next-vibe-ui/ui/alert-dialog";
+import { AlertDialogTitle } from "next-vibe-ui/ui/alert-dialog";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -25,11 +25,11 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types"
 import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
-import { useDisablePullToRefresh } from "../hooks/use-disable-pull-to-refresh";
 import type { ModelId } from "../types";
 import { ChatArea } from "./layout/chat-area";
 import { SidebarWrapper } from "./layout/sidebar-wrapper";
 import { TopBar } from "./layout/top-bar";
+import { SearchModal } from "./search-modal";
 
 // Utility functions
 const isValidInput = (input: string): boolean => input.trim().length > 0;
@@ -98,9 +98,6 @@ export function ChatInterface({
 
   // Track the last message count to detect new messages
   const lastMessageCountRef = useRef<number>(0);
-
-  // Disable pull-to-refresh on mobile browsers
-  useDisablePullToRefresh();
 
   // Delete confirmation dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);

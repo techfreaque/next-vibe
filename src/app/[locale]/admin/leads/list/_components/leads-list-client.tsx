@@ -6,8 +6,8 @@
 "use client";
 
 import { Filter, List, RefreshCw, Table, Users } from 'next-vibe-ui/ui/icons';
-import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
+import { Link } from "next-vibe-ui/ui/link";
 import { Div } from "next-vibe-ui/ui/div";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { P } from "next-vibe-ui/ui/typography";
@@ -38,7 +38,6 @@ import {
   CountryFilter,
   CountryFilterOptions,
   type CountryLanguage,
-  LanguageFilter,
   LanguageFilterOptions,
 } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

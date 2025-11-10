@@ -3,11 +3,10 @@ import type { Route } from "next";
 import type { RouteType } from "next/dist/lib/load-custom-routes";
 import { LOCALE_COOKIE_NAME } from "@/config/constants";
 import { usePathname, useRouter } from "next-vibe-ui/hooks";
-import { storage } from "next-vibe-ui/ui/storage";
+import { storage } from "next-vibe-ui/lib/storage";
+import { setCookie } from "next-vibe-ui/lib/cookies";
 import type { JSX, ReactNode } from "react";
 import React, { createContext, useContext, useEffect, useState } from "react";
-
-import { setCookie } from "@/app/api/[locale]/v1/core/system/unified-interface/react/storage-cookie-client";
 
 import { languageConfig } from "..";
 import type { CountryInfo, CountryLanguage } from "./config";
@@ -112,9 +111,9 @@ export function TranslationProvider({
 
     const newLocale = `${lang}-${country}`;
 
-    // Save to storage and cookie
+    // Save to storage
     await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
-    setCookie(LOCALE_COOKIE_NAME, newLocale);
+    await setCookie(LOCALE_COOKIE_NAME, newLocale);
 
     // Update URL to reflect language change
     if (pathname) {
@@ -138,9 +137,9 @@ export function TranslationProvider({
 
     const newLocale = `${language}-${newCountry}`;
 
-    // Save to storage and cookie
+    // Save to storage
     await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
-    setCookie(LOCALE_COOKIE_NAME, newLocale);
+    await setCookie(LOCALE_COOKIE_NAME, newLocale);
 
     // Update URL to reflect country change
     if (pathname) {
@@ -162,7 +161,7 @@ export function TranslationProvider({
     const countryInfo = languageConfig.countryInfo[newCountry];
     await setLanguage(countryInfo.language as Languages);
     const newLocale = `${countryInfo.language}-${newCountry}`;
-    setCookie(LOCALE_COOKIE_NAME, newLocale);
+    await setCookie(LOCALE_COOKIE_NAME, newLocale);
     await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
     router.push(`/${newLocale}${pathname.replace(`/${currentLocale}`, "")}`);
   };
@@ -179,7 +178,7 @@ export function TranslationProvider({
       const savedLocale = await storage.getItem(LOCALE_COOKIE_NAME);
       if (!savedLocale && currentLocale) {
         await storage.setItem(LOCALE_COOKIE_NAME, currentLocale);
-        setCookie(LOCALE_COOKIE_NAME, currentLocale);
+        await setCookie(LOCALE_COOKIE_NAME, currentLocale);
       }
 
       // Update document language for accessibility (web only)

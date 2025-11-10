@@ -119,7 +119,7 @@ function renderResponseField(
   const transformedData = transformDataForWidget(field.widgetType, fieldValue);
 
   // Translate label if it's a translation key
-  const translatedLabel = field.label ? t(field.label) : undefined;
+  const translatedLabel = field.label ? t(field.label as Parameters<typeof t>[0]) : undefined;
 
   // Create proper metadata structure
   const metadata: ResponseFieldMetadata = {

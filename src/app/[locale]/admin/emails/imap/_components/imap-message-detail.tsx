@@ -16,8 +16,8 @@ import {
   Star,
   User,
 } from 'next-vibe-ui/ui/icons';
-import { useRouter } from "next/navigation";
 import { Div } from "next-vibe-ui/ui/div";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Span } from "next-vibe-ui/ui/span";

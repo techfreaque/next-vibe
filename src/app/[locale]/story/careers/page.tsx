@@ -136,7 +136,7 @@ export default async function CareersPage({
             </Div>
           </Div>
 
-          <section className="mb-12">
+          <Div className="mb-12">
             <H2 className="text-2xl font-semibold mb-4">
               {t("app.story._components.home.careers.whyWorkWithUs")}
             </H2>
@@ -207,9 +207,9 @@ export default async function CareersPage({
                 </P>
               </Div>
             </Div>
-          </section>
+          </Div>
 
-          <section className="mb-12">
+          <Div className="mb-12">
             <H2 className="text-2xl font-semibold mb-6">
               {t("app.story._components.home.careers.openPositions")}
             </H2>
@@ -288,9 +288,9 @@ export default async function CareersPage({
                 </Div>
               ))}
             </Div>
-          </section>
+          </Div>
 
-          <section className="text-center bg-blue-50 bg-gradient-to-r from-blue-50 to-cyan-50 dark:bg-gray-800 dark:from-gray-800 dark:to-gray-700 p-8 rounded-xl">
+          <Div className="text-center bg-blue-50 bg-gradient-to-r from-blue-50 to-cyan-50 dark:bg-gray-800 dark:from-gray-800 dark:to-gray-700 p-8 rounded-xl">
             <H2 className="text-2xl font-semibold mb-4">
               {t("app.story._components.home.careers.readyToJoin")}
             </H2>
@@ -302,7 +302,7 @@ export default async function CareersPage({
                 {t("app.story._components.home.careers.getInTouch")}
               </Link>
             </Button>
-          </section>
+          </Div>
         </Div>
       </Div>
     </Div>

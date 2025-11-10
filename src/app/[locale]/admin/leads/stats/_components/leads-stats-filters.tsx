@@ -26,7 +26,6 @@ import type { LeadsStatsRequestOutput } from "@/app/api/[locale]/v1/core/leads/s
 import type statsEndpoints from "@/app/api/[locale]/v1/core/leads/stats/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import {
-  CountryFilter,
   CountryFilterOptions,
   type CountryLanguage,
 } from "@/i18n/core/config";

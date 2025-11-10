@@ -21,6 +21,7 @@ import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
 import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks/hooks";
+import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -78,12 +79,18 @@ export function RedditStyleView({
       );
       const score = upvotes - downvotes;
 
-      // Get unique model names
+      // Get unique model names (display names, not IDs)
       const modelNames = [
         ...new Set(
           messages
             .filter((msg) => msg.model)
-            .map((msg) => msg.model as string),
+            .map((msg) => {
+              try {
+                return getModelById(msg.model!).name;
+              } catch {
+                return msg.model as string;
+              }
+            }),
         ),
       ];
 
@@ -97,16 +104,22 @@ export function RedditStyleView({
         (Date.now() - thread.createdAt.getTime()) / (1000 * 60 * 60);
       const isRising = hoursSinceCreation < 24 && score > 10;
 
-      // Simple category detection
+      // Get category from folder name if available
       let category = "General";
-      const titleLower = (thread.title ?? "").toLowerCase();
-      if (titleLower.includes("code") || titleLower.includes("dev")) {
-        category = "Dev";
-      } else if (titleLower.includes("learn")) {
-        category = "Learning";
-      } else if (titleLower.includes("help") || titleLower.includes("how")) {
-        category = "Help";
+      if (thread.folderId) {
+        const folder = chat.folders[thread.folderId];
+        if (folder) {
+          category = folder.name;
+        }
       }
+
+      // Get author name from first message
+      const firstMessage = messages
+        .filter((msg) => msg.role === "user")
+        .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime())[0];
+      const authorName = firstMessage?.authorName
+        ? `u/${firstMessage.authorName}`
+        : "u/anonymous";
 
       return {
         id: thread.id,
@@ -114,7 +127,7 @@ export function RedditStyleView({
         category,
         timestamp: thread.createdAt,
         authorId: thread.userId,
-        authorName: "u/anonymous",
+        authorName,
         modelNames,
         messageCount: messages.length,
         upvotes,
@@ -127,7 +140,7 @@ export function RedditStyleView({
     });
 
     return items;
-  }, [chat.threads, chat.messages]);
+  }, [chat.threads, chat.messages, chat.folders]);
 
   // Filter and sort threads
   const displayedThreads = useMemo(() => {
@@ -225,20 +238,21 @@ export function RedditStyleView({
   };
 
   return (
-    <Div className="h-full overflow-y-auto scroll-smooth scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full">
-      <Div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pt-20 pb-8">
-        {/* Forum Header */}
-        <Div className="mb-6 space-y-2">
-          <Span className="text-3xl font-bold">
-            {t("app.chat.publicFeed.header.title")}
-          </Span>
-          <Span className="text-muted-foreground block">
-            {t("app.chat.publicFeed.header.description")}
-          </Span>
-        </Div>
+    <Div className="h-full flex flex-col overflow-hidden">
+      <Div className="flex-1 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full">
+        <Div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pt-20 pb-8">
+          {/* Forum Header */}
+          <Div className="mb-6 space-y-2">
+            <Span className="text-3xl font-bold">
+              {t("app.chat.publicFeed.header.title")}
+            </Span>
+            <Span className="text-muted-foreground block">
+              {t("app.chat.publicFeed.header.description")}
+            </Span>
+          </Div>
 
-        {/* Header with Sort and Search */}
-        <Div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b mb-4 pb-4">
+          {/* Header with Sort and Search */}
+          <Div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b mb-4 pb-4">
           {/* Sort Buttons */}
           <Div className="flex gap-1 mb-3">
             <Button
@@ -416,6 +430,7 @@ export function RedditStyleView({
               </Div>
             ))
           )}
+        </Div>
         </Div>
       </Div>
     </Div>

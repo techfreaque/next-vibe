@@ -6,8 +6,8 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useCallback } from "react";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 
 import type { DefaultFolderId } from "../config";
 import type { CountryLanguage } from "@/i18n/core/config";

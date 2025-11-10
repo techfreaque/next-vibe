@@ -5,8 +5,8 @@
 
 "use client";
 
-import { Div } from "next-vibe-ui//ui/div";
-import { Span } from "next-vibe-ui//ui/span";
+import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 

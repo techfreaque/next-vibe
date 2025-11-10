@@ -15,6 +15,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { ChatFolder, ChatThread, DefaultFolderId } from "../../types";
 import { ChatSidebar } from "../sidebar/chat-sidebar";
+import { envClient } from "@/config/env-client";
 
 const SIDEBAR_WIDTH = "w-65";
 
@@ -61,6 +62,9 @@ export function SidebarWrapper({
   const [isMobile, setIsMobile] = React.useState(false);
 
   React.useEffect(() => {
+    if (envClient.platform.isReactNative) {
+      return;
+    }
     const checkMobile = (): void => {
       setIsMobile(window.innerWidth < 768);
     };

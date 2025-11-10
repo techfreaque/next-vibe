@@ -1,8 +1,8 @@
 "use client";
 
 import { Check, Mail, Send, TrendingUp, Users, X, Zap } from 'next-vibe-ui/ui/icons';
-import Link from "next/link";
 import { Form } from "next-vibe-ui/ui/form/form";
+import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
 import { Input } from "next-vibe-ui/ui/input";
 import { Div } from "next-vibe-ui/ui/div";
@@ -87,7 +87,7 @@ export function NewsletterPage({
   return (
     <Div className="min-h-screen bg-blue-50 bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 md:px-6">
+      <Div className="relative py-20 px-4 md:px-6">
         <Div className="container mx-auto max-w-4xl text-center">
           <H1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
             {prefilledEmail !== undefined && prefilledEmail.length > 0
@@ -120,7 +120,7 @@ export function NewsletterPage({
               }}
               className="space-y-4"
             >
-              <div className="flex flex-col space-y-3">
+              <Div className="flex flex-col space-y-3">
                 <Input
                   type="email"
                   placeholder={t("app.story.newsletter.emailPlaceholder")}
@@ -164,9 +164,9 @@ export function NewsletterPage({
                   disabled={isAnyOperationInProgress}
                 >
                   {isSubmitting || isUnsubscribing ? (
-                    <div className="animate-spin mr-2">
-                      <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
-                    </div>
+                    <Div className="animate-spin mr-2">
+                      <Div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+                    </Div>
                   ) : isSubscribed ? (
                     showConfirmUnsubscribe ? (
                       <Check className="h-5 w-5 mr-2" />
@@ -184,7 +184,7 @@ export function NewsletterPage({
                       : t("app.story.newsletter.subscription.unsubscribe.title")
                     : t("app.story.newsletter.page.cta.subscribeButton")}
                 </Button>
-              </div>
+              </Div>
 
               {/* Notification display */}
               {notification && (
@@ -218,10 +218,10 @@ export function NewsletterPage({
             </Div>
           </Div>
         </Div>
-      </section>
+      </Div>
 
       {/* Benefits Section */}
-      <section className="py-20 px-4 md:px-6 bg-white dark:bg-gray-800">
+      <Div className="py-20 px-4 md:px-6 bg-white dark:bg-gray-800">
         <Div className="container mx-auto max-w-6xl">
           <Div className="text-center mb-16">
             <H2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -254,10 +254,10 @@ export function NewsletterPage({
             })}
           </Div>
         </Div>
-      </section>
+      </Div>
 
       {/* Frequency Section */}
-      <section className="py-16 px-4 md:px-6">
+      <Div className="py-16 px-4 md:px-6">
         <Div className="container mx-auto max-w-4xl text-center">
           <H2 className="text-2xl md:text-3xl font-bold mb-4">
             {t("app.story.newsletter.page.frequency.title")}
@@ -266,10 +266,10 @@ export function NewsletterPage({
             {t("app.story.newsletter.page.frequency.description")}
           </P>
         </Div>
-      </section>
+      </Div>
 
       {/* Final CTA Section */}
-      <section className="py-20 px-4 md:px-6 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600">
+      <Div className="py-20 px-4 md:px-6 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600">
         <Div className="container mx-auto max-w-4xl text-center text-white">
           <H2 className="text-3xl md:text-4xl font-bold mb-4">
             {t("app.story.newsletter.page.cta.title")}
@@ -289,7 +289,7 @@ export function NewsletterPage({
             {t("app.story.newsletter.page.cta.subscribeButton")}
           </Button>
         </Div>
-      </section>
+      </Div>
     </Div>
   );
 }

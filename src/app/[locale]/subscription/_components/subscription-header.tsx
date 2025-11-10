@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'next-vibe-ui/ui/icons';
 import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
@@ -15,7 +16,7 @@ export function SubscriptionHeader({ locale, isAuthenticated }: SubscriptionHead
   const { t } = useTranslation();
 
   return (
-    <div className="flex justify-between items-center mb-6 gap-4">
+    <Div className="flex justify-between items-center mb-6 gap-4">
       <Link
         href={`/${locale}`}
         className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -26,7 +27,7 @@ export function SubscriptionHeader({ locale, isAuthenticated }: SubscriptionHead
 
       {/* Auth Buttons for Public Users */}
       {!isAuthenticated && (
-        <div className="flex gap-2">
+        <Div className="flex gap-2">
           <Button variant="ghost" asChild className="hidden sm:inline-flex">
             <Link href={`/${locale}/user/login`}>
               {t("app.story._components.nav.user.login")}
@@ -40,8 +41,8 @@ export function SubscriptionHeader({ locale, isAuthenticated }: SubscriptionHead
               {t("app.story._components.nav.user.signup")}
             </Link>
           </Button>
-        </div>
+        </Div>
       )}
-    </div>
+    </Div>
   );
 }

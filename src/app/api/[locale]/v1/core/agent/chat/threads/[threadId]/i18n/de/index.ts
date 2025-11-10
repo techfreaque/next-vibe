@@ -5,6 +5,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   messages: messagesTranslations,
   permissions: permissionsTranslations,
+  errors: {
+    not_implemented_on_native:
+      "{{method}} ist auf der nativen Plattform nicht implementiert. Bitte verwenden Sie die Web-Version für diesen Vorgang.",
+  },
   get: {
     title: "Chat-Thread abrufen",
     description: "Einen bestimmten Chat-Thread nach ID abrufen",

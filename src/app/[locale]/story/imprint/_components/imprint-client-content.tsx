@@ -1,6 +1,7 @@
 "use client";
 
 import { Printer } from 'next-vibe-ui/ui/icons';
+import { Button } from "next-vibe-ui/ui/button";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import type { ReactElement } from "react";
@@ -27,14 +28,16 @@ export function ImprintClientInteraction({
 
   return (
     <Div className="flex justify-end mb-8">
-      <button
+      <Button
+        variant="ghost"
+        size="unset"
         onClick={handlePrint}
         className="flex items-center gap-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 rounded-md text-blue-700 dark:text-blue-300 transition-colors"
         aria-label={t("app.story.imprint.printAriaLabel")}
       >
         <Printer className="h-4 w-4" />
         <Span>{t("app.story.imprint.printButton")}</Span>
-      </button>
+      </Button>
     </Div>
   );
 }

@@ -182,6 +182,8 @@ export const translations: typeof enTranslations = {
     user_not_found: "Benutzer nicht gefunden",
     stripe_customer_creation_failed:
       "Stripe-Kunde konnte nicht erstellt werden",
+    not_implemented_on_native:
+      "{{method}} ist auf der nativen Plattform nicht implementiert. Bitte verwenden Sie die Web-Version für diesen Vorgang.",
   },
 
   // Cancel operation

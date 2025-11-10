@@ -3,8 +3,8 @@
  * Preview and manage email templates
  */
 
-import Link from "next/link";
 import { Div } from "next-vibe-ui/ui/div";
+import { Link } from "next-vibe-ui/ui/link";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";

@@ -4,6 +4,7 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
+import { Label } from "next-vibe-ui/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { H4 } from "next-vibe-ui/ui/typography";
@@ -194,8 +195,10 @@ export function IconSelector({
                         currentValueString === iconKey;
 
                       return (
-                        <button
+                        <Button
                           key={iconKey}
+                          variant="ghost"
+                          size="unset"
                           onClick={() => handleIconSelect(iconKey)}
                           className={cn(
                             "flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent transition-colors",
@@ -204,7 +207,7 @@ export function IconSelector({
                           title={iconKey}
                         >
                           <Icon className="h-4 w-4" />
-                        </button>
+                        </Button>
                       );
                     })}
                   </Div>
@@ -217,9 +220,9 @@ export function IconSelector({
           <TabsContent value="emoji" className="p-4 m-0">
             <Div className="space-y-4">
               <Div>
-                <label className="text-sm font-medium mb-2 block">
+                <Label className="text-sm font-medium mb-2 block">
                   {t("app.chat.iconSelector.emojiTab.label")}
-                </label>
+                </Label>
                 <Div className="flex gap-2">
                   <Input
                     value={emojiInput}
@@ -260,8 +263,10 @@ export function IconSelector({
                 </Div>
                 <Div className="grid grid-cols-8 gap-1">
                   {COMMON_EMOJIS.map((emoji) => (
-                    <button
+                    <Button
                       key={emoji}
+                      variant="ghost"
+                      size="unset"
                       onClick={() => {
                         onChange(emoji);
                         setOpen(false);
@@ -273,7 +278,7 @@ export function IconSelector({
                       )}
                     >
                       {emoji}
-                    </button>
+                    </Button>
                   ))}
                 </Div>
               </Div>

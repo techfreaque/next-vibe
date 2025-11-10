@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "next-vibe-ui//ui/button";
-import { Div } from "next-vibe-ui//ui/div";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import React, { useCallback, useState } from "react";
 

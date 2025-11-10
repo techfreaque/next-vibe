@@ -145,7 +145,9 @@ export function ScheduleAutocomplete({
             </Div>
             <Div className="flex items-center gap-1">
               {value && !disabled && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="unset"
                   type="button"
                   className="h-4 w-4 p-0 rounded-sm hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center cursor-pointer border-0 bg-transparent"
                   onClick={(e) => {
@@ -155,7 +157,7 @@ export function ScheduleAutocomplete({
                   aria-label="Clear value"
                 >
                   <X className="h-3 w-3" />
-                </button>
+                </Button>
               )}
               <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
             </Div>

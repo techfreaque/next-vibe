@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
@@ -168,30 +169,35 @@ export function ThreadedMessage({
       >
         {/* Collapse/Expand button for messages with replies */}
         {hasReplies && (
-          <button
-            onClick={(): void => setIsCollapsed(!isCollapsed)}
-            className={cn(
-              "absolute top-4 z-10",
-              "h-5 w-5 rounded",
-              "bg-card backdrop-blur-sm border border-border/60",
-              "flex items-center justify-center",
-              "hover:bg-blue-500/10 hover:border-blue-500/40 transition-all",
-              "text-muted-foreground hover:text-blue-400",
-              "shadow-sm",
-            )}
-            style={{ left: depth > 0 ? `${indent - 26}px` : "-26px" }}
-            title={
-              isCollapsed
-                ? t("app.chat.threadedView.expandReplies")
-                : t("app.chat.threadedView.collapseReplies")
-            }
+          <Div
+            style={{ left: depth > 0 ? `${indent - 26}px` : "-26px", position: "absolute", top: "1rem" }}
+            className="z-10"
           >
-            {isCollapsed ? (
-              <ChevronRight className="h-3.5 w-3.5" />
-            ) : (
-              <ChevronDown className="h-3.5 w-3.5" />
-            )}
-          </button>
+            <Button
+              variant="ghost"
+              size="unset"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className={cn(
+                "h-5 w-5 rounded",
+                "bg-card backdrop-blur-sm border border-border/60",
+                "flex items-center justify-center",
+                "hover:bg-blue-500/10 hover:border-blue-500/40 transition-all",
+                "text-muted-foreground hover:text-blue-400",
+                "shadow-sm",
+              )}
+              title={
+                isCollapsed
+                  ? t("app.chat.threadedView.expandReplies")
+                  : t("app.chat.threadedView.collapseReplies")
+              }
+            >
+              {isCollapsed ? (
+                <ChevronRight className="h-3.5 w-3.5" />
+              ) : (
+                <ChevronDown className="h-3.5 w-3.5" />
+              )}
+            </Button>
+          </Div>
         )}
 
         {/* Message content */}
@@ -285,14 +291,8 @@ export function ThreadedMessage({
 
                 {/* Message header */}
                 <Div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground flex-wrap">
-                  <button
-                    className={cn(
-                      "font-semibold hover:underline cursor-pointer flex items-center gap-1.5",
-                      message.role === "user"
-                        ? "text-green-400"
-                        : "text-blue-400",
-                    )}
-                    onMouseEnter={(e): void => {
+                  <Span
+                    onMouseEnter={(e: React.MouseEvent<HTMLSpanElement>) => {
                       if (message.authorId) {
                         const rect = e.currentTarget.getBoundingClientRect();
                         setHoveredUserId(message.authorId);
@@ -302,11 +302,21 @@ export function ThreadedMessage({
                         });
                       }
                     }}
-                    onMouseLeave={(): void => {
+                    onMouseLeave={() => {
                       setHoveredUserId(null);
                       setUserCardPosition(null);
                     }}
                   >
+                    <Button
+                      variant="ghost"
+                      size="unset"
+                      className={cn(
+                        "font-semibold hover:underline cursor-pointer flex items-center gap-1.5",
+                        message.role === "user"
+                          ? "text-green-400"
+                          : "text-blue-400",
+                      )}
+                    >
                     {/* Show model icon for AI messages */}
                     {message.role === "assistant" &&
                       message.model &&
@@ -330,7 +340,8 @@ export function ThreadedMessage({
                       : message.role === "assistant" && message.model
                         ? getModelById(message.model).name
                         : t("app.chat.threadedView.assistantFallback")}
-                  </button>
+                  </Button>
+                  </Span>
 
                   {/* Persona - only for AI messages */}
                   {message.role === "assistant" && message.persona && (
@@ -432,7 +443,9 @@ export function ThreadedMessage({
               {/* Voting buttons */}
               {onVoteMessage && (
                 <Div className="flex items-center gap-0.5">
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="unset"
                     onClick={() =>
                       onVoteMessage(message.id, userVote === "up" ? 0 : 1)
                     }
@@ -450,7 +463,7 @@ export function ThreadedMessage({
                         userVote === "up" && "fill-current",
                       )}
                     />
-                  </button>
+                  </Button>
                   {voteScore !== 0 && (
                     <Span
                       className={cn(
@@ -462,7 +475,9 @@ export function ThreadedMessage({
                       {voteScore > 0 ? `+${voteScore}` : voteScore}
                     </Span>
                   )}
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="unset"
                     onClick={() =>
                       onVoteMessage(message.id, userVote === "down" ? 0 : -1)
                     }
@@ -480,13 +495,15 @@ export function ThreadedMessage({
                         userVote === "down" && "fill-current",
                       )}
                     />
-                  </button>
+                  </Button>
                 </Div>
               )}
 
               {/* TTS Play/Stop button - For assistant messages */}
               {message.role === "assistant" && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="unset"
                   onClick={isPlaying ? stopAudio : (): void => void playAudio()}
                   disabled={isTTSLoading}
                   className={cn(
@@ -513,46 +530,54 @@ export function ThreadedMessage({
                       ? t("app.chat.threadedView.actions.stop")
                       : t("app.chat.threadedView.actions.play")}
                   </Span>
-                </button>
+                </Button>
               )}
 
               {/* Reply button - Creates a branch from this message */}
               {onBranchMessage && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="unset"
                   onClick={(): void => messageActions.startEdit(message.id)}
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
                   title={t("app.chat.threadedView.actions.replyToMessage")}
                 >
                   <MessageSquare className="h-3.5 w-3.5" />
                   <Span>{t("app.chat.threadedView.actions.reply")}</Span>
-                </button>
+                </Button>
               )}
 
               {/* Edit - For user messages */}
               {message.role === "user" && onBranchMessage && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="unset"
                   onClick={(): void => messageActions.startEdit(message.id)}
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-green-500/10 text-muted-foreground hover:text-green-400 transition-all"
                   title={t("app.chat.threadedView.actions.editMessage")}
                 >
                   <Span>{t("app.chat.threadedView.actions.edit")}</Span>
-                </button>
+                </Button>
               )}
 
               {/* Retry - For user messages */}
               {message.role === "user" && onRetryMessage && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="unset"
                   onClick={(): void => messageActions.startRetry(message.id)}
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-yellow-500/10 text-muted-foreground hover:text-yellow-400 transition-all"
                   title={t("app.chat.threadedView.actions.retryWithDifferent")}
                 >
                   <Span>{t("app.chat.threadedView.actions.retry")}</Span>
-                </button>
+                </Button>
               )}
 
               {/* Answer as AI - For both user and assistant messages */}
               {onAnswerAsModel && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="unset"
                   onClick={(): void => messageActions.startAnswer(message.id)}
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-purple-500/10 text-muted-foreground hover:text-purple-400 transition-all"
                   title={
@@ -562,11 +587,13 @@ export function ThreadedMessage({
                   }
                 >
                   <Span>{t("app.chat.threadedView.actions.answerAsAI")}</Span>
-                </button>
+                </Button>
               )}
 
               {/* Share/Permalink */}
-              <button
+              <Button
+                variant="ghost"
+                size="unset"
                 onClick={(): void => {
                   const element = document.getElementById(
                     `thread-msg-${message.id}`,
@@ -584,22 +611,26 @@ export function ThreadedMessage({
               >
                 <Share2 className="h-3.5 w-3.5" />
                 <Span>{t("app.chat.threadedView.actions.share")}</Span>
-              </button>
+              </Button>
 
               {/* Delete */}
               {onDeleteMessage && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="unset"
                   onClick={(): void => onDeleteMessage(message.id)}
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
                   title={t("app.chat.threadedView.actions.deleteMessage")}
                 >
                   <Span>{t("app.chat.threadedView.actions.delete")}</Span>
-                </button>
+                </Button>
               )}
 
               {/* Show parent (if not root) */}
               {message.parentId && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="unset"
                   onClick={(): void => {
                     const element = document.getElementById(
                       `thread-msg-${message.parentId}`,
@@ -613,7 +644,7 @@ export function ThreadedMessage({
                 >
                   <CornerDownRight className="h-3.5 w-3.5" />
                   <Span>{t("app.chat.threadedView.actions.parent")}</Span>
-                </button>
+                </Button>
               )}
 
               {/* Reply count badge */}
@@ -709,7 +740,9 @@ export function ThreadedMessage({
           !isCollapsed &&
           depth >= maxDepth &&
           !showDeepReplies && (
-            <button
+            <Button
+              variant="ghost"
+              size="unset"
               onClick={(): void => setShowDeepReplies(true)}
               className="mt-3 text-sm text-blue-500 hover:text-blue-600 cursor-pointer hover:underline transition-all flex items-center gap-1"
             >
@@ -721,7 +754,7 @@ export function ThreadedMessage({
                     ? t("app.chat.threadedView.reply")
                     : t("app.chat.threadedView.replies"),
               })}
-            </button>
+            </Button>
           )}
       </Div>
 

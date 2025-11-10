@@ -6,8 +6,8 @@
 "use client";
 
 import { BarChart3, List, Mail, Settings, TestTube } from 'next-vibe-ui/ui/icons';
-import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
+import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";

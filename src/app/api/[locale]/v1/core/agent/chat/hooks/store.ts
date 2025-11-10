@@ -4,6 +4,7 @@
  */
 
 import { create } from "zustand";
+import { storage } from "next-vibe-ui/lib/storage";
 
 import type { DefaultFolderId } from "../config";
 import type { MessageMetadata, ToolCall } from "../db";
@@ -207,48 +208,47 @@ const loadSettings = (): ChatSettings => {
     return defaults;
   }
 
-  try {
-    const stored = localStorage.getItem("chat-settings");
-    if (stored) {
-      const parsed = JSON.parse(stored) as Partial<ChatSettings>;
+  // Load settings asynchronously
+  void (async (): Promise<void> => {
+    try {
+      const stored = await storage.getItem("chat-settings");
+      if (stored) {
+        const parsed = JSON.parse(stored) as Partial<ChatSettings>;
 
-      // Migrate old tool IDs to new format
-      if (parsed.enabledToolIds && Array.isArray(parsed.enabledToolIds)) {
-        const migratedToolIds = migrateToolIds(parsed.enabledToolIds);
+        // Migrate old tool IDs to new format
+        if (parsed.enabledToolIds && Array.isArray(parsed.enabledToolIds)) {
+          const migratedToolIds = migrateToolIds(parsed.enabledToolIds);
 
-        // If migration happened, save the migrated version back to localStorage
-        if (
-          JSON.stringify(migratedToolIds) !==
-          JSON.stringify(parsed.enabledToolIds)
-        ) {
-          const migratedSettings = {
-            ...defaults,
-            ...parsed,
-            enabledToolIds: migratedToolIds,
-          };
-          saveSettings(migratedSettings);
-          return migratedSettings;
+          // If migration happened, save the migrated version back to storage
+          if (
+            JSON.stringify(migratedToolIds) !==
+            JSON.stringify(parsed.enabledToolIds)
+          ) {
+            const migratedSettings = {
+              ...defaults,
+              ...parsed,
+              enabledToolIds: migratedToolIds,
+            };
+            void saveSettings(migratedSettings);
+          }
         }
       }
-
-      // Merge with defaults to handle missing fields from old versions
-      return { ...defaults, ...parsed };
+    } catch {
+      // Silently fail and return defaults
     }
-  } catch {
-    // Silently fail and return defaults
-  }
+  })();
 
   return defaults;
 };
 
-// Helper to save settings to localStorage
-const saveSettings = (settings: ChatSettings): void => {
+// Helper to save settings to storage
+const saveSettings = async (settings: ChatSettings): Promise<void> => {
   if (typeof window === "undefined") {
     return;
   }
 
   try {
-    localStorage.setItem("chat-settings", JSON.stringify(settings));
+    await storage.setItem("chat-settings", JSON.stringify(settings));
   } catch {
     // Silently fail
   }
@@ -399,7 +399,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         ...state.settings,
         ...updates,
       };
-      saveSettings(newSettings);
+      void saveSettings(newSettings);
       return {
         settings: newSettings,
       };
@@ -419,7 +419,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   // Reset
   reset: (): void => {
     const defaultSettings = getDefaultSettings();
-    saveSettings(defaultSettings);
+    void saveSettings(defaultSettings);
     set({
       threads: {},
       messages: {},

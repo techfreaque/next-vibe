@@ -8,6 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
@@ -48,12 +50,12 @@ export function ContainerWidget({
 
   if (!isContainerWidgetData(data)) {
     return (
-      <div
+      <Div
         className={cn("text-muted-foreground italic", className)}
         style={style}
       >
         —
-      </div>
+      </Div>
     );
   }
 
@@ -69,9 +71,9 @@ export function ContainerWidget({
           </CardHeader>
         )}
         <CardContent>
-          <p className="italic text-muted-foreground">
+          <P className="italic text-muted-foreground">
             {t("app.api.v1.core.system.unifiedInterface.react.widgets.container.noContent")}
-          </p>
+          </P>
         </CardContent>
       </Card>
     );
@@ -95,7 +97,7 @@ export function ContainerWidget({
         </CardHeader>
       )}
       <CardContent>
-        <div className={cn(layoutClass)}>
+        <Div className={cn(layoutClass)}>
           {children.map((child, index) => (
             <WidgetRenderer
               key={index}
@@ -105,7 +107,7 @@ export function ContainerWidget({
               context={context}
             />
           ))}
-        </div>
+        </Div>
       </CardContent>
     </Card>
   );

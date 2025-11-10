@@ -6,9 +6,9 @@
  */
 
 import type { Route } from "next";
-import { useRouter } from "next/navigation";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import { useToast } from "next-vibe-ui//hooks/use-toast";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
+import { useToast } from "next-vibe-ui/hooks/use-toast";
 import type { ChangeEvent } from "react";
 import { useCallback, useMemo, useState } from "react";
 
@@ -152,7 +152,7 @@ export function useLogin(
 
         // Set the auth status to indicate successful login
         // No need to clear first since the server has already set the httpOnly cookie
-        const tokenResult = authClientRepository.setAuthStatus(logger);
+        const tokenResult = await authClientRepository.setAuthStatus(logger);
         if (!tokenResult.success) {
           logger.error("app.api.v1.core.user.public.login.token.save.failed");
           toast({
@@ -183,7 +183,7 @@ export function useLogin(
           `/${locale}/`) satisfies Route;
 
         // Set auth status to enable user query on the next page
-        const authStatusResult = authClientRepository.setAuthStatus(logger);
+        const authStatusResult = await authClientRepository.setAuthStatus(logger);
         if (!authStatusResult.success) {
           logger.error("user.auth.status.set.failed", {
             message: authStatusResult.message,

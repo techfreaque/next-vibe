@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Markdown } from "next-vibe-ui//ui/markdown";
+import { Markdown } from "next-vibe-ui/ui/markdown";
 import type { JSX } from "react";
 
 import { simpleT } from "@/i18n/core/shared";

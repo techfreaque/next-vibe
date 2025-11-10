@@ -23,6 +23,7 @@ import {
   deleteThread,
   getMessagesForThread,
   loadIncognitoState,
+  type IncognitoState,
   setActiveThread as setActiveThreadStorage,
   setCurrentFolder as setCurrentFolderStorage,
   updateIncognitoMessage,
@@ -80,12 +81,23 @@ export function useIncognitoChat(
 ): UseIncognitoChatReturn {
   const { t } = simpleT(locale);
 
-  // Load initial state from localStorage
-  const [state, setState] = useState(() => loadIncognitoState());
+  // Load initial state from storage
+  const [state, setState] = useState<IncognitoState>({
+    threads: {},
+    messages: {},
+    folders: {},
+    activeThreadId: null,
+    currentRootFolderId: "incognito",
+    currentSubFolderId: null,
+  });
 
-  // Reload state when folder changes
+  // Load state on mount and when folder changes
   useEffect(() => {
-    setState(loadIncognitoState());
+    async function loadState(): Promise<void> {
+      const loadedState = await loadIncognitoState();
+      setState(loadedState);
+    }
+    void loadState();
   }, [currentRootFolderId, currentSubFolderId]);
 
   // Get active thread
@@ -94,27 +106,62 @@ export function useIncognitoChat(
     : null;
 
   // Get active thread messages
-  const activeThreadMessages = state.activeThreadId
-    ? getMessagesForThread(state.activeThreadId)
-    : [];
+  const [activeThreadMessages, setActiveThreadMessages] = useState<ChatMessage[]>([]);
+
+  useEffect(() => {
+    async function loadMessages(): Promise<void> {
+      if (state.activeThreadId) {
+        const messages = await getMessagesForThread(state.activeThreadId);
+        setActiveThreadMessages(messages);
+      } else {
+        setActiveThreadMessages([]);
+      }
+    }
+    void loadMessages();
+  }, [state.activeThreadId]);
 
   // Thread operations
   const createThread = useCallback(
     (title: string): ChatThread => {
       logger.debug("Incognito: Creating thread", { title });
 
-      const thread = createIncognitoThread(
-        title || t(CHAT_CONSTANTS.DEFAULT_THREAD_TITLE),
-        currentRootFolderId,
-        currentSubFolderId,
-      );
+      void (async (): Promise<void> => {
+        const thread = await createIncognitoThread(
+          title || t(CHAT_CONSTANTS.DEFAULT_THREAD_TITLE),
+          currentRootFolderId,
+          currentSubFolderId,
+        );
 
-      setState((prev) => ({
-        ...prev,
-        threads: { ...prev.threads, [thread.id]: thread },
-      }));
+        setState((prev: IncognitoState) => ({
+          ...prev,
+          threads: { ...prev.threads, [thread.id]: thread },
+        }));
+      })();
 
-      return thread;
+      // Return a placeholder thread that will be updated
+      const placeholderId = `thread-${Date.now()}`;
+      return {
+        id: placeholderId,
+        userId: "incognito",
+        title: title || t(CHAT_CONSTANTS.DEFAULT_THREAD_TITLE),
+        rootFolderId: currentRootFolderId,
+        folderId: currentSubFolderId,
+        status: "active",
+        defaultModel: null,
+        defaultPersona: null,
+        systemPrompt: null,
+        pinned: false,
+        archived: false,
+        tags: [],
+        preview: null,
+        canPost: true,
+        canEdit: true,
+        canModerate: true,
+        canDelete: true,
+        canManagePermissions: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
     },
     [logger, t, currentRootFolderId, currentSubFolderId],
   );
@@ -126,9 +173,9 @@ export function useIncognitoChat(
         updatedFields: Object.keys(updates).join(", "),
       });
 
-      updateIncognitoThread(threadId, updates);
+      void updateIncognitoThread(threadId, updates);
 
-      setState((prev) => ({
+      setState((prev: IncognitoState) => ({
         ...prev,
         threads: {
           ...prev.threads,
@@ -143,9 +190,9 @@ export function useIncognitoChat(
     (threadId: string): void => {
       logger.debug("Incognito: Deleting thread", { threadId });
 
-      deleteThread(threadId);
+      void deleteThread(threadId);
 
-      setState((prev) => {
+      setState((prev: IncognitoState) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [threadId]: _removed, ...remainingThreads } = prev.threads;
         return {
@@ -163,9 +210,9 @@ export function useIncognitoChat(
     (threadId: string | null): void => {
       logger.debug("Incognito: Setting active thread", { threadId });
 
-      setActiveThreadStorage(threadId);
+      void setActiveThreadStorage(threadId);
 
-      setState((prev) => ({
+      setState((prev: IncognitoState) => ({
         ...prev,
         activeThreadId: threadId,
       }));
@@ -189,21 +236,49 @@ export function useIncognitoChat(
         content,
       });
 
-      const message = createIncognitoMessage(
+      // Create placeholder message that will be updated
+      const placeholderId = `msg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      const placeholderMessage: ChatMessage = {
+        id: placeholderId,
         threadId,
         role,
         content,
         parentId,
+        depth: 0,
+        authorId: "incognito",
+        authorName: null,
+        isAI: role === "assistant",
         model,
         persona,
-      );
+        errorType: null,
+        errorMessage: null,
+        edited: false,
+        tokens: null,
+        upvotes: null,
+        downvotes: null,
+        sequenceId: null,
+        sequenceIndex: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
 
-      setState((prev) => ({
-        ...prev,
-        messages: { ...prev.messages, [message.id]: message },
-      }));
+      void (async (): Promise<void> => {
+        const message = await createIncognitoMessage(
+          threadId,
+          role,
+          content,
+          parentId,
+          model,
+          persona,
+        );
 
-      return message;
+        setState((prev: IncognitoState) => ({
+          ...prev,
+          messages: { ...prev.messages, [message.id]: message },
+        }));
+      })();
+
+      return placeholderMessage;
     },
     [logger],
   );
@@ -215,9 +290,9 @@ export function useIncognitoChat(
         updatedFields: Object.keys(updates).join(", "),
       });
 
-      updateIncognitoMessage(messageId, updates);
+      void updateIncognitoMessage(messageId, updates);
 
-      setState((prev) => ({
+      setState((prev: IncognitoState) => ({
         ...prev,
         messages: {
           ...prev.messages,
@@ -232,9 +307,9 @@ export function useIncognitoChat(
     (messageId: string): void => {
       logger.debug("Incognito: Deleting message", { messageId });
 
-      deleteMessage(messageId);
+      void deleteMessage(messageId);
 
-      setState((prev) => {
+      setState((prev: IncognitoState) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [messageId]: _removed, ...remainingMessages } = prev.messages;
         return {
@@ -254,9 +329,9 @@ export function useIncognitoChat(
         subFolderId,
       });
 
-      setCurrentFolderStorage(rootFolderId, subFolderId);
+      void setCurrentFolderStorage(rootFolderId, subFolderId);
 
-      setState((prev) => ({
+      setState((prev: IncognitoState) => ({
         ...prev,
         currentRootFolderId: rootFolderId,
         currentSubFolderId: subFolderId,

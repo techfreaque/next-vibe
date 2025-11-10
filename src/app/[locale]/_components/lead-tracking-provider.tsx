@@ -16,10 +16,7 @@ import { useTranslation } from "@/i18n/core/client";
 import { EngagementTypes } from "../../api/[locale]/v1/core/leads/enum";
 import type { LeadEngagementResponseOutput } from "../../api/[locale]/v1/core/leads/tracking/engagement/definition";
 
-// Session storage key for tracking
-const TRACKING_SESSION_KEY = "lead_tracking_session";
 const TRACKING_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
-
 let lastTrackedTime = 0;
 
 /**

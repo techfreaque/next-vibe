@@ -14,7 +14,7 @@ import {
   createErrorResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import { useToast } from "next-vibe-ui//hooks/use-toast";
+import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useCallback } from "react";
 
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";

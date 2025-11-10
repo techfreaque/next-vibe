@@ -1,7 +1,11 @@
 "use client";
 
-import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { parseError } from "next-vibe/shared/utils";
+import {
+  useParams,
+  useRouter,
+  useSearchParams,
+} from "next-vibe-ui/hooks/use-navigation";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";

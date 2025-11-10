@@ -6,8 +6,8 @@
 "use client";
 
 import { ArrowLeft, Save } from 'next-vibe-ui/ui/icons';
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link } from "next-vibe-ui/ui/link";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Button } from "next-vibe-ui/ui/button";

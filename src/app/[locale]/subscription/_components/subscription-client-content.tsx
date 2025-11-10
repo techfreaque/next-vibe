@@ -2,8 +2,11 @@
 
 import { motion } from "framer-motion";
 import { History, TrendingUp } from 'next-vibe-ui/ui/icons';
-import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
+import {
+  useRouter,
+  useSearchParams,
+} from "next-vibe-ui/hooks/use-navigation";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import { useEffect, useState } from "react";
 

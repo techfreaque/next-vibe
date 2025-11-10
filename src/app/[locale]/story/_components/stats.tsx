@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import CountUp from "react-countup";
 import { useInView } from "react-intersection-observer";
@@ -46,12 +48,12 @@ export function Stats({ locale }: { locale: CountryLanguage }): JSX.Element {
   ];
 
   return (
-    <section
+    <Div
       className="py-20 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 px-4 md:px-6 w-full"
       ref={ref}
     >
-      <div className="container">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-white">
+      <Div className="container">
+        <Div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-white">
           {stats.map((stat, index) => (
             <motion.div
               key={index}
@@ -60,16 +62,16 @@ export function Stats({ locale }: { locale: CountryLanguage }): JSX.Element {
               animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <div className="text-4xl md:text-5xl font-bold mb-2">
+              <Div className="text-4xl md:text-5xl font-bold mb-2">
                 {inView ? <CountUp end={stat.value} duration={2.5} /> : 0}
                 {stat.suffix}
-              </div>
-              <p className="text-blue-100">{stat.title}</p>
+              </Div>
+              <P className="text-blue-100">{stat.title}</P>
             </motion.div>
           ))}
-        </div>
-      </div>
-    </section>
+        </Div>
+      </Div>
+    </Div>
   );
 }
 

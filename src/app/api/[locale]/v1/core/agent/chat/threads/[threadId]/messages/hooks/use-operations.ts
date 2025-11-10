@@ -8,6 +8,7 @@ import { useCallback } from "react";
 
 import { AUTH_STATUS_COOKIE_PREFIX } from "@/config/constants";
 import { parseError } from "next-vibe/shared/utils";
+import { getCookie } from "next-vibe-ui/lib/cookies";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -159,7 +160,7 @@ export function useMessageOperations(
             const { getMessagesForThread } = await import(
               "../../../../incognito/storage"
             );
-            threadMessages = getMessagesForThread(threadIdToUse);
+            threadMessages = await getMessagesForThread(threadIdToUse);
           } else {
             threadMessages = chatStore.getThreadMessages(threadIdToUse);
           }
@@ -515,10 +516,8 @@ export function useMessageOperations(
         return;
       }
 
-      const authStatusCookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith(AUTH_STATUS_COOKIE_PREFIX));
-      const isAuthenticated = authStatusCookie !== undefined;
+      const authStatusCookie = await getCookie(AUTH_STATUS_COOKIE_PREFIX);
+      const isAuthenticated = authStatusCookie !== null;
 
       // Handle incognito message deletion
       if (!isAuthenticated || thread.rootFolderId === "incognito") {
@@ -619,10 +618,8 @@ export function useMessageOperations(
         return;
       }
 
-      const authStatusCookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith(AUTH_STATUS_COOKIE_PREFIX));
-      const isAuthenticated = authStatusCookie !== undefined;
+      const authStatusCookie = await getCookie(AUTH_STATUS_COOKIE_PREFIX);
+      const isAuthenticated = authStatusCookie !== null;
 
       if (!isAuthenticated || thread.rootFolderId === "incognito") {
         logger.debug(

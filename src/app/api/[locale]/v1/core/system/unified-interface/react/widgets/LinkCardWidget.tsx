@@ -1,16 +1,16 @@
 "use client";
 
 import { ExternalLink } from 'next-vibe-ui/ui/icons';
-import Image from "next/image";
 import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui//ui/div";
-import { Span } from "next-vibe-ui//ui/span";
-import { Card } from "next-vibe-ui//ui/card";
-import { CardContent } from "next-vibe-ui//ui/card";
-import { CardDescription } from "next-vibe-ui//ui/card";
-import { CardHeader } from "next-vibe-ui//ui/card";
-import { CardTitle } from "next-vibe-ui//ui/card";
-import { Link } from "next-vibe-ui//ui/link";
+import { Image } from "next-vibe-ui/ui/image";
+import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
+import { Card } from "next-vibe-ui/ui/card";
+import { CardContent } from "next-vibe-ui/ui/card";
+import { CardDescription } from "next-vibe-ui/ui/card";
+import { CardHeader } from "next-vibe-ui/ui/card";
+import { CardTitle } from "next-vibe-ui/ui/card";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX, MouseEvent } from "react";
 
 import type { RenderableValue, WidgetComponentProps } from "../types";

@@ -1,18 +1,18 @@
 "use client";
 
 import { useRouter } from "next-vibe-ui/hooks";
-import { Button } from "next-vibe-ui//ui/button";
-import { Div } from "next-vibe-ui//ui/div";
-import { Input } from "next-vibe-ui//ui/input";
-import { P } from "next-vibe-ui//ui/typography";
-import { ScrollArea } from "next-vibe-ui//ui/scroll-area";
-import { Tooltip } from "next-vibe-ui//ui/tooltip";
-import { TooltipContent } from "next-vibe-ui//ui/tooltip";
-import { TooltipProvider } from "next-vibe-ui//ui/tooltip";
-import { TooltipTrigger } from "next-vibe-ui//ui/tooltip";
-import { FolderPlus } from "next-vibe-ui//ui/icons/FolderPlus";
-import { MessageSquarePlus } from "next-vibe-ui//ui/icons/MessageSquarePlus";
-import { Search } from "next-vibe-ui//ui/icons/Search";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { Input } from "next-vibe-ui/ui/input";
+import { P } from "next-vibe-ui/ui/typography";
+import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
+import { Tooltip } from "next-vibe-ui/ui/tooltip";
+import { TooltipContent } from "next-vibe-ui/ui/tooltip";
+import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
+import { TooltipTrigger } from "next-vibe-ui/ui/tooltip";
+import { FolderPlus } from "next-vibe-ui/ui/icons/FolderPlus";
+import { MessageSquarePlus } from "next-vibe-ui/ui/icons/MessageSquarePlus";
+import { Search } from "next-vibe-ui/ui/icons/Search";
 import type { JSX } from "react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -317,10 +317,10 @@ export function ChatSidebar({
 
       {/* Compact Footer with Credits and User Menu */}
       <SidebarFooter
-        user={user}
         locale={locale}
-        logger={logger}
         credits={credits}
+        user={user}
+        logger={logger}
       />
 
       <NewFolderDialog

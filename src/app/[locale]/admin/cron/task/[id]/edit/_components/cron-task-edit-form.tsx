@@ -8,6 +8,7 @@
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Div } from "next-vibe-ui/ui/div";
+import { Label } from "next-vibe-ui/ui/label";
 import { P } from "next-vibe-ui/ui/typography";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -60,47 +61,47 @@ export function CronTaskEditForm({
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Div>
-            <label className="text-sm font-medium text-muted-foreground">
+            <Label className="text-sm font-medium text-muted-foreground">
               {t(
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.fields.id.label",
               )}
-            </label>
+            </Label>
             <P className="text-sm font-mono">{task.id}</P>
           </Div>
           <Div>
-            <label className="text-sm font-medium text-muted-foreground">
+            <Label className="text-sm font-medium text-muted-foreground">
               {t(
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.label",
               )}
-            </label>
+            </Label>
             <P className="text-sm">{task.version}</P>
           </Div>
           <Div>
-            <label className="text-sm font-medium text-muted-foreground">
+            <Label className="text-sm font-medium text-muted-foreground">
               {t(
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.list.columns.createdAt",
               )}
-            </label>
+            </Label>
             <P className="text-sm">
               {new Date(task.createdAt).toLocaleString()}
             </P>
           </Div>
           <Div>
-            <label className="text-sm font-medium text-muted-foreground">
+            <Label className="text-sm font-medium text-muted-foreground">
               {t(
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.list.columns.updatedAt",
               )}
-            </label>
+            </Label>
             <P className="text-sm">
               {new Date(task.updatedAt).toLocaleString()}
             </P>
           </Div>
           <Div className="md:col-span-2">
-            <label className="text-sm font-medium text-muted-foreground">
+            <Label className="text-sm font-medium text-muted-foreground">
               {t(
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.label",
               )}
-            </label>
+            </Label>
             <P className="text-sm">
               {formatCronSchedule(task.schedule, userTimezone, locale, logger)}
             </P>

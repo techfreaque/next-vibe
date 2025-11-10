@@ -1,6 +1,6 @@
-import { useRouter } from "next/navigation";
 import { parseError } from "next-vibe/shared/utils";
-import { useToast } from "next-vibe-ui//hooks/use-toast";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
+import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useCallback, useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -59,7 +59,7 @@ export function useRegister(): SignupFormReturn & {
       // Clear lead tracking data on successful signup
       logger.info("app.api.v1.core.user.public.signup.success.processing");
 
-      const setTokenResponse = authClientRepository.setAuthStatus(logger);
+      const setTokenResponse = await authClientRepository.setAuthStatus(logger);
       if (!setTokenResponse.success) {
         toast({
           title: t("app.api.v1.core.user.public.signup.errors.title"),

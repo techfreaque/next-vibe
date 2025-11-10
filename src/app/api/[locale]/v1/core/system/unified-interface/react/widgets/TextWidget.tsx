@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Span } from "next-vibe-ui//ui/span";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { RenderableValue, WidgetComponentProps } from "../types";

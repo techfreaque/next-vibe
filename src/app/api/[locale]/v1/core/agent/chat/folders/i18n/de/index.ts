@@ -3,10 +3,12 @@
  */
 
 import { translations as idTranslations } from "../../[id]/i18n/de";
+import { translations as rootPermissionsTranslations } from "../../root-permissions/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   id: idTranslations,
+  rootPermissions: rootPermissionsTranslations,
   get: {
     title: "Ordner auflisten",
     description: "Alle Ordner für den aktuellen Benutzer abrufen",

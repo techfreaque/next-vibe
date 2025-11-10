@@ -1,7 +1,7 @@
 "use client";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import { Button } from "next-vibe-ui//ui/button";
+import { Button } from "next-vibe-ui/ui/button";
 import { Check, Copy } from 'next-vibe-ui/ui/icons';
 import type { JSX } from "react";
 import React, { useState } from "react";

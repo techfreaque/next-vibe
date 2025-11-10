@@ -7,8 +7,8 @@ import {
   Lightbulb,
 } from 'next-vibe-ui/ui/icons';
 import type { Metadata } from "next";
-import Image from "next/image";
 import { Button } from "next-vibe-ui/ui/button";
+import { Image } from "next-vibe-ui/ui/image";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";

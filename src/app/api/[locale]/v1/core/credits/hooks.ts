@@ -7,7 +7,7 @@
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-import { useToast } from "next-vibe-ui//hooks/use-toast";
+import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useCallback, useMemo } from "react";
 
 import { handleCheckoutRedirect } from "@/app/api/[locale]/v1/core/payment/utils/redirect";

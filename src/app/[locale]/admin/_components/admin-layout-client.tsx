@@ -102,7 +102,9 @@ export function AdminLayoutClient({
           sidebarOpen ? "block" : "hidden",
         )}
       >
-        <button
+        <Button
+          variant="ghost"
+          size="unset"
           type="button"
           className="fixed inset-0 bg-gray-600 bg-opacity-75 border-0 p-0 cursor-pointer"
           onClick={() => setSidebarOpen(false)}

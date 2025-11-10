@@ -5,7 +5,7 @@
  * Most of the implementation details are handled by the next-vibe package.
  */
 
-import { useToast } from "next-vibe-ui//hooks/use-toast";
+import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useMemo, useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";

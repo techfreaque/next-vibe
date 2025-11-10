@@ -38,3 +38,22 @@ export function useRouter(): {
     },
   };
 }
+
+/**
+ * Get route params
+ * Compatible with Next.js useParams
+ */
+export function useParams(): Record<string, string | string[]> {
+  // Expo Router's useLocalSearchParams or useGlobalSearchParams can be used
+  // For now returning empty object as placeholder
+  return {};
+}
+
+/**
+ * Get search params
+ * Compatible with Next.js useSearchParams
+ */
+export function useSearchParams(): URLSearchParams {
+  // Placeholder for React Native implementation
+  return new URLSearchParams();
+}

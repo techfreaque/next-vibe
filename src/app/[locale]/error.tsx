@@ -1,8 +1,8 @@
 "use client";
 // error page has to stay a client component
 
-import { useParams } from "next/navigation";
 import { Environment } from "next-vibe/shared/utils";
+import { useParams } from "next-vibe-ui/hooks/use-navigation";
 import { Div } from "next-vibe-ui/ui/div";
 import { H2, P, } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";

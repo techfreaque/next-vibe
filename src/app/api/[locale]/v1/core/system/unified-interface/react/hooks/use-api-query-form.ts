@@ -8,6 +8,7 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+import { storage } from "next-vibe-ui/lib/storage";
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -39,7 +40,7 @@ import { useApiQuery } from "./use-api-query";
  *
  * Features:
  * - Form validation using Zod schema
- * - Form persistence using localStorage (enabled by default)
+ * - Form persistence using platform-agnostic storage (enabled by default)
  * - Automatic query updates based on form values
  * - Debounced form submissions to prevent excessive API calls
  *
@@ -73,7 +74,7 @@ export function useApiQueryForm<
      */
     persistForm?: boolean;
     /**
-     * The key to use for storing form data in localStorage
+     * The key to use for storing form data in storage
      * If not provided, a key will be generated based on the endpoint
      */
     persistenceKey?: string;
@@ -239,24 +240,26 @@ export function useApiQueryForm<
       return;
     }
 
-    try {
-      // Clear from localStorage
-      localStorage.removeItem(storageKey);
-      // Reset the form to default values if available, otherwise empty
-      const resetData =
-        (restFormOptions.defaultValues as ExtractOutput<
-          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-        >) ||
-        ({} as ExtractOutput<
-          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-        >);
-      formMethods.reset(resetData);
-      // Update query params with reset data
-      setQueryParams(resetData);
-    } catch {
-      // Handle error silently - we don't want to break the UI for storage errors
-      // In a production app, this would use a proper error logging service
-    }
+    void (async (): Promise<void> => {
+      try {
+        // Clear from storage
+        await storage.removeItem(storageKey);
+        // Reset the form to default values if available, otherwise empty
+        const resetData =
+          (restFormOptions.defaultValues as ExtractOutput<
+            InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+          >) ||
+          ({} as ExtractOutput<
+            InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+          >);
+        formMethods.reset(resetData);
+        // Update query params with reset data
+        setQueryParams(resetData);
+      } catch {
+        // Handle error silently - we don't want to break the UI for storage errors
+        // In a production app, this would use a proper error logging service
+      }
+    })();
   }, [formMethods, storageKey, setQueryParams, restFormOptions.defaultValues]);
 
   // Load saved form values on mount
@@ -265,20 +268,22 @@ export function useApiQueryForm<
       return;
     }
 
-    try {
-      const savedFormData = localStorage.getItem(storageKey);
-      if (savedFormData) {
-        const parsedData = JSON.parse(savedFormData) as ExtractOutput<
-          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-        >;
-        formMethods.reset(parsedData);
-        // Update query params with saved data
-        setQueryParams(parsedData);
+    void (async (): Promise<void> => {
+      try {
+        const savedFormData = await storage.getItem(storageKey);
+        if (savedFormData) {
+          const parsedData = JSON.parse(savedFormData) as ExtractOutput<
+            InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+          >;
+          formMethods.reset(parsedData);
+          // Update query params with saved data
+          setQueryParams(parsedData);
+        }
+      } catch {
+        // Handle error silently - we don't want to break the UI for storage errors
+        // In a production app, this would use a proper error logging service
       }
-    } catch {
-      // Handle error silently - we don't want to break the UI for storage errors
-      // In a production app, this would use a proper error logging service
-    }
+    })();
   }, [formMethods, storageKey, persistForm, setQueryParams]);
 
   // Save form values when they change
@@ -299,12 +304,14 @@ export function useApiQueryForm<
 
         // Set a new timer
         persistDebounceTimer = window.setTimeout(() => {
-          try {
-            localStorage.setItem(storageKey, JSON.stringify(formValues));
-          } catch {
-            // Handle error silently - we don't want to break the UI for storage errors
-            // In a production app, this would use a proper error logging service
-          }
+          void (async (): Promise<void> => {
+            try {
+              await storage.setItem(storageKey, JSON.stringify(formValues));
+            } catch {
+              // Handle error silently - we don't want to break the UI for storage errors
+              // In a production app, this would use a proper error logging service
+            }
+          })();
         }, persistDebounceMs);
       }
     });

@@ -49,7 +49,7 @@ export function useLogout(logger: EndpointLogger): () => void {
       });
 
       // Remove token AFTER successful API call
-      const removeResponse = authClientRepository.removeAuthStatus(logger);
+      const removeResponse = await authClientRepository.removeAuthStatus(logger);
       if (!removeResponse.success) {
         // Note: Error already logged by repository
       }
@@ -67,7 +67,7 @@ export function useLogout(logger: EndpointLogger): () => void {
       });
 
       // Remove token AFTER API call completes (even with error)
-      const removeResponse = authClientRepository.removeAuthStatus(logger);
+      const removeResponse = await authClientRepository.removeAuthStatus(logger);
       if (!removeResponse.success) {
         // Note: Error already logged by repository
       }

@@ -16,7 +16,7 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
   const { t } = simpleT(locale);
 
   return (
-    <section className="w-full relative">
+    <Div className="w-full relative">
       {/* Background elements */}
       <Div className="absolute inset-0 bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-900 dark:from-gray-900 dark:to-background -z-10" />
       <Div className="absolute top-0 right-0 -z-10 opacity-70 dark:opacity-30">
@@ -90,7 +90,7 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
 
         </Div>
       </Div>
-    </section>
+    </Div>
   );
 };
 

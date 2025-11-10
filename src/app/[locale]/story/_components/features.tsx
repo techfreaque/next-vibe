@@ -18,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import type React from "react";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
@@ -121,12 +122,12 @@ export default function Features({
   };
 
   return (
-    <section
+    <Div
       id="features"
       className="container px-4 md:px-6 py-24 md:py-32"
       ref={ref}
     >
-      <div className="text-center mb-16">
+      <Div className="text-center mb-16">
         <motion.p
           className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2"
           initial={{ opacity: 0 }}
@@ -151,7 +152,7 @@ export default function Features({
         >
           {t("app.story._components.home.features.description")}
         </motion.p>
-      </div>
+      </Div>
 
       <motion.div
         className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
@@ -163,9 +164,9 @@ export default function Features({
           <motion.div key={index} variants={item}>
             <Card className="h-full border-2 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-lg group">
               <CardHeader>
-                <div className="mb-2 p-2 w-14 h-14 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors duration-300">
+                <Div className="mb-2 p-2 w-14 h-14 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors duration-300">
                   {feature.icon}
-                </div>
+                </Div>
                 <CardTitle className="group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                   {feature.title}
                 </CardTitle>
@@ -179,6 +180,6 @@ export default function Features({
           </motion.div>
         ))}
       </motion.div>
-    </section>
+    </Div>
   );
 }

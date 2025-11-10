@@ -129,7 +129,7 @@ export function ToolCallRenderer({
 
   // Get display name and translate if it's a translation key
   const rawDisplayName = toolCall.displayName || toolCall.toolName;
-  const displayName = t(rawDisplayName);
+  const displayName = t(rawDisplayName as Parameters<typeof t>[0]);
 
   // Get credits display with translation
   const creditsDisplay = toolCall.creditsUsed

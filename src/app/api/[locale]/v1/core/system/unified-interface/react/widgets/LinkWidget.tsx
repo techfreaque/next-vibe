@@ -2,8 +2,8 @@
 
 import { ExternalLink } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils";
-import { Span } from "next-vibe-ui//ui/span";
-import { Link } from "next-vibe-ui//ui/link";
+import { Span } from "next-vibe-ui/ui/span";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX, MouseEvent } from "react";
 
 import { simpleT } from "@/i18n/core/shared";

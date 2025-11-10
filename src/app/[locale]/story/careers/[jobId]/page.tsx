@@ -1,7 +1,7 @@
 import { ArrowLeft } from 'next-vibe-ui/ui/icons';
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
+import { notFound } from "next-vibe-ui/lib/not-found";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";

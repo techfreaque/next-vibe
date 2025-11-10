@@ -3,10 +3,12 @@
  */
 
 import { translations as idTranslations } from "../../[id]/i18n/pl";
+import { translations as rootPermissionsTranslations } from "../../root-permissions/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   id: idTranslations,
+  rootPermissions: rootPermissionsTranslations,
   get: {
     title: "Lista folderów",
     description: "Pobierz wszystkie foldery dla bieżącego użytkownika",

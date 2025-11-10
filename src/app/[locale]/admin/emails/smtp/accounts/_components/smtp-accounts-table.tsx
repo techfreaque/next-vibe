@@ -6,8 +6,8 @@
 "use client";
 
 import { Edit, MoreHorizontal, Trash2 } from 'next-vibe-ui/ui/icons';
-import Link from "next/link";
 import { Badge } from "next-vibe-ui/ui/badge";
+import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   DropdownMenu,

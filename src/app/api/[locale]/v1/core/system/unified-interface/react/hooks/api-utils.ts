@@ -108,7 +108,7 @@ export async function callApi<TResponseOutput>(
 
     // Check authentication status if required
     if (endpoint.requiresAuthentication()) {
-      const tokenResponse = authClientRepository.hasAuthStatus(logger);
+      const tokenResponse = await authClientRepository.hasAuthStatus(logger);
       if (!tokenResponse.success || !tokenResponse.data) {
         // Return error - server should provide proper translation key
         return fail({

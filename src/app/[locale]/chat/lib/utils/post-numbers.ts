@@ -4,6 +4,7 @@
  */
 
 import { parseError } from "next-vibe/shared/utils";
+import { storage } from "next-vibe-ui/lib/storage";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -30,15 +31,15 @@ function isPostNumberMap(
 }
 
 /**
- * Get post number map from localStorage
+ * Get post number map from storage
  */
-function getPostNumberMap(logger: EndpointLogger): PostNumberMap {
+async function getPostNumberMap(logger: EndpointLogger): Promise<PostNumberMap> {
   if (typeof window === "undefined") {
     return {};
   }
 
   try {
-    const stored = localStorage.getItem(POST_NUMBER_KEY);
+    const stored = await storage.getItem(POST_NUMBER_KEY);
     if (!stored) {
       return {};
     }
@@ -62,15 +63,15 @@ function getPostNumberMap(logger: EndpointLogger): PostNumberMap {
 }
 
 /**
- * Save post number map to localStorage
+ * Save post number map to storage
  */
-function savePostNumberMap(map: PostNumberMap, logger: EndpointLogger): void {
+async function savePostNumberMap(map: PostNumberMap, logger: EndpointLogger): Promise<void> {
   if (typeof window === "undefined") {
     return;
   }
 
   try {
-    localStorage.setItem(POST_NUMBER_KEY, JSON.stringify(map));
+    await storage.setItem(POST_NUMBER_KEY, JSON.stringify(map));
   } catch (error) {
     logger.error("Storage", "Error saving post numbers", parseError(error));
   }
@@ -79,13 +80,13 @@ function savePostNumberMap(map: PostNumberMap, logger: EndpointLogger): void {
 /**
  * Get current counter value
  */
-function getCounter(logger: EndpointLogger): number {
+async function getCounter(logger: EndpointLogger): Promise<number> {
   if (typeof window === "undefined") {
     return POST_NUMBER_START;
   }
 
   try {
-    const stored = localStorage.getItem(POST_NUMBER_COUNTER_KEY);
+    const stored = await storage.getItem(POST_NUMBER_COUNTER_KEY);
     return stored ? parseInt(stored, 10) : POST_NUMBER_START;
   } catch (error) {
     logger.error("Storage", "Error loading counter", parseError(error));
@@ -96,13 +97,13 @@ function getCounter(logger: EndpointLogger): number {
 /**
  * Save counter value
  */
-function saveCounter(counter: number, logger: EndpointLogger): void {
+async function saveCounter(counter: number, logger: EndpointLogger): Promise<void> {
   if (typeof window === "undefined") {
     return;
   }
 
   try {
-    localStorage.setItem(POST_NUMBER_COUNTER_KEY, counter.toString());
+    await storage.setItem(POST_NUMBER_COUNTER_KEY, counter.toString());
   } catch (error) {
     logger.error("Storage", "Error saving counter", parseError(error));
   }
@@ -112,11 +113,11 @@ function saveCounter(counter: number, logger: EndpointLogger): void {
  * Get or generate post number for a message
  * Returns existing number if already assigned, otherwise generates new one
  */
-export function getPostNumber(
+export async function getPostNumber(
   messageId: string,
   logger: EndpointLogger,
-): number {
-  const map = getPostNumberMap(logger);
+): Promise<number> {
+  const map = await getPostNumberMap(logger);
 
   // Return existing number if found
   if (map[messageId]) {
@@ -124,13 +125,13 @@ export function getPostNumber(
   }
 
   // Generate new number
-  const counter = getCounter(logger);
+  const counter = await getCounter(logger);
   const newNumber = counter;
 
   // Save new number
   map[messageId] = newNumber;
-  savePostNumberMap(map, logger);
-  saveCounter(counter + 1, logger);
+  await savePostNumberMap(map, logger);
+  await saveCounter(counter + 1, logger);
 
   return newNumber;
 }
@@ -139,12 +140,12 @@ export function getPostNumber(
  * Get post numbers for multiple messages at once
  * More efficient than calling getPostNumber multiple times
  */
-export function getPostNumbers(
+export async function getPostNumbers(
   messageIds: string[],
   logger: EndpointLogger,
-): Record<string, number> {
-  const map = getPostNumberMap(logger);
-  let counter = getCounter(logger);
+): Promise<Record<string, number>> {
+  const map = await getPostNumberMap(logger);
+  let counter = await getCounter(logger);
   let hasNewNumbers = false;
 
   const result: Record<string, number> = {};
@@ -162,8 +163,8 @@ export function getPostNumbers(
 
   // Save if we generated any new numbers
   if (hasNewNumbers) {
-    savePostNumberMap(map, logger);
-    saveCounter(counter, logger);
+    await savePostNumberMap(map, logger);
+    await saveCounter(counter, logger);
   }
 
   return result;
@@ -172,14 +173,14 @@ export function getPostNumbers(
 /**
  * Clear all post numbers (for testing/reset)
  */
-export function clearPostNumbers(logger: EndpointLogger): void {
+export async function clearPostNumbers(logger: EndpointLogger): Promise<void> {
   if (typeof window === "undefined") {
     return;
   }
 
   try {
-    localStorage.removeItem(POST_NUMBER_KEY);
-    localStorage.removeItem(POST_NUMBER_COUNTER_KEY);
+    await storage.removeItem(POST_NUMBER_KEY);
+    await storage.removeItem(POST_NUMBER_COUNTER_KEY);
   } catch (error) {
     logger.error("Storage", "Error clearing post numbers", parseError(error));
   }

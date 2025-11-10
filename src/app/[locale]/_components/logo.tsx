@@ -9,8 +9,8 @@ import type { JSX } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import logoBlack from "./unbottled-icon.png";
-import logoWhite from "./unbottled-icon-white.png";
+import { Span } from "next-vibe-ui/ui/span";
+import { envClient } from "@/config/env-client";
 
 export function Logo({
   locale,
@@ -40,33 +40,37 @@ export function Logo({
       <Div className={cn("shrink-0", size)}>
         <Image
           fetchPriority="high"
-          src={logoWhite}
+          src={`${envClient.platform.isReactNative ?envClient.NEXT_PUBLIC_APP_URL: ""}/unbottled-icon-white.png`}
           alt={t("config.appName")}
           className={cn(
             "hidden dark:block h-full w-auto object-contain",
             className,
           )}
+          width={32}
+          height={32}
           priority
         />
         <Image
           fetchPriority="high"
-          src={logoBlack}
+          src={`${envClient.platform.isReactNative ?envClient.NEXT_PUBLIC_APP_URL: ""}/unbottled-icon.png`}
           alt={t("config.appName")}
           className={cn(
             "hidden light:block h-full w-auto object-contain",
             className,
           )}
+          width={32}
+          height={32}
           priority
         />
       </Div>
-      <span
+      <Span
         className={cn(
           "font-inter text-base font-bold tracking-tight whitespace-nowrap",
           "text-gray-900 dark:text-white",
         )}
       >
         {t("config.appName")}
-      </span>
+      </Span>
     </Component>
   );
 }

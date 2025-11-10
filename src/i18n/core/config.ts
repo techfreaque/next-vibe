@@ -40,12 +40,12 @@ export const LanguagesArr = languageConfig.languagesArr;
 export const CountriesOptions = [
                     {
                       value: Countries.GLOBAL,
-                      label: "app.common.countries.global",
+                      label: "app.common.countries.global" as const,
                     },
-                    { value: Countries.DE, label: "app.common.countries.de" },
-                    { value: Countries.PL, label: "app.common.countries.pl" },
-                    { value: Countries.US, label: "app.common.countries.us" },
-                  ] as const;
+                    { value: Countries.DE, label: "app.common.countries.de" as const },
+                    { value: Countries.PL, label: "app.common.countries.pl" as const },
+                    { value: Countries.US, label: "app.common.countries.us" as const },
+                  ];
 
 /**
  * Languages Options for select fields
@@ -54,11 +54,11 @@ export const CountriesOptions = [
 export const LanguagesOptions = [
                     {
                       value: Languages.EN,
-                      label: "app.common.languages.en",
+                      label: "app.common.languages.en" as const,
                     },
-                    { value: Languages.DE, label: "app.common.languages.de" },
-                    { value: Languages.PL, label: "app.common.languages.pl" },
-] as const;
+                    { value: Languages.DE, label: "app.common.languages.de" as const },
+                    { value: Languages.PL, label: "app.common.languages.pl" as const },
+];
 
 /**
  * Country Filter Enum
@@ -79,21 +79,21 @@ export enum CountryFilter {
 export const CountryFilterOptions = [
   {
     value: CountryFilter.ALL,
-    label: "app.admin.leads.leads.admin.filters.countries.all",
+    label: "app.admin.leads.leads.admin.filters.countries.all" as const,
   },
   {
     value: CountryFilter.GLOBAL,
-    label: "app.admin.leads.leads.admin.filters.countries.global",
+    label: "app.admin.leads.leads.admin.filters.countries.global" as const,
   },
   {
     value: CountryFilter.DE,
-    label: "app.admin.leads.leads.admin.filters.countries.de",
+    label: "app.admin.leads.leads.admin.filters.countries.de" as const,
   },
   {
     value: CountryFilter.PL,
-    label: "app.admin.leads.leads.admin.filters.countries.pl",
+    label: "app.admin.leads.leads.admin.filters.countries.pl" as const,
   },
-] as const;
+];
 
 /**
  * Language Filter Enum
@@ -113,21 +113,21 @@ export enum LanguageFilter {
 export const LanguageFilterOptions = [
   {
     value: LanguageFilter.ALL,
-    label: "app.admin.leads.leads.filter.all_languages",
+    label: "app.admin.leads.leads.filter.all_languages" as const,
   },
   {
     value: LanguageFilter.EN,
-    label: "app.admin.leads.leads.admin.filters.languages.en",
+    label: "app.admin.leads.leads.admin.filters.languages.en" as const,
   },
   {
     value: LanguageFilter.DE,
-    label: "app.admin.leads.leads.admin.filters.languages.de",
+    label: "app.admin.leads.leads.admin.filters.languages.de" as const,
   },
   {
     value: LanguageFilter.PL,
-    label: "app.admin.leads.leads.admin.filters.languages.pl",
+    label: "app.admin.leads.leads.admin.filters.languages.pl" as const,
   },
-] as const;
+];
 
 /**
  * Convert country filter - handles CountryFilter and returns string or null
@@ -175,10 +175,10 @@ export const defaultLocale: CountryLanguage = `${languageDefaults.language}-${la
 export const globalCountryInfo: CountryInfo = languageConfig.countryInfo
   .GLOBAL as CountryInfo;
 export const availableCountries: readonly CountryInfo[] = [
-  languageConfig.countryInfo.DE satisfies CountryInfo,
-  languageConfig.countryInfo.PL satisfies CountryInfo,
-  languageConfig.countryInfo.US satisfies CountryInfo,
-  languageConfig.countryInfo.GLOBAL satisfies CountryInfo,
+  languageConfig.countryInfo.DE as CountryInfo,
+  languageConfig.countryInfo.PL as CountryInfo,
+  languageConfig.countryInfo.US as CountryInfo,
+  languageConfig.countryInfo.GLOBAL as CountryInfo,
 ];
 export const availableLanguages = Object.values(languageConfig.languages);
 

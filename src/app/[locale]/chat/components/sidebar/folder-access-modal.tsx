@@ -10,8 +10,9 @@ import {
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
-import Link from "next/link";
 import type { JSX } from "react";
+import { Link } from "next-vibe-ui/ui/link";
+import { P } from "next-vibe-ui/ui/typography";
 import React from "react";
 
 import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
@@ -96,9 +97,9 @@ export function FolderAccessModal({
         </DialogHeader>
 
         <Div className="py-4">
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <P className="text-sm text-muted-foreground leading-relaxed">
             {explanation}
-          </p>
+          </P>
         </Div>
 
         <DialogFooter className="flex-col sm:flex-row gap-2">

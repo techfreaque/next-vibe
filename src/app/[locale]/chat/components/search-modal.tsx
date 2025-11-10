@@ -93,8 +93,10 @@ export function SearchModal({
             <Div className="flex-1 overflow-y-auto space-y-1 min-h-0">
               {searchResults.length > 0 ? (
                 searchResults.map((thread) => (
-                  <button
+                  <Button
                     key={thread.id}
+                    variant="ghost"
+                    size="unset"
                     onClick={() => handleSelectThread(thread.id)}
                     className={cn(
                       "w-full text-left px-3 py-2 rounded-md hover:bg-accent transition-colors",
@@ -102,7 +104,7 @@ export function SearchModal({
                     )}
                   >
                     {thread.title}
-                  </button>
+                  </Button>
                 ))
               ) : (
                 <Div className="text-center py-8 text-muted-foreground text-sm">

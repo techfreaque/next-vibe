@@ -2,19 +2,19 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui//ui/button";
-import { Div } from "next-vibe-ui//ui/div";
-import { Input } from "next-vibe-ui//ui/input";
-import { Popover } from "next-vibe-ui//ui/popover";
-import { PopoverContent } from "next-vibe-ui//ui/popover";
-import { PopoverTrigger } from "next-vibe-ui//ui/popover";
-import { Span } from "next-vibe-ui//ui/span";
-import { Check } from "next-vibe-ui//ui/icons/Check";
-import { ChevronDown } from "next-vibe-ui//ui/icons/ChevronDown";
-import { ChevronUp } from "next-vibe-ui//ui/icons/ChevronUp";
-import { Plus } from "next-vibe-ui//ui/icons/Plus";
-import { Search } from "next-vibe-ui//ui/icons/Search";
-import { Star } from "next-vibe-ui//ui/icons/Star";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { Input } from "next-vibe-ui/ui/input";
+import { Popover } from "next-vibe-ui/ui/popover";
+import { PopoverContent } from "next-vibe-ui/ui/popover";
+import { PopoverTrigger } from "next-vibe-ui/ui/popover";
+import { Span } from "next-vibe-ui/ui/span";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Star } from "next-vibe-ui/ui/icons/Star";
 import type { JSX, ReactNode } from "react";
 import React, { useMemo, useState } from "react";
 
@@ -218,7 +218,7 @@ export function SelectorBase<T extends string = string>({
       > = {};
 
       // Sort group names by their utility order, "Others" goes last
-      const groupNames = Object.keys(grouped).toSorted((a, b) => {
+      const groupNames = Object.keys(grouped).toSorted?.((a, b) => {
         const othersKey = t("app.chat.selectorBase.others");
         // "Others" always goes last
         if (a === othersKey) {
@@ -232,7 +232,7 @@ export function SelectorBase<T extends string = string>({
         const orderA = utilityOrderMap.get(a) ?? Number.MAX_SAFE_INTEGER;
         const orderB = utilityOrderMap.get(b) ?? Number.MAX_SAFE_INTEGER;
         return orderA - orderB;
-      });
+      }) || [];
 
       groupNames.forEach((name) => {
         sortedGroups[name] = grouped[name];
@@ -388,8 +388,10 @@ export function SelectorBase<T extends string = string>({
               <Div className="p-1.5 sm:p-2">
                 {favoriteOptions.length > 0 ? (
                   favoriteOptions.map((option) => (
-                    <button
+                    <Button
                       key={option.id}
+                      variant="ghost"
+                      size="unset"
                       onClick={() => handleSelect(option.id)}
                       title={option.tooltip || option.name}
                       className={cn(
@@ -444,7 +446,7 @@ export function SelectorBase<T extends string = string>({
                           <Check className="h-4 w-4 text-primary" />
                         )}
                       </Div>
-                    </button>
+                    </Button>
                   ))
                 ) : (
                   <Div className="text-center py-8 text-muted-foreground text-sm">
@@ -465,8 +467,10 @@ export function SelectorBase<T extends string = string>({
                     </Div>
                     <Div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
                       {favoriteOptions.map((option) => (
-                        <button
+                        <Button
                           key={option.id}
+                          variant="ghost"
+                          size="unset"
                           onClick={() => handleSelect(option.id)}
                           title={option.tooltip || option.name}
                           className={cn(
@@ -523,7 +527,7 @@ export function SelectorBase<T extends string = string>({
                               {option.description}
                             </Div>
                           )}
-                        </button>
+                        </Button>
                       ))}
                     </Div>
                   </Div>
@@ -542,8 +546,10 @@ export function SelectorBase<T extends string = string>({
                     </Div>
                     <Div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
                       {groupData.options.map((option) => (
-                        <button
+                        <Button
                           key={option.id}
+                          variant="ghost"
+                          size="unset"
                           onClick={() => handleSelect(option.id)}
                           title={option.tooltip || option.name}
                           className={cn(
@@ -598,7 +604,7 @@ export function SelectorBase<T extends string = string>({
                               {option.description}
                             </Div>
                           )}
-                        </button>
+                        </Button>
                       ))}
                     </Div>
                   </Div>

@@ -1,7 +1,8 @@
 "use client";
 
 import { Edit, ExternalLink, Eye } from 'next-vibe-ui/ui/icons';
-import Link from "next/link";
+import {
+  Link } from "next-vibe-ui/ui/link";
 import {
   LeadStatus,
   type LeadStatusValues,
@@ -258,22 +259,22 @@ export function LeadsTable({
                         {t(lead.currentCampaignStage)}
                       </Badge>
                     ) : (
-                      <span className="text-gray-400">
+                      <Span className="text-gray-400">
                         {t(
                           "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
                         )}
-                      </span>
+                      </Span>
                     )}
                   </TableCell>
                   <TableCell>
-                    <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                    <Span className="text-xs bg-gray-100 px-2 py-1 rounded">
                       {lead.country}
-                    </span>
+                    </Span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-xs bg-blue-100 px-2 py-1 rounded">
+                    <Span className="text-xs bg-blue-100 px-2 py-1 rounded">
                       {lead.language}
-                    </span>
+                    </Span>
                   </TableCell>
                   <TableCell>
                     {lead.source ? (
@@ -281,29 +282,31 @@ export function LeadsTable({
                         {lead.source}
                       </Badge>
                     ) : (
-                      <span className="text-gray-400">
+                      <Span className="text-gray-400">
                         {t(
                           "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
                         )}
-                      </span>
+                      </Span>
                     )}
                   </TableCell>
                   <TableCell>
                     {lead.phone ? (
-                      <span className="text-blue-600 text-sm">
+                      <Span className="text-blue-600 text-sm">
                         {lead.phone}
-                      </span>
+                      </Span>
                     ) : (
-                      <span className="text-gray-400">
+                      <Span className="text-gray-400">
                         {t(
                           "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
                         )}
-                      </span>
+                      </Span>
                     )}
                   </TableCell>
                   <TableCell>
                     {lead.website ? (
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="unset"
                         onClick={() => {
                           if (lead.website) {
                             window.open(lead.website, "_blank", "noopener,noreferrer");
@@ -313,7 +316,7 @@ export function LeadsTable({
                       >
                         <ExternalLink className="h-3 w-3" />
                         {t("app.admin.leads.leads.admin.table.website")}
-                      </button>
+                      </Button>
                     ) : (
                       <Span className="text-gray-400">
                         {t(

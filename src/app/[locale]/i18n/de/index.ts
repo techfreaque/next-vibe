@@ -112,6 +112,7 @@ export const translations: typeof enTranslations = {
       global: "Global",
       de: "Deutschland",
       pl: "Polen",
+      us: "Vereinigte Staaten",
     },
     languages: {
       en: "Englisch",

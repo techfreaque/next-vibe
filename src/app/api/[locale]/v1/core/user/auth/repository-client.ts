@@ -24,10 +24,10 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import {
-  deleteCookie,
   getCookie,
+  deleteCookie,
   setCookie,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/react/storage-cookie-client";
+} from "next-vibe-ui/lib/cookies";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import { envClient } from "@/config/env-client";
 
@@ -39,23 +39,23 @@ export interface AuthClientRepository {
   /**
    * Sets the authentication status flag (indicates httpOnly cookie is present)
    * @param logger - Optional logger for debugging
-   * @returns ResponseType indicating success or failure
+   * @returns Promise<ResponseType> indicating success or failure
    */
-  setAuthStatus(logger: EndpointLogger): ResponseType<void>;
+  setAuthStatus(logger: EndpointLogger): Promise<ResponseType<void>>;
 
   /**
    * Removes the authentication status flag
    * @param logger - Optional logger for debugging
-   * @returns ResponseType indicating success or failure
+   * @returns Promise<ResponseType> indicating success or failure
    */
-  removeAuthStatus(logger: EndpointLogger): ResponseType<void>;
+  removeAuthStatus(logger: EndpointLogger): Promise<ResponseType<void>>;
 
   /**
    * Checks if the user has authentication status (indicates httpOnly cookie might be present)
    * @param logger - Optional logger for debugging
-   * @returns ResponseType with boolean indicating authentication status
+   * @returns Promise<ResponseType> with boolean indicating authentication status
    */
-  hasAuthStatus(logger: EndpointLogger): ResponseType<boolean>;
+  hasAuthStatus(logger: EndpointLogger): Promise<ResponseType<boolean>>;
 }
 
 /**
@@ -65,9 +65,9 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
   /**
    * Sets the authentication status flag to indicate httpOnly cookie is present
    * @param logger - Optional logger for debugging
-   * @returns ResponseType indicating success or failure
+   * @returns Promise<ResponseType> indicating success or failure
    */
-  setAuthStatus(logger: EndpointLogger): ResponseType<void> {
+  async setAuthStatus(logger: EndpointLogger): Promise<ResponseType<void>> {
     try {
       if (envClient.platform.isServer) {
         logger.error("setAuthStatus cannot be called on the server");
@@ -77,12 +77,12 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
         );
       }
 
-      logger.debug("Setting auth status cookie", {
-        cookieName: AUTH_STATUS_COOKIE_NAME,
+      logger.debug("Setting auth status storage", {
+        key: AUTH_STATUS_COOKIE_NAME,
         isServer: envClient.platform.isServer,
         hasDocument: typeof document !== "undefined",
       });
-      setCookie(AUTH_STATUS_COOKIE_NAME, "1");
+      await setCookie(AUTH_STATUS_COOKIE_NAME, "1");
 
       return success(undefined);
     } catch (error) {
@@ -98,9 +98,9 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
   /**
    * Removes the authentication status flag
    * @param logger - Optional logger for debugging
-   * @returns ResponseType indicating success or failure
+   * @returns Promise<ResponseType> indicating success or failure
    */
-  removeAuthStatus(logger: EndpointLogger): ResponseType<void> {
+  async removeAuthStatus(logger: EndpointLogger): Promise<ResponseType<void>> {
     try {
       if (envClient.platform.isServer) {
         logger.error("removeAuthStatus cannot be called on the server");
@@ -109,7 +109,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
           ErrorResponseTypes.AUTH_ERROR,
         );
       }
-      deleteCookie(AUTH_STATUS_COOKIE_NAME);
+      await deleteCookie(AUTH_STATUS_COOKIE_NAME);
 
       return success(undefined);
     } catch (error) {
@@ -126,9 +126,9 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
    * Checks if the user has authentication status flag set
    * This indicates that an httpOnly cookie might be present and we should attempt authenticated calls
    * @param logger - Optional logger for debugging
-   * @returns ResponseType with boolean indicating authentication status
+   * @returns Promise<ResponseType> with boolean indicating authentication status
    */
-  hasAuthStatus(logger: EndpointLogger): ResponseType<boolean> {
+  async hasAuthStatus(logger: EndpointLogger): Promise<ResponseType<boolean>> {
     try {
       if (envClient.platform.isServer) {
         logger.error("hasAuthStatus cannot be called on the server");
@@ -138,12 +138,12 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
         );
       }
 
-      const status = getCookie(AUTH_STATUS_COOKIE_NAME);
+      const status = await getCookie(AUTH_STATUS_COOKIE_NAME);
       const hasStatus = status !== null && status !== undefined;
 
-      logger.debug("Checking auth status cookie", {
-        cookieName: AUTH_STATUS_COOKIE_NAME,
-        cookieValue: status,
+      logger.debug("Checking auth status storage", {
+        key: AUTH_STATUS_COOKIE_NAME,
+        value: status,
         hasStatus,
       });
 

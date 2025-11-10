@@ -8,8 +8,8 @@ import {
   MessageSquare,
   PenTool,
 } from 'next-vibe-ui/ui/icons';
-import Image from "next/image";
-import Link from "next/link";
+import { Image } from "next-vibe-ui/ui/image";
+import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { H3, P } from "next-vibe-ui/ui/typography";

@@ -1,5 +1,5 @@
 import type { QueryKey } from "@tanstack/react-query";
-import { storage } from "next-vibe-ui/ui/storage";
+import { storage } from "next-vibe-ui/lib/storage";
 
 import { envClient } from "@/config/env-client";
 

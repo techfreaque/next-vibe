@@ -6,11 +6,12 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
 import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
@@ -122,18 +123,20 @@ function renderContentWithReferences(
     const messageId = postNumberToMessageId[postNumber];
 
     parts.push(
-      <button
+      <Button
         key={`ref-${key++}`}
         onClick={(): void => {
           if (messageId) {
             onMessageClick?.(messageId);
           }
         }}
+        variant="ghost"
+        size="unset"
         className="text-primary hover:text-primary/80 hover:underline cursor-pointer"
       >
         {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
         {`>>${postNumber}`}
-      </button>,
+      </Button>,
     );
 
     lastIndex = regex.lastIndex;
@@ -282,11 +285,13 @@ function UserIdHoverCard({
         {userPosts.map((post, idx) => {
           const postShortId = getShortId(post.id);
           return (
-            <button
+            <Button
               key={post.id}
               onClick={(): void => {
                 onPostClick?.(postShortId);
               }}
+              variant="ghost"
+              size="unset"
               className="w-full text-left p-2 rounded hover:bg-accent transition-colors"
             >
               <Div className="text-xs text-muted-foreground mb-1">
@@ -297,7 +302,7 @@ function UserIdHoverCard({
                 {post.content.substring(0, 100)}
                 {post.content.length > 100 && "..."}
               </Div>
-            </button>
+            </Button>
           );
         })}
       </Div>
@@ -477,15 +482,8 @@ function FlatMessage({
         </Span>
 
         {/* ID Badge - Hoverable */}
-        <button
-          className="px-2 py-0.5 rounded text-xs font-mono font-semibold shadow-sm cursor-pointer hover:opacity-80 transition-opacity"
-          style={{
-            backgroundColor: `${idColor}15`,
-            color: idColor,
-            borderColor: `${idColor}40`,
-            borderWidth: "1px",
-          }}
-          onMouseEnter={(e) => {
+        <Div
+          onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => {
             const rect = e.currentTarget.getBoundingClientRect();
             onSetHoveredUserId(userId, {
               x: rect.left + rect.width / 2,
@@ -495,14 +493,26 @@ function FlatMessage({
           onMouseLeave={() => {
             onSetHoveredUserId(null, null);
           }}
-          title={t("app.chat.flatView.postsById", {
-            count: countPostsByUserId(messages, userId),
-          })}
+          style={{
+            backgroundColor: `${idColor}15`,
+            color: idColor,
+            borderColor: `${idColor}40`,
+            borderWidth: "1px",
+          }}
         >
-          {isUser
-            ? t("app.chat.flatView.idLabel", { id: userId.substring(0, 8) })
-            : personaDisplayName}
-        </button>
+          <Button
+            variant="ghost"
+            size="unset"
+            className="px-2 py-0.5 rounded text-xs font-mono font-semibold shadow-sm cursor-pointer hover:opacity-80 transition-opacity"
+            title={t("app.chat.flatView.postsById", {
+              count: countPostsByUserId(messages, userId),
+            })}
+          >
+            {isUser
+              ? t("app.chat.flatView.idLabel", { id: userId.substring(0, 8) })
+              : personaDisplayName}
+          </Button>
+        </Div>
 
         {/* Timestamp */}
         <Span className="text-muted-foreground/80 text-xs font-medium">
@@ -510,7 +520,9 @@ function FlatMessage({
         </Span>
 
         {/* Post Number */}
-        <button
+        <Button
+          variant="ghost"
+          size="unset"
           className="text-primary hover:text-primary/80 text-xs font-semibold cursor-pointer hover:underline"
           onClick={(): void => {
             void navigator.clipboard.writeText(`>>${postNum}`);
@@ -518,7 +530,7 @@ function FlatMessage({
           title={t("app.chat.flatView.clickToCopyRef")}
         >
           {formatPostNumber(postNum, locale)}
-        </button>
+        </Button>
 
         {/* Reply count badge */}
         {replyCount > 0 && (
@@ -546,29 +558,34 @@ function FlatMessage({
           return (
             <Div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
               <Span>{t("app.chat.flatView.replyingTo")}</Span>
-              <button
-                onClick={() => {
-                  const element = document.getElementById(`${parentPostNum}`);
-                  element?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                  });
-                }}
-                onMouseEnter={(e) => {
+              <Span
+                onMouseEnter={(e: React.MouseEvent<HTMLSpanElement>) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   onSetHoveredRef(parentPostNum.toString(), {
                     x: rect.left + rect.width / 2,
                     y: rect.top,
                   });
                 }}
-                onMouseLeave={(): void => {
+                onMouseLeave={() => {
                   onSetHoveredRef(null, null);
                 }}
-                className="text-primary hover:text-primary/80 hover:underline font-semibold"
               >
-                {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
-                {`>>${parentPostNum}`}
-              </button>
+                <Button
+                  variant="ghost"
+                  size="unset"
+                  onClick={() => {
+                    const element = document.getElementById(`${parentPostNum}`);
+                    element?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "center",
+                    });
+                  }}
+                  className="text-primary hover:text-primary/80 hover:underline font-semibold"
+                >
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
+                  {`>>${parentPostNum}`}
+                </Button>
+              </Span>
             </Div>
           );
         })()}
@@ -813,30 +830,35 @@ function FlatMessage({
           {directReplies.map((reply) => {
             const replyPostNum = postNumberMap[reply.id];
             return (
-              <button
+              <Span
                 key={reply.id}
-                onClick={(): void => {
-                  const element = document.getElementById(`${replyPostNum}`);
-                  element?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                  });
-                }}
-                onMouseEnter={(e): void => {
+                onMouseEnter={(e: React.MouseEvent<HTMLSpanElement>) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   onSetHoveredRef(replyPostNum.toString(), {
                     x: rect.left + rect.width / 2,
                     y: rect.top,
                   });
                 }}
-                onMouseLeave={(): void => {
+                onMouseLeave={() => {
                   onSetHoveredRef(null, null);
                 }}
-                className="text-primary hover:text-primary/80 hover:underline font-semibold"
               >
-                {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
-                {`>>${replyPostNum}`}
-              </button>
+                <Button
+                  variant="ghost"
+                  size="unset"
+                  onClick={() => {
+                    const element = document.getElementById(`${replyPostNum}`);
+                    element?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "center",
+                    });
+                  }}
+                  className="text-primary hover:text-primary/80 hover:underline font-semibold"
+                >
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
+                  {`>>${replyPostNum}`}
+                </Button>
+              </Span>
             );
           })}
         </Div>
@@ -857,18 +879,22 @@ function FlatMessage({
           >
             {/* Reply */}
             {onBranchMessage && (
-              <button
+              <Button
+                variant="ghost"
+                size="unset"
                 onClick={(): void => messageActions.startEdit(message.id)}
                 className="text-primary hover:text-primary/80 hover:underline transition-colors"
                 title={t("app.chat.flatView.actions.replyToMessage")}
               >
                 [{t("app.chat.flatView.actions.reply")}]
-              </button>
+              </Button>
             )}
 
             {/* Edit/Branch */}
             {isUser && onBranchMessage && (
-              <button
+              <Button
+                variant="ghost"
+                size="unset"
                 onClick={(): void => {
                   messageActions.startEdit(message.id);
                 }}
@@ -876,12 +902,14 @@ function FlatMessage({
                 title={t("app.chat.flatView.actions.editMessage")}
               >
                 [{t("app.chat.flatView.actions.edit")}]
-              </button>
+              </Button>
             )}
 
             {/* Retry */}
             {isUser && onRetryMessage && (
-              <button
+              <Button
+                variant="ghost"
+                size="unset"
                 onClick={(): void => {
                   messageActions.startRetry(message.id);
                 }}
@@ -889,12 +917,14 @@ function FlatMessage({
                 title={t("app.chat.flatView.actions.retryWithDifferent")}
               >
                 [{t("app.chat.flatView.actions.retry")}]
-              </button>
+              </Button>
             )}
 
             {/* Answer as AI - For both user and assistant messages */}
             {onAnswerAsModel && (
-              <button
+              <Button
+                variant="ghost"
+                size="unset"
                 onClick={(): void => {
                   messageActions.startAnswer(message.id);
                 }}
@@ -906,22 +936,26 @@ function FlatMessage({
                 }
               >
                 [{t("app.chat.flatView.actions.answerAsAI")}]
-              </button>
+              </Button>
             )}
 
             {/* Quote */}
             {onInsertQuote && (
-              <button
+              <Button
+                variant="ghost"
+                size="unset"
                 onClick={onInsertQuote}
                 className="text-primary hover:text-primary/80 hover:underline transition-colors"
                 title={t("app.chat.flatView.actions.insertQuote")}
               >
                 [{t("app.chat.flatView.actions.insertQuote")}]
-              </button>
+              </Button>
             )}
 
             {/* Copy Link */}
-            <button
+            <Button
+              variant="ghost"
+              size="unset"
               onClick={(): void => {
                 void navigator.clipboard.writeText(`>>${postNum}`);
               }}
@@ -929,11 +963,13 @@ function FlatMessage({
               title={t("app.chat.flatView.actions.copyReference")}
             >
               [{t("app.chat.flatView.actions.copyReference")}]
-            </button>
+            </Button>
 
             {/* Delete */}
             {onDeleteMessage && (
-              <button
+              <Button
+                variant="ghost"
+                size="unset"
                 onClick={(): void => {
                   onDeleteMessage(message.id);
                 }}
@@ -941,7 +977,7 @@ function FlatMessage({
                 title={t("app.chat.flatView.actions.deleteMessage")}
               >
                 [{t("app.chat.flatView.actions.delete")}]
-              </button>
+              </Button>
             )}
           </Div>
         )}
@@ -1001,19 +1037,30 @@ export function FlatMessageView({
   }
 
   // Build post number maps
-  const messageIds = messages.map((m) => m.id);
-  const postNumberMap: Record<string, number> = {};
-  const postNumberToMessageId: Record<number, string> = {};
+  const [postNumberMap, setPostNumberMap] = useState<Record<string, number>>({});
+  const [postNumberToMessageId, setPostNumberToMessageId] = useState<Record<number, string>>({});
 
-  messageIds.forEach((id) => {
-    const postNum = getPostNumber(id, logger);
-    postNumberMap[id] = postNum;
-    postNumberToMessageId[postNum] = id;
-  });
+  useEffect(() => {
+    async function loadPostNumbers(): Promise<void> {
+      const messageIds = messages.map((m) => m.id);
+      const numMap: Record<string, number> = {};
+      const idMap: Record<number, string> = {};
+
+      for (const id of messageIds) {
+        const postNum = await getPostNumber(id, logger);
+        numMap[id] = postNum;
+        idMap[postNum] = id;
+      }
+
+      setPostNumberMap(numMap);
+      setPostNumberToMessageId(idMap);
+    }
+    void loadPostNumbers();
+  }, [messages, logger]);
 
   // Find message by post number for preview
   const previewMessage = hoveredRef
-    ? messages.find((m) => postNumberMap[m.id].toString() === hoveredRef)
+    ? messages.find((m) => postNumberMap[m.id]?.toString() === hoveredRef)
     : null;
 
   return (

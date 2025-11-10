@@ -38,7 +38,6 @@ import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-
 import type { CountryLanguage } from "@/i18n/core/config";
 import {
   CountriesOptions,
-  Languages,
   LanguagesOptions,
 } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

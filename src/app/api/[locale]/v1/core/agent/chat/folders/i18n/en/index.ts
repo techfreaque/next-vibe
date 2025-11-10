@@ -3,9 +3,11 @@
  */
 
 import { translations as idTranslations } from "../../[id]/i18n/en";
+import { translations as rootPermissionsTranslations } from "../../root-permissions/i18n/en";
 
 export const translations = {
   id: idTranslations,
+  rootPermissions: rootPermissionsTranslations,
   get: {
     title: "List Folders",
     description: "Retrieve all folders for the current user",

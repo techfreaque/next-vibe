@@ -6,6 +6,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
@@ -71,8 +72,10 @@ export function UserProfileCard({
             {t("app.chat.userProfile.recentPosts")}
           </Div>
           {recentPosts.map((post) => (
-            <button
+            <Button
               key={post.id}
+              variant="ghost"
+              size="unset"
               onClick={() => onPostClick?.(post.id)}
               className="w-full text-left p-2 rounded hover:bg-accent/50 transition-colors"
             >
@@ -83,7 +86,7 @@ export function UserProfileCard({
                 {post.content.substring(0, 100)}
                 {post.content.length > 100 && "..."}
               </Div>
-            </button>
+            </Button>
           ))}
         </Div>
       )}

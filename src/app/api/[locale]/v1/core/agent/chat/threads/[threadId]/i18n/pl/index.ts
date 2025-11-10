@@ -5,6 +5,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   messages: messagesTranslations,
   permissions: permissionsTranslations,
+  errors: {
+    not_implemented_on_native:
+      "{{method}} nie jest zaimplementowana na platformie natywnej. Użyj wersji webowej dla tej operacji.",
+  },
   get: {
     title: "Pobierz wątek czatu",
     description: "Pobierz określony wątek czatu według ID",

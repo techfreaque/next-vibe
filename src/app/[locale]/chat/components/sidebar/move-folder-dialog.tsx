@@ -75,16 +75,19 @@ export function MoveFolderDialog({
 
     return (
       <Div key={targetFolder.id}>
-        <button
-          onClick={() => setSelectedFolderId(targetFolder.id)}
-          className={`w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors ${
-            isSelected ? "bg-accent border-2 border-primary" : ""
-          }`}
-          style={{ paddingLeft: `${depth * 16 + 12}px` }}
-        >
-          <Icon className="h-4 w-4 flex-shrink-0" />
-          <Span className="text-sm truncate">{displayName}</Span>
-        </button>
+        <Div style={{ paddingLeft: `${depth * 16 + 12}px` }}>
+          <Button
+            variant="ghost"
+            size="unset"
+            onClick={() => setSelectedFolderId(targetFolder.id)}
+            className={`w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors ${
+              isSelected ? "bg-accent border-2 border-primary" : ""
+            }`}
+          >
+            <Icon className="h-4 w-4 flex-shrink-0" />
+            <Span className="text-sm truncate">{displayName}</Span>
+          </Button>
+        </Div>
         {children.map((childFolder) =>
           renderFolderOption(childFolder, depth + 1),
         )}
@@ -106,7 +109,9 @@ export function MoveFolderDialog({
           </Div>
 
           {/* Root option */}
-          <button
+          <Button
+            variant="ghost"
+            size="unset"
             onClick={() => setSelectedFolderId(null)}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors ${
               selectedFolderId === null
@@ -117,7 +122,7 @@ export function MoveFolderDialog({
             <Span className="text-sm font-medium">
               {t("app.chat.moveFolder.rootLevel")}
             </Span>
-          </button>
+          </Button>
 
           {/* Available folders */}
           <ScrollArea className="h-[300px] border rounded-md p-2">

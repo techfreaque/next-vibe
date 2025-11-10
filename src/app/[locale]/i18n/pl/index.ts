@@ -116,6 +116,7 @@ export const translations: typeof enTranslations = {
       global: "Globalny",
       de: "Niemcy",
       pl: "Polska",
+      us: "Stany Zjednoczone",
     },
     languages: {
       en: "Angielski",

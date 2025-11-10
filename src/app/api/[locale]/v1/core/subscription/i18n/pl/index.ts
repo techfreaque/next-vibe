@@ -179,6 +179,8 @@ export const translations: typeof enTranslations = {
     cancel_failed: "Nie udało się anulować subskrypcji",
     user_not_found: "Nie znaleziono użytkownika",
     stripe_customer_creation_failed: "Nie udało się utworzyć klienta Stripe",
+    not_implemented_on_native:
+      "{{method}} nie jest zaimplementowana na platformie natywnej. Użyj wersji webowej dla tej operacji.",
   },
 
   // Cancel operation

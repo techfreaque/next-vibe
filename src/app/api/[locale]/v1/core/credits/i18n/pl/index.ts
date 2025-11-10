@@ -43,6 +43,8 @@ export const translations: typeof enTranslations = {
     noLeadsToMerge: "Brak leadów do połączenia",
     oldestLeadNotFound: "Nie znaleziono najstarszego leada w klastrze",
     transactionFailed: "Nie udało się utworzyć rekordu transakcji",
+    not_implemented_on_native:
+      "{{method}} nie jest zaimplementowana na platformie natywnej. Użyj wersji webowej dla tej operacji.",
   },
   get: {
     title: "Pobierz saldo kredytów",

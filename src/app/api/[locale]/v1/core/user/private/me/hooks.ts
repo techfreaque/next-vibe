@@ -111,13 +111,15 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
       },
       onSuccess: () => {
         // Set auth status when user data is successfully fetched
-        const authStatusResult = authClientRepository.setAuthStatus(logger);
-        if (!authStatusResult.success) {
-          logger.error("user.auth.status.set.failed", {
-            message: authStatusResult.message,
-            errorCode: authStatusResult.errorType.errorCode,
-          });
-        }
+        void (async (): Promise<void> => {
+          const authStatusResult = await authClientRepository.setAuthStatus(logger);
+          if (!authStatusResult.success) {
+            logger.error("user.auth.status.set.failed", {
+              message: authStatusResult.message,
+              errorCode: authStatusResult.errorType.errorCode,
+            });
+          }
+        })();
       },
     },
   });
@@ -131,10 +133,10 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
       return;
     }
 
-    const checkInitialAuthState = (): void => {
+    const checkInitialAuthState = async (): Promise<void> => {
       try {
         // Check if we have client-side auth status
-        const authResponse = authClientRepository.hasAuthStatus(logger);
+        const authResponse = await authClientRepository.hasAuthStatus(logger);
 
         if (authResponse.success && authResponse.data) {
           logger.debug("Client-side auth status found, enabling query");
@@ -151,7 +153,7 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
       }
     };
 
-    checkInitialAuthState();
+    void checkInitialAuthState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authChecked, setQueryEnabled, setAuthChecked]); // Removed logger from deps to prevent re-runs
 

@@ -32,9 +32,7 @@ import {
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import {
-  Countries,
   CountriesOptions,
-  Languages,
   LanguagesOptions,
 } from "@/i18n/core/config";
 import {

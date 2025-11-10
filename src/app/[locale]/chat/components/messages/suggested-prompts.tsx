@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -108,9 +109,11 @@ export function SuggestedPrompts({
       {/* Persona Tabs */}
       <Div className="flex gap-2 justify-center flex-wrap">
         {FEATURED_PERSONAS.map((persona) => (
-          <button
+          <Button
             key={persona.id}
             onClick={(): void => handlePersonaSelect(persona)}
+            variant="ghost"
+            size="unset"
             className={`px-3 sm:px-4 py-2 rounded-full transition-all flex items-center gap-2 text-sm sm:text-base cursor-pointer ${
               selectedPersona.id === persona.id
                 ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30"
@@ -121,18 +124,22 @@ export function SuggestedPrompts({
               className: "text-base sm:text-lg",
             })}
             <Span className="font-medium hidden sm:inline">{persona.name}</Span>
-          </button>
+          </Button>
         ))}
 
         {/* More button - opens modal */}
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
           <DialogTrigger asChild>
-            <button className="px-3 sm:px-4 py-2 rounded-full transition-all flex items-center gap-2 hover:bg-accent border border-transparent text-sm sm:text-base cursor-pointer">
+            <Button
+              variant="ghost"
+              size="unset"
+              className="px-3 sm:px-4 py-2 rounded-full transition-all flex items-center gap-2 hover:bg-accent border border-transparent text-sm sm:text-base cursor-pointer"
+            >
               <MoreHorizontal className="h-4 w-4 sm:h-5 sm:w-5" />
               <Span className="font-medium hidden sm:inline">
                 {t("app.chat.suggestedPrompts.more")}
               </Span>
-            </button>
+            </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[80vh]">
             <DialogHeader>
@@ -143,9 +150,11 @@ export function SuggestedPrompts({
             <ScrollArea className="h-[60vh] pr-4">
               <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {DEFAULT_PERSONAS.map((persona) => (
-                  <button
+                  <Button
                     key={persona.id}
                     onClick={(): void => handlePersonaSelect(persona)}
+                    variant="ghost"
+                    size="unset"
                     className={`p-4 rounded-lg border transition-all text-left cursor-pointer ${
                       selectedPersona.id === persona.id
                         ? "border-purple-500 bg-purple-500/10"
@@ -163,7 +172,7 @@ export function SuggestedPrompts({
                         {persona.description}
                       </P>
                     )}
-                  </button>
+                  </Button>
                 ))}
               </Div>
             </ScrollArea>
@@ -175,13 +184,15 @@ export function SuggestedPrompts({
       <Div className="space-y-3">
         {prompts.length > 0 ? (
           prompts.map((prompt, index) => (
-            <button
+            <Button
               key={index}
               onClick={(): void => handlePromptClick(prompt)}
+              variant="ghost"
+              size="unset"
               className="w-full text-left p-3 sm:p-4 rounded-lg hover:bg-accent transition-all border border-border cursor-pointer text-sm sm:text-base"
             >
               {prompt}
-            </button>
+            </Button>
           ))
         ) : (
           <P className="text-center text-muted-foreground py-8">

@@ -175,6 +175,7 @@ export const translations = {
       emailVerified: "Email Verified",
       emailUnverified: "Email Unverified",
     },
+    country: "Country",
     role: "Role",
     roles: {
       all: "All",

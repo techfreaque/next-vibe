@@ -6,8 +6,8 @@
 "use client";
 
 import { Filter, List, RefreshCw, Table } from 'next-vibe-ui/ui/icons';
-import NextLink from "next/link";
 import { cn } from "next-vibe/shared/utils";
+import { Link as NextLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";

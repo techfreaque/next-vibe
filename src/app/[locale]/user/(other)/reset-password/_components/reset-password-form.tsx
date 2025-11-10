@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle, Loader2, Mail } from 'next-vibe-ui/ui/icons';
-import Link from "next/link";
 import { Environment } from "next-vibe/shared/utils/env-util";
+import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Card,

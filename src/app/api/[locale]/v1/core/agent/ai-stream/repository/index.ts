@@ -774,9 +774,49 @@ class AiStreamRepository implements IAiStreamRepository {
           const currentParentId = initialAiParentId;
           const currentDepth = initialAiDepth;
 
-          // Don't create ASSISTANT message yet - create it when content arrives (SAME AS OPENROUTER)
-          let currentAssistantMessageId: string | null = null;
+          // CRITICAL FIX: Create ASSISTANT message BEFORE API call to show loading state
+          // This ensures the UI displays a loading indicator while waiting for the API response
+          const aiMessageId = crypto.randomUUID();
+          let currentAssistantMessageId: string | null = aiMessageId;
           let currentAssistantContent = "";
+
+          // Emit MESSAGE_CREATED event for ASSISTANT message immediately
+          // This shows loading state in UI while API call is in progress
+          const messageEvent = createStreamEvent.messageCreated({
+            messageId: aiMessageId,
+            threadId,
+            role: ChatMessageRole.ASSISTANT,
+            content: "", // Empty content initially
+            parentId: currentParentId,
+            depth: currentDepth,
+            model,
+            persona,
+            sequenceId,
+            sequenceIndex,
+          });
+          controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
+
+          logger.debug("[Uncensored AI] ASSISTANT message created (loading state)", {
+            messageId: aiMessageId,
+          });
+
+          // Save initial ASSISTANT message to database if not incognito
+          // This ensures the message exists in DB while API call is in progress
+          if (!isIncognito) {
+            await createTextMessage({
+              messageId: aiMessageId,
+              threadId,
+              content: "", // Empty content initially
+              parentId: currentParentId,
+              depth: currentDepth,
+              userId,
+              model,
+              persona,
+              sequenceId,
+              sequenceIndex,
+              logger,
+            });
+          }
 
           // Call Uncensored AI API
           logger.info("[Uncensored AI] Calling API");
@@ -816,39 +856,14 @@ class AiStreamRepository implements IAiStreamRepository {
           for (let i = 0; i < fullContent.length; i += chunkSize) {
             const chunk = fullContent.slice(i, i + chunkSize);
 
-            // Create ASSISTANT message on first chunk - SAME AS OPENROUTER
-            if (!currentAssistantMessageId) {
-              const result = await createAssistantMessage({
-                initialContent: chunk,
-                threadId,
-                parentId: currentParentId,
-                depth: currentDepth,
-                model,
-                persona,
-                sequenceId,
-                sequenceIndex,
-                isIncognito,
-                userId,
-                controller,
-                encoder,
-                logger,
-              });
-              currentAssistantMessageId = result.messageId;
-              currentAssistantContent = result.content;
-
-              logger.debug("[Uncensored AI] ASSISTANT message created", {
-                messageId: currentAssistantMessageId,
-              });
-            } else {
-              // Emit content delta for subsequent chunks - SHARED LOGIC
-              currentAssistantContent += chunk;
-              emitContentDelta({
-                messageId: currentAssistantMessageId,
-                delta: chunk,
-                controller,
-                encoder,
-              });
-            }
+            // Accumulate content and emit delta
+            currentAssistantContent += chunk;
+            emitContentDelta({
+              messageId: currentAssistantMessageId,
+              delta: chunk,
+              controller,
+              encoder,
+            });
           }
 
           // Finalize ASSISTANT message - SHARED LOGIC

@@ -241,8 +241,10 @@ export function FolderIconSelector({
           {ICON_OPTIONS.map((option) => {
             const Icon = option.Icon;
             return (
-              <button
+              <Button
                 key={option.id}
+                variant="ghost"
+                size="unset"
                 onClick={() => {
                   onChange(option.id);
                   setOpen(false);
@@ -254,7 +256,7 @@ export function FolderIconSelector({
                 title={option.label}
               >
                 <Icon className="h-4 w-4" />
-              </button>
+              </Button>
             );
           })}
         </Div>

@@ -52,7 +52,7 @@ export const leads = pgTable("leads", {
   website: text("website"),
 
   // Location and language
-  country: text("country", { enum: ["DE", "PL", "GLOBAL"] }).notNull(),
+  country: text("country", { enum: ["DE", "PL", "US", "GLOBAL"] }).notNull(),
   language: text("language", { enum: ["de", "pl", "en"] }).notNull(),
 
   // IP tracking for free tier credits

@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 
 import { AUTH_STATUS_COOKIE_PREFIX } from "@/config/constants";
 import { parseError } from "next-vibe/shared/utils";
+import { getCookie } from "next-vibe-ui/lib/cookies";
 
 import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -22,11 +23,9 @@ import { GET as threadsGetEndpoint } from "../threads/definition";
 /**
  * Check if user is authenticated
  */
-function isUserAuthenticated(): boolean {
-  const authStatusCookie = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith(AUTH_STATUS_COOKIE_PREFIX));
-  return authStatusCookie !== undefined;
+async function isUserAuthenticated(): Promise<boolean> {
+  const authStatusCookie = await getCookie(AUTH_STATUS_COOKIE_PREFIX);
+  return authStatusCookie !== null;
 }
 
 /**
@@ -40,7 +39,7 @@ async function loadIncognitoData(
 ): Promise<void> {
   try {
     const { loadIncognitoState } = await import("../incognito/storage");
-    const incognitoState = loadIncognitoState();
+    const incognitoState = await loadIncognitoState();
 
     logger.debug("Chat: Loading incognito data from localStorage", {
       threadCount: Object.keys(incognitoState.threads).length,
@@ -290,7 +289,7 @@ export function useDataLoader(
     dataLoadedRef.current = true;
 
     const loadData = async (): Promise<void> => {
-      const isAuthenticated = isUserAuthenticated();
+      const isAuthenticated = await isUserAuthenticated();
 
       logger.debug("Chat: Checking authentication before loading data", {
         isAuthenticated,

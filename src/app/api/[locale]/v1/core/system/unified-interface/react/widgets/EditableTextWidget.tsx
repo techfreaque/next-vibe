@@ -2,10 +2,10 @@
 
 import { Check, Edit2, X } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui//ui/div";
-import { Span } from "next-vibe-ui//ui/span";
-import { Button } from "next-vibe-ui//ui/button";
-import { Input } from "next-vibe-ui//ui/input";
+import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
+import { Button } from "next-vibe-ui/ui/button";
+import { Input } from "next-vibe-ui/ui/input";
 import type { JSX, KeyboardEvent } from "react";
 import { useState } from "react";
 

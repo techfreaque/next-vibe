@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Loader2 } from 'next-vibe-ui/ui/icons';
-import Link from "next/link";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { Link } from "next-vibe-ui/ui/link";
 import { Environment } from "next-vibe/shared/utils/env-util";
 import { Button } from "next-vibe-ui/ui/button";
 import {

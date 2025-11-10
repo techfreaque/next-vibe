@@ -12,8 +12,8 @@ import {
   FolderOpen,
   Mail,
 } from 'next-vibe-ui/ui/icons';
-import { useRouter } from "next/navigation";
 import { Badge } from "next-vibe-ui/ui/badge";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";

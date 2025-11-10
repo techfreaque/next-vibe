@@ -3,8 +3,8 @@
  * Page for viewing individual IMAP message details
  */
 
-import { notFound } from "next/navigation";
 import { Div } from "next-vibe-ui/ui/div";
+import { notFound } from "next-vibe-ui/lib/not-found";
 import { H1 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui//ui/div";
-import { Span } from "next-vibe-ui//ui/span";
+import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type {

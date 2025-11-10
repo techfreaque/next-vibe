@@ -89,6 +89,7 @@ const productDefinitions = {
     priceByCountry: {
       DE: { price: 0, currency: "EUR" },
       PL: { price: 0, currency: "PLN" },
+      US: { price: 0, currency: "USD" },
       GLOBAL: { price: 0, currency: "USD" },
     },
     credits: 20,
@@ -101,12 +102,14 @@ const productDefinitions = {
     description: "app.api.v1.core.products.subscription.description" as const,
     priceByCountry: {
       DE: { price: 10, currency: "EUR" },
-      PL: { price: 10, currency: "PLN" },
+      PL: { price: 70, currency: "PLN" },
+      US: { price: 10, currency: "USD" },
       GLOBAL: { price: 10, currency: "USD" },
     },
     yearlyPriceByCountry: {
       DE: { price: 100, currency: "EUR" },
-      PL: { price: 100, currency: "PLN" },
+      PL: { price: 700, currency: "PLN" },
+      US: { price: 100, currency: "USD" },
       GLOBAL: { price: 100, currency: "USD" },
     },
     credits: 1000,
@@ -120,11 +123,13 @@ const productDefinitions = {
     priceByCountry: {
       DE: { price: 5, currency: "EUR" },
       PL: { price: 5, currency: "PLN" },
+      US: { price: 5, currency: "USD" },
       GLOBAL: { price: 5, currency: "USD" },
     },
     oneTimePriceByCountry: {
       DE: { price: 5, currency: "EUR" },
-      PL: { price: 5, currency: "PLN" },
+      PL: { price: 40, currency: "PLN" },
+      US: { price: 5, currency: "USD" },
       GLOBAL: { price: 5, currency: "USD" },
     },
     credits: 500,
@@ -435,6 +440,11 @@ function buildPricingPlans(
           monthly: getPriceData("PL", "month").price,
           annual: getPriceData("PL", "year").price,
           currency: getPriceData("PL", "month").currency,
+        },
+        US: {
+          monthly: getPriceData("US", "month").price,
+          annual: getPriceData("US", "year").price,
+          currency: getPriceData("US", "month").currency,
         },
         GLOBAL: {
           monthly: getPriceData("GLOBAL", "month").price,

@@ -4,6 +4,8 @@ import { Loader2 } from 'next-vibe-ui/ui/icons';
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { WidgetEmptyStateProps, WidgetLoadingProps } from "../types";
@@ -26,12 +28,12 @@ export function WidgetLoading({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-8">
+    <Div className="flex flex-col items-center justify-center gap-3 py-8">
       <Loader2
         className={cn("animate-spin text-muted-foreground", sizeClasses[size])}
       />
-      {message && <p className="text-sm text-muted-foreground">{message}</p>}
-    </div>
+      {message && <P className="text-sm text-muted-foreground">{message}</P>}
+    </Div>
   );
 }
 
@@ -47,26 +49,26 @@ export function WidgetEmptyState({
   action,
 }: WidgetEmptyStateProps): JSX.Element {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-12">
+    <Div className="flex flex-col items-center justify-center gap-4 py-12">
       {icon && (
-        <div
+        <Div
           className="text-4xl opacity-50"
           role="img"
           // eslint-disable-next-line i18next/no-literal-string
           aria-label="Empty state"
         >
           {icon}
-        </div>
+        </Div>
       )}
-      <p className="max-w-md text-center text-sm text-muted-foreground">
+      <P className="max-w-md text-center text-sm text-muted-foreground">
         {message}
-      </p>
+      </P>
       {action && (
         <Button variant="outline" size="sm" onClick={action.onClick}>
           {action.label}
         </Button>
       )}
-    </div>
+    </Div>
   );
 }
 
@@ -84,7 +86,7 @@ export function WidgetSkeleton({
   className?: string;
 }): JSX.Element {
   return (
-    <div className={cn("space-y-2", className)}>
+    <Div className={cn("space-y-2", className)}>
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
           key={i}
@@ -92,7 +94,7 @@ export function WidgetSkeleton({
           style={{ width: `${100 - i * 10}%` }}
         />
       ))}
-    </div>
+    </Div>
   );
 }
 
