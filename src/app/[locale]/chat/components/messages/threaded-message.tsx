@@ -170,7 +170,11 @@ export function ThreadedMessage({
         {/* Collapse/Expand button for messages with replies */}
         {hasReplies && (
           <Div
-            style={{ left: depth > 0 ? `${indent - 26}px` : "-26px", position: "absolute", top: "1rem" }}
+            style={{
+              left: depth > 0 ? `${indent - 26}px` : "-26px",
+              position: "absolute",
+              top: "1rem",
+            }}
             className="z-10"
           >
             <Button
@@ -317,30 +321,30 @@ export function ThreadedMessage({
                           : "text-blue-400",
                       )}
                     >
-                    {/* Show model icon for AI messages */}
-                    {message.role === "assistant" &&
-                      message.model &&
-                      ((): JSX.Element | null => {
-                        const modelData = getModelById(message.model);
-                        const ModelIcon = modelData.icon;
-                        return typeof ModelIcon === "string" ? (
-                          <Span className="text-base leading-none">
-                            {ModelIcon}
-                          </Span>
-                        ) : (
-                          <ModelIcon className="h-3 w-3" />
-                        );
-                      })()}
-                    {message.role === "user"
-                      ? currentUserId && message.authorId === currentUserId
-                        ? t("app.chat.threadedView.youLabel")
-                        : message.authorName
-                          ? message.authorName
-                          : t("app.chat.threadedView.anonymous")
-                      : message.role === "assistant" && message.model
-                        ? getModelById(message.model).name
-                        : t("app.chat.threadedView.assistantFallback")}
-                  </Button>
+                      {/* Show model icon for AI messages */}
+                      {message.role === "assistant" &&
+                        message.model &&
+                        ((): JSX.Element | null => {
+                          const modelData = getModelById(message.model);
+                          const ModelIcon = modelData.icon;
+                          return typeof ModelIcon === "string" ? (
+                            <Span className="text-base leading-none">
+                              {ModelIcon}
+                            </Span>
+                          ) : (
+                            <ModelIcon className="h-3 w-3" />
+                          );
+                        })()}
+                      {message.role === "user"
+                        ? currentUserId && message.authorId === currentUserId
+                          ? t("app.chat.threadedView.youLabel")
+                          : message.authorName
+                            ? message.authorName
+                            : t("app.chat.threadedView.anonymous")
+                        : message.role === "assistant" && message.model
+                          ? getModelById(message.model).name
+                          : t("app.chat.threadedView.assistantFallback")}
+                    </Button>
                   </Span>
 
                   {/* Persona - only for AI messages */}
@@ -704,7 +708,7 @@ export function ThreadedMessage({
         {hasReplies &&
           !isCollapsed &&
           (depth < maxDepth || showDeepReplies) && (
-            <Div className="mt-2 space-y-2">
+            <Div className="mt-2 flex flex-col gap-2">
               {replies.map((reply) => (
                 <ThreadedMessage
                   key={reply.id}

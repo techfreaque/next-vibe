@@ -1,4 +1,3 @@
-
 import { translations as _componentsTranslations } from "../../_components/i18n/en";
 
 export const translations = {
@@ -332,7 +331,8 @@ export const translations = {
     subject: "Welcome to {{appName}}!",
     previewText: "Welcome to {{appName}}! Start your AI chat experience.",
     welcomeMessage: "Welcome to {{appName}}!",
-    description: "You're now ready to start chatting with AI and joining our community forum.",
+    description:
+      "You're now ready to start chatting with AI and joining our community forum.",
     ctaTitle: "Get Started",
     ctaButton: "Go to Subscription",
     signoff: "Best regards,\nThe {{appName}} Team",

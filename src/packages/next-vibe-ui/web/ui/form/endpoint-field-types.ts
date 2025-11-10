@@ -4,6 +4,7 @@
  */
 
 import type { FieldConfig } from "./endpoint-form-field-types";
+import { type Countries } from "@/i18n/core/config";
 
 /**
  * Type for endpoint field structure from unified interface
@@ -20,8 +21,8 @@ export interface EndpointFieldStructure {
     description?: string;
     disabled?: boolean;
     className?: string;
-    defaultCountry?: string;
-    preferredCountries?: string[];
+    defaultCountry?: Countries;
+    preferredCountries?: Countries[];
     min?: number;
     max?: number;
     step?: number;
@@ -80,12 +81,12 @@ export type GetFieldByPath<
       : never
     : never
   : T extends { type: "object"; children: infer C }
-  ? C extends Record<string, EndpointFieldStructure>
-    ? P extends keyof C
-      ? C[P]
+    ? C extends Record<string, EndpointFieldStructure>
+      ? P extends keyof C
+        ? C[P]
+        : never
       : never
-    : never
-  : never;
+    : never;
 
 /**
  * Map of field paths to their FieldConfig types
@@ -131,14 +132,12 @@ export interface TypedEndpointFields<TFields> {
  * Get FieldConfig type for a specific field path
  * Used for type-safe field configuration
  */
-export type GetFieldConfig<
-  TFields,
-  TPath extends EndpointFieldName<TFields>,
-> = GetFieldByPath<TFields, TPath & string> extends {
-  ui: EndpointFieldStructure["ui"];
-}
-  ? FieldConfig
-  : never;
+export type GetFieldConfig<TFields, TPath extends EndpointFieldName<TFields>> =
+  GetFieldByPath<TFields, TPath & string> extends {
+    ui: EndpointFieldStructure["ui"];
+  }
+    ? FieldConfig
+    : never;
 
 /**
  * Infer form values type from endpoint fields
@@ -183,10 +182,7 @@ export function isValidFieldPath<TFields>(
       return false;
     }
 
-    const children = current.children as Record<
-      string,
-      EndpointFieldStructure
-    >;
+    const children = current.children as Record<string, EndpointFieldStructure>;
     if (!(part in children)) {
       return false;
     }

@@ -217,9 +217,10 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
       logger.error("TRPC validation operation execution failed", parsedError);
 
       return fail({
-          message: "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.executionFailed.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message:
+          "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.executionFailed.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }

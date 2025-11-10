@@ -135,7 +135,9 @@ export async function createTRPCContext<
             opts.logger,
           );
           if (adminUser && !adminUser.isPublic) {
-            (userRoles as unknown as Array<typeof UserRoleValue>).push(UserRole.ADMIN);
+            (userRoles as unknown as Array<typeof UserRoleValue>).push(
+              UserRole.ADMIN,
+            );
           }
         }
       }

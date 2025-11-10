@@ -160,8 +160,8 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
   );
   if (!userResponse.success) {
     return fail({
-          message: "app.api.v1.core.emails.errors.no_email",
-          errorType: ErrorResponseTypes.NOT_FOUND,
+      message: "app.api.v1.core.emails.errors.no_email",
+      errorType: ErrorResponseTypes.NOT_FOUND,
       cause: userResponse,
     });
   }

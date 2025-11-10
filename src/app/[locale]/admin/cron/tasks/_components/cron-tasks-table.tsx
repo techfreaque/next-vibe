@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Edit, Trash2, X } from 'next-vibe-ui/ui/icons';
+import { Edit, Trash2, X } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
@@ -236,7 +236,7 @@ export function CronTasksTable({
 
   if (loading) {
     return (
-      <Div className="space-y-4">
+      <Div className="flex flex-col gap-4">
         {Array.from({ length: 5 }, (_, i) => (
           <Skeleton key={i} className="h-16 w-full" />
         ))}
@@ -255,7 +255,7 @@ export function CronTasksTable({
   }
 
   return (
-    <Div className="space-y-4">
+    <Div className="flex flex-col gap-4">
       <Table>
         <TableHeader>
           <TableRow>
@@ -273,7 +273,7 @@ export function CronTasksTable({
             <React.Fragment key={task.id}>
               <TableRow>
                 <TableCell>
-                  <Div className="flex items-center space-x-2">
+                  <Div className="flex items-center flex flex-row gap-2">
                     <Div
                       className={cn(
                         "h-2 w-2 rounded-full",
@@ -323,7 +323,7 @@ export function CronTasksTable({
                   />
                 </TableCell>
                 <TableCell>
-                  <Div className="flex space-x-1">
+                  <Div className="flex flex flex-row gap-1">
                     {editingTaskId === task.id ? (
                       <Button
                         variant="ghost"

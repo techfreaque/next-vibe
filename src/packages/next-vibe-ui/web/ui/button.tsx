@@ -36,33 +36,30 @@ export const buttonVariants = cva(
   },
 );
 
-export const buttonTextVariants = cva(
-  "text-sm font-medium text-foreground",
-  {
-    variants: {
-      variant: {
-        default: "text-primary-foreground",
-        destructive: "text-destructive-foreground",
-        outline: "group-active:text-accent-foreground",
-        secondary:
-          "text-secondary-foreground group-active:text-secondary-foreground",
-        ghost: "group-active:text-accent-foreground",
-        link: "text-primary group-active:underline",
-      },
-      size: {
-        default: "",
-        sm: "",
-        lg: "",
-        icon: "",
-        unset: "",
-      },
+export const buttonTextVariants = cva("text-sm font-medium text-foreground", {
+  variants: {
+    variant: {
+      default: "text-primary-foreground",
+      destructive: "text-destructive-foreground",
+      outline: "group-active:text-accent-foreground",
+      secondary:
+        "text-secondary-foreground group-active:text-secondary-foreground",
+      ghost: "group-active:text-accent-foreground",
+      link: "text-primary group-active:underline",
     },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
+    size: {
+      default: "",
+      sm: "",
+      lg: "",
+      icon: "",
+      unset: "",
     },
   },
-);
+  defaultVariants: {
+    variant: "default",
+    size: "default",
+  },
+});
 
 export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
 export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
@@ -95,31 +92,25 @@ export interface RegularButtonProps extends BaseButtonProps {
 
 export type ButtonProps = AsChildButtonProps | RegularButtonProps;
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      className,
-      variant,
-      size,
-      asChild = false,
-      suppressHydrationWarning = false,
-      ...props
-    },
-    ref,
-  ): JSX.Element => {
-    const Comp = asChild ? Slot : "button";
-    return (
-      <Comp
-        ref={ref}
-        {...(suppressHydrationWarning ? { suppressHydrationWarning: true } : {})}
-        className={cn(
-          buttonVariants({ variant, size, className }),
-          "cursor-pointer",
-        )}
-        {...props}
-      />
-    );
-  },
-);
-
-Button.displayName = "Button";
+export function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  suppressHydrationWarning = false,
+  ...props
+}: ButtonProps): JSX.Element {
+  const Comp = asChild ? Slot : "button";
+  return (
+    <Comp
+      {...(suppressHydrationWarning
+        ? { suppressHydrationWarning: true }
+        : {})}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        "cursor-pointer",
+      )}
+      {...props}
+    />
+  );
+}

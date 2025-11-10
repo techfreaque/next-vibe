@@ -74,7 +74,7 @@ export async function buildSystemPrompt(params: {
 
 /**
  * Build final system prompt by combining base prompt with formatting instructions
- * 
+ *
  * @param basePrompt - Base system prompt (from persona or custom)
  * @param logger - Logger instance
  * @returns Complete system prompt with formatting instructions appended
@@ -108,7 +108,7 @@ ${formattingSection}`;
 
 /**
  * Build formatting instructions section
- * 
+ *
  * @returns Formatted string with all formatting instructions
  */
 function buildFormattingSection(): string {
@@ -116,4 +116,3 @@ function buildFormattingSection(): string {
 
 ${formattingInstructions.map((instruction) => `- ${instruction}`).join("\n")}`;
 }
-

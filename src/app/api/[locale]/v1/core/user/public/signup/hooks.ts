@@ -55,7 +55,13 @@ export function useRegister(): SignupFormReturn & {
   const handleSignupSuccess: ApiInferMutationOptions<
     typeof signupEndpoints.POST
   >["onSuccess"] = useCallback(
-    async (data) => {
+    async (
+      data: Parameters<
+        NonNullable<
+          ApiInferMutationOptions<typeof signupEndpoints.POST>["onSuccess"]
+        >
+      >[0],
+    ) => {
       // Clear lead tracking data on successful signup
       logger.info("app.api.v1.core.user.public.signup.success.processing");
 
@@ -93,7 +99,13 @@ export function useRegister(): SignupFormReturn & {
   const handleSignupError: ApiInferMutationOptions<
     typeof signupEndpoints.POST
   >["onError"] = useCallback(
-    async (data) => {
+    async (
+      data: Parameters<
+        NonNullable<
+          ApiInferMutationOptions<typeof signupEndpoints.POST>["onError"]
+        >
+      >[0],
+    ) => {
       logger.error(
         "app.api.v1.core.user.public.signup.error",
         parseError(data.error),

@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Mail, Send } from 'next-vibe-ui/ui/icons';
+import { Mail, Send } from "next-vibe-ui/ui/icons";
 
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
@@ -31,10 +31,7 @@ import {
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
-import {
-  CountriesOptions,
-  LanguagesOptions,
-} from "@/i18n/core/config";
+import { CountriesOptions, LanguagesOptions } from "@/i18n/core/config";
 import {
   getCountryFromLocale,
   getLanguageFromLocale,
@@ -177,19 +174,19 @@ export function TestEmailForm({
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
+        <CardTitle className="flex items-center flex flex-row gap-2">
           <Mail className="h-5 w-5" />
           <Span>{t("app.admin.leads.leads.admin.emails.testEmail.title")}</Span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="flex flex-col gap-6">
         <Form
           form={endpoint.create.form}
           onSubmit={handleSubmit}
-          className="space-y-6"
+          className="flex flex-col gap-6"
         >
           {/* Test Email Recipient */}
-          <Div className="space-y-4">
+          <Div className="flex flex-col gap-4">
             <H3 className="text-lg font-medium">
               {t(
                 "app.admin.leads.leads.admin.emails.testEmail.recipient.title",
@@ -214,7 +211,7 @@ export function TestEmailForm({
           <Separator />
 
           {/* SMTP Account Selection Criteria */}
-          <Div className="space-y-4">
+          <Div className="flex flex-col gap-4">
             <H3 className="text-lg font-medium">
               {t("app.admin.emails.smtp.admin.form.selectionCriteria")}
             </H3>
@@ -272,7 +269,7 @@ export function TestEmailForm({
           <Separator />
 
           {/* Lead Data for Template */}
-          <Div className="space-y-4">
+          <Div className="flex flex-col gap-4">
             <H3 className="text-lg font-medium">
               {t("app.admin.leads.leads.admin.emails.testEmail.leadData.title")}
             </H3>
@@ -437,7 +434,7 @@ export function TestEmailForm({
 
           {/* Action Buttons */}
           <Div className="flex items-center justify-between pt-4">
-            <Div className="flex items-center space-x-2">
+            <Div className="flex items-center flex flex-row gap-2">
               {onClose && (
                 <Button type="button" variant="outline" onClick={onClose}>
                   {t("app.common.cancel")}
@@ -447,7 +444,7 @@ export function TestEmailForm({
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center space-x-2"
+              className="flex items-center flex flex-row gap-2"
             >
               <Send className="h-4 w-4" />
               <Span>

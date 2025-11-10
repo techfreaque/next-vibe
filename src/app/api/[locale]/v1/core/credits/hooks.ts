@@ -87,7 +87,7 @@ export function useCredits(
       }
 
       apiClient.updateEndpointData(
-         definitions.GET,
+        definitions.GET,
         (oldData: EndpointData | undefined) => {
           if (!oldData?.success || !oldData.data) {
             return oldData;

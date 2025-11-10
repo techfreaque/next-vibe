@@ -215,7 +215,10 @@ export function SidebarWrapper({
           void onUpdateFolder(folderId, { sortOrder: currentIndex - 1 });
           void onUpdateFolder(prevSibling.id, { sortOrder: currentIndex });
         }
-      } else if (direction === "down" && currentIndex < allSiblings.length - 1) {
+      } else if (
+        direction === "down" &&
+        currentIndex < allSiblings.length - 1
+      ) {
         // Move folder down by swapping positions with next sibling
         const nextSibling = allSiblings[currentIndex + 1];
         if (nextSibling) {

@@ -57,9 +57,9 @@ export class DatabasePingRepositoryImpl implements DatabasePingRepository {
       return success(response);
     } catch (error) {
       return fail({
-          message: "app.api.v1.core.system.db.ping.post.errors.network.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: String(error) },
+        message: "app.api.v1.core.system.db.ping.post.errors.network.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: String(error) },
       });
     }
   }

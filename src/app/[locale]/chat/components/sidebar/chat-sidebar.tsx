@@ -194,7 +194,7 @@ export function ChatSidebar({
 
   return (
     <Div className="flex flex-col h-full bg-background">
-      <Div className="bg-background space-y-0 pt-15" />
+      <Div className="bg-background flex flex-col gap-0 pt-15" />
 
       {/* Root Folder Navigation Bar */}
       <RootFolderBar
@@ -243,7 +243,7 @@ export function ChatSidebar({
         />
       </Div>
       {/* Search Bar + Fullscreen Button */}
-      <Div className="px-3 pb-3 flex flex-row gap-2  border-b border-border ">
+      <Div className="px-3 pb-3 flex flex-row gap-2 border-b border-border ">
         <Div className="relative flex-1 flex flex-row">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
           <Input

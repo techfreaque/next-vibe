@@ -40,9 +40,9 @@ export const translations = {
         errorLabel: "Error:",
         noArguments: "No arguments",
         noResult: "No result",
-        metadataNotAvailable: "Widget metadata not available. Showing raw result.",
+        metadataNotAvailable:
+          "Widget metadata not available. Showing raw result.",
       },
     },
   },
 };
-

@@ -96,8 +96,8 @@ export function SuggestedPrompts({
   };
 
   return (
-    <Div className="w-full space-y-6 sm:space-y-8">
-      <Div className="text-center space-y-2">
+    <Div className="w-full flex flex-col gap-6 sm:gap-8">
+      <Div className="text-center flex flex-col gap-2">
         <H1 className="text-3xl sm:text-4xl font-semibold text-center">
           {t(getTitleKey())}
         </H1>
@@ -181,7 +181,7 @@ export function SuggestedPrompts({
       </Div>
 
       {/* Suggested Prompts for selected persona */}
-      <Div className="space-y-3">
+      <Div className="flex flex-col gap-3">
         {prompts.length > 0 ? (
           prompts.map((prompt, index) => (
             <Button

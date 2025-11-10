@@ -13,7 +13,7 @@ import {
   Play,
   RefreshCw,
   Square,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { Badge } from "next-vibe-ui/ui/badge";
@@ -202,14 +202,14 @@ export function ImapSyncOperations(): JSX.Element {
   };
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Sync Control Panel */}
       <Card>
         <CardHeader>
           <CardTitle> {t("app.admin.emails.imap.sync.controlPanel")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <Div className="space-y-6">
+          <Div className="flex flex-col gap-6">
             {/* Current Status */}
             <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Div className="text-center">
@@ -246,7 +246,7 @@ export function ImapSyncOperations(): JSX.Element {
 
             {/* Progress Bar */}
             {syncStatus.isRunning && (
-              <Div className="space-y-2">
+              <Div className="flex flex-col gap-2">
                 <Div className="flex justify-between text-sm">
                   <Span>{t("app.admin.emails.imap.sync.progress")}</Span>
                   <Span>{syncStatus.progress}%</Span>
@@ -256,11 +256,11 @@ export function ImapSyncOperations(): JSX.Element {
             )}
 
             {/* Control Buttons */}
-            <Div className="flex items-center space-x-4">
+            <Div className="flex items-center flex flex-row gap-4">
               <Button
                 onClick={handleStartSync}
                 disabled={isSyncing}
-                className="flex items-center space-x-2"
+                className="flex items-center flex flex-row gap-2"
               >
                 <Play className="h-4 w-4" />
                 <Span>{t("app.admin.emails.imap.sync.start")}</Span>
@@ -269,7 +269,7 @@ export function ImapSyncOperations(): JSX.Element {
                 variant="outline"
                 onClick={handlePauseSync}
                 disabled={!isSyncing}
-                className="flex items-center space-x-2"
+                className="flex items-center flex flex-row gap-2"
               >
                 <Pause className="h-4 w-4" />
                 <Span>{t("app.admin.emails.imap.sync.pause")}</Span>
@@ -278,7 +278,7 @@ export function ImapSyncOperations(): JSX.Element {
                 variant="outline"
                 onClick={handleStopSync}
                 disabled={!isSyncing}
-                className="flex items-center space-x-2"
+                className="flex items-center flex flex-row gap-2"
               >
                 <Square className="h-4 w-4" />
                 <Span>{t("app.admin.emails.imap.sync.stop")}</Span>
@@ -391,7 +391,7 @@ export function ImapSyncOperations(): JSX.Element {
                     {new Date(sync.startTime).toLocaleString()}
                   </TableCell>
                   <TableCell>
-                    <Div className="flex items-center space-x-2">
+                    <Div className="flex items-center flex flex-row gap-2">
                       {getStatusIcon(sync.status)}
                       {getStatusBadge(sync.status)}
                     </Div>

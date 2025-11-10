@@ -35,13 +35,10 @@ export class MCPServer {
 
   constructor(options: MCPServerOptions = {}) {
     this.locale = options.locale || env.VIBE_LOCALE;
-    const isDebug = options.debug ??
+    const isDebug =
+      options.debug ??
       (process.env.DEBUG === "true" || process.env.VIBE_LOG_LEVEL === "debug");
-    this.logger = createEndpointLogger(
-      isDebug,
-      Date.now(),
-      this.locale,
-    );
+    this.logger = createEndpointLogger(isDebug, Date.now(), this.locale);
   }
 
   /**

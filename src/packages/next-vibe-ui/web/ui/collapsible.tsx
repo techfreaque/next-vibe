@@ -1,16 +1,48 @@
 "use client";
 
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
+import * as React from "react";
 
-// Re-export types for cross-platform compatibility
-export type CollapsibleProps = React.ComponentPropsWithoutRef<typeof CollapsiblePrimitive.Root>;
-export type CollapsibleTriggerProps = React.ComponentPropsWithoutRef<typeof CollapsiblePrimitive.CollapsibleTrigger>;
-export type CollapsibleContentProps = React.ComponentPropsWithoutRef<typeof CollapsiblePrimitive.CollapsibleContent>;
+// Cross-platform types
+export interface CollapsibleRootProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  disabled?: boolean;
+  defaultOpen?: boolean;
+  children?: React.ReactNode;
+}
 
-const Collapsible = CollapsiblePrimitive.Root;
+export interface CollapsibleTriggerProps {
+  asChild?: boolean;
+  disabled?: boolean;
+  children?: React.ReactNode;
+}
 
-const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger;
+export interface CollapsibleContentProps {
+  forceMount?: true;
+  children?: React.ReactNode;
+  className?: string;
+}
 
-const CollapsibleContent = CollapsiblePrimitive.CollapsibleContent;
+export function Collapsible({ children, ...props }: CollapsibleRootProps): React.JSX.Element {
+  return <CollapsiblePrimitive.Root {...props}>{children}</CollapsiblePrimitive.Root>;
+}
+Collapsible.displayName = CollapsiblePrimitive.Root.displayName;
 
-export { Collapsible, CollapsibleContent, CollapsibleTrigger };
+export function CollapsibleTrigger({ children, asChild, ...props }: CollapsibleTriggerProps): React.JSX.Element {
+  return (
+    <CollapsiblePrimitive.CollapsibleTrigger asChild={asChild} {...props}>
+      {children}
+    </CollapsiblePrimitive.CollapsibleTrigger>
+  );
+}
+CollapsibleTrigger.displayName = CollapsiblePrimitive.CollapsibleTrigger.displayName;
+
+export function CollapsibleContent({ children, ...props }: CollapsibleContentProps): React.JSX.Element {
+  return (
+    <CollapsiblePrimitive.CollapsibleContent {...props}>
+      {children}
+    </CollapsiblePrimitive.CollapsibleContent>
+  );
+}
+CollapsibleContent.displayName = CollapsiblePrimitive.CollapsibleContent.displayName;

@@ -100,7 +100,7 @@ export const translations: typeof enTranslations = {
         stubLabel: "Sidebar (zaślepka)",
       },
       slider: {
-      stubWarning: "Używanie zaślepki: Slider",
+        stubWarning: "Używanie zaślepki: Slider",
         stubLabel: "Slider (zaślepka)",
       },
       sonner: {

@@ -59,7 +59,11 @@ export function FormAlert({
   const Icon = getIcon();
 
   return (
-    <Alert variant={alert.variant} icon={Icon} className={cn("my-4", className)}>
+    <Alert
+      variant={alert.variant}
+      icon={Icon}
+      className={cn("my-4", className)}
+    >
       {alert.title && (
         <AlertTitle>
           {t(alert.title.message, alert.title.messageParams)}

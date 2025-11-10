@@ -1,17 +1,14 @@
 "use client";
 
 import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { Loader2 } from 'next-vibe-ui/ui/icons';
+import { Loader2 } from "next-vibe-ui/ui/icons";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
-import {
-  FormField,
-  FormItem,
-} from "next-vibe-ui/ui/form/form";
+import { FormField, FormItem } from "next-vibe-ui/ui/form/form";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import type React from "react";
@@ -66,9 +63,13 @@ export default function SignUpForm({
       transition={{ duration: 0.5 }}
     >
       <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
-        <CardHeader className="space-y-1 pb-2" />
+        <CardHeader className="flex flex-col gap-1 pb-2" />
         <CardContent className="p-2 md:p-6">
-          <Form form={form} onSubmit={submitForm} className="space-y-6">
+          <Form
+            form={form}
+            onSubmit={submitForm}
+            className="flex flex-col gap-6"
+          >
             <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <EndpointFormField
                 name="personalInfo.privateName"
@@ -101,7 +102,7 @@ export default function SignUpForm({
               }}
             />
 
-            <Div className="space-y-4">
+            <Div className="flex flex-col gap-4">
               <FormField
                 control={form.control}
                 name="security.password"
@@ -168,9 +169,9 @@ export default function SignUpForm({
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     {t("app.user.signup.auth.signup.creatingAccount")}
                   </>
-                ) : 
+                ) : (
                   t("app.user.signup.auth.signup.createAccountButton")
-                }
+                )}
               </Button>
 
               <Div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">

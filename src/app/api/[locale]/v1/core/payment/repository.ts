@@ -108,7 +108,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         return fail({
           message: "app.api.v1.core.payment.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-                    messageParams: {
+          messageParams: {
             error: t("app.api.v1.core.payment.errors.unauthorized.description"),
           },
         });
@@ -132,7 +132,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         return fail({
           message: "app.api.v1.core.payment.create.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId: user.id },
+          messageParams: { userId: user.id },
         });
       }
 
@@ -144,7 +144,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         return fail({
           message: "app.api.v1.core.payment.create.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: {
+          messageParams: {
             error: t("app.api.v1.core.payment.errors.customerNotFound"),
           },
         });
@@ -162,8 +162,8 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
         return value.replace(/([A-Z])/g, (match) => `_${match}`).toLowerCase();
       }) || [
-          "card",
-        ]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
+        "card",
+      ]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
 
       // Extract mode value from translation key
       const modeParts = data.mode.split(".");
@@ -249,9 +249,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       });
 
       return fail({
-          message: "app.api.v1.core.payment.create.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message: "app.api.v1.core.payment.create.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -271,7 +271,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         return fail({
           message: "app.api.v1.core.payment.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-                    messageParams: {
+          messageParams: {
             error: t("app.api.v1.core.payment.errors.unauthorized.description"),
           },
         });
@@ -318,9 +318,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       });
 
       return fail({
-          message: "app.api.v1.core.payment.get.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message: "app.api.v1.core.payment.get.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -351,8 +351,8 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     if (!subscription[0]) {
       logger.error("No subscription found for user", { userId });
       return fail({
-          message: "app.api.v1.core.payment.errors.notFound.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
+        message: "app.api.v1.core.payment.errors.notFound.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
@@ -362,7 +362,8 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       return success({
         success: true,
         customerPortalUrl: null,
-        message: "NOWPayments subscriptions are managed via email. Please check your inbox for payment links and subscription details.",
+        message:
+          "NOWPayments subscriptions are managed via email. Please check your inbox for payment links and subscription details.",
       });
     }
 
@@ -408,9 +409,10 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           error: verificationResult.message,
         });
         return fail({
-          message: "app.api.v1.core.stripe.errors.webhookVerificationFailed.title",
+          message:
+            "app.api.v1.core.stripe.errors.webhookVerificationFailed.title",
           errorType: ErrorResponseTypes.BAD_REQUEST,
-                    messageParams: { error: verificationResult.message },
+          messageParams: { error: verificationResult.message },
         });
       }
 
@@ -491,9 +493,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       });
 
       return fail({
-          message: "app.api.v1.core.payment.errors.server.title",
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-                  messageParams: { error: parsedError.message },
+        message: "app.api.v1.core.payment.errors.server.title",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -512,7 +514,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           status: PaymentStatus.SUCCEEDED,
           updatedAt: new Date(),
         })
-        .where(eq(paymentTransactions.providerPaymentIntentId, paymentIntentId));
+        .where(
+          eq(paymentTransactions.providerPaymentIntentId, paymentIntentId),
+        );
 
       logger.debug("Payment succeeded processed", {
         paymentIntentId,
@@ -538,7 +542,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           status: PaymentStatus.FAILED,
           updatedAt: new Date(),
         })
-        .where(eq(paymentTransactions.providerPaymentIntentId, paymentIntentId));
+        .where(
+          eq(paymentTransactions.providerPaymentIntentId, paymentIntentId),
+        );
 
       logger.debug("Payment failed processed", {
         paymentIntentId,
@@ -557,9 +563,12 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     try {
       const invoiceId = data.id;
 
-      logger.debug("Invoice payment succeeded - delegating to subscription module", {
-        invoiceId,
-      });
+      logger.debug(
+        "Invoice payment succeeded - delegating to subscription module",
+        {
+          invoiceId,
+        },
+      );
 
       // Try to get subscription ID from various possible fields
       let subscriptionId: string | undefined;
@@ -568,23 +577,39 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         subscriptionId = data.subscription;
       }
 
-      if (!subscriptionId && "parent" in data && data.parent && typeof data.parent === "object") {
-        if ("subscription_details" in data.parent && data.parent.subscription_details && typeof data.parent.subscription_details === "object") {
+      if (
+        !subscriptionId &&
+        "parent" in data &&
+        data.parent &&
+        typeof data.parent === "object"
+      ) {
+        if (
+          "subscription_details" in data.parent &&
+          data.parent.subscription_details &&
+          typeof data.parent.subscription_details === "object"
+        ) {
           if ("subscription" in data.parent.subscription_details) {
-            subscriptionId = String(data.parent.subscription_details.subscription);
+            subscriptionId = String(
+              data.parent.subscription_details.subscription,
+            );
           }
         }
       }
 
       if (!subscriptionId) {
-        logger.debug("No subscription ID found in invoice - skipping subscription processing", {
-          invoiceId,
-        });
+        logger.debug(
+          "No subscription ID found in invoice - skipping subscription processing",
+          {
+            invoiceId,
+          },
+        );
         return;
       }
 
       // Subscription module handles its own business logic
-      const { subscriptionRepository } = await import("../subscription/repository");
+      const { subscriptionRepository } = await import(
+        "../subscription/repository"
+      );
       await subscriptionRepository.handleInvoicePaymentSucceeded(
         data,
         subscriptionId,
@@ -610,15 +635,22 @@ export class PaymentRepositoryImpl implements PaymentRepository {
   ): Promise<void> {
     try {
       const sessionId = data.id;
-      const metadata = "metadata" in data && data.metadata && typeof data.metadata === "object"
-        ? data.metadata
-        : undefined;
-      const type = metadata && typeof metadata === "object" && "type" in metadata ? String(metadata.type) : undefined;
+      const metadata =
+        "metadata" in data && data.metadata && typeof data.metadata === "object"
+          ? data.metadata
+          : undefined;
+      const type =
+        metadata && typeof metadata === "object" && "type" in metadata
+          ? String(metadata.type)
+          : undefined;
 
-      logger.debug("Checkout session completed - routing to appropriate module", {
-        sessionId,
-        type,
-      });
+      logger.debug(
+        "Checkout session completed - routing to appropriate module",
+        {
+          sessionId,
+          type,
+        },
+      );
 
       // Route to appropriate module based on purchase type
       if (type === "credit_pack") {
@@ -626,15 +658,21 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         // Convert to provider-agnostic format
         const creditPackSession: CreditPackCheckoutSession = {
           id: sessionId,
-          metadata: metadata && typeof metadata === "object"
-            ? Object.fromEntries(
-                Object.entries(metadata).map(([k, v]) => [k, String(v)])
-              )
-            : undefined,
+          metadata:
+            metadata && typeof metadata === "object"
+              ? Object.fromEntries(
+                  Object.entries(metadata).map(([k, v]) => [k, String(v)]),
+                )
+              : undefined,
         };
-        await creditRepository.handleCreditPackPurchase(creditPackSession, logger);
+        await creditRepository.handleCreditPackPurchase(
+          creditPackSession,
+          logger,
+        );
       } else if (type === "subscription") {
-        const { subscriptionRepository } = await import("../subscription/repository");
+        const { subscriptionRepository } = await import(
+          "../subscription/repository"
+        );
         await subscriptionRepository.handleSubscriptionCheckout(data, logger);
       } else {
         logger.debug("Unhandled checkout session type", {
@@ -667,8 +705,13 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         subscriptionId,
       });
 
-      const { subscriptionRepository } = await import("../subscription/repository");
-      await subscriptionRepository.handleSubscriptionCanceled(subscriptionId, logger);
+      const { subscriptionRepository } = await import(
+        "../subscription/repository"
+      );
+      await subscriptionRepository.handleSubscriptionCanceled(
+        subscriptionId,
+        logger,
+      );
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {
         logger.error("Failed to process subscription deleted", {

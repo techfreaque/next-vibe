@@ -226,7 +226,8 @@ export const translations: typeof enTranslations = {
           },
           insights: {
             title: "Für immer kostenlos",
-            description: "{{freeCredits}} Credits monatlich, alle Modelle, alle Ordnertypen",
+            description:
+              "{{freeCredits}} Credits monatlich, alle Modelle, alle Ordnertypen",
           },
         },
         contentCreation: {

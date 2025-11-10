@@ -15,6 +15,7 @@ export function QueryProvider({
 }: {
   children: ReactNode;
 }): JSX.Element {
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
 }
-

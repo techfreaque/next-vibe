@@ -13,7 +13,7 @@ import {
   Section,
 } from "@react-email/components";
 import { Span } from "next-vibe-ui/ui/span";
-import type * as icons from 'next-vibe-ui/ui/icons';
+import type * as icons from "next-vibe-ui/ui/icons";
 import {
   createDataUrl,
   createTransparentPixelDataUrl,

@@ -168,9 +168,10 @@ export class HealthCheckRepositoryImpl
       logger.error("Health check failed", { error: parsedError.message });
 
       return fail({
-          message: "app.api.v1.core.system.server.health.get.errors.server.description",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message:
+          "app.api.v1.core.system.server.health.get.errors.server.description",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }

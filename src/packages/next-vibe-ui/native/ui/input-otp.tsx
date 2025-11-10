@@ -84,10 +84,7 @@ InputOTP.displayName = "InputOTP";
 
 export const InputOTPGroup = React.forwardRef<View, InputOTPGroupProps>(
   ({ className, children }, ref) => (
-    <View
-      ref={ref}
-      className={cn("flex flex-row items-center", className)}
-    >
+    <View ref={ref} className={cn("flex flex-row items-center", className)}>
       {children}
     </View>
   ),

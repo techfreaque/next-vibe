@@ -10,8 +10,7 @@ export const translations: typeof enTranslations = {
     },
     rootFolderId: {
       label: "ID folderu głównego",
-      description:
-        "ID folderu głównego, dla którego sprawdzane są uprawnienia",
+      description: "ID folderu głównego, dla którego sprawdzane są uprawnienia",
       placeholder: "private, shared, public lub incognito",
     },
     response: {

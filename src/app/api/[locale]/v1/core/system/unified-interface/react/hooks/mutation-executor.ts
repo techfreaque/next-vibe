@@ -42,14 +42,14 @@ export interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
 /**
  * Pure function to execute a mutation
  * Extracted from store.ts to be used by useApiMutation with React Query
- * 
+ *
  * This function:
  * - Validates request data
  * - Builds the API URL with path parameters
  * - Makes the API call
  * - Handles errors and returns proper error responses
  * - Calls onSuccess/onError callbacks with our custom shape
- * 
+ *
  * Note: This does NOT handle:
  * - State management (handled by React Query)
  * - Retry logic (handled by React Query)
@@ -136,7 +136,7 @@ export async function executeMutation<
           message:
             "app.api.v1.core.system.unifiedInterface.reactNative.errors.missingUrlParam",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: { paramName, endpoint: endpoint.path.join("/") },
+          messageParams: { paramName, endpoint: endpoint.path.join("/") },
         });
 
         // Call onError callback if provided
@@ -198,13 +198,14 @@ export async function executeMutation<
     const parsedError = parseError(error);
 
     // Use endpoint's SERVER_ERROR error type if available
-    const serverErrorConfig = endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
+    const serverErrorConfig =
+      endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
     const errorMessage = serverErrorConfig?.description;
 
     const errorResponse: ErrorResponseType = fail({
-          message: errorMessage,
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: {
+      message: errorMessage,
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: {
         error: parsedError.message,
         endpoint: endpoint.path.join("/"),
       },
@@ -227,4 +228,3 @@ export async function executeMutation<
     return errorResponse;
   }
 }
-

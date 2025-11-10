@@ -5,7 +5,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
-import { Loader2, Mic, MicOff } from 'next-vibe-ui/ui/icons';
+import { Loader2, Mic, MicOff } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 

@@ -57,7 +57,8 @@ interface RouteHandlersGeneratorRepository {
  * Route Handlers Generator Repository Implementation
  */
 class RouteHandlersGeneratorRepositoryImpl
-  implements RouteHandlersGeneratorRepository {
+  implements RouteHandlersGeneratorRepository
+{
   async generateRouteHandlers(
     data: RouteHandlersRequestType,
     _user: JwtPayloadType,
@@ -110,9 +111,10 @@ class RouteHandlersGeneratorRepositoryImpl
       });
 
       return fail({
-          message: "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           duration,
         },
       });

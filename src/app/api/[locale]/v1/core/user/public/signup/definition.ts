@@ -195,7 +195,6 @@ const { POST } = createEndpoint({
         },
       ),
 
-
       // === TERMS AND CONSENT ===
       consent: objectField(
         {

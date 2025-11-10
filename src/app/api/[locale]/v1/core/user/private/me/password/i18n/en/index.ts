@@ -114,7 +114,8 @@ export const translations = {
     securityTip: "For enhanced security, enable two-factor authentication",
     nextSteps: {
       logoutOther: "All other sessions have been logged out for security",
-      enable2fa: "Consider enabling two-factor authentication for better security",
+      enable2fa:
+        "Consider enabling two-factor authentication for better security",
     },
     title: "Password Updated",
     description: "Your password has been successfully updated",

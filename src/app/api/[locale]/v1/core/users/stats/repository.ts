@@ -335,9 +335,9 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
     } catch (error) {
       logger.error("Error fetching user statistics", parseError(error));
       return fail({
-          message: "app.api.v1.core.users.list.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.users.list.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

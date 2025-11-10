@@ -31,9 +31,9 @@ import type { UserRolesRepository } from "./repository";
 class UserRolesRepositoryNativeImpl implements UserRolesRepository {
   private createNotImplementedError<T>(method: string): ResponseType<T> {
     return fail({
-          message: "app.api.v1.core.user.userRoles.errors.endpoint_not_created",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { method },
+      message: "app.api.v1.core.user.userRoles.errors.endpoint_not_created",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { method },
     });
   }
 
@@ -110,7 +110,9 @@ class UserRolesRepositoryNativeImpl implements UserRolesRepository {
     userId: DbId,
     logger: EndpointLogger,
   ): Promise<ResponseType<string[]>> {
-    logger.warn("getUserRoles not implemented on native - not used in page.tsx");
+    logger.warn(
+      "getUserRoles not implemented on native - not used in page.tsx",
+    );
     return await Promise.resolve(
       this.createNotImplementedError<string[]>("getUserRoles"),
     );

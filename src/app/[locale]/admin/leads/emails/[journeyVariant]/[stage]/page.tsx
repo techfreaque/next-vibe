@@ -3,7 +3,7 @@
  * Server-rendered email preview page
  */
 
-import { ArrowLeft, ChevronLeft, ChevronRight } from 'next-vibe-ui/ui/icons';
+import { ArrowLeft, ChevronLeft, ChevronRight } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { notFound } from "next-vibe-ui/lib/not-found";
 import { Div } from "next-vibe-ui/ui/div";
@@ -91,12 +91,12 @@ export default async function EmailPreviewPage({
       <Div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <Div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Div className="flex items-center justify-between">
-            <Div className="flex items-center space-x-4">
+            <Div className="flex items-center flex flex-row gap-4">
               <Link href={`/${locale}/admin/leads/emails`}>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="flex items-center space-x-2"
+                  className="flex items-center flex flex-row gap-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <Span>{t("app.admin.common.actions.back")}</Span>
@@ -128,7 +128,7 @@ export default async function EmailPreviewPage({
       <Div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <Div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <Div className="flex items-center justify-between">
-            <Div className="flex items-center space-x-2">
+            <Div className="flex items-center flex flex-row gap-2">
               {previousStage ? (
                 <Link
                   href={`/${locale}/admin/leads/emails/${journeyVariant}/${previousStage}`}
@@ -136,7 +136,7 @@ export default async function EmailPreviewPage({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex items-center space-x-1"
+                    className="flex items-center flex flex-row gap-1"
                   >
                     <ChevronLeft className="h-4 w-4" />
                     <Span>
@@ -151,7 +151,7 @@ export default async function EmailPreviewPage({
                   variant="outline"
                   size="sm"
                   disabled
-                  className="flex items-center space-x-1"
+                  className="flex items-center flex flex-row gap-1"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   <Span>{t("app.admin.common.actions.previous")}</Span>
@@ -165,7 +165,7 @@ export default async function EmailPreviewPage({
               </Span>
             </Div>
 
-            <Div className="flex items-center space-x-2">
+            <Div className="flex items-center flex flex-row gap-2">
               {nextStage ? (
                 <Link
                   href={`/${locale}/admin/leads/emails/${journeyVariant}/${nextStage}`}
@@ -173,7 +173,7 @@ export default async function EmailPreviewPage({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex items-center space-x-1"
+                    className="flex items-center flex flex-row gap-1"
                   >
                     <Span>
                       {nextStage
@@ -188,7 +188,7 @@ export default async function EmailPreviewPage({
                   variant="outline"
                   size="sm"
                   disabled
-                  className="flex items-center space-x-1"
+                  className="flex items-center flex flex-row gap-1"
                 >
                   <Span>{t("app.admin.common.actions.next")}</Span>
                   <ChevronRight className="h-4 w-4" />
@@ -202,11 +202,11 @@ export default async function EmailPreviewPage({
       {/* Journey Selector */}
       <Div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <Div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Div className="flex items-center justify-center space-x-4">
+          <Div className="flex items-center justify-center flex flex-row gap-4">
             <Span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("app.admin.leads.leads.admin.emails.journey")}:
             </Span>
-            <Div className="flex space-x-2">
+            <Div className="flex flex flex-row gap-2">
               {allJourneys.map((journey) => {
                 const isCurrentJourney = journey === journeyVariant;
                 const journeyStages = emailService.getAvailableStages(journey);

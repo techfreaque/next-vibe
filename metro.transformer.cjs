@@ -6,16 +6,19 @@
  * from crashing during bundling.
  */
 
-const upstreamTransformer = require('@expo/metro-config/babel-transformer');
+const upstreamTransformer = require("@expo/metro-config/babel-transformer");
 
 module.exports.transform = async (props) => {
   const { filename, src } = props;
 
   // Check if this file imports 'server-only'
-  if (src.includes('import "server-only"') || src.includes("import 'server-only'")) {
+  if (
+    src.includes('import "server-only"') ||
+    src.includes("import 'server-only'")
+  ) {
     // eslint-disable-next-line no-console
     console.error(
-      `[Metro] Skipping server-only file: ${filename.replace(process.cwd(), '')}`
+      `[Metro] Skipping server-only file: ${filename.replace(process.cwd(), "")}`,
     );
 
     // Replace the entire file with a stub that throws at runtime
@@ -23,7 +26,7 @@ module.exports.transform = async (props) => {
       // This file imports 'server-only' and cannot run in React Native
       throw new Error(
         'This module uses server-only features and cannot run in React Native. ' +
-        'File: ${filename.replace(process.cwd(), '')}. ' +
+        'File: ${filename.replace(process.cwd(), "")}. ' +
         'A .native override is needed for this route.'
       );
     `;

@@ -9,6 +9,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type {
   ExtractOutput,
+  FieldUIConfigValue,
   FieldUsageConfig,
   ObjectField,
   UnifiedField,
@@ -42,6 +43,20 @@ type ResponseData =
  * Type for ZodObject shape - a record of Zod schemas
  */
 type ZodShape = Record<string, z.ZodTypeAny>;
+
+/**
+ * Extract translation key from UI config
+ * UI config strings are expected to be translation keys by architectural contract
+ */
+function extractTranslationKey(
+  value: FieldUIConfigValue | undefined,
+): TranslationKey | undefined {
+  if (typeof value === "string") {
+    // By architectural contract, strings in UI config are translation keys
+    return value as TranslationKey;
+  }
+  return undefined;
+}
 
 /**
  * Convert unknown/any Zod output to RenderableValue safely
@@ -161,8 +176,8 @@ export class ResponseMetadataExtractor {
         // This is safe because extractFromFieldsDefinition handles both cases
         return this.extractFromFieldsDefinition(
           definition.fields as
-          | UnifiedField<z.ZodTypeAny>
-          | Record<string, UnifiedField<z.ZodTypeAny>>,
+            | UnifiedField<z.ZodTypeAny>
+            | Record<string, UnifiedField<z.ZodTypeAny>>,
           responseData,
         );
       }
@@ -476,18 +491,13 @@ export class ResponseMetadataExtractor {
         }
       }
 
-      const title: TranslationKey | undefined =
-        "title" in ui && typeof ui.title === "string" ? ui.title : undefined;
-      const label: TranslationKey | undefined =
-        "title" in ui && typeof ui.title === "string"
-          ? ui.title
-          : "label" in ui && typeof ui.label === "string"
-            ? ui.label
-            : undefined;
-      const description: TranslationKey | undefined =
-        "description" in ui && typeof ui.description === "string"
-          ? ui.description
-          : undefined;
+      const title = extractTranslationKey("title" in ui ? ui.title : undefined);
+      const label = extractTranslationKey(
+        "title" in ui ? ui.title : "label" in ui ? ui.label : undefined,
+      );
+      const description = extractTranslationKey(
+        "description" in ui ? ui.description : undefined,
+      );
 
       return {
         name: fieldName,
@@ -539,23 +549,26 @@ export class ResponseMetadataExtractor {
           "type" in col &&
           typeof col.type === "string"
         ) {
-          filteredColumns.push({
-            key: col.key,
-            label: col.label,
-            type: col.type,
-            width:
-              "width" in col && typeof col.width === "string"
-                ? col.width
-                : undefined,
-            sortable:
-              "sortable" in col && typeof col.sortable === "boolean"
-                ? col.sortable
-                : undefined,
-            filterable:
-              "filterable" in col && typeof col.filterable === "boolean"
-                ? col.filterable
-                : undefined,
-          });
+          const colLabel = extractTranslationKey(col.label);
+          if (colLabel) {
+            filteredColumns.push({
+              key: col.key,
+              label: colLabel,
+              type: col.type,
+              width:
+                "width" in col && typeof col.width === "string"
+                  ? col.width
+                  : undefined,
+              sortable:
+                "sortable" in col && typeof col.sortable === "boolean"
+                  ? col.sortable
+                  : undefined,
+              filterable:
+                "filterable" in col && typeof col.filterable === "boolean"
+                  ? col.filterable
+                  : undefined,
+            });
+          }
         }
       }
 
@@ -570,20 +583,21 @@ export class ResponseMetadataExtractor {
       }));
     }
 
-    const regularTitle: TranslationKey | undefined =
-      "title" in ui && typeof ui.title === "string" ? ui.title : undefined;
-    const regularLabel: TranslationKey | undefined =
-      "title" in ui && typeof ui.title === "string"
+    const regularTitle = extractTranslationKey(
+      "title" in ui ? ui.title : undefined,
+    );
+    const regularLabel = extractTranslationKey(
+      "title" in ui
         ? ui.title
-        : "label" in ui && typeof ui.label === "string"
+        : "label" in ui
           ? ui.label
-          : "content" in ui && typeof ui.content === "string"
+          : "content" in ui
             ? ui.content
-            : undefined;
-    const regularDescription: TranslationKey | undefined =
-      "description" in ui && typeof ui.description === "string"
-        ? ui.description
-        : undefined;
+            : undefined,
+    );
+    const regularDescription = extractTranslationKey(
+      "description" in ui ? ui.description : undefined,
+    );
 
     return {
       name: fieldName,
@@ -604,9 +618,9 @@ export class ResponseMetadataExtractor {
   private extractContainerFromDefinition(
     definition:
       | ObjectField<
-        Record<string, UnifiedField<z.ZodTypeAny>>,
-        FieldUsageConfig
-      >
+          Record<string, UnifiedField<z.ZodTypeAny>>,
+          FieldUsageConfig
+        >
       | Record<string, UnifiedField<z.ZodTypeAny>>
       | UnifiedField<z.ZodTypeAny>,
     responseData?: ExtractOutput<z.ZodTypeAny>,
@@ -646,10 +660,10 @@ export class ResponseMetadataExtractor {
         : undefined;
     const layout =
       ui &&
-        "layout" in ui &&
-        typeof ui.layout === "object" &&
-        ui.layout !== null &&
-        ("columns" in ui.layout || "spacing" in ui.layout)
+      "layout" in ui &&
+      typeof ui.layout === "object" &&
+      ui.layout !== null &&
+      ("columns" in ui.layout || "spacing" in ui.layout)
         ? (ui.layout as { columns?: number; spacing?: string } | undefined)
         : undefined;
 
@@ -707,23 +721,26 @@ export class ResponseMetadataExtractor {
             "type" in col &&
             typeof col.type === "string"
           ) {
-            filteredColumns.push({
-              key: col.key,
-              label: col.label,
-              type: col.type,
-              width:
-                "width" in col && typeof col.width === "string"
-                  ? col.width
-                  : undefined,
-              sortable:
-                "sortable" in col && typeof col.sortable === "boolean"
-                  ? col.sortable
-                  : undefined,
-              filterable:
-                "filterable" in col && typeof col.filterable === "boolean"
-                  ? col.filterable
-                  : undefined,
-            });
+            const colLabel = extractTranslationKey(col.label);
+            if (colLabel) {
+              filteredColumns.push({
+                key: col.key,
+                label: colLabel,
+                type: col.type,
+                width:
+                  "width" in col && typeof col.width === "string"
+                    ? col.width
+                    : undefined,
+                sortable:
+                  "sortable" in col && typeof col.sortable === "boolean"
+                    ? col.sortable
+                    : undefined,
+                filterable:
+                  "filterable" in col && typeof col.filterable === "boolean"
+                    ? col.filterable
+                    : undefined,
+              });
+            }
           }
         }
 
@@ -849,7 +866,9 @@ export class ResponseMetadataExtractor {
     // Extract UI configuration with proper typing
     const hasUi = "ui" in definition && typeof definition.ui === "object";
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- UI config can be various widget types
-    const ui = hasUi ? (definition.ui as Record<string, unknown>) : null;
+    const ui = hasUi
+      ? (definition.ui as Record<string, FieldUIConfigValue>)
+      : null;
 
     const schema =
       "schema" in definition && definition.schema instanceof z.ZodType
@@ -872,18 +891,18 @@ export class ResponseMetadataExtractor {
     }
 
     // Extract label from ui
-    const label: TranslationKey | undefined =
-      ui && "title" in ui && typeof ui.title === "string"
+    const label = extractTranslationKey(
+      ui && "title" in ui
         ? ui.title
-        : ui && "label" in ui && typeof ui.label === "string"
+        : ui && "label" in ui
           ? ui.label
-          : undefined;
+          : undefined,
+    );
 
     // Extract description from ui
-    const description: TranslationKey | undefined =
-      ui && "description" in ui && typeof ui.description === "string"
-        ? ui.description
-        : undefined;
+    const description = extractTranslationKey(
+      ui && "description" in ui ? ui.description : undefined,
+    );
 
     // Extract format from ui
     const format =

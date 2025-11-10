@@ -248,8 +248,9 @@ class CampaignStarterConfigRepositoryImpl
     } catch (error) {
       logger.error("Error fetching campaign starter config", parseError(error));
       return fail({
-          message: "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -319,8 +320,9 @@ class CampaignStarterConfigRepositoryImpl
     } catch (error) {
       logger.error("Error updating campaign starter config", parseError(error));
       return fail({
-          message: "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

@@ -125,8 +125,9 @@ export class SchemaVerifyRepositoryImpl
       parseError(error);
 
       return fail({
-          message: "app.api.v1.core.system.db.schemaVerify.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.system.db.schemaVerify.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

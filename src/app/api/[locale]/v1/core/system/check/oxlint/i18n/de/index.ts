@@ -80,7 +80,8 @@ export const translations: typeof enTranslations = {
       description: "Zugriff verboten",
     },
     configNotFound: "lint.config.ts nicht im Projektstammverzeichnis gefunden",
-    configMissingExport: "lint.config.ts muss 'config' oder 'default' exportieren",
+    configMissingExport:
+      "lint.config.ts muss 'config' oder 'default' exportieren",
     oxlintFailed: "Oxlint fehlgeschlagen",
     prettierFailed: "Prettier fehlgeschlagen mit Exit-Code",
   },

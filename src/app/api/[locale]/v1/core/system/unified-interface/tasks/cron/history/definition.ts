@@ -173,7 +173,7 @@ export const { GET } = createEndpoint({
               .object({
                 message: z.string(),
                 messageParams: z.record(z.string(), z.unknown()).optional(),
-          errorType: z.string(),
+                errorType: z.string(),
               })
               .nullable(),
             environment: z.string().nullable(),

@@ -33,9 +33,9 @@ export function runSnykTest(
       parseError(error),
     );
     return fail({
-          message: "app.api.v1.core.system.releaseTool.snyk.cliNotFound",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                messageParams: { packageName },
+      message: "app.api.v1.core.system.releaseTool.snyk.cliNotFound",
+      errorType: ErrorResponseTypes.NOT_FOUND,
+      messageParams: { packageName },
     });
   }
 
@@ -55,9 +55,9 @@ export function runSnykTest(
       parseError(error),
     );
     return fail({
-          message: "app.api.v1.core.system.releaseTool.snyk.testFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { packageName, error: String(error) },
+      message: "app.api.v1.core.system.releaseTool.snyk.testFailed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { packageName, error: String(error) },
     });
   }
 }
@@ -82,9 +82,9 @@ export function runSnykMonitor(
       parseError(error),
     );
     return fail({
-          message: "app.api.v1.core.system.releaseTool.snyk.cliNotFound",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                messageParams: { packageName },
+      message: "app.api.v1.core.system.releaseTool.snyk.cliNotFound",
+      errorType: ErrorResponseTypes.NOT_FOUND,
+      messageParams: { packageName },
     });
   }
 
@@ -97,9 +97,9 @@ export function runSnykMonitor(
       undefined,
     );
     return fail({
-          message: "app.api.v1.core.system.releaseTool.snyk.tokenRequired",
-          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
-                messageParams: { packageName },
+      message: "app.api.v1.core.system.releaseTool.snyk.tokenRequired",
+      errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+      messageParams: { packageName },
     });
   }
 
@@ -109,9 +109,9 @@ export function runSnykMonitor(
       undefined,
     );
     return fail({
-          message: "app.api.v1.core.system.releaseTool.snyk.orgKeyRequired",
-          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
-                messageParams: { packageName },
+      message: "app.api.v1.core.system.releaseTool.snyk.orgKeyRequired",
+      errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+      messageParams: { packageName },
     });
   }
 
@@ -142,9 +142,9 @@ export function runSnykMonitor(
   } catch (error) {
     logger.error(`Snyk monitor failed for ${packageName}:`, parseError(error));
     return fail({
-          message: "app.api.v1.core.system.releaseTool.snyk.monitorFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { packageName, error: String(error) },
+      message: "app.api.v1.core.system.releaseTool.snyk.monitorFailed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { packageName, error: String(error) },
     });
   }
 }

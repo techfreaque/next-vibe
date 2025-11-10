@@ -256,10 +256,11 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
       // If user has other leads, merge credits using cluster resolver
       if (existingLeads.length > 0) {
         const allLeadIds = [...existingLeads.map((l) => l.leadId), leadId];
-        const mergeResult = await creditTransactionManager.mergeCreditsIntoOldest(
-          allLeadIds,
-          logger,
-        );
+        const mergeResult =
+          await creditTransactionManager.mergeCreditsIntoOldest(
+            allLeadIds,
+            logger,
+          );
 
         if (!mergeResult.success) {
           logger.error("Failed to merge credits after linking lead to user", {

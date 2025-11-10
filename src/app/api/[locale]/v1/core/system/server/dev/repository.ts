@@ -23,7 +23,7 @@ import { databaseMigrationRepository } from "../../db/migrate/repository";
 import { dockerOperationsRepository } from "../../db/utils/docker-operations/repository";
 import { dbUtilsRepository } from "../../db/utils/repository";
 import type endpoints from "./definition";
-import {useTurbopack } from "@/config/constants";
+import { useTurbopack } from "@/config/constants";
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 
@@ -300,7 +300,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
                 logger.vibe(`🌐 Starting Next.js on http://localhost:${port}`);
                 this.startNextJsProcess(port);
                 // Intentionally never resolve - keep process running indefinitely
-              return await new Promise<never>(() => undefined);
+                return await new Promise<never>(() => undefined);
               }
 
               logger.vibe("✅ Database started");

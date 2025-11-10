@@ -1,4 +1,4 @@
-import { ChevronRightIcon, DotsHorizontalIcon } from 'next-vibe-ui/ui/icons';
+import { ChevronRightIcon, DotsHorizontalIcon } from "next-vibe-ui/ui/icons";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";

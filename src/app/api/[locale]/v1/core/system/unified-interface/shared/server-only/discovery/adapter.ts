@@ -24,7 +24,9 @@ const logger = {
     process.stderr.write(`[Lazy Loader] ${message}${argsStr}\n`);
   },
   error(message: string, error?: unknown): void {
-    const errorStr = error ? ` ${error instanceof Error ? error.message : String(error)}` : "";
+    const errorStr = error
+      ? ` ${error instanceof Error ? error.message : String(error)}`
+      : "";
     process.stderr.write(`[Lazy Loader] ${message}${errorStr}\n`);
   },
 };
@@ -37,16 +39,16 @@ const logger = {
  */
 type EndpointNode =
   | {
-    [K in Methods]?: CreateApiEndpoint<
-      string,
-      K,
-      readonly (typeof UserRoleValue)[],
-      UnifiedField<z.ZodTypeAny>
-    >;
-  }
+      [K in Methods]?: CreateApiEndpoint<
+        string,
+        K,
+        readonly (typeof UserRoleValue)[],
+        UnifiedField<z.ZodTypeAny>
+      >;
+    }
   | {
-    [key: string]: EndpointNode;
-  };
+      [key: string]: EndpointNode;
+    };
 
 /**
  * Convert generated endpoints to DiscoveredEndpoint format
@@ -73,11 +75,11 @@ export function getDiscoveredEndpoints(): DiscoveredEndpoint[] {
         const methodKey = method as Methods;
         const definition = obj[methodKey] as
           | CreateApiEndpoint<
-            string,
-            Methods,
-            readonly (typeof UserRoleValue)[],
-            UnifiedField<z.ZodTypeAny>
-          >
+              string,
+              Methods,
+              readonly (typeof UserRoleValue)[],
+              UnifiedField<z.ZodTypeAny>
+            >
           | undefined;
 
         if (!definition) {

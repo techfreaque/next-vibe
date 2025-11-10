@@ -50,11 +50,9 @@
   "include": [
     "next-env.d.ts",
     "types/**/*.d.ts",
-    "src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe/types/node.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    "nativewind-env.d.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

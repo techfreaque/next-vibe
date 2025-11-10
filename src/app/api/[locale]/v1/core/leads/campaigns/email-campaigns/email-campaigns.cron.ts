@@ -143,8 +143,9 @@ async function processEmailCampaignStage(
         error: stageResult.message,
       });
       return fail({
-          message: "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { stage, error: stageResult.message },
       });
     }
@@ -155,10 +156,11 @@ async function processEmailCampaignStage(
     logger.error("Error processing stage", { stage, message: errorMessage });
 
     return fail({
-          message: "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { stage, error: errorMessage },
-      });
+      message:
+        "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { stage, error: errorMessage },
+    });
   }
 }
 
@@ -217,10 +219,11 @@ function validateEmailCampaignTask(
     });
 
     return fail({
-          message: "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.validation.title",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: { error: errorMessage },
-      });
+      message:
+        "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.validation.title",
+      errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      messageParams: { error: errorMessage },
+    });
   }
 }
 
@@ -318,10 +321,11 @@ export async function execute(
     });
 
     return fail({
-          message: "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage, executionTimeMs },
-      });
+      message:
+        "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { error: errorMessage, executionTimeMs },
+    });
   }
 }
 

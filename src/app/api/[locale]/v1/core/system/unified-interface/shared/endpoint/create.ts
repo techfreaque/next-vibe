@@ -113,51 +113,51 @@ export interface ApiEndpoint<
   > extends undefined
     ? { requests?: undefined }
     : ExtractInput<
-      InferSchemaFromField<TFields, FieldUsage.RequestData>
-    > extends never
-    ? {
-      requests?: undefined;
-    }
-    : {
-      requests: ExamplesList<
-        ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
-        TExampleKey
-      >;
-    }) &
-  (ExtractInput<
-    InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-  > extends undefined
-    ? { urlPathParams?: undefined }
-    : ExtractInput<
+          InferSchemaFromField<TFields, FieldUsage.RequestData>
+        > extends never
+      ? {
+          requests?: undefined;
+        }
+      : {
+          requests: ExamplesList<
+            ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
+            TExampleKey
+          >;
+        }) &
+    (ExtractInput<
       InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-    > extends never
-    ? {
-      urlPathParams?: undefined;
-    }
-    : {
-      urlPathParams: ExamplesList<
-        ExtractInput<
-          InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-        >,
-        TExampleKey
-      >;
-    }) &
-  (ExtractInput<
-    InferSchemaFromField<TFields, FieldUsage.Response>
-  > extends undefined
-    ? { responses?: undefined }
-    : ExtractInput<
+    > extends undefined
+      ? { urlPathParams?: undefined }
+      : ExtractInput<
+            InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+          > extends never
+        ? {
+            urlPathParams?: undefined;
+          }
+        : {
+            urlPathParams: ExamplesList<
+              ExtractInput<
+                InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+              >,
+              TExampleKey
+            >;
+          }) &
+    (ExtractInput<
       InferSchemaFromField<TFields, FieldUsage.Response>
-    > extends never
-    ? {
-      responses?: undefined;
-    }
-    : {
-      responses: ExamplesList<
-        ExtractInput<InferSchemaFromField<TFields, FieldUsage.Response>>,
-        TExampleKey
-      >;
-    });
+    > extends undefined
+      ? { responses?: undefined }
+      : ExtractInput<
+            InferSchemaFromField<TFields, FieldUsage.Response>
+          > extends never
+        ? {
+            responses?: undefined;
+          }
+        : {
+            responses: ExamplesList<
+              ExtractInput<InferSchemaFromField<TFields, FieldUsage.Response>>,
+              TExampleKey
+            >;
+          });
 
   // Additional configuration - optional
   // readonly config: EndpointConfig;
@@ -189,10 +189,10 @@ export type ExtractFieldCore<F> = F extends {
 }
   ? { type: "primitive"; schema: Schema; usage: Usage }
   : F extends { type: "object"; children: infer Children }
-  ? { type: "object"; children: Children }
-  : F extends { type: "array"; child: infer Child; usage: infer Usage }
-  ? { type: "array"; child: Child; usage: Usage }
-  : never;
+    ? { type: "object"; children: Children }
+    : F extends { type: "array"; child: infer Child; usage: infer Usage }
+      ? { type: "array"; child: Child; usage: Usage }
+      : never;
 
 // --- MAINTAINABLE SUB-TYPES FOR FIELD INFERENCE ---
 
@@ -209,51 +209,51 @@ type HasRequestUrlParamsUsage<U> = U extends { request: "urlPathParams" }
 // Direct field type inference that forces evaluation
 export type InferFieldType<F, Usage extends FieldUsage> =
   FieldCore<F> extends { type: "primitive"; usage: infer U }
-  ? Usage extends FieldUsage.Response
-  ? HasResponseUsage<U> extends true
-  ? ExtractSchemaType<F>
-  : never
-  : Usage extends FieldUsage.RequestData
-  ? HasRequestDataUsage<U> extends true
-  ? ExtractSchemaType<F>
-  : never
-  : Usage extends FieldUsage.RequestUrlParams
-  ? HasRequestUrlParamsUsage<U> extends true
-  ? ExtractSchemaType<F>
-  : never
-  : never
-  : FieldCore<F> extends { type: "object"; children: infer C }
-  ? InferObjectType<C, Usage>
-  : FieldCore<F> extends {
-    type: "array";
-    child: infer Child;
-    usage: infer U;
-  }
-  ? Usage extends FieldUsage.Response
-  ? HasResponseUsage<U> extends true
-  ? Array<InferFieldType<Child, Usage>>
-  : never
-  : Usage extends FieldUsage.RequestData
-  ? HasRequestDataUsage<U> extends true
-  ? Array<InferFieldType<Child, Usage>>
-  : never
-  : Usage extends FieldUsage.RequestUrlParams
-  ? HasRequestUrlParamsUsage<U> extends true
-  ? Array<InferFieldType<Child, Usage>>
-  : never
-  : never
-  : never;
+    ? Usage extends FieldUsage.Response
+      ? HasResponseUsage<U> extends true
+        ? ExtractSchemaType<F>
+        : never
+      : Usage extends FieldUsage.RequestData
+        ? HasRequestDataUsage<U> extends true
+          ? ExtractSchemaType<F>
+          : never
+        : Usage extends FieldUsage.RequestUrlParams
+          ? HasRequestUrlParamsUsage<U> extends true
+            ? ExtractSchemaType<F>
+            : never
+          : never
+    : FieldCore<F> extends { type: "object"; children: infer C }
+      ? InferObjectType<C, Usage>
+      : FieldCore<F> extends {
+            type: "array";
+            child: infer Child;
+            usage: infer U;
+          }
+        ? Usage extends FieldUsage.Response
+          ? HasResponseUsage<U> extends true
+            ? Array<InferFieldType<Child, Usage>>
+            : never
+          : Usage extends FieldUsage.RequestData
+            ? HasRequestDataUsage<U> extends true
+              ? Array<InferFieldType<Child, Usage>>
+              : never
+            : Usage extends FieldUsage.RequestUrlParams
+              ? HasRequestUrlParamsUsage<U> extends true
+                ? Array<InferFieldType<Child, Usage>>
+                : never
+              : never
+        : never;
 
 // Fixed object type inference - filter out never fields and remove readonly
 // Uses flexible constraint that accepts both readonly and mutable properties
 type InferObjectType<C, Usage extends FieldUsage> =
   C extends Record<string, UnifiedField<z.ZodTypeAny>>
-  ? {
-    -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
-    ? never
-    : K]: InferFieldType<C[K], Usage>;
-  }
-  : never;
+    ? {
+        -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
+          ? never
+          : K]: InferFieldType<C[K], Usage>;
+      }
+    : never;
 
 // --- SCHEMA GENERATION FROM UNIFIED FIELDS ---
 // Use the proper generateSchemaForUsage function from utils
@@ -346,13 +346,13 @@ export type CreateEndpointReturnInMethod<
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > = {
-    readonly [KMethod in TMethod]: CreateApiEndpoint<
-      TExampleKey,
-      KMethod,
-      TUserRoleValue,
-      TFields
-    >;
-  };
+  readonly [KMethod in TMethod]: CreateApiEndpoint<
+    TExampleKey,
+    KMethod,
+    TUserRoleValue,
+    TFields
+  >;
+};
 
 /**
  * Create an endpoint definition with perfect type inference from unified fields

@@ -120,10 +120,10 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
         error: errorDetails.message,
       });
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           error: errorDetails.message,
           period: data.period || "day",
           type: data.type || "overview",

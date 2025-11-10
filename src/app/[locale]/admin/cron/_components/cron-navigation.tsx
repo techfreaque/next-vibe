@@ -5,7 +5,7 @@
 
 "use client";
 
-import { History, List, TrendingUp } from 'next-vibe-ui/ui/icons';
+import { History, List, TrendingUp } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils/utils";
 import { Link } from "next-vibe-ui/ui/link";
 import { Badge } from "next-vibe-ui/ui/badge";
@@ -70,13 +70,13 @@ export function CronNavigation({
                   <Button
                     variant={isActive ? "default" : "outline"}
                     className={cn(
-                      "h-auto p-4 flex flex-col items-start space-y-2 w-full",
+                      "h-auto p-4 flex flex-col items-start gap-2 w-full",
                       isActive
                         ? "bg-primary text-primary-foreground"
                         : "hover:bg-accent",
                     )}
                   >
-                    <Div className="flex items-center space-x-2 w-full">
+                    <Div className="flex items-center flex flex-row gap-2 w-full">
                       <Icon className="h-5 w-5" />
                       <Span className="font-medium">{item.label}</Span>
                       {isActive && (

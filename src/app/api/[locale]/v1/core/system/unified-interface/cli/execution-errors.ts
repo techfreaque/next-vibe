@@ -3,7 +3,7 @@
  */
 
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../types/node.d.ts" />
+/// <reference path="../shared/types/node.d.ts" />
 
 import type { EndpointLogger } from "../shared/logger/endpoint";
 
@@ -386,7 +386,10 @@ export namespace ErrorHandler {
   /**
    * Create error from unknown value
    */
-  export function createError(error: UnknownError, context?: ErrorContext): CliError {
+  export function createError(
+    error: UnknownError,
+    context?: ErrorContext,
+  ): CliError {
     if (error instanceof CliError) {
       return error;
     }

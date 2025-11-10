@@ -10,7 +10,7 @@ class ApiError extends Error {
   translationKey?: TranslationKey;
 
   constructor(options: {
-          errorType: string;
+    errorType: string;
     messageParams?: TParams;
     translationKey: TranslationKey;
   }) {
@@ -76,7 +76,7 @@ export function parseError(error: ParseableError): Error {
   // Handle ErrorResponseType objects
   if (isErrorResponseType(error)) {
     return new ApiError({
-          errorType: error.errorType.errorKey,
+      errorType: error.errorType.errorKey,
       messageParams: error.messageParams,
       translationKey: error.message,
     });

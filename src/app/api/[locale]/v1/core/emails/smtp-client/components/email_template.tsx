@@ -109,7 +109,6 @@ export function EmailTemplate({
                 alignItems: "flex-start",
               }}
             >
-
               {/* Tagline - below logo, left aligned */}
               <Span
                 style={{

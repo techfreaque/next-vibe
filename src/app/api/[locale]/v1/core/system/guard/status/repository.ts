@@ -71,9 +71,10 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
         error instanceof Error ? error : new Error(String(error));
 
       return fail({
-          message: "app.api.v1.core.system.guard.status.post.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message:
+          "app.api.v1.core.system.guard.status.post.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }

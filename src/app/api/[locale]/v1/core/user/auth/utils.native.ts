@@ -27,13 +27,13 @@ export async function requireAdminUser(
   // Stub implementation for React Native
   // In a real implementation, this would check native auth state
   return fail({
-          message: "app.api.v1.core.user.auth.errors.not_implemented_native",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              messageParams: {
+    message: "app.api.v1.core.user.auth.errors.not_implemented_native",
+    errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    messageParams: {
       context: "requireAdminUser",
       locale,
       redirectPath: redirectPath ?? "",
-              message: "Proper native authentication not yet implemented",
+      message: "Proper native authentication not yet implemented",
     },
   });
 }
@@ -49,13 +49,13 @@ export async function requireUser(
   // Stub implementation for React Native
   // In a real implementation, this would check native auth state
   return fail({
-          message: "app.api.v1.core.user.auth.errors.not_implemented_native",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              messageParams: {
+    message: "app.api.v1.core.user.auth.errors.not_implemented_native",
+    errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    messageParams: {
       context: "requireUser",
       locale,
       redirectPath: redirectPath ?? "",
-              message: "Proper native authentication not yet implemented",
+      message: "Proper native authentication not yet implemented",
     },
   });
 }

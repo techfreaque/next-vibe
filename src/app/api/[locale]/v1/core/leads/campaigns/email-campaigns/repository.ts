@@ -133,8 +133,9 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
         error: parseError(error).message,
       });
       return fail({
-          message: "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

@@ -36,32 +36,32 @@ import { type CountryLanguage } from "@/i18n/core/config";
 type InferRequestInput<T> =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
-  ? T["types"]["RequestInput"]
-  : never;
+    ? T["types"]["RequestInput"]
+    : never;
 
 type InferRequestOutput<T> =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
-  ? T["types"]["RequestOutput"]
-  : never;
+    ? T["types"]["RequestOutput"]
+    : never;
 
 type InferResponseOutput<T> =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
-  ? T["types"]["ResponseOutput"]
-  : never;
+    ? T["types"]["ResponseOutput"]
+    : never;
 
 type InferUrlVariablesInput<T> =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
-  ? T["types"]["UrlVariablesInput"]
-  : never;
+    ? T["types"]["UrlVariablesInput"]
+    : never;
 
 type InferUrlVariablesOutput<T> =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
-  ? T["types"]["UrlVariablesOutput"]
-  : never;
+    ? T["types"]["UrlVariablesOutput"]
+    : never;
 
 /**
  * Combined parameters for endpoint calls
@@ -70,12 +70,12 @@ type InferUrlVariablesOutput<T> =
 type EndpointParams<TEndpoint> =
   (InferRequestOutput<TEndpoint> extends undefined
     ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    {}
+      {}
     : { data: InferRequestOutput<TEndpoint> }) &
-  (InferUrlVariablesOutput<TEndpoint> extends undefined
-    ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    {}
-    : { urlPathParams: InferUrlVariablesOutput<TEndpoint> });
+    (InferUrlVariablesOutput<TEndpoint> extends undefined
+      ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+        {}
+      : { urlPathParams: InferUrlVariablesOutput<TEndpoint> });
 
 /**
  * Construct URL path from endpoint definition and parameters
@@ -110,10 +110,10 @@ function constructUrl<
 
         if (paramValue === undefined) {
           return fail({
-          message:
+            message:
               "app.api.v1.core.system.unifiedInterface.reactNative.errors.missingUrlParam",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                      messageParams: { paramName, endpoint: endpoint.title },
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: { paramName, endpoint: endpoint.title },
           });
         }
 
@@ -126,10 +126,10 @@ function constructUrl<
     return { success: true, data: urlPath };
   } catch (error) {
     return fail({
-          message:
+      message:
         "app.api.v1.core.system.unifiedInterface.reactNative.errors.urlConstructionFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: {
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: {
         error: String(error),
       },
     });
@@ -159,9 +159,7 @@ function constructUrl<
  * );
  * ```
  */
-export async function nativeEndpoint<
-  TEndpoint extends CreateApiEndpointAny,
->(
+export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   params: EndpointParams<TEndpoint>,
   logger: EndpointLogger,
@@ -188,7 +186,7 @@ export async function nativeEndpoint<
           message:
             "app.api.v1.core.system.unifiedInterface.reactNative.errors.validationFailed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: {
+          messageParams: {
             error: String(validationError),
           },
         });
@@ -276,7 +274,7 @@ export async function nativeEndpoint<
           message:
             "app.api.v1.core.system.unifiedInterface.reactNative.errors.htmlResponseReceived",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: {
+          messageParams: {
             url: fetchUrl,
             status: fetchResponse.status,
             // eslint-disable-next-line i18next/no-literal-string
@@ -305,10 +303,10 @@ export async function nativeEndpoint<
   } catch (error) {
     logger.error("Native endpoint call failed", parseError(error));
     return fail({
-          message:
+      message:
         "app.api.v1.core.system.unifiedInterface.reactNative.errors.networkError",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: {
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: {
         error: String(error),
       },
     });

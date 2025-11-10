@@ -58,7 +58,9 @@ export function MarkdownWidget({
         className={cn("text-muted-foreground italic", className)}
         style={style}
       >
-        {t("app.api.v1.core.system.unifiedInterface.react.widgets.markdown.noContent")}
+        {t(
+          "app.api.v1.core.system.unifiedInterface.react.widgets.markdown.noContent",
+        )}
       </div>
     );
   }

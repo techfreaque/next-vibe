@@ -49,7 +49,7 @@ export function CronTaskEditForm({
   const isLoading = endpoint.create?.isSubmitting ?? false;
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Task Information (Read-only) */}
       <Card>
         <CardHeader>
@@ -125,7 +125,7 @@ export function CronTaskEditForm({
           <Form
             form={endpoint.create?.form}
             onSubmit={endpoint.create?.onSubmit}
-            className="space-y-6"
+            className="flex flex-col gap-6"
           >
             <FormFieldGroup
               title={

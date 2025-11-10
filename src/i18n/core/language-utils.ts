@@ -31,9 +31,9 @@ let instance: LanguageMapper | null = null;
 class LanguageMapper {
   private _uniqueLanguages:
     | [
-      langCode: Languages,
-      langInfo: { name: string; countries: CountryInfo[] },
-    ][]
+        langCode: Languages,
+        langInfo: { name: string; countries: CountryInfo[] },
+      ][]
     | null = null;
   private _languageGroupMap: LanguageGroupMap | null = null;
 
@@ -233,4 +233,4 @@ export function getLocaleFromLanguageAndCountry(
   country: Countries,
 ): CountryLanguage {
   return `${language}-${country}` as CountryLanguage;
-};
+}

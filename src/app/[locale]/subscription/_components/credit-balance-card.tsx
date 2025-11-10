@@ -78,7 +78,7 @@ export function CreditBalanceCard({
       <Card className="relative overflow-hidden">
         <CardHeader>
           <Div className="flex items-start justify-between">
-            <Div className="space-y-1">
+            <Div className="flex flex-col gap-1">
               <CardTitle className="flex items-center gap-3">
                 <Div className="p-2 rounded-lg bg-primary/10">
                   <Coins className="h-6 w-6 text-primary" />

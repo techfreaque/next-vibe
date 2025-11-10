@@ -63,17 +63,17 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "user", "create"],
   aliases: ["create-user", "user:new", "signup"],
-  
+
   cli: {
-    firstCliArgument: "email",  // First positional arg
+    firstCliArgument: "email", // First positional arg
     examples: [
       {
         command: "create-user john@example.com --name='John Doe'",
         description: "Create a user with email and name",
-      }
+      },
     ],
   },
-  
+
   // ... rest of definition
 });
 ```
@@ -165,7 +165,7 @@ Commands respect endpoint permissions:
 
 ```typescript
 // definition.ts
-allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF]
+allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF];
 
 // CLI user must have ADMIN or CLI_OFF role
 ```
@@ -233,13 +233,13 @@ vibe typecheck
 export const CLI_CONFIG: PlatformConfig = {
   platform: Platform.CLI,
   rootDir: "src/app/api/[locale]/v1",
-  excludePaths: [],  // CLI can access everything
+  excludePaths: [], // CLI can access everything
   cache: {
     enabled: true,
     ttl: 10 * 60 * 1000, // 10 minutes
   },
   rateLimit: {
-    enabled: false,  // No rate limiting for CLI
+    enabled: false, // No rate limiting for CLI
   },
 };
 ```
@@ -250,10 +250,10 @@ export const CLI_CONFIG: PlatformConfig = {
 
 ```typescript
 aliases: [
-  "create-user",      // Imperative
-  "user:new",         // Namespaced
-  "signup",           // User-facing term
-]
+  "create-user", // Imperative
+  "user:new", // Namespaced
+  "signup", // User-facing term
+];
 ```
 
 ### 2. Define First Argument

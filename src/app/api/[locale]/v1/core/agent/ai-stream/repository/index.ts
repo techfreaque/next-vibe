@@ -27,7 +27,7 @@ import { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/sh
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
 import { setupAiStream } from "./stream-setup";
 
@@ -722,7 +722,7 @@ class AiStreamRepository implements IAiStreamRepository {
         success: false,
         message:
           "app.api.v1.core.agent.chat.aiStream.route.errors.uncensoredApiKeyMissing",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       };
     }
 
@@ -795,9 +795,12 @@ class AiStreamRepository implements IAiStreamRepository {
           });
           controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
 
-          logger.debug("[Uncensored AI] ASSISTANT message created (loading state)", {
-            messageId: aiMessageId,
-          });
+          logger.debug(
+            "[Uncensored AI] ASSISTANT message created (loading state)",
+            {
+              messageId: aiMessageId,
+            },
+          );
 
           // Save initial ASSISTANT message to database if not incognito
           // This ensures the message exists in DB while API call is in progress
@@ -1043,8 +1046,7 @@ class AiStreamRepository implements IAiStreamRepository {
       const emitInitialEvents = this.emitInitialEvents.bind(this);
       const emitContentDelta = this.emitContentDelta.bind(this);
       const createAssistantMessage = this.createAssistantMessage.bind(this);
-      const finalizeAssistantMessage =
-        this.finalizeAssistantMessage.bind(this);
+      const finalizeAssistantMessage = this.finalizeAssistantMessage.bind(this);
 
       // Track parent/depth/sequence for error handling (accessible in catch block)
       let lastParentId: string | null = null;
@@ -1434,10 +1436,14 @@ class AiStreamRepository implements IAiStreamRepository {
                       widgetMetadata = {
                         endpointId: endpoint.toolName,
                         responseFields: metadata.fields.map((field) => ({
-                          name: field.name,
+                          // By architectural contract, field names/labels/descriptions from endpoint
+                          // definitions are translation keys
+                          name: field.name as TranslationKey,
                           widgetType: field.widgetType,
-                          label: field.label,
-                          description: field.description,
+                          label: field.label as TranslationKey | undefined,
+                          description: field.description as
+                            | TranslationKey
+                            | undefined,
                           layout: field.config as Record<
                             string,
                             string | number | boolean
@@ -1481,7 +1487,7 @@ class AiStreamRepository implements IAiStreamRepository {
 
                 const toolCallData: ToolCall = {
                   toolName: part.toolName,
-                  displayName: (endpoint?.definition.title || part.toolName),
+                  displayName: endpoint?.definition.title || part.toolName,
                   icon: endpoint?.definition.aiTool?.icon,
                   args: validatedArgs,
                   creditsUsed: endpoint?.definition.credits ?? 0,
@@ -1589,7 +1595,7 @@ class AiStreamRepository implements IAiStreamRepository {
                       messageId: errorMessageId,
                       threadId: threadResultThreadId,
                       content: toolError,
-          errorType: "TOOL_ERROR",
+                      errorType: "TOOL_ERROR",
                       parentId: currentToolCallData.parentId,
                       depth: currentToolCallData.depth,
                       userId,
@@ -1725,7 +1731,7 @@ class AiStreamRepository implements IAiStreamRepository {
                 messageId: errorMessageId,
                 threadId: threadResultThreadId,
                 content: `Stream error: ${errorMessage}`,
-          errorType: "STREAM_ERROR",
+                errorType: "STREAM_ERROR",
                 parentId: lastParentId,
                 depth: lastDepth,
                 userId,
@@ -1783,7 +1789,7 @@ class AiStreamRepository implements IAiStreamRepository {
         success: false,
         message:
           "app.api.v1.core.agent.chat.aiStream.route.errors.streamCreationFailed",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: {
           error: errorMessage,
         },

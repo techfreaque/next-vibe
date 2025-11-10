@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Edit, MoreHorizontal, Trash2 } from 'next-vibe-ui/ui/icons';
+import { Edit, MoreHorizontal, Trash2 } from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
@@ -93,7 +93,7 @@ export function SmtpAccountsTable({
   }
 
   return (
-    <Div className="space-y-4">
+    <Div className="flex flex-col gap-4">
       <Table>
         <TableHeader>
           <TableRow>

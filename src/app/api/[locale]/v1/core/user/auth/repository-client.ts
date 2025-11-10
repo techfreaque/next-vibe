@@ -23,11 +23,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import {
-  getCookie,
-  deleteCookie,
-  setCookie,
-} from "next-vibe-ui/lib/cookies";
+import { getCookie, deleteCookie, setCookie } from "next-vibe-ui/lib/cookies";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import { envClient } from "@/config/env-client";
 
@@ -72,7 +68,8 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       if (envClient.platform.isServer) {
         logger.error("setAuthStatus cannot be called on the server");
         return fail({
-          message: "app.api.v1.core.user.auth.authClient.errors.status_save_failed",
+          message:
+            "app.api.v1.core.user.auth.authClient.errors.status_save_failed",
           errorType: ErrorResponseTypes.AUTH_ERROR,
         });
       }
@@ -88,9 +85,10 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
     } catch (error) {
       logger.error("Error setting auth status", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.auth.authClient.errors.status_save_failed",
-          errorType: ErrorResponseTypes.AUTH_ERROR,
-                  messageParams: { error: String(error) },
+        message:
+          "app.api.v1.core.user.auth.authClient.errors.status_save_failed",
+        errorType: ErrorResponseTypes.AUTH_ERROR,
+        messageParams: { error: String(error) },
       });
     }
   }
@@ -105,7 +103,8 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       if (envClient.platform.isServer) {
         logger.error("removeAuthStatus cannot be called on the server");
         return fail({
-          message: "app.api.v1.core.user.auth.authClient.errors.status_remove_failed",
+          message:
+            "app.api.v1.core.user.auth.authClient.errors.status_remove_failed",
           errorType: ErrorResponseTypes.AUTH_ERROR,
         });
       }
@@ -115,9 +114,10 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
     } catch (error) {
       logger.error("Error removing auth status", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.auth.authClient.errors.status_remove_failed",
-          errorType: ErrorResponseTypes.AUTH_ERROR,
-                  messageParams: { error: String(error) },
+        message:
+          "app.api.v1.core.user.auth.authClient.errors.status_remove_failed",
+        errorType: ErrorResponseTypes.AUTH_ERROR,
+        messageParams: { error: String(error) },
       });
     }
   }
@@ -133,7 +133,8 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       if (envClient.platform.isServer) {
         logger.error("hasAuthStatus cannot be called on the server");
         return fail({
-          message: "app.api.v1.core.user.auth.authClient.errors.status_check_failed",
+          message:
+            "app.api.v1.core.user.auth.authClient.errors.status_check_failed",
           errorType: ErrorResponseTypes.AUTH_ERROR,
         });
       }
@@ -151,9 +152,10 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
     } catch (error) {
       logger.error("Error in hasAuthStatus", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.auth.authClient.errors.status_check_failed",
-          errorType: ErrorResponseTypes.AUTH_ERROR,
-                  messageParams: { error: String(error) },
+        message:
+          "app.api.v1.core.user.auth.authClient.errors.status_check_failed",
+        errorType: ErrorResponseTypes.AUTH_ERROR,
+        messageParams: { error: String(error) },
       });
     }
   }

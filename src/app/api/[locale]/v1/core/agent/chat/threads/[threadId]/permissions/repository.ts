@@ -33,9 +33,9 @@ export async function getThreadPermissions(
 ): Promise<ResponseType<ThreadPermissionsGetResponseOutput>> {
   if (user.isPublic) {
     return fail({
-          message:
+      message:
         "app.api.v1.core.agent.chat.threads.threadId.permissions.get.errors.unauthorized.title",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
+      errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
 
@@ -48,9 +48,9 @@ export async function getThreadPermissions(
 
     if (!thread) {
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.threads.threadId.permissions.get.errors.notFound.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
+        errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
@@ -63,9 +63,9 @@ export async function getThreadPermissions(
     );
     if (!canManage) {
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.threads.threadId.permissions.get.errors.forbidden.title",
-          errorType: ErrorResponseTypes.FORBIDDEN,
+        errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
 
@@ -79,9 +79,9 @@ export async function getThreadPermissions(
     });
   } catch {
     return fail({
-          message:
+      message:
         "app.api.v1.core.agent.chat.threads.threadId.permissions.get.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
 }
@@ -98,9 +98,9 @@ export async function updateThreadPermissions(
 ): Promise<ResponseType<ThreadPermissionsUpdateResponseOutput>> {
   if (user.isPublic) {
     return fail({
-          message:
+      message:
         "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.errors.unauthorized.title",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
+      errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
 
@@ -123,9 +123,9 @@ export async function updateThreadPermissions(
 
     if (!existingThread) {
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.errors.notFound.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
+        errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
@@ -138,9 +138,9 @@ export async function updateThreadPermissions(
     );
     if (!canManage) {
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.errors.forbidden.title",
-          errorType: ErrorResponseTypes.FORBIDDEN,
+        errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
 
@@ -203,9 +203,9 @@ export async function updateThreadPermissions(
     });
   } catch {
     return fail({
-          message:
+      message:
         "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
 }

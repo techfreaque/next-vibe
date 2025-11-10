@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Users } from 'next-vibe-ui/ui/icons';
+import { Users } from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
@@ -155,9 +155,14 @@ export function BatchOperationsToolbar({
             <Div className="flex items-center gap-2">
               <Select
                 value={operationScope}
-                onValueChange={(value: typeof BatchOperationScopeValues) =>
-                  setOperationScope(value)
-                }
+                onValueChange={(value) => {
+                  if (
+                    value === BatchOperationScope.ALL_PAGES ||
+                    value === BatchOperationScope.CURRENT_PAGE
+                  ) {
+                    setOperationScope(value);
+                  }
+                }}
                 disabled={isLoading}
               >
                 <SelectTrigger className="w-40">

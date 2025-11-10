@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Eye, Mail, MailOpen, Paperclip, Star } from 'next-vibe-ui/ui/icons';
+import { Eye, Mail, MailOpen, Paperclip, Star } from "next-vibe-ui/ui/icons";
 import { Div } from "next-vibe-ui/ui/div";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Badge } from "next-vibe-ui/ui/badge";
@@ -48,9 +48,7 @@ const getStatusBadge = (
     );
   }
   return (
-    <Badge variant="outline">
-      {t("app.admin.emails.imap.messages.read")}
-    </Badge>
+    <Badge variant="outline">{t("app.admin.emails.imap.messages.read")}</Badge>
   );
 };
 
@@ -138,12 +136,12 @@ export function ImapMessagesTable({
             className={!message.isRead ? "bg-blue-50 dark:bg-blue-950/20" : ""}
           >
             <TableCell>
-              <Div className="flex items-center space-x-2">
+              <Div className="flex items-center flex flex-row gap-2">
                 {getStatusIcon(message)}
               </Div>
             </TableCell>
             <TableCell>
-              <Div className="space-y-1">
+              <Div className="flex flex-col gap-1">
                 <Div
                   className={`font-medium ${!message.isRead ? "font-bold" : ""}`}
                 >
@@ -156,7 +154,7 @@ export function ImapMessagesTable({
               </Div>
             </TableCell>
             <TableCell>
-              <Div className="space-y-1">
+              <Div className="flex flex-col gap-1">
                 <Div className="font-medium">
                   {message.senderName || message.senderEmail}
                 </Div>
@@ -175,7 +173,7 @@ export function ImapMessagesTable({
             </TableCell>
             <TableCell>
               {message.hasAttachments && (
-                <Div className="flex items-center space-x-1">
+                <Div className="flex items-center flex flex-row gap-1">
                   <Paperclip className="h-4 w-4 text-gray-600" />
                 </Div>
               )}
@@ -186,7 +184,7 @@ export function ImapMessagesTable({
               )}
             </TableCell>
             <TableCell>
-              <Div className="flex items-center space-x-2">
+              <Div className="flex items-center flex flex-row gap-2">
                 <Button
                   variant="outline"
                   size="sm"

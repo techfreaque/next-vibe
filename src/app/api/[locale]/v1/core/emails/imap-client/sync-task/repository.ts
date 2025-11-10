@@ -119,8 +119,8 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
       });
 
       return fail({
-          message: "app.api.v1.core.emails.error.default",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.emails.error.default",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -145,8 +145,8 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
         error instanceof Error ? error.message : String(error),
       );
       return fail({
-          message: "app.api.v1.core.emails.error.default",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.emails.error.default",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

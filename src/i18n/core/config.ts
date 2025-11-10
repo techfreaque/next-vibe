@@ -38,26 +38,26 @@ export const LanguagesArr = languageConfig.languagesArr;
  * Maps country codes to translation keys for UI display
  */
 export const CountriesOptions = [
-                    {
-                      value: Countries.GLOBAL,
-                      label: "app.common.countries.global" as const,
-                    },
-                    { value: Countries.DE, label: "app.common.countries.de" as const },
-                    { value: Countries.PL, label: "app.common.countries.pl" as const },
-                    { value: Countries.US, label: "app.common.countries.us" as const },
-                  ];
+  {
+    value: Countries.GLOBAL,
+    label: "app.common.countries.global" as const,
+  },
+  { value: Countries.DE, label: "app.common.countries.de" as const },
+  { value: Countries.PL, label: "app.common.countries.pl" as const },
+  { value: Countries.US, label: "app.common.countries.us" as const },
+];
 
 /**
  * Languages Options for select fields
  * Maps language codes to translation keys for UI display
  */
 export const LanguagesOptions = [
-                    {
-                      value: Languages.EN,
-                      label: "app.common.languages.en" as const,
-                    },
-                    { value: Languages.DE, label: "app.common.languages.de" as const },
-                    { value: Languages.PL, label: "app.common.languages.pl" as const },
+  {
+    value: Languages.EN,
+    label: "app.common.languages.en" as const,
+  },
+  { value: Languages.DE, label: "app.common.languages.de" as const },
+  { value: Languages.PL, label: "app.common.languages.pl" as const },
 ];
 
 /**

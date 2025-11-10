@@ -131,9 +131,10 @@ export class StripePriceManager {
         interval,
       });
       return fail({
-          message: "app.api.v1.core.payment.providers.stripe.errors.priceCreationFailed.title",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                  messageParams: { error: parseError(error).message, productId },
+        message:
+          "app.api.v1.core.payment.providers.stripe.errors.priceCreationFailed.title",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: parseError(error).message, productId },
       });
     }
   }

@@ -175,9 +175,9 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
     } catch (error) {
       logger.error("Vibe check failed", parseError(error));
       return fail({
-          message: "app.api.v1.core.system.check.vibeCheck.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: String(error) },
+        message: "app.api.v1.core.system.check.vibeCheck.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: String(error) },
       });
     }
   }

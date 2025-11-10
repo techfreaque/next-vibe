@@ -159,7 +159,10 @@ export const envSchema = envClientSchema.extend({
   // NOWPayments configuration
   NOWPAYMENTS_API_KEY: z.string().min(1),
   NOWPAYMENTS_IPN_SECRET: z.string().min(1),
-  NOWPAYMENTS_API_URL: z.string().url().default("https://api-sandbox.nowpayments.io/v1"),
+  NOWPAYMENTS_API_URL: z
+    .string()
+    .url()
+    .default("https://api-sandbox.nowpayments.io/v1"),
   // Lead campaigns email configuration
   LEADS_EMAIL_FROM_EMAIL: z.email(),
   LEADS_EMAIL_HOST: z.string(),

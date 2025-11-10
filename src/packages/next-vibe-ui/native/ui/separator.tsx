@@ -1,19 +1,20 @@
 import * as SeparatorPrimitive from "@rn-primitives/separator";
 import * as React from "react";
 
-import type { SeparatorProps } from "@/packages/next-vibe-ui/web/ui/separator";
+import type { SeparatorRootProps } from "@/packages/next-vibe-ui/web/ui/separator";
 import { cn } from "next-vibe/shared/utils/utils";
 import { styled } from "nativewind";
+
+export type { SeparatorRootProps };
 
 // Styled component using nativewind
 const StyledSeparatorRoot = styled(SeparatorPrimitive.Root);
 
-function Separator({
+export function Separator({
   className,
   orientation = "horizontal",
   decorative = true,
-  ...props
-}: SeparatorProps): React.JSX.Element {
+}: SeparatorRootProps): React.JSX.Element {
   return (
     <StyledSeparatorRoot
       decorative={decorative}
@@ -23,10 +24,6 @@ function Separator({
         orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
         className,
       )}
-      {...props}
     />
   );
 }
-Separator.displayName = SeparatorPrimitive.Root.displayName;
-
-export { Separator };

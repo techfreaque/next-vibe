@@ -1,6 +1,14 @@
 "use client";
 
-import { Check, Mail, Send, TrendingUp, Users, X, Zap } from 'next-vibe-ui/ui/icons';
+import {
+  Check,
+  Mail,
+  Send,
+  TrendingUp,
+  Users,
+  X,
+  Zap,
+} from "next-vibe-ui/ui/icons";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
@@ -118,9 +126,9 @@ export function NewsletterPage({
                   subscribe(email);
                 }
               }}
-              className="space-y-4"
+              className="flex flex-col gap-4"
             >
-              <Div className="flex flex-col space-y-3">
+              <Div className="flex flex-col gap-3">
                 <Input
                   type="email"
                   placeholder={t("app.story.newsletter.emailPlaceholder")}

@@ -9,7 +9,10 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
-import { Methods as MethodsEnum, EndpointErrorTypes } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import {
+  Methods as MethodsEnum,
+  EndpointErrorTypes,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { envClient } from "@/config/env-client";
@@ -39,23 +42,21 @@ export interface QueryExecutorOptions<TRequest, TResponse, TUrlVariables> {
 /**
  * Pure function to execute a query
  * Extracted from store.ts to be used by useApiQuery with React Query
- * 
+ *
  * This function:
  * - Validates request data
  * - Builds the API URL with path parameters
  * - Makes the API call
  * - Handles errors and returns proper error responses
  * - Calls onSuccess/onError callbacks with our custom shape
- * 
+ *
  * Note: This does NOT handle:
  * - Caching (handled by React Query)
  * - Deduplication (handled by React Query)
  * - Throttling (handled by React Query's staleTime)
  * - State management (handled by React Query)
  */
-export async function executeQuery<
-  TEndpoint extends CreateApiEndpointAny,
->({
+export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
   logger,
   requestData: initialRequestData,
@@ -116,13 +117,14 @@ export async function executeQuery<
       });
 
       // Use endpoint's VALIDATION_FAILED error type if available
-      const validationErrorConfig = endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
+      const validationErrorConfig =
+        endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
       const errorMessage = validationErrorConfig?.description;
 
       const errorResponse = fail({
-          message: errorMessage,
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                  messageParams: {
+        message: errorMessage,
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        messageParams: {
           endpoint: endpoint.path.join("/"),
           error: requestValidation.error.message,
         },
@@ -163,13 +165,14 @@ export async function executeQuery<
           });
 
           // Use endpoint's VALIDATION_FAILED error type if available
-          const validationErrorConfig = endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
+          const validationErrorConfig =
+            endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
           const errorMessage = validationErrorConfig?.description;
 
           const errorResponse = fail({
-          message: errorMessage,
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                      messageParams: {
+            message: errorMessage,
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            messageParams: {
               paramName,
               endpoint: endpoint.path.join("/"),
             },
@@ -223,12 +226,7 @@ export async function executeQuery<
       }
     }
 
-    const response = await callApi(
-      endpoint ,
-      endpointUrl,
-      postBody,
-      logger,
-    );
+    const response = await callApi(endpoint, endpointUrl, postBody, logger);
 
     if (!response.success) {
       // Call onError callback if provided
@@ -273,19 +271,22 @@ export async function executeQuery<
     const parsedError = parseError(err);
 
     // Use endpoint's SERVER_ERROR or NETWORK_ERROR error type if available
-    const serverErrorConfig = endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
-    const networkErrorConfig = endpoint.errorTypes?.[EndpointErrorTypes.NETWORK_ERROR];
+    const serverErrorConfig =
+      endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
+    const networkErrorConfig =
+      endpoint.errorTypes?.[EndpointErrorTypes.NETWORK_ERROR];
 
     // Prefer NETWORK_ERROR for network-related issues, otherwise SERVER_ERROR
-    const isNetworkError = parsedError.message.toLowerCase().includes('network') ||
-                          parsedError.message.toLowerCase().includes('fetch');
+    const isNetworkError =
+      parsedError.message.toLowerCase().includes("network") ||
+      parsedError.message.toLowerCase().includes("fetch");
     const errorConfig = isNetworkError ? networkErrorConfig : serverErrorConfig;
     const errorMessage = errorConfig?.description;
 
     const errorResponse = fail({
-          message: errorMessage,
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: {
+      message: errorMessage,
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: {
         error: parsedError.message,
         endpoint: endpoint.path.join("/"),
       },
@@ -303,4 +304,3 @@ export async function executeQuery<
     return errorResponse;
   }
 }
-

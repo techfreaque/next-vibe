@@ -6,28 +6,62 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { cn } from "../lib/utils";
 import { buttonTextVariants, buttonVariants } from "./button";
 import { TextClassContext } from "./text";
+
+// Import ALL types from web - ZERO definitions here
 import type {
-  AlertDialogDescriptionProps,
-  AlertDialogFooterProps,
+  AlertDialogRootProps,
+  AlertDialogTriggerProps,
+  AlertDialogPortalProps,
+  AlertDialogOverlayProps,
+  AlertDialogContentProps,
   AlertDialogHeaderProps,
+  AlertDialogFooterProps,
   AlertDialogTitleProps,
+  AlertDialogDescriptionProps,
+  AlertDialogActionProps,
+  AlertDialogCancelProps,
 } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
 
-const AlertDialog = AlertDialogPrimitive.Root;
 
-const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
-
-const AlertDialogPortal = AlertDialogPrimitive.Portal;
-
-interface AlertDialogOverlayNativeProps {
-  className?: string;
-  children?: React.ReactNode;
+function AlertDialog({
+  children,
+  ...props
+}: AlertDialogRootProps): React.JSX.Element {
+  return (
+    <AlertDialogPrimitive.Root {...props}>{children}</AlertDialogPrimitive.Root>
+  );
 }
+AlertDialog.displayName = AlertDialogPrimitive.Root.displayName;
 
-const AlertDialogOverlayNative = ({
+function AlertDialogTrigger({
+  children,
+  asChild,
+  ...props
+}: AlertDialogTriggerProps): React.JSX.Element {
+  return (
+    <AlertDialogPrimitive.Trigger asChild={asChild} {...props}>
+      {children}
+    </AlertDialogPrimitive.Trigger>
+  );
+}
+AlertDialogTrigger.displayName = AlertDialogPrimitive.Trigger.displayName;
+
+function AlertDialogPortal({
+  children,
+  ...props
+}: AlertDialogPortalProps): React.JSX.Element {
+  return (
+    <AlertDialogPrimitive.Portal {...props}>
+      {children}
+    </AlertDialogPrimitive.Portal>
+  );
+}
+AlertDialogPortal.displayName = "AlertDialogPortal";
+
+function AlertDialogOverlay({
   className,
   children,
-}: AlertDialogOverlayNativeProps): React.ReactNode => {
+}: AlertDialogOverlayProps): React.JSX.Element {
   return (
     <AlertDialogPrimitive.Overlay
       style={StyleSheet.absoluteFill}
@@ -45,27 +79,18 @@ const AlertDialogOverlayNative = ({
       </Animated.View>
     </AlertDialogPrimitive.Overlay>
   );
-};
-
-const AlertDialogOverlay = AlertDialogOverlayNative;
-
-interface AlertDialogContentProps {
-  className?: string;
-  children?: React.ReactNode;
-  portalHost?: string;
 }
 
-const AlertDialogContent = React.forwardRef<
-  AlertDialogPrimitive.ContentRef,
-  AlertDialogContentProps
->(({ className, portalHost, children }, ref) => {
+function AlertDialogContent({
+  className,
+  children,
+}: AlertDialogContentProps): React.JSX.Element {
   const { open } = AlertDialogPrimitive.useRootContext();
 
   return (
-    <AlertDialogPortal hostName={portalHost}>
+    <AlertDialogPortal>
       <AlertDialogOverlay>
         <AlertDialogPrimitive.Content
-          ref={ref}
           className={cn(
             "z-50 max-w-lg gap-4 border border-border bg-background p-6 shadow-lg shadow-foreground/10 duration-200 rounded-lg",
             open
@@ -79,106 +104,101 @@ const AlertDialogContent = React.forwardRef<
       </AlertDialogOverlay>
     </AlertDialogPortal>
   );
-});
+}
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
 
-const AlertDialogHeader = ({
+function AlertDialogHeader({
   className,
   children,
-}: AlertDialogHeaderProps): React.JSX.Element => (
-  <View className={cn("flex flex-col gap-2", className)}>{children}</View>
-);
+}: AlertDialogHeaderProps): React.JSX.Element {
+  return (
+    <View className={cn("flex flex-col gap-2", className)}>{children}</View>
+  );
+}
 AlertDialogHeader.displayName = "AlertDialogHeader";
 
-const AlertDialogFooter = ({
+function AlertDialogFooter({
   className,
   children,
-}: AlertDialogFooterProps): React.JSX.Element => (
-  <View
-    className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end gap-2",
-      className,
-    )}
-  >
-    {children}
-  </View>
-);
+}: AlertDialogFooterProps): React.JSX.Element {
+  return (
+    <View
+      className={cn(
+        "flex flex-col-reverse sm:flex-row sm:justify-end gap-2",
+        className,
+      )}
+    >
+      {children}
+    </View>
+  );
+}
 AlertDialogFooter.displayName = "AlertDialogFooter";
 
-const AlertDialogTitle = React.forwardRef<
-  AlertDialogPrimitive.TitleRef,
-  AlertDialogTitleProps
->(({ className, children }, ref) => (
-  <AlertDialogPrimitive.Title
-    ref={ref}
-    className={cn(
-      "text-lg text-xl text-foreground font-semibold",
-      className,
-    )}
-  >
-    {children}
-  </AlertDialogPrimitive.Title>
-));
+function AlertDialogTitle({
+  className,
+  children,
+}: AlertDialogTitleProps): React.JSX.Element {
+  return (
+    <AlertDialogPrimitive.Title
+      className={cn("text-lg text-xl text-foreground font-semibold", className)}
+    >
+      {children}
+    </AlertDialogPrimitive.Title>
+  );
+}
 AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName;
 
-const AlertDialogDescription = React.forwardRef<
-  AlertDialogPrimitive.DescriptionRef,
-  AlertDialogDescriptionProps
->(({ className, children }, ref) => (
-  <AlertDialogPrimitive.Description
-    ref={ref}
-    className={cn("text-sm text-base text-muted-foreground", className)}
-  >
-    {children}
-  </AlertDialogPrimitive.Description>
-));
+function AlertDialogDescription({
+  className,
+  children,
+}: AlertDialogDescriptionProps): React.JSX.Element {
+  return (
+    <AlertDialogPrimitive.Description
+      className={cn("text-sm text-base text-muted-foreground", className)}
+    >
+      {children}
+    </AlertDialogPrimitive.Description>
+  );
+}
 AlertDialogDescription.displayName =
   AlertDialogPrimitive.Description.displayName;
 
-interface AlertDialogActionProps {
-  className?: string;
-  children?: React.ReactNode;
-  asChild?: boolean;
+function AlertDialogAction({
+  className,
+  children,
+  asChild,
+}: AlertDialogActionProps): React.JSX.Element {
+  return (
+    <TextClassContext.Provider value={buttonTextVariants({ className })}>
+      <AlertDialogPrimitive.Action
+        className={cn(buttonVariants(), className)}
+        asChild={asChild}
+      >
+        {children}
+      </AlertDialogPrimitive.Action>
+    </TextClassContext.Provider>
+  );
 }
-
-const AlertDialogAction = React.forwardRef<
-  AlertDialogPrimitive.ActionRef,
-  AlertDialogActionProps
->(({ className, children, asChild }, ref) => (
-  <TextClassContext.Provider value={buttonTextVariants({ className })}>
-    <AlertDialogPrimitive.Action
-      ref={ref}
-      className={cn(buttonVariants(), className)}
-      asChild={asChild}
-    >
-      {children}
-    </AlertDialogPrimitive.Action>
-  </TextClassContext.Provider>
-));
 AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
 
-interface AlertDialogCancelProps {
-  className?: string;
-  children?: React.ReactNode;
-  asChild?: boolean;
-}
-
-const AlertDialogCancel = React.forwardRef<
-  AlertDialogPrimitive.CancelRef,
-  AlertDialogCancelProps
->(({ className, children, asChild }, ref) => (
-  <TextClassContext.Provider
-    value={buttonTextVariants({ className, variant: "outline" })}
-  >
-    <AlertDialogPrimitive.Cancel
-      ref={ref}
-      className={cn(buttonVariants({ variant: "outline", className }))}
-      asChild={asChild}
+function AlertDialogCancel({
+  className,
+  children,
+  asChild,
+}: AlertDialogCancelProps): React.JSX.Element {
+  return (
+    <TextClassContext.Provider
+      value={buttonTextVariants({ className, variant: "outline" })}
     >
-      {children}
-    </AlertDialogPrimitive.Cancel>
-  </TextClassContext.Provider>
-));
+      <AlertDialogPrimitive.Cancel
+        className={cn(buttonVariants({ variant: "outline", className }))}
+        asChild={asChild}
+      >
+        {children}
+      </AlertDialogPrimitive.Cancel>
+    </TextClassContext.Provider>
+  );
+}
 AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName;
 
 export {

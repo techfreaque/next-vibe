@@ -21,7 +21,6 @@ import type {
   FormProps,
   FormFieldProps,
   FormItemProps,
-  FormLabelProps,
   FormControlProps,
   FormDescriptionProps,
   FormMessageProps,
@@ -57,13 +56,13 @@ function Form<TRequest extends FieldValues>(
   return <View className={cn(props.className)}>{props.children}</View>;
 }
 
-const FormFieldContext = React.createContext<FormFieldContextValue | undefined>(
-  undefined,
-);
+const FormFieldContext = React.createContext<
+  FormFieldContextValue<FieldValues, FieldPath<FieldValues>> | undefined
+>(undefined);
 
 const FormField = <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
 >({
   ...props
 }: FormFieldProps<TFieldValues, TName>): React.JSX.Element => {
@@ -132,23 +131,27 @@ FormItem.displayName = "FormItem";
 
 /**
  * FormLabel - Native implementation using Label component
- * Uses FormLabelProps type from web
+ * Uses native-compatible props (only className and children)
+ * Note: ref and htmlFor are web-specific and not used in native
  */
-const FormLabel = React.forwardRef<
-  React.ElementRef<typeof Label>,
-  FormLabelProps
->(({ className, ...props }, ref) => {
+const FormLabel = ({
+  className,
+  children,
+}: {
+  className?: string;
+  children?: React.ReactNode;
+}): React.JSX.Element => {
   const { error, formItemId } = useFormField();
 
   return (
     <Label
-      ref={ref}
       className={cn(error && "text-red-600 dark:text-red-400", className)}
-      htmlFor={formItemId}
-      {...props}
-    />
+      nativeID={formItemId}
+    >
+      {children}
+    </Label>
   );
-});
+};
 FormLabel.displayName = "FormLabel";
 
 /**
@@ -183,21 +186,17 @@ FormControl.displayName = "FormControl";
  * Type compatibility: FormDescriptionProps is HTMLAttributes on web, but we need
  * TextProps on native. We pick only the compatible props (className, children, etc.)
  */
-const FormDescription = React.forwardRef<
-  React.ElementRef<typeof P>,
-  Pick<FormDescriptionProps, "className" | "children">
->(({ className, ...props }, ref) => {
+function FormDescription({ className, ...props }: Pick<FormDescriptionProps, "className" | "children">): React.JSX.Element {
   const { formDescriptionId } = useFormField();
 
   return (
     <P
-      ref={ref}
       nativeID={formDescriptionId}
       className={cn("text-[0.8rem] text-muted-foreground", className)}
       {...props}
     />
   );
-});
+}
 FormDescription.displayName = "FormDescription";
 
 /**
@@ -207,10 +206,7 @@ FormDescription.displayName = "FormDescription";
  * Type compatibility: FormMessageProps is HTMLAttributes on web, but we need
  * TextProps on native. We pick only the compatible props (className, children, etc.)
  */
-const FormMessage = React.forwardRef<
-  React.ElementRef<typeof P>,
-  Pick<FormMessageProps, "className" | "children">
->(({ className, children, ...props }, ref) => {
+function FormMessage({ className, children, ...props }: Pick<FormMessageProps, "className" | "children">): React.JSX.Element | null {
   const { error, formMessageId } = useFormField();
   const { t } = useTranslation();
   const body = error ? String(error.message) : children;
@@ -220,7 +216,6 @@ const FormMessage = React.forwardRef<
   }
   return (
     <P
-      ref={ref}
       nativeID={formMessageId}
       className={cn(
         "text-[0.8rem] font-medium text-red-600 dark:text-red-400",
@@ -231,7 +226,7 @@ const FormMessage = React.forwardRef<
       {t(body as TranslationKey)}
     </P>
   );
-});
+}
 FormMessage.displayName = "FormMessage";
 
 export {

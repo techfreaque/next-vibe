@@ -16,7 +16,7 @@ import { toolExecutor } from "./executor";
 // Get endpoints for user
 const endpoints = aiToolRegistry.getEndpoints(
   { id: userId, roles: ["CUSTOMER"], isPublic: false },
-  Platform.AI
+  Platform.AI,
 );
 
 // Convert to AI SDK tools
@@ -65,18 +65,18 @@ const result = streamText({
 
 ```typescript
 interface DiscoveredEndpoint {
-  id: string;               // Unique endpoint ID
-  toolName: string;         // Tool name (e.g., "core_user_create")
-  path: string;            // Full endpoint path
+  id: string; // Unique endpoint ID
+  toolName: string; // Tool name (e.g., "core_user_create")
+  path: string; // Full endpoint path
   definition: {
-    method: Methods;        // HTTP method
-    title: string;         // Human-readable title
-    description: string;   // For AI understanding
-    category?: string;     // For grouping
-    tags: string[];       // For filtering
-    icon?: string;        // For UI display
+    method: Methods; // HTTP method
+    title: string; // Human-readable title
+    description: string; // For AI understanding
+    category?: string; // For grouping
+    tags: string[]; // For filtering
+    icon?: string; // For UI display
     allowedRoles: UserRoleValue[];
-    fields?: FieldNode;   // Field definitions for schema generation
+    fields?: FieldNode; // Field definitions for schema generation
   };
 }
 ```
@@ -100,7 +100,7 @@ const endpoints = aiToolRegistry.getEndpoints();
 ```typescript
 const endpoints = aiToolRegistry.getEndpoints(
   { id: userId, roles: ["ADMIN"], isPublic: false },
-  Platform.AI
+  Platform.AI,
 );
 ```
 
@@ -135,12 +135,12 @@ Endpoints are filtered by user roles:
 
 ```typescript
 // definition.ts
-allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER]
+allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER];
 
 // Only users with ADMIN or CUSTOMER role can access
 const endpoints = aiToolRegistry.getEndpoints(
   { id: userId, roles: ["CUSTOMER"], isPublic: false },
-  Platform.AI
+  Platform.AI,
 );
 ```
 
@@ -194,11 +194,16 @@ const allTools = factory.createToolsFromEndpoints(endpoints, toolExecutor, {
 });
 
 // Filter by requested tools
-const requestedTools = data.tools === null
-  ? new Map()
-  : data.tools?.length
-    ? new Map(Array.from(allTools.entries()).filter(([name]) => data.tools.includes(name)))
-    : allTools;
+const requestedTools =
+  data.tools === null
+    ? new Map()
+    : data.tools?.length
+      ? new Map(
+          Array.from(allTools.entries()).filter(([name]) =>
+            data.tools.includes(name),
+          ),
+        )
+      : allTools;
 
 // Use in AI SDK
 const result = streamText({
@@ -233,7 +238,7 @@ await db.insert(chatMessages).values({
 
 ```typescript
 // tool-call-display.tsx
-<ToolCallDisplay 
+<ToolCallDisplay
   toolCalls={message.toolCalls}
   locale={locale}
 />
@@ -275,7 +280,7 @@ The AI system uses the shared platform configuration system. Configuration is ha
 
 ```typescript
 // ✅ Good
-description: "Create a new user account with email and optional profile information"
+description: "Create a new user account with email and optional profile information";
 ```
 
 ### 2. Provide Examples

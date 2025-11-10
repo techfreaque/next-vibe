@@ -112,7 +112,8 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
       onSuccess: () => {
         // Set auth status when user data is successfully fetched
         void (async (): Promise<void> => {
-          const authStatusResult = await authClientRepository.setAuthStatus(logger);
+          const authStatusResult =
+            await authClientRepository.setAuthStatus(logger);
           if (!authStatusResult.success) {
             logger.error("user.auth.status.set.failed", {
               message: authStatusResult.message,

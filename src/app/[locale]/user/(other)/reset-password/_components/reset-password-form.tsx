@@ -1,7 +1,7 @@
 "use client";
 
 import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { ArrowLeft, CheckCircle, Loader2, Mail } from 'next-vibe-ui/ui/icons';
+import { ArrowLeft, CheckCircle, Loader2, Mail } from "next-vibe-ui/ui/icons";
 import { Environment } from "next-vibe/shared/utils/env-util";
 import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
@@ -69,7 +69,7 @@ export default function ResetPasswordForm({
               )}
             </CardDescription>
           </CardHeader>
-          <CardContent className="text-center space-y-4">
+          <CardContent className="text-center flex flex-col gap-4">
             <Div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <Mail className="w-6 h-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
               <P className="text-sm text-blue-700 dark:text-blue-300">
@@ -114,7 +114,11 @@ export default function ResetPasswordForm({
           {/* Show form alert if any */}
           {alert && <FormAlert alert={alert} className="mb-6" />}
 
-          <Form form={form} onSubmit={submitForm} className="space-y-6">
+          <Form
+            form={form}
+            onSubmit={submitForm}
+            className="flex flex-col gap-6"
+          >
             <EndpointFormField
               name="emailInput.email"
               config={{

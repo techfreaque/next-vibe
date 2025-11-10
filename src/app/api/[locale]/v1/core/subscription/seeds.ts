@@ -55,8 +55,7 @@ function createLocalSubscriptionSeed(
   };
 }
 
-
-const ENABLED = false
+const ENABLED = false;
 
 /**
  * Development seed function for subscription module
@@ -233,7 +232,8 @@ export async function dev(
             status: adminCreatedSubscription.status,
             cancelAtPeriodEnd: adminCreatedSubscription.cancelAtPeriodEnd,
             provider: adminCreatedSubscription.provider,
-            providerSubscriptionId: adminCreatedSubscription.providerSubscriptionId || undefined,
+            providerSubscriptionId:
+              adminCreatedSubscription.providerSubscriptionId || undefined,
             currentPeriodStart:
               adminCreatedSubscription.currentPeriodStart?.toISOString() ?? "",
             currentPeriodEnd:
@@ -373,7 +373,8 @@ export async function dev(
             status: createdSubscription.status,
             cancelAtPeriodEnd: createdSubscription.cancelAtPeriodEnd,
             provider: createdSubscription.provider,
-            providerSubscriptionId: createdSubscription.providerSubscriptionId || undefined,
+            providerSubscriptionId:
+              createdSubscription.providerSubscriptionId || undefined,
             currentPeriodStart:
               createdSubscription.currentPeriodStart?.toISOString() ?? "",
             currentPeriodEnd:

@@ -111,8 +111,7 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Zabroniony",
-        description:
-          "Nie masz uprawnień do aktualizacji uprawnień tego wątku",
+        description: "Nie masz uprawnień do aktualizacji uprawnień tego wątku",
       },
       notFound: {
         title: "Nie znaleziono",

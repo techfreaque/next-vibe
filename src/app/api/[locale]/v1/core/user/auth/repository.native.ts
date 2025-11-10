@@ -48,8 +48,8 @@ function createUnsupportedError<T>(
 ): ResponseType<T> {
   logger.error(`${operation} not available on native - use HTTP endpoints`);
   return fail({
-          message: "app.api.v1.core.user.auth.errors.native.unsupported",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    message: "app.api.v1.core.user.auth.errors.native.unsupported",
+    errorType: ErrorResponseTypes.INTERNAL_ERROR,
   });
 }
 
@@ -181,9 +181,9 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     } catch (error) {
       logger.error("Error storing auth token", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.auth.errors.native.storage_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: String(error) },
+        message: "app.api.v1.core.user.auth.errors.native.storage_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: String(error) },
       });
     }
   }
@@ -200,9 +200,9 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     } catch (error) {
       logger.error("Error clearing auth token", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.auth.errors.native.clear_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: String(error) },
+        message: "app.api.v1.core.user.auth.errors.native.clear_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: String(error) },
       });
     }
   }

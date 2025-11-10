@@ -171,10 +171,10 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
           if (!data.force) {
             return fail({
-          message:
+              message:
                 "app.api.v1.core.system.server.build.post.errors.nextjs_build_failed.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                        messageParams: {
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              messageParams: {
                 error: parsedError.message,
               },
             });
@@ -204,9 +204,9 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               errors.push(MESSAGES.FAILED_PROD_MIGRATIONS);
               if (!data.force) {
                 return fail({
-          message: "app.api.v1.core.shared.errorTypes.database_error",
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-                            messageParams: { error: MESSAGES.FAILED_PROD_MIGRATIONS },
+                  message: "app.api.v1.core.shared.errorTypes.database_error",
+                  errorType: ErrorResponseTypes.DATABASE_ERROR,
+                  messageParams: { error: MESSAGES.FAILED_PROD_MIGRATIONS },
                   cause: migrateResult,
                 });
               }
@@ -233,15 +233,14 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
           errors.push(errorMsg);
           if (!data.force) {
             return fail({
-          message: "app.api.v1.core.shared.errorTypes.database_error",
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-                        messageParams: {
+              message: "app.api.v1.core.shared.errorTypes.database_error",
+              errorType: ErrorResponseTypes.DATABASE_ERROR,
+              messageParams: {
                 error: errorMsg,
                 details: parsedError.message,
                 suggestion: MESSAGES.DB_START_SUGGESTION,
               },
-              }
-            );
+            });
           }
         }
       } else {
@@ -265,13 +264,12 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
       // Return error response with proper structure
       return fail({
-          message: "app.api.v1.core.shared.errorTypes.internal_error",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message: "app.api.v1.core.shared.errorTypes.internal_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           error: parsedError.message,
         },
-        }
-      );
+      });
     }
   }
 }

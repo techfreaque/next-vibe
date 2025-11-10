@@ -190,7 +190,7 @@ export function UsersTable({
                   </Div>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Div className="flex items-center justify-end space-x-2">
+                  <Div className="flex items-center justify-end flex flex-row gap-2">
                     <Button asChild variant="outline" size="sm">
                       <NextLink href={`/${locale}/admin/users/${user.id}/edit`}>
                         {t("app.admin.users.actions.edit")}

@@ -512,7 +512,7 @@ export function LeadsStatsChart({
   };
 
   return (
-    <Div className={`space-y-4 ${className}`}>
+    <Div className={`flex flex-col gap-4 ${className}`}>
       {/* Main Chart */}
       <Card>
         <CardHeader>

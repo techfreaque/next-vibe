@@ -15,7 +15,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { EndpointLogger } from "../shared/logger/endpoint";
-import type { EndpointDefinition } from "../shared/types/endpoint";
+import type { CreateApiEndpointAny } from "../shared/types/endpoint";
 import { getCliUserForCommand } from "../shared/server-only/auth/cli-user";
 import type { ParameterValue } from "../shared/server-only/execution/executor";
 import { findRouteFiles } from "../shared/server-only/filesystem/scanner";
@@ -76,7 +76,7 @@ export class CliEntryPoint {
     private logger: EndpointLogger,
     private t: TFunction,
     private locale: CountryLanguage,
-  ) { }
+  ) {}
 
   /**
    * Initialize the CLI system by discovering routes
@@ -169,10 +169,10 @@ export class CliEntryPoint {
     const cliUser = options.user
       ? options.user
       : await getCliUserForCommand(
-        command,
-        this.logger,
-        options.locale || "en-GLOBAL",
-      );
+          command,
+          this.logger,
+          options.locale || "en-GLOBAL",
+        );
 
     // Create execution context
     const context: RouteExecutionContext = {
@@ -278,16 +278,16 @@ export class CliEntryPoint {
 
     try {
       const definitionImport = (await import(definitionPath)) as
-        | Record<string, EndpointDefinition>
-        | { default: Record<string, EndpointDefinition> };
+        | Record<string, CreateApiEndpointAny>
+        | { default: Record<string, CreateApiEndpointAny> };
       const definition =
         "default" in definitionImport
           ? definitionImport.default
           : definitionImport;
 
-      let defaultExport: Record<string, EndpointDefinition>;
+      let defaultExport: Record<string, CreateApiEndpointAny>;
       if (typeof definition === "object" && definition !== null) {
-        defaultExport = definition as Record<string, EndpointDefinition>;
+        defaultExport = definition as Record<string, CreateApiEndpointAny>;
       } else {
         defaultExport = {};
       }
@@ -447,9 +447,10 @@ export class CliEntryPoint {
       }
 
       try {
-        const definitionImport = (await import(definitionPath)) as
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: CLI argument parsing requires 'unknown' for flexible input handling
-          | Record<string, unknown>
+        const definitionImport = (await import(
+          definitionPath
+        )) as // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: CLI argument parsing requires 'unknown' for flexible input handling
+        | Record<string, unknown>
           // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Option extraction requires 'unknown' for dynamic CLI options
           | { default: Record<string, unknown> };
         const definitionModule =
@@ -611,7 +612,7 @@ export class CliEntryPoint {
    */
   private async getCreateApiEndpoint(
     route: CliRouteMetadata,
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Result formatting requires 'unknown' for flexible output types
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Result formatting requires 'unknown' for flexible output types
   ): Promise<unknown | null> {
     try {
       // Import the route module dynamically

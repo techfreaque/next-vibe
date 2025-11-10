@@ -7,7 +7,7 @@ import {
   Lightbulb,
   MessageSquare,
   PenTool,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
@@ -124,7 +124,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
           </MotionDiv>
         </Div>
 
-        <Div className="space-y-24 relative">
+        <Div className="flex flex-col gap-24 relative">
           {steps.map((step, index) => (
             <MotionDiv
               // eslint-disable-next-line i18next/no-literal-string

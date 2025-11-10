@@ -45,6 +45,7 @@ import type { z } from "zod";
 import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { DEFAULT_FOLDER_IDS, type DefaultFolderId } from "./config";
 import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
@@ -99,18 +100,21 @@ export type ToolCallResult =
 
 /**
  * Widget metadata for tool result rendering
+ * Compatible with unified-interface/ai/types version
  */
 export interface ToolCallWidgetMetadata {
   endpointId: string;
   responseFields: Array<{
-    name: string;
+    name: TranslationKey;
     widgetType: WidgetType;
-    label?: string;
-    description?: string;
+    label?: TranslationKey;
+    description?: TranslationKey;
     layout?: Record<string, string | number | boolean>;
     validation?: Record<string, string | number | boolean>;
-    options?: Array<{ value: string; label: string }>;
+    options?: Array<{ value: string; label: TranslationKey }>;
   }>;
+  creditsUsed?: number;
+  executionTime?: number;
 }
 
 /**
@@ -467,7 +471,7 @@ export const chatMessages = pgTable(
     persona: text("tone"), // Persona used (DB column is "tone" for backwards compatibility)
 
     // Error information (for error messages)
-          errorType: text("error_type"),
+    errorType: text("error_type"),
     errorMessage: text("error_message"),
     errorCode: text("error_code"),
 

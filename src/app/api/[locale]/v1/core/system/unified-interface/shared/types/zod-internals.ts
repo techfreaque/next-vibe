@@ -9,12 +9,12 @@ import { z } from "zod";
 /**
  * Type guard for ZodObject
  */
-export function isZodObject(schema: z.ZodTypeAny): schema is z.ZodObject<
-  // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Generic object shape requires any
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Generic object shape requires any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  any
-> {
+export function isZodObject(
+  schema: z.ZodTypeAny,
+): schema is z.ZodObject<// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Generic object shape requires any
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Generic object shape requires any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+any> {
   return schema instanceof z.ZodObject;
 }
 
@@ -248,7 +248,10 @@ export function isZodBranded(
   // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Brand checking requires string type
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Brand checking requires string type
 ): schema is z.ZodTypeAny & { unwrap: () => z.ZodTypeAny } {
-  return "unwrap" in schema && typeof (schema as { unwrap?: unknown }).unwrap === "function";
+  return (
+    "unwrap" in schema &&
+    typeof (schema as { unwrap?: unknown }).unwrap === "function"
+  );
 }
 
 /**

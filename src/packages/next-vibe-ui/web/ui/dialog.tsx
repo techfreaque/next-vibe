@@ -1,7 +1,7 @@
 "use client";
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Cross2Icon } from 'next-vibe-ui/ui/icons';
+import { Cross2Icon } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
@@ -23,7 +23,7 @@ export interface DialogTriggerProps {
 
 export interface DialogPortalProps {
   children?: React.ReactNode;
-  forceMount?: boolean;
+  forceMount?: true;
   container?: HTMLElement | null;
 }
 
@@ -42,7 +42,7 @@ export interface DialogContentProps {
   children?: React.ReactNode;
   onOpenAutoFocus?: (event: Event) => void;
   onCloseAutoFocus?: (event: Event) => void;
-  onEscapeKeyDown?: (event: KeyboardEvent) => void;
+  onEscapeKeyDown?: (event: Event) => void;
   onPointerDownOutside?: (event: Event) => void;
   onInteractOutside?: (event: Event) => void;
 }
@@ -67,40 +67,80 @@ export interface DialogDescriptionProps {
   children?: React.ReactNode;
 }
 
-const Dialog = DialogPrimitive.Root;
+export function Dialog({
+  children,
+  ...props
+}: DialogRootProps): React.JSX.Element {
+  return <DialogPrimitive.Root {...props}>{children}</DialogPrimitive.Root>;
+}
+Dialog.displayName = DialogPrimitive.Root.displayName;
 
-const DialogTrigger = DialogPrimitive.Trigger;
+export function DialogTrigger({
+  children,
+  asChild,
+  ...props
+}: DialogTriggerProps): React.JSX.Element {
+  return (
+    <DialogPrimitive.Trigger asChild={asChild} {...props}>
+      {children}
+    </DialogPrimitive.Trigger>
+  );
+}
+DialogTrigger.displayName = DialogPrimitive.Trigger.displayName;
 
-const DialogPortal = DialogPrimitive.Portal;
+export function DialogPortal({
+  children,
+  forceMount,
+  container,
+}: DialogPortalProps): React.JSX.Element {
+  return (
+    <DialogPrimitive.Portal forceMount={forceMount} container={container}>
+      {children}
+    </DialogPrimitive.Portal>
+  );
+}
+DialogPortal.displayName = DialogPrimitive.Portal.displayName;
 
-const DialogClose = DialogPrimitive.Close;
+export function DialogClose({
+  children,
+  asChild,
+  ...props
+}: DialogCloseProps): React.JSX.Element {
+  return (
+    <DialogPrimitive.Close asChild={asChild} {...props}>
+      {children}
+    </DialogPrimitive.Close>
+  );
+}
+DialogClose.displayName = DialogPrimitive.Close.displayName;
 
-const DialogOverlay = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Overlay
-    ref={ref}
-    className={cn(
-      "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className,
-    )}
-    {...props}
-  />
-));
+export function DialogOverlay({
+  className,
+  ...props
+}: DialogOverlayProps): React.JSX.Element {
+  return (
+    <DialogPrimitive.Overlay
+      className={cn(
+        "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
-const DialogContent = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => {
+export function DialogContent({
+  className,
+  children,
+  ...props
+}: DialogContentProps): React.JSX.Element {
   const { t } = useTranslation();
 
   return (
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Content
-        ref={ref}
         className={cn(
           "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
           className,
@@ -117,75 +157,68 @@ const DialogContent = React.forwardRef<
       </DialogPrimitive.Content>
     </DialogPortal>
   );
-});
+}
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
-const DialogHeader = ({
+export function DialogHeader({
   className,
   children,
-}: DialogHeaderProps): React.JSX.Element => (
-  <div
-    className={cn(
-      "flex flex-col space-y-1.5 text-center sm:text-left",
-      className,
-    )}
-  >
-    {children}
-  </div>
-);
+}: DialogHeaderProps): React.JSX.Element {
+  return (
+    <div
+      className={cn(
+        "flex flex-col space-y-1.5 text-center sm:text-left",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
 DialogHeader.displayName = "DialogHeader";
 
-const DialogFooter = ({
+export function DialogFooter({
   className,
   children,
-}: DialogFooterProps): React.JSX.Element => (
-  <div
-    className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className,
-    )}
-  >
-    {children}
-  </div>
-);
+}: DialogFooterProps): React.JSX.Element {
+  return (
+    <div
+      className={cn(
+        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
 DialogFooter.displayName = "DialogFooter";
 
-const DialogTitle = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Title>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Title
-    ref={ref}
-    className={cn(
-      "text-lg font-semibold leading-none tracking-tight",
-      className,
-    )}
-    {...props}
-  />
-));
+export function DialogTitle({
+  className,
+  ...props
+}: DialogTitleProps): React.JSX.Element {
+  return (
+    <DialogPrimitive.Title
+      className={cn(
+        "text-lg font-semibold leading-none tracking-tight",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
 DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
-const DialogDescription = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Description>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Description
-    ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
-    {...props}
-  />
-));
+export function DialogDescription({
+  className,
+  ...props
+}: DialogDescriptionProps): React.JSX.Element {
+  return (
+    <DialogPrimitive.Description
+      className={cn("text-sm text-muted-foreground", className)}
+      {...props}
+    />
+  );
+}
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
-
-export {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-  DialogTrigger,
-};

@@ -58,17 +58,17 @@ export interface FormExamples<
         FieldUsage.RequestData
       >
     > extends never
-    ? undefined
-    : ExamplesList<
-      ExtractInput<
-        InferSchemaFromFieldForMethod<
-          TFields,
-          Methods.GET,
-          FieldUsage.RequestData
-        >
-      >,
-      TExampleKey
-    >;
+      ? undefined
+      : ExamplesList<
+          ExtractInput<
+            InferSchemaFromFieldForMethod<
+              TFields,
+              Methods.GET,
+              FieldUsage.RequestData
+            >
+          >,
+          TExampleKey
+        >;
     responses: ExamplesList<
       ExtractOutput<
         InferSchemaFromFieldForMethod<TFields, Methods.GET, FieldUsage.Response>
@@ -82,17 +82,17 @@ export interface FormExamples<
         FieldUsage.RequestUrlParams
       >
     > extends never
-    ? undefined
-    : ExamplesList<
-      ExtractInput<
-        InferSchemaFromFieldForMethod<
-          TFields,
-          Methods.GET,
-          FieldUsage.RequestUrlParams
-        >
-      >,
-      TExampleKey
-    >;
+      ? undefined
+      : ExamplesList<
+          ExtractInput<
+            InferSchemaFromFieldForMethod<
+              TFields,
+              Methods.GET,
+              FieldUsage.RequestUrlParams
+            >
+          >,
+          TExampleKey
+        >;
   };
   readonly POST?: {
     requests?: ExtractInput<
@@ -102,17 +102,17 @@ export interface FormExamples<
         FieldUsage.RequestData
       >
     > extends never
-    ? undefined
-    : ExamplesList<
-      ExtractInput<
-        InferSchemaFromFieldForMethod<
-          TFields,
-          Methods.POST,
-          FieldUsage.RequestData
-        >
-      >,
-      TExampleKey
-    >;
+      ? undefined
+      : ExamplesList<
+          ExtractInput<
+            InferSchemaFromFieldForMethod<
+              TFields,
+              Methods.POST,
+              FieldUsage.RequestData
+            >
+          >,
+          TExampleKey
+        >;
     responses: ExamplesList<
       ExtractOutput<
         InferSchemaFromFieldForMethod<
@@ -130,17 +130,17 @@ export interface FormExamples<
         FieldUsage.RequestUrlParams
       >
     > extends never
-    ? undefined
-    : ExamplesList<
-      ExtractInput<
-        InferSchemaFromFieldForMethod<
-          TFields,
-          Methods.POST,
-          FieldUsage.RequestUrlParams
-        >
-      >,
-      TExampleKey
-    >;
+      ? undefined
+      : ExamplesList<
+          ExtractInput<
+            InferSchemaFromFieldForMethod<
+              TFields,
+              Methods.POST,
+              FieldUsage.RequestUrlParams
+            >
+          >,
+          TExampleKey
+        >;
   };
 }
 
@@ -199,37 +199,37 @@ type SupportsMethodAndUsage<
 > =
   // Check if it's method-specific format first
   TMethod extends keyof TUsage
-  ? TUsage[TMethod] extends infer TMethodUsage
-  ? TTargetUsage extends FieldUsage.RequestData
-  ? TMethodUsage extends { request: "data" | "data&urlPathParams" }
-  ? true
-  : false
-  : TTargetUsage extends FieldUsage.RequestUrlParams
-  ? TMethodUsage extends {
-    request: "urlPathParams" | "data&urlPathParams";
-  }
-  ? true
-  : false
-  : TTargetUsage extends FieldUsage.Response
-  ? TMethodUsage extends { response: true }
-  ? true
-  : false
-  : false
-  : false
-  : // Fall back to original logic for backward compatibility
-  TTargetUsage extends FieldUsage.RequestData
-  ? TUsage extends { request: "data" | "data&urlPathParams" }
-  ? true
-  : false
-  : TTargetUsage extends FieldUsage.RequestUrlParams
-  ? TUsage extends { request: "urlPathParams" | "data&urlPathParams" }
-  ? true
-  : false
-  : TTargetUsage extends FieldUsage.Response
-  ? TUsage extends { response: true }
-  ? true
-  : false
-  : false;
+    ? TUsage[TMethod] extends infer TMethodUsage
+      ? TTargetUsage extends FieldUsage.RequestData
+        ? TMethodUsage extends { request: "data" | "data&urlPathParams" }
+          ? true
+          : false
+        : TTargetUsage extends FieldUsage.RequestUrlParams
+          ? TMethodUsage extends {
+              request: "urlPathParams" | "data&urlPathParams";
+            }
+            ? true
+            : false
+          : TTargetUsage extends FieldUsage.Response
+            ? TMethodUsage extends { response: true }
+              ? true
+              : false
+            : false
+      : false
+    : // Fall back to original logic for backward compatibility
+      TTargetUsage extends FieldUsage.RequestData
+      ? TUsage extends { request: "data" | "data&urlPathParams" }
+        ? true
+        : false
+      : TTargetUsage extends FieldUsage.RequestUrlParams
+        ? TUsage extends { request: "urlPathParams" | "data&urlPathParams" }
+          ? true
+          : false
+        : TTargetUsage extends FieldUsage.Response
+          ? TUsage extends { response: true }
+            ? true
+            : false
+          : false;
 
 /**
  * Filter schema for a specific method and usage type
@@ -240,30 +240,30 @@ export type FilterSchemaForMethod<
   TMethod extends Methods,
 > =
   TFields extends PrimitiveField<infer TSchema, FieldUsageConfig>
-  ? SupportsMethodAndUsage<
-    TFields["usage"],
-    TMethod,
-    TTargetUsage
-  > extends true
-  ? TSchema
-  : z.ZodNever
-  : TFields extends ObjectField<infer TChildren, FieldUsageConfig>
-  ? SupportsMethodAndUsage<
-    TFields["usage"],
-    TMethod,
-    TTargetUsage
-  > extends true
-  ? z.ZodObject<{
-    [K in keyof TChildren as FilterSchemaForMethod<
-      TChildren[K],
-      TTargetUsage,
-      TMethod
-    > extends z.ZodNever
-    ? never
-    : K]: FilterSchemaForMethod<TChildren[K], TTargetUsage, TMethod>;
-  }>
-  : z.ZodNever
-  : z.ZodNever;
+    ? SupportsMethodAndUsage<
+        TFields["usage"],
+        TMethod,
+        TTargetUsage
+      > extends true
+      ? TSchema
+      : z.ZodNever
+    : TFields extends ObjectField<infer TChildren, FieldUsageConfig>
+      ? SupportsMethodAndUsage<
+          TFields["usage"],
+          TMethod,
+          TTargetUsage
+        > extends true
+        ? z.ZodObject<{
+            [K in keyof TChildren as FilterSchemaForMethod<
+              TChildren[K],
+              TTargetUsage,
+              TMethod
+            > extends z.ZodNever
+              ? never
+              : K]: FilterSchemaForMethod<TChildren[K], TTargetUsage, TMethod>;
+          }>
+        : z.ZodNever
+      : z.ZodNever;
 
 /**
  * Method-specific endpoint type that extends CreateApiEndpoint

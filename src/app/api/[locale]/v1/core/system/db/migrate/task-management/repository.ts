@@ -193,10 +193,11 @@ export class MigrationTaskManagementRepositoryImpl
           break;
         default:
           return fail({
-          message: "app.api.v1.core.system.db.migrate.taskManagement.errors.validation.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { operation },
-      });
+            message:
+              "app.api.v1.core.system.db.migrate.taskManagement.errors.validation.title",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: { operation },
+          });
       }
 
       logger.info("Migration task operation completed", {
@@ -225,8 +226,9 @@ export class MigrationTaskManagementRepositoryImpl
       logger.error("Migration task operation execution failed", parsedError);
 
       return fail({
-          message: "app.api.v1.core.system.db.migrate.taskManagement.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.system.db.migrate.taskManagement.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
     }

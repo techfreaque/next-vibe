@@ -119,9 +119,10 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
       if (!localeMapping) {
         logger.error("Invalid locale format", { locale: data.params.locale });
         return fail({
-          message: "app.api.v1.core.emails.smtpClient.emailSending.email.errors.sending_failed",
+          message:
+            "app.api.v1.core.emails.smtpClient.emailSending.email.errors.sending_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: {
+          messageParams: {
             recipient: data.params.toEmail,
             error: `Invalid locale format: ${data.params.locale}`,
           },
@@ -172,7 +173,7 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
         return fail({
           message: emailResponse.message,
           errorType: emailResponse.errorType || ErrorResponseTypes.EMAIL_ERROR,
-                    messageParams: emailResponse.messageParams,
+          messageParams: emailResponse.messageParams,
           cause: emailResponse,
         });
       }
@@ -203,9 +204,10 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
         campaignType: data.params.campaignType,
       });
       return fail({
-          message: "app.api.v1.core.emails.smtpClient.emailSending.email.errors.sending_failed",
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.emails.smtpClient.emailSending.email.errors.sending_failed",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
           recipient: data.params.toEmail,
           error: parseError(error).message,
         },

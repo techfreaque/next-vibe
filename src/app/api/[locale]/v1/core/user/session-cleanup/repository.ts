@@ -157,9 +157,10 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       // Return error if there were any errors, otherwise success
       if (errors.length > 0) {
         return fail({
-          message: "app.api.v1.core.user.session-cleanup.errors.partial_failure.title",
+          message:
+            "app.api.v1.core.user.session-cleanup.errors.partial_failure.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: {
+          messageParams: {
             errors:
               result.errors?.join(", ") ||
               "app.api.v1.core.user.session-cleanup.errors.unknown_error.title",
@@ -178,9 +179,10 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       });
 
       return fail({
-          message: "app.api.v1.core.user.session-cleanup.errors.execution_failed.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: errorMessage },
+        message:
+          "app.api.v1.core.user.session-cleanup.errors.execution_failed.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
       });
     }
   }
@@ -214,25 +216,28 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
         config.sessionRetentionDays > 365
       ) {
         return fail({
-          message: "app.api.v1.core.user.session-cleanup.errors.invalid_session_retention.title",
+          message:
+            "app.api.v1.core.user.session-cleanup.errors.invalid_session_retention.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: { sessionRetentionDays: config.sessionRetentionDays },
+          messageParams: { sessionRetentionDays: config.sessionRetentionDays },
         });
       }
 
       if (config.tokenRetentionDays < 1 || config.tokenRetentionDays > 365) {
         return fail({
-          message: "app.api.v1.core.user.session-cleanup.errors.invalid_token_retention.title",
+          message:
+            "app.api.v1.core.user.session-cleanup.errors.invalid_token_retention.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: { tokenRetentionDays: config.tokenRetentionDays },
+          messageParams: { tokenRetentionDays: config.tokenRetentionDays },
         });
       }
 
       if (config.batchSize < 1 || config.batchSize > 1000) {
         return fail({
-          message: "app.api.v1.core.user.session-cleanup.errors.invalid_batch_size.title",
+          message:
+            "app.api.v1.core.user.session-cleanup.errors.invalid_batch_size.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: { batchSize: config.batchSize },
+          messageParams: { batchSize: config.batchSize },
         });
       }
 
@@ -244,9 +249,10 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
         parseError(error),
       );
       return fail({
-          message: "app.api.v1.core.user.session-cleanup.errors.validation_failed.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.user.session-cleanup.errors.validation_failed.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

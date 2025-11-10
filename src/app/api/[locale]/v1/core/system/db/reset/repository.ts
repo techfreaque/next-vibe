@@ -185,9 +185,9 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
       const parsedError = parseError(error);
 
       return fail({
-          message: "app.api.v1.core.system.db.reset.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message: "app.api.v1.core.system.db.reset.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           error: parsedError.message,
           operationsCount: operations.length,
           duration: Date.now() - startTime,

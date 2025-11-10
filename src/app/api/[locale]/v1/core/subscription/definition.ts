@@ -123,8 +123,7 @@ const { GET } = createEndpoint({
       cancelAt: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.subscription.response.cancelAt" as const,
+          content: "app.api.v1.core.subscription.response.cancelAt" as const,
         },
         z.string().optional(),
       ),

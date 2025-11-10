@@ -99,9 +99,10 @@ export class NewsletterSubscribeSmsServiceImpl
 
       if (!smsResult.success) {
         return fail({
-          message: "app.api.v1.core.newsletter.error.general.internal_server_error",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR, }
-        );
+          message:
+            "app.api.v1.core.newsletter.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       return success({
@@ -111,9 +112,10 @@ export class NewsletterSubscribeSmsServiceImpl
     } catch (error) {
       logger.error("Error sending newsletter welcome SMS", parseError(error));
       return fail({
-        message: "app.api.v1.core.newsletter.error.general.internal_server_error",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR, }
-      );
+        message:
+          "app.api.v1.core.newsletter.error.general.internal_server_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -171,9 +173,10 @@ export class NewsletterSubscribeSmsServiceImpl
 
       if (!smsResult.success) {
         return fail({
-          message: "app.api.v1.core.newsletter.error.general.internal_server_error",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR, }
-        );
+          message:
+            "app.api.v1.core.newsletter.error.general.internal_server_error",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       return success({
@@ -183,9 +186,10 @@ export class NewsletterSubscribeSmsServiceImpl
     } catch (error) {
       logger.error("Error sending admin notification SMS", parseError(error));
       return fail({
-        message: "app.api.v1.core.newsletter.error.general.internal_server_error",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR, }
-      );
+        message:
+          "app.api.v1.core.newsletter.error.general.internal_server_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 

@@ -27,54 +27,53 @@ const toggleVariants = cva(
   },
 );
 
-const toggleTextVariants = cva(
-  "text-sm text-foreground font-medium",
-  {
-    variants: {
-      variant: {
-        default: "",
-        outline:
-          "web:group-hover:text-accent-foreground web:group-active:text-accent-foreground",
-      },
-      size: {
-        default: "",
-        sm: "",
-        lg: "",
-      },
+const toggleTextVariants = cva("text-sm text-foreground font-medium", {
+  variants: {
+    variant: {
+      default: "",
+      outline:
+        "web:group-hover:text-accent-foreground web:group-active:text-accent-foreground",
     },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
+    size: {
+      default: "",
+      sm: "",
+      lg: "",
     },
   },
-);
+  defaultVariants: {
+    variant: "default",
+    size: "default",
+  },
+});
 
 // Cross-platform types - exported for native
 export type ToggleVariant = VariantProps<typeof toggleVariants>["variant"];
 export type ToggleSize = VariantProps<typeof toggleVariants>["size"];
 
-export interface ToggleProps {
+export interface ToggleRootProps
+  extends React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root>,
+    VariantProps<typeof toggleVariants> {
+  className?: string;
   variant?: ToggleVariant;
   size?: ToggleSize;
-  className?: string;
   children?: React.ReactNode;
   pressed?: boolean;
   onPressedChange?: (pressed: boolean) => void;
   disabled?: boolean;
 }
 
-const Toggle = React.forwardRef<
-  React.ElementRef<typeof TogglePrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root> &
-    VariantProps<typeof toggleVariants>
->(({ className, variant, size, ...props }, ref) => (
-  <TogglePrimitive.Root
-    ref={ref}
-    className={cn(toggleVariants({ variant, size, className }))}
-    {...props}
-  />
-));
+export function Toggle({
+  className,
+  variant,
+  size,
+  ...props
+}: ToggleRootProps): React.JSX.Element {
+  return (
+    <TogglePrimitive.Root
+      className={cn(toggleVariants({ variant, size, className }))}
+      {...props}
+    />
+  );
+}
 
-Toggle.displayName = TogglePrimitive.Root.displayName;
-
-export { Toggle, toggleVariants, toggleTextVariants };
+export { toggleVariants, toggleTextVariants };

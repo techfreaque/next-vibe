@@ -389,13 +389,9 @@ const SidebarInset = React.forwardRef<
 });
 SidebarInset.displayName = "SidebarInset";
 
-const SidebarInput = React.forwardRef<
-  React.ElementRef<typeof Input>,
-  React.ComponentProps<typeof Input>
->(({ className, ...props }, ref) => {
+function SidebarInput({ className, ...props }: React.ComponentProps<typeof Input>): React.JSX.Element {
   return (
     <Input
-      ref={ref}
       data-sidebar="input"
       className={cn(
         "h-8 w-full bg-background shadow-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
@@ -404,7 +400,7 @@ const SidebarInput = React.forwardRef<
       {...props}
     />
   );
-});
+}
 SidebarInput.displayName = "SidebarInput";
 
 const SidebarHeader = React.forwardRef<
@@ -438,16 +434,17 @@ const SidebarFooter = React.forwardRef<
 SidebarFooter.displayName = "SidebarFooter";
 
 const SidebarSeparator = React.forwardRef<
-  React.ElementRef<typeof Separator>,
-  React.ComponentProps<typeof Separator>
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof Separator>
 >(({ className, ...props }, ref) => {
   return (
-    <Separator
-      ref={ref}
-      data-sidebar="separator"
-      className={cn("mx-2 w-auto bg-sidebar-border", className)}
-      {...props}
-    />
+    <div ref={ref}>
+      <Separator
+        data-sidebar="separator"
+        className={cn("mx-2 w-auto bg-sidebar-border", className)}
+        {...props}
+      />
+    </div>
   );
 });
 SidebarSeparator.displayName = "SidebarSeparator";
@@ -640,7 +637,7 @@ const SidebarMenuButton = React.forwardRef<
         <TooltipContent
           side="right"
           align="center"
-          hidden={state !== "collapsed" || isMobile}
+          className={state !== "collapsed" || isMobile ? "hidden" : undefined}
           {...tooltip}
         />
       </Tooltip>

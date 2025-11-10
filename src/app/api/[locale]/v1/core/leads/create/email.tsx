@@ -476,7 +476,8 @@ export const renderWelcomeMail: EmailFunctionType<
     });
   } catch {
     return fail({
-      message: "app.api.v1.core.leads.create.email.error.general.internal_server_error",
+      message:
+        "app.api.v1.core.leads.create.email.error.general.internal_server_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -494,7 +495,8 @@ export const renderAdminNotificationMail: EmailFunctionType<
   try {
     if (!responseData?.lead) {
       return fail({
-        message: "app.api.v1.core.leads.create.email.admin.newLead.error.noData",
+        message:
+          "app.api.v1.core.leads.create.email.admin.newLead.error.noData",
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -524,7 +526,8 @@ export const renderAdminNotificationMail: EmailFunctionType<
     });
   } catch {
     return fail({
-      message: "app.api.v1.core.leads.create.email.error.general.internal_server_error",
+      message:
+        "app.api.v1.core.leads.create.email.error.general.internal_server_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

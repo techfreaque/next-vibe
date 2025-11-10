@@ -69,7 +69,9 @@ export class InteractiveModeHandler {
    */
   private getSession(): InteractiveSession {
     if (!this.session) {
-      throw new Error("Session not initialized. Call initializeDefaultSession first.");
+      throw new Error(
+        "Session not initialized. Call initializeDefaultSession first.",
+      );
     }
     return this.session;
   }
@@ -736,9 +738,7 @@ export class InteractiveModeHandler {
   /**
    * Get endpoint definition from route (reused from route-delegation-handler)
    */
-  private async getCreateApiEndpoint(
-    route: DiscoveredRoute,
-  ): Promise<{
+  private async getCreateApiEndpoint(route: DiscoveredRoute): Promise<{
     title?: string;
     description?: string;
     requestSchema?: z.ZodTypeAny;
@@ -779,7 +779,8 @@ export class InteractiveModeHandler {
           ? definition.title
           : undefined,
       description:
-        "description" in definition && typeof definition.description === "string"
+        "description" in definition &&
+        typeof definition.description === "string"
           ? definition.description
           : undefined,
       requestSchema:

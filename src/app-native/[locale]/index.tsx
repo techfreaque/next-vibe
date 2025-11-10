@@ -1,5 +1,3 @@
-"use custom";
-
 /**
  * Expo Router compatibility wrapper for Next.js page.tsx
  *

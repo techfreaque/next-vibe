@@ -4,7 +4,7 @@
 
 "use client";
 
-import { Upload } from 'next-vibe-ui/ui/icons';
+import { Upload } from "next-vibe-ui/ui/icons";
 import { Button } from "next-vibe-ui/ui/button";
 import type React from "react";
 import { useState } from "react";

@@ -382,7 +382,7 @@ export const translations: typeof enTranslations = {
     },
 
     // === TYPY BŁĘDÓW ===
-          errorType: {
+    errorType: {
       validation: {
         label: "Błąd Walidacji",
         description: "Dane nie spełniają wymaganego formatu lub zasad",

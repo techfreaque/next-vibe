@@ -156,9 +156,10 @@ export function createNextHandler<
 
       if (!validationResult.success) {
         logger.error(
-          `Validation error: ${validationResult.message} (${validationResult.messageParams
-            ? JSON.stringify(validationResult.messageParams)
-            : "No params"
+          `Validation error: ${validationResult.message} (${
+            validationResult.messageParams
+              ? JSON.stringify(validationResult.messageParams)
+              : "No params"
           })`,
         );
         return createHTTPErrorResponse({
@@ -229,7 +230,7 @@ export function createNextHandler<
       // Handle unexpected errors - error details are included in messageParams
       return createHTTPErrorResponse({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parseError(error).message,
         },

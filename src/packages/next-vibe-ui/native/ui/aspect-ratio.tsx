@@ -1,5 +1,26 @@
 import * as AspectRatioPrimitive from "@rn-primitives/aspect-ratio";
+import * as React from "react";
 
-const AspectRatio = AspectRatioPrimitive.Root;
+import type { AspectRatioRootProps } from "@/packages/next-vibe-ui/web/ui/aspect-ratio";
+import { cn } from "next-vibe/shared/utils/utils";
+import { styled } from "nativewind";
 
-export { AspectRatio };
+export type { AspectRatioRootProps };
+
+// Styled component using nativewind
+const StyledAspectRatioRoot = styled(AspectRatioPrimitive.Root);
+
+export function AspectRatio({
+  className,
+  ratio,
+  children,
+}: AspectRatioRootProps): React.JSX.Element {
+  return (
+    <StyledAspectRatioRoot
+      ratio={ratio ?? 16 / 9}
+      className={cn(className)}
+    >
+      {children}
+    </StyledAspectRatioRoot>
+  );
+}

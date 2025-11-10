@@ -1,7 +1,12 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Span } from "next-vibe-ui/ui/span";
@@ -103,7 +108,7 @@ export function MoveFolderDialog({
         <DialogHeader>
           <DialogTitle>{t("app.chat.moveFolder.title")}</DialogTitle>
         </DialogHeader>
-        <Div className="space-y-4">
+        <Div className="flex flex-col gap-4">
           <Div className="text-sm text-muted-foreground">
             {t("app.chat.moveFolder.description")}
           </Div>
@@ -126,7 +131,7 @@ export function MoveFolderDialog({
 
           {/* Available folders */}
           <ScrollArea className="h-[300px] border rounded-md p-2">
-            <Div className="space-y-1">
+            <Div className="flex flex-col gap-1">
               {rootFolders.map((f) => renderFolderOption(f))}
             </Div>
           </ScrollArea>

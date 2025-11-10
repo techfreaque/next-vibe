@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Filter, List, RefreshCw, Table } from 'next-vibe-ui/ui/icons';
+import { Filter, List, RefreshCw, Table } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Link as NextLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
@@ -86,14 +86,14 @@ export function UsersListClient({
     <Card>
       <CardHeader>
         <Div className="flex items-center justify-between">
-          <CardTitle className="flex items-center space-x-2">
+          <CardTitle className="flex items-center flex flex-row gap-2">
             <Span>{t("app.admin.users.list.title")}</Span>
             {queryLoading && (
               <RefreshCw className="h-4 w-4 animate-spin text-gray-500" />
             )}
           </CardTitle>
 
-          <Div className="flex items-center space-x-2">
+          <Div className="flex items-center flex flex-row gap-2">
             {/* View Mode Toggle */}
             <Div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-md">
               <Button
@@ -138,14 +138,14 @@ export function UsersListClient({
       <CardContent>
         {/* Filter Form */}
         <Div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <Div className="flex items-center space-x-2 mb-4">
+          <Div className="flex items-center flex flex-row gap-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <Span className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {t("app.admin.users.list.filters.title")}:
             </Span>
           </Div>
 
-          <Div className="space-y-4">
+          <Div className="flex flex-col gap-4">
             <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Search Field */}
               <EndpointFormField
@@ -280,7 +280,7 @@ export function UsersListClient({
 
             {/* Sort Order and Actions */}
             <Div className="flex items-center justify-between">
-              <Div className="flex items-center space-x-4">
+              <Div className="flex items-center flex flex-row gap-4">
                 <EndpointFormField
                   name="sorting.sortOrder"
                   config={{
@@ -356,14 +356,14 @@ export function UsersListClient({
         ) : viewMode === "table" ? (
           <UsersTable locale={locale} users={users} isLoading={queryLoading} />
         ) : (
-          <Div className="space-y-3">
+          <Div className="flex flex-col gap-3">
             {users.map((user: UserType) => (
               <Div
                 key={user.id}
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 <Div className="flex items-center justify-between">
-                  <Div className="flex items-center space-x-4">
+                  <Div className="flex items-center flex flex-row gap-4">
                     <Div>
                       <NextLink
                         href={`/${locale}/admin/users/${user.id}/edit`}

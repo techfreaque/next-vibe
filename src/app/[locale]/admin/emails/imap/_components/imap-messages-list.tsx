@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Eye, Mail, MailOpen, Paperclip, Star } from 'next-vibe-ui/ui/icons';
+import { Eye, Mail, MailOpen, Paperclip, Star } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Div } from "next-vibe-ui/ui/div";
@@ -155,13 +155,13 @@ export function ImapMessagesList({
 
   // TODO: Re-enable when messageSize is added to API definition
   // const formatSize = (bytes: number): string => {
-  //   if (bytes < 1024) {
-  //     return `${bytes} B`;
-  //   }
-  //   if (bytes < 1024 * 1024) {
-  //     return `${(bytes / 1024).toFixed(1)} KB`;
-  //   }
-  //   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  // if (bytes < 1024) {
+  // return `${bytes} B`;
+  // }
+  // if (bytes < 1024 * 1024) {
+  // return `${(bytes / 1024).toFixed(1)} KB`;
+  // }
+  // return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   // };
 
   const handleSelectMessage = (messageId: string, checked: boolean): void => {
@@ -191,10 +191,10 @@ export function ImapMessagesList({
   }
 
   return (
-    <Div className="space-y-4">
+    <Div className="flex flex-col gap-4">
       {/* Bulk Actions */}
       {selectedMessages.length > 0 && (
-        <Div className="flex items-center space-x-2 p-3 bg-blue-50 rounded-lg">
+        <Div className="flex items-center flex flex-row gap-2 p-3 bg-blue-50 rounded-lg">
           <Span className="text-sm font-medium">
             {t("app.admin.emails.imap.message.selected", {
               count: selectedMessages.length,
@@ -263,7 +263,7 @@ export function ImapMessagesList({
                     />
                   </TableCell>
                   <TableCell>
-                    <Div className="flex items-center space-x-1">
+                    <Div className="flex items-center flex flex-row gap-1">
                       {message.isRead ? (
                         <MailOpen className="h-4 w-4 text-gray-400" />
                       ) : (
@@ -336,7 +336,7 @@ export function ImapMessagesList({
               total: totalMessages,
             })}
           </Div>
-          <Div className="flex items-center space-x-2">
+          <Div className="flex items-center flex flex-row gap-2">
             <Button
               variant="outline"
               size="sm"

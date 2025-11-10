@@ -36,7 +36,7 @@ export default async function CronTasksPage({
   const { locale } = await params;
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       <CronTasksClient locale={locale} />
     </Div>
   );

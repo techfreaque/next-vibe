@@ -1,7 +1,7 @@
 "use client";
 
-import { Button, } from "next-vibe-ui/ui/button";
-import {Span} from "next-vibe-ui/ui/span"
+import { Button } from "next-vibe-ui/ui/button";
+import { Span } from "next-vibe-ui/ui/span";
 import { ChevronLeft } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React from "react";

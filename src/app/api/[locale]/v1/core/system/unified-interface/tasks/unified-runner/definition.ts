@@ -28,7 +28,8 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "tasks", "unified-runner"],
   aliases: ["unified-runner", "task-runner", "runner"],
-  title: "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.title",
+  title:
+    "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.title",
   description:
     "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.description",
   category: "app.api.v1.core.system.unifiedInterface.tasks.category",

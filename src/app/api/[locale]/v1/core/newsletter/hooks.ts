@@ -196,7 +196,10 @@ export function useNewsletterManager(): NewsletterManagerResult {
       (subscriptionEndpoint.create?.isSubmitting ?? false) ||
       (unsubscribeEndpoint.create?.isSubmitting ?? false)
     );
-  }, [subscriptionEndpoint.create?.isSubmitting, unsubscribeEndpoint.create?.isSubmitting]);
+  }, [
+    subscriptionEndpoint.create?.isSubmitting,
+    unsubscribeEndpoint.create?.isSubmitting,
+  ]);
 
   // Check status when we have a valid email
   const statusEndpoint = useNewsletterStatus({
@@ -215,9 +218,9 @@ export function useNewsletterManager(): NewsletterManagerResult {
 
   // Override subscription status based on recent mutations for immediate UI feedback
   const effectiveIsSubscribed =
-    unsubscribeEndpoint.create?.isSuccess ?? false
+    (unsubscribeEndpoint.create?.isSuccess ?? false)
       ? false
-      : subscriptionEndpoint.create?.isSuccess ?? false
+      : (subscriptionEndpoint.create?.isSuccess ?? false)
         ? true
         : isSubscribed;
 

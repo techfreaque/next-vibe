@@ -223,7 +223,8 @@ export const translations: typeof enTranslations = {
     },
     notImplemented: {
       title: "Nicht implementiert",
-      description: "Diese Zahlungsanbieter-Funktion ist noch nicht implementiert",
+      description:
+        "Diese Zahlungsanbieter-Funktion ist noch nicht implementiert",
     },
     customerCreationFailed: "Fehler beim Erstellen des Stripe-Kunden",
     customerNotFound: "Stripe-Kunde nicht gefunden",

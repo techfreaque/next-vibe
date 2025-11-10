@@ -8,47 +8,18 @@ import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
 import { cn } from "next-vibe/shared/utils/utils";
 
-// Cross-platform type definitions for native
-export interface DrawerRootProps {
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  children?: React.ReactNode;
-}
+// Import ALL types from web - ZERO definitions here
+import type {
+  DrawerRootProps,
+  DrawerTriggerProps,
+  DrawerCloseProps,
+  DrawerContentProps,
+  DrawerHeaderProps,
+  DrawerFooterProps,
+  DrawerTitleProps,
+  DrawerDescriptionProps,
+} from "@/packages/next-vibe-ui/web/ui/drawer";
 
-export interface DrawerTriggerProps {
-  asChild?: boolean;
-  children?: React.ReactNode;
-}
-
-export interface DrawerCloseProps {
-  asChild?: boolean;
-  children?: React.ReactNode;
-}
-
-export interface DrawerContentProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface DrawerHeaderProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface DrawerFooterProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface DrawerTitleProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface DrawerDescriptionProps {
-  className?: string;
-  children?: React.ReactNode;
-}
 
 interface DrawerContextValue {
   open: boolean;
@@ -207,9 +178,7 @@ export function DrawerHeader({
   className,
   children,
 }: DrawerHeaderProps): React.JSX.Element {
-  return (
-    <View className={cn("flex gap-1.5 p-4", className)}>{children}</View>
-  );
+  return <View className={cn("flex gap-1.5 p-4", className)}>{children}</View>;
 }
 
 DrawerHeader.displayName = "DrawerHeader";

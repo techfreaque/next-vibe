@@ -28,13 +28,13 @@ export default function ContactInfo({
   const { t } = simpleT(locale);
 
   return (
-    <Div className="space-y-8">
+    <Div className="flex flex-col gap-8">
       <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
         <H2 className="text-2xl font-bold mb-6">
           {t("app.help.components.pages.help.info.title")}
         </H2>
 
-        <Div className="space-y-6">
+        <Div className="flex flex-col gap-6">
           <Div>
             <Div className="flex items-start mb-2">
               <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
@@ -74,7 +74,7 @@ export default function ContactInfo({
           {t("app.help.components.pages.help.info.community")}
         </H2>
 
-        <Div className="space-y-6">
+        <Div className="flex flex-col gap-6">
           <Div>
             <Div className="flex items-start mb-2">
               <MessageCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />

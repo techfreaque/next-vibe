@@ -19,14 +19,17 @@ export function TextWidget({
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
   const value =
     typeof data === "string" ||
-      typeof data === "number" ||
-      typeof data === "boolean"
+    typeof data === "number" ||
+    typeof data === "boolean"
       ? String(data)
       : "";
 
   if (!value) {
     return (
-      <Span className={cn("text-muted-foreground italic", className)} style={style}>
+      <Span
+        className={cn("text-muted-foreground italic", className)}
+        style={style}
+      >
         —
       </Span>
     );

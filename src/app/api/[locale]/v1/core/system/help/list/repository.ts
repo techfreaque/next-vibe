@@ -83,9 +83,9 @@ class HelpListRepository {
       const parsedError = parseError(error);
       logger.error("Failed to discover commands", parsedError);
       return fail({
-          message: "app.api.v1.core.system.help.list.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message: "app.api.v1.core.system.help.list.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }

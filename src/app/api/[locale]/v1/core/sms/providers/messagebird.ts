@@ -168,9 +168,9 @@ export function getMessageBirdProvider(): SmsProvider {
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
-            "Authorization": authValue,
+            Authorization: authValue,
             "Content-Type": "application/json",
-            "Accept": "application/json",
+            Accept: "application/json",
           },
           body: JSON.stringify(requestData),
         });

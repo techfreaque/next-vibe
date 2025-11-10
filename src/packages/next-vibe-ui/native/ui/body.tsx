@@ -1,33 +1,19 @@
 import React from "react";
-import { ScrollView, Platform, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import type { BodyProps } from "../../web/ui/body";
 import { styled } from "nativewind";
-import { cn } from "next-vibe/shared/utils/utils";
+import type { BodyProps } from "../../web/ui/body";
 
-const StyledSafeArea = styled(SafeAreaView);
-const StyledScrollView = styled(ScrollView);
-const _StyledContent = styled(View);
-
+// Styled component defined locally to avoid type issues
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const StyledSafeAreaView = styled(SafeAreaView) as any;
 
 export default function Body({
   children,
   className,
 }: BodyProps): React.JSX.Element {
   return (
-    <StyledSafeArea className={cn("flex-1", className)}>
-      <StyledScrollView
-        scrollEnabled={true}
-        keyboardDismissMode={Platform.select({
-          ios: "interactive",
-          android: "on-drag",
-        })}
-        keyboardShouldPersistTaps="handled"
-        contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
+    <StyledSafeAreaView className={className}>
         {children}
-      </StyledScrollView>
-    </StyledSafeArea>
+    </StyledSafeAreaView>
   );
-} 
+}

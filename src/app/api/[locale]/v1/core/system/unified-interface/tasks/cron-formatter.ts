@@ -131,9 +131,12 @@ function generateDescription(
   } else if (minute.includes(",")) {
     const minutes = minute.split(",");
     parts.push(
-      t("app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.atMinutes", {
-        minutes: minutes.join(", "),
-      }),
+      t(
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.atMinutes",
+        {
+          minutes: minutes.join(", "),
+        },
+      ),
     );
   } else if (minute.includes("-")) {
     const [start, end] = minute.split("-");
@@ -148,9 +151,12 @@ function generateDescription(
     );
   } else if (minute !== "0") {
     parts.push(
-      t("app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.atMinute", {
-        minute,
-      }),
+      t(
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.patterns.atMinute",
+        {
+          minute,
+        },
+      ),
     );
   }
 
@@ -226,9 +232,12 @@ function generateDescription(
     } else if (dayOfMonth.includes(",")) {
       const days = dayOfMonth.split(",");
       parts.push(
-        t("app.api.v1.core.system.unifiedInterface.tasks.cron.calendar.onDays", {
-          days: days.join(", "),
-        }),
+        t(
+          "app.api.v1.core.system.unifiedInterface.tasks.cron.calendar.onDays",
+          {
+            days: days.join(", "),
+          },
+        ),
       );
     } else {
       parts.push(
@@ -253,9 +262,12 @@ function generateDescription(
       );
     } else {
       parts.push(
-        t("app.api.v1.core.system.unifiedInterface.tasks.cron.calendar.inMonth", {
-          month: formatMonth(month, locale),
-        }),
+        t(
+          "app.api.v1.core.system.unifiedInterface.tasks.cron.calendar.inMonth",
+          {
+            month: formatMonth(month, locale),
+          },
+        ),
       );
     }
   }
@@ -320,7 +332,9 @@ function formatHour(hour: string, locale: CountryLanguage): string {
   const { t } = simpleT(locale);
   const h = parseInt(hour, 10);
   if (h === 0) {
-    return t("app.api.v1.core.system.unifiedInterface.tasks.cron.time.midnight");
+    return t(
+      "app.api.v1.core.system.unifiedInterface.tasks.cron.time.midnight",
+    );
   }
   if (h === 12) {
     return t("app.api.v1.core.system.unifiedInterface.tasks.cron.time.noon");
@@ -351,15 +365,23 @@ function formatMonth(month: string, locale: CountryLanguage): string {
         "app.api.v1.core.system.unifiedInterface.tasks.cron.months.february",
       );
     case 3:
-      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.months.march");
+      return t(
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.months.march",
+      );
     case 4:
-      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.months.april");
+      return t(
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.months.april",
+      );
     case 5:
       return t("app.api.v1.core.system.unifiedInterface.tasks.cron.months.may");
     case 6:
-      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.months.june");
+      return t(
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.months.june",
+      );
     case 7:
-      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.months.july");
+      return t(
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.months.july",
+      );
     case 8:
       return t(
         "app.api.v1.core.system.unifiedInterface.tasks.cron.months.august",
@@ -393,11 +415,17 @@ function formatDayOfWeek(day: string, locale: CountryLanguage): string {
   const d = parseInt(day, 10);
   switch (d) {
     case 0:
-      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.days.sunday");
+      return t(
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.days.sunday",
+      );
     case 1:
-      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.days.monday");
+      return t(
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.days.monday",
+      );
     case 2:
-      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.days.tuesday");
+      return t(
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.days.tuesday",
+      );
     case 3:
       return t(
         "app.api.v1.core.system.unifiedInterface.tasks.cron.days.wednesday",
@@ -407,7 +435,9 @@ function formatDayOfWeek(day: string, locale: CountryLanguage): string {
         "app.api.v1.core.system.unifiedInterface.tasks.cron.days.thursday",
       );
     case 5:
-      return t("app.api.v1.core.system.unifiedInterface.tasks.cron.days.friday");
+      return t(
+        "app.api.v1.core.system.unifiedInterface.tasks.cron.days.friday",
+      );
     case 6:
       return t(
         "app.api.v1.core.system.unifiedInterface.tasks.cron.days.saturday",

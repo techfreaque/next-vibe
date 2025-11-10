@@ -174,10 +174,10 @@ export class WebAuthHandler extends BaseAuthHandler {
     } catch (error) {
       logger.error("JWT verification failed", parseError(error));
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.invalidToken",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-                  messageParams: { error: parseError(error).message },
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -202,10 +202,10 @@ export class WebAuthHandler extends BaseAuthHandler {
     } catch (error) {
       logger.error("JWT signing failed", parseError(error));
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.signingFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -297,10 +297,10 @@ export class WebAuthHandler extends BaseAuthHandler {
     } catch (error) {
       logger.error("Error storing auth token", parseError(error));
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.storeFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -326,10 +326,10 @@ export class WebAuthHandler extends BaseAuthHandler {
     } catch (error) {
       logger.error("Error clearing auth token", parseError(error));
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.clearFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -364,10 +364,10 @@ export class WebAuthHandler extends BaseAuthHandler {
     } catch (error) {
       logger.error("Failed to set leadId cookie", parseError(error));
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.setLeadIdCookieFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

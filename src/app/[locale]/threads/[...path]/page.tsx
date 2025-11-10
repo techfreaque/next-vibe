@@ -122,14 +122,18 @@ export default async function ThreadsPathPage({
 
   // Compute root folder permissions server-side
   // This is stateless and based on user role + folder config
-  let rootFolderPermissions = { canCreateThread: false, canCreateFolder: false };
+  let rootFolderPermissions = {
+    canCreateThread: false,
+    canCreateFolder: false,
+  };
   if (user) {
-    const permissionsResult = await rootFolderPermissionsRepository.getRootFolderPermissions(
-      { rootFolderId: initialRootFolderId },
-      user,
-      locale,
-      logger,
-    );
+    const permissionsResult =
+      await rootFolderPermissionsRepository.getRootFolderPermissions(
+        { rootFolderId: initialRootFolderId },
+        user,
+        locale,
+        logger,
+      );
     if (permissionsResult.success) {
       rootFolderPermissions = permissionsResult.data;
     }

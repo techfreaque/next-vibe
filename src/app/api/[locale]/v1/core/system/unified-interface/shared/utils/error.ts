@@ -75,8 +75,8 @@ export function formatErrorForLogging(error: Error | string): {
       code: error.code,
       details:
         "details" in error &&
-          typeof error.details === "object" &&
-          error.details !== null
+        typeof error.details === "object" &&
+        error.details !== null
           ? (error.details as ErrorDetails)
           : undefined,
     };

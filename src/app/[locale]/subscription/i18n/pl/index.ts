@@ -11,7 +11,8 @@ export const translations: typeof enTranslations = {
     endsOn: "Subskrypcja kończy się",
     cancellation: {
       title: "Subskrypcja zaplanowana do anulowania",
-      description: "Twoja subskrypcja zakończy się {{date}}. Zachowasz dostęp do tego czasu.",
+      description:
+        "Twoja subskrypcja zakończy się {{date}}. Zachowasz dostęp do tego czasu.",
     },
     manage: {
       stripe: {
@@ -31,7 +32,8 @@ export const translations: typeof enTranslations = {
       nextExpiration: "Następne wygaśnięcie",
       expiring: {
         title: "Kredyty subskrypcyjne",
-        description: "Z miesięcznej subskrypcji ({{subCredits}} kredytów/miesiąc)",
+        description:
+          "Z miesięcznej subskrypcji ({{subCredits}} kredytów/miesiąc)",
       },
       permanent: {
         title: "Kredyty stałe",

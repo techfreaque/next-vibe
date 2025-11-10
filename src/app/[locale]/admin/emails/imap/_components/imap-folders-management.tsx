@@ -58,7 +58,7 @@ export function ImapFoldersManagement({
   const syncEndpoint = useImapFoldersSync(logger);
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
           <CardTitle>
@@ -67,13 +67,13 @@ export function ImapFoldersManagement({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Div className="space-y-6">
+          <Div className="flex flex-col gap-6">
             <FormAlert alert={foldersEndpoint.alert} />
 
             {/* Controls */}
             <Div className="flex items-center justify-between">
-              <Div className="flex items-center space-x-4">
-                <Div className="flex flex-col space-y-2">
+              <Div className="flex items-center flex flex-row gap-4">
+                <Div className="flex flex-col gap-2">
                   <Label htmlFor="account-select">
                     {t("app.admin.emails.imap.common.selectAccount")}
                   </Label>
@@ -104,7 +104,7 @@ export function ImapFoldersManagement({
                 {/* View Mode - not part of sync form, remove for now */}
               </Div>
 
-              <Div className="space-x-2">
+              <Div className="flex flex-row gap-2">
                 <Button
                   type="button"
                   onClick={syncEndpoint.create.onSubmit}

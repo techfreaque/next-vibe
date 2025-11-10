@@ -17,11 +17,11 @@ import {
   TrendingUp,
   UserCheck,
   Users,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import type { HistoricalDataSeriesType } from "next-vibe/shared/types/stats-filtering.schema";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
-import { Span } from "next-vibe-ui/ui/span";  
+import { Span } from "next-vibe-ui/ui/span";
 import { H4 } from "next-vibe-ui/ui/typography";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -62,7 +62,7 @@ export function LeadsStatsClient({
 
   if (isLoading) {
     return (
-      <Div className="space-y-6">
+      <Div className="flex flex-col gap-6">
         {/* Filters Skeleton */}
         <Card>
           <CardHeader>
@@ -96,7 +96,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-32" />
-            <Div className="flex space-x-2 mt-4">
+            <Div className="flex flex flex-row gap-2 mt-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-8 w-20" />
               ))}
@@ -111,7 +111,7 @@ export function LeadsStatsClient({
   }
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Filters */}
       <LeadsStatsFiltersContainer
         locale={locale}
@@ -126,7 +126,7 @@ export function LeadsStatsClient({
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Leads */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.totalLeads")}
             </CardTitle>
@@ -145,7 +145,7 @@ export function LeadsStatsClient({
 
         {/* Active Leads */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.activeLeads")}
             </CardTitle>
@@ -166,7 +166,7 @@ export function LeadsStatsClient({
 
         {/* Conversion Rate */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.conversionRate")}
             </CardTitle>
@@ -185,7 +185,7 @@ export function LeadsStatsClient({
 
         {/* Email Engagement */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.emailEngagement")}
             </CardTitle>
@@ -207,7 +207,7 @@ export function LeadsStatsClient({
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Campaign Running Leads */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t(
                 "app.admin.leads.leads.admin.stats.metrics.campaign_running_leads",
@@ -230,7 +230,7 @@ export function LeadsStatsClient({
 
         {/* Consultation Bookings */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.consultationBookings")}
             </CardTitle>
@@ -249,7 +249,7 @@ export function LeadsStatsClient({
 
         {/* Data Completeness */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.dataCompleteness")}
             </CardTitle>
@@ -267,7 +267,7 @@ export function LeadsStatsClient({
 
         {/* Lead Velocity */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.leadVelocity")}
             </CardTitle>
@@ -288,7 +288,7 @@ export function LeadsStatsClient({
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Converted Leads */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.convertedLeads")}
             </CardTitle>
@@ -307,7 +307,7 @@ export function LeadsStatsClient({
 
         {/* Signed Up Leads */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.signedUpLeads")}
             </CardTitle>
@@ -326,7 +326,7 @@ export function LeadsStatsClient({
 
         {/* Consultation Booked */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.consultationBookedLeads")}
             </CardTitle>
@@ -345,7 +345,7 @@ export function LeadsStatsClient({
 
         {/* Subscription Confirmed */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t(
                 "app.admin.leads.leads.admin.stats.subscriptionConfirmedLeads",
@@ -366,7 +366,7 @@ export function LeadsStatsClient({
 
         {/* Website User Leads */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t(
                 "app.admin.leads.leads.admin.stats.metrics.website_user_leads",
@@ -389,7 +389,7 @@ export function LeadsStatsClient({
 
         {/* Newsletter Subscriber Leads */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t(
                 "app.admin.leads.leads.admin.stats.metrics.newsletter_subscriber_leads",
@@ -416,7 +416,7 @@ export function LeadsStatsClient({
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Unsubscribed Leads */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.unsubscribedLeads")}
             </CardTitle>
@@ -437,7 +437,7 @@ export function LeadsStatsClient({
 
         {/* Bounced Leads */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.bouncedLeads")}
             </CardTitle>
@@ -458,7 +458,7 @@ export function LeadsStatsClient({
 
         {/* Invalid Leads */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.invalidLeads")}
             </CardTitle>
@@ -482,7 +482,7 @@ export function LeadsStatsClient({
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Leads with Email Engagement */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.leadsWithEmailEngagement")}
             </CardTitle>
@@ -504,7 +504,7 @@ export function LeadsStatsClient({
 
         {/* Leads without Email Engagement */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t(
                 "app.admin.leads.leads.admin.stats.leadsWithoutEmailEngagement",
@@ -528,7 +528,7 @@ export function LeadsStatsClient({
 
         {/* Average Email Engagement Score */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t(
                 "app.admin.leads.leads.admin.stats.averageEmailEngagementScore",
@@ -548,7 +548,7 @@ export function LeadsStatsClient({
 
         {/* Total Email Engagements */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.stats.totalEmailEngagements")}
             </CardTitle>
@@ -575,7 +575,7 @@ export function LeadsStatsClient({
               {t("app.admin.leads.leads.admin.stats.todayActivity")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="flex flex-col gap-3">
             <Div className="flex items-center justify-between">
               <Span className="text-sm font-medium">
                 {t("app.admin.leads.leads.admin.stats.leadsCreatedToday")}
@@ -603,7 +603,7 @@ export function LeadsStatsClient({
               {t("app.admin.leads.leads.admin.stats.weekActivity")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="flex flex-col gap-3">
             <Div className="flex items-center justify-between">
               <Span className="text-sm font-medium">
                 {t("app.admin.leads.leads.admin.stats.leadsCreatedThisWeek")}
@@ -631,7 +631,7 @@ export function LeadsStatsClient({
               {t("app.admin.leads.leads.admin.stats.monthActivity")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="flex flex-col gap-3">
             <Div className="flex items-center justify-between">
               <Span className="text-sm font-medium">
                 {t("app.admin.leads.leads.admin.stats.leadsCreatedThisMonth")}
@@ -662,11 +662,11 @@ export function LeadsStatsClient({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Div className="space-y-3">
+            <Div className="flex flex-col gap-3">
               {stats?.leadsByCampaignStage &&
                 Object.entries(stats.leadsByCampaignStage).map(
                   ([stage, count]) => (
-                    <Div key={stage} className="space-y-2">
+                    <Div key={stage} className="flex flex-col gap-2">
                       <Div className="flex items-center justify-between">
                         <Span className="text-sm font-medium">{stage}</Span>
                         <Span className="text-sm text-muted-foreground">
@@ -715,11 +715,11 @@ export function LeadsStatsClient({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Div className="space-y-3">
+            <Div className="flex flex-col gap-3">
               {stats?.leadsByJourneyVariant &&
                 Object.entries(stats.leadsByJourneyVariant).map(
                   ([variant, count]) => (
-                    <Div key={variant} className="space-y-2">
+                    <Div key={variant} className="flex flex-col gap-2">
                       <Div className="flex items-center justify-between">
                         <Span className="text-sm font-medium">
                           {variant.replace("_", " ")}
@@ -749,7 +749,7 @@ export function LeadsStatsClient({
       </Div>
 
       {/* Comprehensive Analytics Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs defaultValue="overview" className="flex flex-col gap-4">
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview">
             {t("app.admin.leads.leads.admin.stats.overview")}
@@ -771,7 +771,7 @@ export function LeadsStatsClient({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="overview" className="flex flex-col gap-4">
           {/* Historical Chart */}
           {stats?.historicalData && (
             <LeadsStatsChart
@@ -798,7 +798,7 @@ export function LeadsStatsClient({
           )}
         </TabsContent>
 
-        <TabsContent value="campaigns" className="space-y-4">
+        <TabsContent value="campaigns" className="flex flex-col gap-4">
           <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Campaign Performance */}
             <Card>
@@ -808,9 +808,9 @@ export function LeadsStatsClient({
                   {t("app.admin.leads.leads.admin.stats.campaignPerformance")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="flex flex-col gap-4">
                 <Div className="grid grid-cols-2 gap-4">
-                  <Div className="space-y-2">
+                  <Div className="flex flex-col gap-2">
                     <P className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.emailsSent")}
                     </P>
@@ -818,7 +818,7 @@ export function LeadsStatsClient({
                       {formatNumber(stats?.totalEmailsSent || 0)}
                     </P>
                   </Div>
-                  <Div className="space-y-2">
+                  <Div className="flex flex-col gap-2">
                     <P className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.emailsOpened")}
                     </P>
@@ -826,7 +826,7 @@ export function LeadsStatsClient({
                       {formatNumber(stats?.totalEmailsOpened || 0)}
                     </P>
                   </Div>
-                  <Div className="space-y-2">
+                  <Div className="flex flex-col gap-2">
                     <P className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.open_rate")}
                     </P>
@@ -834,7 +834,7 @@ export function LeadsStatsClient({
                       {formatPercentage(stats?.averageOpenRate || 0)}
                     </P>
                   </Div>
-                  <Div className="space-y-2">
+                  <Div className="flex flex-col gap-2">
                     <P className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.click_rate")}
                     </P>
@@ -855,7 +855,7 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   {stats?.topPerformingCampaigns
                     ?.slice(0, 5)
                     .map((campaign, index) => (
@@ -863,7 +863,7 @@ export function LeadsStatsClient({
                         key={index}
                         className="flex items-center justify-between"
                       >
-                        <Div className="space-y-1">
+                        <Div className="flex flex-col gap-1">
                           <P className="text-sm font-medium">
                             {campaign.campaignName}
                           </P>
@@ -885,7 +885,7 @@ export function LeadsStatsClient({
           </Div>
         </TabsContent>
 
-        <TabsContent value="performance" className="space-y-4">
+        <TabsContent value="performance" className="flex flex-col gap-4">
           <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Performance Metrics */}
             <Card>
@@ -895,8 +895,8 @@ export function LeadsStatsClient({
                   {t("app.admin.leads.leads.admin.stats.performanceMetrics")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <Div className="space-y-3">
+              <CardContent className="flex flex-col gap-4">
+                <Div className="flex flex-col gap-3">
                   <Div className="flex items-center justify-between">
                     <Span className="text-sm font-medium">
                       {t(
@@ -938,7 +938,7 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   {stats?.topPerformingSources
                     ?.slice(0, 5)
                     .map((source, index) => (
@@ -946,7 +946,7 @@ export function LeadsStatsClient({
                         key={index}
                         className="flex items-center justify-between"
                       >
-                        <Div className="space-y-1">
+                        <Div className="flex flex-col gap-1">
                           <P className="text-sm font-medium">{source.source}</P>
                           <P className="text-xs text-muted-foreground">
                             {formatNumber(source.leadsGenerated)}{" "}
@@ -974,7 +974,7 @@ export function LeadsStatsClient({
           </Div>
         </TabsContent>
 
-        <TabsContent value="distribution" className="space-y-4">
+        <TabsContent value="distribution" className="flex flex-col gap-4">
           <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Status Distribution */}
             <Card>
@@ -985,9 +985,9 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   {stats?.groupedStats?.byStatus?.map((status, index) => (
-                    <Div key={index} className="space-y-2">
+                    <Div key={index} className="flex flex-col gap-2">
                       <Div className="flex items-center justify-between">
                         <Span className="text-sm font-medium">
                           {status.label}
@@ -1020,9 +1020,9 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   {stats?.groupedStats?.bySource?.map((source, index) => (
-                    <Div key={index} className="space-y-2">
+                    <Div key={index} className="flex flex-col gap-2">
                       <Div className="flex items-center justify-between">
                         <Span className="text-sm font-medium">
                           {source.label}
@@ -1057,9 +1057,9 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   {stats?.groupedStats?.byCountry?.map((country, index) => (
-                    <Div key={index} className="space-y-2">
+                    <Div key={index} className="flex flex-col gap-2">
                       <Div className="flex items-center justify-between">
                         <Span className="text-sm font-medium">
                           {country.label}
@@ -1094,7 +1094,7 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   <Div className="flex items-center justify-between">
                     <Span className="text-sm font-medium">
                       {t("app.admin.leads.leads.admin.stats.withBusinessName")}
@@ -1133,7 +1133,7 @@ export function LeadsStatsClient({
           </Div>
         </TabsContent>
 
-        <TabsContent value="activity" className="space-y-4">
+        <TabsContent value="activity" className="flex flex-col gap-4">
           <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Recent Activity */}
             <Card>
@@ -1144,15 +1144,15 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-4">
+                <Div className="flex flex-col gap-4">
                   {stats?.recentActivity
                     ?.slice(0, 10)
                     .map((activity, index) => (
                       <Div
                         key={index}
-                        className="flex items-start space-x-3 p-3 rounded-lg border"
+                        className="flex items-start flex flex-row gap-3 p-3 rounded-lg border"
                       >
-                        <Div className="flex-1 space-y-1">
+                        <Div className="flex-1 flex flex-col gap-1">
                           <Div className="flex items-center justify-between">
                             <P className="text-sm font-medium">
                               {activity.leadBusinessName || activity.leadEmail}
@@ -1185,10 +1185,10 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   {stats?.groupedStats?.byEngagementLevel?.map(
                     (engagement, index) => (
-                      <Div key={index} className="space-y-2">
+                      <Div key={index} className="flex flex-col gap-2">
                         <Div className="flex items-center justify-between">
                           <Span className="text-sm font-medium">
                             {engagement.label}
@@ -1218,7 +1218,7 @@ export function LeadsStatsClient({
           </Div>
         </TabsContent>
 
-        <TabsContent value="topPerformers" className="space-y-4">
+        <TabsContent value="topPerformers" className="flex flex-col gap-4">
           <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Top Performing Campaigns */}
             <Card>
@@ -1231,11 +1231,11 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-4">
+                <Div className="flex flex-col gap-4">
                   {stats?.topPerformingCampaigns?.map((campaign, index) => (
                     <Div
                       key={index}
-                      className="p-3 rounded-lg border space-y-2"
+                      className="p-3 rounded-lg border flex flex-col gap-2"
                     >
                       <Div className="flex items-center justify-between">
                         <H4 className="text-sm font-medium">
@@ -1298,11 +1298,11 @@ export function LeadsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-4">
+                <Div className="flex flex-col gap-4">
                   {stats?.topPerformingSources?.map((source, index) => (
                     <Div
                       key={index}
-                      className="p-3 rounded-lg border space-y-2"
+                      className="p-3 rounded-lg border flex flex-col gap-2"
                     >
                       <Div className="flex items-center justify-between">
                         <H4 className="text-sm font-medium">{source.source}</H4>

@@ -45,7 +45,7 @@ export default async function LeadsEmailsPage({
   });
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Page Description */}
       <Div>
         <P className="text-gray-600 dark:text-gray-400">
@@ -75,7 +75,7 @@ export default async function LeadsEmailsPage({
               <TabsContent
                 key={journey.variant}
                 value={journey.variant}
-                className="space-y-4"
+                className="flex flex-col gap-4"
               >
                 {/* Journey Description */}
                 <Div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
@@ -99,7 +99,7 @@ export default async function LeadsEmailsPage({
                           {getStageDisplayName(stage)}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-3">
+                      <CardContent className="flex flex-col gap-3">
                         <Div className="text-sm text-gray-600 dark:text-gray-400">
                           <P>
                             <strong>

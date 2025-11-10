@@ -49,9 +49,9 @@ class HelpRepository {
 
         if (!command) {
           return fail({
-          message: "app.api.v1.core.system.help.post.errors.notFound.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                      messageParams: { command: data.command },
+            message: "app.api.v1.core.system.help.post.errors.notFound.title",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+            messageParams: { command: data.command },
           });
         }
 
@@ -68,9 +68,9 @@ class HelpRepository {
       const parsedError = parseError(error);
       logger.error("Failed to generate help information", parsedError);
       return fail({
-          message: "app.api.v1.core.system.help.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message: "app.api.v1.core.system.help.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }

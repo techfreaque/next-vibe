@@ -36,7 +36,7 @@ export default async function CronHistoryPage({
   const { locale } = await params;
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* History Content */}
       <CronHistoryClient locale={locale} />
     </Div>

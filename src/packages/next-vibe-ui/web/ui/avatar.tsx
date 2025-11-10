@@ -4,10 +4,9 @@ import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
-// Cross-platform types for native import
-export interface AvatarProps {
+// Cross-platform types
+export interface AvatarRootProps {
   className?: string;
-  alt?: string;
   children?: React.ReactNode;
 }
 
@@ -22,46 +21,42 @@ export interface AvatarFallbackProps {
   children?: React.ReactNode;
 }
 
-const Avatar = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Root>,
-  AvatarProps
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Root
-    ref={ref}
-    className={cn(
-      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
-      className,
-    )}
-    {...props}
-  />
-));
+export function Avatar({ className, children, ...props }: AvatarRootProps): React.JSX.Element {
+  return (
+    <AvatarPrimitive.Root
+      className={cn(
+        "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </AvatarPrimitive.Root>
+  );
+}
 Avatar.displayName = AvatarPrimitive.Root.displayName;
 
-const AvatarImage = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Image>,
-  AvatarImageProps
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Image
-    ref={ref}
-    className={cn("aspect-square h-full w-full", className)}
-    {...props}
-  />
-));
+export function AvatarImage({ className, ...props }: AvatarImageProps): React.JSX.Element {
+  return (
+    <AvatarPrimitive.Image
+      className={cn("aspect-square h-full w-full", className)}
+      {...props}
+    />
+  );
+}
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 
-const AvatarFallback = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Fallback>,
-  AvatarFallbackProps
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Fallback
-    ref={ref}
-    className={cn(
-      "flex h-full w-full items-center justify-center rounded-full bg-muted",
-      className,
-    )}
-    {...props}
-  />
-));
+export function AvatarFallback({ className, children, ...props }: AvatarFallbackProps): React.JSX.Element {
+  return (
+    <AvatarPrimitive.Fallback
+      className={cn(
+        "flex h-full w-full items-center justify-center rounded-full bg-muted",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </AvatarPrimitive.Fallback>
+  );
+}
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
-
-export { Avatar, AvatarFallback, AvatarImage };

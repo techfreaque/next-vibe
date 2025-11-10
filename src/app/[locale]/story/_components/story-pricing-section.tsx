@@ -37,9 +37,9 @@ export function StoryPricingSection({
   const FREE_CREDITS = products[ProductIds.FREE_TIER].credits;
 
   return (
-    <Container className="py-16 space-y-12">
+    <Container className="py-16 flex flex-col gap-12">
       {/* Section Header */}
-      <Div className="text-center space-y-4">
+      <Div className="text-center flex flex-col gap-4">
         <H2 className="text-3xl font-bold tracking-tight">
           {t("app.story._components.home.pricingSection.title")}
         </H2>
@@ -49,7 +49,7 @@ export function StoryPricingSection({
       </Div>
 
       {/* Overview Section */}
-      <Div className="space-y-6">
+      <Div className="flex flex-col gap-6">
         <OverviewTab
           locale={locale}
           subscriptionPrice={SUBSCRIPTION_PRICE}
@@ -61,7 +61,7 @@ export function StoryPricingSection({
       </Div>
 
       {/* Buy Credits Section */}
-      <Div className="space-y-6">
+      <Div className="flex flex-col gap-6">
         <BuyCreditsTab
           locale={locale}
           isAuthenticated={isAuthenticated}

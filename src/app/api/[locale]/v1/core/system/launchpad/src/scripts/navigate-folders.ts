@@ -23,7 +23,9 @@ const logger = {
     process.stdout.write(`${message}\n`);
   },
   error(message: string, error?: Error | string): void {
-    const errorStr = error ? ` ${error instanceof Error ? error.message : String(error)}` : "";
+    const errorStr = error
+      ? ` ${error instanceof Error ? error.message : String(error)}`
+      : "";
     process.stderr.write(`${message}${errorStr}\n`);
   },
 };
@@ -69,7 +71,10 @@ async function openInVSCode(folderPath: string): Promise<void> {
     await execAsync(`code "${folderPath}"`);
     logger.log("VS Code opened successfully ✅");
   } catch (error) {
-    logger.error("Failed to open VS Code:", error instanceof Error ? error : String(error));
+    logger.error(
+      "Failed to open VS Code:",
+      error instanceof Error ? error : String(error),
+    );
     logger.error("Failed to open VS Code. Is it installed and in your PATH?");
   }
 }
@@ -341,7 +346,9 @@ export async function navigateFolders(
               logger.log(
                 `⚠️  Package directory does not exist: ${packagePath}`,
               );
-              const cloneResult = await inquirer.prompt<{ shouldCloneRepo: boolean }>([
+              const cloneResult = await inquirer.prompt<{
+                shouldCloneRepo: boolean;
+              }>([
                 {
                   type: "confirm",
                   name: "shouldCloneRepo",
@@ -383,7 +390,10 @@ export async function navigateFolders(
     // Clear screen when exiting
     clearScreen();
   } catch (error) {
-    logger.error("Error navigating folders:", error instanceof Error ? error : String(error));
+    logger.error(
+      "Error navigating folders:",
+      error instanceof Error ? error : String(error),
+    );
     // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
     throw error;
   }

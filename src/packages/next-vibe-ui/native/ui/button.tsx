@@ -34,9 +34,7 @@ function Button({
 
     if (Array.isArray(content)) {
       return content.map((child, index) => (
-        <React.Fragment key={index}>
-          {renderChildren(child)}
-        </React.Fragment>
+        <React.Fragment key={index}>{renderChildren(child)}</React.Fragment>
       ));
     }
 

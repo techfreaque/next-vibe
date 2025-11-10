@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink } from 'next-vibe-ui/ui/icons';
+import { ExternalLink } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Span } from "next-vibe-ui/ui/span";
 import { Link } from "next-vibe-ui/ui/link";
@@ -45,7 +45,9 @@ export function LinkWidget({
         className={cn("text-muted-foreground italic", className)}
         style={style}
       >
-        {t("app.api.v1.core.system.unifiedInterface.react.widgets.link.invalidData")}
+        {t(
+          "app.api.v1.core.system.unifiedInterface.react.widgets.link.invalidData",
+        )}
       </Span>
     );
   }

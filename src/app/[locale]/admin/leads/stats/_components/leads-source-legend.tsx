@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Eye, EyeOff } from 'next-vibe-ui/ui/icons';
+import { Eye, EyeOff } from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -64,7 +64,7 @@ export function LeadsSourceLegend({
           </Badge>
         </Div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col gap-4">
         {/* Control buttons */}
         <Div className="flex items-center justify-between pb-2 border-b">
           <Div className="flex gap-2">
@@ -108,7 +108,7 @@ export function LeadsSourceLegend({
         </Div>
 
         {/* Source legend items */}
-        <Div className="space-y-3">
+        <Div className="flex flex-col gap-3">
           {sources.map((source) => (
             <Div
               key={source.source}

@@ -149,9 +149,7 @@ export function RedditStyleView({
     // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((t) =>
-        t.title.toLowerCase().includes(query),
-      );
+      filtered = filtered.filter((t) => t.title.toLowerCase().includes(query));
     }
 
     // Sort based on mode
@@ -242,7 +240,7 @@ export function RedditStyleView({
       <Div className="flex-1 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full">
         <Div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pt-20 pb-8">
           {/* Forum Header */}
-          <Div className="mb-6 space-y-2">
+          <Div className="mb-6 flex flex-col gap-2">
             <Span className="text-3xl font-bold">
               {t("app.chat.publicFeed.header.title")}
             </Span>
@@ -253,184 +251,186 @@ export function RedditStyleView({
 
           {/* Header with Sort and Search */}
           <Div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b mb-4 pb-4">
-          {/* Sort Buttons */}
-          <Div className="flex gap-1 mb-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSortMode("hot")}
-              className={cn(
-                "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
-                sortMode === "hot" &&
-                  "bg-primary/10 text-primary hover:bg-primary/20",
-              )}
-            >
-              <Flame className="h-4 w-4" />
-              {t("app.chat.publicFeed.sort.hot")}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSortMode("rising")}
-              className={cn(
-                "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
-                sortMode === "rising" &&
-                  "bg-primary/10 text-primary hover:bg-primary/20",
-              )}
-            >
-              <TrendingUp className="h-4 w-4" />
-              {t("app.chat.publicFeed.sort.rising")}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSortMode("new")}
-              className={cn(
-                "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
-                sortMode === "new" &&
-                  "bg-primary/10 text-primary hover:bg-primary/20",
-              )}
-            >
-              <Plus className="h-4 w-4" />
-              {t("app.chat.publicFeed.sort.new")}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSortMode("following")}
-              className={cn(
-                "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
-                sortMode === "following" &&
-                  "bg-primary/10 text-primary hover:bg-primary/20",
-              )}
-            >
-              <Heart className="h-4 w-4" />
-              {t("app.chat.publicFeed.sort.following")}
-            </Button>
-          </Div>
-
-          {/* Search Bar */}
-          <Div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder={t("app.chat.publicFeed.searchPlaceholder")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </Div>
-        </Div>
-
-        {/* Thread List */}
-        <Div className="space-y-2">
-          {displayedThreads.length === 0 ? (
-            <Div className="text-center py-12 text-muted-foreground">
-              <Span className="text-lg">
-                {searchQuery
-                  ? t("app.chat.publicFeed.noResults")
-                  : t("app.chat.publicFeed.noThreads")}
-              </Span>
-            </Div>
-          ) : (
-            displayedThreads.map((thread) => (
-              <Div
-                key={thread.id}
-                onClick={() => handleThreadClick(thread.id)}
+            {/* Sort Buttons */}
+            <Div className="flex gap-1 mb-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSortMode("hot")}
                 className={cn(
-                  "border rounded-lg hover:bg-accent/50 hover:border-primary/20 transition-all duration-200 cursor-pointer",
-                  "flex gap-3 p-3 hover:shadow-md",
+                  "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
+                  sortMode === "hot" &&
+                    "bg-primary/10 text-primary hover:bg-primary/20",
                 )}
               >
-                {/* Vote Section */}
-                <Div className="flex flex-col items-center gap-1 min-w-12">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "h-6 w-6 hover:text-orange-500",
-                      thread.userVote === 1 && "text-orange-500",
-                    )}
-                    onClick={(e) => handleVote(thread.id, 1, e)}
-                  >
-                    <ArrowBigUp className="h-5 w-5" />
-                  </Button>
-                  <Span
-                    className={cn(
-                      "font-bold text-sm",
-                      thread.score > 0 && "text-orange-500",
-                      thread.score < 0 && "text-blue-500",
-                    )}
-                  >
-                    {thread.score}
-                  </Span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "h-6 w-6 hover:text-blue-500",
-                      thread.userVote === -1 && "text-blue-500",
-                    )}
-                    onClick={(e) => handleVote(thread.id, -1, e)}
-                  >
-                    <ArrowBigDown className="h-5 w-5" />
-                  </Button>
-                </Div>
+                <Flame className="h-4 w-4" />
+                {t("app.chat.publicFeed.sort.hot")}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSortMode("rising")}
+                className={cn(
+                  "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
+                  sortMode === "rising" &&
+                    "bg-primary/10 text-primary hover:bg-primary/20",
+                )}
+              >
+                <TrendingUp className="h-4 w-4" />
+                {t("app.chat.publicFeed.sort.rising")}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSortMode("new")}
+                className={cn(
+                  "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
+                  sortMode === "new" &&
+                    "bg-primary/10 text-primary hover:bg-primary/20",
+                )}
+              >
+                <Plus className="h-4 w-4" />
+                {t("app.chat.publicFeed.sort.new")}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSortMode("following")}
+                className={cn(
+                  "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
+                  sortMode === "following" &&
+                    "bg-primary/10 text-primary hover:bg-primary/20",
+                )}
+              >
+                <Heart className="h-4 w-4" />
+                {t("app.chat.publicFeed.sort.following")}
+              </Button>
+            </Div>
 
-                {/* Content Section */}
-                <Div className="flex-1 min-w-0 space-y-1">
-                  {/* Title Row */}
-                  <Div className="font-semibold text-base line-clamp-2 hover:underline">
-                    {thread.title}
-                  </Div>
+            {/* Search Bar */}
+            <Div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder={t("app.chat.publicFeed.searchPlaceholder")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </Div>
+          </Div>
 
-                  {/* Metadata Row */}
-                  <Div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    <Badge variant="outline" className="text-xs px-1.5 py-0">
-                      {thread.category}
-                    </Badge>
-                    <Span>{formatTimestamp(thread.timestamp)}</Span>
-                    <Span className="hover:underline">{thread.authorName}</Span>
-                    {thread.modelNames.length > 0 && (
-                      <Span className="text-blue-500 font-medium">
-                        {thread.modelNames.join(", ")}
-                      </Span>
-                    )}
-                    {thread.hasBestAnswer && (
-                      <Badge
-                        variant="secondary"
-                        className="text-xs px-1.5 py-0 bg-amber-500/10 text-amber-600 dark:text-amber-400 gap-1"
-                      >
-                        <Award className="h-3 w-3" />
-                        {t("app.chat.publicFeed.bestAnswer")}
-                      </Badge>
-                    )}
-                  </Div>
-
-                  {/* Stats Row */}
-                  <Div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
-                    <Div className="flex items-center gap-1">
-                      <MessageSquare className="h-3.5 w-3.5" />
-                      <Span>
-                        {thread.messageCount}{" "}
-                        {t("app.chat.publicFeed.comments")}
-                      </Span>
-                    </Div>
-                    {thread.isRising && (
-                      <Badge
-                        variant="secondary"
-                        className="text-xs px-1.5 py-0 bg-green-500/10 text-green-600 dark:text-green-400"
-                      >
-                        <TrendingUp className="h-3 w-3 mr-1" />
-                        {t("app.chat.publicFeed.rising")}
-                      </Badge>
-                    )}
-                  </Div>
-                </Div>
+          {/* Thread List */}
+          <Div className="flex flex-col gap-2">
+            {displayedThreads.length === 0 ? (
+              <Div className="text-center py-12 text-muted-foreground">
+                <Span className="text-lg">
+                  {searchQuery
+                    ? t("app.chat.publicFeed.noResults")
+                    : t("app.chat.publicFeed.noThreads")}
+                </Span>
               </Div>
-            ))
-          )}
-        </Div>
+            ) : (
+              displayedThreads.map((thread) => (
+                <Div
+                  key={thread.id}
+                  onClick={() => handleThreadClick(thread.id)}
+                  className={cn(
+                    "border rounded-lg hover:bg-accent/50 hover:border-primary/20 transition-all duration-200 cursor-pointer",
+                    "flex gap-3 p-3 hover:shadow-md",
+                  )}
+                >
+                  {/* Vote Section */}
+                  <Div className="flex flex-col items-center gap-1 min-w-12">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={cn(
+                        "h-6 w-6 hover:text-orange-500",
+                        thread.userVote === 1 && "text-orange-500",
+                      )}
+                      onClick={(e) => handleVote(thread.id, 1, e)}
+                    >
+                      <ArrowBigUp className="h-5 w-5" />
+                    </Button>
+                    <Span
+                      className={cn(
+                        "font-bold text-sm",
+                        thread.score > 0 && "text-orange-500",
+                        thread.score < 0 && "text-blue-500",
+                      )}
+                    >
+                      {thread.score}
+                    </Span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={cn(
+                        "h-6 w-6 hover:text-blue-500",
+                        thread.userVote === -1 && "text-blue-500",
+                      )}
+                      onClick={(e) => handleVote(thread.id, -1, e)}
+                    >
+                      <ArrowBigDown className="h-5 w-5" />
+                    </Button>
+                  </Div>
+
+                  {/* Content Section */}
+                  <Div className="flex-1 min-w-0 flex flex-col gap-1">
+                    {/* Title Row */}
+                    <Div className="font-semibold text-base line-clamp-2 hover:underline">
+                      {thread.title}
+                    </Div>
+
+                    {/* Metadata Row */}
+                    <Div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <Badge variant="outline" className="text-xs px-1.5 py-0">
+                        {thread.category}
+                      </Badge>
+                      <Span>{formatTimestamp(thread.timestamp)}</Span>
+                      <Span className="hover:underline">
+                        {thread.authorName}
+                      </Span>
+                      {thread.modelNames.length > 0 && (
+                        <Span className="text-blue-500 font-medium">
+                          {thread.modelNames.join(", ")}
+                        </Span>
+                      )}
+                      {thread.hasBestAnswer && (
+                        <Badge
+                          variant="secondary"
+                          className="text-xs px-1.5 py-0 bg-amber-500/10 text-amber-600 dark:text-amber-400 gap-1"
+                        >
+                          <Award className="h-3 w-3" />
+                          {t("app.chat.publicFeed.bestAnswer")}
+                        </Badge>
+                      )}
+                    </Div>
+
+                    {/* Stats Row */}
+                    <Div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
+                      <Div className="flex items-center gap-1">
+                        <MessageSquare className="h-3.5 w-3.5" />
+                        <Span>
+                          {thread.messageCount}{" "}
+                          {t("app.chat.publicFeed.comments")}
+                        </Span>
+                      </Div>
+                      {thread.isRising && (
+                        <Badge
+                          variant="secondary"
+                          className="text-xs px-1.5 py-0 bg-green-500/10 text-green-600 dark:text-green-400"
+                        >
+                          <TrendingUp className="h-3 w-3 mr-1" />
+                          {t("app.chat.publicFeed.rising")}
+                        </Badge>
+                      )}
+                    </Div>
+                  </Div>
+                </Div>
+              ))
+            )}
+          </Div>
         </Div>
       </Div>
     </Div>

@@ -131,7 +131,7 @@ function renderResponseField(
 
   // Use WidgetRenderer to render the field
   return (
-    <Div key={field.name} className="space-y-1">
+    <Div key={field.name} className="flex flex-col gap-1">
       {/* Field Label (if provided) */}
       {field.label && (
         <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
@@ -163,7 +163,7 @@ function renderFallback(
   const { t } = simpleT(locale);
 
   return (
-    <Div className="space-y-2">
+    <Div className="flex flex-col gap-2">
       <Div className="flex items-center gap-2 text-xs text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-md p-2">
         {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
         <Span>⚠️</Span>
@@ -214,7 +214,7 @@ export function ResponseFieldsRenderer({
 
   // Render all response fields using WidgetRenderer
   return (
-    <Div className="space-y-3">
+    <Div className="flex flex-col gap-3">
       {widgetMetadata.responseFields.map((field) =>
         renderResponseField(field, result, context, locale),
       )}

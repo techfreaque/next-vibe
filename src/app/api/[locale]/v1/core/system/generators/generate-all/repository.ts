@@ -320,9 +320,10 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       outputLines.push(`❌ Generation failed: ${errorMessage}`);
 
       return fail({
-          message: "app.api.v1.core.system.generators.generateAll.post.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: errorMessage.message },
+        message:
+          "app.api.v1.core.system.generators.generateAll.post.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage.message },
       });
     }
   }

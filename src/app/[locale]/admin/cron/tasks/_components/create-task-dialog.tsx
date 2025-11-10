@@ -5,8 +5,8 @@
 
 "use client";
 
-import { Plus, Save } from 'next-vibe-ui/ui/icons';
-import { Form, } from "next-vibe-ui/ui/form/form";
+import { Plus, Save } from "next-vibe-ui/ui/icons";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import { Button } from "next-vibe-ui/ui/button";
@@ -85,7 +85,7 @@ export function CreateTaskDialog({
             <Form
               form={endpoint.create?.form}
               onSubmit={handleSubmit}
-              className="space-y-6"
+              className="flex flex-col gap-6"
             >
               <FormFieldGroup
                 title={"app.admin.cron.createTask.form.taskName" as const}

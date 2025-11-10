@@ -454,7 +454,8 @@ export const translations: typeof enTranslations = {
     // Header
     header: {
       title: "Öffentliches Forum",
-      description: "Ein durch den First Amendment geschützter Raum, in dem freie Meinungsäußerung gedeiht. Diskutieren Sie mit KI-Modellen und Nutzern weltweit. Teilen Sie Ideen, hinterfragen Sie Perspektiven und sprechen Sie frei ohne Zensur.",
+      description:
+        "Ein durch den First Amendment geschützter Raum, in dem freie Meinungsäußerung gedeiht. Diskutieren Sie mit KI-Modellen und Nutzern weltweit. Teilen Sie Ideen, hinterfragen Sie Perspektiven und sprechen Sie frei ohne Zensur.",
     },
     // Sort modes
     sort: {

@@ -87,9 +87,7 @@ export abstract class BaseToolsRepositoryImpl<TRequest, TResponse>
     sampleTool?: ToolMetadata,
   ): void {
     const resultKeys =
-      typeof result === "object" && result !== null
-        ? Object.keys(result)
-        : [];
+      typeof result === "object" && result !== null ? Object.keys(result) : [];
     logger.info(`[${this.platformName}] Returning result`, {
       resultKeys,
       toolsCount,

@@ -157,9 +157,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         token,
       });
       return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.tokenValidationFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { operation: "findValidByToken" },
+        message:
+          "app.api.v1.core.user.public.resetPassword.errors.tokenValidationFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { operation: "findValidByToken" },
       });
     }
   }
@@ -184,9 +185,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         userId,
       });
       return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.userLookupFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { userId, operation: "findByUserId" },
+        message:
+          "app.api.v1.core.user.public.resetPassword.errors.userLookupFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { userId, operation: "findByUserId" },
       });
     }
   }
@@ -207,9 +209,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         token,
       });
       return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.tokenDeletionFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { operation: "deleteByToken" },
+        message:
+          "app.api.v1.core.user.public.resetPassword.errors.tokenDeletionFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { operation: "deleteByToken" },
       });
     }
   }
@@ -230,9 +233,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         userId,
       });
       return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.userDeletionFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { userId, operation: "deleteByUserId" },
+        message:
+          "app.api.v1.core.user.public.resetPassword.errors.userDeletionFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { userId, operation: "deleteByUserId" },
       });
     }
   }
@@ -257,9 +261,9 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         error: parseError(error),
       });
       return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.resetFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { operation: "deleteExpired" },
+        message: "app.api.v1.core.user.public.resetPassword.errors.resetFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { operation: "deleteExpired" },
       });
     }
   }
@@ -312,13 +316,14 @@ export class PasswordRepositoryImpl implements PasswordRepository {
 
         if (!results || results.length === 0) {
           return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.tokenCreationFailed",
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-                      messageParams: {
+            message:
+              "app.api.v1.core.user.public.resetPassword.errors.tokenCreationFailed",
+            errorType: ErrorResponseTypes.DATABASE_ERROR,
+            messageParams: {
               error:
                 "app.api.v1.core.user.public.resetPassword.errors.noDataReturned",
             },
-      });
+          });
         }
       }
 
@@ -330,9 +335,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         userId,
       });
       return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.tokenCreationFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { email, userId, operation: "generateJwtToken" },
+        message:
+          "app.api.v1.core.user.public.resetPassword.errors.tokenCreationFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { email, userId, operation: "generateJwtToken" },
       });
     }
   }
@@ -359,9 +365,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         );
         if (!resetRecordResponse.success || !resetRecordResponse.data) {
           return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.tokenInvalid",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-      });
+            message:
+              "app.api.v1.core.user.public.resetPassword.errors.tokenInvalid",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
         }
 
         const resetRecord = resetRecordResponse.data;
@@ -377,9 +384,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
           }
 
           return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.tokenExpired",
-          errorType: ErrorResponseTypes.TOKEN_EXPIRED_ERROR,
-      });
+            message:
+              "app.api.v1.core.user.public.resetPassword.errors.tokenExpired",
+            errorType: ErrorResponseTypes.TOKEN_EXPIRED_ERROR,
+          });
         }
 
         return success({
@@ -389,16 +397,18 @@ export class PasswordRepositoryImpl implements PasswordRepository {
       } catch (jwtError) {
         logger.debug("Invalid JWT token", parseError(jwtError));
         return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.tokenInvalid",
+          message:
+            "app.api.v1.core.user.public.resetPassword.errors.tokenInvalid",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-      });
+        });
       }
     } catch (error) {
       logger.error("Error verifying JWT token", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.tokenVerificationFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { operation: "verifyJwtToken" },
+        message:
+          "app.api.v1.core.user.public.resetPassword.errors.tokenVerificationFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { operation: "verifyJwtToken" },
       });
     }
   }
@@ -423,10 +433,11 @@ export class PasswordRepositoryImpl implements PasswordRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.userNotFound",
+          message:
+            "app.api.v1.core.user.public.resetPassword.errors.userNotFound",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { email },
-      });
+          messageParams: { email },
+        });
       }
 
       const userId = userResponse.data.id;
@@ -439,9 +450,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         email,
       });
       return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.tokenCreationFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { email, operation: "createResetToken" },
+        message:
+          "app.api.v1.core.user.public.resetPassword.errors.tokenCreationFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { email, operation: "createResetToken" },
       });
     }
   }
@@ -461,9 +473,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
 
       if (!passwordResetResponse.success || !passwordResetResponse.data) {
         return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.tokenInvalid",
+          message:
+            "app.api.v1.core.user.public.resetPassword.errors.tokenInvalid",
           errorType: ErrorResponseTypes.NOT_FOUND,
-      });
+        });
       }
 
       return success(passwordResetResponse.data.userId);
@@ -472,9 +485,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         error: parseError(error),
       });
       return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.tokenVerificationFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { operation: "verifyResetToken" },
+        message:
+          "app.api.v1.core.user.public.resetPassword.errors.tokenVerificationFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { operation: "verifyResetToken" },
       });
     }
   }
@@ -507,10 +521,11 @@ export class PasswordRepositoryImpl implements PasswordRepository {
 
       if (!updatedUser) {
         return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.passwordUpdateFailed",
+          message:
+            "app.api.v1.core.user.public.resetPassword.errors.passwordUpdateFailed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: { userId },
-      });
+          messageParams: { userId },
+        });
       }
 
       // Delete the used token
@@ -523,9 +538,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         token,
       });
       return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.passwordResetFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { operation: "resetPassword" },
+        message:
+          "app.api.v1.core.user.public.resetPassword.errors.passwordResetFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { operation: "resetPassword" },
       });
     }
   }
@@ -546,18 +562,17 @@ export class PasswordRepositoryImpl implements PasswordRepository {
 
       // We don't want to reveal if the email exists or not for security reasons
       // So we always return a success message
-      return success(
-        "app.api.v1.core.user.auth.resetPassword.emailSent",
-      );
+      return success("app.api.v1.core.user.auth.resetPassword.emailSent");
     } catch (error) {
       logger.error("Error requesting password reset", {
         error: parseError(error),
         email,
       });
       return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.requestFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { email, operation: "requestPasswordReset" },
+        message:
+          "app.api.v1.core.user.public.resetPassword.errors.requestFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { email, operation: "requestPasswordReset" },
       });
     }
   }
@@ -582,9 +597,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
       if (!resetPayloadResponse.success) {
         logger.debug("Invalid or expired token", { email });
         return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.tokenExpired",
+          message:
+            "app.api.v1.core.user.public.resetPassword.errors.tokenExpired",
           errorType: ErrorResponseTypes.TOKEN_EXPIRED_ERROR,
-      });
+        });
       }
 
       const resetPayload = resetPayloadResponse.data;
@@ -596,10 +612,11 @@ export class PasswordRepositoryImpl implements PasswordRepository {
           tokenEmail: resetPayload.email,
         });
         return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.emailMismatch",
+          message:
+            "app.api.v1.core.user.public.resetPassword.errors.emailMismatch",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: { email, tokenEmail: resetPayload.email },
-      });
+          messageParams: { email, tokenEmail: resetPayload.email },
+        });
       }
 
       // Find the user
@@ -612,10 +629,11 @@ export class PasswordRepositoryImpl implements PasswordRepository {
       if (!userResponse.success) {
         logger.debug("User not found", { userId: resetPayload.userId });
         return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.userNotFound",
+          message:
+            "app.api.v1.core.user.public.resetPassword.errors.userNotFound",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId: resetPayload.userId },
-      });
+          messageParams: { userId: resetPayload.userId },
+        });
       }
 
       // Update the user's password
@@ -628,18 +646,17 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         userId: resetPayload.userId,
         email,
       });
-      return success(
-        "app.api.v1.core.user.auth.resetPassword.success",
-      );
+      return success("app.api.v1.core.user.auth.resetPassword.success");
     } catch (error) {
       logger.error("Error confirming password reset", {
         error: parseError(error),
         email,
       });
       return fail({
-          message: "app.api.v1.core.user.public.resetPassword.errors.confirmationFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { email, operation: "confirmPasswordReset" },
+        message:
+          "app.api.v1.core.user.public.resetPassword.errors.confirmationFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { email, operation: "confirmPasswordReset" },
       });
     }
   }

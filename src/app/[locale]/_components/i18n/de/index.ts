@@ -182,8 +182,7 @@ export const translations: typeof enTranslations = {
       description:
         "Erschwingliche KI-Chat-Pläne für jeden. Starten Sie kostenlos mit 10 täglichen Nachrichten.",
       imageAlt: "Preispläne",
-      keywords:
-        "preise, pläne, abonnement, KI-chat-preise, {{appName}} preise",
+      keywords: "preise, pläne, abonnement, KI-chat-preise, {{appName}} preise",
       ogTitle: "Preispläne - {{appName}}",
       ogDescription: "Einfache, transparente Preise für unzensierten KI-Chat",
       twitterTitle: "Preise - {{appName}}",
@@ -231,9 +230,9 @@ export const translations: typeof enTranslations = {
           organization: "Organisation",
           contactPoint: "Kontaktstelle",
         },
-  
+
         contactPoint: {
-            telephone: "{{config.group.contact.telephone}}",
+          telephone: "{{config.group.contact.telephone}}",
           contactType: "Kundenservice",
         },
       },

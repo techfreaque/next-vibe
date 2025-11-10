@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2 } from 'next-vibe-ui/ui/icons';
+import { Loader2 } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
@@ -86,7 +86,7 @@ export function WidgetSkeleton({
   className?: string;
 }): JSX.Element {
   return (
-    <Div className={cn("space-y-2", className)}>
+    <Div className={cn("flex flex-col gap-2", className)}>
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
           key={i}

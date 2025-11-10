@@ -6,7 +6,7 @@ import {
   Sparkles,
   Lightbulb,
   Zap,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 

@@ -5,7 +5,13 @@
 
 "use client";
 
-import { BarChart3, List, Mail, Settings, TestTube } from 'next-vibe-ui/ui/icons';
+import {
+  BarChart3,
+  List,
+  Mail,
+  Settings,
+  TestTube,
+} from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
@@ -71,7 +77,7 @@ export function LeadsNavigation({
   return (
     <Div className="border-b border-gray-200 dark:border-gray-700">
       <nav
-        className="flex space-x-8"
+        className="flex flex flex-row gap-8"
         aria-label={t("app.admin.leads.leads.admin.tabs.overview")}
       >
         {navigationItems.map((item) => {

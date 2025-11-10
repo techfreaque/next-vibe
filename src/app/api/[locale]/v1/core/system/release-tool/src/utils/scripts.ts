@@ -64,9 +64,9 @@ export function runTests(
   if (!isPackageJson(parsedJson)) {
     logger.error(`Invalid package.json format in ${packagePath}`);
     return fail({
-          message: "app.api.v1.core.system.releaseTool.scripts.invalidPackageJson",
-          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
-                messageParams: { path: packagePath },
+      message: "app.api.v1.core.system.releaseTool.scripts.invalidPackageJson",
+      errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+      messageParams: { path: packagePath },
     });
   }
 
@@ -84,9 +84,9 @@ export function runTests(
   } catch (error) {
     logger.error(`Tests failed in ${packagePath}`, parseError(error));
     return fail({
-          message: "app.api.v1.core.system.releaseTool.scripts.testsFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { path: packagePath, error: String(error) },
+      message: "app.api.v1.core.system.releaseTool.scripts.testsFailed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { path: packagePath, error: String(error) },
     });
   }
 }
@@ -136,9 +136,9 @@ export const lint = (
       logger.info(`\n${lintOutput}`);
     }
     return fail({
-          message: "app.api.v1.core.system.releaseTool.scripts.lintFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { path: cwd, output: lintOutput },
+      message: "app.api.v1.core.system.releaseTool.scripts.lintFailed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { path: cwd, output: lintOutput },
     });
   }
 };
@@ -178,9 +178,10 @@ export const typecheck = (
       if (!isPackageJson(parsedJson)) {
         logger.error(`Invalid package.json format in ${cwd}`);
         return fail({
-          message: "app.api.v1.core.system.releaseTool.scripts.invalidPackageJson",
+          message:
+            "app.api.v1.core.system.releaseTool.scripts.invalidPackageJson",
           errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
-                    messageParams: { path: cwd },
+          messageParams: { path: cwd },
         });
       }
 
@@ -206,9 +207,9 @@ export const typecheck = (
       parseError(error),
     );
     return fail({
-          message: "app.api.v1.core.system.releaseTool.scripts.typecheckFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { path: cwd, error: String(error) },
+      message: "app.api.v1.core.system.releaseTool.scripts.typecheckFailed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { path: cwd, error: String(error) },
     });
   }
 };
@@ -224,9 +225,9 @@ export const build = (
   } catch (error) {
     logger.error(`Build failed in ${cwd}`, parseError(error));
     return fail({
-          message: "app.api.v1.core.system.releaseTool.scripts.buildFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { path: cwd, error: String(error) },
+      message: "app.api.v1.core.system.releaseTool.scripts.buildFailed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { path: cwd, error: String(error) },
     });
   }
 };
@@ -270,9 +271,9 @@ function getPackageJson(
   if (!existsSync(pkgPath)) {
     logger.error(`No package.json found in ${cwd}`);
     return fail({
-          message: "app.api.v1.core.system.releaseTool.scripts.packageJsonNotFound",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                messageParams: { path: cwd },
+      message: "app.api.v1.core.system.releaseTool.scripts.packageJsonNotFound",
+      errorType: ErrorResponseTypes.NOT_FOUND,
+      messageParams: { path: cwd },
     });
   }
   // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Script validation requires 'unknown' for runtime checking
@@ -280,9 +281,9 @@ function getPackageJson(
   if (!isPackageJson(parsedJson)) {
     logger.error(`Invalid package.json format in ${cwd}`);
     return fail({
-          message: "app.api.v1.core.system.releaseTool.scripts.invalidPackageJson",
-          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
-                messageParams: { path: cwd },
+      message: "app.api.v1.core.system.releaseTool.scripts.invalidPackageJson",
+      errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+      messageParams: { path: cwd },
     });
   }
   return success(parsedJson);

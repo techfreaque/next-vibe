@@ -26,9 +26,16 @@ const { GET } = createEndpoint({
   title: "app.api.v1.core.system.unifiedInterface.mcp.tools.get.title" as const,
   description:
     "app.api.v1.core.system.unifiedInterface.mcp.tools.get.description" as const,
-  category: "app.api.v1.core.system.unifiedInterface.mcp.tools.category" as const,
+  category:
+    "app.api.v1.core.system.unifiedInterface.mcp.tools.category" as const,
   tags: ["app.api.v1.core.system.unifiedInterface.mcp.tools.tags.mcp" as const],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF] as const,
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+  ] as const,
 
   fields: objectField(
     {
@@ -141,7 +148,8 @@ const { GET } = createEndpoint({
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.system.unifiedInterface.mcp.tools.get.success.title",
+    title:
+      "app.api.v1.core.system.unifiedInterface.mcp.tools.get.success.title",
     description:
       "app.api.v1.core.system.unifiedInterface.mcp.tools.get.success.description",
   },

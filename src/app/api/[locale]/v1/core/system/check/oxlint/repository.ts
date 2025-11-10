@@ -73,7 +73,8 @@ const IGNORED_PATHS = [] as const;
  */
 const PERMISSION_ERROR_CODES = ["EACCES", "permission denied"] as const;
 
-export const LINT_CONFIG_PATH = "../../../../../../../../../lint.config.ts" as const;
+export const LINT_CONFIG_PATH =
+  "../../../../../../../../../lint.config.ts" as const;
 export const OXLINT_CONFIG_PATH = "./.tmp/.oxlintrc.json" as const;
 
 /**
@@ -599,27 +600,27 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       /* eslint-disable i18next/no-literal-string */
       const baseArgs = configExists
         ? [
-          "oxlint",
-          "--format=json",
-          "--config",
-          oxlintConfigPath,
-          "--tsconfig",
-          "./tsconfig.json",
-          ...task.files,
-        ]
+            "oxlint",
+            "--format=json",
+            "--config",
+            oxlintConfigPath,
+            "--tsconfig",
+            "./tsconfig.json",
+            ...task.files,
+          ]
         : [
-          "oxlint",
-          "--format=json",
-          // Fallback: Enable plugins manually if no config
-          "--tsconfig",
-          "./tsconfig.json",
-          "--react-plugin",
-          "--jsx-a11y-plugin",
-          "--nextjs-plugin",
-          "-D",
-          "all",
-          ...task.files,
-        ];
+            "oxlint",
+            "--format=json",
+            // Fallback: Enable plugins manually if no config
+            "--tsconfig",
+            "./tsconfig.json",
+            "--react-plugin",
+            "--jsx-a11y-plugin",
+            "--nextjs-plugin",
+            "-D",
+            "all",
+            ...task.files,
+          ];
       /* eslint-enable i18next/no-literal-string */
 
       // If fix is requested, run oxlint --fix and prettier in parallel
@@ -1001,19 +1002,28 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
 
     return await new Promise((resolve, _reject) => {
       /* eslint-disable i18next/no-literal-string */
-      const configArgs = Object.entries(prettierConfig).flatMap(([key, value]) => {
-        // Convert camelCase to kebab-case for CLI flags
-        const flagName = key.replaceAll(/([A-Z])/g, "-$1").toLowerCase();
-        if (typeof value === "boolean") {
-          return value ? [`--${flagName}`] : [`--no-${flagName}`];
-        }
-        return [`--${flagName}`, String(value)];
-      });
+      const configArgs = Object.entries(prettierConfig).flatMap(
+        ([key, value]) => {
+          // Convert camelCase to kebab-case for CLI flags
+          const flagName = key.replaceAll(/([A-Z])/g, "-$1").toLowerCase();
+          if (typeof value === "boolean") {
+            return value ? [`--${flagName}`] : [`--no-${flagName}`];
+          }
+          return [`--${flagName}`, String(value)];
+        },
+      );
       /* eslint-enable i18next/no-literal-string */
 
       const child = spawn(
         "bunx",
-        ["prettier", "--check", "--log-level", "error", ...configArgs, ...files],
+        [
+          "prettier",
+          "--check",
+          "--log-level",
+          "error",
+          ...configArgs,
+          ...files,
+        ],
         {
           cwd: process.cwd(),
           stdio: ["ignore", "pipe", "pipe"],
@@ -1040,7 +1050,9 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
           return code !== 0 && (stdout.includes(file) || stderr.includes(file));
         });
 
-        logger.debug(`${needsFormatting.length} files need prettier formatting`);
+        logger.debug(
+          `${needsFormatting.length} files need prettier formatting`,
+        );
         resolve(needsFormatting);
       });
 
@@ -1082,14 +1094,16 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
 
     // Convert prettier config to CLI flags
     /* eslint-disable i18next/no-literal-string */
-    const configArgs = Object.entries(prettierConfig).flatMap(([key, value]) => {
-      // Convert camelCase to kebab-case for CLI flags
-      const flagName = key.replaceAll(/([A-Z])/g, "-$1").toLowerCase();
-      if (typeof value === "boolean") {
-        return value ? [`--${flagName}`] : [`--no-${flagName}`];
-      }
-      return [`--${flagName}`, String(value)];
-    });
+    const configArgs = Object.entries(prettierConfig).flatMap(
+      ([key, value]) => {
+        // Convert camelCase to kebab-case for CLI flags
+        const flagName = key.replaceAll(/([A-Z])/g, "-$1").toLowerCase();
+        if (typeof value === "boolean") {
+          return value ? [`--${flagName}`] : [`--no-${flagName}`];
+        }
+        return [`--${flagName}`, String(value)];
+      },
+    );
     /* eslint-enable i18next/no-literal-string */
 
     return await new Promise((resolve, reject) => {
@@ -1122,7 +1136,9 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
           resolve();
         } else {
           // eslint-disable-next-line i18next/no-literal-string
-          reject(new Error(`Prettier failed with exit code ${code}: ${stderr}`));
+          reject(
+            new Error(`Prettier failed with exit code ${code}: ${stderr}`),
+          );
         }
       });
 

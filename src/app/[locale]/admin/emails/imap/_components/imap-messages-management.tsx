@@ -6,7 +6,7 @@
 
 "use client";
 
-import { Filter, RefreshCw } from 'next-vibe-ui/ui/icons';
+import { Filter, RefreshCw } from "next-vibe-ui/ui/icons";
 import { Div } from "next-vibe-ui/ui/div";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Span } from "next-vibe-ui/ui/span";
@@ -83,15 +83,15 @@ export function ImapMessagesManagement(): JSX.Element {
           {t("app.admin.emails.imap.admin.messages.description")}
         </P>
       </Div>
-      <Div className="space-y-6">
+      <Div className="flex flex-col gap-6">
         <Card>
           <CardHeader>
             <Div className="flex items-center justify-between">
-              <CardTitle className="flex items-center space-x-2">
+              <CardTitle className="flex items-center flex flex-row gap-2">
                 <Filter className="h-5 w-5" />
                 <Span>{t("app.admin.emails.imap.admin.messages.filters")}</Span>
               </CardTitle>
-              <Div className="flex items-center space-x-2">
+              <Div className="flex items-center flex flex-row gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -114,7 +114,7 @@ export function ImapMessagesManagement(): JSX.Element {
             </Div>
           </CardHeader>
           <CardContent>
-            <Div className="space-y-6">
+            <Div className="flex flex-col gap-6">
               <FormAlert alert={messagesEndpoint.alert} />
 
               {/* Filters Grid */}
@@ -271,7 +271,7 @@ export function ImapMessagesManagement(): JSX.Element {
               </Div>
 
               {/* Search Bar */}
-              <Div className="flex items-center space-x-4">
+              <Div className="flex items-center flex flex-row gap-4">
                 <Div className="flex-1">
                   <EndpointFormField
                     name="search"
@@ -332,7 +332,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       "app.admin.emails.imap.admin.messages.title",
                     ).toLowerCase()}
                   </Div>
-                  <Div className="flex items-center space-x-2">
+                  <Div className="flex items-center flex flex-row gap-2">
                     <Button
                       variant="outline"
                       size="sm"

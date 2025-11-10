@@ -48,7 +48,7 @@ export function CronTaskEditClient({
   };
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Header with back button */}
       <Div className="flex items-center justify-between">
         <Div>

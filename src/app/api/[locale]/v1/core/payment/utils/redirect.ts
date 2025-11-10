@@ -8,7 +8,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 /**
  * Handles redirect to payment provider checkout
  * Extracts checkout URL from response and redirects the browser
- * 
+ *
  * @param response - The API response containing checkout URL
  * @param onError - Optional callback for error handling
  * @returns true if redirect was initiated, false otherwise
@@ -47,4 +47,3 @@ export function hasCheckoutUrl<T>(
     typeof response.data.checkoutUrl === "string"
   );
 }
-

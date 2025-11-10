@@ -12,8 +12,6 @@ export interface SpanProps
 }
 
 // Web: Just a regular span element
-export const Span = React.forwardRef<HTMLSpanElement, SpanProps>(
-  (props, ref) => <span ref={ref} {...props} />
-);
-
-Span.displayName = "Span";
+export function Span(props: SpanProps): React.JSX.Element {
+  return <span {...props} />;
+}

@@ -341,10 +341,10 @@ export function getHttpProvider(): SmsProvider {
         return fail({
           message: "app.api.v1.core.sms.sms.error.delivery_failed",
           errorType: ErrorResponseTypes.SMS_ERROR,
-        messageParams: {
+          messageParams: {
             error: error instanceof Error ? error.message : unknownErrorMsg,
           },
-      });
+        });
       }
     },
   };

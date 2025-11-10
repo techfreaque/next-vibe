@@ -130,10 +130,10 @@ class CronStatusRepositoryImpl implements ICronStatusRepository {
         error: parsedError.message,
       });
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           error: parsedError.message,
           taskId: data.taskId || "unknown",
         },

@@ -1,12 +1,9 @@
 "use client";
 
 import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { History, TrendingUp } from 'next-vibe-ui/ui/icons';
+import { History, TrendingUp } from "next-vibe-ui/ui/icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
-import {
-  useRouter,
-  useSearchParams,
-} from "next-vibe-ui/hooks/use-navigation";
+import { useRouter, useSearchParams } from "next-vibe-ui/hooks/use-navigation";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import { useEffect, useState } from "react";
 
@@ -89,7 +86,7 @@ export function SubscriptionClientContent({
   }, [searchParams, router, t]);
 
   return (
-    <Container className="py-8 space-y-8">
+    <Container className="py-8 flex flex-col gap-8">
       {/* Header with Back Button and Auth Buttons */}
       <SubscriptionHeader locale={locale} isAuthenticated={isAuthenticated} />
 
@@ -106,7 +103,7 @@ export function SubscriptionClientContent({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center space-y-4"
+        className="text-center flex flex-col gap-4"
       >
         <H1 className="text-4xl font-bold tracking-tight">
           {t("app.subscription.subscription.title")}
@@ -135,7 +132,7 @@ export function SubscriptionClientContent({
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
-        className="space-y-6"
+        className="flex flex-col gap-6"
       >
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview" className="flex items-center gap-2">
@@ -153,7 +150,7 @@ export function SubscriptionClientContent({
         </TabsList>
 
         {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
+        <TabsContent value="overview" className="flex flex-col gap-6">
           <OverviewTab
             locale={locale}
             subscriptionPrice={SUBSCRIPTION_PRICE}
@@ -165,7 +162,7 @@ export function SubscriptionClientContent({
         </TabsContent>
 
         {/* Buy Credits Tab */}
-        <TabsContent value="buy" className="space-y-6">
+        <TabsContent value="buy" className="flex flex-col gap-6">
           <BuyCreditsTab
             locale={locale}
             isAuthenticated={isAuthenticated}
@@ -178,7 +175,7 @@ export function SubscriptionClientContent({
         </TabsContent>
 
         {/* Usage History Tab */}
-        <TabsContent value="history" className="space-y-6">
+        <TabsContent value="history" className="flex flex-col gap-6">
           <HistoryTab locale={locale} initialHistory={initialHistory} />
         </TabsContent>
       </Tabs>

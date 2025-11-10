@@ -1,6 +1,6 @@
 "use client";
 
-import { DashIcon } from 'next-vibe-ui/ui/icons';
+import { DashIcon } from "next-vibe-ui/ui/icons";
 import type { SlotProps } from "input-otp";
 import { OTPInput, OTPInputContext } from "input-otp";
 import { cn } from "next-vibe/shared/utils/utils";
@@ -35,34 +35,34 @@ export interface OTPContextValue {
   maxLength: number;
 }
 
-const InputOTP = React.forwardRef<
-  React.ElementRef<typeof OTPInput>,
-  React.ComponentPropsWithoutRef<typeof OTPInput>
->(({ className, containerClassName, ...props }, ref) => (
-  <OTPInput
-    ref={ref}
-    containerClassName={cn(
-      "flex items-center gap-2 has-[:disabled]:opacity-50",
-      containerClassName,
-    )}
-    className={cn("disabled:cursor-not-allowed", className)}
-    {...props}
-  />
-));
+function InputOTP({ className, containerClassName, maxLength = 6, value, onChange, children }: InputOTPProps): React.JSX.Element {
+  return (
+    <OTPInput
+      maxLength={maxLength}
+      value={value}
+      onChange={onChange}
+      containerClassName={cn(
+        "flex items-center gap-2 has-[:disabled]:opacity-50",
+        containerClassName,
+      )}
+      className={cn("disabled:cursor-not-allowed", className)}
+    >
+      {children}
+    </OTPInput>
+  );
+}
 InputOTP.displayName = "InputOTP";
 
-const InputOTPGroup = React.forwardRef<
-  React.ElementRef<"div">,
-  React.ComponentPropsWithoutRef<"div">
->(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("flex items-center", className)} {...props} />
-));
+function InputOTPGroup({ className, children }: InputOTPGroupProps): React.JSX.Element {
+  return (
+    <div className={cn("flex items-center", className)}>
+      {children}
+    </div>
+  );
+}
 InputOTPGroup.displayName = "InputOTPGroup";
 
-const InputOTPSlot = React.forwardRef<
-  React.ElementRef<"div">,
-  React.ComponentPropsWithoutRef<"div"> & { index: number }
->(({ index, className, ...props }, ref) => {
+function InputOTPSlot({ index, className }: InputOTPSlotProps): React.JSX.Element | null {
   const inputOTPContext = React.useContext(OTPInputContext);
   const slotProps = inputOTPContext.slots[index];
   if (!slotProps) {
@@ -72,13 +72,11 @@ const InputOTPSlot = React.forwardRef<
 
   return (
     <div
-      ref={ref}
       className={cn(
         "relative flex h-9 w-9 items-center justify-center border-y border-r border-input text-sm shadow-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md",
         isActive ? "z-10 ring-1 ring-ring" : "",
         className,
       )}
-      {...props}
     >
       {char}
       {hasFakeCaret && (
@@ -88,17 +86,16 @@ const InputOTPSlot = React.forwardRef<
       )}
     </div>
   );
-});
+}
 InputOTPSlot.displayName = "InputOTPSlot";
 
-const InputOTPSeparator = React.forwardRef<
-  React.ElementRef<"div">,
-  React.ComponentPropsWithoutRef<"div">
->(({ ...props }, ref) => (
-  <div ref={ref} role="separator" {...props}>
-    <DashIcon />
-  </div>
-));
+function InputOTPSeparator({ className }: InputOTPSeparatorProps): React.JSX.Element {
+  return (
+    <div role="separator" className={className}>
+      <DashIcon />
+    </div>
+  );
+}
 InputOTPSeparator.displayName = "InputOTPSeparator";
 
 export { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot };

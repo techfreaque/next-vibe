@@ -1,7 +1,7 @@
 "use client";
 
 import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { ArrowDown, Play } from 'next-vibe-ui/ui/icons';
+import { ArrowDown, Play } from "next-vibe-ui/ui/icons";
 import { Button } from "next-vibe-ui/ui/button";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
@@ -23,7 +23,7 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
       <Div className="container px-4 md:px-6 py-20 md:py-32">
         <Div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-center">
           <MotionDiv
-            className="flex flex-col justify-center space-y-5"
+            className="flex flex-col justify-center flex flex-col gap-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -60,9 +60,7 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
                 </Link>
               </Button>
             </Div>
-
           </MotionDiv>
-
         </Div>
       </Div>
     </Div>

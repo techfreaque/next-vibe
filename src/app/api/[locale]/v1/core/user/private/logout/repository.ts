@@ -67,7 +67,8 @@ export class LogoutRepositoryImpl implements LogoutRepository {
     try {
       if (!user.id) {
         return fail({
-          message: "app.api.v1.core.user.private.logout.errors.invalid_user.title",
+          message:
+            "app.api.v1.core.user.private.logout.errors.invalid_user.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -107,15 +108,15 @@ export class LogoutRepositoryImpl implements LogoutRepository {
         );
         // Use a specific error for session deletion failure
         return fail({
-          message: "app.api.v1.core.user.private.logout.errors.session_deletion_failed.title",
+          message:
+            "app.api.v1.core.user.private.logout.errors.session_deletion_failed.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: {
+          messageParams: {
             resourceType: "user.sessions",
             userId,
             error: parseError(error).message,
           },
-          },
-        );
+        });
       }
 
       // Return success with proper response structure
@@ -134,14 +135,13 @@ export class LogoutRepositoryImpl implements LogoutRepository {
         parseError(error),
       );
       return fail({
-          message: "app.api.v1.core.user.private.logout.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message: "app.api.v1.core.user.private.logout.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           userId: user.id ?? "unknown",
           error: parseError(error).message,
         },
-        },
-      );
+      });
     }
   }
 }

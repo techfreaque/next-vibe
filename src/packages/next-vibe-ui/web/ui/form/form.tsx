@@ -75,8 +75,8 @@ export interface FormProps<TRequest extends FieldValues> {
 }
 
 export interface FormFieldContextValue<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
 > {
   name: TName;
 }
@@ -111,9 +111,25 @@ export type FormDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
 export type FormMessageProps = React.HTMLAttributes<HTMLParagraphElement>;
 
 export type FormFieldProps<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
 > = ControllerProps<TFieldValues, TName>;
+
+// Native-specific form component props (not implemented on web)
+export interface FormDatePickerProps {
+  label?: string;
+  description?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+}
+
+export interface FormComboboxProps {
+  label?: string;
+  description?: string;
+  value?: { label: string; value: string };
+  onChange?: (value: { label: string; value: string }) => void;
+  options?: { label: string; value: string }[];
+}
 
 // ============================================================================
 // IMPLEMENTATION
@@ -142,12 +158,12 @@ function Form<TRequest extends FieldValues>(
 }
 
 const FormFieldContext = React.createContext<
-  FormFieldContextValue | undefined
+  FormFieldContextValue<FieldValues, FieldPath<FieldValues>> | undefined
 >(undefined);
 
 const FormField = <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
 >({
   ...props
 }: FormFieldProps<TFieldValues, TName>): React.JSX.Element => {
@@ -191,46 +207,38 @@ const useFormField = (): UseFormFieldReturn => {
   };
 };
 
-const FormItem = React.forwardRef<HTMLDivElement, FormItemProps>(
-  ({ className, ...props }, ref) => {
-    const id = React.useId();
+function FormItem({ className, ...props }: FormItemProps): React.JSX.Element {
+  const id = React.useId();
 
-    return (
-      <FormItemContext.Provider value={{ id }}>
-        <div ref={ref} className={cn("space-y-2", className)} {...props} />
-      </FormItemContext.Provider>
-    );
-  },
-);
+  return (
+    <FormItemContext.Provider value={{ id }}>
+      <div className={cn("space-y-2", className)} {...props} />
+    </FormItemContext.Provider>
+  );
+}
 FormItem.displayName = "FormItem";
 
-const FormLabel = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Root>,
-  FormLabelProps
->(({ className, ...props }, ref) => {
+function FormLabel({ className, ...props }: FormLabelProps): React.JSX.Element {
   const { error, formItemId } = useFormField();
 
   return (
-    <Label
-      ref={ref}
-      className={cn(error && "text-red-600 dark:text-red-400", className)}
-      htmlFor={formItemId}
-      {...props}
-    />
+    <div>
+      <Label
+        className={cn(error && "text-red-600 dark:text-red-400", className)}
+        htmlFor={formItemId}
+        {...props}
+      />
+    </div>
   );
-});
+}
 FormLabel.displayName = "FormLabel";
 
-const FormControl = React.forwardRef<
-  React.ElementRef<typeof Slot>,
-  FormControlProps
->(({ ...props }, ref) => {
+function FormControl({ ...props }: FormControlProps): React.JSX.Element {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
   return (
     <Slot
-      ref={ref}
       id={formItemId}
       aria-describedby={
         error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`
@@ -239,50 +247,43 @@ const FormControl = React.forwardRef<
       {...props}
     />
   );
-});
+}
 FormControl.displayName = "FormControl";
 
-const FormDescription = React.forwardRef<
-  HTMLParagraphElement,
-  FormDescriptionProps
->(({ className, ...props }, ref) => {
+function FormDescription({ className, ...props }: FormDescriptionProps): React.JSX.Element {
   const { formDescriptionId } = useFormField();
 
   return (
     <p
-      ref={ref}
       id={formDescriptionId}
       className={cn("text-[0.8rem] text-muted-foreground", className)}
       {...props}
     />
   );
-});
+}
 FormDescription.displayName = "FormDescription";
 
-const FormMessage = React.forwardRef<HTMLParagraphElement, FormMessageProps>(
-  ({ className, children, ...props }, ref) => {
-    const { error, formMessageId } = useFormField();
-    const { t } = useTranslation();
-    const body = error ? String(error.message) : children;
+function FormMessage({ className, children, ...props }: FormMessageProps): React.JSX.Element | null {
+  const { error, formMessageId } = useFormField();
+  const { t } = useTranslation();
+  const body = error ? String(error.message) : children;
 
-    if (!body || body === "undefined") {
-      return null;
-    }
-    return (
-      <p
-        ref={ref}
-        id={formMessageId}
-        className={cn(
-          "text-[0.8rem] font-medium text-red-600 dark:text-red-400",
-          className,
-        )}
-        {...props}
-      >
-        {t(body as TranslationKey)}
-      </p>
-    );
-  },
-);
+  if (!body || body === "undefined") {
+    return null;
+  }
+  return (
+    <p
+      id={formMessageId}
+      className={cn(
+        "text-[0.8rem] font-medium text-red-600 dark:text-red-400",
+        className,
+      )}
+      {...props}
+    >
+      {t(body as TranslationKey)}
+    </p>
+  );
+}
 FormMessage.displayName = "FormMessage";
 
 export {

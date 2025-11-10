@@ -5,7 +5,7 @@
 
 "use client";
 
-import { ArrowLeft, Save } from 'next-vibe-ui/ui/icons';
+import { ArrowLeft, Save } from "next-vibe-ui/ui/icons";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
@@ -60,13 +60,13 @@ export function UserEditForm({
   }
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Action Buttons */}
       <Div className="flex items-center justify-between">
         <Button
           variant="outline"
           onClick={handleBack}
-          className="flex items-center space-x-2"
+          className="flex items-center flex flex-row gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
           <Span>{t("app.admin.common.actions.back")}</Span>
@@ -76,7 +76,7 @@ export function UserEditForm({
       {/* Main Form Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
+          <CardTitle className="flex items-center flex flex-row gap-2">
             <Span>{t("app.admin.users.actions.editUser")}</Span>
             <Span className="text-lg font-normal text-gray-500">
               - {user.email}
@@ -87,7 +87,7 @@ export function UserEditForm({
           <Form
             form={endpoint.create.form}
             onSubmit={handleSubmit}
-            className="space-y-6"
+            className="flex flex-col gap-6"
           >
             <FormFieldGroup>
               <EndpointFormField
@@ -189,7 +189,7 @@ export function UserEditForm({
             <FormAlert alert={endpoint.alert} />
 
             {/* Submit Button */}
-            <Div className="flex justify-end space-x-4">
+            <Div className="flex justify-end flex flex-row gap-4">
               <Button
                 type="button"
                 variant="outline"

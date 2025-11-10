@@ -94,11 +94,12 @@ class CreditValidator implements CreditValidatorInterface {
       const userLead = { leadId: canonicalLeadId };
 
       // Use repository method to determine credit source and get balance
-      const identifierResult = await creditRepository.getCreditIdentifierBySubscription(
-        userId,
-        userLead.leadId,
-        logger,
-      );
+      const identifierResult =
+        await creditRepository.getCreditIdentifierBySubscription(
+          userId,
+          userLead.leadId,
+          logger,
+        );
 
       if (!identifierResult.success) {
         return fail({
@@ -149,8 +150,8 @@ class CreditValidator implements CreditValidatorInterface {
         modelId,
       });
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -167,10 +168,14 @@ class CreditValidator implements CreditValidatorInterface {
       const cost = getModelCost(modelId);
 
       // Get lead's balance (with monthly rotation)
-      const balanceResult = await creditRepository.getLeadBalance(leadId, logger);
+      const balanceResult = await creditRepository.getLeadBalance(
+        leadId,
+        logger,
+      );
       if (!balanceResult.success) {
         return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
+          message:
+            "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: balanceResult,
         });
@@ -199,8 +204,9 @@ class CreditValidator implements CreditValidatorInterface {
         modelId,
       });
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -229,7 +235,8 @@ class CreditValidator implements CreditValidatorInterface {
 
       if (!leadResult.success) {
         return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.getOrCreateLeadFailed",
+          message:
+            "app.api.v1.core.agent.chat.credits.errors.getOrCreateLeadFailed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: leadResult,
         });
@@ -265,8 +272,9 @@ class CreditValidator implements CreditValidatorInterface {
         modelId,
       });
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

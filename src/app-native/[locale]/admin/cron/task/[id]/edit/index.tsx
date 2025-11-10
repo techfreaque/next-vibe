@@ -19,4 +19,6 @@ import { createPageWrapperWithImport } from "@/app/api/[locale]/v1/core/system/u
  * Wrapper component that dynamically imports and converts Expo Router's synchronous params
  * to Next.js 15's async params format
  */
-export default createPageWrapperWithImport(() => import("@/app/[locale]/admin/cron/task/[id]/edit/page"));
+export default createPageWrapperWithImport(
+  () => import("@/app/[locale]/admin/cron/task/[id]/edit/page"),
+);

@@ -92,7 +92,7 @@ export function validateCliRequestData<
             success: false,
             message:
               "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
-          errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
+            errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
             messageParams: {
               error: urlValidation.message,
             },
@@ -148,7 +148,7 @@ export function validateCliRequestData<
         success: false,
         message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
         },
@@ -172,7 +172,7 @@ export function validateCliRequestData<
         success: false,
         message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: urlValidation.message,
         },
@@ -192,7 +192,7 @@ export function validateCliRequestData<
       success: false,
       message:
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error:
           error instanceof Error

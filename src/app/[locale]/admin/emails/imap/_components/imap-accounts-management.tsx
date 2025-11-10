@@ -6,7 +6,7 @@
 
 "use client";
 
-import { Plus } from 'next-vibe-ui/ui/icons';
+import { Plus } from "next-vibe-ui/ui/icons";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import {
@@ -42,7 +42,7 @@ export function ImapAccountsManagement(): JSX.Element {
   };
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Header with Create Button */}
       <Card>
         <CardHeader>

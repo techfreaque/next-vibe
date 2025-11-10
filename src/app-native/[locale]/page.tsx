@@ -40,13 +40,15 @@ export default async function HomePage({
   const { t } = simpleT(locale);
   return (
     <Div className="flex-1 p-6 bg-background">
-      <Div className="max-w-4xl mx-auto space-y-6">
+      <Div className="max-w-4xl mx-auto flex flex-col gap-6">
         {/* Header */}
-        <Div className="text-center space-y-2">
-          <H1>{t("app.native.page.welcome", { appName: t("config.appName") })}</H1>
-            <P className="text-muted-foreground">
-              {t("app.native.page.description")} {locale}
-            </P>
+        <Div className="text-center flex flex-col gap-2">
+          <H1>
+            {t("app.native.page.welcome", { appName: t("config.appName") })}
+          </H1>
+          <P className="text-muted-foreground">
+            {t("app.native.page.description")} {locale}
+          </P>
         </Div>
 
         {/* Locale Info Card */}
@@ -58,7 +60,7 @@ export default async function HomePage({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Div className="flex flex-row items-center space-x-2">
+            <Div className="flex flex-row items-center flex flex-row gap-2">
               <Span className="text-2xl font-bold text-primary">{locale}</Span>
             </Div>
           </CardContent>
@@ -72,21 +74,27 @@ export default async function HomePage({
               {t("app.native.page.features.description")}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-col gap-4">
             <Div>
-              <H2 className="text-lg mb-2">{t("app.native.page.features.unified.title")}</H2>
+              <H2 className="text-lg mb-2">
+                {t("app.native.page.features.unified.title")}
+              </H2>
               <P className="text-muted-foreground">
                 {t("app.native.page.features.unified.description")}
               </P>
             </Div>
             <Div>
-              <H2 className="text-lg mb-2">{t("app.native.page.features.types.title")}</H2>
+              <H2 className="text-lg mb-2">
+                {t("app.native.page.features.types.title")}
+              </H2>
               <P className="text-muted-foreground">
                 {t("app.native.page.features.types.description")}
               </P>
             </Div>
             <Div>
-              <H2 className="text-lg mb-2">{t("app.native.page.features.async.title")}</H2>
+              <H2 className="text-lg mb-2">
+                {t("app.native.page.features.async.title")}
+              </H2>
               <P className="text-muted-foreground">
                 {t("app.native.page.features.async.description")}
               </P>
@@ -111,8 +119,13 @@ export default async function HomePage({
               </Link>
               <Link href={`/${locale}/story`} asChild>
                 {/* <Button className="w-full"> */}
-                <Span>{t("app.native.page.links.about")}</Span>
+                <Span>{t("app.native.page.links.story")}</Span>
                 {/* </Button> */}
+              </Link>
+              <Link href={`/${locale}/design-test`} asChild>
+                <Span className="text-primary font-bold">
+                  {t("app.native.page.links.designTest")}
+                </Span>
               </Link>
             </Div>
           </CardFooter>
@@ -124,18 +137,30 @@ export default async function HomePage({
             <CardTitle>{t("app.native.page.status.title")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Div className="space-y-2">
+            <Div className="flex flex-col gap-2">
               <Div className="flex flex-row justify-between">
-                <Span className="text-muted-foreground">{t("app.native.page.status.platform")}:</Span>
-                <Span className="font-medium">{t("app.native.page.status.universal")}</Span>
+                <Span className="text-muted-foreground">
+                  {t("app.native.page.status.platform")}:
+                </Span>
+                <Span className="font-medium">
+                  {t("app.native.page.status.universal")}
+                </Span>
               </Div>
               <Div className="flex flex-row justify-between">
-                <Span className="text-muted-foreground">{t("app.native.page.status.routing")}:</Span>
-                <Span className="font-medium">{t("app.native.page.status.filebased")}</Span>
+                <Span className="text-muted-foreground">
+                  {t("app.native.page.status.routing")}:
+                </Span>
+                <Span className="font-medium">
+                  {t("app.native.page.status.filebased")}
+                </Span>
               </Div>
               <Div className="flex flex-row justify-between">
-                <Span className="text-muted-foreground">{t("app.native.page.status.styling")}:</Span>
-                <Span className="font-medium">{t("app.native.page.status.nativewind")}</Span>
+                <Span className="text-muted-foreground">
+                  {t("app.native.page.status.styling")}:
+                </Span>
+                <Span className="font-medium">
+                  {t("app.native.page.status.nativewind")}
+                </Span>
               </Div>
             </Div>
           </CardContent>

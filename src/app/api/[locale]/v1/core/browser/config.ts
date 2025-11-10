@@ -32,11 +32,11 @@ export const chromeMCPConfig: ChromeMCPConfig = {
     "--chromeArg=--ozone-platform=wayland",
     "--chromeArg=--no-sandbox",
     "--chromeArg=--disable-setuid-sandbox",
-    "--chromeArg=--disable-dev-shm-usage"
+    "--chromeArg=--disable-dev-shm-usage",
   ],
   env: {
     XDG_RUNTIME_DIR: "/run/user/1000",
-    WAYLAND_DISPLAY: "wayland-0"
+    WAYLAND_DISPLAY: "wayland-0",
   },
   timeout: 30000,
   debug: false,
@@ -51,20 +51,29 @@ export function getChromeMCPConfig(): ChromeMCPConfig {
 
   // Override executable path if specified
   if (process.env.CHROME_EXECUTABLE_PATH) {
-    const executableArgIndex = config.args.findIndex(arg => arg.startsWith("--executablePath"));
+    const executableArgIndex = config.args.findIndex((arg) =>
+      arg.startsWith("--executablePath"),
+    );
     if (executableArgIndex !== -1) {
-      config.args[executableArgIndex] = `--executablePath=${process.env.CHROME_EXECUTABLE_PATH}`;
+      config.args[executableArgIndex] =
+        `--executablePath=${process.env.CHROME_EXECUTABLE_PATH}`;
     }
   }
 
   // Override Wayland display if specified
   if (process.env.WAYLAND_DISPLAY) {
-    config.env = { ...config.env, WAYLAND_DISPLAY: process.env.WAYLAND_DISPLAY };
+    config.env = {
+      ...config.env,
+      WAYLAND_DISPLAY: process.env.WAYLAND_DISPLAY,
+    };
   }
 
   // Override XDG runtime dir if specified
   if (process.env.XDG_RUNTIME_DIR) {
-    config.env = { ...config.env, XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR };
+    config.env = {
+      ...config.env,
+      XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR,
+    };
   }
 
   // Enable debug mode if specified
@@ -84,7 +93,15 @@ export function getChromeMCPConfig(): ChromeMCPConfig {
  * Get MCP server configuration for external clients
  * Returns the configuration that can be used in MCP client config files
  */
-export const getMCPServerConfig = (): { mcpServers: { "Chrome Dev Tools": { command: string; args: string[]; env?: Record<string, string> } } } => {
+export const getMCPServerConfig = (): {
+  mcpServers: {
+    "Chrome Dev Tools": {
+      command: string;
+      args: string[];
+      env?: Record<string, string>;
+    };
+  };
+} => {
   const config = getChromeMCPConfig();
   return {
     mcpServers: {
@@ -92,7 +109,7 @@ export const getMCPServerConfig = (): { mcpServers: { "Chrome Dev Tools": { comm
         command: config.command,
         args: config.args,
         env: config.env,
-      }
-    }
+      },
+    },
   };
 };

@@ -225,10 +225,13 @@ class CreditTransactionManager {
 
       if (existingResetTransaction) {
         // Transaction already exists, just return current balance
-        logger.debug("Monthly reset transaction already exists for this period", {
-          leadId,
-          transactionId: existingResetTransaction.id,
-        });
+        logger.debug(
+          "Monthly reset transaction already exists for this period",
+          {
+            leadId,
+            transactionId: existingResetTransaction.id,
+          },
+        );
         return success(credit.amount);
       }
 
@@ -267,8 +270,8 @@ class CreditTransactionManager {
         leadId,
       });
       return fail({
-          message: "app.api.v1.core.credits.errors.monthlyResetFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.credits.errors.monthlyResetFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -458,8 +461,8 @@ class CreditTransactionManager {
         leadIds,
       });
       return fail({
-          message: "app.api.v1.core.credits.errors.mergeFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.credits.errors.mergeFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -496,8 +499,8 @@ class CreditTransactionManager {
     } catch (error) {
       logger.error("Failed to create transaction", parseError(error), params);
       return fail({
-          message: "app.api.v1.core.credits.errors.transactionFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.credits.errors.transactionFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -521,8 +524,8 @@ class CreditRepository
     if (!identifier.leadId) {
       logger.error("getBalance requires leadId from DB");
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.invalidIdentifier",
-          errorType: ErrorResponseTypes.BAD_REQUEST,
+        message: "app.api.v1.core.agent.chat.credits.errors.invalidIdentifier",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
 
@@ -597,7 +600,10 @@ class CreditRepository
         .limit(1);
 
       if (userLead) {
-        const leadBalanceResult = await this.getLeadBalance(userLead.leadId, logger);
+        const leadBalanceResult = await this.getLeadBalance(
+          userLead.leadId,
+          logger,
+        );
         if (leadBalanceResult.success) {
           const leadCredits = leadBalanceResult.data;
           total += leadCredits;
@@ -614,8 +620,8 @@ class CreditRepository
       });
     } catch {
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -646,7 +652,10 @@ class CreditRepository
    * If lead has no credits, create initial free credits from products repository
    * Also handles monthly credit rotation automatically
    */
-  async getLeadBalance(leadId: string, logger?: EndpointLogger): Promise<ResponseType<number>> {
+  async getLeadBalance(
+    leadId: string,
+    logger?: EndpointLogger,
+  ): Promise<ResponseType<number>> {
     try {
       const credits = await db
         .select()
@@ -685,10 +694,8 @@ class CreditRepository
 
       // Check if monthly rotation is needed (if logger provided)
       if (logger) {
-        const monthlyResult = await creditTransactionManager.ensureMonthlyCredits(
-          leadId,
-          logger,
-        );
+        const monthlyResult =
+          await creditTransactionManager.ensureMonthlyCredits(leadId, logger);
         if (monthlyResult.success) {
           return success(monthlyResult.data);
         }
@@ -697,8 +704,9 @@ class CreditRepository
       return success(credits[0].amount);
     } catch {
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -728,10 +736,11 @@ class CreditRepository
 
       if (allUserLeads.length > 1) {
         // Merge credits (idempotent - safe to call multiple times)
-        const mergeResult = await creditTransactionManager.mergeCreditsIntoOldest(
-          allUserLeads.map((l) => l.leadId),
-          logger,
-        );
+        const mergeResult =
+          await creditTransactionManager.mergeCreditsIntoOldest(
+            allUserLeads.map((l) => l.leadId),
+            logger,
+          );
 
         if (!mergeResult.success) {
           logger.error("Failed to merge credits for user with multiple leads", {
@@ -780,8 +789,8 @@ class CreditRepository
             userId: effectiveUserId,
           });
           return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
-          errorType: ErrorResponseTypes.NOT_FOUND,
+            message: "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
+            errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
 
@@ -794,7 +803,10 @@ class CreditRepository
       // If user has no subscription → return combined user credits + lead credits
       if (creditType === CreditTypeIdentifier.LEAD_FREE && effectiveLeadId) {
         // Get lead credits (free credits)
-        const leadBalanceResult = await this.getLeadBalance(effectiveLeadId, logger);
+        const leadBalanceResult = await this.getLeadBalance(
+          effectiveLeadId,
+          logger,
+        );
 
         if (!leadBalanceResult.success) {
           return leadBalanceResult;
@@ -835,8 +847,8 @@ class CreditRepository
         effectiveLeadId,
       });
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.noCreditSource",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.agent.chat.credits.errors.noCreditSource",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     } catch (error) {
       logger.error("Failed to get credit balance for user", parseError(error), {
@@ -845,8 +857,8 @@ class CreditRepository
         isPublic: user.isPublic,
       });
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -914,8 +926,9 @@ class CreditRepository
         ipAddress,
       });
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.getOrCreateLeadFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.agent.chat.credits.errors.getOrCreateLeadFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -935,8 +948,8 @@ class CreditRepository
     if (!identifier.leadId) {
       logger.error("CRITICAL: addCredits requires leadId from DB");
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.invalidIdentifier",
-          errorType: ErrorResponseTypes.BAD_REQUEST,
+        message: "app.api.v1.core.agent.chat.credits.errors.invalidIdentifier",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
 
@@ -994,8 +1007,8 @@ class CreditRepository
         amount,
       });
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.addCreditsFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.agent.chat.credits.errors.addCreditsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -1049,8 +1062,8 @@ class CreditRepository
         error: parseError(error),
       });
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.addCreditsFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.agent.chat.credits.errors.addCreditsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -1075,8 +1088,8 @@ class CreditRepository
     if (!identifier.leadId) {
       logger.error("CRITICAL: deductCredits requires leadId from DB");
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.invalidIdentifier",
-          errorType: ErrorResponseTypes.BAD_REQUEST,
+        message: "app.api.v1.core.agent.chat.credits.errors.invalidIdentifier",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
 
@@ -1187,9 +1200,9 @@ class CreditRepository
 
         if (!credit) {
           return fail({
-          message:
+            message:
               "app.api.v1.core.agent.chat.credits.errors.insufficientCredits",
-          errorType: ErrorResponseTypes.NOT_FOUND,
+            errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
 
@@ -1214,8 +1227,9 @@ class CreditRepository
       return success(undefined);
     } catch {
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.deductCreditsFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.agent.chat.credits.errors.deductCreditsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -1303,9 +1317,9 @@ class CreditRepository
       });
     } catch {
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.credits.errors.getTransactionsFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -1351,9 +1365,9 @@ class CreditRepository
       });
     } catch {
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.credits.errors.getTransactionsFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -1376,8 +1390,9 @@ class CreditRepository
       return success(expiredCredits.length);
     } catch {
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.deductCreditsFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.agent.chat.credits.errors.deductCreditsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -1434,7 +1449,9 @@ class CreditRepository
         const [primaryUserLead] = await db
           .select()
           .from(userLeads)
-          .where(and(eq(userLeads.userId, userId), eq(userLeads.isPrimary, true)))
+          .where(
+            and(eq(userLeads.userId, userId), eq(userLeads.isPrimary, true)),
+          )
           .limit(1);
 
         if (!primaryUserLead) {
@@ -1448,8 +1465,8 @@ class CreditRepository
           if (!anyUserLead) {
             logger.error("No lead found for user", { userId });
             return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
-          errorType: ErrorResponseTypes.NOT_FOUND,
+              message: "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
+              errorType: ErrorResponseTypes.NOT_FOUND,
             });
           }
 
@@ -1480,9 +1497,9 @@ class CreditRepository
         leadId,
       });
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.credits.errors.getCreditIdentifierFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

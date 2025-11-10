@@ -2,15 +2,10 @@
  * ThemeProvider Component for React Native
  * Uses NativeWind's color scheme management
  */
-import type { ReactNode } from "react";
 import React from "react";
 
-// Cross-platform interface - matches web version
-export interface ThemeProviderProps {
-  children: ReactNode;
-  defaultTheme?: "light" | "dark" | "system";
-  storageKey?: string;
-}
+// Import ALL types from web - ZERO definitions here
+import type { ThemeProviderProps } from "@/packages/next-vibe-ui/web/ui/theme-provider";
 
 /**
  * ThemeProvider for React Native
@@ -23,6 +18,6 @@ export function ThemeProvider({
   children,
 }: ThemeProviderProps): React.JSX.Element {
   // NativeWind handles theme management automatically
-  // No need for additional context or state management
+  // No need to implement theme switching logic here
   return <>{children}</>;
 }

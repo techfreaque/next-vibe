@@ -156,7 +156,9 @@ export function processTranslationValue<K extends TranslationKey>(
   context?: string,
 ): string {
   // Import shared processing logic
-  const { processTranslationValue: sharedProcess } = require("./shared-translation-utils");
+  const {
+    processTranslationValue: sharedProcess,
+  } = require("./shared-translation-utils");
   const result = sharedProcess(value, key, params, context);
 
   // Log error if value was not a string (only for global translations)

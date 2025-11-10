@@ -64,11 +64,11 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
           !data.smsNotifications.smsMessage
         ) {
           return fail({
-          message: "app.api.v1.core.emails.send.errors.validation.title",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                      messageParams: {
+            message: "app.api.v1.core.emails.send.errors.validation.title",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            messageParams: {
               field: "app.api.v1.core.emails.send.errors.validation.smsFields",
-                      message:
+              message:
                 "app.api.v1.core.emails.send.errors.validation.smsRequired",
             },
           });
@@ -211,9 +211,9 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
         parsedError,
       );
       return fail({
-          message: "app.api.v1.core.emails.send.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message: "app.api.v1.core.emails.send.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }

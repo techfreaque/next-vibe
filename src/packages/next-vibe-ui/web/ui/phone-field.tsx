@@ -183,9 +183,7 @@ export function PhoneField({
         <PopoverContent className="w-[300px] p-0" align="start">
           <Command id="country-listbox">
             <CommandInput
-              placeholder={_t(
-                "packages.nextVibeUi.web.common.searchCountries",
-              )}
+              placeholder={_t("packages.nextVibeUi.web.common.searchCountries")}
             />
             <CommandList className="max-h-[200px]">
               <CommandEmpty>

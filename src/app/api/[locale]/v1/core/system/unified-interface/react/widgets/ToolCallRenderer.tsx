@@ -35,6 +35,7 @@ import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-ac
 import type { WidgetRenderContext } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/ui/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { RequestFieldsRenderer } from "./RequestFieldsRenderer";
 import { ResponseFieldsRenderer } from "./ResponseFieldsRenderer";
@@ -129,7 +130,8 @@ export function ToolCallRenderer({
 
   // Get display name and translate if it's a translation key
   const rawDisplayName = toolCall.displayName || toolCall.toolName;
-  const displayName = t(rawDisplayName );
+  // displayName/toolName are translation keys by architectural contract
+  const displayName = t(rawDisplayName as TranslationKey);
 
   // Get credits display with translation
   const creditsDisplay = toolCall.creditsUsed
@@ -162,10 +164,13 @@ export function ToolCallRenderer({
 
               {/* Tool Icon and Name - show icon with name, or just name if no icon */}
               <Div className="flex items-center gap-2">
-                {toolCall.icon && (() => {
-                  const IconComponent = getIconComponent(toolCall.icon);
-                  return <IconComponent className="h-4 w-4 text-muted-foreground" />;
-                })()}
+                {toolCall.icon &&
+                  (() => {
+                    const IconComponent = getIconComponent(toolCall.icon);
+                    return (
+                      <IconComponent className="h-4 w-4 text-muted-foreground" />
+                    );
+                  })()}
                 <Span className="font-medium text-sm">{displayName}</Span>
               </Div>
 
@@ -211,10 +216,10 @@ export function ToolCallRenderer({
 
         {/* Content */}
         <CollapsibleContent>
-          <Div className="border-t border-border/50 p-3 space-y-3">
+          <Div className="border-t border-border/50 p-3 flex flex-col gap-3">
             {/* Request Fields (Arguments) */}
             {toolCall.args && Object.keys(toolCall.args).length > 0 && (
-              <Div className="space-y-2">
+              <Div className="flex flex-col gap-2">
                 <Collapsible
                   open={isRequestOpen}
                   onOpenChange={setIsRequestOpen}
@@ -276,7 +281,7 @@ export function ToolCallRenderer({
 
             {/* Response Fields (Result) */}
             {hasResult && !hasError && (
-              <Div className="space-y-2">
+              <Div className="flex flex-col gap-2">
                 <Collapsible
                   open={isResponseOpen}
                   onOpenChange={setIsResponseOpen}

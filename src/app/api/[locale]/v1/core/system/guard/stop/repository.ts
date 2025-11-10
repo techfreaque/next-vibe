@@ -64,9 +64,11 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
       }
 
       return fail({
-          message: "app.api.v1.core.system.guard.stop.errors.validation.title",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                  messageParams: { error: "Either projectPath, guardId, or stopAll must be specified" }, // eslint-disable-line i18next/no-literal-string
+        message: "app.api.v1.core.system.guard.stop.errors.validation.title",
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        messageParams: {
+          error: "Either projectPath, guardId, or stopAll must be specified",
+        }, // eslint-disable-line i18next/no-literal-string
       });
     } catch (error) {
       logger.error("Guard stop failed", parseError(error));
@@ -74,9 +76,9 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
         error instanceof Error ? error : new Error(String(error));
 
       return fail({
-          message: "app.api.v1.core.system.guard.stop.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message: "app.api.v1.core.system.guard.stop.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }

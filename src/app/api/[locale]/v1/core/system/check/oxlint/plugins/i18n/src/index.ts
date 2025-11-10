@@ -65,7 +65,9 @@ const noLiteralStringRule = {
       },
     ],
   },
-  create(context: I18nRuleContext): Record<string, (node: OxlintASTNode) => void> {
+  create(
+    context: I18nRuleContext,
+  ): Record<string, (node: OxlintASTNode) => void> {
     // Merge user options with defaults
     const userOptions = context.options?.[0] || {};
     const options: I18nOptions = {
@@ -160,7 +162,7 @@ const noLiteralStringRule = {
 
     // Convert string patterns to RegExp
     const wordExclusionPatterns = (options.words?.exclude || []).map(
-      (pattern: string) => new RegExp(pattern)
+      (pattern: string) => new RegExp(pattern),
     );
     const excludedAttributes = options["jsx-attributes"]?.exclude || [];
 
@@ -228,7 +230,8 @@ const noLiteralStringRule = {
         }
 
         // Get the attribute name string - properly typed now
-        const attrName: string = (nameNode as JSXIdentifier).name || String(nameNode);
+        const attrName: string =
+          (nameNode as JSXIdentifier).name || String(nameNode);
 
         // Skip ALL excluded attributes (className, href, etc.) - these contain non-translatable values
         if (isExcludedAttribute(attrName)) {

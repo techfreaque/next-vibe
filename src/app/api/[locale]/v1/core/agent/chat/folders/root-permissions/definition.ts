@@ -37,11 +37,7 @@ const DefaultFolderIdSchema = z.enum([
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "agent", "chat", "folders", "root-permissions"],
-  allowedRoles: [
-    UserRole.PUBLIC,
-    UserRole.CUSTOMER,
-    UserRole.ADMIN,
-  ] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title:
     "app.api.v1.core.agent.chat.folders.rootPermissions.get.title" as const,

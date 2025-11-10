@@ -22,7 +22,7 @@ export function CronHistoryClient({
 }: CronHistoryClientProps): React.JSX.Element {
   const historyEndpoint = useTaskHistory();
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       <ExecutionHistory
         historyEndpoint={historyEndpoint}
         isLoading={historyEndpoint.read?.isLoading || false}

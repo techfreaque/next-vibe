@@ -1,4 +1,4 @@
-import { ArrowLeft } from 'next-vibe-ui/ui/icons';
+import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -12,7 +12,10 @@ interface SubscriptionHeaderProps {
   isAuthenticated: boolean;
 }
 
-export function SubscriptionHeader({ locale, isAuthenticated }: SubscriptionHeaderProps): JSX.Element {
+export function SubscriptionHeader({
+  locale,
+  isAuthenticated,
+}: SubscriptionHeaderProps): JSX.Element {
   const { t } = useTranslation();
 
   return (

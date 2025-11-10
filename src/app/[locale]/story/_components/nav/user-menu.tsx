@@ -52,7 +52,7 @@ export function UserMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
-          <Div className="flex flex-col space-y-1">
+          <Div className="flex flex-col gap-1">
             <P className="text-sm font-medium leading-none">
               {getUserDisplayName(user)}
             </P>

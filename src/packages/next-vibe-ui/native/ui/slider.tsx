@@ -3,45 +3,102 @@
  * Uses @rn-primitives/slider
  */
 import * as SliderPrimitive from "@rn-primitives/slider";
-import React from "react";
+import * as React from "react";
 
-import type { SliderProps } from "@/packages/next-vibe-ui/web/ui/slider";
+import type {
+  SliderRangeProps,
+  SliderRootProps,
+  SliderThumbProps,
+  SliderTrackProps,
+} from "@/packages/next-vibe-ui/web/ui/slider";
 import { cn } from "../lib/utils";
-import { styled } from "nativewind";
 
-// Styled components using nativewind
-const StyledSliderRoot = styled(SliderPrimitive.Root);
-const StyledSliderTrack = styled(SliderPrimitive.Track);
-const StyledSliderRange = styled(SliderPrimitive.Range);
-const StyledSliderThumb = styled(SliderPrimitive.Thumb);
+// Re-export all types from web
+export type {
+  SliderRangeProps,
+  SliderRootProps,
+  SliderThumbProps,
+  SliderTrackProps,
+};
 
-/* eslint-disable i18next/no-literal-string -- CSS classNames */
-const RANGE_CLASSNAME = "absolute h-full bg-primary";
-/* eslint-enable i18next/no-literal-string */
-
-const Slider = React.forwardRef<
-  React.ElementRef<typeof SliderPrimitive.Root>,
-  SliderProps
->(({ className, value, defaultValue, onValueChange, ...props }, ref) => {
-  return (
-    <StyledSliderRoot
-      ref={ref}
-      className={cn(
-        "relative flex w-full touch-none select-none items-center",
-        className,
-      )}
-      value={value?.[0] ?? defaultValue?.[0] ?? 0}
-      onValueChange={onValueChange}
-      {...props}
-    >
-      <StyledSliderTrack className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20">
-        <StyledSliderRange className={RANGE_CLASSNAME} />
-      </StyledSliderTrack>
-      <StyledSliderThumb className="block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50" />
-    </StyledSliderRoot>
+export function Slider({
+  value,
+  defaultValue = [0],
+  onValueChange,
+  min = 0,
+  max = 100,
+  step = 1,
+  disabled = false,
+  children,
+}: SliderRootProps): React.JSX.Element {
+  // Native primitive expects (value: number[]) => void for onChange
+  // but we need to convert our single value to array for cross-platform compatibility
+  const handleNativeValueChange = React.useCallback(
+    (newValues: number[]) => {
+      onValueChange?.(newValues);
+    },
+    [onValueChange],
   );
-});
 
+  return (
+    <SliderPrimitive.Root
+      value={value?.[0] ?? defaultValue[0]}
+      onValueChange={handleNativeValueChange}
+      min={min}
+      max={max}
+      step={step}
+      disabled={disabled}
+    >
+      {children}
+    </SliderPrimitive.Root>
+  );
+}
 Slider.displayName = SliderPrimitive.Root.displayName;
 
-export { Slider };
+export function SliderTrack({
+  className,
+  children,
+  ...props
+}: SliderTrackProps): React.JSX.Element {
+  return (
+    <SliderPrimitive.Track
+      className={cn(
+        "relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </SliderPrimitive.Track>
+  );
+}
+SliderTrack.displayName = SliderPrimitive.Track.displayName;
+
+export function SliderRange({
+  className,
+  ...props
+}: SliderRangeProps): React.JSX.Element {
+  return (
+    <SliderPrimitive.Range
+      className={cn("absolute h-full bg-primary", className)}
+      {...props}
+    />
+  );
+}
+SliderRange.displayName = SliderPrimitive.Range.displayName;
+
+export function SliderThumb({
+  className,
+  ...props
+}: SliderThumbProps): React.JSX.Element {
+  return (
+    <SliderPrimitive.Thumb
+      className={cn(
+        "block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+SliderThumb.displayName = SliderPrimitive.Thumb.displayName;

@@ -59,7 +59,7 @@ export function NewsletterSignupFooter({
               subscribe(email);
             }
           }}
-          className="flex items-center space-x-2 mb-3"
+          className="flex items-center flex flex-row gap-2 mb-3"
         >
           <Input
             type="email"
@@ -78,12 +78,13 @@ export function NewsletterSignupFooter({
 
           <Button
             type="submit"
-            className={`h-10 w-10 ${isSubscribed
+            className={`h-10 w-10 ${
+              isSubscribed
                 ? showConfirmUnsubscribe
                   ? "bg-red-600 hover:bg-red-700"
                   : "border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
                 : "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
-              }`}
+            }`}
             variant={
               isSubscribed && !showConfirmUnsubscribe ? "outline" : "default"
             }
@@ -115,14 +116,15 @@ export function NewsletterSignupFooter({
         {/* Single notification display */}
         {notification && (
           <Div
-            className={`text-xs mb-2 ${notification.type === "error"
+            className={`text-xs mb-2 ${
+              notification.type === "error"
                 ? "text-red-600 dark:text-red-400"
                 : notification.type === "success"
                   ? "text-green-600 dark:text-green-400"
                   : notification.type === "info"
                     ? "text-blue-600 dark:text-blue-400"
                     : "text-orange-600 dark:text-orange-400"
-              }`}
+            }`}
           >
             {t(notification.message)}
           </Div>

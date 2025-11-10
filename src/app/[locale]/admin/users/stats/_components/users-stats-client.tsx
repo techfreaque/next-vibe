@@ -15,7 +15,7 @@ import {
   TrendingUp,
   UserCheck,
   Users,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -57,7 +57,7 @@ export function UsersStatsClient({
 
   if (isLoading) {
     return (
-      <Div className="space-y-6">
+      <Div className="flex flex-col gap-6">
         {/* Filters Skeleton */}
         <Card>
           <CardHeader>
@@ -91,7 +91,7 @@ export function UsersStatsClient({
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-32" />
-            <Div className="flex space-x-2 mt-4">
+            <Div className="flex flex flex-row gap-2 mt-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-8 w-20" />
               ))}
@@ -106,7 +106,7 @@ export function UsersStatsClient({
   }
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Filters */}
       <UsersStatsFiltersContainer
         locale={locale}
@@ -121,7 +121,7 @@ export function UsersStatsClient({
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Users */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.users.stats.totalUsers")}
             </CardTitle>
@@ -140,7 +140,7 @@ export function UsersStatsClient({
 
         {/* Active Users */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.users.stats.activeUsers")}
             </CardTitle>
@@ -161,7 +161,7 @@ export function UsersStatsClient({
 
         {/* Email Verified Users */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.users.stats.emailVerifiedUsers")}
             </CardTitle>
@@ -180,7 +180,7 @@ export function UsersStatsClient({
 
         {/* Users with Stripe ID */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.users.stats.usersWithStripeId")}
             </CardTitle>
@@ -199,7 +199,7 @@ export function UsersStatsClient({
 
         {/* Users with Lead ID */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.users.stats.usersWithLeadId")}
             </CardTitle>
@@ -218,7 +218,7 @@ export function UsersStatsClient({
 
         {/* Growth Rate */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.users.stats.growthRate")}
             </CardTitle>
@@ -236,7 +236,7 @@ export function UsersStatsClient({
 
         {/* Inactive Users */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.users.stats.inactiveUsers")}
             </CardTitle>
@@ -257,7 +257,7 @@ export function UsersStatsClient({
 
         {/* Retention Rate */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.users.stats.retentionRate")}
             </CardTitle>
@@ -275,7 +275,7 @@ export function UsersStatsClient({
       </Div>
 
       {/* Detailed Stats with Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs defaultValue="overview" className="flex flex-col gap-4">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="overview">
             {t("app.admin.users.stats.tabs.overview")}
@@ -285,7 +285,7 @@ export function UsersStatsClient({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="overview" className="flex flex-col gap-4">
           {/* Additional Metrics */}
           <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Email Statistics */}
@@ -297,7 +297,7 @@ export function UsersStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-2">
+                <Div className="flex flex-col gap-2">
                   <Div className="flex justify-between text-sm">
                     <Span>{t("app.admin.users.stats.emailVerifiedUsers")}</Span>
                     <Span>{formatNumber(data?.emailVerifiedUsers || 0)}</Span>
@@ -331,7 +331,7 @@ export function UsersStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-2">
+                <Div className="flex flex-col gap-2">
                   <Div className="flex justify-between text-sm">
                     <Span>{t("app.admin.users.stats.usersWithStripeId")}</Span>
                     <Span>{formatNumber(data?.usersWithStripeId || 0)}</Span>
@@ -365,7 +365,7 @@ export function UsersStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-2">
+                <Div className="flex flex-col gap-2">
                   <Div className="flex justify-between text-sm">
                     <Span>{t("app.admin.users.stats.newUsers")}</Span>
                     <Span>{formatNumber(data?.usersCreatedToday || 0)}</Span>
@@ -399,7 +399,7 @@ export function UsersStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-2">
+                <Div className="flex flex-col gap-2">
                   <Div className="flex justify-between text-sm">
                     <Span>{t("app.admin.users.stats.growthRate")}</Span>
                     <Span>{formatPercentage(data?.growthRate || 0)}</Span>
@@ -422,7 +422,7 @@ export function UsersStatsClient({
           </Div>
         </TabsContent>
 
-        <TabsContent value="distribution" className="space-y-4">
+        <TabsContent value="distribution" className="flex flex-col gap-4">
           <Div className="grid grid-cols-1 gap-6">
             {/* Role Distribution */}
             <Card>
@@ -433,8 +433,8 @@ export function UsersStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
-                  <Div className="space-y-2">
+                <Div className="flex flex-col gap-3">
+                  <Div className="flex flex-col gap-2">
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm font-medium">
                         {t("app.admin.users.role.public")}
@@ -452,7 +452,7 @@ export function UsersStatsClient({
                     />
                   </Div>
 
-                  <Div className="space-y-2">
+                  <Div className="flex flex-col gap-2">
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm font-medium">
                         {t("app.admin.users.role.customer")}
@@ -470,7 +470,7 @@ export function UsersStatsClient({
                     />
                   </Div>
 
-                  <Div className="space-y-2">
+                  <Div className="flex flex-col gap-2">
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm font-medium">
                         {t("app.admin.users.role.partner_admin")}
@@ -489,7 +489,7 @@ export function UsersStatsClient({
                     />
                   </Div>
 
-                  <Div className="space-y-2">
+                  <Div className="flex flex-col gap-2">
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm font-medium">
                         {t("app.admin.users.role.partner_employee")}
@@ -508,7 +508,7 @@ export function UsersStatsClient({
                     />
                   </Div>
 
-                  <Div className="space-y-2">
+                  <Div className="flex flex-col gap-2">
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm font-medium">
                         {t("app.admin.users.role.admin")}

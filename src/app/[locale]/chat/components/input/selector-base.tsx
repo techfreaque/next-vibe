@@ -195,8 +195,14 @@ export function SelectorBase<T extends string = string>({
                 icon: utilityIconsMap[utilityName],
               };
               // Store the order for this utility from utilityOrders map
-              if (option.utilityOrders && option.utilityOrders[utilityName] !== undefined) {
-                utilityOrderMap.set(utilityName, option.utilityOrders[utilityName]);
+              if (
+                option.utilityOrders &&
+                option.utilityOrders[utilityName] !== undefined
+              ) {
+                utilityOrderMap.set(
+                  utilityName,
+                  option.utilityOrders[utilityName],
+                );
               }
             }
             grouped[utilityName].options.push(option);
@@ -218,21 +224,22 @@ export function SelectorBase<T extends string = string>({
       > = {};
 
       // Sort group names by their utility order, "Others" goes last
-      const groupNames = Object.keys(grouped).toSorted?.((a, b) => {
-        const othersKey = t("app.chat.selectorBase.others");
-        // "Others" always goes last
-        if (a === othersKey) {
-          return 1;
-        }
-        if (b === othersKey) {
-          return -1;
-        }
+      const groupNames =
+        Object.keys(grouped).toSorted?.((a, b) => {
+          const othersKey = t("app.chat.selectorBase.others");
+          // "Others" always goes last
+          if (a === othersKey) {
+            return 1;
+          }
+          if (b === othersKey) {
+            return -1;
+          }
 
-        // Sort by utility order from utilityOrders map
-        const orderA = utilityOrderMap.get(a) ?? Number.MAX_SAFE_INTEGER;
-        const orderB = utilityOrderMap.get(b) ?? Number.MAX_SAFE_INTEGER;
-        return orderA - orderB;
-      }) || [];
+          // Sort by utility order from utilityOrders map
+          const orderA = utilityOrderMap.get(a) ?? Number.MAX_SAFE_INTEGER;
+          const orderB = utilityOrderMap.get(b) ?? Number.MAX_SAFE_INTEGER;
+          return orderA - orderB;
+        }) || [];
 
       groupNames.forEach((name) => {
         sortedGroups[name] = grouped[name];
@@ -458,7 +465,7 @@ export function SelectorBase<T extends string = string>({
           ) : (
             /* Grid View - Favorites, Featured, then Grouped */
             <Div className="overflow-y-auto max-h-[500px] overscroll-contain">
-              <Div className="p-3 sm:p-4 space-y-5 sm:space-y-6">
+              <Div className="p-3 sm:p-4 flex flex-col gap-5 sm:gap-6">
                 {/* Favorites Section - Always First */}
                 {favoriteOptions.length > 0 && (
                   <Div>
@@ -542,7 +549,9 @@ export function SelectorBase<T extends string = string>({
                           {renderIcon(groupData.icon, ICON_SIZE_SMALL)}
                         </Span>
                       )}
-                      {groupMode === "utility" ? t(group as Parameters<typeof t>[0]) : group}
+                      {groupMode === "utility"
+                        ? t(group as Parameters<typeof t>[0])
+                        : group}
                     </Div>
                     <Div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
                       {groupData.options.map((option) => (

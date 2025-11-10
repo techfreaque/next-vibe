@@ -7,40 +7,40 @@ import { translations as userRolesTranslations } from "../../user-roles/i18n/pl"
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  "category": "Zarządzanie Użytkownikami",
-  "auth": authTranslations,
-  "private": privateTranslations,
-  "public": publicTranslations,
-  "search": searchTranslations,
+  category: "Zarządzanie Użytkownikami",
+  auth: authTranslations,
+  private: privateTranslations,
+  public: publicTranslations,
+  search: searchTranslations,
   "session-cleanup": sessionCleanupTranslations,
-  "userRoles": userRolesTranslations,
-  "profileVisibility": {
+  userRoles: userRolesTranslations,
+  profileVisibility: {
     public: "Publiczny",
     private: "Prywatny",
     contactsOnly: "Tylko kontakty",
   },
-  "contactMethods": {
+  contactMethods: {
     email: "E-mail",
     phone: "Telefon",
     sms: "SMS",
     whatsapp: "WhatsApp",
   },
-  "theme": {
+  theme: {
     light: "Jasny",
     dark: "Ciemny",
     system: "Systemowy",
   },
-  "userDetailLevel": {
+  userDetailLevel: {
     minimal: "Minimalny",
     standard: "Standardowy",
     complete: "Pełny",
   },
-  "language": {
+  language: {
     en: "Angielski",
     de: "Niemiecki",
     pl: "Polski",
   },
-  "timezone": {
+  timezone: {
     utc: "UTC",
     america_new_york: "Ameryka/Nowy_Jork",
     america_los_angeles: "Ameryka/Los_Angeles",
@@ -50,7 +50,7 @@ export const translations: typeof enTranslations = {
     asia_tokyo: "Azja/Tokio",
     australia_sydney: "Australia/Sydney",
   },
-  "errors": {
+  errors: {
     emailAlreadyInUse: "Adres e-mail jest już używany",
     locale_required: "Locale jest wymagane",
     auth_required: "Wymagana autoryzacja",
@@ -70,7 +70,7 @@ export const translations: typeof enTranslations = {
     not_implemented_on_native:
       "Ta funkcja nie jest zaimplementowana w React Native",
   },
-  "notifications": {
+  notifications: {
     profileUpdated: {
       title: "Profil zaktualizowany",
       description: "Twój profil został pomyślnie zaktualizowany",

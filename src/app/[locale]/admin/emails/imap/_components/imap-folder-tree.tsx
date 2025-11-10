@@ -11,7 +11,7 @@ import {
   Folder,
   FolderOpen,
   Mail,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Button } from "next-vibe-ui/ui/button";
@@ -161,7 +161,7 @@ function FolderTreeNode({
 
         {/* Folder Info */}
         <Div className="flex-1 min-w-0">
-          <Div className="flex items-center space-x-2">
+          <Div className="flex items-center flex flex-row gap-2">
             <Span className="font-medium truncate">
               {folder.displayName || folder.name}
             </Span>
@@ -175,7 +175,7 @@ function FolderTreeNode({
         </Div>
 
         {/* Message Counts */}
-        <Div className="flex items-center space-x-4 text-sm">
+        <Div className="flex items-center flex flex-row gap-4 text-sm">
           <Div className="text-center">
             <Div className="font-medium">{folder.messageCount}</Div>
             <Div className="text-xs text-gray-500">
@@ -215,7 +215,7 @@ function FolderTreeNode({
         </Div>
 
         {/* Actions */}
-        <Div className="ml-4 flex items-center space-x-2">
+        <Div className="ml-4 flex items-center flex flex-row gap-2">
           <Button variant="outline" size="sm" onClick={() => onSync(folder.id)}>
             {t("app.admin.emails.imap.folder.actions.sync")}
           </Button>

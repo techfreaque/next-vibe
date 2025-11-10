@@ -20,7 +20,11 @@ export type DivProps = ViewProps & {
  * Alias for View to provide more traditional web naming
  * Automatically wraps text strings in Text components for React Native
  */
-export function Div({ className, children, ...props }: DivProps): React.JSX.Element {
+export function Div({
+  className,
+  children,
+  ...props
+}: DivProps): React.JSX.Element {
   // Helper to wrap text strings in Text components for React Native
   const renderChildren = (content: React.ReactNode): React.ReactNode => {
     if (typeof content === "string" || typeof content === "number") {
@@ -29,9 +33,7 @@ export function Div({ className, children, ...props }: DivProps): React.JSX.Elem
 
     if (Array.isArray(content)) {
       return content.map((child, index) => (
-        <React.Fragment key={index}>
-          {renderChildren(child)}
-        </React.Fragment>
+        <React.Fragment key={index}>{renderChildren(child)}</React.Fragment>
       ));
     }
 

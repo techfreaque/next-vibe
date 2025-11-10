@@ -79,10 +79,10 @@ export async function safeExecuteTRPC<
     });
   } catch (err) {
     return fail({
-          message:
+      message:
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: {
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: {
         error: parseError(err).message,
       },
     });

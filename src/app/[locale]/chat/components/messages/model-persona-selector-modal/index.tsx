@@ -107,7 +107,7 @@ export function ModelPersonaSelectorModal({
         )}
 
         {/* Selectors */}
-        <Div className="space-y-3 mb-4">
+        <Div className="flex flex-col gap-3 mb-4">
           <Div className="flex items-center gap-2 flex-wrap">
             <ModelSelector
               value={selectedModel}

@@ -5,7 +5,7 @@
 
 "use client";
 
-import { ArrowLeft, Save } from 'next-vibe-ui/ui/icons';
+import { ArrowLeft, Save } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Form } from "next-vibe-ui/ui/form/form";
@@ -104,7 +104,7 @@ export function EditSmtpAccountForm({
   }
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Back Button */}
       <Div>
         <Button variant="outline" asChild>
@@ -126,7 +126,7 @@ export function EditSmtpAccountForm({
           <Form
             form={endpoint.create.form}
             onSubmit={handleSubmit}
-            className="space-y-6"
+            className="flex flex-col gap-6"
           >
             {/* Basic Information */}
             <FormFieldGroup
@@ -298,7 +298,7 @@ export function EditSmtpAccountForm({
             <FormAlert alert={endpoint.alert} />
 
             {/* Submit Button */}
-            <Div className="flex justify-end space-x-2">
+            <Div className="flex justify-end flex flex-row gap-2">
               <Button
                 type="button"
                 variant="outline"

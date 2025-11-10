@@ -1,14 +1,38 @@
 import * as CollapsiblePrimitive from "@rn-primitives/collapsible";
+import * as React from "react";
 
-// Native uses RN primitives directly - same interface as web
-export type CollapsibleProps = React.ComponentPropsWithoutRef<typeof CollapsiblePrimitive.Root>;
-export type CollapsibleTriggerProps = React.ComponentPropsWithoutRef<typeof CollapsiblePrimitive.Trigger>;
-export type CollapsibleContentProps = React.ComponentPropsWithoutRef<typeof CollapsiblePrimitive.Content>;
+// Import types from web for cross-platform compatibility
+import type {
+  CollapsibleRootProps,
+  CollapsibleTriggerProps,
+  CollapsibleContentProps,
+} from "next-vibe-ui/ui/collapsible";
 
-const Collapsible = CollapsiblePrimitive.Root;
+export type {
+  CollapsibleRootProps,
+  CollapsibleTriggerProps,
+  CollapsibleContentProps,
+};
 
-const CollapsibleTrigger = CollapsiblePrimitive.Trigger;
+export function Collapsible({ children, ...props }: CollapsibleRootProps): React.JSX.Element {
+  return <CollapsiblePrimitive.Root {...props}>{children}</CollapsiblePrimitive.Root>;
+}
+Collapsible.displayName = CollapsiblePrimitive.Root.displayName;
 
-const CollapsibleContent = CollapsiblePrimitive.Content;
+export function CollapsibleTrigger({ children, asChild, ...props }: CollapsibleTriggerProps): React.JSX.Element {
+  return (
+    <CollapsiblePrimitive.Trigger asChild={asChild} {...props}>
+      {children}
+    </CollapsiblePrimitive.Trigger>
+  );
+}
+CollapsibleTrigger.displayName = CollapsiblePrimitive.Trigger.displayName;
 
-export { Collapsible, CollapsibleContent, CollapsibleTrigger };
+export function CollapsibleContent({ children, ...props }: CollapsibleContentProps): React.JSX.Element {
+  return (
+    <CollapsiblePrimitive.Content {...props}>
+      {children}
+    </CollapsiblePrimitive.Content>
+  );
+}
+CollapsibleContent.displayName = CollapsiblePrimitive.Content.displayName;

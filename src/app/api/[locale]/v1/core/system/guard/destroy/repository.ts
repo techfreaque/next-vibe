@@ -76,9 +76,10 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
         error instanceof Error ? error : new Error(String(error));
 
       return fail({
-          message: "app.api.v1.core.system.guard.destroy.errors.destruction_failed.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message:
+          "app.api.v1.core.system.guard.destroy.errors.destruction_failed.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -137,9 +138,10 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
 
     if (!fs.existsSync(guardScriptPath)) {
       return fail({
-          message: "app.api.v1.core.system.guard.destroy.errors.guard_not_found.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                  messageParams: { error: `No guard found for project '${projectName}'` }, // eslint-disable-line i18next/no-literal-string
+        message:
+          "app.api.v1.core.system.guard.destroy.errors.guard_not_found.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: { error: `No guard found for project '${projectName}'` }, // eslint-disable-line i18next/no-literal-string
       });
     }
 

@@ -1,6 +1,11 @@
 import * as React from "react";
 import { Pressable } from "react-native";
-import { MotiView, MotiText, MotiImage, AnimatePresence as MotiAnimatePresence } from "moti";
+import {
+  MotiView,
+  MotiText,
+  MotiImage,
+  AnimatePresence as MotiAnimatePresence,
+} from "moti";
 import { styled } from "nativewind";
 
 // Create styled wrappers for Moti components
@@ -28,12 +33,16 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/motion";
 
 // AnimatePresence component for native
-export function AnimatePresence({ children }: AnimatePresenceProps): JSX.Element {
+export function AnimatePresence({
+  children,
+}: AnimatePresenceProps): JSX.Element {
   return <MotiAnimatePresence>{children}</MotiAnimatePresence>;
 }
 
 // Helper to convert transition props from web format to moti format
-function convertTransitionProps(transition?: MotionTransition): Record<string, number | string> | undefined {
+function convertTransitionProps(
+  transition?: MotionTransition,
+): Record<string, number | string> | undefined {
   if (!transition) {
     return undefined;
   }
@@ -69,13 +78,18 @@ function convertTransitionProps(transition?: MotionTransition): Record<string, n
 }
 
 // Helper to convert web props (x/y) to native props (translateX/translateY)
-function convertAnimationProps(props?: {
-  opacity?: number;
-  scale?: number;
-  x?: number;
-  y?: number;
-  rotate?: number;
-} | string | boolean):
+function convertAnimationProps(
+  props?:
+    | {
+        opacity?: number;
+        scale?: number;
+        x?: number;
+        y?: number;
+        rotate?: number;
+      }
+    | string
+    | boolean,
+):
   | {
       opacity?: number;
       scale?: number;
@@ -122,8 +136,22 @@ function convertAnimationProps(props?: {
 }
 
 // Export individual motion components - convert props for moti
-export const MotionDiv = React.forwardRef<React.ElementRef<typeof StyledMotiView>, MotionDivProps>(
-  ({ initial, animate, exit, variants: _variants, transition, children, className }, ref) => (
+export const MotionDiv = React.forwardRef<
+  React.ElementRef<typeof StyledMotiView>,
+  MotionDivProps
+>(
+  (
+    {
+      initial,
+      animate,
+      exit,
+      variants: _variants,
+      transition,
+      children,
+      className,
+    },
+    ref,
+  ) => (
     <StyledMotiView
       ref={ref}
       from={convertAnimationProps(initial)}
@@ -134,50 +162,53 @@ export const MotionDiv = React.forwardRef<React.ElementRef<typeof StyledMotiView
     >
       {children}
     </StyledMotiView>
-  )
+  ),
 );
 MotionDiv.displayName = "MotionDiv";
 
-export const MotionSpan = React.forwardRef<React.ElementRef<typeof StyledMotiText>, MotionSpanProps>(
-  ({ initial, animate, transition, children, className }, ref) => (
-    <StyledMotiText
-      ref={ref}
-      from={convertAnimationProps(initial)}
-      animate={convertAnimationProps(animate)}
-      transition={convertTransitionProps(transition)}
-      className={className}
-    >
-      {children}
-    </StyledMotiText>
-  )
-);
+export const MotionSpan = React.forwardRef<
+  React.ElementRef<typeof StyledMotiText>,
+  MotionSpanProps
+>(({ initial, animate, transition, children, className }, ref) => (
+  <StyledMotiText
+    ref={ref}
+    from={convertAnimationProps(initial)}
+    animate={convertAnimationProps(animate)}
+    transition={convertTransitionProps(transition)}
+    className={className}
+  >
+    {children}
+  </StyledMotiText>
+));
 MotionSpan.displayName = "MotionSpan";
 
-export const MotionButton = React.forwardRef<React.ElementRef<typeof StyledMotiView>, MotionButtonProps>(
-  ({ initial, animate, transition, onClick, children, className }, ref) => (
-    <StyledMotiView
-      ref={ref}
-      from={convertAnimationProps(initial)}
-      animate={convertAnimationProps(animate)}
-      transition={convertTransitionProps(transition)}
-      className={className}
-    >
-      <Pressable onPress={onClick}>{children}</Pressable>
-    </StyledMotiView>
-  )
-);
+export const MotionButton = React.forwardRef<
+  React.ElementRef<typeof StyledMotiView>,
+  MotionButtonProps
+>(({ initial, animate, transition, onClick, children, className }, ref) => (
+  <StyledMotiView
+    ref={ref}
+    from={convertAnimationProps(initial)}
+    animate={convertAnimationProps(animate)}
+    transition={convertTransitionProps(transition)}
+    className={className}
+  >
+    <Pressable onPress={onClick}>{children}</Pressable>
+  </StyledMotiView>
+));
 MotionButton.displayName = "MotionButton";
 
-export const MotionImg = React.forwardRef<React.ElementRef<typeof StyledMotiImage>, MotionImgProps>(
-  ({ initial, animate, transition, src, className }, ref) => (
-    <StyledMotiImage
-      ref={ref}
-      from={convertAnimationProps(initial)}
-      animate={convertAnimationProps(animate)}
-      transition={convertTransitionProps(transition)}
-      source={src ? { uri: src } : undefined}
-      className={className}
-    />
-  )
-);
+export const MotionImg = React.forwardRef<
+  React.ElementRef<typeof StyledMotiImage>,
+  MotionImgProps
+>(({ initial, animate, transition, src, className }, ref) => (
+  <StyledMotiImage
+    ref={ref}
+    from={convertAnimationProps(initial)}
+    animate={convertAnimationProps(animate)}
+    transition={convertTransitionProps(transition)}
+    source={src ? { uri: src } : undefined}
+    className={className}
+  />
+));
 MotionImg.displayName = "MotionImg";

@@ -77,9 +77,10 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
 
       if (!accountsResponse.success) {
         return fail({
-          message: "app.api.v1.core.emails.imapClient.health.health.get.errors.server.title",
+          message:
+            "app.api.v1.core.emails.imapClient.health.health.get.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: { error: accountsResponse.message },
+          messageParams: { error: accountsResponse.message },
           cause: accountsResponse,
         });
       }
@@ -119,9 +120,10 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
       const parsedError = parseError(error);
       logger.error("Error getting IMAP health status", parsedError);
       return fail({
-          message: "app.api.v1.core.emails.imapClient.health.health.get.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message:
+          "app.api.v1.core.emails.imapClient.health.health.get.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }

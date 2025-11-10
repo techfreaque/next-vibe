@@ -14,7 +14,6 @@ import { ErrorBoundary } from "./_components/error-boundary";
 import ErrorFallback from "./_components/error-fallback";
 import { LeadTrackingProvider } from "./_components/lead-tracking-provider";
 import { QueryProvider } from "next-vibe/system/unified-interface/react/hooks/query-provider";
-
 /**
  * Shared root providers for both web and native
  * Contains all platform-agnostic provider logic

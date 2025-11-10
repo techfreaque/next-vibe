@@ -5,7 +5,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
 import type { JSX } from "react";
-import type { UseFormReturn } from "react-hook-form";
+import type { FieldPath, UseFormReturn } from "react-hook-form";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -15,11 +15,9 @@ import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 /**
  * Extract all request field paths from endpoint definition
  * Recursively walks the field structure to find all data fields
+ * Returns strings that are valid field paths for the form
  */
-function extractRequestFieldPaths(
-  fields: unknown,
-  parentPath = "",
-): string[] {
+function extractRequestFieldPaths(fields: unknown, parentPath = ""): string[] {
   if (!fields || typeof fields !== "object") {
     return [];
   }
@@ -108,17 +106,15 @@ export interface EndpointFormRendererProps<
  * Example:
  * ```tsx
  * <EndpointFormRenderer
- *   endpoint={loginEndpoints.POST}
- *   form={form}
- *   onSubmit={onSubmit}
- *   locale={locale}
- *   isSubmitting={isSubmitting}
+ * endpoint={loginEndpoints.POST}
+ * form={form}
+ * onSubmit={onSubmit}
+ * locale={locale}
+ * isSubmitting={isSubmitting}
  * />
  * ```
  */
-export function EndpointFormRenderer<
-  TEndpoint extends CreateApiEndpointAny
->({
+export function EndpointFormRenderer<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
   form,
   onSubmit,
@@ -134,17 +130,19 @@ export function EndpointFormRenderer<
   const fieldPaths = extractRequestFieldPaths(endpoint.fields);
 
   // Get submit button text
-  const submitText = submitButtonText ? t(submitButtonText) : t("app.user.other.login.auth.login.signInButton");
+  const submitText = submitButtonText
+    ? t(submitButtonText)
+    : t("app.user.other.login.auth.login.signInButton");
   const loadingText = t("app.user.common.loading");
 
   return (
     <Form form={form} onSubmit={onSubmit} className={className}>
-      <Div className="space-y-6">
+      <Div className="flex flex-col gap-6">
         {/* Automatically render all request fields */}
         {fieldPaths.map((fieldPath) => (
           <EndpointFormField
             key={fieldPath}
-            name={fieldPath}
+            name={fieldPath as FieldPath<TEndpoint["TRequestOutput"]>}
             control={form.control}
             endpointFields={endpoint.fields}
             schema={endpoint.requestSchema}

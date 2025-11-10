@@ -1,10 +1,8 @@
 import * as NavigationMenuPrimitive from "@rn-primitives/navigation-menu";
 import * as React from "react";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import Animated, {
   Extrapolation,
-  FadeInLeft,
-  FadeOutLeft,
   interpolate,
   useAnimatedStyle,
   useDerivedValue,
@@ -13,16 +11,20 @@ import Animated, {
 
 import { cn } from "next-vibe/shared/utils/utils";
 import { buttonVariants } from "./button";
+import { ChevronDown } from "./icons/ChevronDown";
 
-// Import all types from web (web is source of truth)
+// Import ALL types from web - ZERO definitions here
 import type {
   NavigationMenuProps,
   NavigationMenuListProps,
+  NavigationMenuItemProps,
   NavigationMenuTriggerProps,
   NavigationMenuContentProps,
+  NavigationMenuLinkProps,
   NavigationMenuViewportProps,
   NavigationMenuIndicatorProps,
 } from "@/packages/next-vibe-ui/web/ui/navigation-menu";
+
 
 // navigationMenuTriggerStyle helper function (native implementation)
 function navigationMenuTriggerStyle(): string {
@@ -31,44 +33,47 @@ function navigationMenuTriggerStyle(): string {
     "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50",
   );
 }
-import { ChevronDown } from "./icons/ChevronDown";
 
 function NavigationMenu({
   className,
   children,
   value,
   onValueChange,
-  ...props
-}: NavigationMenuProps &
-  Omit<
-    NavigationMenuPrimitive.RootProps,
-    keyof NavigationMenuProps
-  >): JSX.Element {
+  // Native primitives don't support defaultValue - destructured but not used
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  defaultValue,
+  delayDuration,
+  skipDelayDuration,
+  dir,
+  orientation,
+}: NavigationMenuProps): React.JSX.Element {
   return (
-    <NavigationMenuPrimitive.Root
-      value={value}
-      onValueChange={onValueChange ?? (() => undefined)}
+    <View
       className={cn(
         "relative z-10 flex flex-row max-w-max items-center justify-center",
         className,
       )}
-      {...props}
     >
-      {children}
-      {Platform.OS === "web" && <NavigationMenuViewport />}
-    </NavigationMenuPrimitive.Root>
+      <NavigationMenuPrimitive.Root
+        value={value}
+        onValueChange={onValueChange ?? (() => undefined)}
+        delayDuration={delayDuration}
+        skipDelayDuration={skipDelayDuration}
+        dir={dir}
+        orientation={orientation}
+      >
+        {children}
+      </NavigationMenuPrimitive.Root>
+    </View>
   );
 }
 NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName;
 
 function NavigationMenuList({
   className,
+  children,
   ...props
-}: NavigationMenuListProps &
-  Omit<
-    NavigationMenuPrimitive.ListProps,
-    keyof NavigationMenuListProps
-  >): JSX.Element {
+}: NavigationMenuListProps): React.JSX.Element {
   return (
     <NavigationMenuPrimitive.List
       className={cn(
@@ -76,26 +81,26 @@ function NavigationMenuList({
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </NavigationMenuPrimitive.List>
   );
 }
 NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 
-const NavigationMenuItem = NavigationMenuPrimitive.Item;
+function NavigationMenuItem({
+  value,
+  children,
+}: NavigationMenuItemProps): React.JSX.Element {
+  return <NavigationMenuPrimitive.Item value={value}>{children}</NavigationMenuPrimitive.Item>;
+}
+NavigationMenuItem.displayName = NavigationMenuPrimitive.Item.displayName;
 
 function NavigationMenuTrigger({
   className,
   children,
   ...props
-}: NavigationMenuTriggerProps &
-  Omit<
-    NavigationMenuPrimitive.TriggerProps,
-    keyof NavigationMenuTriggerProps | "children"
-  > & {
-    children?:
-      | React.ReactNode
-      | ((props: { pressed: boolean }) => React.ReactNode);
-  }): JSX.Element {
+}: NavigationMenuTriggerProps): React.JSX.Element {
   const { value } = NavigationMenuPrimitive.useRootContext();
   const { value: itemValue } = NavigationMenuPrimitive.useItemContext();
 
@@ -119,7 +124,7 @@ function NavigationMenuTrigger({
       )}
       {...props}
     >
-      {typeof children === "function" ? children({ pressed: false }) : children}
+      {children}
       <Animated.View style={chevronStyle}>
         <ChevronDown
           size={12}
@@ -137,51 +142,34 @@ NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName;
 function NavigationMenuContent({
   className,
   children,
-  portalHost,
   ...props
-}: NavigationMenuContentProps &
-  Omit<
-    NavigationMenuPrimitive.ContentProps,
-    keyof NavigationMenuContentProps
-  > & {
-    portalHost?: string;
-  }): JSX.Element {
-  const { value } = NavigationMenuPrimitive.useRootContext();
-  const { value: itemValue } = NavigationMenuPrimitive.useItemContext();
+}: NavigationMenuContentProps): React.JSX.Element {
   return (
-    <NavigationMenuPrimitive.Portal hostName={portalHost}>
-      <NavigationMenuPrimitive.Content
-        className={cn(
-          "w-full border border-border rounded-lg shadow-lg bg-popover text-popover-foreground overflow-hidden",
-          value === itemValue
-            ? "animate-in fade-in slide-in-from-right-20"
-            : "animate-out fade-out slide-out-to-left-20",
-          className,
-        )}
-        {...props}
-      >
-        <Animated.View
-          entering={Platform.OS !== "web" ? FadeInLeft : undefined}
-          exiting={Platform.OS !== "web" ? FadeOutLeft : undefined}
-        >
-          {children}
-        </Animated.View>
-      </NavigationMenuPrimitive.Content>
-    </NavigationMenuPrimitive.Portal>
+    <NavigationMenuPrimitive.Content
+      className={cn(
+        "w-full border border-border rounded-lg shadow-lg bg-popover text-popover-foreground overflow-hidden data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </NavigationMenuPrimitive.Content>
   );
 }
 NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
 
-const NavigationMenuLink = NavigationMenuPrimitive.Link;
+function NavigationMenuLink({
+  children,
+  ...props
+}: NavigationMenuLinkProps): React.JSX.Element {
+  return <NavigationMenuPrimitive.Link {...props}>{children}</NavigationMenuPrimitive.Link>;
+}
+NavigationMenuLink.displayName = NavigationMenuPrimitive.Link.displayName;
 
 function NavigationMenuViewport({
   className,
   ...props
-}: NavigationMenuViewportProps &
-  Omit<
-    NavigationMenuPrimitive.ViewportProps,
-    keyof NavigationMenuViewportProps
-  >): React.ReactElement {
+}: NavigationMenuViewportProps): React.JSX.Element {
   return (
     <View className={cn("absolute left-0 top-full flex justify-center")}>
       <View
@@ -196,17 +184,12 @@ function NavigationMenuViewport({
     </View>
   );
 }
-NavigationMenuViewport.displayName =
-  NavigationMenuPrimitive.Viewport.displayName;
+NavigationMenuViewport.displayName = NavigationMenuPrimitive.Viewport.displayName;
 
 function NavigationMenuIndicator({
   className,
   ...props
-}: NavigationMenuIndicatorProps &
-  Omit<
-    NavigationMenuPrimitive.IndicatorProps,
-    keyof NavigationMenuIndicatorProps
-  >): JSX.Element {
+}: NavigationMenuIndicatorProps): React.JSX.Element {
   const { value } = NavigationMenuPrimitive.useRootContext();
   const { value: itemValue } = NavigationMenuPrimitive.useItemContext();
 
@@ -214,9 +197,7 @@ function NavigationMenuIndicator({
     <NavigationMenuPrimitive.Indicator
       className={cn(
         "top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden",
-        value === itemValue
-          ? "animate-in fade-in"
-          : "animate-out fade-out",
+        value === itemValue ? "animate-in fade-in" : "animate-out fade-out",
         className,
       )}
       {...props}
@@ -225,8 +206,7 @@ function NavigationMenuIndicator({
     </NavigationMenuPrimitive.Indicator>
   );
 }
-NavigationMenuIndicator.displayName =
-  NavigationMenuPrimitive.Indicator.displayName;
+NavigationMenuIndicator.displayName = NavigationMenuPrimitive.Indicator.displayName;
 
 export {
   NavigationMenu,

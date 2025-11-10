@@ -509,9 +509,7 @@ export async function canManageFolderPermissions(
 ): Promise<boolean> {
   // Permission management is only available for PUBLIC root folder
   // Private, shared, and incognito folders are owner-only by design
-  if (
-    folder.rootFolderId !== "public"
-  ) {
+  if (folder.rootFolderId !== "public") {
     return false;
   }
 
@@ -790,9 +788,7 @@ export async function canManageThreadPermissions(
 ): Promise<boolean> {
   // Permission management is only available for PUBLIC root folder
   // Private, shared, and incognito threads are owner-only by design
-  if (
-    thread.rootFolderId !== "public"
-  ) {
+  if (thread.rootFolderId !== "public") {
     return false;
   }
 

@@ -5,7 +5,7 @@
 
 "use client";
 
-import { AlertTriangle, CheckCircle, Eye, Users } from 'next-vibe-ui/ui/icons';
+import { AlertTriangle, CheckCircle, Eye, Users } from "next-vibe-ui/ui/icons";
 import { Div } from "next-vibe-ui/ui/div";
 import { H4, P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
@@ -32,7 +32,7 @@ import {
 import type React from "react";
 
 import type {
-LeadStatusValues,
+  LeadStatusValues,
   EmailCampaignStage,
   LeadSource,
   LeadStatus,
@@ -93,7 +93,7 @@ export function BatchOperationsDialog({
   const { t } = simpleT(locale);
 
   const renderPreviewContent = (): React.JSX.Element => (
-    <Div className="space-y-4">
+    <Div className="flex flex-col gap-4">
       {description && (
         <P className="text-sm text-muted-foreground">{description}</P>
       )}
@@ -108,7 +108,7 @@ export function BatchOperationsDialog({
       </Alert>
 
       {updates && (
-        <Div className="space-y-2">
+        <Div className="flex flex-col gap-2">
           <H4 className="text-sm font-medium">
             {t("app.admin.leads.leads.admin.batch.planned_changes")}
           </H4>
@@ -188,7 +188,7 @@ export function BatchOperationsDialog({
   );
 
   const renderResultContent = (): React.JSX.Element => (
-    <Div className="space-y-4">
+    <Div className="flex flex-col gap-4">
       {result?.success ? (
         <Alert>
           <CheckCircle className="h-4 w-4" />
@@ -214,14 +214,14 @@ export function BatchOperationsDialog({
       )}
 
       {result?.errors && result.errors.length > 0 && (
-        <Div className="space-y-2">
+        <Div className="flex flex-col gap-2">
           <H4 className="text-sm font-medium text-destructive">
             {t("app.admin.leads.leads.admin.batch.errors_title", {
               count: result.errors.length,
             })}
           </H4>
           <ScrollArea className="h-32 border rounded-md p-2">
-            <Div className="space-y-1">
+            <Div className="flex flex-col gap-1">
               {result.errors.map((error, index) => (
                 <Div key={index} className="text-sm text-destructive">
                   {error.error}

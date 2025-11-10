@@ -5,7 +5,7 @@
 
 "use client";
 
-import { RefreshCw } from 'next-vibe-ui/ui/icons';
+import { RefreshCw } from "next-vibe-ui/ui/icons";
 import {
   ChartType,
   DateRangePreset,
@@ -54,9 +54,9 @@ export function EmailStatsFiltersContainer({
   const { t } = simpleT(locale);
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-4">
           <CardTitle className="text-lg font-semibold">
             {title || t("app.admin.emails.stats.common.filter")}
           </CardTitle>
@@ -72,7 +72,7 @@ export function EmailStatsFiltersContainer({
             </Button>
           )}
         </CardHeader>
-        <CardContent className="space-y-4">{children}</CardContent>
+        <CardContent className="flex flex-col gap-4">{children}</CardContent>
       </Card>
     </div>
   );
@@ -85,7 +85,7 @@ export function EmailStatsFilters({
   control,
 }: EmailStatsFiltersProps): JSX.Element {
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {/* Base time and chart filters */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Time Period */}

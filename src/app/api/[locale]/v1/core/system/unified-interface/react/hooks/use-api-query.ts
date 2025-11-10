@@ -2,12 +2,8 @@
 
 import type { QueryKey } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
-import type {
-  ErrorResponseType,
-} from "next-vibe/shared/types/response.schema";
-import {
-  success,
-} from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { useMemo } from "react";
 
@@ -138,7 +134,12 @@ export function useApiQuery<
         locale,
         options: {
           onSuccess: onSuccess
-            ? (context): void | ErrorResponseType | Promise<void | ErrorResponseType> => {
+            ? (
+                context,
+              ):
+                | void
+                | ErrorResponseType
+                | Promise<void | ErrorResponseType> => {
                 const result = onSuccess({
                   responseData: context.responseData,
                   requestData: context.requestData,
@@ -189,21 +190,23 @@ export function useApiQuery<
     const isFetching = query.isFetching;
     const isLoadingFresh = query.isLoading; // First load, no data yet
     const isCachedData = !!query.data && !query.isLoading;
-    const isError = query.isError || (responseData?.success === false);
+    const isError = query.isError || responseData?.success === false;
     const isSuccess = query.isSuccess && responseData?.success === true;
 
     // Create status message based on state
-    const statusMessage = (!enabled
-      ? "app.error.api.store.status.disabled"
-      : isLoadingFresh
-        ? "app.error.api.store.status.loading_data"
-        : isCachedData && !isFetching
-          ? "app.error.api.store.status.cached_data"
-          : isSuccess
-            ? "app.api.v1.core.system.unifiedInterface.react.hooks.store.status.success"
-            : isError
-              ? "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.request_failed"
-              : undefined) as ApiQueryReturn<TEndpoint["TResponseOutput"]>["statusMessage"];
+    const statusMessage = (
+      !enabled
+        ? "app.error.api.store.status.disabled"
+        : isLoadingFresh
+          ? "app.error.api.store.status.loading_data"
+          : isCachedData && !isFetching
+            ? "app.error.api.store.status.cached_data"
+            : isSuccess
+              ? "app.api.v1.core.system.unifiedInterface.react.hooks.store.status.success"
+              : isError
+                ? "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.request_failed"
+                : undefined
+    ) as ApiQueryReturn<TEndpoint["TResponseOutput"]>["statusMessage"];
 
     const result: ApiQueryReturn<TEndpoint["TResponseOutput"]> = {
       response: responseData,
@@ -233,7 +236,9 @@ export function useApiQuery<
 
       // Placeholder for setErrorType (deprecated, kept for compatibility)
       setErrorType: (_newError: ErrorResponseType | null) => {
-        logger.warn("setErrorType is deprecated, use React Query's error handling instead");
+        logger.warn(
+          "setErrorType is deprecated, use React Query's error handling instead",
+        );
         // This is a no-op now, React Query manages errors
       },
     };

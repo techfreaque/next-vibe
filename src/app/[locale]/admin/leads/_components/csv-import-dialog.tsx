@@ -5,7 +5,7 @@
 
 "use client";
 
-import { CheckCircle, Download, FileText, Upload } from 'next-vibe-ui/ui/icons';
+import { CheckCircle, Download, FileText, Upload } from "next-vibe-ui/ui/icons";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
@@ -36,10 +36,7 @@ import {
 import { useLeadsImportEndpoint } from "@/app/api/[locale]/v1/core/leads/import/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import {
-  CountriesOptions,
-  LanguagesOptions,
-} from "@/i18n/core/config";
+import { CountriesOptions, LanguagesOptions } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface ImportResult {
@@ -104,7 +101,7 @@ export function CsvImportDialog({
               <Form
                 form={endpoint.create.form}
                 onSubmit={endpoint.create.submitForm}
-                className="space-y-6"
+                className="flex flex-col gap-6"
               >
                 <FormFieldGroup
                   title={"app.admin.leads.leads.admin.import.title" as const}
@@ -143,7 +140,7 @@ export function CsvImportDialog({
                   </Div>
 
                   {/* File Upload */}
-                  <Div className="space-y-4">
+                  <Div className="flex flex-col gap-4">
                     <Div
                       className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                         endpoint.dragOver
@@ -515,7 +512,7 @@ export function CsvImportDialog({
 
                 {/* Import Progress */}
                 {endpoint.create.isSubmitting && (
-                  <Div className="space-y-2">
+                  <Div className="flex flex-col gap-2">
                     <Div className="flex items-center justify-between">
                       <P className="font-medium">
                         {t("app.admin.leads.leads.admin.import.progress.title")}

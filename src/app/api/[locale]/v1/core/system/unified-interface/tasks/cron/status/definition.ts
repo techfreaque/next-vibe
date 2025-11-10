@@ -28,7 +28,8 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 const { GET: cronStatusGetEndpoint } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "system", "tasks", "cron", "status"],
-  title: "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.title",
+  title:
+    "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.title",
   description:
     "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.description",
   category: "app.api.v1.core.system.unifiedInterface.tasks.taskCategory.system",

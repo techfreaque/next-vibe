@@ -124,13 +124,23 @@ Write your endpoint once, get everything:
 ```typescript
 // definition.ts - The single source of truth
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
-import { Methods, WidgetType, FieldDataType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { objectField, requestDataField, responseField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
+  Methods,
+  WidgetType,
+  FieldDataType,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import {
+  objectField,
+  requestDataField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "user", "public", "login"],
-  fields: objectField({ /* ... */ }),
+  fields: objectField({
+    /* ... */
+  }),
 });
 
 // Automatically generates:
@@ -148,8 +158,8 @@ const { POST } = createEndpoint({
 
 ```typescript
 // Auto-detected from folder path
-t("app.api.v1.core.user.public.login.title") // ✅ Valid
-t("app.invalid.key")                          // ❌ TypeScript error
+t("app.api.v1.core.user.public.login.title"); // ✅ Valid
+t("app.invalid.key"); // ❌ TypeScript error
 
 // Works in:
 // - React components
@@ -443,7 +453,7 @@ src/
 ├── app/
 │   ├── [locale]/                   # Next.js pages (Web)
 │   ├── api/[locale]/v1/core/       # API endpoints (recursive structure)
-│   └── api/[locale]/v1/core/system # Core Framework and CLI tools 
+│   └── api/[locale]/v1/core/system # Core Framework and CLI tools
 ├── packages/
 │   ├── next-vibe/                  # Deprecated: Core framework utilities
 │   ├── next-vibe-ui/
@@ -472,8 +482,17 @@ cd src/app/api/[locale]/v1/core/products/create
 // definition.ts
 import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
-import { Methods, WidgetType, FieldDataType, LayoutType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { objectField, requestDataField, responseField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import {
+  Methods,
+  WidgetType,
+  FieldDataType,
+  LayoutType,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import {
+  objectField,
+  requestDataField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 const { POST } = createEndpoint({
@@ -488,17 +507,22 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       name: requestDataField(
-        { type: WidgetType.FORM_FIELD, fieldType: FieldDataType.TEXT, label: "app.api.v1.core.products.create.fields.name.label" },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.v1.core.products.create.fields.name.label",
+        },
         z.string().min(1).max(100),
       ),
       price: requestDataField(
-        { type: WidgetType.FORM_FIELD, fieldType: FieldDataType.NUMBER, label: "app.api.v1.core.products.create.fields.price.label" },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.products.create.fields.price.label",
+        },
         z.number().positive(),
       ),
-      productId: responseField(
-        { type: WidgetType.TEXT },
-        z.uuid(),
-      ),
+      productId: responseField({ type: WidgetType.TEXT }, z.uuid()),
     },
   ),
 });
@@ -525,11 +549,14 @@ export class ProductRepository {
   ): Promise<ResponseType<{ productId: string }>> {
     logger.info("Creating product", { name: data.name });
 
-    const product = await db.insert(products).values({
-      name: data.name,
-      price: data.price,
-      createdBy: user.id,
-    }).returning();
+    const product = await db
+      .insert(products)
+      .values({
+        name: data.name,
+        price: data.price,
+        createdBy: user.id,
+      })
+      .returning();
 
     return success({ productId: product[0].id });
   }
@@ -669,10 +696,14 @@ vibe user:public:login --help
 ```typescript
 // Types inferred from Zod schemas
 const { POST } = createEndpoint({
-  fields: objectField({}, { request: "data", response: true }, {
-    email: requestDataField({}, z.string().email()),
-    userId: responseField({}, z.uuid()),
-  }),
+  fields: objectField(
+    {},
+    { request: "data", response: true },
+    {
+      email: requestDataField({}, z.string().email()),
+      userId: responseField({}, z.uuid()),
+    },
+  ),
 });
 
 // TypeScript knows:
@@ -685,9 +716,9 @@ type ResponseData = { userId: string };
 ```typescript
 const { form, mutation } = useApiForm(definitions.POST, logger);
 
-form.setValue("email", "test@example.com");  // ✅ Type-safe
-form.setValue("email", 123);                  // ❌ Type error
-form.setValue("invalid", "value");            // ❌ Property doesn't exist
+form.setValue("email", "test@example.com"); // ✅ Type-safe
+form.setValue("email", 123); // ❌ Type error
+form.setValue("invalid", "value"); // ❌ Property doesn't exist
 ```
 
 ### 3. Database Queries
@@ -699,16 +730,16 @@ const user = await db.query.users.findFirst({
 });
 
 // TypeScript knows the exact shape of `user`
-console.log(user.email);     // ✅ string
-console.log(user.invalid);   // ❌ Property doesn't exist
+console.log(user.email); // ✅ string
+console.log(user.invalid); // ❌ Property doesn't exist
 ```
 
 ### 4. Translations
 
 ```typescript
 // Translation keys are validated at compile time
-t("app.api.v1.core.user.public.login.title")  // ✅ Valid key
-t("app.some.invalid.key")                       // ❌ Type error
+t("app.api.v1.core.user.public.login.title"); // ✅ Valid key
+t("app.some.invalid.key"); // ❌ Type error
 
 // Works in components, APIs, CLI, everywhere
 ```
@@ -967,7 +998,6 @@ AI: git add . && git commit -m "Add user suspension endpoint"
 ```
 
 **The framework won't let AI make mistakes.**
-
 
 ---
 

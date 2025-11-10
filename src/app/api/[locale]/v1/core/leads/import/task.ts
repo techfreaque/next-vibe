@@ -238,8 +238,8 @@ async function executeCsvProcessor(
 
     return fail({
       message: "app.api.v1.core.leads.import.post.errors.server.title",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR, }
-    );
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 }
 
@@ -253,9 +253,9 @@ async function validateCsvProcessor(): Promise<ResponseType<boolean>> {
     return success(true);
   } catch {
     return fail({
-          message: "app.api.v1.core.leads.import.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,}
-    );
+      message: "app.api.v1.core.leads.import.post.errors.server.title",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 }
 
@@ -299,10 +299,10 @@ const csvProcessorTask: Task = {
 
     if (!result.success) {
       return fail({
-          message: "app.api.v1.core.leads.import.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          cause: result,
-        });
+        message: "app.api.v1.core.leads.import.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        cause: result,
+      });
     }
     // Returns void implicitly on success
   },

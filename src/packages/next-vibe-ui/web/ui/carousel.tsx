@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftIcon, ArrowRightIcon } from 'next-vibe-ui/ui/icons';
+import { ArrowLeftIcon, ArrowRightIcon } from "next-vibe-ui/ui/icons";
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
@@ -204,19 +204,15 @@ const CarouselItem = React.forwardRef<
 });
 CarouselItem.displayName = "CarouselItem";
 
-const CarouselPrevious = React.forwardRef<
-  HTMLButtonElement,
-  Omit<
-    React.ComponentProps<typeof Button>,
-    "onClick" | "disabled" | "onMouseEnter" | "onMouseLeave" | "tabIndex"
-  >
->(({ className, variant = "outline", size = "icon" }, ref) => {
+function CarouselPrevious({ className, variant = "outline", size = "icon" }: Omit<
+  React.ComponentProps<typeof Button>,
+  "onClick" | "disabled" | "onMouseEnter" | "onMouseLeave" | "tabIndex"
+>): React.JSX.Element {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
   const { t } = useTranslation();
 
   return (
     <Button
-      ref={ref}
       variant={variant ?? "outline"}
       size={size ?? "icon"}
       className={cn(
@@ -239,22 +235,17 @@ const CarouselPrevious = React.forwardRef<
       </>
     </Button>
   );
-});
-CarouselPrevious.displayName = "CarouselPrevious";
+}
 
-const CarouselNext = React.forwardRef<
-  HTMLButtonElement,
-  Omit<
-    React.ComponentProps<typeof Button>,
-    "onClick" | "disabled" | "onMouseEnter" | "onMouseLeave" | "tabIndex"
-  >
->(({ className, variant = "outline", size = "icon" }, ref) => {
+function CarouselNext({ className, variant = "outline", size = "icon" }: Omit<
+  React.ComponentProps<typeof Button>,
+  "onClick" | "disabled" | "onMouseEnter" | "onMouseLeave" | "tabIndex"
+>): React.JSX.Element {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
   const { t } = useTranslation();
 
   return (
     <Button
-      ref={ref}
       variant={variant ?? "outline"}
       size={size ?? "icon"}
       className={cn(
@@ -275,8 +266,7 @@ const CarouselNext = React.forwardRef<
       </>
     </Button>
   );
-});
-CarouselNext.displayName = "CarouselNext";
+}
 
 export {
   Carousel,

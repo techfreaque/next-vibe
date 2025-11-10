@@ -296,7 +296,8 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       if (existingAccount.length > 0) {
         return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.post.error.duplicate.title",
+          message:
+            "app.api.v1.core.emails.imapClient.imapErrors.accounts.post.error.duplicate.title",
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
@@ -339,9 +340,10 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     } catch (error) {
       logger.error("Error creating IMAP account", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.post.error.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.emails.imapClient.imapErrors.accounts.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -450,9 +452,10 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     } catch (error) {
       logger.error("Error listing IMAP accounts", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -480,7 +483,8 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       if (!account) {
         return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
+          message:
+            "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -491,9 +495,10 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     } catch (error) {
       logger.error("Error getting IMAP account by ID", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -522,7 +527,8 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       if (!existingAccount) {
         return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.put.error.not_found.title",
+          message:
+            "app.api.v1.core.emails.imapClient.imapErrors.accounts.put.error.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -542,9 +548,9 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
         if (emailConflict.length > 0) {
           return fail({
-          message:
-            "app.api.v1.core.emails.imapClient.imapErrors.accounts.put.error.duplicate.title",
-          errorType: ErrorResponseTypes.CONFLICT,
+            message:
+              "app.api.v1.core.emails.imapClient.imapErrors.accounts.put.error.duplicate.title",
+            errorType: ErrorResponseTypes.CONFLICT,
           });
         }
       }
@@ -584,9 +590,10 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     } catch (error) {
       logger.error("Error updating IMAP account", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.put.error.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.emails.imapClient.imapErrors.accounts.put.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -614,7 +621,8 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       if (!existingAccount) {
         return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.delete.error.not_found.title",
+          message:
+            "app.api.v1.core.emails.imapClient.imapErrors.accounts.delete.error.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -634,9 +642,10 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     } catch (error) {
       logger.error("Error deleting IMAP account", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.delete.error.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.emails.imapClient.imapErrors.accounts.delete.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -664,7 +673,8 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       if (!account) {
         return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
+          message:
+            "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -675,9 +685,10 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     } catch (error) {
       logger.error("Error testing IMAP account connection", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.connection.timeout.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.emails.imapClient.imapErrors.connection.timeout.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -709,7 +720,8 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
           error: "Missing required configuration",
         });
         return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.validation.account.username.required",
+          message:
+            "app.api.v1.core.emails.imapClient.imapErrors.validation.account.username.required",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -721,7 +733,8 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
           port: account.port,
         });
         return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.validation.account.port.invalid",
+          message:
+            "app.api.v1.core.emails.imapClient.imapErrors.validation.account.port.invalid",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -733,7 +746,8 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
           host: account.host,
         });
         return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.validation.account.host.invalid",
+          message:
+            "app.api.v1.core.emails.imapClient.imapErrors.validation.account.host.invalid",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -802,9 +816,10 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
             resolveOnce(
               fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.connection.test.failed",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                          messageParams: { error: parseError(error).message },
+                message:
+                  "app.api.v1.core.emails.imapClient.imapErrors.connection.test.failed",
+                errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                messageParams: { error: parseError(error).message },
               }),
             );
           });
@@ -813,8 +828,9 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
           setTimeout(() => {
             resolveOnce(
               fail({
-          message: "app.api.v1.core.emails.imapClient.imap.connection.test.timeout",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                message:
+                  "app.api.v1.core.emails.imapClient.imap.connection.test.timeout",
+                errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
               }),
             );
           }, 15000);
@@ -825,9 +841,10 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     } catch (error) {
       logger.error("IMAP connection test failed", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.imapClient.imap.connection.test.failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.emails.imapClient.imap.connection.test.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

@@ -28,7 +28,7 @@ export default async function ImapOverviewPage({
   const { t } = simpleT(locale);
 
   return (
-    <Div className="container mx-auto py-6 space-y-6">
+    <Div className="container mx-auto py-6 flex flex-col gap-6">
       <Div className="mb-6">
         <H1 className="text-3xl font-bold">
           {t("app.admin.emails.imap.admin.overview.title")}

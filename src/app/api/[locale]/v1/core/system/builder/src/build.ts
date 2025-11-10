@@ -136,7 +136,7 @@ export async function pweBuild(fileConfig: FileToCompile): Promise<void> {
   if (fileConfig.options?.type?.includes("react")) {
     outputOptions.globals = {
       // eslint-disable-next-line i18next/no-literal-string
-      "react": "React",
+      react: "React",
       // eslint-disable-next-line i18next/no-literal-string
       "react-dom": "ReactDOM",
     };

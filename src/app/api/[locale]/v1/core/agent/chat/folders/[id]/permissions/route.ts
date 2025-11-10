@@ -7,10 +7,7 @@ import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-inte
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import {
-  getFolderPermissions,
-  updateFolderPermissions,
-} from "./repository";
+import { getFolderPermissions, updateFolderPermissions } from "./repository";
 
 export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
@@ -31,7 +28,11 @@ export const { GET, PATCH, tools } = endpointsHandler({
         ...props.data,
         id: props.urlPathParams.id,
       };
-      return await updateFolderPermissions(props.user, dataWithId, props.logger);
+      return await updateFolderPermissions(
+        props.user,
+        dataWithId,
+        props.logger,
+      );
     },
   },
 });

@@ -49,15 +49,15 @@ export function getTwilioProvider(): SmsProvider {
         // Validate credentials
         if (!accountSid) {
           return fail({
-          message: "app.api.v1.core.sms.sms.error.missing_recipient",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            message: "app.api.v1.core.sms.sms.error.missing_recipient",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
         if (!authToken) {
           return fail({
-          message: "app.api.v1.core.sms.sms.error.missing_recipient",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            message: "app.api.v1.core.sms.sms.error.missing_recipient",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
@@ -73,8 +73,8 @@ export function getTwilioProvider(): SmsProvider {
         // Type guard for params
         if (!params || typeof params !== "object") {
           return fail({
-          message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
@@ -83,8 +83,8 @@ export function getTwilioProvider(): SmsProvider {
         // Validate required parameters
         if (!params.to) {
           return fail({
-          message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
@@ -92,8 +92,8 @@ export function getTwilioProvider(): SmsProvider {
         const fromNumber = params.from ?? env.SMS_FROM_NUMBER;
         if (!fromNumber) {
           return fail({
-          message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
@@ -103,8 +103,8 @@ export function getTwilioProvider(): SmsProvider {
           params.message.trim() === ""
         ) {
           return fail({
-          message: "app.api.v1.core.sms.sms.error.empty_message",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            message: "app.api.v1.core.sms.sms.error.empty_message",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
@@ -135,11 +135,11 @@ export function getTwilioProvider(): SmsProvider {
         // Type-safe headers handling
         const headers: {
           "Content-Type": string;
-          "Authorization": string;
+          Authorization: string;
           [key: string]: string;
         } = {
           "Content-Type": "application/x-www-form-urlencoded",
-          "Authorization": authHeader,
+          Authorization: authHeader,
         };
 
         // Type-safe header merging
@@ -182,9 +182,9 @@ export function getTwilioProvider(): SmsProvider {
             errorData.code ?? errorData.error_code ?? response.status;
 
           return fail({
-          message: "app.api.v1.core.sms.sms.error.delivery_failed",
-          errorType: ErrorResponseTypes.SMS_ERROR,
-                      messageParams: {
+            message: "app.api.v1.core.sms.sms.error.delivery_failed",
+            errorType: ErrorResponseTypes.SMS_ERROR,
+            messageParams: {
               error: errorMessage,
               errorCode,
             },
@@ -228,7 +228,7 @@ export function getTwilioProvider(): SmsProvider {
         return fail({
           message: "app.api.v1.core.sms.sms.error.delivery_failed",
           errorType: ErrorResponseTypes.SMS_ERROR,
-                    messageParams: {
+          messageParams: {
             error: errorMessage,
           },
         });

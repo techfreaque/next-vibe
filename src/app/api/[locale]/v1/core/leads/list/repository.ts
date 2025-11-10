@@ -83,8 +83,8 @@ export class LeadsListRepositoryImpl implements LeadsListRepository {
     } else {
       logger.error("Failed to list leads", { message: result.message });
       return fail({
-          message: "app.api.v1.core.leads.list.get.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.leads.list.get.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

@@ -3,7 +3,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   DotsHorizontalIcon,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
@@ -53,24 +53,22 @@ const Pagination = ({
 );
 Pagination.displayName = "Pagination";
 
-const PaginationContent = React.forwardRef<
-  HTMLUListElement,
-  React.ComponentProps<"ul">
->(({ className, ...props }, ref) => (
-  <ul
-    ref={ref}
-    className={cn("flex flex-row items-center gap-1", className)}
-    {...props}
-  />
-));
+function PaginationContent({ className, children }: PaginationContentProps): React.JSX.Element {
+  return (
+    <ul className={cn("flex flex-row items-center gap-1", className)}>
+      {children}
+    </ul>
+  );
+}
 PaginationContent.displayName = "PaginationContent";
 
-const PaginationItem = React.forwardRef<
-  HTMLLIElement,
-  React.ComponentProps<"li">
->(({ className, ...props }, ref) => (
-  <li ref={ref} className={cn("", className)} {...props} />
-));
+function PaginationItem({ className, children }: PaginationItemProps): React.JSX.Element {
+  return (
+    <li className={cn("", className)}>
+      {children}
+    </li>
+  );
+}
 PaginationItem.displayName = "PaginationItem";
 
 export type PaginationLinkProps = {

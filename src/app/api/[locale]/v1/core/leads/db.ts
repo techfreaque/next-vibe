@@ -28,10 +28,7 @@ import {
   LeadStatus,
   LeadStatusDB,
 } from "./enum";
-import {
-  EmailStatus,
-  EmailStatusDB,
-} from "../emails/messages/enum";
+import { EmailStatus, EmailStatusDB } from "../emails/messages/enum";
 
 /**
  * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys

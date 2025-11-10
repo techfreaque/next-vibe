@@ -1,4 +1,3 @@
-
 import { translations as _componentsTranslations } from "../../_components/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
@@ -332,9 +331,11 @@ export const translations: typeof enTranslations = {
   email: {
     title: "Witamy w {{appName}}!",
     subject: "Witamy w {{appName}}!",
-    previewText: "Witamy w {{appName}}! Rozpocznij swoje doświadczenie z czatem AI.",
+    previewText:
+      "Witamy w {{appName}}! Rozpocznij swoje doświadczenie z czatem AI.",
     welcomeMessage: "Witamy w {{appName}}!",
-    description: "Jesteś teraz gotowy, aby rozpocząć czat z AI i dołączyć do naszego forum społeczności.",
+    description:
+      "Jesteś teraz gotowy, aby rozpocząć czat z AI i dołączyć do naszego forum społeczności.",
     ctaTitle: "Rozpocznij",
     ctaButton: "Przejdź do subskrypcji",
     signoff: "Z poważaniem,\nZespół {{appName}}",

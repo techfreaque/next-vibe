@@ -48,9 +48,9 @@ export function AdminUsersLayoutClient({
   const currentPage = getCurrentPage();
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Header with Navigation */}
-      <Div className="flex flex-col space-y-4">
+      <Div className="flex flex-col gap-4">
         <Div>
           <H1 className="text-3xl font-bold text-gray-900 dark:text-white">
             {t("app.admin.users.overview.title")}

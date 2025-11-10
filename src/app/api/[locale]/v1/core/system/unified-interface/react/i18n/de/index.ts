@@ -41,9 +41,9 @@ export const translations: typeof enTranslations = {
         errorLabel: "Fehler:",
         noArguments: "Keine Argumente",
         noResult: "Kein Ergebnis",
-        metadataNotAvailable: "Widget-Metadaten nicht verfügbar. Zeige Rohdaten.",
+        metadataNotAvailable:
+          "Widget-Metadaten nicht verfügbar. Zeige Rohdaten.",
       },
     },
   },
 };
-

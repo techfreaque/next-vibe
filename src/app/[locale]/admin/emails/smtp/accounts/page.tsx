@@ -22,7 +22,7 @@ export default async function SmtpAccountsPage({
   const { t } = simpleT(locale);
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Page Description */}
       <Div>
         <P className="text-gray-600 dark:text-gray-400">

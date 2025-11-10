@@ -26,8 +26,7 @@
  * ```
  */
 
-import {
-  Slot, useLocalSearchParams } from "expo-router";
+import { Slot, useLocalSearchParams } from "expo-router";
 import type React from "react";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -71,7 +70,9 @@ export interface ExpoRouterParams extends Record<string, string | string[]> {
  * Type for any Next.js page component (handles various signatures)
  * Using a single flexible signature to avoid intersection type issues
  */
-type AnyNextPageComponent<_TParams extends RouteParams = ExpoRouterParams> =
+export type AnyNextPageComponent<
+  _TParams extends RouteParams = ExpoRouterParams,
+> =
   // eslint-disable-next-line typescript-eslint/no-explicit-any -- Need flexible type to support various Next.js component signatures
   (props: any) => Promise<JSX.Element> | JSX.Element | never;
 
@@ -91,9 +92,7 @@ type AnyNextPageComponent<_TParams extends RouteParams = ExpoRouterParams> =
  */
 export function createPageWrapperWithImport<
   TParams extends ExpoRouterParams = ExpoRouterParams,
->(
-  importFn: () => Promise<{ default: AnyNextPageComponent<TParams> }>,
-): () => React.ReactElement {
+>(importFn: () => Promise<Record<string, unknown>>): () => React.ReactElement {
   return function PageWrapper(): React.ReactElement {
     const params = useLocalSearchParams<TParams>();
 
@@ -111,7 +110,7 @@ export function createPageWrapperWithImport<
         try {
           // Dynamically import the component
           const componentModule = await importFn();
-          const PageComponent = componentModule.default;
+          const PageComponent = componentModule.default as AnyNextPageComponent<TParams>;
 
           // Create a proper Promise<TParams> for Next.js 15 async params
           const paramsPromise: Promise<TParams> = Promise.resolve(params);
@@ -138,8 +137,8 @@ export function createPageWrapperWithImport<
             if (isServerOnlyError) {
               logger.warn(
                 "Page uses server-only features not available in React Native. " +
-                "A .native override is needed for this route.",
-                { error: parsedError, route: params }
+                  "A .native override is needed for this route.",
+                { error: parsedError, route: params },
               );
             } else {
               logger.error("Failed to load page", { error: parsedError });
@@ -149,10 +148,10 @@ export function createPageWrapperWithImport<
               err instanceof Error
                 ? err
                 : new Error(
-                  t(
-                    "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+                    t(
+                      "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+                    ),
                   ),
-                ),
             );
           }
         }
@@ -264,8 +263,8 @@ export function createPageWrapper<
               if (isNodeModuleError) {
                 logger.warn(
                   "Page uses server-only features not available in React Native. " +
-                  "A .native override is needed for this route.",
-                  { error: parsedError, route: params }
+                    "A .native override is needed for this route.",
+                  { error: parsedError, route: params },
                 );
               } else {
                 logger.error("Failed to load page", { error: parsedError });
@@ -275,10 +274,10 @@ export function createPageWrapper<
                 err instanceof Error
                   ? err
                   : new Error(
-                    t(
-                      "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+                      t(
+                        "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+                      ),
                     ),
-                  ),
               );
             }
           }
@@ -550,10 +549,10 @@ export function createPageWrapperWithOptions<
                 err instanceof Error
                   ? err
                   : new Error(
-                    t(
-                      "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+                      t(
+                        "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+                      ),
                     ),
-                  ),
               );
             }
           }

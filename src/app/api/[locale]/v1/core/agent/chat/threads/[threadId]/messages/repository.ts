@@ -218,7 +218,7 @@ export async function createErrorMessage(params: {
   parentId: string | null;
   depth: number;
   userId: string | undefined;
-          errorType: string;
+  errorType: string;
   errorDetails?: Record<string, string | number | boolean | null>;
   sequenceId?: string | null;
   sequenceIndex?: number;
@@ -232,7 +232,7 @@ export async function createErrorMessage(params: {
     | null
     | Record<string, string | number | boolean | null>
   > = {
-          errorType: params.errorType,
+    errorType: params.errorType,
   };
 
   if (params.errorDetails) {
@@ -256,7 +256,7 @@ export async function createErrorMessage(params: {
   params.logger.info("Created ERROR message", {
     messageId: params.messageId,
     threadId: params.threadId,
-          errorType: params.errorType,
+    errorType: params.errorType,
     userId: params.userId ?? "public",
   });
 }
@@ -365,7 +365,14 @@ export async function createToolMessage(params: {
   });
 }
 
-export async function handleEditOperation<T extends { parentMessageId?: string | null; threadId?: string | null; content: string; role: ChatMessageRole }>(
+export async function handleEditOperation<
+  T extends {
+    parentMessageId?: string | null;
+    threadId?: string | null;
+    content: string;
+    role: ChatMessageRole;
+  },
+>(
   data: T,
   userId: string | undefined,
   logger: EndpointLogger,
@@ -378,12 +385,17 @@ export async function handleEditOperation<T extends { parentMessageId?: string |
   // If no parentMessageId, this is branching from the first message (creating a second root message)
   // In this case, we need threadId to be provided
   if (!data.parentMessageId) {
-    logger.debug("Edit operation without parentMessageId - creating second root message", {
-      threadId: data.threadId,
-    });
+    logger.debug(
+      "Edit operation without parentMessageId - creating second root message",
+      {
+        threadId: data.threadId,
+      },
+    );
 
     if (!data.threadId) {
-      logger.error("Edit operation requires either parentMessageId or threadId");
+      logger.error(
+        "Edit operation requires either parentMessageId or threadId",
+      );
       return null;
     }
 
@@ -413,7 +425,9 @@ export async function handleEditOperation<T extends { parentMessageId?: string |
   };
 }
 
-export async function handleRetryOperation<T extends { parentMessageId?: string | null }>(
+export async function handleRetryOperation<
+  T extends { parentMessageId?: string | null },
+>(
   data: T,
   userId: string | undefined,
   logger: EndpointLogger,
@@ -446,7 +460,16 @@ export async function handleRetryOperation<T extends { parentMessageId?: string 
   };
 }
 
-export function handleAnswerAsAiOperation<T extends { threadId?: string | null; parentMessageId?: string | null; content: string; role: ChatMessageRole }>(data: T): {
+export function handleAnswerAsAiOperation<
+  T extends {
+    threadId?: string | null;
+    parentMessageId?: string | null;
+    content: string;
+    role: ChatMessageRole;
+  },
+>(
+  data: T,
+): {
   threadId: string | null | undefined;
   parentMessageId: string | null | undefined;
   content: string;
@@ -610,10 +633,10 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
     } catch (error) {
       logger.error("Error listing messages", parseError(error));
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.server.title" as const,
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -732,10 +755,10 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
 
         if (!parentMessage) {
           return fail({
-          message:
+            message:
               "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.validation.title",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                      messageParams: {
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            messageParams: {
               error:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.validation.parentNotFound",
             },
@@ -789,10 +812,10 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
     } catch (error) {
       logger.error("Error creating message", parseError(error));
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

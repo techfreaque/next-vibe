@@ -184,7 +184,8 @@ export class LoginRepositoryImpl implements LoginRepository {
         });
 
         return fail({
-          message: "app.api.v1.core.user.public.login.errors.invalid_credentials",
+          message:
+            "app.api.v1.core.user.public.login.errors.invalid_credentials",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
           cause: userResponse,
         });
@@ -210,7 +211,8 @@ export class LoginRepositoryImpl implements LoginRepository {
         });
 
         return fail({
-          message: "app.api.v1.core.user.public.login.errors.invalid_credentials",
+          message:
+            "app.api.v1.core.user.public.login.errors.invalid_credentials",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -221,7 +223,8 @@ export class LoginRepositoryImpl implements LoginRepository {
         // Here you would implement 2FA flow
         // This is a placeholder for the actual implementation
         return fail({
-          message: "app.api.v1.core.user.public.login.errors.two_factor_required",
+          message:
+            "app.api.v1.core.user.public.login.errors.two_factor_required",
           errorType: ErrorResponseTypes.TWO_FACTOR_REQUIRED,
         });
       }
@@ -264,9 +267,9 @@ export class LoginRepositoryImpl implements LoginRepository {
       return sessionResponse;
     } catch (error) {
       return fail({
-          message: "app.api.v1.core.user.public.login.errors.auth_error",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message: "app.api.v1.core.user.public.login.errors.auth_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           email,
           error: parseError(error).message,
         },
@@ -366,7 +369,7 @@ export class LoginRepositoryImpl implements LoginRepository {
         return fail({
           message: "app.api.v1.core.user.public.login.errors.user_not_found",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId },
+          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -477,9 +480,10 @@ export class LoginRepositoryImpl implements LoginRepository {
         error: parseError(error).message,
       });
       return fail({
-          message: "app.api.v1.core.user.public.login.errors.session_creation_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.user.public.login.errors.session_creation_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           userId,
           error: parseError(error).message,
         },
@@ -536,9 +540,9 @@ export class LoginRepositoryImpl implements LoginRepository {
         );
         if (!user.success) {
           return fail({
-          message: "app.api.v1.core.user.public.login.errors.user_not_found",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                      messageParams: { userId: email },
+            message: "app.api.v1.core.user.public.login.errors.user_not_found",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+            messageParams: { userId: email },
             cause: user,
           });
         }
@@ -556,9 +560,9 @@ export class LoginRepositoryImpl implements LoginRepository {
       return success(options);
     } catch (error) {
       return fail({
-          message: "app.api.v1.core.user.public.login.errors.auth_error",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message: "app.api.v1.core.user.public.login.errors.auth_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           email: email || "unknown",
           error: parseError(error).message,
         },
@@ -650,7 +654,7 @@ export class LoginRepositoryImpl implements LoginRepository {
             email,
             userId,
             error: convertResult.message,
-          errorType: convertResult.errorType,
+            errorType: convertResult.errorType,
           });
         }
       }

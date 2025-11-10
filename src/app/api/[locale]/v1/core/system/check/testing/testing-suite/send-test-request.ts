@@ -95,18 +95,20 @@ export async function sendTestRequest<
       | undefined;
     if (!responseData) {
       return fail({
-          message: "app.api.v1.core.system.check.testing.test.errors.internal.title",
-          errorType: ErrorResponseTypes.NO_RESPONSE_DATA,
-                  messageParams: { endpoint: endpoint.path.join("/") },
+        message:
+          "app.api.v1.core.system.check.testing.test.errors.internal.title",
+        errorType: ErrorResponseTypes.NO_RESPONSE_DATA,
+        messageParams: { endpoint: endpoint.path.join("/") },
       });
     }
     // TODO parse response schema
     return responseData;
   } catch (error) {
     return fail({
-          message: "app.api.v1.core.system.check.testing.test.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { error: parseError(error).message },
+      message:
+        "app.api.v1.core.system.check.testing.test.errors.internal.title",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { error: parseError(error).message },
     });
   }
 }

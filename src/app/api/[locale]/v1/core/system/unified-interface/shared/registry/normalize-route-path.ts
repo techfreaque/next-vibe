@@ -23,7 +23,9 @@ export function normalizeRoutePath(routePath: string): string {
   }
 
   // Extract from filesystem path or module path: .../v1/core/system/help/route.ts -> core/system/help
-  const match = routePath.match(/\/v1\/(.+?)(?:\/(?:definition|route)(?:\.ts)?)?$/);
+  const match = routePath.match(
+    /\/v1\/(.+?)(?:\/(?:definition|route)(?:\.ts)?)?$/,
+  );
   if (match) {
     return match[1];
   }

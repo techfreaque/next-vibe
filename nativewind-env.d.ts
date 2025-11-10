@@ -9,9 +9,9 @@
  * allowing className props on React Native components.
  */
 
-import type { ComponentProps } from 'react';
+import type { ComponentProps } from "react";
 
-declare module 'react-native' {
+declare module "react-native" {
   // Augment existing React Native component props with className
   export interface ViewProps {
     className?: string;
@@ -51,19 +51,19 @@ declare module 'react-native' {
   }
 }
 
-declare module 'react-native-reanimated' {
+declare module "react-native-reanimated" {
   export interface AnimateProps<P> {
     className?: string;
   }
 }
 
-declare module 'lucide-react-native' {
+declare module "lucide-react-native" {
   export interface LucideProps {
     className?: string;
   }
 }
 
-declare module '@rn-primitives/types' {
+declare module "@rn-primitives/types" {
   interface SlottableViewProps {
     className?: string;
     asChild?: boolean;
@@ -79,11 +79,13 @@ declare module '@rn-primitives/types' {
   interface SlottablePressableProps {
     className?: string;
     asChild?: boolean;
-    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+    children?:
+      | React.ReactNode
+      | ((props: { pressed: boolean }) => React.ReactNode);
   }
 }
 
-declare module '@rn-primitives/alert-dialog' {
+declare module "@rn-primitives/alert-dialog" {
   interface OverlayProps {
     className?: string;
     children?: React.ReactNode;
@@ -111,10 +113,12 @@ declare module '@rn-primitives/alert-dialog' {
   }
 }
 
-declare module '@rn-primitives/dialog' {
+declare module "@rn-primitives/dialog" {
   interface OverlayProps {
     className?: string;
-    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+    children?:
+      | React.ReactNode
+      | ((props: { pressed: boolean }) => React.ReactNode);
   }
 
   interface ContentProps {
@@ -139,10 +143,12 @@ declare module '@rn-primitives/dialog' {
   }
 }
 
-declare module '@rn-primitives/context-menu' {
+declare module "@rn-primitives/context-menu" {
   interface SubTriggerProps {
     className?: string;
-    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+    children?:
+      | React.ReactNode
+      | ((props: { pressed: boolean }) => React.ReactNode);
   }
 
   interface SubContentProps {
@@ -160,7 +166,9 @@ declare module '@rn-primitives/context-menu' {
 
   interface CheckboxItemProps {
     className?: string;
-    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+    children?:
+      | React.ReactNode
+      | ((props: { pressed: boolean }) => React.ReactNode);
     disabled?: boolean;
     checked: boolean;
     onCheckedChange: (checked: boolean) => void;
@@ -186,17 +194,36 @@ declare module '@rn-primitives/context-menu' {
   }
 }
 
-declare module '@rn-primitives/slot' {
-  import type * as React from 'react';
-  import type { ViewProps as RNViewProps, View as RNView, PressableProps as RNPressableProps, TextProps as RNTextProps, Text as RNText, ImageProps as RNImageProps, Image as RNImage } from 'react-native';
+declare module "@rn-primitives/slot" {
+  import type * as React from "react";
+  import type {
+    ViewProps as RNViewProps,
+    View as RNView,
+    PressableProps as RNPressableProps,
+    TextProps as RNTextProps,
+    Text as RNText,
+    ImageProps as RNImageProps,
+    Image as RNImage,
+  } from "react-native";
 
-  export const Pressable: React.ForwardRefExoticComponent<RNPressableProps & { className?: string } & React.RefAttributes<RNView>>;
-  export const View: React.ForwardRefExoticComponent<RNViewProps & { className?: string } & React.RefAttributes<RNView>>;
-  export const Text: React.ForwardRefExoticComponent<RNTextProps & { className?: string } & React.RefAttributes<RNText>>;
-  export const Image: React.ForwardRefExoticComponent<RNImageProps & { className?: string; children?: React.ReactNode } & React.RefAttributes<RNImage>>;
+  export const Pressable: React.ForwardRefExoticComponent<
+    RNPressableProps & { className?: string } & React.RefAttributes<RNView>
+  >;
+  export const View: React.ForwardRefExoticComponent<
+    RNViewProps & { className?: string } & React.RefAttributes<RNView>
+  >;
+  export const Text: React.ForwardRefExoticComponent<
+    RNTextProps & { className?: string } & React.RefAttributes<RNText>
+  >;
+  export const Image: React.ForwardRefExoticComponent<
+    RNImageProps & {
+      className?: string;
+      children?: React.ReactNode;
+    } & React.RefAttributes<RNImage>
+  >;
 }
 
-declare module '@rn-primitives/table' {
+declare module "@rn-primitives/table" {
   interface RootProps {
     className?: string;
     children?: React.ReactNode;
@@ -237,26 +264,26 @@ declare module '@rn-primitives/table' {
   }
 }
 
-declare module '@shopify/flash-list' {
+declare module "@shopify/flash-list" {
   interface FlashListProps<T> {
     className?: string;
   }
 }
 
-declare module 'react-native' {
+declare module "react-native" {
   export interface ActivityIndicatorProps {
     className?: string;
   }
 }
 
 // Additional @rn-primitives modules
-declare module '@rn-primitives/aspect-ratio' {
+declare module "@rn-primitives/aspect-ratio" {
   interface RootProps {
     className?: string;
   }
 }
 
-declare module '@rn-primitives/checkbox' {
+declare module "@rn-primitives/checkbox" {
   interface RootProps {
     className?: string;
     checked: boolean;
@@ -269,7 +296,7 @@ declare module '@rn-primitives/checkbox' {
   }
 }
 
-declare module '@rn-primitives/collapsible' {
+declare module "@rn-primitives/collapsible" {
   interface RootProps {
     className?: string;
   }
@@ -283,10 +310,12 @@ declare module '@rn-primitives/collapsible' {
   }
 }
 
-declare module '@rn-primitives/dropdown-menu' {
+declare module "@rn-primitives/dropdown-menu" {
   interface SubTriggerProps {
     className?: string;
-    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+    children?:
+      | React.ReactNode
+      | ((props: { pressed: boolean }) => React.ReactNode);
   }
 
   interface SubContentProps {
@@ -304,7 +333,9 @@ declare module '@rn-primitives/dropdown-menu' {
 
   interface CheckboxItemProps {
     className?: string;
-    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+    children?:
+      | React.ReactNode
+      | ((props: { pressed: boolean }) => React.ReactNode);
     disabled?: boolean;
     checked: boolean;
     onCheckedChange: (checked: boolean) => void;
@@ -334,9 +365,9 @@ declare module '@rn-primitives/dropdown-menu' {
   }
 }
 
-declare module '@rn-primitives/hover-card' {
-  import type { ViewProps } from 'react-native';
-  import type { PositionedContentProps } from '@rn-primitives/types';
+declare module "@rn-primitives/hover-card" {
+  import type { ViewProps } from "react-native";
+  import type { PositionedContentProps } from "@rn-primitives/types";
 
   interface RootProps {
     className?: string;
@@ -353,7 +384,7 @@ declare module '@rn-primitives/hover-card' {
   }
 }
 
-declare module '@rn-primitives/label' {
+declare module "@rn-primitives/label" {
   interface RootProps {
     className?: string;
   }
@@ -364,7 +395,7 @@ declare module '@rn-primitives/label' {
   }
 }
 
-declare module '@rn-primitives/menubar' {
+declare module "@rn-primitives/menubar" {
   interface RootProps {
     className?: string;
     value?: string | undefined;
@@ -384,7 +415,9 @@ declare module '@rn-primitives/menubar' {
 
   interface SubTriggerProps {
     className?: string;
-    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+    children?:
+      | React.ReactNode
+      | ((props: { pressed: boolean }) => React.ReactNode);
   }
 
   interface SubContentProps {
@@ -405,7 +438,9 @@ declare module '@rn-primitives/menubar' {
 
   interface CheckboxItemProps {
     className?: string;
-    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+    children?:
+      | React.ReactNode
+      | ((props: { pressed: boolean }) => React.ReactNode);
     disabled?: boolean;
     checked: boolean;
     onCheckedChange: (checked: boolean) => void;
@@ -415,7 +450,9 @@ declare module '@rn-primitives/menubar' {
 
   interface RadioItemProps {
     className?: string;
-    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+    children?:
+      | React.ReactNode
+      | ((props: { pressed: boolean }) => React.ReactNode);
     value: string;
     textValue?: string;
     closeOnPress?: boolean;
@@ -432,7 +469,7 @@ declare module '@rn-primitives/menubar' {
   }
 }
 
-declare module '@rn-primitives/navigation-menu' {
+declare module "@rn-primitives/navigation-menu" {
   interface RootProps {
     className?: string;
     children?: React.ReactNode;
@@ -440,8 +477,8 @@ declare module '@rn-primitives/navigation-menu' {
     onValueChange?: (value: string | undefined) => void;
     delayDuration?: number;
     skipDelayDuration?: number;
-    dir?: 'ltr' | 'rtl';
-    orientation?: 'horizontal' | 'vertical';
+    dir?: "ltr" | "rtl";
+    orientation?: "horizontal" | "vertical";
   }
 
   interface ListProps {
@@ -456,7 +493,9 @@ declare module '@rn-primitives/navigation-menu' {
 
   interface TriggerProps {
     className?: string;
-    children?: React.ReactNode | ((props: { pressed: boolean }) => React.ReactNode);
+    children?:
+      | React.ReactNode
+      | ((props: { pressed: boolean }) => React.ReactNode);
   }
 
   interface ContentProps {
@@ -479,7 +518,7 @@ declare module '@rn-primitives/navigation-menu' {
   }
 }
 
-declare module '@rn-primitives/popover' {
+declare module "@rn-primitives/popover" {
   interface RootProps {
     className?: string;
   }
@@ -491,7 +530,7 @@ declare module '@rn-primitives/popover' {
   interface ContentProps {
     className?: string;
     children?: React.ReactNode;
-    align?: 'start' | 'center' | 'end';
+    align?: "start" | "center" | "end";
     sideOffset?: number;
   }
 
@@ -500,7 +539,7 @@ declare module '@rn-primitives/popover' {
   }
 }
 
-declare module '@rn-primitives/progress' {
+declare module "@rn-primitives/progress" {
   interface RootProps {
     className?: string;
     value?: number | null | undefined;
@@ -511,7 +550,7 @@ declare module '@rn-primitives/progress' {
   }
 }
 
-declare module '@rn-primitives/radio-group' {
+declare module "@rn-primitives/radio-group" {
   interface RootProps {
     className?: string;
   }
@@ -525,7 +564,7 @@ declare module '@rn-primitives/radio-group' {
   }
 }
 
-declare module '@rn-primitives/select' {
+declare module "@rn-primitives/select" {
   interface TriggerProps {
     className?: string;
   }
@@ -583,15 +622,15 @@ declare module '@rn-primitives/select' {
   }
 }
 
-declare module '@rn-primitives/separator' {
+declare module "@rn-primitives/separator" {
   interface RootProps {
     className?: string;
-    orientation?: 'horizontal' | 'vertical';
+    orientation?: "horizontal" | "vertical";
     decorative?: boolean;
   }
 }
 
-declare module '@rn-primitives/slider' {
+declare module "@rn-primitives/slider" {
   interface RootProps {
     className?: string;
   }
@@ -609,7 +648,7 @@ declare module '@rn-primitives/slider' {
   }
 }
 
-declare module '@rn-primitives/switch' {
+declare module "@rn-primitives/switch" {
   interface RootProps {
     className?: string;
     checked: boolean;
@@ -623,7 +662,7 @@ declare module '@rn-primitives/switch' {
   }
 }
 
-declare module '@rn-primitives/tabs' {
+declare module "@rn-primitives/tabs" {
   interface RootProps {
     className?: string;
   }
@@ -644,7 +683,7 @@ declare module '@rn-primitives/tabs' {
   }
 }
 
-declare module '@rn-primitives/toggle' {
+declare module "@rn-primitives/toggle" {
   interface RootProps {
     className?: string;
     pressed: boolean;
@@ -653,7 +692,7 @@ declare module '@rn-primitives/toggle' {
   }
 }
 
-declare module '@rn-primitives/toggle-group' {
+declare module "@rn-primitives/toggle-group" {
   interface RootProps {
     className?: string;
     children?: React.ReactNode;
@@ -667,8 +706,8 @@ declare module '@rn-primitives/toggle-group' {
   }
 }
 
-declare module '@rn-primitives/tooltip' {
-  import type { ViewStyle } from 'react-native';
+declare module "@rn-primitives/tooltip" {
+  import type { ViewStyle } from "react-native";
 
   interface RootProps {
     className?: string;
@@ -688,8 +727,8 @@ declare module '@rn-primitives/tooltip' {
     className?: string;
     children?: React.ReactNode;
     sideOffset?: number;
-    side?: 'top' | 'right' | 'bottom' | 'left';
-    align?: 'start' | 'center' | 'end';
+    side?: "top" | "right" | "bottom" | "left";
+    align?: "start" | "center" | "end";
     alignOffset?: number;
     avoidCollisions?: boolean;
     forceMount?: true | undefined;
@@ -720,7 +759,7 @@ declare module '@rn-primitives/tooltip' {
   }
 }
 
-declare module '@rn-primitives/accordion' {
+declare module "@rn-primitives/accordion" {
   interface RootProps {
     className?: string;
     children?: React.ReactNode;
@@ -749,7 +788,7 @@ declare module '@rn-primitives/accordion' {
   }
 }
 
-declare module '@rn-primitives/avatar' {
+declare module "@rn-primitives/avatar" {
   interface RootProps {
     className?: string;
     alt: string;

@@ -61,7 +61,14 @@ const configWithIcon: { icon: React.ReactNode } = {
 
 const configWithParenthesizedJsx = {
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, oxlint-plugin-i18n/no-literal-string
-  element: (<span>Wrapped</span>), // Should error: JSX elements inside object literals are not allowed
+  element: <span>Wrapped</span>, // Should error: JSX elements inside object literals are not allowed
 };
 
-export { testUnknown, testObject, testThrow, configWithJsx, configWithIcon, configWithParenthesizedJsx };
+export {
+  testUnknown,
+  testObject,
+  testThrow,
+  configWithJsx,
+  configWithIcon,
+  configWithParenthesizedJsx,
+};

@@ -95,7 +95,7 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
         return fail({
           message: "app.api.v1.core.system.db.seed.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: { error: error.message },
+          messageParams: { error: error.message },
         });
       }
 
@@ -135,8 +135,8 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
       parseError(error);
 
       return fail({
-          message: "app.api.v1.core.system.db.seed.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.system.db.seed.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

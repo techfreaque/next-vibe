@@ -67,7 +67,7 @@ export function SearchModal({
           </DialogTitle>
         </DialogHeader>
 
-        <Div className="space-y-4 flex-1 overflow-hidden flex flex-col">
+        <Div className="flex flex-col gap-4 flex-1 overflow-hidden flex flex-col">
           {/* New Thread Button */}
           <Button onClick={handleCreateThread} className="w-full flex-shrink-0">
             <MessageSquarePlus className="h-4 w-4 mr-2" />
@@ -90,7 +90,7 @@ export function SearchModal({
 
           {/* Search Results */}
           {searchQuery.length > 0 && (
-            <Div className="flex-1 overflow-y-auto space-y-1 min-h-0">
+            <Div className="flex-1 overflow-y-auto flex flex-col gap-1 min-h-0">
               {searchResults.length > 0 ? (
                 searchResults.map((thread) => (
                   <Button

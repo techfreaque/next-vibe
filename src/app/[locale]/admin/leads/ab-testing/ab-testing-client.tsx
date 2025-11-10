@@ -3,7 +3,7 @@
  * Displays and manages A/B testing configuration for email campaigns
  */
 
-import { BarChart3, Settings, TestTube, Users } from 'next-vibe-ui/ui/icons';
+import { BarChart3, Settings, TestTube, Users } from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
@@ -24,7 +24,7 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
   const abTestSummary = getABTestSummary();
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Header with refresh button */}
       <Div className="flex justify-between items-center">
         <Div>
@@ -40,7 +40,7 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
       {/* A/B Test Status Overview */}
       <Div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.abTesting.metrics.testStatus")}
             </CardTitle>
@@ -71,7 +71,7 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.abTesting.metrics.totalVariants")}
             </CardTitle>
@@ -90,7 +90,7 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.leads.leads.admin.abTesting.metrics.configuration")}
             </CardTitle>
@@ -126,9 +126,12 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Div className="space-y-6">
+          <Div className="flex flex-col gap-6">
             {abTestSummary.variants.map((variant) => (
-              <Div key={variant.id} className="border rounded-lg p-4 space-y-4">
+              <Div
+                key={variant.id}
+                className="border rounded-lg p-4 flex flex-col gap-4"
+              >
                 <Div className="flex items-center justify-between">
                   <Div className="flex items-center gap-3">
                     <Div
@@ -157,7 +160,7 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                 </Div>
 
                 {/* Progress bar showing weight distribution */}
-                <Div className="space-y-2">
+                <Div className="flex flex-col gap-2">
                   <Div className="flex justify-between text-sm">
                     <P>
                       {t(
@@ -178,7 +181,7 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                 </Div>
 
                 {/* Variant characteristics */}
-                <Div className="space-y-2">
+                <Div className="flex flex-col gap-2">
                   <H4 className="font-medium text-sm">
                     {t(
                       "app.admin.leads.leads.admin.abTesting.variants.keyCharacteristics",
@@ -218,7 +221,7 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                   "app.admin.leads.leads.admin.abTesting.config.testConfiguration",
                 )}
               </H4>
-              <Div className="space-y-2 text-sm">
+              <Div className="flex flex-col gap-2 text-sm">
                 <Div className="flex justify-between">
                   <P>
                     {t("app.admin.leads.leads.admin.abTesting.config.status")}:
@@ -272,7 +275,7 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                   "app.admin.leads.leads.admin.abTesting.config.trafficDistribution",
                 )}
               </H4>
-              <Div className="space-y-2 text-sm">
+              <Div className="flex flex-col gap-2 text-sm">
                 {abTestSummary.variants.map((variant) => (
                   <Div key={variant.id} className="flex justify-between">
                     <P>{variant.metadata.name}:</P>

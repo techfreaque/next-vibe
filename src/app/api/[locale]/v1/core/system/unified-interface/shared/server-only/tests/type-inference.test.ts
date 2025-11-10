@@ -43,10 +43,8 @@ import type {
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
 } from "@/app/api/[locale]/v1/core/user/auth/types";
-import type { UserRoleValue,
- } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-import { UserRole,
- } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type {
@@ -913,38 +911,41 @@ type PublicOnlyConfigHasEndpointCheck = Expect<
 
 // Extract what the POST method handler config type WOULD BE if provided
 // This tests the conditional type logic in EndpointHandlerConfig
-type PublicOnlyPostConfigType = (typeof testPublicOnlyDefinitions)["POST"] extends {
-  types: {
-    RequestOutput: infer TReqOut;
-    ResponseOutput: infer TResOut;
-    UrlVariablesOutput: infer TUrlOut;
-  };
-  allowedRoles: infer TRoles extends readonly (typeof UserRoleValue)[];
-}
-  ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, TRoles>
-  : never;
+type PublicOnlyPostConfigType =
+  (typeof testPublicOnlyDefinitions)["POST"] extends {
+    types: {
+      RequestOutput: infer TReqOut;
+      ResponseOutput: infer TResOut;
+      UrlVariablesOutput: infer TUrlOut;
+    };
+    allowedRoles: infer TRoles extends readonly (typeof UserRoleValue)[];
+  }
+    ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, TRoles>
+    : never;
 
-type AdminOnlyPostConfigType = (typeof testAdminOnlyDefinitions)["POST"] extends {
-  types: {
-    RequestOutput: infer TReqOut;
-    ResponseOutput: infer TResOut;
-    UrlVariablesOutput: infer TUrlOut;
-  };
-  allowedRoles: infer TRoles extends readonly (typeof UserRoleValue)[];
-}
-  ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, TRoles>
-  : never;
+type AdminOnlyPostConfigType =
+  (typeof testAdminOnlyDefinitions)["POST"] extends {
+    types: {
+      RequestOutput: infer TReqOut;
+      ResponseOutput: infer TResOut;
+      UrlVariablesOutput: infer TUrlOut;
+    };
+    allowedRoles: infer TRoles extends readonly (typeof UserRoleValue)[];
+  }
+    ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, TRoles>
+    : never;
 
-type MixedRolesPostConfigType = (typeof testMixedRolesDefinitions)["POST"] extends {
-  types: {
-    RequestOutput: infer TReqOut;
-    ResponseOutput: infer TResOut;
-    UrlVariablesOutput: infer TUrlOut;
-  };
-  allowedRoles: infer TRoles extends readonly (typeof UserRoleValue)[];
-}
-  ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, TRoles>
-  : never;
+type MixedRolesPostConfigType =
+  (typeof testMixedRolesDefinitions)["POST"] extends {
+    types: {
+      RequestOutput: infer TReqOut;
+      ResponseOutput: infer TResOut;
+      UrlVariablesOutput: infer TUrlOut;
+    };
+    allowedRoles: infer TRoles extends readonly (typeof UserRoleValue)[];
+  }
+    ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, TRoles>
+    : never;
 
 // Verify these config types are not never (definitions match expected structure)
 type PublicOnlyPostConfigTypeExists = PublicOnlyPostConfigType extends never

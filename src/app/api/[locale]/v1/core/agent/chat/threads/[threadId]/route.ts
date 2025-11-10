@@ -13,9 +13,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async (
-      props,
-    ) => {
+    handler: async (props) => {
       return await threadByIdRepository.getThreadById(
         props.urlPathParams.threadId,
         props.user,
@@ -26,9 +24,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: async (
-      props,
-    ) => {
+    handler: async (props) => {
       return await threadByIdRepository.updateThread(
         props.data,
         props.urlPathParams.threadId,
@@ -40,9 +36,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: async (
-      props,
-    ) => {
+    handler: async (props) => {
       return await threadByIdRepository.deleteThread(
         props.urlPathParams.threadId,
         props.user,

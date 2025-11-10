@@ -27,8 +27,7 @@ export const translations: typeof enTranslations = {
       },
       network: {
         title: "Błąd sieci",
-        description:
-          "Wystąpił błąd sieci podczas pobierania uprawnień folderu",
+        description: "Wystąpił błąd sieci podczas pobierania uprawnień folderu",
       },
       unauthorized: {
         title: "Nieautoryzowany",

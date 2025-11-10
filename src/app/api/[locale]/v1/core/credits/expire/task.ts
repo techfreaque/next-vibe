@@ -56,9 +56,11 @@ async function executeTask(
   } catch (error) {
     logger.error("Credit expiration task crashed", parseError(error));
     return fail({
-          message: "app.api.v1.core.agent.chat.credits.expire.task.error",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { error: error instanceof Error ? error.message : String(error) },
+      message: "app.api.v1.core.agent.chat.credits.expire.task.error",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: {
+        error: error instanceof Error ? error.message : String(error),
+      },
     });
   }
 }
@@ -81,8 +83,8 @@ const creditExpirationTask: Task = {
 
     if (!result.success) {
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.expire.task.error",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.agent.chat.credits.expire.task.error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         cause: result,
       });
     }

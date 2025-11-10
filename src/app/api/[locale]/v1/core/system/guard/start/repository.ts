@@ -312,13 +312,14 @@ function setupVSCodeIntegration(
     }
 
     // Merge guard settings with existing settings
-    const existingProfiles = existingSettings["terminal.integrated.profiles.linux"] || {};
+    const existingProfiles =
+      existingSettings["terminal.integrated.profiles.linux"] || {};
     const guardSettings: VSCodeSettings = {
       "terminal.integrated.profiles.linux": {
         ...existingProfiles,
         "Vibe Guard": {
           // eslint-disable-next-line i18next/no-literal-string, eslint/no-template-curly-in-string
-          path: '${workspaceFolder}/.vibe-guard-instance/.guard.sh',
+          path: "${workspaceFolder}/.vibe-guard-instance/.guard.sh",
         },
       },
       "terminal.integrated.defaultProfile.linux": "Vibe Guard",
@@ -525,9 +526,9 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
         error instanceof Error ? error : new Error(String(error));
 
       return fail({
-          message: "app.api.v1.core.system.guard.start.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message: "app.api.v1.core.system.guard.start.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -540,9 +541,9 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
 
     // For now, return error - guard ID lookup not implemented yet
     return fail({
-          message: "app.api.v1.core.system.guard.start.errors.notFound.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                messageParams: {
+      message: "app.api.v1.core.system.guard.start.errors.notFound.title",
+      errorType: ErrorResponseTypes.NOT_FOUND,
+      messageParams: {
         error: `Guard ID lookup not implemented yet. Use project path instead.`,
       },
     });
@@ -560,9 +561,9 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     const vscodePath = path.join(projectPath, ".vscode");
     if (!fs.existsSync(vscodePath)) {
       return fail({
-          message: "app.api.v1.core.system.guard.start.errors.notFound.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                  messageParams: {
+        message: "app.api.v1.core.system.guard.start.errors.notFound.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: {
           error: `Guard requires a VSCode project. .vscode directory not found in ${projectPath}`,
         },
       });
@@ -579,9 +580,9 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     const setupResult = setupGuardJailEnvironment(config, projectPath, logger);
     if (!setupResult.success) {
       return fail({
-          message: "app.api.v1.core.system.guard.start.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: setupResult.message },
+        message: "app.api.v1.core.system.guard.start.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: setupResult.message },
       });
     }
 
@@ -589,9 +590,9 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     const vscodeResult = setupVSCodeIntegration(config, projectPath, logger);
     if (!vscodeResult.success) {
       return fail({
-          message: "app.api.v1.core.system.guard.start.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: vscodeResult.message },
+        message: "app.api.v1.core.system.guard.start.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: vscodeResult.message },
       });
     }
 

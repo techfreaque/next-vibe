@@ -19,6 +19,6 @@ export const { GET, POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, user, locale, logger }) =>
-      chatFoldersRepository.createFolder(data, user, locale, logger) ,
+      chatFoldersRepository.createFolder(data, user, locale, logger),
   },
 });

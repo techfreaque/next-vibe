@@ -149,5 +149,5 @@ export function endpointsHandler<const T>(
     },
     definitions,
     methods: availableMethods,
-  } as Prettify<EndpointsHandlerReturn<T>>;
+  } as unknown as Prettify<EndpointsHandlerReturn<T>>;
 }

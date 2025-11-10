@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Edit2, X } from 'next-vibe-ui/ui/icons';
+import { Check, Edit2, X } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
@@ -26,8 +26,8 @@ export function EditableTextWidget({
 }: WidgetComponentProps): JSX.Element {
   const value =
     typeof data === "string" ||
-      typeof data === "number" ||
-      typeof data === "boolean"
+    typeof data === "number" ||
+    typeof data === "boolean"
       ? String(data)
       : "";
   const [isEditing, setIsEditing] = useState(false);

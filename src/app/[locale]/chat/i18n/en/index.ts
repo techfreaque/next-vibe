@@ -446,7 +446,8 @@ export const translations = {
     // Header
     header: {
       title: "Public Forum",
-      description: "A First Amendment protected space where free speech thrives. Engage with AI models and users worldwide. Share ideas, challenge perspectives, and speak freely without censorship.",
+      description:
+        "A First Amendment protected space where free speech thrives. Engage with AI models and users worldwide. Share ideas, challenge perspectives, and speak freely without censorship.",
     },
     // Sort modes
     sort: {

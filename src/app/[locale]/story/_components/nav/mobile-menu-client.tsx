@@ -100,12 +100,12 @@ export function MobileMenuClient({
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
           >
-            <Div className="container py-6 space-y-6 px-4">
+            <Div className="container py-6 flex flex-col gap-6 px-4">
               {/* Theme toggle inside mobile menu */}
               <ThemeToggleMobile locale={locale} />
 
               {/* Dynamic Navigation items */}
-              <Div className="space-y-3">
+              <Div className="flex flex-col gap-3">
                 {navigationItems.map((item) => {
                   if (item.children) {
                     // Dropdown item with children
@@ -114,7 +114,7 @@ export function MobileMenuClient({
                       <Div key={item.title}>
                         {/* Parent item header */}
                         <Div
-                          className="flex space-x-2 pb-4 border-b text-base font-medium hover:text-primary transition-colors py-2 cursor-pointer"
+                          className="flex flex flex-row gap-2 pb-4 border-b text-base font-medium hover:text-primary transition-colors py-2 cursor-pointer"
                           onClick={() => toggleDropdown(item.title)}
                         >
                           <Span className="my-auto">{item.icon}</Span>
@@ -130,7 +130,7 @@ export function MobileMenuClient({
 
                         {/* Children items */}
                         {isExpanded && (
-                          <Div className="pl-7 space-y-3 mb-4">
+                          <Div className="pl-7 flex flex-col gap-3 mb-4">
                             {item.children.map((childItem) => {
                               const isChildDisabled = childItem.disabled;
                               const childDisabledReason =

@@ -44,7 +44,8 @@ export interface SubscriptionCheckoutRepository {
  * Subscription Checkout Repository Implementation
  */
 export class SubscriptionCheckoutRepositoryImpl
-  implements SubscriptionCheckoutRepository {
+  implements SubscriptionCheckoutRepository
+{
   /**
    * Create a subscription checkout session
    */
@@ -54,7 +55,10 @@ export class SubscriptionCheckoutRepositoryImpl
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CheckoutResponseOutput>> {
-    logger.debug("Function called - before try block", { userId: user?.id, locale });
+    logger.debug("Function called - before try block", {
+      userId: user?.id,
+      locale,
+    });
     try {
       logger.debug("Step 1: Getting translation function");
       const { t } = simpleT(locale);
@@ -69,9 +73,10 @@ export class SubscriptionCheckoutRepositoryImpl
 
       // Get payment provider from request data or default to stripe
       logger.debug("Step 3: Getting payment provider");
-      const providerKey = data.provider === PaymentProvider.NOWPAYMENTS
-        ? "nowpayments"
-        : "stripe";
+      const providerKey =
+        data.provider === PaymentProvider.NOWPAYMENTS
+          ? "nowpayments"
+          : "stripe";
       const provider = getPaymentProvider(providerKey);
       logger.debug("Step 4: Payment provider retrieved", {
         providerName: provider.name,
@@ -81,10 +86,12 @@ export class SubscriptionCheckoutRepositoryImpl
 
       // Check if user already has an active subscription
       logger.debug("Step 5: Checking for existing subscription");
-      const { subscriptionRepository } = await import("../../subscription/repository");
+      const { subscriptionRepository } = await import(
+        "../../subscription/repository"
+      );
       const existingSubscription = await subscriptionRepository.getSubscription(
         user.id,
-        logger
+        logger,
       );
 
       if (existingSubscription.success && existingSubscription.data) {
@@ -95,9 +102,10 @@ export class SubscriptionCheckoutRepositoryImpl
             subscriptionId: existingSubscription.data.id,
           });
           return fail({
-          message: "app.api.v1.core.payment.checkout.post.errors.alreadySubscribed.title",
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-                      messageParams: { userId: user.id },
+            message:
+              "app.api.v1.core.payment.checkout.post.errors.alreadySubscribed.title",
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+            messageParams: { userId: user.id },
           });
         }
       }
@@ -111,15 +119,18 @@ export class SubscriptionCheckoutRepositoryImpl
         user.id,
         UserDetailLevel.STANDARD,
         locale,
-        logger
+        logger,
       );
-      logger.debug("Step 8: User result received", { success: userResult.success });
+      logger.debug("Step 8: User result received", {
+        success: userResult.success,
+      });
 
       if (!userResult.success || !userResult.data) {
         return fail({
-          message: "app.api.v1.core.payment.checkout.post.errors.notFound.title",
+          message:
+            "app.api.v1.core.payment.checkout.post.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId: user.id },
+          messageParams: { userId: user.id },
         });
       }
 
@@ -138,7 +149,8 @@ export class SubscriptionCheckoutRepositoryImpl
       const country = getCountryFromLocale(locale);
 
       // Map billing interval to payment interval
-      const interval = data.billingInterval === BillingInterval.MONTHLY ? "month" : "year";
+      const interval =
+        data.billingInterval === BillingInterval.MONTHLY ? "month" : "year";
 
       // Create checkout session using provider abstraction
       const session = await provider.createCheckoutSession(
@@ -180,18 +192,19 @@ export class SubscriptionCheckoutRepositoryImpl
         message: t("app.api.v1.core.payment.checkout.post.success.description"),
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
       logger.error("Failed to create checkout session", {
         errorMessage,
         errorStack,
-          errorType: typeof error,
-        errorConstructor: error?.constructor?.name
+        errorType: typeof error,
+        errorConstructor: error?.constructor?.name,
       });
       return fail({
-          message: "app.api.v1.core.payment.checkout.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: errorMessage },
+        message: "app.api.v1.core.payment.checkout.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
       });
     }
   }

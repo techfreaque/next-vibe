@@ -61,7 +61,6 @@ export const DEFAULT_FAVORITES: ModelId[] = [
   ModelId.KIMI_K2_THINKING,
 ];
 
-
 /**
  * Configuration interface for AI model options.
  * Contains all necessary information for model selection and API integration.
@@ -300,11 +299,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiOpenai,
     openRouterModel: "openai/gpt-5-codex",
     creditCost: 10, // Premium model
-    utilities: [
-      ModelUtility.SMART,
-      ModelUtility.CODING,
-      ModelUtility.CREATIVE,
-    ],
+    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
     supportsTools: true,
   },
   {
@@ -317,11 +312,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiOpenai,
     openRouterModel: "openai/gpt-5",
     creditCost: 10, // Premium model
-    utilities: [
-      ModelUtility.SMART,
-      ModelUtility.CODING,
-      ModelUtility.CREATIVE,
-    ],
+    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
     supportsTools: true,
   },
   {
@@ -371,7 +362,13 @@ export const modelOptions: ModelOption[] = [
     parameterCount: 1000,
     contextWindow: 256000,
     creditCost: 4,
-    utilities: [ModelUtility.SMART, ModelUtility.FAST, ModelUtility.CODING, ModelUtility.ANALYSIS, ModelUtility.CREATIVE],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.FAST,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+    ],
     icon: MoonIcon,
     openRouterModel: "moonshotai/kimi-k2-0905",
     supportsTools: true, // OpenRouter reports: "No endpoints found that support tool use"
@@ -384,7 +381,12 @@ export const modelOptions: ModelOption[] = [
     parameterCount: 1000,
     contextWindow: 256000,
     creditCost: 8,
-    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS, ModelUtility.CREATIVE],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+    ],
     icon: MoonIcon,
     openRouterModel: "moonshotai/kimi-k2-thinking",
     supportsTools: true, // OpenRouter reports: "No endpoints found that support tool use"

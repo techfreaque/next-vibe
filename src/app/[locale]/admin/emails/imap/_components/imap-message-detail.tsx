@@ -15,7 +15,7 @@ import {
   Paperclip,
   Star,
   User,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { Div } from "next-vibe-ui/ui/div";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Form } from "next-vibe-ui/ui/form/form";
@@ -139,15 +139,15 @@ export function ImapMessageDetail({
   };
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Header with Back Button and Edit Toggle */}
       <Div className="flex items-center justify-between">
         <Button variant="outline" onClick={handleBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t("app.admin.emails.imap.forms.back")}
         </Button>
-        <Div className="flex items-center space-x-4">
-          <Div className="flex items-center space-x-2">
+        <Div className="flex items-center flex flex-row gap-4">
+          <Div className="flex items-center flex flex-row gap-2">
             {!messageData.isRead && (
               <Badge variant="default" className="bg-blue-100 text-blue-800">
                 {t("app.admin.emails.imap.messages.unread")}
@@ -195,7 +195,7 @@ export function ImapMessageDetail({
             <Form
               form={messageEndpoint.create?.form}
               onSubmit={messageEndpoint.create?.onSubmit}
-              className="space-y-4"
+              className="flex flex-col gap-4"
             >
               <FormAlert alert={messageEndpoint.alert} />
 
@@ -257,9 +257,9 @@ export function ImapMessageDetail({
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <Span className="text-xl">{messageData.subject}</Span>
-                <Div className="flex items-center space-x-2">
+                <Div className="flex items-center flex flex-row gap-2">
                   {messageData.hasAttachments && (
-                    <Div className="flex items-center space-x-1 text-sm text-gray-600">
+                    <Div className="flex items-center flex flex-row gap-1 text-sm text-gray-600">
                       <Paperclip className="h-4 w-4" />
                       <Span>{messageData.attachmentCount}</Span>
                     </Div>
@@ -267,10 +267,10 @@ export function ImapMessageDetail({
                 </Div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-col gap-4">
               {/* Sender/Recipient Info */}
               <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Div className="flex items-center space-x-3">
+                <Div className="flex items-center flex flex-row gap-3">
                   <User className="h-5 w-5 text-gray-500" />
                   <Div>
                     <Div className="font-medium">
@@ -288,7 +288,7 @@ export function ImapMessageDetail({
                     </Div>
                   </Div>
                 </Div>
-                <Div className="flex items-center space-x-3">
+                <Div className="flex items-center flex flex-row gap-3">
                   <Mail className="h-5 w-5 text-gray-500" />
                   <Div>
                     <Div className="font-medium">
@@ -309,7 +309,7 @@ export function ImapMessageDetail({
               </Div>
 
               {/* Date Info */}
-              <Div className="flex items-center space-x-3">
+              <Div className="flex items-center flex flex-row gap-3">
                 <Calendar className="h-5 w-5 text-gray-500" />
                 <Div>
                   <Div className="font-medium">
@@ -365,7 +365,7 @@ export function ImapMessageDetail({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Div className="space-y-2">
+              <Div className="flex flex-col gap-2">
                 <Div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <Div>
                     <Span className="font-medium">

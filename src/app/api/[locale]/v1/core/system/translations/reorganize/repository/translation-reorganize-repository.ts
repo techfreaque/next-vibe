@@ -383,7 +383,8 @@ export class TranslationReorganizeRepositoryImpl {
       });
 
       return fail({
-        message: "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
+        message:
+          "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -589,7 +590,8 @@ export class TranslationReorganizeRepositoryImpl {
       // Validate backup path exists
       if (!fs.existsSync(request.backupPath)) {
         return fail({
-          message: "app.api.v1.core.system.translations.restoreBackup.post.messages.backupNotFound",
+          message:
+            "app.api.v1.core.system.translations.restoreBackup.post.messages.backupNotFound",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -647,7 +649,8 @@ export class TranslationReorganizeRepositoryImpl {
       });
 
       return fail({
-        message: "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
+        message:
+          "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1509,7 +1512,8 @@ export class TranslationReorganizeRepositoryImpl {
         error: parseError(error),
       });
       return fail({
-        message: "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
+        message:
+          "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

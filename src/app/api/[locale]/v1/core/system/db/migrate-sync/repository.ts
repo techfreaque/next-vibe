@@ -136,9 +136,10 @@ export class DatabaseMigrateSyncRepositoryImpl
     } catch (error) {
       logger.error("Migration sync failed", { error: String(error) });
       return fail({
-          message: "app.api.v1.core.system.db.migrateSync.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: String(error) },
+        message:
+          "app.api.v1.core.system.db.migrateSync.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: String(error) },
       });
     }
   }

@@ -193,8 +193,9 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     } catch (error) {
       logger.error("Error generating email stats", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.messages.stats.get.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.emails.messages.stats.get.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

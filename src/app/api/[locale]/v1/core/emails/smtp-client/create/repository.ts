@@ -76,9 +76,10 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
 
       if (!newAccount) {
         return fail({
-          message: "app.api.v1.core.emails.smtpClient.create.errors.server.title",
+          message:
+            "app.api.v1.core.emails.smtpClient.create.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: {
+          messageParams: {
             error:
               "app.api.v1.core.emails.smtpClient.create.errors.server.description",
           },
@@ -128,9 +129,10 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
         errorMessage.includes("duplicate")
       ) {
         return fail({
-          message: "app.api.v1.core.emails.smtpClient.create.errors.conflict.title",
+          message:
+            "app.api.v1.core.emails.smtpClient.create.errors.conflict.title",
           errorType: ErrorResponseTypes.CONFLICT,
-                    messageParams: {
+          messageParams: {
             error:
               "app.api.v1.core.emails.smtpClient.create.errors.conflict.description",
           },
@@ -138,9 +140,9 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
       }
 
       return fail({
-          message: "app.api.v1.core.emails.smtpClient.create.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.emails.smtpClient.create.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

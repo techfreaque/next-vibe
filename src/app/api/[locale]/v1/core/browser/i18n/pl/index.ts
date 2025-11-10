@@ -4,9 +4,11 @@
 
 export const translations = {
   title: "Chrome DevTools MCP Tools",
-  description: "Wykonaj narzędzia Chrome DevTools MCP dla automatyzacji przeglądarki i debugowania",
+  description:
+    "Wykonaj narzędzia Chrome DevTools MCP dla automatyzacji przeglądarki i debugowania",
   category: "Core API",
-  summary: "Dostęp do narzędzi Chrome DevTools Protocol przez MCP dla automatyzacji webowej",
+  summary:
+    "Dostęp do narzędzi Chrome DevTools Protocol przez MCP dla automatyzacji webowej",
   tags: {
     browserAutomation: "Automatyzacja przeglądarki",
     chromeDevTools: "Chrome DevTools",
@@ -17,7 +19,8 @@ export const translations = {
 
   form: {
     label: "Wykonanie narzędzia przeglądarki",
-    description: "Wykonaj narzędzia Chrome DevTools MCP dla sterowania przeglądarką i analizy",
+    description:
+      "Wykonaj narzędzia Chrome DevTools MCP dla sterowania przeglądarką i analizy",
     fields: {
       tool: {
         label: "Narzędzie",
@@ -174,7 +177,8 @@ export const translations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description: "Wystąpił wewnętrzny błąd serwera podczas wykonywania narzędzia",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas wykonywania narzędzia",
     },
     unknown: {
       title: "Nieznany błąd",

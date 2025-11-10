@@ -3,7 +3,7 @@
  * Server component for leads statistics and analytics
  */
 
-import { BarChart3 } from 'next-vibe-ui/ui/icons';
+import { BarChart3 } from "next-vibe-ui/ui/icons";
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
@@ -39,7 +39,7 @@ export default async function LeadsStatsPage({
   const { t } = simpleT(locale);
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Stats Content */}
       <Card>
         <CardHeader>

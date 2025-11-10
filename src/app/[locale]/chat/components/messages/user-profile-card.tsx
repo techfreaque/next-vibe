@@ -67,7 +67,7 @@ export function UserProfileCard({
 
       {/* Recent Posts */}
       {recentPosts.length > 0 && (
-        <Div className="space-y-2">
+        <Div className="flex flex-col gap-2">
           <Div className="text-xs font-semibold text-muted-foreground mb-2">
             {t("app.chat.userProfile.recentPosts")}
           </Div>

@@ -221,7 +221,7 @@ function UserIdHoverCard({
       </Div>
 
       {/* Post List */}
-      <Div className="space-y-2 max-h-64 overflow-y-auto">
+      <Div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
         {userPosts.map((post, idx) => {
           const postShortId = getShortId(post.id);
           return (
@@ -692,10 +692,7 @@ function FlatMessage({
                       msgIndex > 0 && "mt-3",
                     )}
                   >
-                  <Markdown
-                    content={msg.content}
-                    messageId={msg.id}
-                  />
+                    <Markdown content={msg.content} messageId={msg.id} />
                   </Div>
                 )}
               </React.Fragment>
@@ -953,7 +950,7 @@ export function FlatMessageView({
     : null;
 
   return (
-    <Div className="space-y-4">
+    <Div className="flex flex-col gap-4">
       {/* Preview Popup */}
       {previewMessage && hoveredRef && previewPosition && (
         <MessagePreview

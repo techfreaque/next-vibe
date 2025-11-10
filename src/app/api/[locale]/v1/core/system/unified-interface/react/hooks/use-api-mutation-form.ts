@@ -116,7 +116,10 @@ export function useApiForm<
           ({} as TEndpoint["TRequestOutput"]);
         formMethods.reset(resetData);
       } catch (error) {
-        logger.error("Error clearing form data from storage:", parseError(error));
+        logger.error(
+          "Error clearing form data from storage:",
+          parseError(error),
+        );
       }
     })();
   }, [formMethods, storageKey, options.defaultValues, logger]);
@@ -137,7 +140,10 @@ export function useApiForm<
           formMethods.reset(parsedData);
         }
       } catch (error) {
-        logger.error("Error loading form data from storage:", parseError(error));
+        logger.error(
+          "Error loading form data from storage:",
+          parseError(error),
+        );
       }
     })();
   }, [formMethods, storageKey, persistForm, logger]);
@@ -236,7 +242,8 @@ export function useApiForm<
         clearFormError();
 
         // Call the API with the validated form data using React Query mutation
-        const urlPathParams = (options?.urlParamVariables as TEndpoint["TUrlVariablesOutput"]) ||
+        const urlPathParams =
+          (options?.urlParamVariables as TEndpoint["TUrlVariablesOutput"]) ||
           ({} as TEndpoint["TUrlVariablesOutput"]);
 
         const result = await mutation.mutateAsync({
@@ -282,9 +289,9 @@ export function useApiForm<
         const errorResponse = isErrorResponseType(error)
           ? error
           : fail({
-          message:
+              message:
                 "app.api.v1.core.system.unifiedInterface.react.hooks.mutationForm.post.errors.mutation_failed.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
             });
 
         setError(errorResponse);
@@ -304,10 +311,10 @@ export function useApiForm<
 
       // Create an error response for form validation errors
       const errorResponse = fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.react.hooks.mutationForm.post.errors.validation_error.title",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                  messageParams: { formErrors: JSON.stringify(errors) },
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        messageParams: { formErrors: JSON.stringify(errors) },
       });
 
       // Set the error in the form state so it's displayed

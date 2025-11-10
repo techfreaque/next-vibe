@@ -112,9 +112,10 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
       // Safe access to result data since we know result.success is true
       if (!result.data) {
         return fail({
-          message: "app.api.v1.core.emails.emailService.send.errors.server.title",
+          message:
+            "app.api.v1.core.emails.emailService.send.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: {
+          messageParams: {
             error:
               "app.api.v1.core.emails.emailService.send.errors.noData.description",
           },
@@ -146,9 +147,9 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
     } catch (error) {
       logger.error("Email service: Send failed", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.emailService.send.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.emails.emailService.send.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

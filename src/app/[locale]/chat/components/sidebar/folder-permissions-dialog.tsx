@@ -80,7 +80,7 @@ export function FolderPermissionsDialog({
           className="flex flex-col flex-1 overflow-hidden"
         >
           <ScrollArea className="flex-1 -mx-6 px-6 overflow-y-auto">
-            <Div className="space-y-4 pr-4 pb-4">
+            <Div className="flex flex-col gap-4 pr-4 pb-4">
               {/* Show error alert if GET request failed */}
               {endpoint.alert && <FormAlert alert={endpoint.alert} />}
 

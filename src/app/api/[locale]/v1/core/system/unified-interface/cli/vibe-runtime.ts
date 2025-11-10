@@ -506,7 +506,7 @@ program
           logger,
           options.verbose ?? false,
           options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
-          result
+          result,
         );
       } catch (error) {
         const handled = ErrorHandler.handleError(

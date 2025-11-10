@@ -72,8 +72,9 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                 if (!emailData.ignoreErrors) {
                   errors.push(
                     fail({
-          message: "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.rendering_failed",
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                      message:
+                        "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.rendering_failed",
+                      errorType: ErrorResponseTypes.EMAIL_ERROR,
                       messageParams: { error: emailMessage.message },
                     }),
                   );
@@ -97,7 +98,8 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                     senderName: templateData.senderName,
                     // Pass through campaign context from template
                     campaignType: templateData.campaignType,
-                    emailJourneyVariant: templateData.emailJourneyVariant ?? null,
+                    emailJourneyVariant:
+                      templateData.emailJourneyVariant ?? null,
                     emailCampaignStage: templateData.emailCampaignStage ?? null,
                     // Pass through email metadata
                     replyToEmail: templateData.replyToEmail,
@@ -137,8 +139,9 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                 );
                 errors.push(
                   fail({
-          message: "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.send_failed",
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                    message:
+                      "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.send_failed",
+                    errorType: ErrorResponseTypes.EMAIL_ERROR,
                     messageParams: { error: emailSendResult.message },
                   }),
                 );
@@ -169,7 +172,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                       leadId: null,
                       metadata: {
                         locale: data.locale,
-          errorType: data.t(
+                        errorType: data.t(
                           "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.email_render_exception",
                         ),
                         errorDetails: parsedError.message,
@@ -203,8 +206,9 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
 
               errors.push(
                 fail({
-          message: "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.rendering_failed",
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
+                  message:
+                    "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.rendering_failed",
+                  errorType: ErrorResponseTypes.EMAIL_ERROR,
                   messageParams: { error: parsedError.message },
                 }),
               );
@@ -215,8 +219,9 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
         const parsedError = parseError(error);
         errors.push(
           fail({
-          message: "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.batch_send_failed",
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
+            message:
+              "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.batch_send_failed",
+            errorType: ErrorResponseTypes.EMAIL_ERROR,
             messageParams: { error: parsedError.message },
           }),
         );
@@ -226,9 +231,12 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
     if (errors.length) {
       logger.error("Email errors");
       return fail({
-          message: "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.batch_send_failed",
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: { errors: errors.map((error) => error.message).join(", ") },
+        message:
+          "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.batch_send_failed",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
+          errors: errors.map((error) => error.message).join(", "),
+        },
       });
     }
 

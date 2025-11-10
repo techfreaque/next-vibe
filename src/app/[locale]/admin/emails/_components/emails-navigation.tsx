@@ -5,7 +5,7 @@
 
 "use client";
 
-import { BarChart3, Database, List, Settings } from 'next-vibe-ui/ui/icons';
+import { BarChart3, Database, List, Settings } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
@@ -58,7 +58,7 @@ export function EmailsNavigation({
   ] as const;
 
   return (
-    <Div className="flex space-x-1 rounded-lg bg-muted p-1">
+    <Div className="flex flex flex-row gap-1 rounded-lg bg-muted p-1">
       {navigationItems.map((item) => {
         const Icon = item.icon;
         const isActive = currentPage === item.key;

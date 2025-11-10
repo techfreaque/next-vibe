@@ -59,7 +59,7 @@ class RootFolderPermissionsRepositoryNativeImpl
     // Error response - preserve all error information
     return {
       success: false,
-          errorType: response.errorType,
+      errorType: response.errorType,
       message: response.message,
       messageParams: response.messageParams,
     };

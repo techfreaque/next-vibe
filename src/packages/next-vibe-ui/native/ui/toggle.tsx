@@ -7,10 +7,10 @@ import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 import type {
-  ToggleProps,
+  ToggleRootProps,
   ToggleSize,
   ToggleVariant,
-} from "../../web/ui/toggle";
+} from "@/packages/next-vibe-ui/web/ui/toggle";
 
 const toggleVariants = cva(
   "group inline-flex items-center justify-center rounded-md ring-offset-background transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
@@ -56,16 +56,22 @@ const toggleTextVariants = cva(
   },
 );
 
-export type { ToggleProps, ToggleSize, ToggleVariant };
+export type { ToggleRootProps, ToggleSize, ToggleVariant };
 
 const StyledToggleRoot = styled(TogglePrimitive.Root);
 
-const Toggle = React.forwardRef<
-  TogglePrimitive.RootRef,
-  ToggleProps
->(({ className, variant, size, pressed, onPressedChange, children, disabled }, ref): React.ReactElement => {
+export function Toggle({
+  className,
+  variant,
+  size,
+  pressed,
+  onPressedChange,
+  children,
+  disabled,
+}: ToggleRootProps): React.JSX.Element {
   const isPressed = pressed ?? false;
-  const handlePressedChange = onPressedChange ?? ((_pressed: boolean): void => undefined);
+  const handlePressedChange =
+    onPressedChange ?? ((_pressed: boolean): void => undefined);
   return (
     <TextClassContext.Provider
       value={cn(
@@ -76,10 +82,9 @@ const Toggle = React.forwardRef<
       )}
     >
       <StyledToggleRoot
-        ref={ref}
         pressed={isPressed}
         onPressedChange={handlePressedChange}
-        disabled={disabled}
+        disabled={disabled ?? false}
         className={cn(
           toggleVariants({ variant, size }),
           disabled && "pointer-events-none opacity-50",
@@ -91,9 +96,7 @@ const Toggle = React.forwardRef<
       </StyledToggleRoot>
     </TextClassContext.Provider>
   );
-});
-
-Toggle.displayName = TogglePrimitive.Root.displayName;
+}
 
 function ToggleIcon({
   icon: Icon,
@@ -106,4 +109,4 @@ function ToggleIcon({
   return <Icon {...props} color={textClass} />;
 }
 
-export { Toggle, ToggleIcon, toggleTextVariants, toggleVariants };
+export { ToggleIcon, toggleTextVariants, toggleVariants };

@@ -12,12 +12,7 @@
  * Tasks Database Schema
  * Database tables for task management system
  */
-import {
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -36,11 +31,7 @@ import { TaskStatusDB } from "./enum";
 /**
  * Import and re-export cron task tables from cron/db.ts to avoid duplicate definitions
  */
-import {
-  cronTasks,
-  cronTaskExecutions,
-  cronTaskSchedules,
-} from "./cron/db";
+import { cronTasks, cronTaskExecutions, cronTaskSchedules } from "./cron/db";
 
 export {
   cronTasks,
@@ -78,11 +69,7 @@ export {
 /**
  * Import and re-export pulse health tables from pulse/db.ts to avoid duplicate definitions
  */
-import {
-  pulseHealth,
-  pulseExecutions,
-  pulseNotifications,
-} from "./pulse/db";
+import { pulseHealth, pulseExecutions, pulseNotifications } from "./pulse/db";
 
 export {
   pulseHealth,

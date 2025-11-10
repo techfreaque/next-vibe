@@ -100,9 +100,9 @@ export async function validateNextRequestData<
 
     if (!urlValidation.success) {
       return fail({
-          message: "app.api.v1.core.shared.errors.invalid_url_parameters",
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-                  messageParams: {
+        message: "app.api.v1.core.shared.errors.invalid_url_parameters",
+        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+        messageParams: {
           error: urlValidation.message,
         },
         cause: urlValidation,
@@ -131,10 +131,10 @@ export async function validateNextRequestData<
 
     if (!requestValidation.success) {
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-                  messageParams: {
+        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+        messageParams: {
           error: requestValidation.message,
         },
         cause: requestValidation,
@@ -155,7 +155,7 @@ export async function validateNextRequestData<
       success: false,
       message:
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error:
           error instanceof Error
@@ -411,9 +411,9 @@ async function validatePostRequestData<TRequestOutput>(
         messageParams: validationResult.messageParams,
       });
       return fail({
-          message: "app.api.v1.core.shared.errors.invalid_request_data",
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-                  messageParams: {
+        message: "app.api.v1.core.shared.errors.invalid_request_data",
+        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+        messageParams: {
           error: validationResult.message,
         },
         cause: validationResult,
@@ -428,9 +428,9 @@ async function validatePostRequestData<TRequestOutput>(
       contentType: request.headers.get("content-type"),
     });
     return fail({
-          message: "app.api.v1.core.shared.errors.invalid_request_data",
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-                messageParams: {
+      message: "app.api.v1.core.shared.errors.invalid_request_data",
+      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+      messageParams: {
         error: parsedError.message,
       },
     });

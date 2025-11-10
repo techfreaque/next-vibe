@@ -5,7 +5,7 @@
 
 "use client";
 
-import { BarChart3, Database, List, Settings } from 'next-vibe-ui/ui/icons';
+import { BarChart3, Database, List, Settings } from "next-vibe-ui/ui/icons";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Link } from "next-vibe-ui/ui/link";
 import { cn } from "next-vibe/shared/utils";
@@ -80,9 +80,9 @@ export function EmailsAdminLayoutClient({
   );
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Header */}
-      <Div className="flex flex-col space-y-4">
+      <Div className="flex flex-col gap-4">
         <Div>
           <H1 className="text-3xl font-bold text-gray-900 dark:text-white">
             {t("app.admin.emails.components.admin.title")}

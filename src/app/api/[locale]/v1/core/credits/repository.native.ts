@@ -27,8 +27,14 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 
 import { GET as getCreditsEndpoint } from "./definition";
-import type { CreditRepositoryInterface, CreditTransactionOutput } from "./repository";
-import type { CreditBalance, CreditIdentifier } from "../system/unified-interface/shared/server-only/credits/handler";
+import type {
+  CreditRepositoryInterface,
+  CreditTransactionOutput,
+} from "./repository";
+import type {
+  CreditBalance,
+  CreditIdentifier,
+} from "../system/unified-interface/shared/server-only/credits/handler";
 import type { CreditTypeIdentifierValue } from "./enum";
 import type { CreditPackCheckoutSession } from "../payment/providers/types";
 
@@ -39,9 +45,9 @@ import type { CreditPackCheckoutSession } from "../payment/providers/types";
 class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
   private createNotImplementedError<T>(method: string): ResponseType<T> {
     return fail({
-          message: "app.api.v1.core.credits.errors.not_implemented_on_native",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { method },
+      message: "app.api.v1.core.credits.errors.not_implemented_on_native",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { method },
     });
   }
 
@@ -69,7 +75,7 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     // Error response - preserve all error information
     return {
       success: false,
-          errorType: response.errorType,
+      errorType: response.errorType,
       message: response.message,
       messageParams: response.messageParams,
     };

@@ -36,7 +36,10 @@ interface JsonSchemaPropertyValue {
  */
 export interface JsonSchemaObject {
   type: "object";
-  properties?: Record<string, Record<string, string | number | boolean | null | JsonSchemaPropertyValue>>;
+  properties?: Record<
+    string,
+    Record<string, string | number | boolean | null | JsonSchemaPropertyValue>
+  >;
   required?: string[];
   additionalProperties?: boolean;
 }
@@ -317,7 +320,10 @@ export function isEnabledForPlatform(
 ): boolean {
   const roles = extractAllowedRoles(endpoint);
 
-  let optOutRole: typeof UserRole.CLI_OFF | typeof UserRole.AI_TOOL_OFF | typeof UserRole.WEB_OFF;
+  let optOutRole:
+    | typeof UserRole.CLI_OFF
+    | typeof UserRole.AI_TOOL_OFF
+    | typeof UserRole.WEB_OFF;
   switch (platform) {
     case "CLI":
       optOutRole = UserRole.CLI_OFF;

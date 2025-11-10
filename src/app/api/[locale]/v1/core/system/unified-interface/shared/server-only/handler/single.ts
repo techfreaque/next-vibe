@@ -49,12 +49,12 @@ export function endpointHandler<
   allowedRoles: infer TUserRoleValue extends readonly (typeof UserRoleValue)[];
 }
   ? EndpointHandlerReturn<
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TMethod,
-    TUserRoleValue
-  >
+      TRequestOutput,
+      TResponseOutput,
+      TUrlVariablesOutput,
+      TMethod,
+      TUserRoleValue
+    >
   : never {
   // Create the Next.js handler
   const nextHandler = createNextHandler(options);
@@ -81,14 +81,14 @@ export function endpointHandler<
     };
     method: infer TMethod extends Methods;
     allowedRoles: infer TUserRoleValue extends
-    readonly (typeof UserRoleValue)[];
+      readonly (typeof UserRoleValue)[];
   }
     ? EndpointHandlerReturn<
-      TRequestOutput,
-      TResponseOutput,
-      TUrlVariablesOutput,
-      TMethod,
-      TUserRoleValue
-    >
+        TRequestOutput,
+        TResponseOutput,
+        TUrlVariablesOutput,
+        TMethod,
+        TUserRoleValue
+      >
     : never;
 }

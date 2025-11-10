@@ -15,7 +15,8 @@ export function shouldSkipPath(path: string): boolean {
     path.includes("/_next/") ||
     path.includes("/static/") ||
     path.includes("/images/") ||
-    path.match(/\.(ico|png|jpg|jpeg|svg|css|js|woff|woff2|ttf|eot)$/) !== null ||
+    path.match(/\.(ico|png|jpg|jpeg|svg|css|js|woff|woff2|ttf|eot)$/) !==
+      null ||
     path === "/favicon.ico" ||
     path === "/robots.txt" ||
     path === "/sitemap.xml"
@@ -48,4 +49,3 @@ export function extractLocaleFromPath(path: string): string | undefined {
   const localeMatch = path.match(/^\/([a-z]{2}-[A-Z]+)/);
   return localeMatch?.[1];
 }
-

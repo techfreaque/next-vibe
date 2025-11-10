@@ -366,8 +366,8 @@ export const renderWelcomeEmail: EmailFunctionType<
   try {
     if (!responseData) {
       return fail({
-          message: "app.api.v1.core.users.create.email.users.errors.missing_data",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        message: "app.api.v1.core.users.create.email.users.errors.missing_data",
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
 
@@ -385,8 +385,9 @@ export const renderWelcomeEmail: EmailFunctionType<
     });
   } catch {
     return fail({
-          message: "app.api.v1.core.users.create.email.users.error.general.internal_server_error",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      message:
+        "app.api.v1.core.users.create.email.users.error.general.internal_server_error",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
 };
@@ -403,8 +404,8 @@ export const renderAdminNotificationEmail: EmailFunctionType<
   try {
     if (!responseData) {
       return fail({
-          message: "app.api.v1.core.users.create.email.users.errors.missing_data",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        message: "app.api.v1.core.users.create.email.users.errors.missing_data",
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
 
@@ -422,8 +423,9 @@ export const renderAdminNotificationEmail: EmailFunctionType<
     });
   } catch {
     return fail({
-          message: "app.api.v1.core.users.create.email.users.error.general.internal_server_error",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      message:
+        "app.api.v1.core.users.create.email.users.error.general.internal_server_error",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
 };

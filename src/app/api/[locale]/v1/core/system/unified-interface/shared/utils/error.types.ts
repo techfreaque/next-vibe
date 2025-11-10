@@ -37,4 +37,3 @@ export type ErrorDetails = Record<string, JsonPrimitive>;
 export interface ErrorLogger {
   error: (message: string, context?: ErrorDetails) => void;
 }
-

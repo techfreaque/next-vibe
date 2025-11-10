@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink } from 'next-vibe-ui/ui/icons';
+import { ExternalLink } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Image } from "next-vibe-ui/ui/image";
 import { Div } from "next-vibe-ui/ui/div";

@@ -141,7 +141,7 @@ export function createCliHandler<
       return {
         success: false,
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       };
     }
 

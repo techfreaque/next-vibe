@@ -91,7 +91,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.threadId.get.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { threadId },
+          messageParams: { threadId },
         });
       }
 
@@ -142,10 +142,10 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
     } catch (error) {
       logger.error("Error getting thread by ID", parseError(error));
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.threads.threadId.get.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -180,7 +180,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.threadId.patch.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { threadId },
+          messageParams: { threadId },
         });
       }
 
@@ -283,10 +283,10 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
     } catch (error) {
       logger.error("Error updating thread", parseError(error));
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.threads.threadId.patch.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -328,7 +328,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.threadId.delete.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { threadId },
+          messageParams: { threadId },
         });
       }
 
@@ -377,10 +377,10 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
     } catch (error) {
       logger.error("Error deleting thread", parseError(error));
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.threads.threadId.delete.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

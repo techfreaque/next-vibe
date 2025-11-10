@@ -202,7 +202,7 @@ export function ImapFoldersList({
                 </TableCell>
                 <TableCell>{getSyncStatusBadge(folder.syncStatus)}</TableCell>
                 <TableCell>
-                  <Div className="flex items-center space-x-2">
+                  <Div className="flex items-center flex flex-row gap-2">
                     <Button
                       variant="outline"
                       size="sm"

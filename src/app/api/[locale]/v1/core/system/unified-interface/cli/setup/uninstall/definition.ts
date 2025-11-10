@@ -26,11 +26,15 @@ import { UserRole } from "../../../../../user/user-roles/enum";
  * Setup Uninstall Endpoint Definition
  */
 const { POST } = createEndpoint({
-  title: "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
+  title:
+    "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
   description:
     "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.description",
-  category: "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
-  tags: ["app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title"],
+  category:
+    "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
+  tags: [
+    "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
+  ],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["uninstall", "setup:uninstall"],
   method: Methods.POST,
@@ -44,7 +48,8 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
+      title:
+        "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.title",
       description:
         "app.api.v1.core.system.unifiedInterface.cli.setup.uninstall.post.description",
       layout: { type: LayoutType.GRID, columns: 12 },

@@ -162,9 +162,7 @@ export interface ApiStore {
    * Update endpoint data in React Query cache (for optimistic updates)
    * This is the ONLY way to update query data - no Zustand involved
    */
-  updateEndpointData: <
-    TEndpoint extends CreateApiEndpointAny,
-  >(
+  updateEndpointData: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     updater: (
       oldData:
@@ -310,9 +308,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
    * Update query data for an endpoint
    * This is useful for optimistic updates or updating cache after mutations/streams
    */
-  updateEndpointData: <
-    TEndpoint extends CreateApiEndpointAny,
-  >(
+  updateEndpointData: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     updater: (
       oldData:
@@ -557,9 +553,7 @@ export const apiClient = {
    *   }
    * );
    */
-  updateEndpointData: <
-    TEndpoint extends CreateApiEndpointAny
-   >(
+  updateEndpointData: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     updater: (
       oldData:

@@ -1,6 +1,6 @@
 "use client";
 
-import { Printer } from 'next-vibe-ui/ui/icons';
+import { Printer } from "next-vibe-ui/ui/icons";
 import { Button } from "next-vibe-ui/ui/button";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";

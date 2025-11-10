@@ -59,7 +59,7 @@ export const standardUserSchema = z.object({
   createdAt: dateSchema,
   updatedAt: dateSchema,
 });
-export type StandardUserType = z.infer<typeof standardUserSchema>
+export type StandardUserType = z.infer<typeof standardUserSchema>;
 
 /**
  * Complete User Schema

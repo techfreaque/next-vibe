@@ -161,8 +161,7 @@ export const translations = {
       category: "Legal",
       description: "Legal information and company details for {{appName}}",
       imageAlt: "Legal Notice",
-      keywords:
-        "imprint, legal notice, company information, {{appName}} legal",
+      keywords: "imprint, legal notice, company information, {{appName}} legal",
     },
     careers: {
       title: "Careers - {{appName}}",
@@ -226,9 +225,9 @@ export const translations = {
           organization: "Organization",
           contactPoint: "ContactPoint",
         },
-  
+
         contactPoint: {
-            telephone: "{{config.group.contact.telephone}}",
+          telephone: "{{config.group.contact.telephone}}",
           contactType: "Customer Service",
         },
       },

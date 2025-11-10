@@ -412,14 +412,10 @@ const { POST } = createEndpoint({
 });
 
 // Extract types for use in other files
-export type LoginPostRequestInput =
-  typeof POST.types.RequestInput;
-export type LoginPostRequestOutput =
-  typeof POST.types.RequestOutput;
-export type LoginPostResponseInput =
-  typeof POST.types.ResponseInput;
-export type LoginPostResponseOutput =
-  typeof POST.types.ResponseOutput;
+export type LoginPostRequestInput = typeof POST.types.RequestInput;
+export type LoginPostRequestOutput = typeof POST.types.RequestOutput;
+export type LoginPostResponseInput = typeof POST.types.ResponseInput;
+export type LoginPostResponseOutput = typeof POST.types.ResponseOutput;
 
 const loginEndpoints = { POST } as const;
 

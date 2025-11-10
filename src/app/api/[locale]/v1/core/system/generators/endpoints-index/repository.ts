@@ -89,7 +89,9 @@ class EndpointsIndexGeneratorRepositoryImpl
 
       const duration = Date.now() - startTime;
 
-      logger.info(`Generated endpoints index with ${definitionFiles.length} endpoints in ${duration}ms`);
+      logger.info(
+        `Generated endpoints index with ${definitionFiles.length} endpoints in ${duration}ms`,
+      );
 
       return success({
         success: true,
@@ -107,9 +109,10 @@ class EndpointsIndexGeneratorRepositoryImpl
       });
 
       return fail({
-          message: "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           duration,
         },
       });
@@ -199,7 +202,8 @@ class EndpointsIndexGeneratorRepositoryImpl
       addSetNestedPathCall(nestedPath);
 
       // Extract and add real aliases from definition file
-      const definitionAliases = await this.extractAliasesFromDefinition(defFile);
+      const definitionAliases =
+        await this.extractAliasesFromDefinition(defFile);
       for (const alias of definitionAliases) {
         // Treat single-word aliases as standalone, multi-segment aliases as paths
         const aliasSegments = alias.includes("/") ? alias.split("/") : [alias];

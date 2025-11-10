@@ -57,9 +57,10 @@ export class StripeProvider implements PaymentProvider {
 
       if (!user) {
         return fail({
-          message: "app.api.v1.core.payment.providers.stripe.errors.userNotFound.title",
+          message:
+            "app.api.v1.core.payment.providers.stripe.errors.userNotFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId },
+          messageParams: { userId },
         });
       }
 
@@ -94,9 +95,10 @@ export class StripeProvider implements PaymentProvider {
         userId,
       });
       return fail({
-          message: "app.api.v1.core.payment.providers.stripe.errors.customerCreationFailed.title",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                  messageParams: { error: parseError(error).message, userId },
+        message:
+          "app.api.v1.core.payment.providers.stripe.errors.customerCreationFailed.title",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: parseError(error).message, userId },
       });
     }
   }
@@ -177,9 +179,10 @@ export class StripeProvider implements PaymentProvider {
         userId: params.userId,
       });
       return fail({
-          message: "app.api.v1.core.payment.providers.stripe.errors.checkoutCreationFailed.title",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.payment.providers.stripe.errors.checkoutCreationFailed.title",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -199,31 +202,51 @@ export class StripeProvider implements PaymentProvider {
       };
 
       // Add optional fields if they exist
-      if ("metadata" in eventData && typeof eventData.metadata === "object" && eventData.metadata) {
+      if (
+        "metadata" in eventData &&
+        typeof eventData.metadata === "object" &&
+        eventData.metadata
+      ) {
         webhookData.metadata = Object.fromEntries(
-          Object.entries(eventData.metadata).map(([k, v]) => [k, String(v)])
+          Object.entries(eventData.metadata).map(([k, v]) => [k, String(v)]),
         );
       }
       if ("customer" in eventData) {
-        webhookData.customer = typeof eventData.customer === "string" ? eventData.customer : null;
+        webhookData.customer =
+          typeof eventData.customer === "string" ? eventData.customer : null;
       }
       if ("status" in eventData && typeof eventData.status === "string") {
         webhookData.status = eventData.status;
       }
-      if ("cancel_at_period_end" in eventData && typeof eventData.cancel_at_period_end === "boolean") {
+      if (
+        "cancel_at_period_end" in eventData &&
+        typeof eventData.cancel_at_period_end === "boolean"
+      ) {
         webhookData.cancel_at_period_end = eventData.cancel_at_period_end;
       }
-      if ("current_period_start" in eventData && typeof eventData.current_period_start === "number") {
+      if (
+        "current_period_start" in eventData &&
+        typeof eventData.current_period_start === "number"
+      ) {
         webhookData.current_period_start = eventData.current_period_start;
       }
-      if ("current_period_end" in eventData && typeof eventData.current_period_end === "number") {
+      if (
+        "current_period_end" in eventData &&
+        typeof eventData.current_period_end === "number"
+      ) {
         webhookData.current_period_end = eventData.current_period_end;
       }
-      if ("amount_total" in eventData && typeof eventData.amount_total === "number") {
+      if (
+        "amount_total" in eventData &&
+        typeof eventData.amount_total === "number"
+      ) {
         webhookData.amount_total = eventData.amount_total;
       }
       if ("subscription" in eventData) {
-        webhookData.subscription = typeof eventData.subscription === "string" ? eventData.subscription : undefined;
+        webhookData.subscription =
+          typeof eventData.subscription === "string"
+            ? eventData.subscription
+            : undefined;
       }
 
       return success<WebhookEvent>({
@@ -236,9 +259,10 @@ export class StripeProvider implements PaymentProvider {
         error: parseError(error),
       });
       return fail({
-          message: "app.api.v1.core.payment.providers.stripe.errors.webhookVerificationFailed.title",
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.payment.providers.stripe.errors.webhookVerificationFailed.title",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -307,9 +331,10 @@ export class StripeProvider implements PaymentProvider {
         subscriptionId,
       });
       return fail({
-          message: "app.api.v1.core.payment.providers.stripe.errors.subscriptionRetrievalFailed.title",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.payment.providers.stripe.errors.subscriptionRetrievalFailed.title",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -327,9 +352,10 @@ export class StripeProvider implements PaymentProvider {
         subscriptionId,
       });
       return fail({
-          message: "app.api.v1.core.payment.providers.stripe.errors.subscriptionCancellationFailed.title",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.payment.providers.stripe.errors.subscriptionCancellationFailed.title",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

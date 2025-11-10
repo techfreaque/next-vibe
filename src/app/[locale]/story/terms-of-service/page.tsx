@@ -1,4 +1,4 @@
-import { FileText, Scale } from 'next-vibe-ui/ui/icons';
+import { FileText, Scale } from "next-vibe-ui/ui/icons";
 import type { Metadata, ResolvingMetadata } from "next";
 import type { JSX } from "react";
 
@@ -217,7 +217,7 @@ export default async function TermsOfServicePage({
                 "app.story._components.home.termsOfService.sections.userContent.guidelines.intro",
               )}
             </P>
-            <ul className="space-y-1 mt-4">
+            <ul className="flex flex-col gap-1 mt-4">
               <li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(

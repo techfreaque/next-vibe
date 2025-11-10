@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Plus, Users } from 'next-vibe-ui/ui/icons';
+import { Plus, Users } from "next-vibe-ui/ui/icons";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Link } from "next-vibe-ui/ui/link";
 import { cn } from "next-vibe/shared/utils";
@@ -64,11 +64,11 @@ export function SmtpAdminLayoutClient({
   );
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* SMTP Sub-Navigation */}
       <Card>
         <CardContent className="p-4">
-          <Div className="flex flex-col space-y-4">
+          <Div className="flex flex-col gap-4">
             <Div>
               <H2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {t("app.admin.emails.smtp.list.title")}
@@ -81,7 +81,7 @@ export function SmtpAdminLayoutClient({
             {/* Sub Navigation Tabs */}
             <Div className="border-b border-gray-200 dark:border-gray-700">
               <nav
-                className="flex space-x-8"
+                className="flex flex flex-row gap-8"
                 aria-label={t("app.admin.emails.smtp.list.title")}
               >
                 {subNavigationItems.map((item) => {

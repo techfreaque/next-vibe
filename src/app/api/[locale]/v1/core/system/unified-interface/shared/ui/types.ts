@@ -128,8 +128,8 @@ export interface WidgetRegistryEntry<TData = unknown> {
 
   /** Widget component or renderer function */
   component:
-  | React.ComponentType<WidgetComponentProps<TData>>
-  | WidgetRenderer<TData>;
+    | React.ComponentType<WidgetComponentProps<TData>>
+    | WidgetRenderer<TData>;
 
   /** Supported platforms */
   platforms?: Array<"web" | "native" | "cli">;
@@ -282,13 +282,13 @@ export interface ContainerWidgetData {
     gap?: string;
   };
   [key: string]:
-  | RenderableValue
-  | Array<{
-    type: WidgetType;
-    data: RenderableValue;
-    metadata: ResponseFieldMetadata;
-  }>
-  | { type: "grid" | "flex" | "stack"; columns?: number; gap?: string };
+    | RenderableValue
+    | Array<{
+        type: WidgetType;
+        data: RenderableValue;
+        metadata: ResponseFieldMetadata;
+      }>
+    | { type: "grid" | "flex" | "stack"; columns?: number; gap?: string };
 }
 
 /**

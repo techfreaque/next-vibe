@@ -136,9 +136,9 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
         }
         default: {
           return fail({
-          message: "app.api.v1.core.stripe.errors.validation.title",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                      messageParams: { operation: data.operation },
+            message: "app.api.v1.core.stripe.errors.validation.title",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            messageParams: { operation: data.operation },
           });
         }
       }
@@ -156,9 +156,9 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       logger.error("Error processing Stripe CLI operation:", parseError(error));
       const parsedError = parseError(error);
       return fail({
-          message: "app.api.v1.core.stripe.errors.serverError.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message: "app.api.v1.core.stripe.errors.serverError.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           operation: data.operation,
           error: parsedError.message,
           details: t("app.api.v1.core.stripe.errors.execution_failed"),
@@ -182,9 +182,9 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
         parseError(error),
       );
       return fail({
-          message: "app.api.v1.core.stripe.errors.serverError.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.stripe.errors.serverError.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -208,14 +208,14 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
         return fail({
           message: "app.api.v1.core.stripe.errors.serverError.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: { error: "stripe.errors.listener_failed" },
+          messageParams: { error: "stripe.errors.listener_failed" },
         });
       }
     } catch (error) {
       return fail({
-          message: "app.api.v1.core.stripe.errors.serverError.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.stripe.errors.serverError.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -229,9 +229,9 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       return success(authenticated);
     } catch (error) {
       return fail({
-          message: "app.api.v1.core.stripe.errors.serverError.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.stripe.errors.serverError.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -339,7 +339,9 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       args.push("--skip-verify");
     }
 
-    logger.debug("🎧 Stripe webhook listener is running. Press Ctrl+C to stop.");
+    logger.debug(
+      "🎧 Stripe webhook listener is running. Press Ctrl+C to stop.",
+    );
 
     // Execute stripe listen and block forever
     // We need to capture output to extract webhook secret, but also display it
@@ -377,7 +379,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       });
 
       stripeProcess.on("error", (error: Error) => {
-        logger.error("Failed to start Stripe webhook listener:", parseError(error));
+        logger.error(
+          "Failed to start Stripe webhook listener:",
+          parseError(error),
+        );
         reject(error);
       });
     });

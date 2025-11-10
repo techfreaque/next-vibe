@@ -101,7 +101,9 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
       }
       requestDataKey =
         typeof requestData === "object"
-          ? Object.keys(requestData as object).toSorted().join(",")
+          ? Object.keys(requestData as object)
+              .toSorted()
+              .join(",")
           : String(requestData);
     }
   }
@@ -154,7 +156,9 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
       }
       urlPathParamsKey =
         typeof urlPathParams === "object"
-          ? Object.keys(urlPathParams as object).toSorted().join(",")
+          ? Object.keys(urlPathParams as object)
+              .toSorted()
+              .join(",")
           : String(urlPathParams);
     }
   }
@@ -162,4 +166,3 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
   // Return the query key built from the components
   return [endpointKey, requestDataKey, urlPathParamsKey];
 }
-

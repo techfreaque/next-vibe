@@ -5,7 +5,7 @@
 
 "use client";
 
-import { ArrowLeft, Save } from 'next-vibe-ui/ui/icons';
+import { ArrowLeft, Save } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Div } from "next-vibe-ui/ui/div";
@@ -26,10 +26,7 @@ import type { LeadDetailResponse } from "@/app/api/[locale]/v1/core/leads/types"
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import {
-  CountriesOptions,
-  LanguagesOptions,
-} from "@/i18n/core/config";
+import { CountriesOptions, LanguagesOptions } from "@/i18n/core/config";
 
 interface LeadEditFormProps {
   lead: LeadDetailResponse;
@@ -61,10 +58,10 @@ export function LeadEditForm({
   }
 
   return (
-    <Div className="max-w-4xl mx-auto space-y-6">
+    <Div className="max-w-4xl mx-auto flex flex-col gap-6">
       {/* Header with Navigation */}
       <Div className="flex items-center justify-between">
-        <Div className="flex items-center space-x-4">
+        <Div className="flex items-center flex flex-row gap-4">
           <Button variant="outline" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t("app.admin.leads.leads.edit.form.actions.back")}
@@ -76,7 +73,7 @@ export function LeadEditForm({
       {/* Main Form Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
+          <CardTitle className="flex items-center flex flex-row gap-2">
             <Span>{t("app.admin.common.actions.edit")}</Span>
             <Span className="text-lg font-normal text-gray-500">
               - {lead.lead.basicInfo.businessName}
@@ -87,7 +84,7 @@ export function LeadEditForm({
           <Form
             form={endpoint.create.form}
             onSubmit={handleSubmit}
-            className="space-y-6"
+            className="flex flex-col gap-6"
           >
             <FormFieldGroup>
               <EndpointFormField
@@ -324,21 +321,21 @@ export function LeadEditForm({
 
               {/* User Selector for Converted User */}
               {/* TODO: Implement UserSelector component
-              <div className="space-y-2">
-                <UserSelector
-                  locale={locale}
-                  value={
-                    endpoint.create.form?.watch("convertedUserId") || undefined
-                  }
-                  onChange={(userId: string | undefined) =>
-                    endpoint.create.form?.setValue(
-                      "convertedUserId",
-                      userId || null,
-                    )
-                  }
-                />
-              </div>
-              */}
+ <div className="flex flex-col gap-2">
+ <UserSelector
+ locale={locale}
+ value={
+ endpoint.create.form?.watch("convertedUserId") || undefined
+ }
+ onChange={(userId: string | undefined) =>
+ endpoint.create.form?.setValue(
+ "convertedUserId",
+ userId || null,
+ )
+ }
+ />
+ </div>
+ */}
 
               <EndpointFormField
                 name="updates.additionalDetails.notes"
@@ -358,7 +355,7 @@ export function LeadEditForm({
             </FormFieldGroup>
             <FormAlert alert={endpoint.alert} />
 
-            <Div className="mt-6 flex justify-end space-x-3">
+            <Div className="mt-6 flex justify-end flex flex-row gap-3">
               <Button
                 type="button"
                 variant="outline"

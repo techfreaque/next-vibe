@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Save } from 'next-vibe-ui/ui/icons';
+import { Save } from "next-vibe-ui/ui/icons";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { FormSection } from "next-vibe-ui/ui/form/form-section";
@@ -49,11 +49,11 @@ export function CampaignStarterForm({
   }
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       <Form
         form={endpoint.create.form}
         onSubmit={handleSubmit}
-        className="space-y-6"
+        className="flex flex-col gap-6"
       >
         <FormSection
           title={"app.admin.leads.leads.admin.campaignStarter.settings.title"}
@@ -108,7 +108,7 @@ export function CampaignStarterForm({
                 }
               >
                 {/* Enabled Days - Custom checkbox group */}
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   <Div className="grid grid-cols-2 gap-3">
                     {[
                       { value: 1, key: "monday" },
@@ -121,7 +121,7 @@ export function CampaignStarterForm({
                     ].map((day) => (
                       <Div
                         key={day.value}
-                        className="flex items-center space-x-2"
+                        className="flex items-center flex flex-row gap-2"
                       >
                         <Checkbox
                           id={`day-${day.value}`}
@@ -207,9 +207,12 @@ export function CampaignStarterForm({
                 }
               >
                 {/* Leads Per Week - Custom inputs for each locale */}
-                <Div className="space-y-4">
+                <Div className="flex flex-col gap-4">
                   {Object.values(CountryLanguageValues).map((locale) => (
-                    <Div key={locale} className="flex items-center space-x-4">
+                    <Div
+                      key={locale}
+                      className="flex items-center flex flex-row gap-4"
+                    >
                       <Label className="w-24 font-medium">{locale}:</Label>
                       <Input
                         type="number"
@@ -390,14 +393,14 @@ export function CampaignStarterForm({
 
 function CampaignStarterFormSkeleton(): JSX.Element {
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       <Card>
-        <CardContent className="space-y-6">
-          <Div className="space-y-2">
+        <CardContent className="flex flex-col gap-6">
+          <Div className="flex flex-col gap-2">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-10 w-full" />
           </Div>
-          <Div className="space-y-2">
+          <Div className="flex flex-col gap-2">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-10 w-full" />
           </Div>

@@ -51,7 +51,11 @@ export const DataCardsWidget = ({
   style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element => {
   if (!isDataCardsWidgetData(data)) {
-    return <Div className={className} style={style}>—</Div>;
+    return (
+      <Div className={className} style={style}>
+        —
+      </Div>
+    );
   }
 
   const typedData = data;
@@ -115,7 +119,7 @@ export const DataCardsWidget = ({
                   {description}
                 </P>
               )}
-              <Div className="space-y-2">
+              <Div className="flex flex-col gap-2">
                 {Object.entries(item).map(([key, value]) => {
                   // Skip keys used for title, description, image
                   if (

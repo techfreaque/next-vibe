@@ -68,7 +68,9 @@ export function buildMessagePath(
   for (const [parentId, siblings] of childrenMap.entries()) {
     childrenMap.set(
       parentId,
-      siblings.toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+      siblings.toSorted(
+        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+      ),
     );
   }
 

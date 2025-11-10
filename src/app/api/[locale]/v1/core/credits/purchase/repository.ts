@@ -96,7 +96,8 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
           },
         );
         return fail({
-          message: "app.api.v1.core.credits.purchase.post.errors.noActiveSubscription.title",
+          message:
+            "app.api.v1.core.credits.purchase.post.errors.noActiveSubscription.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
           cause: subscriptionResult,
         });
@@ -112,15 +113,17 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
           },
         );
         return fail({
-          message: "app.api.v1.core.credits.purchase.post.errors.noActiveSubscription.title",
+          message:
+            "app.api.v1.core.credits.purchase.post.errors.noActiveSubscription.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
       // Get payment provider from request data or default to stripe
-      const providerKey = data.provider === PaymentProvider.NOWPAYMENTS
-        ? "nowpayments"
-        : "stripe";
+      const providerKey =
+        data.provider === PaymentProvider.NOWPAYMENTS
+          ? "nowpayments"
+          : "stripe";
       const provider = getPaymentProvider(providerKey);
 
       logger.debug("Using payment provider", {
@@ -220,9 +223,10 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
         quantity: data.quantity,
       });
       return fail({
-          message: "app.api.v1.core.agent.chat.credits.purchase.post.errors.server.title",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.agent.chat.credits.purchase.post.errors.server.title",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

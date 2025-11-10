@@ -42,7 +42,7 @@ export default async function CronStatsPage({
 }: CronStatsPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       <CronStatsClient locale={locale} />
     </Div>
   );

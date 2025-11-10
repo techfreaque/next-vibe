@@ -1,5 +1,5 @@
 import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { Calendar, Coins, Info, Sparkles, Zap } from 'next-vibe-ui/ui/icons';
+import { Calendar, Coins, Info, Sparkles, Zap } from "next-vibe-ui/ui/icons";
 import {
   Card,
   CardContent,
@@ -61,8 +61,8 @@ export function OverviewTab({
             )}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Div className="space-y-3">
+        <CardContent className="flex flex-col gap-4">
+          <Div className="flex flex-col gap-3">
             <Div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20">
               <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5" />
               <Div>
@@ -137,12 +137,12 @@ export function OverviewTab({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Div className="space-y-4">
+          <Div className="flex flex-col gap-4">
             <Div>
               <H4 className="font-semibold mb-2">
                 {t("app.subscription.subscription.overview.costs.models.title")}
               </H4>
-              <Div className="space-y-4">
+              <Div className="flex flex-col gap-4">
                 {Object.entries(modelProviders).map(
                   ([providerId, provider]) => {
                     const providerModels = modelOptions.filter(

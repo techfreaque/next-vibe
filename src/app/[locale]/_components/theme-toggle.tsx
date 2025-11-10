@@ -59,7 +59,7 @@ export function ThemeToggleMobile({
 
   return (
     <Div
-      className="flex space-x-2 pb-7 border-b text-base font-medium hover:text-primary transition-colors py-2 cursor-pointer"
+      className="flex flex flex-row gap-2 pb-7 border-b text-base font-medium hover:text-primary transition-colors py-2 cursor-pointer"
       onClick={() =>
         setTheme(resolvedTheme === "dark" || !isMounted ? "light" : "dark")
       }

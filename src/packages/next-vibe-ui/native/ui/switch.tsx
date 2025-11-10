@@ -9,57 +9,22 @@ import Animated, {
 
 import { styled } from "nativewind";
 
-import type { SwitchBaseProps } from "@/packages/next-vibe-ui/web/ui/switch";
+import type { SwitchRootProps } from "@/packages/next-vibe-ui/web/ui/switch";
 
 import { useColorScheme } from "../lib/useColorScheme";
 import { cn } from "next-vibe/shared/utils/utils";
+
+// Re-export all types from web
+export type { SwitchRootProps };
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const THUMB_CLASSNAME =
   "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0";
 /* eslint-enable i18next/no-literal-string */
 
-type NativeSwitchProps = SwitchBaseProps;
-
 const StyledAnimatedView = styled(Animated.View);
 const StyledSwitchRoot = styled(SwitchPrimitives.Root);
 const StyledSwitchThumb = styled(SwitchPrimitives.Thumb);
-
-const SwitchWeb = React.forwardRef<SwitchPrimitives.RootRef, NativeSwitchProps>(
-  ({ className, checked, onCheckedChange, disabled, ...props }, ref) => {
-    const isChecked = checked ?? false;
-    const handleCheckedChange =
-      onCheckedChange ??
-      ((_checked: boolean): void => {
-        return;
-      });
-    return (
-      <StyledSwitchRoot
-        className={cn(
-          // eslint-disable-next-line i18n/no-literal-string
-          "peer flex-row h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed",
-          isChecked ? "bg-primary" : "bg-input",
-          disabled && "opacity-50",
-          className,
-        )}
-        checked={isChecked}
-        onCheckedChange={handleCheckedChange}
-        disabled={disabled}
-        {...props}
-        ref={ref}
-      >
-        <StyledSwitchThumb
-          className={cn(
-            "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-md shadow-foreground/5 ring-0 transition-transform",
-            isChecked ? "translate-x-5" : "translate-x-0",
-          )}
-        />
-      </StyledSwitchRoot>
-    );
-  },
-);
-
-SwitchWeb.displayName = "SwitchWeb";
 
 // eslint-disable-next-line i18n/no-literal-string
 const RGB_COLORS = {
@@ -73,17 +38,37 @@ const RGB_COLORS = {
   },
 } as const;
 
-const SwitchNative = React.forwardRef<
-  SwitchPrimitives.RootRef,
-  NativeSwitchProps
->(({ className, checked, onCheckedChange, disabled, ...props }, ref) => {
+export function Switch({
+  checked,
+  onCheckedChange,
+  disabled,
+  defaultChecked,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  name,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  value,
+  className,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  required,
+  id,
+  onBlur,
+  children,
+}: SwitchRootProps): React.JSX.Element {
   const { colorScheme } = useColorScheme();
-  const isChecked = checked ?? false;
-  const handleCheckedChange =
-    onCheckedChange ??
-    ((_checked: boolean): void => {
-      return;
-    });
+
+  // Handle controlled/uncontrolled state with defaultChecked
+  const [internalChecked, setInternalChecked] = React.useState(defaultChecked ?? false);
+  const isControlled = checked !== undefined;
+  const isChecked = isControlled ? (checked ?? false) : internalChecked;
+
+  const handleCheckedChange = React.useCallback((newChecked: boolean) => {
+    if (!isControlled) {
+      setInternalChecked(newChecked);
+    }
+    onCheckedChange?.(newChecked);
+    onBlur?.();
+  }, [isControlled, onCheckedChange, onBlur]);
+
   const translateX = useDerivedValue(() => (isChecked ? 18 : 0));
   const animatedRootStyle = useAnimatedStyle(() => {
     return {
@@ -99,33 +84,24 @@ const SwitchNative = React.forwardRef<
       { translateX: withTiming(translateX.value, { duration: 200 }) },
     ],
   }));
+
   return (
     <StyledAnimatedView
       style={animatedRootStyle}
-      className={cn("h-8 w-[46px] rounded-full", disabled && "opacity-50")}
+      className={cn("h-8 w-[46px] rounded-full", disabled && "opacity-50", className)}
+      nativeID={id}
     >
       <StyledSwitchRoot
-        className={cn(
-          "flex-row h-8 w-[46px] shrink-0 items-center rounded-full border-2 border-transparent",
-          isChecked ? "bg-primary" : "bg-input",
-          className,
-        )}
         checked={isChecked}
         onCheckedChange={handleCheckedChange}
         disabled={disabled}
-        {...props}
-        ref={ref}
       >
         <StyledAnimatedView style={animatedThumbStyle}>
           <StyledSwitchThumb className={THUMB_CLASSNAME} />
         </StyledAnimatedView>
       </StyledSwitchRoot>
+      {children}
     </StyledAnimatedView>
   );
-});
-SwitchNative.displayName = "SwitchNative";
-
-const Switch = SwitchNative;
-
-export { Switch };
-export type { NativeSwitchProps as SwitchProps };
+}
+Switch.displayName = "Switch";

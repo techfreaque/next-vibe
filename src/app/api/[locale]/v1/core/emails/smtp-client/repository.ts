@@ -113,9 +113,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
 
         if (isLeadCampaign) {
           return fail({
-          message: "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                      messageParams: {
+            message:
+              "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+            messageParams: {
               campaignType: data.selectionCriteria.campaignType,
               emailJourneyVariant:
                 data.selectionCriteria.emailJourneyVariant || "null",
@@ -127,12 +128,13 @@ class SmtpRepositoryImpl implements SmtpRepository {
           });
         } else {
           return fail({
-          message: "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                      messageParams: {
+            message:
+              "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+            messageParams: {
               campaignType: data.selectionCriteria.campaignType,
             },
-      });
+          });
         }
       }
 
@@ -186,9 +188,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
     } catch (error) {
       logger.error("Critical error in email sending", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
           error: parseError(error).message,
         },
       });
@@ -244,9 +247,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
     } catch (error) {
       logger.error("Error getting total sending capacity", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.smtpClient.sending.errors.capacity.title",
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.emails.smtpClient.sending.errors.capacity.title",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
           error: parseError(error).message,
         },
       });
@@ -276,19 +280,21 @@ class SmtpRepositoryImpl implements SmtpRepository {
 
       if (!account) {
         return fail({
-          message: "app.api.v1.core.emails.smtpClient.list.errors.notFound.title",
+          message:
+            "app.api.v1.core.emails.smtpClient.list.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: {
+          messageParams: {
             accountId: data.accountId,
           },
-      });
+        });
       }
 
       const transportResult = await this.getTransport(account, logger);
       if (!transportResult.success) {
         return fail({
           message: transportResult.message,
-          errorType: transportResult.errorType || ErrorResponseTypes.EMAIL_ERROR,
+          errorType:
+            transportResult.errorType || ErrorResponseTypes.EMAIL_ERROR,
           messageParams: transportResult.messageParams,
           cause: transportResult,
         });
@@ -312,9 +318,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
       );
 
       return fail({
-          message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           error: parseError(error).message,
         },
       });
@@ -486,9 +493,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   private async getTransport(
     account: SmtpAccount,
     logger: EndpointLogger,
-  ): Promise<
-    ResponseType<Transporter<SMTPTransport.SentMessageInfo>>
-  > {
+  ): Promise<ResponseType<Transporter<SMTPTransport.SentMessageInfo>>> {
     const cacheKey = account.id;
 
     if (this.transportCache.has(cacheKey)) {
@@ -538,9 +543,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
       );
 
       return fail({
-          message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
           accountId: account.id,
           accountName: account.name,
           error: parseError(error).message,
@@ -621,14 +627,15 @@ class SmtpRepositoryImpl implements SmtpRepository {
       } catch (error) {
         const errorMessage = parseError(error).message;
         lastError = fail({
-          message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+          message:
+            "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
           errorType: ErrorResponseTypes.EMAIL_ERROR,
-                    messageParams: {
+          messageParams: {
             error: errorMessage,
             accountId: account.id,
             attempt: attempt.toString(),
           },
-      });
+        });
 
         const isRetryable = this.isRetryableError(errorMessage);
         if (!isRetryable || attempt === maxRetries) {
@@ -646,8 +653,9 @@ class SmtpRepositoryImpl implements SmtpRepository {
     return (
       lastError ||
       fail({
-          message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
+        message:
+          "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
         messageParams: {
           accountId: account.id,
         },
@@ -679,10 +687,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
         if (!rateLimitCheck.success) {
           // Convert rate limit error to proper SMTP send error
           return fail({
-          message: rateLimitCheck.message,
-          errorType: rateLimitCheck.errorType,
-          messageParams: rateLimitCheck.messageParams,
-          cause: rateLimitCheck,
+            message: rateLimitCheck.message,
+            errorType: rateLimitCheck.errorType,
+            messageParams: rateLimitCheck.messageParams,
+            cause: rateLimitCheck,
           });
         }
 
@@ -703,7 +711,8 @@ class SmtpRepositoryImpl implements SmtpRepository {
       if (!transportResult.success) {
         return fail({
           message: transportResult.message,
-          errorType: transportResult.errorType || ErrorResponseTypes.EMAIL_ERROR,
+          errorType:
+            transportResult.errorType || ErrorResponseTypes.EMAIL_ERROR,
           messageParams: transportResult.messageParams,
           cause: transportResult,
         });
@@ -744,13 +753,14 @@ class SmtpRepositoryImpl implements SmtpRepository {
         );
 
         return fail({
-          message: "app.api.v1.core.emails.smtpClient.sending.errors.rejected.title",
+          message:
+            "app.api.v1.core.emails.smtpClient.sending.errors.rejected.title",
           errorType: ErrorResponseTypes.EMAIL_ERROR,
-                    messageParams: {
+          messageParams: {
             recipient: params.to,
             reason: rejectedReason,
           },
-      });
+        });
       }
 
       // Check if no recipients were accepted
@@ -763,12 +773,13 @@ class SmtpRepositoryImpl implements SmtpRepository {
         );
 
         return fail({
-          message: "app.api.v1.core.emails.smtpClient.sending.errors.no_recipients.title",
+          message:
+            "app.api.v1.core.emails.smtpClient.sending.errors.no_recipients.title",
           errorType: ErrorResponseTypes.EMAIL_ERROR,
-                    messageParams: {
+          messageParams: {
             recipient: params.to,
           },
-      });
+        });
       }
 
       // Record email in database for rate limiting and tracking
@@ -832,9 +843,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
       }
 
       return fail({
-          message: "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+        messageParams: {
           error: parseError(error).message,
           accountId: account.id,
           accountName: account.name,
@@ -892,16 +904,17 @@ class SmtpRepositoryImpl implements SmtpRepository {
 
       if (!canSend) {
         return fail({
-          message: "app.api.v1.core.emails.smtpClient.sending.errors.rate_limit.title",
+          message:
+            "app.api.v1.core.emails.smtpClient.sending.errors.rate_limit.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: {
+          messageParams: {
             accountName: account.name,
             limit: account.rateLimitPerHour.toString(),
             current: emailsSentThisHour.toString(),
             timeWindow: "hour",
             remainingCapacity: "0",
           },
-      });
+        });
       }
 
       return success({

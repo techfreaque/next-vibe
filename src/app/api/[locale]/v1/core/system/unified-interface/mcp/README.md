@@ -461,15 +461,15 @@ This means:
 
 ## Comparison with Other Interfaces
 
-| Feature | Web API | CLI | AI Tool | MCP |
-|---------|---------|-----|---------|-----|
-| Protocol | HTTP | Terminal | Function Call | JSON-RPC |
-| Transport | Network | Process | In-Memory | STDIO |
-| Authentication | JWT/Session | CLI User | Context | CLI User |
-| Discovery | OpenAPI | Help Command | Registry | tools/list |
-| Execution | Route Handler | Route Handler | Executor | Route Handler |
-| Type Safety | Runtime | Runtime | Compile-time | Runtime |
-| Best For | Web/Mobile | Scripts | AI Streaming | AI Assistants |
+| Feature        | Web API       | CLI           | AI Tool       | MCP           |
+| -------------- | ------------- | ------------- | ------------- | ------------- |
+| Protocol       | HTTP          | Terminal      | Function Call | JSON-RPC      |
+| Transport      | Network       | Process       | In-Memory     | STDIO         |
+| Authentication | JWT/Session   | CLI User      | Context       | CLI User      |
+| Discovery      | OpenAPI       | Help Command  | Registry      | tools/list    |
+| Execution      | Route Handler | Route Handler | Executor      | Route Handler |
+| Type Safety    | Runtime       | Runtime       | Compile-time  | Runtime       |
+| Best For       | Web/Mobile    | Scripts       | AI Streaming  | AI Assistants |
 
 ## Migration Guide
 
@@ -511,10 +511,10 @@ Create a user with email john@example.com and name John Doe
 Before (TypeScript):
 
 ```typescript
-const response = await fetch('/api/v1/core/user/create', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email: 'john@example.com', name: 'John Doe' })
+const response = await fetch("/api/v1/core/user/create", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email: "john@example.com", name: "John Doe" }),
 });
 ```
 
@@ -532,10 +532,10 @@ Your AI will understand your API better with good descriptions:
 
 ```typescript
 // ❌ Bad
-description: "Creates user"
+description: "Creates user";
 
 // ✅ Good
-description: "Create a new user account with email and optional profile information"
+description: "Create a new user account with email and optional profile information";
 ```
 
 ### 2. Use Semantic Aliases
@@ -544,11 +544,11 @@ Make tools discoverable with intuitive aliases:
 
 ```typescript
 aliases: [
-  "create-user",      // Imperative
-  "user:new",         // Namespaced
-  "signup",           // User-facing term
-  "register-account"  // Alternative term
-]
+  "create-user", // Imperative
+  "user:new", // Namespaced
+  "signup", // User-facing term
+  "register-account", // Alternative term
+];
 ```
 
 ### 3. Provide Examples
@@ -571,16 +571,12 @@ Rich descriptions improve AI understanding:
 
 ```typescript
 objectField({
-  email: inputField(
-    { type: WidgetType.TEXT },
-    z.string().email(),
-    {
-      title: "Email Address",
-      description: "User's email address for login and notifications",
-      placeholder: "user@example.com"
-    }
-  )
-})
+  email: inputField({ type: WidgetType.TEXT }, z.string().email(), {
+    title: "Email Address",
+    description: "User's email address for login and notifications",
+    placeholder: "user@example.com",
+  }),
+});
 ```
 
 ### 5. Handle Errors Gracefully

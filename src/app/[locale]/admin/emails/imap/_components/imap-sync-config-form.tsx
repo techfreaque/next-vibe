@@ -22,7 +22,7 @@ export function ImapSyncConfigForm({
   control,
 }: ImapSyncConfigFormProps): JSX.Element {
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <EndpointFormField
         name="syncEnabled"
         config={{

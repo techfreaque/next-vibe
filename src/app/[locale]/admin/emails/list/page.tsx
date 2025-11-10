@@ -35,7 +35,7 @@ export default async function EmailsListPage({
   const { locale } = await params;
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* List Content */}
       <EmailsListClient locale={locale} />
     </div>

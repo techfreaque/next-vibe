@@ -1,12 +1,12 @@
 {
-    "recommendations": [
-        "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
-        "davidanson.vscode-markdownlint",
-        "typescriptteam.native-preview",
-        "oxc.oxc-vscode",
-        "oven.bun-vscode",
-        "bradlc.vscode-tailwindcss",
-        "bourhaouta.tailwindshades",
-        "formulahendry.auto-rename-tag"
-    ]
+  "recommendations": [
+    "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
+    "davidanson.vscode-markdownlint",
+    "typescriptteam.native-preview",
+    "oxc.oxc-vscode",
+    "oven.bun-vscode",
+    "bradlc.vscode-tailwindcss",
+    "bourhaouta.tailwindshades",
+    "formulahendry.auto-rename-tag"
+  ]
 }

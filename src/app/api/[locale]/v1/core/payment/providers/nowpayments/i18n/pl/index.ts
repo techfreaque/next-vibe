@@ -29,7 +29,8 @@ export const translations = {
     },
     planCreationFailed: {
       title: "Tworzenie planu nie powiodło się",
-      description: "Nie udało się utworzyć planu subskrypcji NOWPayments: {error}",
+      description:
+        "Nie udało się utworzyć planu subskrypcji NOWPayments: {error}",
     },
     subscriptionCreationFailed: {
       title: "Tworzenie subskrypcji nie powiodło się",
@@ -45,15 +46,18 @@ export const translations = {
     },
     subscriptionListFailed: {
       title: "Pobieranie listy subskrypcji nie powiodło się",
-      description: "Nie udało się pobrać listy subskrypcji NOWPayments: {error}",
+      description:
+        "Nie udało się pobrać listy subskrypcji NOWPayments: {error}",
     },
     webhookVerificationFailed: {
       title: "Weryfikacja webhooka nie powiodła się",
-      description: "Nie udało się zweryfikować podpisu webhooka NOWPayments: {error}",
+      description:
+        "Nie udało się zweryfikować podpisu webhooka NOWPayments: {error}",
     },
     paymentStatusFailed: {
       title: "Pobieranie statusu płatności nie powiodło się",
-      description: "Nie udało się pobrać statusu płatności z NOWPayments: {error}",
+      description:
+        "Nie udało się pobrać statusu płatności z NOWPayments: {error}",
     },
   },
 

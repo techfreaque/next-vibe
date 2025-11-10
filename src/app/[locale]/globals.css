@@ -71,7 +71,6 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
-
   *,
   ::after,
   ::before,
@@ -406,7 +405,6 @@ html {
 }
 
 @media (min-width: 768px) {
-
   /* Tailwind's md breakpoint */
   html {
     scroll-padding-top: 5rem;

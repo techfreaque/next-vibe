@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Eye, Mail, MousePointer } from 'next-vibe-ui/ui/icons';
+import { Eye, Mail, MousePointer } from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import {
@@ -75,9 +75,9 @@ export function EmailsListTable({
 
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="flex items-center space-x-4">
+          <div key={i} className="flex items-center flex flex-row gap-4">
             <Skeleton className="h-4 w-48" />
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-4 w-24" />
@@ -103,7 +103,7 @@ export function EmailsListTable({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <Table>
         <TableHeader>
           <TableRow>
@@ -134,7 +134,7 @@ export function EmailsListTable({
                 </div>
               </TableCell>
               <TableCell>
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1">
                   <div className="text-sm font-medium">
                     {email.emailParties.recipient.recipientEmail}
                   </div>

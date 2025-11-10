@@ -14,7 +14,7 @@ import {
   Shield,
   Users,
   X,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Span } from "next-vibe-ui/ui/span";
@@ -126,7 +126,7 @@ export function AdminLayoutClient({
               <X className="h-6 w-6" />
             </Button>
           </Div>
-          <nav className="flex-1 space-y-1 px-2 py-4">
+          <nav className="flex-1 flex flex-col gap-1 px-2 py-4">
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -163,7 +163,7 @@ export function AdminLayoutClient({
               {t("app.admin.components.navigation.adminPanel")}
             </Span>
           </Div>
-          <nav className="flex-1 space-y-1 px-2 py-4">
+          <nav className="flex-1 flex flex-col gap-1 px-2 py-4">
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -229,7 +229,7 @@ export function AdminLayoutClient({
               </H1>
             </Div>
 
-            <Div className="flex items-center space-x-4">
+            <Div className="flex items-center flex flex-row gap-4">
               {/* Theme toggle */}
               <ThemeToggle locale={locale} />
 

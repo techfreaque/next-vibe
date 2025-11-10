@@ -2,11 +2,27 @@
 "use client";
 import type { JSX } from "react";
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "next-vibe-ui/ui/card";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "next-vibe-ui/ui/accordion";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "next-vibe-ui/ui/collapsible";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "next-vibe-ui/ui/accordion";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "next-vibe-ui/ui/collapsible";
 import { Section } from "next-vibe-ui/ui/section";
 import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
@@ -90,15 +106,11 @@ export function LayoutsPreview(): JSX.Element {
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1">
                 <AccordionTrigger>Section 1</AccordionTrigger>
-                <AccordionContent>
-                  Content for section 1.
-                </AccordionContent>
+                <AccordionContent>Content for section 1.</AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-2">
                 <AccordionTrigger>Section 2</AccordionTrigger>
-                <AccordionContent>
-                  Content for section 2.
-                </AccordionContent>
+                <AccordionContent>Content for section 2.</AccordionContent>
               </AccordionItem>
             </Accordion>
           </Div>

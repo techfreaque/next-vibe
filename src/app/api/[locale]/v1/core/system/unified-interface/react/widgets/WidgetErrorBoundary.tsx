@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle } from 'next-vibe-ui/ui/icons';
+import { AlertTriangle } from "next-vibe-ui/ui/icons";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import React, { Component, type ErrorInfo, type ReactNode } from "react";
 
@@ -76,15 +76,21 @@ export class WidgetErrorBoundary extends Component<
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>
-            {t("app.api.v1.core.system.unifiedInterface.react.widgets.errorBoundary.title")}
+            {t(
+              "app.api.v1.core.system.unifiedInterface.react.widgets.errorBoundary.title",
+            )}
           </AlertTitle>
           <AlertDescription>
             {this.state.error?.message ||
-              t("app.api.v1.core.system.unifiedInterface.react.widgets.errorBoundary.defaultMessage")}
+              t(
+                "app.api.v1.core.system.unifiedInterface.react.widgets.errorBoundary.defaultMessage",
+              )}
             {this.state.errorInfo && (
               <details className="mt-2 text-xs">
                 <summary className="cursor-pointer">
-                  {t("app.api.v1.core.system.unifiedInterface.react.widgets.errorBoundary.errorDetails")}
+                  {t(
+                    "app.api.v1.core.system.unifiedInterface.react.widgets.errorBoundary.errorDetails",
+                  )}
                 </summary>
                 <pre className="mt-2 overflow-auto p-2 bg-muted rounded">
                   {this.state.errorInfo.componentStack}

@@ -16,7 +16,8 @@ export const translations = {
     permissions: {
       publicUsersCannotAccess:
         "Public users cannot access this authenticated endpoint",
-      insufficientPermissions: "Insufficient permissions to access this endpoint",
+      insufficientPermissions:
+        "Insufficient permissions to access this endpoint",
     },
   },
 };

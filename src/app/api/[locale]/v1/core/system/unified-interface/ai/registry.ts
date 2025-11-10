@@ -164,7 +164,8 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
     if (!endpoint) {
       return {
         success: false,
-        error: "app.api.v1.core.system.unifiedInterface.aiTool.errors.toolNotFound",
+        error:
+          "app.api.v1.core.system.unifiedInterface.aiTool.errors.toolNotFound",
         metadata: {
           executionTime: 0,
           endpointPath: "",

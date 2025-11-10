@@ -19,7 +19,7 @@ import {
   TrendingUp,
   UserCheck,
   UserX,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
@@ -83,7 +83,7 @@ export function EmailsStatsClient({
   // Loading state
   if (isLoading) {
     return (
-      <Div className="space-y-6">
+      <Div className="flex flex-col gap-6">
         {/* Filters Skeleton */}
         <Card>
           <CardHeader>
@@ -102,7 +102,7 @@ export function EmailsStatsClient({
         <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <Card key={i}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-4 w-4" />
               </CardHeader>
@@ -118,7 +118,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-32" />
-            <Div className="flex space-x-2 mt-4">
+            <Div className="flex flex flex-row gap-2 mt-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-8 w-20" />
               ))}
@@ -133,7 +133,7 @@ export function EmailsStatsClient({
   }
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Filters */}
       <EmailStatsFiltersContainer
         locale={locale}
@@ -150,7 +150,7 @@ export function EmailsStatsClient({
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.totalEmails")}
             </CardTitle>
@@ -169,7 +169,7 @@ export function EmailsStatsClient({
 
         {/* Delivered Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.metrics.deliveredEmails")}
             </CardTitle>
@@ -188,7 +188,7 @@ export function EmailsStatsClient({
 
         {/* Opened Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.openedEmails")}
             </CardTitle>
@@ -207,7 +207,7 @@ export function EmailsStatsClient({
 
         {/* Clicked Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.clickedEmails")}
             </CardTitle>
@@ -226,7 +226,7 @@ export function EmailsStatsClient({
 
         {/* Bounced Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.bouncedEmails")}
             </CardTitle>
@@ -245,7 +245,7 @@ export function EmailsStatsClient({
 
         {/* Failed Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.failedEmails")}
             </CardTitle>
@@ -264,7 +264,7 @@ export function EmailsStatsClient({
 
         {/* Draft Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.draftEmails")}
             </CardTitle>
@@ -285,7 +285,7 @@ export function EmailsStatsClient({
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Emails with User ID */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.metrics.emailsWithUserId")}
             </CardTitle>
@@ -306,7 +306,7 @@ export function EmailsStatsClient({
 
         {/* Emails with Lead ID */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.metrics.emailsWithLeadId")}
             </CardTitle>
@@ -327,7 +327,7 @@ export function EmailsStatsClient({
 
         {/* Emails with Errors */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.metrics.emailsWithErrors")}
             </CardTitle>
@@ -348,7 +348,7 @@ export function EmailsStatsClient({
 
         {/* Average Retry Count */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t(
                 "app.admin.emails.stats.admin.stats.metrics.averageRetryCount",
@@ -372,7 +372,7 @@ export function EmailsStatsClient({
       <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Average Processing Time */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t(
                 "app.admin.emails.stats.admin.stats.metrics.averageProcessingTime",
@@ -394,7 +394,7 @@ export function EmailsStatsClient({
 
         {/* Average Delivery Time */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t(
                 "app.admin.emails.stats.admin.stats.metrics.averageDeliveryTime",
@@ -416,7 +416,7 @@ export function EmailsStatsClient({
       </Div>
 
       {/* Detailed Analytics with Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs defaultValue="overview" className="flex flex-col gap-4">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">
             {t("app.admin.emails.stats.admin.stats.tabs.overview")}
@@ -432,7 +432,7 @@ export function EmailsStatsClient({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="overview" className="flex flex-col gap-4">
           {/* Historical Chart */}
           {stats?.historicalData && (
             <EmailStatsChart
@@ -444,7 +444,7 @@ export function EmailsStatsClient({
           )}
         </TabsContent>
 
-        <TabsContent value="performance" className="space-y-4">
+        <TabsContent value="performance" className="flex flex-col gap-4">
           <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Performance Metrics */}
             <Card>
@@ -454,8 +454,8 @@ export function EmailsStatsClient({
                   {t("app.admin.emails.stats.admin.stats.performance.title")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <Div className="space-y-3">
+              <CardContent className="flex flex-col gap-4">
+                <Div className="flex flex-col gap-3">
                   <Div className="flex items-center justify-between">
                     <Span className="text-sm font-medium">
                       {t(
@@ -511,7 +511,7 @@ export function EmailsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   {stats?.topPerformingTemplates &&
                   Array.isArray(stats.topPerformingTemplates) &&
                   stats.topPerformingTemplates.length > 0 ? (
@@ -525,7 +525,7 @@ export function EmailsStatsClient({
                         },
                         index: number,
                       ) => (
-                        <Div key={index} className="space-y-2">
+                        <Div key={index} className="flex flex-col gap-2">
                           <Div className="flex items-center justify-between">
                             <Span className="text-sm font-medium">
                               {template.templateName}
@@ -565,7 +565,7 @@ export function EmailsStatsClient({
           </Div>
         </TabsContent>
 
-        <TabsContent value="distribution" className="space-y-4">
+        <TabsContent value="distribution" className="flex flex-col gap-4">
           <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Status Distribution */}
             <Card>
@@ -576,13 +576,13 @@ export function EmailsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   {stats?.emailsByStatus &&
                   typeof stats.emailsByStatus === "object" &&
                   Object.keys(stats.emailsByStatus).length > 0 ? (
                     Object.entries(stats.emailsByStatus).map(
                       ([status, count], index) => (
-                        <Div key={index} className="space-y-2">
+                        <Div key={index} className="flex flex-col gap-2">
                           <Div className="flex items-center justify-between">
                             <Span className="text-sm font-medium capitalize">
                               {((): string => {
@@ -665,13 +665,13 @@ export function EmailsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   {stats?.emailsByType &&
                   typeof stats.emailsByType === "object" &&
                   Object.keys(stats.emailsByType).length > 0 ? (
                     Object.entries(stats.emailsByType).map(
                       ([type, count], index) => (
-                        <Div key={index} className="space-y-2">
+                        <Div key={index} className="flex flex-col gap-2">
                           <Div className="flex items-center justify-between">
                             <Span className="text-sm font-medium capitalize">
                               {((): string => {
@@ -729,7 +729,7 @@ export function EmailsStatsClient({
           </Div>
         </TabsContent>
 
-        <TabsContent value="providers" className="space-y-4">
+        <TabsContent value="providers" className="flex flex-col gap-4">
           <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Provider Performance */}
             <Card>
@@ -740,7 +740,7 @@ export function EmailsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   {stats?.topPerformingProviders &&
                   Array.isArray(stats.topPerformingProviders) &&
                   stats.topPerformingProviders.length > 0 ? (
@@ -756,7 +756,7 @@ export function EmailsStatsClient({
                         },
                         index: number,
                       ) => (
-                        <Div key={index} className="space-y-2">
+                        <Div key={index} className="flex flex-col gap-2">
                           <Div className="flex items-center justify-between">
                             <Span className="text-sm font-medium capitalize">
                               {provider.provider}
@@ -805,7 +805,7 @@ export function EmailsStatsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-3">
+                <Div className="flex flex-col gap-3">
                   {stats?.recentActivity &&
                   Array.isArray(stats.recentActivity) &&
                   stats.recentActivity.length > 0 ? (
@@ -823,7 +823,7 @@ export function EmailsStatsClient({
                           key={index}
                           className="flex items-center justify-between"
                         >
-                          <Div className="space-y-1">
+                          <Div className="flex flex-col gap-1">
                             <P className="text-sm font-medium">
                               {(activity.details?.subject as string) ||
                                 activity.templateName ||

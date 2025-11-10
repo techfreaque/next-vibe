@@ -108,8 +108,8 @@ async function executeImapSync(
         error: syncResult.message,
       });
       return fail({
-          message: "app.api.v1.core.emails.error.default",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.emails.error.default",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   } catch (error) {
@@ -121,8 +121,8 @@ async function executeImapSync(
     });
 
     return fail({
-          message: "app.api.v1.core.emails.error.default",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      message: "app.api.v1.core.emails.error.default",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
 }
@@ -148,14 +148,14 @@ function validateImapSync(
       return success(validationResult.data.isValid);
     } else {
       return fail({
-          message: "app.api.v1.core.emails.error.default",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.emails.error.default",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   } catch {
     return fail({
-          message: "app.api.v1.core.emails.error.default",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      message: "app.api.v1.core.emails.error.default",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
 }
@@ -201,8 +201,8 @@ const imapSyncTask: Task = {
 
     if (!result.success) {
       return fail({
-          message: "app.api.v1.core.emails.error.default",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.emails.error.default",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
     // Returns void implicitly on success

@@ -37,8 +37,7 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um Berechtigungen zu prüfen",
+        description: "Sie müssen angemeldet sein, um Berechtigungen zu prüfen",
       },
       forbidden: {
         title: "Verboten",

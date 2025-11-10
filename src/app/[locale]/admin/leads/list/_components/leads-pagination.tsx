@@ -10,7 +10,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";

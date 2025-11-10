@@ -50,7 +50,7 @@ export interface ProductDefinition {
   isSubscription: boolean;
   allowedIntervals: PaymentInterval[];
   credits: number;
-  status?: "active" | "deprecated";
+  status: "active" | "deprecated";
   deprecatedAt?: Date;
   replacedBy?: ProductIds;
 }
@@ -87,10 +87,10 @@ const productDefinitions = {
     name: "app.api.v1.core.products.free.name" as const,
     description: "app.api.v1.core.products.free.description" as const,
     priceByCountry: {
-      DE: { price: 0, currency: "EUR" },
-      PL: { price: 0, currency: "PLN" },
-      US: { price: 0, currency: "USD" },
-      GLOBAL: { price: 0, currency: "USD" },
+      DE: { price: 0, currency: "EUR" as const },
+      PL: { price: 0, currency: "PLN" as const },
+      US: { price: 0, currency: "USD" as const },
+      GLOBAL: { price: 0, currency: "USD" as const },
     },
     credits: 20,
     isSubscription: true,
@@ -101,16 +101,16 @@ const productDefinitions = {
     name: "app.api.v1.core.products.subscription.name" as const,
     description: "app.api.v1.core.products.subscription.description" as const,
     priceByCountry: {
-      DE: { price: 10, currency: "EUR" },
-      PL: { price: 70, currency: "PLN" },
-      US: { price: 10, currency: "USD" },
-      GLOBAL: { price: 10, currency: "USD" },
+      DE: { price: 10, currency: "EUR" as const },
+      PL: { price: 70, currency: "PLN" as const },
+      US: { price: 10, currency: "USD" as const },
+      GLOBAL: { price: 10, currency: "USD" as const },
     },
     yearlyPriceByCountry: {
-      DE: { price: 100, currency: "EUR" },
-      PL: { price: 700, currency: "PLN" },
-      US: { price: 100, currency: "USD" },
-      GLOBAL: { price: 100, currency: "USD" },
+      DE: { price: 100, currency: "EUR" as const },
+      PL: { price: 700, currency: "PLN" as const },
+      US: { price: 100, currency: "USD" as const },
+      GLOBAL: { price: 100, currency: "USD" as const },
     },
     credits: 1000,
     isSubscription: true,
@@ -121,23 +121,23 @@ const productDefinitions = {
     name: "app.api.v1.core.products.creditPack.name" as const,
     description: "app.api.v1.core.products.creditPack.description" as const,
     priceByCountry: {
-      DE: { price: 5, currency: "EUR" },
-      PL: { price: 5, currency: "PLN" },
-      US: { price: 5, currency: "USD" },
-      GLOBAL: { price: 5, currency: "USD" },
+      DE: { price: 5, currency: "EUR" as const },
+      PL: { price: 5, currency: "PLN" as const },
+      US: { price: 5, currency: "USD" as const },
+      GLOBAL: { price: 5, currency: "USD" as const },
     },
     oneTimePriceByCountry: {
-      DE: { price: 5, currency: "EUR" },
-      PL: { price: 40, currency: "PLN" },
-      US: { price: 5, currency: "USD" },
-      GLOBAL: { price: 5, currency: "USD" },
+      DE: { price: 5, currency: "EUR" as const },
+      PL: { price: 40, currency: "PLN" as const },
+      US: { price: 5, currency: "USD" as const },
+      GLOBAL: { price: 5, currency: "USD" as const },
     },
     credits: 500,
     isSubscription: false,
     allowedIntervals: ["one_time" as const],
     status: "active" as const,
   },
-} as const satisfies Record<ProductIds, ProductDefinition>;
+};
 
 /**
  * Products Repository Interface
@@ -226,8 +226,12 @@ export class ProductsRepositoryImpl implements ProductsRepository {
       credits: definition.credits,
       country,
       status: definition.status || "active",
-      deprecatedAt: ("deprecatedAt" in definition ? definition.deprecatedAt : undefined) as Date | undefined,
-      replacedBy: ("replacedBy" in definition ? definition.replacedBy : undefined) as ProductIds | undefined,
+      deprecatedAt: ("deprecatedAt" in definition
+        ? definition.deprecatedAt
+        : undefined) as Date | undefined,
+      replacedBy: ("replacedBy" in definition
+        ? definition.replacedBy
+        : undefined) as ProductIds | undefined,
     };
   }
 
@@ -258,7 +262,9 @@ export class ProductsRepositoryImpl implements ProductsRepository {
    */
   isDeprecated(productId: ProductIds): boolean {
     const definition = productDefinitions[productId];
-    return definition.status === "deprecated";
+    // Type widening: definition.status is inferred as "active" literal from const context
+    // but architecturally it represents the union "active" | "deprecated"
+    return (definition.status as "active" | "deprecated") === "deprecated";
   }
 
   /**
@@ -266,7 +272,9 @@ export class ProductsRepositoryImpl implements ProductsRepository {
    */
   getReplacementProduct(productId: ProductIds): ProductIds | null {
     const definition = productDefinitions[productId];
-    return ("replacedBy" in definition ? definition.replacedBy || null : null) as ProductIds | null;
+    return (
+      "replacedBy" in definition ? definition.replacedBy || null : null
+    ) as ProductIds | null;
   }
 
   /**

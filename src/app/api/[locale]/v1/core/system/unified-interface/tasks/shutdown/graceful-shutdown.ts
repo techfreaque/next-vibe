@@ -77,7 +77,8 @@ export class GracefulShutdownManager {
 
     // Handle unhandled promise rejections
     process.on("unhandledRejection", (reason: Error | string) => {
-      const errorMessage = typeof reason === "string" ? reason : reason.message || String(reason);
+      const errorMessage =
+        typeof reason === "string" ? reason : reason.message || String(reason);
       logger.error("💥 Unhandled promise rejection:", errorMessage);
       void this.initiateShutdown("UNHANDLED_REJECTION");
     });

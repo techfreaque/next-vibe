@@ -230,7 +230,8 @@ export const translations: typeof enTranslations = {
           },
           insights: {
             title: "Na zawsze darmowe",
-            description: "{{freeCredits}} kredytów miesięcznie, wszystkie modele, wszystkie typy folderów",
+            description:
+              "{{freeCredits}} kredytów miesięcznie, wszystkie modele, wszystkie typy folderów",
           },
         },
         contentCreation: {

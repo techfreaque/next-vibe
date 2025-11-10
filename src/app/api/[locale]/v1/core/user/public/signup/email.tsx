@@ -163,9 +163,9 @@ export const renderRegisterMail: EmailFunctionType<
   );
   if (!userResponse.success) {
     return fail({
-          message: "app.api.v1.core.user.errors.not_found",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                messageParams: { email: requestData.personalInfo.email },
+      message: "app.api.v1.core.user.errors.not_found",
+      errorType: ErrorResponseTypes.NOT_FOUND,
+      messageParams: { email: requestData.personalInfo.email },
       cause: userResponse,
     });
   }
@@ -365,47 +365,45 @@ function renderAdminNotificationEmailContent(
             )}
           </Text>
 
-            {
-              requestData.subscribeToNewsletter !== undefined && (
-                <Text
-                  style={{
-                    fontSize: "14px",
-                    marginBottom: "6px",
-                    color: "#4b5563",
-                    lineHeight: "1.5",
-                  }}
-                >
-                  <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                    {t(
-                      "app.api.v1.core.user.public.signup.admin_notification.newsletter",
+          {requestData.subscribeToNewsletter !== undefined && (
+            <Text
+              style={{
+                fontSize: "14px",
+                marginBottom: "6px",
+                color: "#4b5563",
+                lineHeight: "1.5",
+              }}
+            >
+              <Text style={{ fontWeight: "700", color: "#1f2937" }}>
+                {t(
+                  "app.api.v1.core.user.public.signup.admin_notification.newsletter",
+                )}
+                :
+              </Text>{" "}
+              <span
+                style={{
+                  backgroundColor: requestData.subscribeToNewsletter
+                    ? "#dcfce7"
+                    : "#fee2e2",
+                  color: requestData.subscribeToNewsletter
+                    ? "#166534"
+                    : "#991b1b",
+                  padding: "2px 8px",
+                  borderRadius: "4px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                }}
+              >
+                {requestData.subscribeToNewsletter
+                  ? t(
+                      "app.api.v1.core.user.public.signup.admin_notification.subscribed",
+                    )
+                  : t(
+                      "app.api.v1.core.user.public.signup.admin_notification.not_subscribed",
                     )}
-                    :
-                  </Text>{" "}
-                  <span
-                    style={{
-                      backgroundColor: requestData.subscribeToNewsletter
-                        ? "#dcfce7"
-                        : "#fee2e2",
-                      color: requestData.subscribeToNewsletter
-                        ? "#166534"
-                        : "#991b1b",
-                      padding: "2px 8px",
-                      borderRadius: "4px",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                    }}
-                  >
-                    {requestData.subscribeToNewsletter
-                      ? t(
-                        "app.api.v1.core.user.public.signup.admin_notification.subscribed",
-                      )
-                      : t(
-                        "app.api.v1.core.user.public.signup.admin_notification.not_subscribed",
-                      )}
-                  </span>
-                </Text>
-              )
-            }
+              </span>
+            </Text>
+          )}
         </div>
 
         {/* Signup Details */}
@@ -511,10 +509,9 @@ function renderAdminNotificationEmailContent(
           paddingTop: "16px",
         }}
       >
-        {
-          t("app.api.v1.core.user.public.signup.admin_notification.footer", {
-            appName: t("config.appName"),
-          })}
+        {t("app.api.v1.core.user.public.signup.admin_notification.footer", {
+          appName: t("config.appName"),
+        })}
       </Text>
     </EmailTemplate>
   );
@@ -537,9 +534,9 @@ export const renderAdminSignupNotification: EmailFunctionType<
   );
   if (!userResponse.success) {
     return fail({
-          message: "app.api.v1.core.user.errors.not_found",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                messageParams: { email: requestData.personalInfo.email },
+      message: "app.api.v1.core.user.errors.not_found",
+      errorType: ErrorResponseTypes.NOT_FOUND,
+      messageParams: { email: requestData.personalInfo.email },
       cause: userResponse,
     });
   }

@@ -5,14 +5,9 @@
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "skipLibCheck": true,
-    "types": [
-      "node",
-      "jest"
-    ],
+    "types": ["node", "jest"],
     "paths": {
-      "release-tool": [
-        "../release-tool/src/*"
-      ]
+      "release-tool": ["../release-tool/src/*"]
     },
     "noEmitOnError": true,
     "removeComments": false,
@@ -44,10 +39,5 @@
     "suppressImplicitAnyIndexErrors": false,
     "noStrictGenericChecks": false
   },
-  "include": [
-    "src",
-    "test-files",
-    "vitest.config.ts",
-    "release.config.ts"
-  ]
+  "include": ["src", "test-files", "vitest.config.ts", "release.config.ts"]
 }

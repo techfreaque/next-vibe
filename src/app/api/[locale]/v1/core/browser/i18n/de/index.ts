@@ -4,9 +4,11 @@
 
 export const translations = {
   title: "Chrome DevTools MCP Tools",
-  description: "Chrome DevTools MCP Tools für Browser-Automatisierung und Debugging ausführen",
+  description:
+    "Chrome DevTools MCP Tools für Browser-Automatisierung und Debugging ausführen",
   category: "Core API",
-  summary: "Zugriff auf Chrome DevTools Protocol Tools über MCP für Web-Automatisierung",
+  summary:
+    "Zugriff auf Chrome DevTools Protocol Tools über MCP für Web-Automatisierung",
   tags: {
     browserAutomation: "Browser-Automatisierung",
     chromeDevTools: "Chrome DevTools",
@@ -17,7 +19,8 @@ export const translations = {
 
   form: {
     label: "Browser Tool Ausführung",
-    description: "Chrome DevTools MCP Tools für Browser-Steuerung und Analyse ausführen",
+    description:
+      "Chrome DevTools MCP Tools für Browser-Steuerung und Analyse ausführen",
     fields: {
       tool: {
         label: "Tool",
@@ -136,11 +139,13 @@ export const translations = {
   errors: {
     toolExecutionFailed: {
       title: "Tool-Ausführung fehlgeschlagen",
-      description: "Das ausgewählte Tool konnte nicht erfolgreich ausgeführt werden",
+      description:
+        "Das ausgewählte Tool konnte nicht erfolgreich ausgeführt werden",
     },
     invalidArguments: {
       title: "Ungültige Argumente",
-      description: "Die bereitgestellten Argumente sind für dieses Tool nicht gültig",
+      description:
+        "Die bereitgestellten Argumente sind für dieses Tool nicht gültig",
     },
     browserNotAvailable: {
       title: "Browser nicht verfügbar",
@@ -152,7 +157,8 @@ export const translations = {
     },
     validation: {
       title: "Validierungsfehler",
-      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description:
+        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
       toolRequired: "Tool-Auswahl ist erforderlich",
       argumentsInvalid: "Argumente müssen gültiges JSON sein",
     },
@@ -174,15 +180,18 @@ export const translations = {
     },
     serverError: {
       title: "Serverfehler",
-      description: "Bei der Tool-Ausführung ist ein interner Serverfehler aufgetreten",
+      description:
+        "Bei der Tool-Ausführung ist ein interner Serverfehler aufgetreten",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description: "Bei der Tool-Ausführung ist ein unbekannter Fehler aufgetreten",
+      description:
+        "Bei der Tool-Ausführung ist ein unbekannter Fehler aufgetreten",
     },
     unsavedChanges: {
       title: "Ungespeicherte Änderungen",
-      description: "Sie haben ungespeicherte Änderungen, die verloren gehen könnten",
+      description:
+        "Sie haben ungespeicherte Änderungen, die verloren gehen könnten",
     },
     conflict: {
       title: "Konflikt",

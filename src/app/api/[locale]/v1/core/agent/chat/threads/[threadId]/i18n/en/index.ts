@@ -174,7 +174,8 @@ export const translations = {
     },
     published: {
       label: "Published",
-      description: "Make this thread publicly accessible via link (SHARED folders only)",
+      description:
+        "Make this thread publicly accessible via link (SHARED folders only)",
     },
     response: {
       thread: {

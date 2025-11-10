@@ -1,6 +1,5 @@
 import * as ProgressPrimitive from "@rn-primitives/progress";
 import * as React from "react";
-import { Platform, View as RNView } from "react-native";
 import Animated, {
   Extrapolation,
   interpolate,
@@ -9,41 +8,45 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
-import type { ProgressProps } from "@/packages/next-vibe-ui/web/ui/progress";
-import type { ViewPropsWithClassName } from "../lib/types";
 import { cn } from "next-vibe/shared/utils/utils";
 
-// Type-safe View component with className support for NativeWind
-const View = RNView as React.ComponentType<ViewPropsWithClassName>;
+// Import ALL types from web - ZERO definitions here
+import type {
+  ProgressRootProps,
+  ProgressIndicatorProps,
+} from "@/packages/next-vibe-ui/web/ui/progress";
 
-const Progress = React.forwardRef<ProgressPrimitive.RootRef, ProgressProps>(
-  function Progress({ className, indicatorClassName, value, max }, ref) {
-    return (
-      <ProgressPrimitive.Root
-        ref={ref}
-        className={cn(
-          "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
-          className,
-        )}
-        value={value ?? undefined}
-        max={max}
-      >
-        <Indicator value={value} className={indicatorClassName} />
-      </ProgressPrimitive.Root>
-    );
-  },
-);
+const StyledProgressRoot = ProgressPrimitive.Root;
+const StyledProgressIndicator = ProgressPrimitive.Indicator;
+
+function Progress({
+  className,
+  value,
+  max,
+  getValueLabel,
+  children,
+}: ProgressRootProps): React.JSX.Element {
+  return (
+    <StyledProgressRoot
+      className={cn(
+        "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
+        className,
+      )}
+      value={value ?? undefined}
+      max={max}
+      getValueLabel={getValueLabel}
+    >
+      {children ?? <ProgressIndicator value={value} />}
+    </StyledProgressRoot>
+  );
+}
 Progress.displayName = ProgressPrimitive.Root.displayName;
 
-export { Progress };
-
-function Indicator({
-  value,
+function ProgressIndicator({
   className,
-}: {
-  value: number | undefined | null;
-  className?: string;
-}): React.JSX.Element {
+  value,
+  ...props
+}: ProgressIndicatorProps): React.JSX.Element {
   const progress = useDerivedValue(() => value ?? 0);
 
   const indicator = useAnimatedStyle(() => {
@@ -55,30 +58,16 @@ function Indicator({
     };
   });
 
-  if (Platform.OS === "web") {
-    return (
-      <ProgressPrimitive.Indicator
-        asChild
-        className={cn(
-          "h-full w-full flex-1 bg-primary transition-all",
-          className,
-        )}
-      >
-        <View
-          style={{
-            transform: `translateX(-${100 - (value ?? 0)}%)`,
-          }}
-        />
-      </ProgressPrimitive.Indicator>
-    );
-  }
-
   return (
-    <ProgressPrimitive.Indicator
+    <StyledProgressIndicator
       asChild
       className={cn("h-full bg-foreground", className)}
+      {...props}
     >
       <Animated.View style={indicator} />
-    </ProgressPrimitive.Indicator>
+    </StyledProgressIndicator>
   );
 }
+ProgressIndicator.displayName = ProgressPrimitive.Indicator.displayName;
+
+export { Progress, ProgressIndicator };

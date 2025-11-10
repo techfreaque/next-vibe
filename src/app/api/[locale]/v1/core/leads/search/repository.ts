@@ -100,8 +100,8 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
     if (!searchResult.success || !searchResult.data) {
       logger.error("Failed to search leads");
       return fail({
-          message: "app.api.v1.core.leads.list.get.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.leads.list.get.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
 

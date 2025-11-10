@@ -297,7 +297,7 @@ export function createTRPCProceduresFromRouteExports(routeExports: {
       string,
       Methods,
       readonly (typeof UserRoleValue)[],
-       UnifiedField<z.ZodTypeAny>,
+      UnifiedField<z.ZodTypeAny>,
       any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
       any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
       any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Complex tRPC generic requires flexible type parameters
@@ -409,7 +409,9 @@ export interface RouteFileStructure {
 /**
  * Utility to validate that a route file has the correct structure for tRPC conversion
  */
-export function validateRouteFileForTRPC(routeFile: RouteFileStructure & Record<string, unknown>): {
+export function validateRouteFileForTRPC(
+  routeFile: RouteFileStructure & Record<string, unknown>,
+): {
   isValid: boolean;
   errors: string[];
   warnings: string[];

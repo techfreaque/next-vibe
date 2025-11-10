@@ -18,7 +18,7 @@ import {
   TrendingUp,
   Users,
   Zap,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import {
   objectEntries,
   objectEntriesNumericEnum,
@@ -157,7 +157,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
   if (isLoading) {
     return (
-      <Div className="space-y-6">
+      <Div className="flex flex-col gap-6">
         {/* Filters Skeleton */}
         <Card>
           <CardHeader>
@@ -176,7 +176,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
         <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
             <Card key={i}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-4 w-4" />
               </CardHeader>
@@ -192,7 +192,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-32" />
-            <Div className="flex space-x-2 mt-4">
+            <Div className="flex flex flex-row gap-2 mt-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-8 w-20" />
               ))}
@@ -207,7 +207,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
   }
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Filters */}
       <CronStatsFiltersContainer
         locale={locale}
@@ -221,7 +221,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Executions */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.totalExecutions")}
             </CardTitle>
@@ -242,7 +242,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* Success Rate */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.successRate")}
             </CardTitle>
@@ -263,7 +263,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* Active Tasks */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.activeTasks")}
             </CardTitle>
@@ -286,7 +286,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* System Performance */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.systemLoad")}
             </CardTitle>
@@ -310,7 +310,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Failed Executions */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.failedExecutions")}
             </CardTitle>
@@ -329,7 +329,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* Average Execution Time */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.avgExecutionTime")}
             </CardTitle>
@@ -351,7 +351,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* Healthy Tasks */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.healthyTasks")}
             </CardTitle>
@@ -370,7 +370,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* Queue Status */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.queueStatus")}
             </CardTitle>
@@ -389,7 +389,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
       </Div>
 
       {/* Comprehensive Analytics Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs defaultValue="overview" className="flex flex-col gap-4">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">
             {t("app.admin.cron.stats.tabs.overview")}
@@ -408,7 +408,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="overview" className="flex flex-col gap-4">
           <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Execution Trends */}
             {stats?.historicalData && (
@@ -442,7 +442,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
           </Div>
         </TabsContent>
 
-        <TabsContent value="performance" className="space-y-4">
+        <TabsContent value="performance" className="flex flex-col gap-4">
           <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Performance Metrics */}
             <Card>
@@ -452,8 +452,8 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                   {t("app.admin.cron.stats.performanceMetrics")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <Div className="space-y-3">
+              <CardContent className="flex flex-col gap-4">
+                <Div className="flex flex-col gap-3">
                   <Div className="flex items-center justify-between">
                     <Span className="text-sm font-medium">
                       {t("app.admin.cron.stats.avgExecutionTime")}
@@ -542,7 +542,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
           </Div>
         </TabsContent>
 
-        <TabsContent value="distribution" className="space-y-4">
+        <TabsContent value="distribution" className="flex flex-col gap-4">
           <Div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Task Priority Distribution */}
             {stats?.tasksByPriority && (
@@ -609,7 +609,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
           </Div>
         </TabsContent>
 
-        <TabsContent value="tasks" className="space-y-4">
+        <TabsContent value="tasks" className="flex flex-col gap-4">
           {/* Top Performing Tasks */}
           <Card>
             <CardHeader>
@@ -619,7 +619,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Div className="space-y-4">
+              <Div className="flex flex-col gap-4">
                 {}
                 {stats?.topPerformingTasks?.map(
                   (
@@ -669,7 +669,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Div className="space-y-4">
+              <Div className="flex flex-col gap-4">
                 {}
                 {stats?.problemTasks?.map((task, index: number) => (
                   <Div
@@ -713,7 +713,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Div className="space-y-4">
+              <Div className="flex flex-col gap-4">
                 {}
                 {stats?.groupedStats?.byTaskName?.map(
                   (taskStat: {
@@ -737,7 +737,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                           </P>
                         </Div>
                       </Div>
-                      <Div className="text-right space-y-1">
+                      <Div className="text-right flex flex-col gap-1">
                         <Div className="flex items-center gap-2">
                           <Span className="text-sm text-green-600">
                             {formatNumber(taskStat.successes)}{" "}
@@ -776,7 +776,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-4">
+                <Div className="flex flex-col gap-4">
                   {}
                   {stats.recentActivity.map(
                     (activity: {
@@ -815,7 +815,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
         </TabsContent>
 
         {/* Detailed Statistics Tab */}
-        <TabsContent value="detailed" className="space-y-6">
+        <TabsContent value="detailed" className="flex flex-col gap-6">
           {/* Daily Stats */}
 
           {stats?.dailyStats && stats.dailyStats.length > 0 && (
@@ -827,7 +827,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-4">
+                <Div className="flex flex-col gap-4">
                   {}
                   {stats.dailyStats
                     .slice(0, 10)
@@ -855,7 +855,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                               </P>
                             </Div>
                           </Div>
-                          <Div className="text-right space-y-1">
+                          <Div className="text-right flex flex-col gap-1">
                             <Div className="flex items-center gap-2">
                               <Span className="text-sm text-green-600">
                                 {formatNumber(day.successes)}{" "}
@@ -896,7 +896,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-4">
+                <Div className="flex flex-col gap-4">
                   {}
                   {objectEntries(stats.taskStats)
                     .slice(0, 10)
@@ -932,7 +932,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                               </P>
                             </Div>
                           </Div>
-                          <Div className="text-right space-y-1">
+                          <Div className="text-right flex flex-col gap-1">
                             <Div className="flex items-center gap-2">
                               <Span className="text-sm text-green-600">
                                 {formatNumber(taskStat.successfulExecutions)} /{" "}
@@ -974,7 +974,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Div className="space-y-4">
+                  <Div className="flex flex-col gap-4">
                     {}
                     {stats.groupedStats.byPriority.map(
                       (priorityStat: {
@@ -999,7 +999,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                               </P>
                             </Div>
                           </Div>
-                          <Div className="text-right space-y-1">
+                          <Div className="text-right flex flex-col gap-1">
                             <Div className="flex items-center gap-2">
                               <span className="text-sm font-medium">
                                 {formatNumber(priorityStat.executions)}{" "}
@@ -1036,7 +1036,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Div className="space-y-4">
+                  <Div className="flex flex-col gap-4">
                     {}
                     {stats.groupedStats.byHealthStatus.map(
                       (healthStat: {
@@ -1087,7 +1087,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Div className="space-y-4">
+                  <Div className="flex flex-col gap-4">
                     {}
                     {stats.groupedStats.byExecutionTime.map(
                       (timeStat: {

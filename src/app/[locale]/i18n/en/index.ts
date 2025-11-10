@@ -31,7 +31,8 @@ export const translations = {
         description: "This page works on both web and mobile",
         unified: {
           title: "✅ Unified Components",
-          description: "Using next-vibe-ui components that work seamlessly across platforms",
+          description:
+            "Using next-vibe-ui components that work seamlessly across platforms",
         },
         types: {
           title: "✅ Type Safety",
@@ -46,6 +47,8 @@ export const translations = {
         chat: "Go to Chat",
         help: "Go to Help",
         about: "Go to About Us",
+        story: "Our Story",
+        designTest: "Design Test",
       },
       status: {
         title: "System Status",

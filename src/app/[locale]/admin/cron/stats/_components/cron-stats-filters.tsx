@@ -5,7 +5,7 @@
 
 "use client";
 
-import { RefreshCw } from 'next-vibe-ui/ui/icons';
+import { RefreshCw } from "next-vibe-ui/ui/icons";
 import {
   DateRangePreset,
   TimePeriod,
@@ -57,9 +57,9 @@ export function CronStatsFiltersContainer({
   const { t } = simpleT(locale);
 
   return (
-    <Form form={form} onSubmit={noOpSubmit} className="space-y-4">
+    <Form form={form} onSubmit={noOpSubmit} className="flex flex-col gap-4">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-4">
           <CardTitle className="text-lg font-semibold">
             {title || t("app.admin.common.filter")}
           </CardTitle>
@@ -75,7 +75,7 @@ export function CronStatsFiltersContainer({
             </Button>
           )}
         </CardHeader>
-        <CardContent className="space-y-4">{children}</CardContent>
+        <CardContent className="flex flex-col gap-4">{children}</CardContent>
       </Card>
     </Form>
   );

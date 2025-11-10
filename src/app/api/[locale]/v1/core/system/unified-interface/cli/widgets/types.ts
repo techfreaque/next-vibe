@@ -10,8 +10,7 @@ import type {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction,
-TranslationKey } from "@/i18n/core/static-types";
+import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
 /**
  * Valid primitive values that can be rendered

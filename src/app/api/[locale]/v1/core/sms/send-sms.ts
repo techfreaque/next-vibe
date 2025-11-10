@@ -105,12 +105,12 @@ export async function sendSms(
       reason: validation.reason,
     });
     return fail({
-          message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-        messageParams: {
+      message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
+      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+      messageParams: {
         reason: validation.reason || "",
       },
-      });
+    });
   }
 
   try {
@@ -177,24 +177,24 @@ export async function sendSms(
       attempts: maxAttempts,
     });
     return fail({
-          message: "app.api.v1.core.sms.sms.error.delivery_failed",
-          errorType: ErrorResponseTypes.SMS_ERROR,
-        messageParams: {
+      message: "app.api.v1.core.sms.sms.error.delivery_failed",
+      errorType: ErrorResponseTypes.SMS_ERROR,
+      messageParams: {
         errorMessage: lastError?.message ?? "",
       },
-      });
+    });
   } catch (error) {
     logger.error(
       "app.api.v1.core.sms.sms.error.unexpected_error",
       parseError(error),
     );
     return fail({
-          message: "app.api.v1.core.sms.sms.error.unexpected_error",
-          errorType: ErrorResponseTypes.SMS_ERROR,
-        messageParams: {
+      message: "app.api.v1.core.sms.sms.error.unexpected_error",
+      errorType: ErrorResponseTypes.SMS_ERROR,
+      messageParams: {
         errorMessage: error instanceof Error ? error.message : "",
       },
-      });
+    });
   }
 }
 
@@ -242,12 +242,12 @@ export async function batchSendSms(
       totalResults: results.length,
     });
     return fail({
-          message: "app.api.v1.core.sms.sms.error.all_failed",
-          errorType: ErrorResponseTypes.SMS_ERROR,
-        messageParams: {
+      message: "app.api.v1.core.sms.sms.error.all_failed",
+      errorType: ErrorResponseTypes.SMS_ERROR,
+      messageParams: {
         totalResults: results.length.toString(),
       },
-      });
+    });
   }
 
   if (failureCount > 0) {
@@ -256,13 +256,13 @@ export async function batchSendSms(
       totalCount: results.length,
     });
     return fail({
-          message: "app.api.v1.core.sms.sms.error.partial_failure",
-          errorType: ErrorResponseTypes.SMS_ERROR,
-        messageParams: {
+      message: "app.api.v1.core.sms.sms.error.partial_failure",
+      errorType: ErrorResponseTypes.SMS_ERROR,
+      messageParams: {
         failureCount: failureCount.toString(),
         totalCount: results.length.toString(),
       },
-      });
+    });
   }
 
   logger.info("Batch SMS sent successfully", { count: messages.length });

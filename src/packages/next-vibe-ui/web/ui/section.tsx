@@ -1,12 +1,12 @@
-import type { ComponentPropsWithoutRef, ReactNode } from "react";
-import { forwardRef } from "react";
+import type { ReactNode } from "react";
 
 // Cross-platform props interface
 // Includes all standard HTML section props for web (style, etc.)
-export interface SectionProps extends ComponentPropsWithoutRef<"section"> {
+export interface SectionProps {
   children?: ReactNode;
   className?: string;
   id?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -14,9 +14,6 @@ export interface SectionProps extends ComponentPropsWithoutRef<"section"> {
  * On web, this is a section element
  * Provides semantic HTML5 section element with platform consistency
  */
-export const Section = forwardRef<HTMLElement, SectionProps>(function Section(
-  props,
-  ref,
-) {
-  return <section ref={ref} {...props} />;
-});
+export function Section(props: SectionProps): React.JSX.Element {
+  return <section {...props} />;
+}

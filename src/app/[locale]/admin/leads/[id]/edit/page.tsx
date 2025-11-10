@@ -42,7 +42,7 @@ export default async function LeadEditPage({
   }
 
   return (
-    <Div className="space-y-8">
+    <Div className="flex flex-col gap-8">
       {/* Header */}
       <Div>
         <H1 className="text-3xl font-bold tracking-tight">

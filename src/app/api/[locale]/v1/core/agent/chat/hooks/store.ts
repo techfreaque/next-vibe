@@ -62,7 +62,7 @@ export interface ChatMessage {
   isAI: boolean;
   model: ModelId | null;
   persona: string | null;
-          errorType: string | null;
+  errorType: string | null;
   errorMessage: string | null;
   edited: boolean;
   tokens: number | null;

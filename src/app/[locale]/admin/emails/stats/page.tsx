@@ -3,7 +3,7 @@
  * Server component for email statistics and analytics
  */
 
-import { BarChart3 } from 'next-vibe-ui/ui/icons';
+import { BarChart3 } from "next-vibe-ui/ui/icons";
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import type React from "react";
@@ -38,7 +38,7 @@ export default async function EmailsStatsPage({
   const { t } = simpleT(locale);
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Stats Content */}
       <Card>
         <CardHeader>

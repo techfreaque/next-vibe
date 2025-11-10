@@ -123,9 +123,7 @@ export class ManifestRepositoryImpl implements ManifestRepository {
         language: manifestLang,
       });
 
-      return await Promise.resolve(
-        success({ response: manifest }),
-      );
+      return await Promise.resolve(success({ response: manifest }));
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to generate manifest", {
@@ -134,9 +132,9 @@ export class ManifestRepositoryImpl implements ManifestRepository {
       });
 
       return fail({
-          message: "app.api.v1.core.manifest.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message, locale },
+        message: "app.api.v1.core.manifest.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message, locale },
       });
     }
   }

@@ -195,7 +195,6 @@ export function TagsField({
             <PopoverTrigger asChild>
               <div className="flex-1 min-w-[120px]">
                 <Input
-                  ref={inputRef}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}

@@ -123,10 +123,11 @@ export class DockerOperationsRepositoryImpl
       logger.error("🗄️  Docker command execution failed", parsedError);
 
       return fail({
-          message: "app.api.v1.core.system.db.utils.dockerOperations.errors.executionFailed.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },}
-      );
+        message:
+          "app.api.v1.core.system.db.utils.dockerOperations.errors.executionFailed.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -161,15 +162,16 @@ export class DockerOperationsRepositoryImpl
       logger.info(`🗄️  Docker Compose down completed: ${result.success}`);
 
       return success(result.success);
-    } catch(error) {
+    } catch (error) {
       const parsedError = parseError(error);
       logger.error("🗄️ Docker Compose down failed", parsedError);
 
       return fail({
-          message: "app.api.v1.core.system.db.utils.dockerOperations.errors.composeDownFailed.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-         messageParams: { error: parsedError.message },}
-      );
+        message:
+          "app.api.v1.core.system.db.utils.dockerOperations.errors.composeDownFailed.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
@@ -210,10 +212,11 @@ export class DockerOperationsRepositoryImpl
       logger.error("🗄️  Docker Compose up failed", parsedError);
 
       return fail({
-          message: "app.api.v1.core.system.db.utils.dockerOperations.errors.composeUpFailed.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-         messageParams: { error: parsedError.message },}
-      );
+        message:
+          "app.api.v1.core.system.db.utils.dockerOperations.errors.composeUpFailed.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 

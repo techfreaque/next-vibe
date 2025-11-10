@@ -1,13 +1,25 @@
 import * as MenubarPrimitive from "@rn-primitives/menubar";
 import * as React from "react";
-import { Platform, type TextProps, View } from "react-native";
+import {
+  StyleSheet,
+  View,
+} from "react-native";
 
 import { cn } from "next-vibe/shared/utils/utils";
+import { Check } from "./icons/Check";
+import { ChevronRight } from "./icons/ChevronRight";
+import { Span } from "./span";
+import { TextClassContext } from "./text";
 
-// Import all types from web (web is source of truth)
+// Import ALL types from web - ZERO definitions here
 import type {
-  MenubarProps,
+  MenubarRootProps,
+  MenubarMenuProps,
   MenubarTriggerProps,
+  MenubarGroupProps,
+  MenubarPortalProps,
+  MenubarSubProps,
+  MenubarRadioGroupProps,
   MenubarSubTriggerProps,
   MenubarSubContentProps,
   MenubarContentProps,
@@ -19,39 +31,41 @@ import type {
   MenubarShortcutProps,
 } from "@/packages/next-vibe-ui/web/ui/menubar";
 
-import { Check } from "./icons/Check";
-import { ChevronDown } from "./icons/ChevronDown";
-import { ChevronRight } from "./icons/ChevronRight";
-import { ChevronUp } from "./icons/ChevronUp";
-import { Span } from "./span";
-import { TextClassContext } from "./text";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_ITEM =
   "select-none text-sm text-lg text-popover-foreground group-focus:text-accent-foreground";
 /* eslint-enable i18next/no-literal-string */
 
-const MenubarMenu = MenubarPrimitive.Menu;
+// Local styled components - use direct primitives to avoid type instantiation issues
+// The styled() function from nativewind has overly complex type inference for these components
+const StyledMenubarTrigger = MenubarPrimitive.Trigger;
+const StyledMenubarSubTrigger = MenubarPrimitive.SubTrigger;
+const StyledMenubarSubContent = MenubarPrimitive.SubContent;
+const StyledMenubarContent = MenubarPrimitive.Content;
+const StyledMenubarItem = MenubarPrimitive.Item;
+const StyledMenubarCheckboxItem = MenubarPrimitive.CheckboxItem;
+const StyledMenubarRadioItem = MenubarPrimitive.RadioItem;
+const StyledMenubarLabel = MenubarPrimitive.Label;
+const StyledMenubarSeparator = MenubarPrimitive.Separator;
+const StyledMenubarItemIndicator = MenubarPrimitive.ItemIndicator;
 
-const MenubarGroup = MenubarPrimitive.Group;
-
-const MenubarPortal = MenubarPrimitive.Portal;
-
-const MenubarSub = MenubarPrimitive.Sub;
-
-const MenubarRadioGroup = MenubarPrimitive.RadioGroup;
-
-function Menubar({ className, children }: MenubarProps): JSX.Element {
-  const [value, setValue] = React.useState<string | undefined>(undefined);
+function Menubar({ className, children, value, onValueChange, ...props }: MenubarRootProps): React.JSX.Element {
+  const handleValueChange = React.useCallback((newValue: string | undefined) => {
+    if (onValueChange) {
+      onValueChange(newValue ?? "");
+    }
+  }, [onValueChange]);
 
   return (
     <MenubarPrimitive.Root
       value={value}
-      onValueChange={setValue}
+      onValueChange={handleValueChange}
       className={cn(
-        "flex flex-row h-10 h-12 items-center space-x-1 rounded-md border border-border bg-background p-1",
+        "flex flex-row h-9 items-center space-x-1 rounded-md border border-border bg-background p-1 shadow-sm",
         className,
       )}
+      {...props}
     >
       {children}
     </MenubarPrimitive.Root>
@@ -59,35 +73,65 @@ function Menubar({ className, children }: MenubarProps): JSX.Element {
 }
 Menubar.displayName = MenubarPrimitive.Root.displayName;
 
-function MenubarTrigger({
-  className,
-  children,
-}: MenubarTriggerProps): JSX.Element {
+function MenubarMenu({ children, value, ...props }: MenubarMenuProps): React.JSX.Element {
+  return <MenubarPrimitive.Menu value={value} {...props}>{children}</MenubarPrimitive.Menu>;
+}
+MenubarMenu.displayName = MenubarPrimitive.Menu.displayName;
+
+function MenubarTrigger({ className, children, ...props }: MenubarTriggerProps): React.JSX.Element {
   const { value } = MenubarPrimitive.useRootContext();
   const { value: itemValue } = MenubarPrimitive.useMenuContext();
 
   return (
-    <MenubarPrimitive.Trigger
+    <StyledMenubarTrigger
       className={cn(
-        "flex flex-row cursor-default select-none items-center rounded-sm px-3 py-1.5 text-sm h-10 px-5 py-0 font-medium outline-none focus:bg-accent active:bg-accent focus:text-accent-foreground",
+        "flex cursor-default select-none items-center rounded-sm px-3 py-1 text-sm font-medium outline-none focus:bg-accent focus:text-accent-foreground active:bg-accent",
         value === itemValue && "bg-accent text-accent-foreground",
         className,
       )}
+      {...props}
     >
       {children}
-    </MenubarPrimitive.Trigger>
+    </StyledMenubarTrigger>
   );
 }
 MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName;
+
+function MenubarGroup({ children }: MenubarGroupProps): React.JSX.Element {
+  return <MenubarPrimitive.Group>{children}</MenubarPrimitive.Group>;
+}
+MenubarGroup.displayName = MenubarPrimitive.Group.displayName;
+
+function MenubarPortal({ children }: MenubarPortalProps): React.JSX.Element {
+  return <MenubarPrimitive.Portal>{children}</MenubarPrimitive.Portal>;
+}
+MenubarPortal.displayName = "MenubarPortal";
+
+function MenubarSub({ children, ...props }: MenubarSubProps): React.JSX.Element {
+  return <MenubarPrimitive.Sub {...props}>{children}</MenubarPrimitive.Sub>;
+}
+MenubarSub.displayName = MenubarPrimitive.Sub.displayName;
+
+function MenubarRadioGroup({ children, value, onValueChange, ...props }: MenubarRadioGroupProps): React.JSX.Element {
+  return (
+    <MenubarPrimitive.RadioGroup
+      value={value ?? ""}
+      onValueChange={onValueChange ?? (() => {})} // eslint-disable-line no-empty-function
+      {...props}
+    >
+      {children}
+    </MenubarPrimitive.RadioGroup>
+  );
+}
+MenubarRadioGroup.displayName = MenubarPrimitive.RadioGroup.displayName;
 
 function MenubarSubTrigger({
   className,
   inset,
   children,
-}: MenubarSubTriggerProps): JSX.Element {
+  ...props
+}: MenubarSubTriggerProps): React.JSX.Element {
   const { open } = MenubarPrimitive.useSubContext();
-  const Icon =
-    Platform.OS === "web" ? ChevronRight : open ? ChevronUp : ChevronDown;
   return (
     <TextClassContext.Provider
       value={cn(
@@ -95,19 +139,18 @@ function MenubarSubTrigger({
         open && "text-accent-foreground",
       )}
     >
-      <MenubarPrimitive.SubTrigger
+      <StyledMenubarSubTrigger
         className={cn(
-          "flex flex-row cursor-default select-none items-center gap-2 focus:bg-accent active:bg-accent hover:bg-accent rounded-sm px-2 py-1.5 py-2 outline-none",
+          "flex flex-row cursor-default select-none gap-2 items-center focus:bg-accent hover:bg-accent active:bg-accent rounded-sm px-2 py-1.5 outline-none",
           open && "bg-accent",
           inset && "pl-8",
           className,
         )}
+        {...props}
       >
-        <>
-          {children}
-          <Icon size={18} className="ml-auto text-foreground" />
-        </>
-      </MenubarPrimitive.SubTrigger>
+        {children}
+        <ChevronRight size={18} className="ml-auto text-foreground" />
+      </StyledMenubarSubTrigger>
     </TextClassContext.Provider>
   );
 }
@@ -116,50 +159,55 @@ MenubarSubTrigger.displayName = MenubarPrimitive.SubTrigger.displayName;
 function MenubarSubContent({
   className,
   children,
-}: MenubarSubContentProps): JSX.Element {
+  ...props
+}: MenubarSubContentProps): React.JSX.Element {
   const { open } = MenubarPrimitive.useSubContext();
   return (
-    <MenubarPrimitive.SubContent
+    <StyledMenubarSubContent
       className={cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded-md border mt-1 border-border bg-popover p-1 shadow-md shadow-foreground/5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 min-w-32 overflow-hidden rounded-md border border-border mt-1 bg-popover p-1 text-popover-foreground shadow-lg shadow-foreground/5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         open
           ? "animate-in fade-in-0 zoom-in-95"
-          : "animate-out fade-out-0 zoom-out ",
+          : "animate-out fade-out-0 zoom-out",
         className,
       )}
+      {...props}
     >
       {children}
-    </MenubarPrimitive.SubContent>
+    </StyledMenubarSubContent>
   );
 }
 MenubarSubContent.displayName = MenubarPrimitive.SubContent.displayName;
 
 function MenubarContent({
   className,
-  portalHost,
   children,
-  align,
-  alignOffset,
-  sideOffset,
-}: MenubarContentProps & { portalHost?: string }): JSX.Element {
+  align = "start",
+  alignOffset = -4,
+  sideOffset = 8,
+  ...props
+}: MenubarContentProps): React.JSX.Element {
   const { value } = MenubarPrimitive.useRootContext();
   const { value: itemValue } = MenubarPrimitive.useMenuContext();
   return (
-    <MenubarPrimitive.Portal hostName={portalHost}>
-      <MenubarPrimitive.Content
-        align={align}
-        alignOffset={alignOffset}
-        sideOffset={sideOffset}
-        className={cn(
-          "z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md shadow-foreground/5",
-          value === itemValue
-            ? "animate-in fade-in-0 zoom-in-95"
-            : "animate-out fade-out-0 zoom-out-95",
-          className,
-        )}
-      >
-        {children}
-      </MenubarPrimitive.Content>
+    <MenubarPrimitive.Portal>
+      <MenubarPrimitive.Overlay style={StyleSheet.absoluteFill}>
+        <StyledMenubarContent
+          align={align}
+          alignOffset={alignOffset}
+          sideOffset={sideOffset}
+          className={cn(
+            "z-50 min-w-48 overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md shadow-foreground/5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+            value === itemValue
+              ? "animate-in fade-in-0 zoom-in-95"
+              : "animate-out fade-out-0 zoom-out-95",
+            className,
+          )}
+          {...props}
+        >
+          {children}
+        </StyledMenubarContent>
+      </MenubarPrimitive.Overlay>
     </MenubarPrimitive.Portal>
   );
 }
@@ -169,18 +217,20 @@ function MenubarItem({
   className,
   inset,
   children,
-}: MenubarItemProps): JSX.Element {
+  ...props
+}: MenubarItemProps): React.JSX.Element {
   return (
     <TextClassContext.Provider value={TEXT_CLASS_ITEM}>
-      <MenubarPrimitive.Item
+      <StyledMenubarItem
         className={cn(
-          "relative flex flex-row cursor-default items-center gap-2 rounded-sm px-2 py-1.5 py-2 outline-none focus:bg-accent active:bg-accent hover:bg-accent group",
+          "relative flex flex-row cursor-default gap-2 items-center rounded-sm px-2 py-1.5 outline-none focus:bg-accent active:bg-accent hover:bg-accent group",
           inset && "pl-8",
           className,
         )}
+        {...props}
       >
         {children}
-      </MenubarPrimitive.Item>
+      </StyledMenubarItem>
     </TextClassContext.Provider>
   );
 }
@@ -191,27 +241,25 @@ function MenubarCheckboxItem({
   children,
   checked,
   onCheckedChange,
-}: MenubarCheckboxItemProps): JSX.Element {
-  const handleCheckedChange =
-    onCheckedChange ?? ((() => undefined) as (checked: boolean) => void);
+  ...props
+}: MenubarCheckboxItemProps): React.JSX.Element {
   return (
-    <MenubarPrimitive.CheckboxItem
+    <StyledMenubarCheckboxItem
       className={cn(
-        "relative flex flex-row cursor-default items-center group rounded-sm py-1.5 py-2 pl-8 pr-2 outline-none focus:bg-accent active:bg-accent",
+        "relative flex flex-row cursor-default items-center group rounded-sm py-1.5 pl-8 pr-2 outline-none focus:bg-accent active:bg-accent",
         className,
       )}
       checked={checked ?? false}
-      onCheckedChange={handleCheckedChange}
+      onCheckedChange={onCheckedChange ?? (() => {})} // eslint-disable-line no-empty-function
+      {...props}
     >
-      <>
-        <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-          <MenubarPrimitive.ItemIndicator>
-            <Check size={14} strokeWidth={3} color="#000" />
-          </MenubarPrimitive.ItemIndicator>
-        </View>
-        {children}
-      </>
-    </MenubarPrimitive.CheckboxItem>
+      <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+        <StyledMenubarItemIndicator>
+          <Check size={14} strokeWidth={3} className="text-foreground" />
+        </StyledMenubarItemIndicator>
+      </View>
+      {children}
+    </StyledMenubarCheckboxItem>
   );
 }
 MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName;
@@ -220,24 +268,24 @@ function MenubarRadioItem({
   className,
   children,
   value,
-}: MenubarRadioItemProps): JSX.Element {
+  ...props
+}: MenubarRadioItemProps): React.JSX.Element {
   return (
-    <MenubarPrimitive.RadioItem
-      value={value ?? ""}
+    <StyledMenubarRadioItem
       className={cn(
-        "relative flex flex-row cursor-default group items-center rounded-sm py-1.5 py-2 pl-8 pr-2 outline-none focus:bg-accent active:bg-accent",
+        "relative flex flex-row cursor-default group items-center rounded-sm py-1.5 pl-8 pr-2 outline-none focus:bg-accent active:bg-accent",
         className,
       )}
+      value={value ?? ""}
+      {...props}
     >
-      <>
-        <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-          <MenubarPrimitive.ItemIndicator>
-            <View className="bg-foreground h-2 w-2 rounded-full" />
-          </MenubarPrimitive.ItemIndicator>
-        </View>
-        {children}
-      </>
-    </MenubarPrimitive.RadioItem>
+      <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+        <StyledMenubarItemIndicator>
+          <View className="bg-foreground h-2 w-2 rounded-full" />
+        </StyledMenubarItemIndicator>
+      </View>
+      {children}
+    </StyledMenubarRadioItem>
   );
 }
 MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName;
@@ -246,44 +294,53 @@ function MenubarLabel({
   className,
   inset,
   children,
-}: MenubarLabelProps): JSX.Element {
+  ...props
+}: MenubarLabelProps): React.JSX.Element {
   return (
-    <MenubarPrimitive.Label
+    <StyledMenubarLabel
       className={cn(
         "px-2 py-1.5 text-sm text-base font-semibold text-foreground cursor-default",
         inset && "pl-8",
         className,
       )}
+      {...props}
     >
       {children}
-    </MenubarPrimitive.Label>
+    </StyledMenubarLabel>
   );
 }
 MenubarLabel.displayName = MenubarPrimitive.Label.displayName;
 
-function MenubarSeparator({ className }: MenubarSeparatorProps): JSX.Element {
+function MenubarSeparator({
+  className,
+  ...props
+}: MenubarSeparatorProps): React.JSX.Element {
   return (
-    <MenubarPrimitive.Separator
+    <StyledMenubarSeparator
       className={cn("-mx-1 my-1 h-px bg-border", className)}
+      {...props}
     />
   );
 }
 MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName;
 
-const MenubarShortcut = ({
+function MenubarShortcut({
   className,
+  children,
   ...props
-}: MenubarShortcutProps & TextProps): React.JSX.Element => {
+}: MenubarShortcutProps): React.JSX.Element {
   return (
     <Span
       className={cn(
-        "ml-auto text-xs text-sm tracking-widest text-muted-foreground",
+        "ml-auto text-xs tracking-widest text-muted-foreground",
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </Span>
   );
-};
+}
 MenubarShortcut.displayName = "MenubarShortcut";
 
 export {

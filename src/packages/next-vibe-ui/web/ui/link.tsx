@@ -21,24 +21,21 @@ export interface LinkProps
  * Link component for web using Next.js Link
  * Supports asChild pattern for composition
  */
-const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
-  ({ asChild = false, className, children, ...props }, ref) => {
-    const Comp = asChild ? Slot : NextLink;
+function Link({ asChild = false, className, children, ...props }: LinkProps): React.JSX.Element {
+  const Comp = asChild ? Slot : NextLink;
 
-    return (
-      <Comp
-        ref={ref}
-        className={cn(
-          "text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </Comp>
-    );
-  },
-);
+  return (
+    <Comp
+      className={cn(
+        "text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </Comp>
+  );
+}
 
 Link.displayName = "Link";
 

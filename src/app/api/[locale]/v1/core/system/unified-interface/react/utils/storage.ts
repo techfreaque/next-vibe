@@ -21,10 +21,7 @@ export async function getStorageItem<T>(key: string): Promise<T | null> {
   }
 }
 
-export async function setStorageItem<T>(
-  key: string,
-  value: T,
-): Promise<void> {
+export async function setStorageItem<T>(key: string, value: T): Promise<void> {
   if (typeof window === "undefined") {
     return;
   }

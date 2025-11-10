@@ -1,4 +1,4 @@
-import { ArrowLeft } from 'next-vibe-ui/ui/icons';
+import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import type { Metadata } from "next";
 import { Button } from "next-vibe-ui/ui/button";
 import { notFound } from "next-vibe-ui/lib/not-found";
@@ -303,7 +303,7 @@ export default async function JobPostingPage({
           </P>
           <Div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             <Div className="lg:col-span-3">
-              <Div className="space-y-8">
+              <Div className="flex flex-col gap-8">
                 <section>
                   <H2 className="text-2xl font-bold mb-4">
                     {t(
@@ -321,7 +321,7 @@ export default async function JobPostingPage({
                       "app.story._components.home.careers.jobDetail.responsibilities",
                     )}
                   </H2>
-                  <ul className="list-disc pl-6 space-y-2">
+                  <ul className="list-disc pl-6 flex flex-col gap-2">
                     {Object.values(job.responsibilities).map(
                       (responsibility: string, index: number) => (
                         <li
@@ -341,7 +341,7 @@ export default async function JobPostingPage({
                       "app.story._components.home.careers.jobDetail.requirements",
                     )}
                   </H2>
-                  <ul className="list-disc pl-6 space-y-2">
+                  <ul className="list-disc pl-6 flex flex-col gap-2">
                     {Object.values(job.requirements).map(
                       (requirement: string, index: number) => (
                         <li
@@ -367,7 +367,7 @@ export default async function JobPostingPage({
                       "app.story._components.home.careers.jobDetail.qualificationsRequired",
                     )}
                   </H3>
-                  <ul className="list-disc pl-6 space-y-2 mb-4">
+                  <ul className="list-disc pl-6 flex flex-col gap-2 mb-4">
                     {Object.values(job.qualifications.required).map(
                       (qualification: string, index: number) => (
                         <li
@@ -385,7 +385,7 @@ export default async function JobPostingPage({
                       "app.story._components.home.careers.jobDetail.qualificationsPreferred",
                     )}
                   </H3>
-                  <ul className="list-disc pl-6 space-y-2">
+                  <ul className="list-disc pl-6 flex flex-col gap-2">
                     {Object.values(job.qualifications.preferred).map(
                       (qualification: string, index: number) => (
                         <li
@@ -466,7 +466,7 @@ export default async function JobPostingPage({
             </Div>
 
             <Div className="lg:col-span-2">
-              <Div className="sticky top-24 space-y-6">
+              <Div className="sticky top-24 flex flex-col gap-6">
                 <Card>
                   <CardContent className="p-6">
                     <H3 className="text-xl font-bold mb-4">
@@ -474,7 +474,7 @@ export default async function JobPostingPage({
                         "app.story._components.home.careers.jobDetail.applyNow",
                       )}
                     </H3>
-                    <Div className="space-y-4">
+                    <Div className="flex flex-col gap-4">
                       <Div className="grid grid-cols-2 gap-2 text-sm">
                         <Div className="text-gray-500 dark:text-gray-400">
                           {t(
@@ -547,7 +547,7 @@ export default async function JobPostingPage({
                         "app.story._components.home.careers.jobDetail.relatedPositions",
                       )}
                     </H3>
-                    <Div className="space-y-3">
+                    <Div className="flex flex-col gap-3">
                       {Object.entries(jobs)
                         .filter(([key]) => key !== jobId)
                         .slice(0, 2)

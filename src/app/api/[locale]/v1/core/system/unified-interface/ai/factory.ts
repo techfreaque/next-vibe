@@ -24,11 +24,49 @@ import type {
 } from "./types";
 
 /**
+ * Type for Zod internal _def structure
+ * These are Zod internals not exposed in public API
+ */
+interface ZodInternalDef {
+  typeName: string;
+  schema?: z.ZodTypeAny;
+  type?: z.ZodTypeAny;
+  defaultValue?: unknown;
+  [key: string]: unknown;
+}
+
+/**
+ * Type for Zod schema with internal properties
+ * Extends z.ZodTypeAny to maintain compatibility
+ */
+type ZodSchemaWithInternals = z.ZodTypeAny & {
+  _def: ZodInternalDef;
+  unwrap?: () => z.ZodTypeAny;
+  removeDefault?: () => z.ZodTypeAny;
+  shape?: Record<string, z.ZodTypeAny>;
+  element?: z.ZodTypeAny;
+  options?: z.ZodTypeAny[];
+};
+
+/**
  * Type-safe helper to check if schema has a property
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function hasProperty<T extends string>(obj: any, prop: T): obj is Record<T, any> {
-  return obj && typeof obj === "object" && prop in obj;
+function hasProperty<T extends string>(
+  obj: unknown,
+  prop: T,
+): obj is Record<T, unknown> {
+  return obj !== null && obj !== undefined && typeof obj === "object" && prop in obj;
+}
+
+/**
+ * Helper to access Zod internals safely
+ * This function serves as a type guard to access Zod's internal properties
+ * At runtime, all z.ZodTypeAny instances have these internal properties
+ */
+function accessZodInternals(schema: z.ZodTypeAny): ZodSchemaWithInternals {
+  // TypeScript doesn't know z.ZodTypeAny has these properties, but at runtime it does
+  // This is a safe narrowing because we're just exposing properties that exist
+  return schema as z.ZodTypeAny & ZodSchemaWithInternals;
 }
 
 /**
@@ -41,8 +79,8 @@ function hasProperty<T extends string>(obj: any, prop: T): obj is Record<T, any>
  */
 function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
   // Access Zod internal _def - this is a Zod internal structure
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-  const schemaDef = (schema as any)._def;
+  const schemaWithInternals = accessZodInternals(schema);
+  const schemaDef = schemaWithInternals._def;
 
   if (!schemaDef || typeof schemaDef.typeName !== "string") {
     return schema;
@@ -62,35 +100,45 @@ function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
   // Handle ZodOptional - has unwrap() method
   if (schemaDef.typeName === "ZodOptional" && hasProperty(schema, "unwrap")) {
     // Zod internal method access - unwrap() is not in public API
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    const unwrapped = stripTransformsAndRefinements((schema as any).unwrap() as z.ZodTypeAny);
+    const schemaWithInternals = accessZodInternals(schema);
+    const unwrapped = stripTransformsAndRefinements(
+      schemaWithInternals.unwrap!(),
+    );
     return unwrapped.optional();
   }
 
   // Handle ZodNullable - has unwrap() method
   if (schemaDef.typeName === "ZodNullable" && hasProperty(schema, "unwrap")) {
     // Zod internal method access - unwrap() is not in public API
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    const unwrapped = stripTransformsAndRefinements((schema as any).unwrap() as z.ZodTypeAny);
+    const schemaWithInternals = accessZodInternals(schema);
+    const unwrapped = stripTransformsAndRefinements(
+      schemaWithInternals.unwrap!(),
+    );
     return unwrapped.nullable();
   }
 
   // Handle ZodDefault - has removeDefault() method
-  if (schemaDef.typeName === "ZodDefault" && hasProperty(schema, "removeDefault")) {
+  if (
+    schemaDef.typeName === "ZodDefault" &&
+    hasProperty(schema, "removeDefault")
+  ) {
     // Zod internal method access - removeDefault() is not in public API
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    const innerSchema = stripTransformsAndRefinements((schema as any).removeDefault() as z.ZodTypeAny);
+    const schemaWithInternals = accessZodInternals(schema);
+    const innerSchema = stripTransformsAndRefinements(
+      schemaWithInternals.removeDefault!(),
+    );
     // Get the default value from _def
     const defaultValue = schemaDef.defaultValue;
-    const resolvedDefault = typeof defaultValue === "function" ? defaultValue() : defaultValue;
+    const resolvedDefault =
+      typeof defaultValue === "function" ? defaultValue() : defaultValue;
     return innerSchema.default(resolvedDefault);
   }
 
   // Handle ZodObject - recursively strip from all properties
   if (schemaDef.typeName === "ZodObject" && hasProperty(schema, "shape")) {
     // Zod internal property access - shape is not in public API for ZodTypeAny
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    const shape = (schema as any).shape as Record<string, z.ZodTypeAny>;
+    const schemaWithInternals = accessZodInternals(schema);
+    const shape = schemaWithInternals.shape!;
     const strippedShape: Record<string, z.ZodTypeAny> = {};
 
     for (const [key, value] of Object.entries(shape)) {
@@ -103,8 +151,8 @@ function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
   // Handle ZodArray - has element property
   if (schemaDef.typeName === "ZodArray" && hasProperty(schema, "element")) {
     // Zod internal property access - element is not in public API for ZodTypeAny
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    const element = (schema as any).element as z.ZodTypeAny;
+    const schemaWithInternals = accessZodInternals(schema);
+    const element = schemaWithInternals.element!;
     const stripped = stripTransformsAndRefinements(element);
     return z.array(stripped);
   }
@@ -112,8 +160,8 @@ function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
   // Handle ZodUnion - has options property
   if (schemaDef.typeName === "ZodUnion" && hasProperty(schema, "options")) {
     // Zod internal property access - options is not in public API for ZodTypeAny
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    const options = (schema as any).options as z.ZodTypeAny[];
+    const schemaWithInternals = accessZodInternals(schema);
+    const options = schemaWithInternals.options!;
     const strippedOptions = options.map((option) =>
       stripTransformsAndRefinements(option),
     ) as [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]];
@@ -121,7 +169,11 @@ function stripTransformsAndRefinements(schema: z.ZodTypeAny): z.ZodTypeAny {
   }
 
   // Handle ZodIntersection - access left and right through _def
-  if (schemaDef.typeName === "ZodIntersection" && hasProperty(schemaDef, "left") && hasProperty(schemaDef, "right")) {
+  if (
+    schemaDef.typeName === "ZodIntersection" &&
+    hasProperty(schemaDef, "left") &&
+    hasProperty(schemaDef, "right")
+  ) {
     const left = schemaDef.left as z.ZodTypeAny;
     const right = schemaDef.right as z.ZodTypeAny;
     const strippedLeft = stripTransformsAndRefinements(left);
@@ -329,10 +381,13 @@ export class ToolFactory {
         });
       } catch (error) {
         // Skip tools that have schemas with custom types that can't be serialized to JSON Schema
-        context.logger.warn("[Tool Factory] Skipping tool with invalid schema", {
-          toolName: endpoint.toolName,
-          error: error instanceof Error ? error.message : String(error),
-        });
+        context.logger.warn(
+          "[Tool Factory] Skipping tool with invalid schema",
+          {
+            toolName: endpoint.toolName,
+            error: error instanceof Error ? error.message : String(error),
+          },
+        );
       }
     }
 

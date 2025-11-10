@@ -406,7 +406,8 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
   try {
     if (!responseData?.response) {
       return fail({
-        message: "app.api.v1.core.leads.batch.email.admin.batchUpdate.error.noData",
+        message:
+          "app.api.v1.core.leads.batch.email.admin.batchUpdate.error.noData",
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -433,7 +434,8 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
     });
   } catch {
     return fail({
-      message: "app.api.v1.core.leads.batch.email.error.general.internal_server_error",
+      message:
+        "app.api.v1.core.leads.batch.email.error.general.internal_server_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -451,7 +453,8 @@ export const renderBatchDeleteNotificationMail: EmailFunctionType<
   try {
     if (!responseData?.response) {
       return fail({
-        message: "app.api.v1.core.leads.batch.email.admin.batchDelete.error.noData",
+        message:
+          "app.api.v1.core.leads.batch.email.admin.batchDelete.error.noData",
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -478,7 +481,8 @@ export const renderBatchDeleteNotificationMail: EmailFunctionType<
     });
   } catch {
     return fail({
-      message: "app.api.v1.core.leads.batch.email.error.general.internal_server_error",
+      message:
+        "app.api.v1.core.leads.batch.email.error.general.internal_server_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

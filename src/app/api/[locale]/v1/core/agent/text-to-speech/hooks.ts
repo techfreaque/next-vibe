@@ -178,7 +178,7 @@ export function useTTSAudio({
         },
         onError: ({ error }) => {
           logger.error("TTS: API returned error", {
-          errorType: error.errorType,
+            errorType: error.errorType,
             errorMessage: error.message,
           });
           const errorMsg =

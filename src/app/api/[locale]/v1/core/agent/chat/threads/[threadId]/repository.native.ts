@@ -43,9 +43,10 @@ import type {
 class ThreadByIdRepositoryNativeImpl implements ThreadByIdRepositoryInterface {
   private createNotImplementedError<T>(method: string): ResponseType<T> {
     return fail({
-          message: "app.api.v1.core.agent.chat.threads.threadId.errors.not_implemented_on_native",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { method },
+      message:
+        "app.api.v1.core.agent.chat.threads.threadId.errors.not_implemented_on_native",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { method },
     });
   }
 
@@ -75,7 +76,7 @@ class ThreadByIdRepositoryNativeImpl implements ThreadByIdRepositoryInterface {
     // Error response - preserve all error information
     return {
       success: false,
-          errorType: response.errorType,
+      errorType: response.errorType,
       message: response.message,
       messageParams: response.messageParams,
     };
@@ -109,7 +110,9 @@ class ThreadByIdRepositoryNativeImpl implements ThreadByIdRepositoryInterface {
     void user;
     void locale;
     return await Promise.resolve(
-      this.createNotImplementedError<ThreadDeleteResponseOutput>("deleteThread"),
+      this.createNotImplementedError<ThreadDeleteResponseOutput>(
+        "deleteThread",
+      ),
     );
   }
 }

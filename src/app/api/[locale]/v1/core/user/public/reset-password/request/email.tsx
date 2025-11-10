@@ -170,9 +170,9 @@ export const renderResetPasswordMail: EmailFunctionType<
     if (!userResponse.success) {
       // will not get sent to the user as ignoreError is true
       return fail({
-          message: "app.api.v1.core.emails.errors.no_email",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                  messageParams: { email: requestData.emailInput.email },
+        message: "app.api.v1.core.emails.errors.no_email",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: { email: requestData.emailInput.email },
         cause: userResponse,
       });
     }
@@ -187,9 +187,9 @@ export const renderResetPasswordMail: EmailFunctionType<
     );
     if (!tokenResponse.success) {
       return fail({
-          message: "app.api.v1.core.emails.errors.email_generation_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { email: requestData.emailInput.email },
+        message: "app.api.v1.core.emails.errors.email_generation_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { email: requestData.emailInput.email },
         cause: tokenResponse,
       });
     }
@@ -221,9 +221,9 @@ export const renderResetPasswordMail: EmailFunctionType<
     logger.error("Error generating password reset email", parseError(error));
     const parsedError = parseError(error);
     return fail({
-          message: "app.api.v1.core.emails.errors.email_generation_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: {
+      message: "app.api.v1.core.emails.errors.email_generation_failed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: {
         email: requestData.emailInput.email,
         errorMessage: parsedError.message,
       },

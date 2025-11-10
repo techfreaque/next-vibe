@@ -8,7 +8,7 @@
 import { Minus, Plus } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
-import { forwardRef, useEffect } from "react";
+import { useEffect } from "react";
 
 import { Button } from "./button";
 import { Div } from "./div";
@@ -26,21 +26,17 @@ export interface NumberInputProps {
   name?: string;
 }
 
-export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
-  (
-    {
-      value = 1,
-      onChange,
-      onBlur,
-      min = 1,
-      max = 10,
-      step = 1,
-      disabled = false,
-      className,
-      name,
-    },
-    ref,
-  ): JSX.Element => {
+export function NumberInput({
+  value = 1,
+  onChange,
+  onBlur,
+  min = 1,
+  max = 10,
+  step = 1,
+  disabled = false,
+  className,
+  name,
+}: NumberInputProps): JSX.Element {
     // Call onChange with initial value on mount to register the field
     useEffect(() => {
       onChange?.(value);
@@ -57,7 +53,9 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       onChange?.(newValue);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const handleInputChange = (
+      e: React.ChangeEvent<HTMLInputElement>,
+    ): void => {
       const inputValue = e.target.value;
       if (inputValue === "") {
         onChange?.(min);
@@ -83,7 +81,6 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           <Minus className="h-4 w-4" />
         </Button>
         <Input
-          ref={ref}
           type="number"
           name={name}
           value={String(value)}
@@ -107,8 +104,4 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         </Button>
       </Div>
     );
-  },
-);
-
-NumberInput.displayName = "NumberInput";
-
+  }

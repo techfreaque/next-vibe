@@ -12,7 +12,7 @@ import {
   Filter,
   RefreshCw,
   XCircle,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
@@ -41,40 +41,45 @@ type CronExecutionType = CronHistoryResponseOutput["executions"][number];
 type CronTaskStatusType = CronExecutionType["status"];
 
 const getStatusIcon = (status: CronTaskStatusType): React.ReactElement => {
-    switch (status) {
-      case CronTaskStatus.COMPLETED:
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case CronTaskStatus.FAILED:
-        return <XCircle className="h-4 w-4 text-red-600" />;
-      case CronTaskStatus.TIMEOUT:
-        return <XCircle className="h-4 w-4 text-red-600" />;
-      case CronTaskStatus.RUNNING:
-        return <Clock className="h-4 w-4 text-blue-600 animate-pulse" />;
-      case CronTaskStatus.PENDING:
-        return <Clock className="h-4 w-4 text-yellow-600" />;
-      case CronTaskStatus.CANCELLED:
-        return <XCircle className="h-4 w-4 text-gray-600" />;
-      case CronTaskStatus.SKIPPED:
-        return <AlertCircle className="h-4 w-4 text-orange-600" />;
-      default:
-        return <AlertCircle className="h-4 w-4 text-yellow-600" />;
-    }
-  };
+  switch (status) {
+    case CronTaskStatus.COMPLETED:
+      return <CheckCircle className="h-4 w-4 text-green-600" />;
+    case CronTaskStatus.FAILED:
+      return <XCircle className="h-4 w-4 text-red-600" />;
+    case CronTaskStatus.TIMEOUT:
+      return <XCircle className="h-4 w-4 text-red-600" />;
+    case CronTaskStatus.RUNNING:
+      return <Clock className="h-4 w-4 text-blue-600 animate-pulse" />;
+    case CronTaskStatus.PENDING:
+      return <Clock className="h-4 w-4 text-yellow-600" />;
+    case CronTaskStatus.CANCELLED:
+      return <XCircle className="h-4 w-4 text-gray-600" />;
+    case CronTaskStatus.SKIPPED:
+      return <AlertCircle className="h-4 w-4 text-orange-600" />;
+    default:
+      return <AlertCircle className="h-4 w-4 text-yellow-600" />;
+  }
+};
 
 const STATUS_COLORS: Record<CronTaskStatusType, string> = {
   [CronTaskStatus.COMPLETED]:
     "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
-  [CronTaskStatus.FAILED]: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-  [CronTaskStatus.TIMEOUT]: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-  [CronTaskStatus.RUNNING]: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
+  [CronTaskStatus.FAILED]:
+    "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  [CronTaskStatus.TIMEOUT]:
+    "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  [CronTaskStatus.RUNNING]:
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
   [CronTaskStatus.PENDING]:
     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
   [CronTaskStatus.CANCELLED]:
     "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
   [CronTaskStatus.SKIPPED]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
-  [CronTaskStatus.STOPPED]: "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
-  [CronTaskStatus.ERROR]: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  [CronTaskStatus.STOPPED]:
+    "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
+  [CronTaskStatus.ERROR]:
+    "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
   [CronTaskStatus.BLOCKED]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
   [CronTaskStatus.SCHEDULED]:
@@ -172,7 +177,7 @@ export function ExecutionHistory({
       <CardContent>
         {/* Filter Form */}
         <Div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-          <Div className="flex items-center space-x-2 mb-4">
+          <Div className="flex items-center flex flex-row gap-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <Span className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {t("app.admin.cron.cronErrors.admin.interface.filter")}:
@@ -182,7 +187,7 @@ export function ExecutionHistory({
           <Form
             form={historyEndpoint.read.form}
             onSubmit={handleSubmit}
-            className="space-y-4"
+            className="flex flex-col gap-4"
           >
             <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Task Name Search */}
@@ -267,7 +272,7 @@ export function ExecutionHistory({
         </Div>
 
         {/* Execution List */}
-        <Div className="space-y-3">
+        <Div className="flex flex-col gap-3">
           {history.length === 0 ? (
             <Div className="text-center py-8 text-gray-500 dark:text-gray-400">
               {queryLoading ? (
@@ -290,7 +295,7 @@ export function ExecutionHistory({
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
               >
                 <Div className="flex items-center justify-between">
-                  <Div className="flex items-center space-x-4">
+                  <Div className="flex items-center flex flex-row gap-4">
                     {getStatusIcon(execution.status)}
                     <Div>
                       <H4 className="font-medium text-gray-900 dark:text-gray-100">
@@ -305,7 +310,7 @@ export function ExecutionHistory({
                     </Div>
                   </Div>
 
-                  <Div className="flex items-center space-x-4">
+                  <Div className="flex items-center flex flex-row gap-4">
                     <Div className="text-right">
                       <Badge className={getStatusColor(execution.status)}>
                         {execution.status}
@@ -368,7 +373,7 @@ export function ExecutionHistory({
                 total: totalExecutions,
               })}
             </P>
-            <Div className="flex space-x-2">
+            <Div className="flex flex flex-row gap-2">
               <Button
                 variant="outline"
                 size="sm"

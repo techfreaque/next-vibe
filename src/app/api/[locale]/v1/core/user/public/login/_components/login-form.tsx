@@ -1,7 +1,7 @@
 "use client";
 
 import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { Loader2 } from 'next-vibe-ui/ui/icons';
+import { Loader2 } from "next-vibe-ui/ui/icons";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
@@ -50,7 +50,7 @@ export function LoginForm({
           {/* Show form alert if any */}
           {alert && <FormAlert alert={alert} className="mb-6" />}
 
-          <Form form={form} onSubmit={onSubmit} className="space-y-6">
+          <Form form={form} onSubmit={onSubmit} className="flex flex-col gap-6">
             <EndpointFormField
               name="credentials.email"
               control={form.control}
@@ -77,7 +77,8 @@ export function LoginForm({
               }}
               config={{
                 type: "password",
-                label: "app.api.v1.core.user.public.login.fields.password.label",
+                label:
+                  "app.api.v1.core.user.public.login.fields.password.label",
                 placeholder:
                   "app.api.v1.core.user.public.login.fields.password.placeholder",
                 description:

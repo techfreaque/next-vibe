@@ -1,4 +1,4 @@
-import { Building, FileText, Info } from 'next-vibe-ui/ui/icons';
+import { Building, FileText, Info } from "next-vibe-ui/ui/icons";
 import type { Metadata, ResolvingMetadata } from "next";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Span } from "next-vibe-ui/ui/span";
@@ -124,7 +124,7 @@ export default async function ImprintPage({
                 },
               )}
             </P>
-            <ul className="space-y-2 mt-4">
+            <ul className="flex flex-col gap-2 mt-4">
               <li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 <Span>{t("config.group.name")}</Span>
@@ -138,13 +138,13 @@ export default async function ImprintPage({
                 <Span>{t("config.group.registrationNumber")}</Span>
               </li>
               {/* <li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                <Span>{t("app.common.company.vatId")}</Span>
-              </li> */}
+ <Span className="mr-2 text-blue-500">•</Span>
+ <Span>{t("app.common.company.vatId")}</Span>
+ </li> */}
               {/* <li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                <Span>{t("app.common.company.registrationCourt")}</Span>
-              </li> */}
+ <Span className="mr-2 text-blue-500">•</Span>
+ <Span>{t("app.common.company.registrationCourt")}</Span>
+ </li> */}
             </ul>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />

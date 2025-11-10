@@ -106,7 +106,9 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
     const toolMeta = this.getToolByName(context.toolName);
     if (!toolMeta) {
       return this.fail({
-        error: t("app.api.v1.core.system.unifiedInterface.mcp.registry.toolNotFound"),
+        error: t(
+          "app.api.v1.core.system.unifiedInterface.mcp.registry.toolNotFound",
+        ),
         code: MCPErrorCode.TOOL_NOT_FOUND,
         details: { toolName: context.toolName },
       });
@@ -247,7 +249,9 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
     return this.fail({
       error:
         result.error ||
-        t("app.api.v1.core.system.unifiedInterface.mcp.registry.toolExecutionFailed"),
+        t(
+          "app.api.v1.core.system.unifiedInterface.mcp.registry.toolExecutionFailed",
+        ),
       code: MCPErrorCode.TOOL_EXECUTION_FAILED,
       details: { toolName },
     });

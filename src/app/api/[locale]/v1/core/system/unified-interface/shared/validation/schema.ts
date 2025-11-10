@@ -179,7 +179,7 @@ export function createValidationError(error?: string): ResponseType<never> {
   return {
     success: false,
     message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+    errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
     messageParams: error ? { error } : undefined,
   };
 }
@@ -191,7 +191,7 @@ export function createUrlValidationError(error: string): ResponseType<never> {
   return {
     success: false,
     message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
-          errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
+    errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
     messageParams: {
       error,
     },
@@ -207,7 +207,7 @@ export function createRequestValidationError(
   return {
     success: false,
     message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+    errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
     messageParams: {
       error,
     },

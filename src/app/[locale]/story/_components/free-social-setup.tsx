@@ -10,7 +10,7 @@ import {
   Settings,
   Twitter,
   Youtube,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Card,
@@ -187,7 +187,7 @@ export default function FreeSocialSetup({
                 </Div>
               </CardHeader>
               <CardContent>
-                <Div className="space-y-4">
+                <Div className="flex flex-col gap-4">
                   {benefits.map((benefit, index) => (
                     <MotionDiv
                       // eslint-disable-next-line i18next/no-literal-string
@@ -230,7 +230,7 @@ export default function FreeSocialSetup({
 
           {/* Right side - Social Platforms */}
           <MotionDiv
-            className="space-y-6"
+            className="flex flex-col gap-6"
             variants={container}
             initial="hidden"
             animate={inView ? "show" : "hidden"}

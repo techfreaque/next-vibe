@@ -6,21 +6,14 @@
 
 "use client";
 
-import type { JSX, ReactNode } from "react";
+import type { JSX } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
-/**
- * Form Field Group Component
- * Groups multiple form fields with consistent spacing
- */
-interface FormFieldGroupProps {
-  children: ReactNode;
-  title?: TranslationKey;
-  description?: TranslationKey;
-  className?: string;
-}
+import type {
+  FormFieldGroupProps,
+  FormSectionProps,
+} from "../../../web/ui/form/form-section";
 
 export function FormFieldGroup({
   children,
@@ -43,24 +36,6 @@ export function FormFieldGroup({
       <div className="space-y-6">{children}</div>
     </div>
   );
-}
-
-/**
- * Form Section Component
- * Wraps form content with consistent styling and completion status
- */
-interface FormSectionProps {
-  children: ReactNode;
-  title: TranslationKey;
-  description?: TranslationKey;
-  completionStatus?: {
-    isComplete: boolean;
-    completedFields: number;
-    totalFields: number;
-    completionPercentage: number;
-    missingRequiredFields: string[];
-  };
-  className?: string;
 }
 
 export function FormSection({

@@ -206,8 +206,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         },
       });
       return fail({
-          message: "app.api.v1.core.leads.stats.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.leads.stats.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

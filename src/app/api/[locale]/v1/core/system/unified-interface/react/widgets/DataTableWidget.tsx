@@ -63,7 +63,11 @@ export const DataTableWidget = ({
   }, [typedData]);
 
   if (!isValidData || !typedData) {
-    return <Div className={className} style={style}>—</Div>;
+    return (
+      <Div className={className} style={style}>
+        —
+      </Div>
+    );
   }
 
   // Handle column sort
@@ -107,10 +111,11 @@ export const DataTableWidget = ({
             {typedData.columns.map((column) => (
               <th
                 key={column.key}
-                className={`px-6 py-3 text-${column.align ?? "left"} text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 ${column.sortable
+                className={`px-6 py-3 text-${column.align ?? "left"} text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 ${
+                  column.sortable
                     ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                     : ""
-                  }`}
+                }`}
                 style={{ width: column.width }}
                 onClick={(): void => {
                   if (column.sortable) {
@@ -178,11 +183,17 @@ export const DataTableWidget = ({
         typedData.totalRows > typedData.rows.length && (
           <Div className="mt-4 flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-700">
             <Div className="text-sm text-gray-700 dark:text-gray-300">
-              {t("app.api.v1.core.system.unifiedInterface.react.widgets.dataTable.showing")}{" "}
+              {t(
+                "app.api.v1.core.system.unifiedInterface.react.widgets.dataTable.showing",
+              )}{" "}
               {typedData.rows.length}{" "}
-              {t("app.api.v1.core.system.unifiedInterface.react.widgets.dataTable.of")}{" "}
+              {t(
+                "app.api.v1.core.system.unifiedInterface.react.widgets.dataTable.of",
+              )}{" "}
               {typedData.totalRows}{" "}
-              {t("app.api.v1.core.system.unifiedInterface.react.widgets.dataTable.results")}
+              {t(
+                "app.api.v1.core.system.unifiedInterface.react.widgets.dataTable.results",
+              )}
             </Div>
           </Div>
         )}

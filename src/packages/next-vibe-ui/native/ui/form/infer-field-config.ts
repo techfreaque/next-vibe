@@ -73,9 +73,11 @@ export function extractFieldConfig(
       return {
         ...baseConfig,
         type: "phone" as const,
-        defaultCountry: (widget.defaultCountry as Countries) || ("GLOBAL" as Countries),
+        defaultCountry:
+          (widget.defaultCountry as Countries) || ("GLOBAL" as Countries),
         preferredCountries:
-          (widget.preferredCountries as Countries[]) || (["GLOBAL"] as Countries[]),
+          (widget.preferredCountries as Countries[]) ||
+          (["GLOBAL"] as Countries[]),
       };
 
     case FieldDataType.URL:

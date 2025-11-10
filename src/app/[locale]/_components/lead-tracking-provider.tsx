@@ -92,7 +92,7 @@ export function LeadTrackingProvider(): null {
 
         if (apiResult.success) {
           // Store tracking timestamp in session storage
-          lastTrackedTime= Date.now()
+          lastTrackedTime = Date.now();
 
           logger.debug("info.leads.tracking.engagement.visit_recorded", {
             leadId: apiResult.data.responseLeadId,

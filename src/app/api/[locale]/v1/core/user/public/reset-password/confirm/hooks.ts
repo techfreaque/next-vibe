@@ -166,7 +166,7 @@ export function useResetPasswordConfirm(
   const tokenError = tokenIsValid
     ? ""
     : (tokenValidationResponse.message as string) ||
-    "app.api.v1.core.user.auth.reset.errors.token_invalid";
+      "app.api.v1.core.user.auth.reset.errors.token_invalid";
 
   return {
     form: formResult.form,

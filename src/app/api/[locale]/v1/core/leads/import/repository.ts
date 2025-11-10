@@ -139,7 +139,7 @@ export interface DomainImportRepository<T extends DomainRecord> {
     ResponseType<{
       result: {
         success: boolean;
-          message: string;
+        message: string;
       };
     }>
   >;
@@ -285,17 +285,19 @@ export class LeadsImportRepository implements ILeadsImportRepository {
       } else {
         errors.push(
           fail({
-            message: "app.admin.leads.leadsErrors.leadsImport.post.error.validation.invalid_email_format",
-            errorType: ErrorResponseTypes.BAD_REQUEST, }
-          ),
+            message:
+              "app.admin.leads.leadsErrors.leadsImport.post.error.validation.invalid_email_format",
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          }),
         );
       }
     } else {
       errors.push(
         fail({
-          message: "app.admin.leads.leadsErrors.leadsImport.post.error.validation.email_required",
-          errorType: ErrorResponseTypes.BAD_REQUEST, }
-        ),
+          message:
+            "app.admin.leads.leadsErrors.leadsImport.post.error.validation.email_required",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        }),
       );
     }
 
@@ -437,9 +439,10 @@ export class LeadsImportRepository implements ILeadsImportRepository {
     } catch (error) {
       logger.error("Error creating/updating lead", parseError(error));
       return fail({
-        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR, }
-      );
+        message:
+          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -525,9 +528,10 @@ export class LeadsImportRepository implements ILeadsImportRepository {
     } catch (error) {
       logger.error("Error importing leads from CSV", parseError(error));
       return fail({
-        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR, }
-      );
+        message:
+          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -677,7 +681,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
     ResponseType<{
       result: {
         success: boolean;
-          message: string;
+        message: string;
       };
     }>
   > {

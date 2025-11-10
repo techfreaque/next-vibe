@@ -39,7 +39,12 @@ const chatMessageSchema = z.object({
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "agent", "ai-stream"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC, UserRole.AI_TOOL_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.CUSTOMER,
+    UserRole.PUBLIC,
+    UserRole.AI_TOOL_OFF,
+  ],
 
   title: "app.api.v1.core.agent.chat.aiStream.post.title",
   description: "app.api.v1.core.agent.chat.aiStream.post.description",

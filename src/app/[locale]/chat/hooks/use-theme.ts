@@ -39,7 +39,10 @@ export function useTheme(): [Theme, () => void] {
         }
         void saveTheme();
         if (typeof document !== "undefined") {
-          document.documentElement.classList.toggle("dark", newTheme === "dark");
+          document.documentElement.classList.toggle(
+            "dark",
+            newTheme === "dark",
+          );
         }
       }
       return newTheme;

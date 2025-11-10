@@ -50,8 +50,8 @@ export async function executeTask(
   if (!validationResult.success) {
     logger.error("Session cleanup configuration validation failed");
     return fail({
-          message: "app.api.v1.core.user.session-cleanup.errors.default",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      message: "app.api.v1.core.user.session-cleanup.errors.default",
+      errorType: ErrorResponseTypes.VALIDATION_ERROR,
       cause: validationResult,
     });
   }
@@ -99,8 +99,8 @@ const sessionCleanupTask: Task = {
 
     if (!result.success) {
       return fail({
-          message: "app.api.v1.core.user.session-cleanup.errors.default",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.user.session-cleanup.errors.default",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         cause: result,
       });
     }

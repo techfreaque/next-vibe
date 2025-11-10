@@ -90,7 +90,8 @@ export const {
     "app.api.v1.core.system.unifiedInterface.tasks.status.running" as const,
   COMPLETED:
     "app.api.v1.core.system.unifiedInterface.tasks.status.completed" as const,
-  FAILED: "app.api.v1.core.system.unifiedInterface.tasks.status.failed" as const,
+  FAILED:
+    "app.api.v1.core.system.unifiedInterface.tasks.status.failed" as const,
   TIMEOUT:
     "app.api.v1.core.system.unifiedInterface.tasks.status.timeout" as const,
   CANCELLED:
@@ -132,7 +133,8 @@ export const {
     "app.api.v1.core.system.unifiedInterface.tasks.status.filter.active" as const,
   COMPLETED:
     "app.api.v1.core.system.unifiedInterface.tasks.status.completed" as const,
-  FAILED: "app.api.v1.core.system.unifiedInterface.tasks.status.failed" as const,
+  FAILED:
+    "app.api.v1.core.system.unifiedInterface.tasks.status.failed" as const,
   RUNNING:
     "app.api.v1.core.system.unifiedInterface.tasks.status.running" as const,
   PENDING:

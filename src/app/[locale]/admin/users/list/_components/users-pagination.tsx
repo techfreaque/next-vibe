@@ -10,7 +10,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
@@ -76,7 +76,7 @@ export function UsersPagination({
 
   return (
     <Div className={`flex items-center justify-between ${className}`}>
-      <Div className="flex items-center space-x-2">
+      <Div className="flex items-center flex flex-row gap-2">
         <P className="text-sm text-gray-700 dark:text-gray-300">
           {t("app.admin.users.list.pagination.showing", {
             start: startItem,
@@ -86,9 +86,9 @@ export function UsersPagination({
         </P>
       </Div>
 
-      <Div className="flex items-center space-x-6">
+      <Div className="flex items-center flex flex-row gap-6">
         {/* Items per page */}
-        <Div className="flex items-center space-x-2">
+        <Div className="flex items-center flex flex-row gap-2">
           <P className="text-sm text-gray-700 dark:text-gray-300">
             {t("app.admin.users.list.pagination.per_page")}
           </P>
@@ -109,7 +109,7 @@ export function UsersPagination({
         </Div>
 
         {/* Page navigation */}
-        <Div className="flex items-center space-x-2">
+        <Div className="flex items-center flex flex-row gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -127,7 +127,7 @@ export function UsersPagination({
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          <Div className="flex items-center space-x-1">
+          <Div className="flex items-center flex flex-row gap-1">
             <Span className="text-sm text-gray-700 dark:text-gray-300">
               {t("app.admin.users.list.pagination.page", {
                 current: currentPage,

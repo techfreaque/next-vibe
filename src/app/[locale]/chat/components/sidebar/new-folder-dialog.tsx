@@ -1,7 +1,12 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
@@ -57,8 +62,8 @@ export function NewFolderDialog({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <Div className="space-y-4">
-          <Div className="space-y-2">
+        <Div className="flex flex-col gap-4">
+          <Div className="flex flex-col gap-2">
             <Label htmlFor="folder-name">
               {t("app.chat.newFolder.folderName")}
             </Label>
@@ -72,10 +77,9 @@ export function NewFolderDialog({
                   handleSave();
                 }
               }}
-              
             />
           </Div>
-          <Div className="space-y-2">
+          <Div className="flex flex-col gap-2">
             <Label>{t("app.chat.newFolder.folderIcon")}</Label>
             <FolderIconSelector value={icon} onChange={setIcon} />
           </Div>

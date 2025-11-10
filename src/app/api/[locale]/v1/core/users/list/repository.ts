@@ -247,8 +247,8 @@ export class UserListRepositoryImpl implements UserListRepository {
     } catch (error) {
       logger.error("Error listing users", parseError(error));
       return fail({
-          message: "app.api.v1.core.users.list.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.users.list.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

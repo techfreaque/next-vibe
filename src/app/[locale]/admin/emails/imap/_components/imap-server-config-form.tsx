@@ -23,7 +23,7 @@ export function ImapServerConfigForm({
   control,
 }: ImapServerConfigFormProps): JSX.Element {
   return (
-    <Div className="space-y-4">
+    <Div className="flex flex-col gap-4">
       <EndpointFormField
         name="serverEnabled"
         config={{

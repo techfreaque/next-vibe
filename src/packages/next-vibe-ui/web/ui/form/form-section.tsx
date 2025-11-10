@@ -14,7 +14,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
  * Form Field Group Component
  * Groups multiple form fields with consistent spacing
  */
-interface FormFieldGroupProps {
+export interface FormFieldGroupProps {
   children: ReactNode;
   title?: TranslationKey;
   description?: TranslationKey;
@@ -48,7 +48,7 @@ export function FormFieldGroup({
  * Form Section Component
  * Wraps form content with consistent styling and completion status
  */
-interface FormSectionProps {
+export interface FormSectionProps {
   children: ReactNode;
   title: TranslationKey;
   description?: TranslationKey;

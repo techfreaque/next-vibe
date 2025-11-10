@@ -18,9 +18,7 @@ import { useTranslation } from "@/i18n/core/client";
 import { Alert, AlertDescription, AlertTitle } from "../alert";
 
 // Import all public types from web version (web is source of truth)
-import type {
-  FormAlertProps,
-} from "../../../web/ui/form/form-alert";
+import type { FormAlertProps } from "../../../web/ui/form/form-alert";
 
 /**
  * Central alert component for forms with consistent styling and icons
@@ -63,7 +61,11 @@ export function FormAlert({
   const Icon = getIcon();
 
   return (
-    <Alert variant={alert.variant} icon={Icon} className={cn("my-4", className)}>
+    <Alert
+      variant={alert.variant}
+      icon={Icon}
+      className={cn("my-4", className)}
+    >
       {alert.title && (
         <AlertTitle>
           {t(alert.title.message, alert.title.messageParams)}

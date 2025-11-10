@@ -233,7 +233,7 @@ const startSmartFileWatcher = async (
 
       // Close all watchers
       watchers.forEach((watcher) => {
-        try{
+        try {
           watcher.close();
         } catch (error) {
           logger.debug("Error closing watcher:", { error: String(error) });

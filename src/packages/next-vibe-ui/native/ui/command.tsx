@@ -3,9 +3,7 @@
  * TODO: Implement command palette with search and keyboard navigation
  * Currently a simple container with search input
  */
-import type { ReactNode } from "react";
 import React from "react";
-import type { ViewProps } from "react-native";
 import { Pressable, Text as RNText, TextInput, View } from "react-native";
 
 import { cn } from "next-vibe/shared/utils/utils";
@@ -15,6 +13,7 @@ import type {
   CommandProps,
   CommandInputProps,
   CommandListProps,
+  CommandEmptyProps,
   CommandGroupProps,
   CommandItemProps,
   CommandSeparatorProps,
@@ -68,13 +67,8 @@ export const CommandList = React.forwardRef<View, CommandListProps>(
 
 CommandList.displayName = "CommandList";
 
-export const CommandEmpty = React.forwardRef<
-  View,
-  Omit<ViewProps, "children"> & {
-    children?: ReactNode;
-    className?: string;
-  }
->(({ className, children, ...props }, ref) => (
+export const CommandEmpty = React.forwardRef<View, CommandEmptyProps>(
+  ({ className, children, ...props }, ref) => (
   <View
     ref={ref}
     className={cn("py-6 text-center text-sm", className)}

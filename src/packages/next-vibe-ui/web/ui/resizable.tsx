@@ -1,9 +1,8 @@
 "use client";
 
-import { DragHandleDots2Icon } from 'next-vibe-ui/ui/icons';
+import { DragHandleDots2Icon } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils/utils";
 import type { ComponentProps, JSX, ReactNode } from "react";
-import { forwardRef } from "react";
 import * as ResizablePrimitive from "react-resizable-panels";
 
 // Cross-platform props interfaces
@@ -22,33 +21,38 @@ export interface ResizablePanelGroupProps {
   tagName?: keyof HTMLElementTagNameMap;
 }
 
-export interface ResizablePanelProps extends ComponentProps<typeof ResizablePrimitive.Panel> {
+export interface ResizablePanelProps
+  extends ComponentProps<typeof ResizablePrimitive.Panel> {
   children: ReactNode;
   className?: string;
   defaultSize?: number;
 }
 
-export interface ResizableHandleProps extends ComponentProps<typeof ResizablePrimitive.PanelResizeHandle> {
+export interface ResizableHandleProps
+  extends ComponentProps<typeof ResizablePrimitive.PanelResizeHandle> {
   className?: string;
   withHandle?: boolean;
 }
 
-const ResizablePanelGroup = forwardRef<
-  ResizablePrimitive.ImperativePanelGroupHandle,
-  ResizablePanelGroupProps
->(({ className, children, direction, ...props }, ref) => (
-  <ResizablePrimitive.PanelGroup
-    ref={ref}
-    direction={direction}
-    className={cn(
-      "flex h-full w-full data-[panel-group-direction=vertical]:flex-col",
-      className,
-    )}
-    {...props}
-  >
-    {children}
-  </ResizablePrimitive.PanelGroup>
-));
+function ResizablePanelGroup({ className, children, direction, autoSaveId, id, keyboardResizeBy, onLayout, storage, tagName }: ResizablePanelGroupProps): JSX.Element {
+  return (
+    <ResizablePrimitive.PanelGroup
+      direction={direction}
+      autoSaveId={autoSaveId}
+      id={id}
+      keyboardResizeBy={keyboardResizeBy}
+      onLayout={onLayout}
+      storage={storage}
+      tagName={tagName}
+      className={cn(
+        "flex h-full w-full data-[panel-group-direction=vertical]:flex-col",
+        className,
+      )}
+    >
+      {children}
+    </ResizablePrimitive.PanelGroup>
+  );
+}
 
 ResizablePanelGroup.displayName = "ResizablePanelGroup";
 

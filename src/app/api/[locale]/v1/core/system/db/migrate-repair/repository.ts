@@ -166,9 +166,10 @@ export class DatabaseMigrateRepairRepositoryImpl
     } catch (error) {
       logger.error("Migration repair failed", { error: String(error) });
       return fail({
-          message: "app.api.v1.core.system.db.migrateRepair.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: String(error) },
+        message:
+          "app.api.v1.core.system.db.migrateRepair.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: String(error) },
       });
     }
   }

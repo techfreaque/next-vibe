@@ -50,7 +50,8 @@ const { POST } = createEndpoint({
       layout: { type: LayoutType.STACKED },
     },
     {
-      request: "data", response: true
+      request: "data",
+      response: true,
     },
     {
       // === REQUEST FIELDS ===

@@ -449,7 +449,8 @@ export const translations: typeof enTranslations = {
     // Header
     header: {
       title: "Forum publiczne",
-      description: "Przestrzeń chroniona przez First Amendment, gdzie kwitnie wolność słowa. Rozmawiaj z modelami AI i użytkownikami z całego świata. Dziel się pomysłami, kwestionuj perspektywy i mów swobodnie bez censury.",
+      description:
+        "Przestrzeń chroniona przez First Amendment, gdzie kwitnie wolność słowa. Rozmawiaj z modelami AI i użytkownikami z całego świata. Dziel się pomysłami, kwestionuj perspektywy i mów swobodnie bez censury.",
     },
     // Sort modes
     sort: {

@@ -90,7 +90,9 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
 
       const duration = Date.now() - startTime;
 
-      logger.info(`Generated seeds file with ${seedFiles.length} seeds in ${duration}ms`);
+      logger.info(
+        `Generated seeds file with ${seedFiles.length} seeds in ${duration}ms`,
+      );
 
       return success({
         success: true,
@@ -107,9 +109,10 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
       });
 
       return fail({
-          message: "app.api.v1.core.system.generators.seeds.error.generation_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.system.generators.seeds.error.generation_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           duration,
         },
       });

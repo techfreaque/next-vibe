@@ -9,7 +9,6 @@ import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { Countries } from "@/i18n/core/config";
 
 import type { FieldConfig } from "./endpoint-form-field-types";
 import {
@@ -73,9 +72,8 @@ export function extractFieldConfig(
       return {
         ...baseConfig,
         type: "phone" as const,
-        defaultCountry: (widget.defaultCountry as Countries) || ("GLOBAL" as Countries),
-        preferredCountries:
-          (widget.preferredCountries as Countries[]) || (["GLOBAL"] as Countries[]),
+        defaultCountry: widget.defaultCountry || "GLOBAL",
+        preferredCountries: widget.preferredCountries || ["GLOBAL"],
       };
 
     case FieldDataType.URL:

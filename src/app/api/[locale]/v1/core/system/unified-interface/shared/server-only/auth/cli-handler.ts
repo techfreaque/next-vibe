@@ -70,9 +70,9 @@ export class CliAuthHandler extends BaseAuthHandler {
       if (context.jwtPayload) {
         if (context.jwtPayload.isPublic) {
           return fail({
-          message:
+            message:
               "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.publicPayloadNotSupported",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
+            errorType: ErrorResponseTypes.UNAUTHORIZED,
           });
         }
         return success(context.jwtPayload);
@@ -156,10 +156,10 @@ export class CliAuthHandler extends BaseAuthHandler {
       const parsedError = parseError(error);
       logger.error("JWT verification failed", parsedError);
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.invalidToken",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-                  messageParams: { error: parsedError.message },
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
+        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -185,10 +185,10 @@ export class CliAuthHandler extends BaseAuthHandler {
       const parsedError = parseError(error);
       logger.error("JWT signing failed", parsedError);
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.signingFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -336,24 +336,22 @@ export class CliAuthHandler extends BaseAuthHandler {
           message:
             "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.userNotFound",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { email },
+          messageParams: { email },
         });
       }
 
       const user = userResult.data;
       const leadId = await this.getLeadIdFromDb(user.id, locale, logger);
 
-      return success(
-        this.createPrivateUser(user.id, leadId || ""),
-      );
+      return success(this.createPrivateUser(user.id, leadId || ""));
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Error authenticating by email", parsedError);
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.authenticationFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }

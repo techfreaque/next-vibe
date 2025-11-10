@@ -117,10 +117,7 @@ export class HelpService {
     // Try to load endpoint definition using registry
     const definitionResult = endpointRegistry.loadDefinition<
       Record<string, { aliases?: string[]; description?: string }>
-    >(
-      { routePath, method: "POST" },
-      logger,
-    );
+    >({ routePath, method: "POST" }, logger);
 
     // If no endpoint definition found, create basic metadata
     if (!definitionResult.definition) {
@@ -157,16 +154,14 @@ export class HelpService {
     const firstMethodDef = definition[actualMethods[0]];
     const customAliases = Array.isArray(firstMethodDef?.aliases)
       ? firstMethodDef.aliases.filter(
-        (alias): alias is string => typeof alias === "string",
-      )
+          (alias): alias is string => typeof alias === "string",
+        )
       : [];
 
     let endpointDescription: string | undefined = firstMethodDef?.description;
     if (endpointDescription?.includes(".")) {
       try {
-        endpointDescription = t(
-          endpointDescription as Parameters<typeof t>[0],
-        );
+        endpointDescription = t(endpointDescription as Parameters<typeof t>[0]);
       } catch {
         // Keep original if translation fails
       }

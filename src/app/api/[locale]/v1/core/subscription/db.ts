@@ -67,7 +67,9 @@ export const subscriptions = pgTable("subscriptions", {
   interval: text("interval").notNull().default("month"),
 
   // Payment provider info
-  provider: text("provider", { enum: PaymentProviderDB }).notNull().default(PaymentProvider.STRIPE),
+  provider: text("provider", { enum: PaymentProviderDB })
+    .notNull()
+    .default(PaymentProvider.STRIPE),
   providerSubscriptionId: text("provider_subscription_id").unique(),
 
   // Provider-specific IDs (for managing recurring subscriptions)

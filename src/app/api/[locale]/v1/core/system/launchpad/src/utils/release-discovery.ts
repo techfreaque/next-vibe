@@ -23,8 +23,10 @@ interface ModuleWithDefault {
 type LoadedModule =
   | { default: ReleaseConfig }
   | ReleaseConfig
-  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Release metadata extraction requires 'unknown' for flexible data structures
-  | Record<string, ReleaseConfig | Array<unknown> | string | number | boolean | null>;
+  | Record<
+      string,
+      ReleaseConfig | Array<unknown> | string | number | boolean | null // eslint-disable-line oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Release metadata extraction requires 'unknown'
+    >;
 
 /**
  * Type guard to check if module has a default export with ReleaseConfig

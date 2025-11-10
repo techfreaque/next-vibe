@@ -17,6 +17,7 @@ import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks/
 import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { envClient } from "@/config/env-client";
 
 import { DOM_IDS, LAYOUT, QUOTE_CHARACTER } from "../../lib/config/constants";
 import {
@@ -378,12 +379,17 @@ export function ChatMessages({
       )}
     >
       {/* Inner container with consistent padding and dynamic bottom padding */}
+      {/* On native: no bottom padding needed since input is in normal flow */}
       <Div
         id={DOM_IDS.MESSAGES_CONTENT}
-        className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-5 md:pt-15 space-y-5"
-        style={{
-          paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,
-        }}
+        className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-5 md:pt-15 flex flex-col gap-5"
+        style={
+          envClient.platform.isReactNative
+            ? { paddingBottom: LAYOUT.MESSAGES_BOTTOM_PADDING }
+            : {
+                paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,
+              }
+        }
       >
         {mergedMessages.length === 0 && !isLoading && onSendMessage ? (
           <Div

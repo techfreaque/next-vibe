@@ -48,8 +48,8 @@ export function validateUserHasId(
 ): ResponseType<never> | null {
   if (!userId) {
     return fail({
-          message: titleKey,
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
+      message: titleKey,
+      errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
   return null;
@@ -65,9 +65,9 @@ export function validateExists<T>(
 ): ResponseType<never> | null {
   if (!entity) {
     return fail({
-          message: titleKey,
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                messageParams: {
+      message: titleKey,
+      errorType: ErrorResponseTypes.NOT_FOUND,
+      messageParams: {
         error: messageKey,
       },
     });
@@ -86,9 +86,9 @@ export function validateNoCircularReference(
 ): ResponseType<never> | null {
   if (parentId === id) {
     return fail({
-          message: titleKey,
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                messageParams: {
+      message: titleKey,
+      errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      messageParams: {
         error: messageKey,
       },
     });

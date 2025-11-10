@@ -5,7 +5,11 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "next-vibe-ui/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { H4 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -105,7 +109,7 @@ export function IconSelector({
 
   // Group icons by category for better organization
   const iconCategories: Record<string, IconKey[]> = {
-    "Folders": [
+    Folders: [
       "folder",
       "folder-open",
       "folder-heart",
@@ -125,9 +129,9 @@ export function IconSelector({
       "monitor",
       "database",
     ],
-    "Security": ["lock", "shield", "shield-plus", "eye-off"],
-    "Social": ["users", "globe", "message-square", "heart"],
-    "Development": [
+    Security: ["lock", "shield", "shield-plus", "eye-off"],
+    Social: ["users", "globe", "message-square", "heart"],
+    Development: [
       "si-react",
       "si-nextdotjs",
       "si-typescript",
@@ -137,18 +141,12 @@ export function IconSelector({
       "si-go",
       "si-nodejs",
     ],
-    "Education": [
-      "book",
-      "book-open",
-      "graduation-cap",
-      "library",
-      "microscope",
-    ],
-    "Creative": ["palette", "camera", "film", "music", "image"],
-    "Business": ["briefcase", "dollar-sign", "trending-up", "trophy", "scale"],
-    "Lifestyle": ["coffee", "utensils", "dumbbell", "gamepad", "plane"],
-    "Nature": ["leaf", "mountain", "flame", "sparkles"],
-    "Other": ["star", "heart", "link", "zap", "rocket"],
+    Education: ["book", "book-open", "graduation-cap", "library", "microscope"],
+    Creative: ["palette", "camera", "film", "music", "image"],
+    Business: ["briefcase", "dollar-sign", "trending-up", "trophy", "scale"],
+    Lifestyle: ["coffee", "utensils", "dumbbell", "gamepad", "plane"],
+    Nature: ["leaf", "mountain", "flame", "sparkles"],
+    Other: ["star", "heart", "link", "zap", "rocket"],
   };
 
   return (
@@ -181,7 +179,7 @@ export function IconSelector({
             value="library"
             className="max-h-96 overflow-y-auto p-2 m-0"
           >
-            <Div className="space-y-4">
+            <Div className="flex flex-col gap-4">
               {Object.entries(iconCategories).map(([category, icons]) => (
                 <Div key={category}>
                   <H4 className="text-xs font-semibold text-muted-foreground mb-2 px-1">
@@ -218,7 +216,7 @@ export function IconSelector({
 
           {/* Unicode/Emoji Tab */}
           <TabsContent value="emoji" className="p-4 m-0">
-            <Div className="space-y-4">
+            <Div className="flex flex-col gap-4">
               <Div>
                 <Label className="text-sm font-medium mb-2 block">
                   {t("app.chat.iconSelector.emojiTab.label")}

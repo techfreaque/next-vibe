@@ -23,10 +23,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import { useTranslation } from "@/i18n/core/client";
 
 import { handleCheckoutRedirect } from "../utils/redirect";
-import {
-  BillingInterval,
-  SubscriptionPlan,
-} from "../../subscription/enum";
+import { BillingInterval, SubscriptionPlan } from "../../subscription/enum";
 import type {
   BillingIntervalValue,
   SubscriptionPlanValue,
@@ -149,8 +146,8 @@ export function useCheckout(logger: EndpointLogger): {
   ): Promise<ResponseType<CheckoutResponseOutput>> => {
     if (!endpoint.create) {
       return fail({
-          message: "app.api.v1.core.subscription.checkout.error",
-          errorType: ErrorResponseTypes.UNKNOWN_ERROR,
+        message: "app.api.v1.core.subscription.checkout.error",
+        errorType: ErrorResponseTypes.UNKNOWN_ERROR,
       });
     }
 
@@ -174,9 +171,11 @@ export function useCheckout(logger: EndpointLogger): {
           onError: ({ error }) => {
             resolve(
               fail({
-          message: error.message ?? "app.api.v1.core.subscription.checkout.error",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                          messageParams: error.messageParams,
+                message:
+                  error.message ??
+                  "app.api.v1.core.subscription.checkout.error",
+                errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+                messageParams: error.messageParams,
               }),
             );
           },
@@ -185,16 +184,16 @@ export function useCheckout(logger: EndpointLogger): {
         if (error instanceof Error) {
           resolve(
             fail({
-          message: "app.api.v1.core.subscription.checkout.error",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                        messageParams: { error: error.message },
+              message: "app.api.v1.core.subscription.checkout.error",
+              errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+              messageParams: { error: error.message },
             }),
           );
         } else {
           resolve(
             fail({
-          message: "app.api.v1.core.subscription.checkout.error",
-          errorType: ErrorResponseTypes.UNKNOWN_ERROR,
+              message: "app.api.v1.core.subscription.checkout.error",
+              errorType: ErrorResponseTypes.UNKNOWN_ERROR,
             }),
           );
         }

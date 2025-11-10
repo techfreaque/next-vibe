@@ -1,13 +1,13 @@
 /**
  * Collapse State Management Hook
- * 
+ *
  * Manages collapse state for thinking sections and tool calls in message sequences.
- * 
+ *
  * **Behavior**:
  * - Thinking sections: Expanded while streaming, auto-collapse when content follows (unless user overrode)
  * - Tool calls: Collapsed when content follows, expanded when no content follows (unless user overrode)
  * - User overrides are always respected and never changed automatically
- * 
+ *
  * **Architecture**:
  * - Tracks user overrides separately from auto-determined states
  * - Uses message ID + section type + index as unique key
@@ -40,10 +40,7 @@ interface UseCollapseStateReturn {
    * Check if a section is collapsed
    * Returns the user override if set, otherwise returns the auto-determined state
    */
-  isCollapsed: (
-    key: CollapseKey,
-    autoCollapsed: boolean,
-  ) => boolean;
+  isCollapsed: (key: CollapseKey, autoCollapsed: boolean) => boolean;
 
   /**
    * Toggle collapse state for a section
@@ -80,12 +77,12 @@ export function useCollapseState(): UseCollapseStateReturn {
     (key: CollapseKey, autoCollapsed: boolean): boolean => {
       const serialized = serializeKey(key);
       const override = userOverrides.get(serialized);
-      
+
       // If user has overridden, use their preference
       if (override !== undefined) {
         return override;
       }
-      
+
       // Otherwise use auto-determined state
       return autoCollapsed;
     },
@@ -145,7 +142,7 @@ export function useCollapseState(): UseCollapseStateReturn {
 
 /**
  * Determine if a thinking section should be auto-collapsed
- * 
+ *
  * @param hasContentAfter - Whether there's content after this thinking section
  * @param isStreaming - Whether the thinking section is still streaming
  * @returns true if should be collapsed, false if should be expanded
@@ -158,7 +155,7 @@ export function shouldThinkingBeCollapsed(
   if (isStreaming) {
     return false;
   }
-  
+
   // After streaming complete:
   // - Collapse if there's content after (reduce noise)
   // - Keep expanded if no content after (user needs to see what happened)
@@ -167,7 +164,7 @@ export function shouldThinkingBeCollapsed(
 
 /**
  * Determine if a tool call should be auto-collapsed
- * 
+ *
  * @param hasContentAfter - Whether there's content after this tool call
  * @param isExecuting - Whether the tool is still executing
  * @returns true if should be collapsed, false if should be expanded
@@ -180,10 +177,9 @@ export function shouldToolBeCollapsed(
   if (isExecuting) {
     return false;
   }
-  
+
   // After execution complete:
   // - Collapse if there's content after (reduce noise)
   // - Keep expanded if no content after (user needs to see results)
   return hasContentAfter;
 }
-

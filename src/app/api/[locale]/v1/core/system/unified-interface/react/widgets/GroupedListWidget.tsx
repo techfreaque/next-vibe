@@ -57,7 +57,11 @@ export const GroupedListWidget = ({
   }, [typedData]);
 
   if (!isValidData || !typedData) {
-    return <Div className={className} style={style}>—</Div>;
+    return (
+      <Div className={className} style={style}>
+        —
+      </Div>
+    );
   }
 
   const toggleGroup = (groupKey: string): void => {
@@ -73,7 +77,7 @@ export const GroupedListWidget = ({
   };
 
   return (
-    <Div className={`space-y-4 ${className}`} style={style}>
+    <Div className={`flex flex-col gap-4 ${className}`} style={style}>
       {typedData.groups.map((group) => {
         const isExpanded = expandedGroups.has(group.key);
         const itemCount = group.items.length;
@@ -102,8 +106,9 @@ export const GroupedListWidget = ({
                 </Span>
               </Div>
               <svg
-                className={`h-5 w-5 text-gray-500 transition-transform ${isExpanded ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-gray-500 transition-transform ${
+                  isExpanded ? "rotate-180" : ""
+                }`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

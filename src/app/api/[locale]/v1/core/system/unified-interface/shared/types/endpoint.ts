@@ -27,9 +27,11 @@ export { FieldUsage };
 
 /**
  * Recursive type for UI configuration values
+ * Includes TranslationKey to properly type label/title/description fields
  */
-type FieldUIConfigValue =
+export type FieldUIConfigValue =
   | string
+  | TranslationKey
   | number
   | boolean
   | null
@@ -53,14 +55,13 @@ export type FieldUIConfig = {
  * Type alias for CreateApiEndpoint - accepts any generic parameters
  * This uses the any type to accept any possible CreateApiEndpoint instance
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type CreateApiEndpointAny = CreateApiEndpoint< string, Methods, readonly (typeof UserRoleValue)[], any>;
-
-/**
- * Export for backward compatibility
- * @deprecated Import CreateApiEndpoint from endpoint/create instead
- */
-export type EndpointDefinition = CreateApiEndpointAny;
+export type CreateApiEndpointAny = CreateApiEndpoint<
+  string,
+  Methods,
+  readonly (typeof UserRoleValue)[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic catch-all type
+  any
+>;
 
 /**
  * API section type for nested endpoint structure
@@ -73,8 +74,7 @@ export interface ApiSection {
   readonly PUT?: CreateApiEndpointAny;
   readonly PATCH?: CreateApiEndpointAny;
   readonly DELETE?: CreateApiEndpointAny;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  readonly [key: string]: CreateApiEndpointAny | ApiSection | undefined | any;
+  readonly [key: string]: CreateApiEndpointAny | ApiSection | undefined
 }
 
 // ============================================================================

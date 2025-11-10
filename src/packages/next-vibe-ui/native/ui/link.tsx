@@ -20,13 +20,15 @@ interface LinkProps extends LinkBaseProps {
  * Link component for React Native using Expo Router Link
  * Simple implementation that wraps all children in a clickable Text component
  */
-export function Link({ className, children, asChild: _asChild, href, ...props }: LinkProps): React.JSX.Element {
+export function Link({
+  className,
+  children,
+  asChild: _asChild,
+  href,
+  ...props
+}: LinkProps): React.JSX.Element {
   return (
-    <ExpoLink
-      href={href}
-      asChild
-      {...props}
-    >
+    <ExpoLink href={href} asChild {...props}>
       <StyledText
         className={cn(
           "text-primary underline-offset-4 active:underline",

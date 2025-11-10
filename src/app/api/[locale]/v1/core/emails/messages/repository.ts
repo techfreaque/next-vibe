@@ -253,8 +253,8 @@ class EmailsRepositoryImpl implements EmailsRepository {
     } catch (error) {
       logger.error("Error fetching emails", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.messages.list.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.emails.messages.list.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
     }
@@ -283,7 +283,8 @@ class EmailsRepositoryImpl implements EmailsRepository {
 
       if (!emailResult) {
         return fail({
-          message: "app.api.v1.core.emails.messages.id.get.errors.not_found.title",
+          message:
+            "app.api.v1.core.emails.messages.id.get.errors.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -319,8 +320,8 @@ class EmailsRepositoryImpl implements EmailsRepository {
     } catch (error) {
       logger.error("Error fetching email by ID", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.messages.id.get.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.emails.messages.id.get.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
     }
@@ -355,8 +356,8 @@ class EmailsRepositoryImpl implements EmailsRepository {
     } catch (error) {
       logger.error("Error creating email record", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.messages.list.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.emails.messages.list.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
     }

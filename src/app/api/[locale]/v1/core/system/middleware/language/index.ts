@@ -81,7 +81,9 @@ export function detectLocale(
   }
 
   // Check for user's preferred locale from cookie
-  const cookieLocale = request.cookies.get(cookieName)?.value as CountryLanguage | undefined;
+  const cookieLocale = request.cookies.get(cookieName)?.value as
+    | CountryLanguage
+    | undefined;
 
   // Check if cookie locale is valid
   let validCookieLocale = false;

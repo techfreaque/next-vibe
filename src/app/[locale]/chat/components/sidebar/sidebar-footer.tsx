@@ -57,7 +57,10 @@ export function SidebarFooter({
             >
               <Div className="flex flex-row items-center gap-2 min-w-0">
                 <Coins className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                <Span className="text-sm font-medium truncate" suppressHydrationWarning>
+                <Span
+                  className="text-sm font-medium truncate"
+                  suppressHydrationWarning
+                >
                   {credits.total === 1
                     ? t("app.chat.credits.credit", { count: credits.total })
                     : t("app.chat.credits.credits", { count: credits.total })}
@@ -74,10 +77,10 @@ export function SidebarFooter({
 
         {/* Expandable Content */}
         <CollapsibleContent className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-          <Div className="px-2 py-2 space-y-1 bg-muted/30">
+          <Div className="px-2 py-2 flex flex-col gap-1 bg-muted/30">
             {/* Credits Breakdown */}
             {credits && (
-              <Div className="px-2 py-2 space-y-1.5 text-xs">
+              <Div className="px-2 py-2 flex flex-col gap-1.5 text-xs">
                 {credits.free > 0 && (
                   <Div className="flex flex-row justify-between items-center">
                     <Span className="text-muted-foreground">
@@ -134,7 +137,7 @@ export function SidebarFooter({
             )}
 
             {/* Navigation Links */}
-            <Div className="space-y-0.5">
+            <Div className="flex flex-col gap-0.5">
               <Link href={`/${locale}/subscription`}>
                 <Button
                   variant="ghost"

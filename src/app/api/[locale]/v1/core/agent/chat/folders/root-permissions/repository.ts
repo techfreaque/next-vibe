@@ -85,9 +85,7 @@ export class RootFolderPermissionsRepositoryImpl
     // Admin users can always create threads and folders in any root folder
     const userId = user.id;
     if (userId) {
-      const { isAdmin } = await import(
-        "../../permissions/permissions"
-      );
+      const { isAdmin } = await import("../../permissions/permissions");
       const isAdminUser = await isAdmin(userId, logger);
       if (isAdminUser) {
         return success({

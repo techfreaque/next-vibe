@@ -215,9 +215,10 @@ export class FunctionalGeneratorsRepositoryImpl
       });
     } catch (error) {
       return fail({
-          message: "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -232,18 +233,20 @@ export class FunctionalGeneratorsRepositoryImpl
       // Basic validation - could be expanded
       if (options.rootDir && !options.rootDir.trim()) {
         return fail({
-          message: "app.api.v1.core.system.generators.endpoints.post.errors.validation.title",
+          message:
+            "app.api.v1.core.system.generators.endpoints.post.errors.validation.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: { error: "Root directory cannot be empty" },
+          messageParams: { error: "Root directory cannot be empty" },
         });
       }
 
       return success(true);
     } catch (error) {
       return fail({
-          message: "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

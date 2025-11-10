@@ -36,7 +36,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
       <Div className="container px-4 md:px-6 py-12 md:py-16">
         <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand Column */}
-          <Div className="lg:col-span-1 space-y-4">
+          <Div className="lg:col-span-1 flex flex-col gap-4">
             <Logo locale={locale} pathName="/story" />
             <P className="text-sm text-gray-600 dark:text-gray-400 max-w-xs">
               {t("app.story._components.footer.tagline")}
@@ -53,7 +53,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
             </H3>
             <Div
               role="list"
-              className="space-y-3 text-sm text-gray-600 dark:text-gray-400"
+              className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400"
             >
               <Div role="listitem">
                 <Link
@@ -101,7 +101,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
             </H3>
             <Div
               role="list"
-              className="space-y-3 text-sm text-gray-600 dark:text-gray-400"
+              className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400"
             >
               <Div role="listitem">
                 <Link
@@ -149,7 +149,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
             </H3>
             <Div
               role="list"
-              className="space-y-3 text-sm text-gray-600 dark:text-gray-400"
+              className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400"
             >
               <Div role="listitem">
                 <Link
@@ -179,7 +179,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
             </H3>
             <Div
               role="list"
-              className="space-y-3 text-sm text-gray-600 dark:text-gray-400"
+              className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400"
             >
               <Div role="listitem">
                 <Link

@@ -74,7 +74,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         return fail({
           message: "app.api.v1.core.users.user.errors.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId: data.id },
+          messageParams: { userId: data.id },
         });
       }
 
@@ -133,9 +133,9 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
       logger.error("Error getting user by ID", parseError(error));
       const parsedError = parseError(error);
       return fail({
-          message: "app.api.v1.core.users.user.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message: "app.api.v1.core.users.user.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -160,7 +160,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         return fail({
           message: "app.api.v1.core.users.user.errors.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId: userId },
+          messageParams: { userId: userId },
         });
       }
 
@@ -240,9 +240,9 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
       logger.error("Error updating user", parseError(error));
       const parsedError = parseError(error);
       return fail({
-          message: "app.api.v1.core.users.user.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message: "app.api.v1.core.users.user.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -270,7 +270,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         return fail({
           message: "app.api.v1.core.users.user.errors.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId: data.id },
+          messageParams: { userId: data.id },
         });
       }
 
@@ -288,9 +288,9 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
       logger.error("Error deleting user", parseError(error));
       const parsedError = parseError(error);
       return fail({
-          message: "app.api.v1.core.users.user.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message: "app.api.v1.core.users.user.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }

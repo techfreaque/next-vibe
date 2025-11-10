@@ -12,7 +12,7 @@ import {
   Server,
   Wifi,
   WifiOff,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { Badge } from "next-vibe-ui/ui/badge";
@@ -164,7 +164,7 @@ export function ImapOverviewDashboard(): JSX.Element {
   // Show loading state if no data
   if (isLoading || !healthData) {
     return (
-      <Div className="space-y-6">
+      <Div className="flex flex-col gap-6">
         <Card>
           <CardHeader>
             <CardTitle>
@@ -189,11 +189,11 @@ export function ImapOverviewDashboard(): JSX.Element {
   );
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Key Metrics Cards */}
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.imap.dashboard.totalAccounts")}
             </CardTitle>
@@ -212,7 +212,7 @@ export function ImapOverviewDashboard(): JSX.Element {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.imap.dashboard.totalMessages")}
             </CardTitle>
@@ -228,7 +228,7 @@ export function ImapOverviewDashboard(): JSX.Element {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.imap.dashboard.lastSync")}
             </CardTitle>
@@ -246,7 +246,7 @@ export function ImapOverviewDashboard(): JSX.Element {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.imap.admin.health.uptime")}
             </CardTitle>
@@ -267,13 +267,13 @@ export function ImapOverviewDashboard(): JSX.Element {
       <Card>
         <CardHeader>
           <Div className="flex items-center justify-between">
-            <CardTitle className="flex items-center space-x-2">
+            <CardTitle className="flex items-center flex flex-row gap-2">
               {getStatusIcon(healthData?.serverStatus ?? "unknown")}
               <Span>
                 {t("app.admin.emails.imap.admin.health.serverStatus")}
               </Span>
             </CardTitle>
-            <Div className="flex items-center space-x-4">
+            <Div className="flex items-center flex flex-row gap-4">
               <Span className="text-sm text-gray-500">
                 {t("app.admin.emails.imap.admin.health.lastUpdate", {
                   lastUpdate: lastUpdate.toLocaleTimeString(),
@@ -454,7 +454,7 @@ export function ImapOverviewDashboard(): JSX.Element {
                     </Div>
                   </TableCell>
                   <TableCell>
-                    <Div className="flex items-center space-x-2">
+                    <Div className="flex items-center flex flex-row gap-2">
                       {getStatusIcon(
                         account.isConnected ? "connected" : "disconnected",
                       )}
@@ -478,7 +478,7 @@ export function ImapOverviewDashboard(): JSX.Element {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Div className="flex items-center space-x-2">
+                    <Div className="flex items-center flex flex-row gap-2">
                       <Button variant="outline" size="sm">
                         {t("app.admin.emails.imap.account.test")}
                       </Button>

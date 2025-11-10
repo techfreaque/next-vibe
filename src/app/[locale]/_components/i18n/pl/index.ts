@@ -228,9 +228,9 @@ export const translations: typeof enTranslations = {
           organization: "Organizacja",
           contactPoint: "Punkt kontaktowy",
         },
-  
+
         contactPoint: {
-            telephone: "{{config.group.contact.telephone}}",
+          telephone: "{{config.group.contact.telephone}}",
           contactType: "Obsługa klienta",
         },
       },

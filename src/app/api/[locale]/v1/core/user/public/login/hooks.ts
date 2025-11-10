@@ -146,7 +146,13 @@ export function useLogin(
   const handleLoginSuccess: ApiInferMutationOptions<
     typeof loginEndpoints.POST
   >["onSuccess"] = useCallback(
-    async (data) => {
+    async (
+      data: Parameters<
+        NonNullable<
+          ApiInferMutationOptions<typeof loginEndpoints.POST>["onSuccess"]
+        >
+      >[0],
+    ) => {
       try {
         logger.debug("app.api.v1.core.user.public.login.onSuccess.start");
 
@@ -183,7 +189,8 @@ export function useLogin(
           `/${locale}/`) satisfies Route;
 
         // Set auth status to enable user query on the next page
-        const authStatusResult = await authClientRepository.setAuthStatus(logger);
+        const authStatusResult =
+          await authClientRepository.setAuthStatus(logger);
         if (!authStatusResult.success) {
           logger.error("user.auth.status.set.failed", {
             message: authStatusResult.message,
@@ -210,13 +217,19 @@ export function useLogin(
   const handleLoginError: ApiInferMutationOptions<
     typeof loginEndpoints.POST
   >["onError"] = useCallback(
-    async (data) => {
+    async (
+      data: Parameters<
+        NonNullable<
+          ApiInferMutationOptions<typeof loginEndpoints.POST>["onError"]
+        >
+      >[0],
+    ) => {
       logger.error(
         "app.api.v1.core.user.public.login.error",
         parseError(data.error),
       );
       if (data.error?.message) {
-                toast({
+        toast({
           title: t("app.api.v1.core.user.public.login.errors.title"),
           description: t("app.api.v1.core.user.public.login.errors.auth_error"),
           variant: "destructive",

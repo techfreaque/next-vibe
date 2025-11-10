@@ -3,13 +3,24 @@
 import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
 import { Button } from "next-vibe-ui/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { P } from "next-vibe-ui/ui/typography";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "next-vibe-ui/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import type { JSX } from "react";
@@ -138,7 +149,10 @@ export function PersonaSelector({
       (p) => !DEFAULT_PERSONAS.find((dp) => dp.id === p.id),
     );
     async function save(): Promise<void> {
-      await storage.setItem(STORAGE_KEY_PERSONAS, JSON.stringify(customPersonas));
+      await storage.setItem(
+        STORAGE_KEY_PERSONAS,
+        JSON.stringify(customPersonas),
+      );
     }
     void save();
     setPersonas(newPersonas);
@@ -233,15 +247,13 @@ export function PersonaSelector({
   ): { group: string; groupIcon: IconValue } => {
     const sourceLabels = {
       "built-in": t("app.chat.personaSelector.grouping.sourceLabels.builtIn"),
-      "my": t("app.chat.personaSelector.grouping.sourceLabels.my"),
-      "community": t(
-        "app.chat.personaSelector.grouping.sourceLabels.community",
-      ),
+      my: t("app.chat.personaSelector.grouping.sourceLabels.my"),
+      community: t("app.chat.personaSelector.grouping.sourceLabels.community"),
     };
     const sourceIcons = {
       "built-in": t("app.chat.personaSelector.grouping.sourceIcons.builtIn"),
-      "my": t("app.chat.personaSelector.grouping.sourceIcons.my"),
-      "community": t("app.chat.personaSelector.grouping.sourceIcons.community"),
+      my: t("app.chat.personaSelector.grouping.sourceIcons.my"),
+      community: t("app.chat.personaSelector.grouping.sourceIcons.community"),
     };
     return {
       group: sourceLabels[persona.source],
@@ -301,8 +313,8 @@ export function PersonaSelector({
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh] pr-4">
-            <Div className="space-y-4">
-              <Div className="space-y-2">
+            <Div className="flex flex-col gap-4">
+              <Div className="flex flex-col gap-2">
                 <Label htmlFor="persona-name">
                   {t("app.chat.personaSelector.addDialog.fields.name.label")}
                 </Label>
@@ -317,7 +329,7 @@ export function PersonaSelector({
                   }
                 />
               </Div>
-              <Div className="space-y-2">
+              <Div className="flex flex-col gap-2">
                 <Label htmlFor="persona-icon">
                   {t("app.chat.personaSelector.addDialog.fields.icon.label")}
                 </Label>
@@ -333,7 +345,7 @@ export function PersonaSelector({
                   maxLength={2}
                 />
               </Div>
-              <Div className="space-y-2">
+              <Div className="flex flex-col gap-2">
                 <Label htmlFor="persona-description">
                   {t(
                     "app.chat.personaSelector.addDialog.fields.description.label",
@@ -353,7 +365,7 @@ export function PersonaSelector({
                   }
                 />
               </Div>
-              <Div className="space-y-2">
+              <Div className="flex flex-col gap-2">
                 <Label htmlFor="persona-prompt">
                   {t(
                     "app.chat.personaSelector.addDialog.fields.systemPrompt.label",
@@ -376,7 +388,7 @@ export function PersonaSelector({
               </Div>
 
               {/* Category Selector */}
-              <Div className="space-y-2">
+              <Div className="flex flex-col gap-2">
                 <Div className="flex items-center justify-between">
                   <Label htmlFor="persona-category">
                     {t(
@@ -419,7 +431,7 @@ export function PersonaSelector({
               </Div>
 
               {/* Suggested Prompts */}
-              <Div className="space-y-2">
+              <Div className="flex flex-col gap-2">
                 <Label>
                   {t(
                     "app.chat.personaSelector.addDialog.fields.suggestedPrompts.label",
@@ -475,8 +487,8 @@ export function PersonaSelector({
             </DialogTitle>
           </DialogHeader>
 
-          <Div className="space-y-4 py-4">
-            <Div className="space-y-2">
+          <Div className="flex flex-col gap-4 py-4">
+            <Div className="flex flex-col gap-2">
               <Label htmlFor="category-name">
                 {t(
                   "app.chat.personaSelector.addCategoryDialog.fields.name.label",
@@ -493,7 +505,7 @@ export function PersonaSelector({
                 }
               />
             </Div>
-            <Div className="space-y-2">
+            <Div className="flex flex-col gap-2">
               <Label htmlFor="category-icon">
                 {t(
                   "app.chat.personaSelector.addCategoryDialog.fields.icon.label",

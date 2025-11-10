@@ -853,7 +853,8 @@ export const translations = {
   },
   footer: {
     tagline: "Chat with AI, Connect with Community",
-    privacyTagline: "Privacy-first AI chat with {{modelCount}}+ uncensored models",
+    privacyTagline:
+      "Privacy-first AI chat with {{modelCount}}+ uncensored models",
     platform: {
       title: "Platform",
       features: "Features",

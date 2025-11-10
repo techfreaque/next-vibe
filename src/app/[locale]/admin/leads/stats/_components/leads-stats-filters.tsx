@@ -5,7 +5,7 @@
 
 "use client";
 
-import { RefreshCw } from 'next-vibe-ui/ui/icons';
+import { RefreshCw } from "next-vibe-ui/ui/icons";
 import {
   ChartType,
   DateRangePreset,
@@ -25,10 +25,7 @@ import {
 import type { LeadsStatsRequestOutput } from "@/app/api/[locale]/v1/core/leads/stats/definition";
 import type statsEndpoints from "@/app/api/[locale]/v1/core/leads/stats/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
-import {
-  CountryFilterOptions,
-  type CountryLanguage,
-} from "@/i18n/core/config";
+import { CountryFilterOptions, type CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface LeadsStatsFiltersContainerProps {
@@ -47,7 +44,7 @@ export function LeadsStatsFilters({
   control,
 }: LeadsStatsFiltersProps): JSX.Element {
   return (
-    <Div className="space-y-4">
+    <Div className="flex flex-col gap-4">
       {/* Base time and chart filters */}
       <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Time Period */}
@@ -305,9 +302,9 @@ export function LeadsStatsFiltersContainer({
   const { t } = simpleT(locale);
 
   return (
-    <Div className="space-y-4">
+    <Div className="flex flex-col gap-4">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-4">
           <CardTitle className="text-lg font-semibold">
             {title || t("app.admin.leads.leads.admin.stats.filter")}
           </CardTitle>
@@ -323,7 +320,7 @@ export function LeadsStatsFiltersContainer({
             </Button>
           )}
         </CardHeader>
-        <CardContent className="space-y-4">{children}</CardContent>
+        <CardContent className="flex flex-col gap-4">{children}</CardContent>
       </Card>
     </Div>
   );

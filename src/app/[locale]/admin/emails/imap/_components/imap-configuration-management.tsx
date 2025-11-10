@@ -72,14 +72,14 @@ export function ImapConfigurationManagement({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>
               {t("app.admin.emails.imap.admin.config.settings.title")}
             </CardTitle>
-            <div className="space-x-2">
+            <div className="flex flex-row gap-2">
               <Button variant="outline" onClick={configEndpoint.read.refetch}>
                 {t("app.admin.emails.imap.common.refresh")}
               </Button>
@@ -96,7 +96,7 @@ export function ImapConfigurationManagement({
           <Form
             form={configEndpoint.create.form}
             onSubmit={configEndpoint.create.onSubmit}
-            className="space-y-6"
+            className="flex flex-col gap-6"
           >
             <FormAlert alert={configEndpoint.alert} />
 
@@ -154,7 +154,7 @@ export function ImapConfigurationManagement({
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-4">
                       <EndpointFormField
                         name="maxRetries"
                         config={{
@@ -195,7 +195,7 @@ export function ImapConfigurationManagement({
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-4">
                       <EndpointFormField
                         name="healthCheckInterval"
                         config={{
@@ -257,7 +257,7 @@ export function ImapConfigurationManagement({
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-4">
                       <EndpointFormField
                         name="debugMode"
                         config={{
@@ -283,7 +283,7 @@ export function ImapConfigurationManagement({
             </Tabs>
 
             {/* Form Actions */}
-            <div className="flex justify-end space-x-4 pt-6 border-t">
+            <div className="flex justify-end flex flex-row gap-4 pt-6 border-t">
               <Button
                 type="button"
                 variant="outline"

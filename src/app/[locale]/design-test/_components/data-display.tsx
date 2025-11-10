@@ -2,15 +2,52 @@
 "use client";
 import type { JSX } from "react";
 
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "next-vibe-ui/ui/table";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "next-vibe-ui/ui/carousel";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe-ui/ui/table";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "next-vibe-ui/ui/carousel";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "next-vibe-ui/ui/chart";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "next-vibe-ui/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-import { H1, H2, H3, H4, P, BlockQuote, Lead, Large, Small, Muted } from "next-vibe-ui/ui/typography";
+import {
+  H1,
+  H2,
+  H3,
+  H4,
+  P,
+  BlockQuote,
+  Lead,
+  Large,
+  Small,
+  Muted,
+} from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
 import { Title } from "next-vibe-ui/ui/title";
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "next-vibe-ui/ui/pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "next-vibe-ui/ui/pagination";
 import { Div } from "next-vibe-ui/ui/div";
 import { Section } from "next-vibe-ui/ui/section";
 
@@ -46,7 +83,8 @@ export function DataDisplayPreview(): JSX.Element {
               <H3>Heading 3</H3>
               <H4>Heading 4</H4>
               <P>
-                This is a paragraph with <Span className="font-bold">bold text</Span> and{" "}
+                This is a paragraph with{" "}
+                <Span className="font-bold">bold text</Span> and{" "}
                 <Span className="italic">italic text</Span>.
               </P>
               <BlockQuote>
@@ -96,7 +134,10 @@ export function DataDisplayPreview(): JSX.Element {
             <H3>Chart</H3>
             <Card>
               <CardContent className="pt-6">
-                <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+                <ChartContainer
+                  config={chartConfig}
+                  className="min-h-[200px] w-full"
+                >
                   <BarChart accessibilityLayer data={chartData}>
                     <CartesianGrid vertical={false} />
                     <XAxis
@@ -107,7 +148,11 @@ export function DataDisplayPreview(): JSX.Element {
                       tickFormatter={(value) => value.slice(0, 3)}
                     />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+                    <Bar
+                      dataKey="desktop"
+                      fill="var(--color-desktop)"
+                      radius={4}
+                    />
                   </BarChart>
                 </ChartContainer>
               </CardContent>
@@ -123,7 +168,9 @@ export function DataDisplayPreview(): JSX.Element {
                     <Div className="p-1">
                       <Card>
                         <CardContent className="flex aspect-square items-center justify-center p-6">
-                          <Span className="text-4xl font-semibold">{index + 1}</Span>
+                          <Span className="text-4xl font-semibold">
+                            {index + 1}
+                          </Span>
                         </CardContent>
                       </Card>
                     </Div>

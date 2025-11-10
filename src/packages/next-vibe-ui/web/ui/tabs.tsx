@@ -5,12 +5,15 @@ import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
 // Cross-platform types
-export interface TabsProps {
+export interface TabsRootProps {
   value?: string;
   onValueChange?: (value: string) => void;
   defaultValue?: string;
+  orientation?: "horizontal" | "vertical";
+  activationMode?: "automatic" | "manual";
   className?: string;
   children?: React.ReactNode;
+  dir?: "ltr" | "rtl";
 }
 
 export interface TabsListProps {
@@ -23,6 +26,8 @@ export interface TabsTriggerProps {
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export interface TabsContentProps {
@@ -31,51 +36,52 @@ export interface TabsContentProps {
   children?: React.ReactNode;
 }
 
-const Tabs = TabsPrimitive.Root;
+export function Tabs({ children, ...props }: TabsRootProps): React.JSX.Element {
+  return <TabsPrimitive.Root {...props}>{children}</TabsPrimitive.Root>;
+}
+Tabs.displayName = TabsPrimitive.Root.displayName;
 
-const TabsList = React.forwardRef<
-  React.ElementRef<typeof TabsPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.List
-    ref={ref}
-    className={cn(
-      "inline-flex h-11 items-center justify-center rounded-lg bg-muted/50 p-1 text-muted-foreground border border-border",
-      className,
-    )}
-    {...props}
-  />
-));
+export function TabsList({ className, children, ...props }: TabsListProps): React.JSX.Element {
+  return (
+    <TabsPrimitive.List
+      className={cn(
+        "inline-flex h-11 items-center justify-center rounded-lg bg-muted/50 p-1 text-muted-foreground border border-border",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </TabsPrimitive.List>
+  );
+}
 TabsList.displayName = TabsPrimitive.List.displayName;
 
-const TabsTrigger = React.forwardRef<
-  React.ElementRef<typeof TabsPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      "cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-muted/80 hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm",
-      className,
-    )}
-    {...props}
-  />
-));
+export function TabsTrigger({ className, children, ...props }: TabsTriggerProps): React.JSX.Element {
+  return (
+    <TabsPrimitive.Trigger
+      className={cn(
+        "cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-muted/80 hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </TabsPrimitive.Trigger>
+  );
+}
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
-const TabsContent = React.forwardRef<
-  React.ElementRef<typeof TabsPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.Content
-    ref={ref}
-    className={cn(
-      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-      className,
-    )}
-    {...props}
-  />
-));
+export function TabsContent({ className, children, ...props }: TabsContentProps): React.JSX.Element {
+  return (
+    <TabsPrimitive.Content
+      className={cn(
+        "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </TabsPrimitive.Content>
+  );
+}
 TabsContent.displayName = TabsPrimitive.Content.displayName;
-
-export { Tabs, TabsContent, TabsList, TabsTrigger };

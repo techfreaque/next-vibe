@@ -617,7 +617,6 @@ export const EmailCampaignStageDB = [
   EmailCampaignStage.REACTIVATION,
 ] as const;
 
-
 export const EmailJourneyVariantDB = [
   EmailJourneyVariant.PERSONAL_APPROACH,
   EmailJourneyVariant.RESULTS_FOCUSED,

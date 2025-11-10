@@ -9,7 +9,6 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import type { FormEvent } from "react";
 import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
-import type { z } from "zod";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
@@ -37,7 +36,7 @@ export type InferApiFormReturn<T> =
   >
     ? T extends {
         types: {
-          RequestOutput: infer TRequestOutput;
+          RequestOutput: infer TRequestOutput extends FieldValues;
           ResponseOutput: infer TResponseOutput;
           UrlVariablesOutput: infer TUrlVariablesOutput;
         };
@@ -77,7 +76,7 @@ export type InferApiQueryFormReturn<T> =
   >
     ? T extends {
         types: {
-          RequestOutput: infer TRequestOutput;
+          RequestOutput: infer TRequestOutput extends FieldValues;
           ResponseOutput: infer TResponseOutput;
           UrlVariablesOutput: infer TUrlVariablesOutput;
         };
@@ -221,8 +220,11 @@ export interface ApiQueryFormOptions<TRequest extends FieldValues>
 /**
  * Return type for useApiQueryForm hook combining form and query functionality
  */
-export interface ApiQueryFormReturn<TRequest, TResponse, TUrlVariables>
-  extends ApiFormReturn<TRequest, TResponse, TUrlVariables> {
+export interface ApiQueryFormReturn<
+  TRequest extends FieldValues,
+  TResponse,
+  TUrlVariables,
+> extends ApiFormReturn<TRequest, TResponse, TUrlVariables> {
   // Query-specific properties - backward compatibility
   /** @deprecated Use response.success and response.data instead */
   data: TResponse | undefined;
@@ -263,11 +265,12 @@ export type ApiFormOptions<TRequest extends FieldValues> =
     persistenceKey?: string;
   };
 
-export interface ApiFormReturn<TRequest, TResponse, TUrlVariables> {
-  form: UseFormReturn<
-    TRequest extends FieldValues ? TRequest : FieldValues,
-    z.ZodTypeAny
-  >;
+export interface ApiFormReturn<
+  TRequest extends FieldValues,
+  TResponse,
+  TUrlVariables,
+> {
+  form: UseFormReturn<TRequest>;
 
   /** The complete response including success/error state */
   response: ResponseType<TResponse> | undefined;

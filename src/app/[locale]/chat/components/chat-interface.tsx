@@ -23,6 +23,7 @@ import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
+import { envClient } from "@/config/env-client";
 
 import { useChatContext } from "../features/chat/context";
 import type { ModelId } from "../types";
@@ -428,7 +429,14 @@ export function ChatInterface({
 
   return (
     <>
-      <Div className="flex h-dvh overflow-hidden bg-background">
+      <Div
+        className={
+          envClient.platform.isReactNative
+            ? "flex flex-1 overflow-hidden bg-background"
+            : "flex h-dvh overflow-hidden bg-background"
+        }
+        style={envClient.platform.isReactNative ? { flex: 1 } : undefined}
+      >
         {/* Top Bar - Menu, Search, Settings */}
         <TopBar
           theme={theme}

@@ -25,11 +25,11 @@ export type MutationVariables<TRequest, TUrlVariables> = [TRequest] extends [
   never,
 ]
   ? [TUrlVariables] extends [never]
-  ? Record<string, never> // Both are never - empty object
-  : { requestData: TRequest; urlPathParams: TUrlVariables }
+    ? Record<string, never> // Both are never - empty object
+    : { requestData: TRequest; urlPathParams: TUrlVariables }
   : [TUrlVariables] extends [never]
-  ? { requestData: TRequest; urlPathParams?: never } // TRequest exists, TUrlVariables is never - urlPathParams is optional
-  : { requestData: TRequest; urlPathParams: TUrlVariables };
+    ? { requestData: TRequest; urlPathParams?: never } // TRequest exists, TUrlVariables is never - urlPathParams is optional
+    : { requestData: TRequest; urlPathParams: TUrlVariables };
 
 /**
  * Mutation context type for tracking additional mutation state
@@ -102,9 +102,7 @@ export type EnhancedMutationResult<TResponse, TRequest, TUrlVariables> = Omit<
  * @param options - Mutation options
  * @returns Mutation result
  */
-export function useApiMutation<
-  TEndpoint extends CreateApiEndpointAny,
->(
+export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   logger: EndpointLogger,
   options: ApiMutationOptions<
@@ -158,7 +156,9 @@ export function useApiMutation<
         locale,
         options: {
           onSuccess: options.onSuccess
-            ? (context): void | ErrorResponseType | Promise<void | ErrorResponseType> =>
+            ? (
+                context,
+              ): void | ErrorResponseType | Promise<void | ErrorResponseType> =>
                 options.onSuccess?.({
                   requestData: context.requestData,
                   pathParams: context.urlPathParams,

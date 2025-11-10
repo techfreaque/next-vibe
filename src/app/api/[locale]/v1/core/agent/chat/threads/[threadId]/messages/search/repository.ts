@@ -44,7 +44,8 @@ export interface MessageSearchRepositoryInterface {
  * Message Search Repository Implementation
  */
 export class MessageSearchRepositoryImpl
-  implements MessageSearchRepositoryInterface {
+  implements MessageSearchRepositoryInterface
+{
   /**
    * Search messages within a specific thread using full-text search
    */
@@ -165,9 +166,9 @@ export class MessageSearchRepositoryImpl
     } catch (error) {
       logger.error("Failed to search messages", parseError(error));
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.errors.serverError.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

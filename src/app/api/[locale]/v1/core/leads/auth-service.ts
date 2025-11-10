@@ -344,13 +344,10 @@ class LeadAuthServiceImpl {
         isPrimary: true,
       });
 
-      logger.error(
-        "app.api.v1.core.leads.auth.createForUser.createdFallback",
-        {
-          userId,
-          leadId: fallbackLead.id,
-        },
-      );
+      logger.error("app.api.v1.core.leads.auth.createForUser.createdFallback", {
+        userId,
+        leadId: fallbackLead.id,
+      });
       return fallbackLead.id;
     }
 

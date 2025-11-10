@@ -1,14 +1,10 @@
 "use client";
 
-import { Edit, ExternalLink, Eye } from 'next-vibe-ui/ui/icons';
-import {
-  Link } from "next-vibe-ui/ui/link";
-import {
-  LeadStatus,
-  type LeadStatusValues,
-} from "next-vibe/leads/enum";
+import { Edit, ExternalLink, Eye } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
+import { LeadStatus, type LeadStatusValues } from "next-vibe/leads/enum";
 import type { LeadListGetResponseTypeOutput } from "next-vibe/leads/list/definition";
-import { P} from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui/typography";
 import { Div } from "next-vibe-ui/ui/div";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Span } from "next-vibe-ui/ui/span";
@@ -309,7 +305,11 @@ export function LeadsTable({
                         size="unset"
                         onClick={() => {
                           if (lead.website) {
-                            window.open(lead.website, "_blank", "noopener,noreferrer");
+                            window.open(
+                              lead.website,
+                              "_blank",
+                              "noopener,noreferrer",
+                            );
                           }
                         }}
                         className="text-blue-600 hover:underline text-sm flex items-center gap-1 cursor-pointer bg-transparent border-none p-0"

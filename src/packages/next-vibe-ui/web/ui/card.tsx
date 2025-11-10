@@ -52,12 +52,12 @@ function Card({ className, ...props }: CardProps): React.JSX.Element {
 }
 Card.displayName = "Card";
 
-function CardHeader({ className, ...props }: CardHeaderProps): React.JSX.Element {
+function CardHeader({
+  className,
+  ...props
+}: CardHeaderProps): React.JSX.Element {
   return (
-    <div
-      className={cn("flex flex-col space-y-1.5 p-6", className)}
-      {...props}
-    />
+    <div className={cn("flex flex-col gap-1.5 p-6", className)} {...props} />
   );
 }
 CardHeader.displayName = "CardHeader";
@@ -75,7 +75,10 @@ function CardTitle({ className, ...props }: CardTitleProps): React.JSX.Element {
 }
 CardTitle.displayName = "CardTitle";
 
-function CardDescription({ className, ...props }: CardDescriptionProps): React.JSX.Element {
+function CardDescription({
+  className,
+  ...props
+}: CardDescriptionProps): React.JSX.Element {
   return (
     <div
       className={cn("text-sm text-muted-foreground", className)}
@@ -85,17 +88,20 @@ function CardDescription({ className, ...props }: CardDescriptionProps): React.J
 }
 CardDescription.displayName = "CardDescription";
 
-function CardContent({ className, ...props }: CardContentProps): React.JSX.Element {
+function CardContent({
+  className,
+  ...props
+}: CardContentProps): React.JSX.Element {
   return <div className={cn("p-6 pt-0", className)} {...props} />;
 }
 CardContent.displayName = "CardContent";
 
-function CardFooter({ className, ...props }: CardFooterProps): React.JSX.Element {
+function CardFooter({
+  className,
+  ...props
+}: CardFooterProps): React.JSX.Element {
   return (
-    <div
-      className={cn("flex items-center p-6 pt-0", className)}
-      {...props}
-    />
+    <div className={cn("flex items-center p-6 pt-0", className)} {...props} />
   );
 }
 CardFooter.displayName = "CardFooter";

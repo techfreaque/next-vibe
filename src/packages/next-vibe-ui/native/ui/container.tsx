@@ -2,17 +2,12 @@
  * Container Component for React Native
  * Provides consistent max-width and padding for app pages
  */
-import type { ReactNode } from "react";
 import { View } from "react-native";
 
 import { cn } from "next-vibe/shared/utils/utils";
 
-// Cross-platform container props
-export interface ContainerProps {
-  children?: ReactNode;
-  className?: string;
-  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "full";
-}
+// Import ALL types from web - ZERO definitions here
+import type { ContainerProps } from "@/packages/next-vibe-ui/web/ui/container";
 
 const sizeClasses: Record<NonNullable<ContainerProps["size"]>, string> = {
   sm: "max-w-2xl",
@@ -30,11 +25,7 @@ export function Container({
 }: ContainerProps): React.JSX.Element {
   return (
     <View
-      className={cn(
-        "mx-auto px-4 px-6 py-8",
-        sizeClasses[size],
-        className,
-      )}
+      className={cn("mx-auto px-4 px-6 py-8", sizeClasses[size], className)}
     >
       {children}
     </View>

@@ -21,7 +21,7 @@ export default async function CreateSmtpAccountPage({
   const { t } = simpleT(locale);
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Page Header */}
       <Div>
         <H1 className="text-3xl font-bold tracking-tight">

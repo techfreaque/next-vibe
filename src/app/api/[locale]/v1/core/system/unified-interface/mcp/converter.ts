@@ -50,8 +50,11 @@ interface MCPPropertyValue {
 function isMCPProperty(
   // eslint-disable-next-line no-restricted-syntax -- Infrastructure: MCP tool conversion requires 'unknown' for flexible tool schemas
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: MCP tool conversion requires 'unknown' for flexible tool schemas
-  value: unknown
-): value is Record<string, string | number | boolean | null | MCPPropertyValue> {
+  value: unknown,
+): value is Record<
+  string,
+  string | number | boolean | null | MCPPropertyValue
+> {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return false;
   }
@@ -78,7 +81,7 @@ function isMCPProperty(
  * Safely extracts and types properties for MCP format
  */
 function buildMCPInputSchema(
-  schema: ReturnType<typeof zodSchemaToJsonSchema>
+  schema: ReturnType<typeof zodSchemaToJsonSchema>,
 ): MCPTool["inputSchema"] {
   const defaultSchema: MCPTool["inputSchema"] = {
     type: "object",
@@ -94,11 +97,16 @@ function buildMCPInputSchema(
   // Extract properties
   const properties = "properties" in schema ? schema.properties : undefined;
   const required = "required" in schema ? schema.required : undefined;
-  const additionalProperties = "additionalProperties" in schema ? schema.additionalProperties : undefined;
+  const additionalProperties =
+    "additionalProperties" in schema ? schema.additionalProperties : undefined;
 
   // Validate and build properties
   let typedProperties: MCPTool["inputSchema"]["properties"];
-  if (properties && typeof properties === "object" && !Array.isArray(properties)) {
+  if (
+    properties &&
+    typeof properties === "object" &&
+    !Array.isArray(properties)
+  ) {
     typedProperties = {};
     for (const [key, value] of Object.entries(properties)) {
       if (isMCPProperty(value)) {
@@ -111,7 +119,10 @@ function buildMCPInputSchema(
     type: "object",
     properties: typedProperties,
     required: Array.isArray(required) ? required : undefined,
-    additionalProperties: typeof additionalProperties === "boolean" ? additionalProperties : undefined,
+    additionalProperties:
+      typeof additionalProperties === "boolean"
+        ? additionalProperties
+        : undefined,
   };
 }
 

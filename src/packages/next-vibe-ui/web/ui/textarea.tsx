@@ -1,23 +1,56 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils";
-import type { TextareaHTMLAttributes } from "react";
 import React from "react";
 
+export interface TextareaChangeEvent {
+  target: {
+    value: string;
+    name?: string;
+    id?: string;
+  };
+  currentTarget?: {
+    value?: string;
+  };
+  preventDefault?: () => void;
+  stopPropagation?: () => void;
+}
+
+export interface TextareaFocusEvent {
+  target?: {
+    focus?: () => void;
+    blur?: () => void;
+    value?: string;
+  };
+  currentTarget?: {
+    focus?: () => void;
+    blur?: () => void;
+  };
+}
+
 // Cross-platform props interface
-export interface TextareaBaseProps
-  extends Omit<
-    TextareaHTMLAttributes<HTMLTextAreaElement>,
-    "onChange" | "onChangeText"
-  > {
+export interface TextareaBaseProps {
+  className?: string;
+  value?: string;
+  defaultValue?: string;
+  placeholder?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
+  required?: boolean;
+  rows?: number;
+  name?: string;
+  id?: string;
+  maxLength?: number;
   onChangeText?: (text: string) => void;
-  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onChange?: (e: TextareaChangeEvent) => void;
+  onBlur?: (e: TextareaFocusEvent) => void;
+  onFocus?: (e: TextareaFocusEvent) => void;
   minRows?: number;
   maxRows?: number;
-  // Native-specific props (optional for web)
   placeholderClassName?: string;
   editable?: boolean;
   numberOfLines?: number;
   multiline?: boolean;
+  ref?: (node: { focus?: () => void; blur?: () => void; select?: () => void; value?: string } | null) => void;
 }
 
 export const textareaVariants = cva(
@@ -41,77 +74,78 @@ export interface TextareaProps
   extends TextareaBaseProps,
     VariantProps<typeof textareaVariants> {}
 
-const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  (
-    { className, variant, minRows = 2, maxRows = 10, onChange, onChangeText, ...props },
-    ref,
-  ) => {
-    const internalRef = React.useRef<HTMLTextAreaElement>(null);
-    const textareaRef =
-      (ref as React.RefObject<HTMLTextAreaElement>) || internalRef;
+function Textarea({
+  className,
+  variant,
+  minRows = 2,
+  maxRows = 10,
+  onChange,
+  onChangeText,
+  ref: _ref,
+  ...props
+}: TextareaProps): React.JSX.Element {
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
-    const adjustHeight = React.useCallback(() => {
-      const textarea = textareaRef.current;
-      if (!textarea) {
-        return;
-      }
-
-      // Reset height to get accurate scrollHeight
-      textarea.style.height = "auto";
-
-      // Calculate line height
-      const computedStyle = window.getComputedStyle(textarea);
-      const lineHeight = parseInt(computedStyle.lineHeight);
-      const paddingTop = parseInt(computedStyle.paddingTop);
-      const paddingBottom = parseInt(computedStyle.paddingBottom);
-
-      // Calculate min and max heights
-      const minHeight = lineHeight * minRows + paddingTop + paddingBottom;
-      const maxHeight = lineHeight * maxRows + paddingTop + paddingBottom;
-
-      // Set new height within bounds
-      const newHeight = Math.min(
-        Math.max(textarea.scrollHeight, minHeight),
-        maxHeight,
-      );
-      textarea.style.height = `${newHeight}px`;
-
-      // Enable scrolling if content exceeds maxHeight
-      textarea.style.overflowY =
-        textarea.scrollHeight > maxHeight ? "auto" : "hidden";
-    }, [minRows, maxRows, textareaRef]);
-
-    React.useEffect(() => {
-      adjustHeight();
-    }, [adjustHeight, props.value, props.defaultValue]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
-      adjustHeight();
-      onChange?.(e);
-      onChangeText?.(e.target.value);
-    };
-
-    const content = (
-      <textarea
-        className={cn(textareaVariants({ variant }), className)}
-        ref={textareaRef}
-        onChange={handleChange}
-        {...props}
-      />
-    );
-
-    // Ghost variant needs wrapper for border styling
-    if (variant === "ghost") {
-      return (
-        <div className="overflow-hidden rounded-t-md border-transparent">
-          {content}
-        </div>
-      );
+  const adjustHeight = React.useCallback(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      return;
     }
 
-    return content;
-  },
-);
-Textarea.displayName = "Textarea";
+    // Reset height to get accurate scrollHeight
+    textarea.style.height = "auto";
+
+    // Calculate line height
+    const computedStyle = window.getComputedStyle(textarea);
+    const lineHeight = parseInt(computedStyle.lineHeight);
+    const paddingTop = parseInt(computedStyle.paddingTop);
+    const paddingBottom = parseInt(computedStyle.paddingBottom);
+
+    // Calculate min and max heights
+    const minHeight = lineHeight * minRows + paddingTop + paddingBottom;
+    const maxHeight = lineHeight * maxRows + paddingTop + paddingBottom;
+
+    // Set new height within bounds
+    const newHeight = Math.min(
+      Math.max(textarea.scrollHeight, minHeight),
+      maxHeight,
+    );
+    textarea.style.height = `${newHeight}px`;
+
+    // Enable scrolling if content exceeds maxHeight
+    textarea.style.overflowY =
+      textarea.scrollHeight > maxHeight ? "auto" : "hidden";
+  }, [minRows, maxRows]);
+
+  React.useEffect(() => {
+    adjustHeight();
+  }, [adjustHeight, props.value, props.defaultValue]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+    adjustHeight();
+    onChange?.({ target: { value: e.target.value, name: e.target.name } });
+    onChangeText?.(e.target.value);
+  };
+
+  const content = (
+    <textarea
+      className={cn(textareaVariants({ variant }), className)}
+      ref={textareaRef}
+      onChange={handleChange}
+      {...props}
+    />
+  );
+
+  // Ghost variant needs wrapper for border styling
+  if (variant === "ghost") {
+    return (
+      <div className="overflow-hidden rounded-t-md border-transparent">
+        {content}
+      </div>
+    );
+  }
+
+  return content;
+}
 
 export { Textarea };

@@ -69,7 +69,10 @@ interface MCPResponse {
 export class BrowserRepositoryImpl implements BrowserRepository {
   private mcpProcess: ChildProcess | null = null;
   private nextRequestId = 1;
-  private pendingRequests = new Map<number, { resolve: (value: MCPResponse) => void; reject: (error: Error) => void }>();
+  private pendingRequests = new Map<
+    number,
+    { resolve: (value: MCPResponse) => void; reject: (error: Error) => void }
+  >();
   private isInitialized = false;
 
   /**
@@ -91,7 +94,8 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       const serverReady = await this.ensureMCPServer(logger);
       if (!serverReady) {
         return fail({
-          message: "app.api.v1.core.browser.repository.mcp.connect.failedToInitialize",
+          message:
+            "app.api.v1.core.browser.repository.mcp.connect.failedToInitialize",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -100,15 +104,22 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       let parsedArgs: Record<string, ParameterValue> = {};
       if (data.arguments) {
         try {
-          parsedArgs = JSON.parse(data.arguments) as Record<string, ParameterValue>;
+          parsedArgs = JSON.parse(data.arguments) as Record<
+            string,
+            ParameterValue
+          >;
         } catch (parseError) {
           logger.warn("[Browser Repository] Failed to parse arguments", {
             arguments: data.arguments,
-            error: parseError instanceof Error ? parseError.message : String(parseError),
+            error:
+              parseError instanceof Error
+                ? parseError.message
+                : String(parseError),
           });
           return fail({
-          message: "app.api.v1.core.browser.repository.mcp.tool.call.invalidJsonArguments",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            message:
+              "app.api.v1.core.browser.repository.mcp.tool.call.invalidJsonArguments",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
       }
@@ -127,21 +138,26 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       return success({
         success: result.success,
         result: result.success ? result.result : result.error,
-        status: [result.success ? BrowserToolStatus.COMPLETED : BrowserToolStatus.FAILED],
+        status: [
+          result.success
+            ? BrowserToolStatus.COMPLETED
+            : BrowserToolStatus.FAILED,
+        ],
         executionId,
       });
-
     } catch (error) {
       logger.error("[Browser Repository] Tool execution error", {
         tool: data.tool,
         error: error instanceof Error ? error.message : String(error),
       });
 
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       return fail({
-          message: "app.api.v1.core.browser.repository.mcp.tool.call.executionFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: errorMessage },
+        message:
+          "app.api.v1.core.browser.repository.mcp.tool.call.executionFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
       });
     }
   }
@@ -160,7 +176,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       return initialized;
     } catch (error) {
       logger.error("[Browser Repository] Failed to ensure MCP server", {
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
       return false;
     }
@@ -188,7 +204,9 @@ export class BrowserRepositoryImpl implements BrowserRepository {
 
     // Handle process lifecycle
     this.mcpProcess.on("error", (error) => {
-      logger.error("[Browser Repository] MCP process error", { error: error.message });
+      logger.error("[Browser Repository] MCP process error", {
+        error: error.message,
+      });
       this.isInitialized = false;
     });
 
@@ -225,7 +243,9 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       const response = await this.sendRequest(initRequest, logger);
 
       if (response.error) {
-        logger.error("[Browser Repository] MCP initialization failed", { error: response.error.message });
+        logger.error("[Browser Repository] MCP initialization failed", {
+          error: response.error.message,
+        });
         return false;
       }
 
@@ -234,7 +254,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       return true;
     } catch (error) {
       logger.error("[Browser Repository] MCP initialization error", {
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
       return false;
     }
@@ -243,7 +263,11 @@ export class BrowserRepositoryImpl implements BrowserRepository {
   /**
    * Call a tool via MCP
    */
-  private async callTool(toolName: string, args: Record<string, ParameterValue>, logger: EndpointLogger): Promise<{ success: boolean; result?: ParameterValue; error?: string }> {
+  private async callTool(
+    toolName: string,
+    args: Record<string, ParameterValue>,
+    logger: EndpointLogger,
+  ): Promise<{ success: boolean; result?: ParameterValue; error?: string }> {
     const toolRequest: MCPRequest = {
       jsonrpc: "2.0",
       id: this.nextRequestId++,
@@ -279,7 +303,10 @@ export class BrowserRepositoryImpl implements BrowserRepository {
   /**
    * Send a request to the MCP server
    */
-  private sendRequest(request: MCPRequest, logger: EndpointLogger): Promise<MCPResponse> {
+  private sendRequest(
+    request: MCPRequest,
+    logger: EndpointLogger,
+  ): Promise<MCPResponse> {
     return new Promise((resolve, reject) => {
       if (!this.mcpProcess) {
         reject(new Error("MCP process not running"));
@@ -290,7 +317,10 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       this.pendingRequests.set(id, { resolve, reject });
 
       const message = `${JSON.stringify(request)}\n`;
-      logger.debug("[Browser Repository] Sending MCP request", { method: request.method, id });
+      logger.debug("[Browser Repository] Sending MCP request", {
+        method: request.method,
+        id,
+      });
 
       this.mcpProcess.stdin?.write(message);
 
@@ -328,7 +358,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
             logger.debug("[Browser Repository] Received MCP response", {
               id: response.id,
               hasResult: !!response.result,
-              hasError: !!response.error
+              hasError: !!response.error,
             });
 
             const pending = this.pendingRequests.get(response.id);
@@ -343,7 +373,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
           } catch (error) {
             logger.warn("[Browser Repository] Failed to parse MCP response", {
               line,
-              error: error instanceof Error ? error.message : String(error)
+              error: error instanceof Error ? error.message : String(error),
             });
           }
         }
@@ -351,7 +381,9 @@ export class BrowserRepositoryImpl implements BrowserRepository {
     });
 
     this.mcpProcess.stderr?.on("data", (data) => {
-      logger.warn("[Browser Repository] MCP stderr", { data: data.toString().trim() });
+      logger.warn("[Browser Repository] MCP stderr", {
+        data: data.toString().trim(),
+      });
     });
   }
 

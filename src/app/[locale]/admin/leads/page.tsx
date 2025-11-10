@@ -21,7 +21,7 @@ export default async function AdminLeadsPage({
 }: AdminLeadsPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Stats Client Component */}
       <LeadsStatsClient locale={locale} />
     </Div>

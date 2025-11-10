@@ -67,7 +67,11 @@ export function LinkListWidget({
         className={cn("py-8 text-center text-muted-foreground", className)}
         style={style}
       >
-        <P>{t("app.api.v1.core.system.unifiedInterface.react.widgets.linkList.noResults")}</P>
+        <P>
+          {t(
+            "app.api.v1.core.system.unifiedInterface.react.widgets.linkList.noResults",
+          )}
+        </P>
       </Div>
     );
   }
@@ -84,9 +88,9 @@ export function LinkListWidget({
   /* eslint-enable i18next/no-literal-string */
 
   return (
-    <Div className={cn("space-y-4", className)} style={style}>
+    <Div className={cn("flex flex-col gap-4", className)} style={style}>
       {title && (
-        <Div className="space-y-1">
+        <Div className="flex flex-col gap-1">
           <H3 className="text-lg font-semibold">{title}</H3>
           {description && (
             <P className="text-sm text-muted-foreground">{description}</P>

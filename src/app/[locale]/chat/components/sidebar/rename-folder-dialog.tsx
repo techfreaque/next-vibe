@@ -1,7 +1,12 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
@@ -54,8 +59,8 @@ export function RenameFolderDialog({
         <DialogHeader>
           <DialogTitle>{t("app.chat.renameFolder.title")}</DialogTitle>
         </DialogHeader>
-        <Div className="space-y-4">
-          <Div className="space-y-2">
+        <Div className="flex flex-col gap-4">
+          <Div className="flex flex-col gap-2">
             <Label htmlFor="folder-name">
               {t("app.chat.renameFolder.folderName")}
             </Label>
@@ -71,7 +76,7 @@ export function RenameFolderDialog({
               }}
             />
           </Div>
-          <Div className="space-y-2">
+          <Div className="flex flex-col gap-2">
             <Label>{t("app.chat.renameFolder.folderIcon")}</Label>
             <IconSelector
               value={icon ?? "folder"}

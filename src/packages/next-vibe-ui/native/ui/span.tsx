@@ -12,18 +12,14 @@ export type SpanProps = TextProps &
   };
 
 // Native: Use Text component (inline text in React Native)
-export const Span = React.forwardRef<
-  React.ElementRef<typeof RNText>,
-  SpanProps
->(({ className, children, id, ...props }, ref) => (
-  <RNText
-    ref={ref}
-    className={cn("text-base text-foreground", className)}
-    nativeID={id}
-    {...props}
-  >
-    {children}
-  </RNText>
-));
-
-Span.displayName = "Span";
+export function Span({ className, children, id, ...props }: SpanProps): React.JSX.Element {
+  return (
+    <RNText
+      className={cn("text-base text-foreground", className)}
+      nativeID={id}
+      {...props}
+    >
+      {children}
+    </RNText>
+  );
+}

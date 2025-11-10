@@ -117,10 +117,13 @@ export const translations: typeof enTranslations = {
   },
   success: {
     updated: "Passwort erfolgreich aktualisiert",
-    securityTip: "Aktivieren Sie für erhöhte Sicherheit die Zwei-Faktor-Authentifizierung",
+    securityTip:
+      "Aktivieren Sie für erhöhte Sicherheit die Zwei-Faktor-Authentifizierung",
     nextSteps: {
-      logoutOther: "Alle anderen Sitzungen wurden aus Sicherheitsgründen abgemeldet",
-      enable2fa: "Erwägen Sie die Aktivierung der Zwei-Faktor-Authentifizierung für bessere Sicherheit",
+      logoutOther:
+        "Alle anderen Sitzungen wurden aus Sicherheitsgründen abgemeldet",
+      enable2fa:
+        "Erwägen Sie die Aktivierung der Zwei-Faktor-Authentifizierung für bessere Sicherheit",
     },
     title: "Passwort Aktualisiert",
     description: "Ihr Passwort wurde erfolgreich aktualisiert",

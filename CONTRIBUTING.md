@@ -165,7 +165,7 @@ vibe dev
    return success({ userId: "123" });
 
    // ❌ BAD
-   return { userId: "123" };  // Not type-safe
+   return { userId: "123" }; // Not type-safe
    ```
 
 ### Forbidden Patterns
@@ -282,25 +282,30 @@ git push origin feature/my-feature
 
 **Example PR description:**
 
-```markdown
+````markdown
 ## Summary
+
 Add user profile export feature
 
 ## Motivation
+
 Users requested ability to export their profile data
 
 ## Changes
+
 - Added `/api/[locale]/v1/core/user/private/export` endpoint
 - Added export format options (JSON, CSV)
 - Added tests for export functionality
 - Added translations (en, de, pl)
 
 ## Testing
+
 ```bash
 vibe check  # Passes
 vibe test   # All pass
 vibe user:private:export --format=json  # Works
 ```
+````
 
 ## Checklist
 
@@ -444,3 +449,4 @@ See [LICENSE](LICENSE) and [src/packages/LICENSE](src/packages/LICENSE) for deta
 **Thank you for contributing to NextVibe!** 🎉
 
 Every contribution, no matter how small, helps make NextVibe better for everyone.
+```

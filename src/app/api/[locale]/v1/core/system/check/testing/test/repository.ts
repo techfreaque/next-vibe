@@ -110,9 +110,10 @@ class TestRepositoryImpl implements TestRepositoryInterface {
       );
 
       return fail({
-          message: "app.api.v1.core.system.check.testing.test.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.system.check.testing.test.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           error: parsedError.message,
           output: output.trim(),
           duration,

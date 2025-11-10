@@ -1,7 +1,7 @@
 "use client";
 
 import * as LabelPrimitive from "@radix-ui/react-label";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
@@ -9,28 +9,20 @@ const labelVariants = cva(
   "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 );
 
-// Cross-platform base props interface
-export interface LabelBaseProps {
+// Cross-platform props interface
+export interface LabelRootProps {
   className?: string;
   children?: React.ReactNode;
   htmlFor?: string;
+  nativeID?: string;
 }
 
-// Web-specific props interface that extends Radix UI primitives
-export interface LabelProps extends React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> {
-  className?: string;
+export function Label({ className, ...props }: LabelRootProps): React.JSX.Element {
+  return (
+    <LabelPrimitive.Root
+      className={cn(labelVariants(), className)}
+      {...props}
+    />
+  );
 }
-
-const Label = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Root>,
-  LabelProps & VariantProps<typeof labelVariants>
->(({ className, ...props }, ref) => (
-  <LabelPrimitive.Root
-    ref={ref}
-    className={cn(labelVariants(), className)}
-    {...props}
-  />
-));
 Label.displayName = LabelPrimitive.Root.displayName;
-
-export { Label };

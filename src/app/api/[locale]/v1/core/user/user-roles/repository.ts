@@ -143,18 +143,18 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
         return fail({
           message: "app.api.v1.core.user.userRoles.errors.find_failed",
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-                    messageParams: {
+          messageParams: {
             userId,
             error: parsedError.message,
             details: parsedError.message,
           },
-      });
+        });
       }
 
       return fail({
-          message: "app.api.v1.core.user.userRoles.errors.find_failed",
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-                  messageParams: { userId, error: parsedError.message },
+        message: "app.api.v1.core.user.userRoles.errors.find_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: { userId, error: parsedError.message },
       });
     }
   }
@@ -193,10 +193,10 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
           return success(cliRole);
         } else {
           return fail({
-          message: "app.api.v1.core.user.userRoles.errors.not_found",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                      messageParams: { userId, role },
-      });
+            message: "app.api.v1.core.user.userRoles.errors.not_found",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+            messageParams: { userId, role },
+          });
         }
       }
 
@@ -209,8 +209,8 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
         return fail({
           message: "app.api.v1.core.user.userRoles.errors.not_found",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId, role },
-      });
+          messageParams: { userId, role },
+        });
       }
 
       return success(results[0]);
@@ -220,9 +220,9 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
         parseError(error),
       );
       return fail({
-          message: "app.api.v1.core.user.userRoles.errors.lookup_failed",
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-                  messageParams: { userId, role, error: parseError(error).message },
+        message: "app.api.v1.core.user.userRoles.errors.lookup_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: { userId, role, error: parseError(error).message },
       });
     }
   }
@@ -270,17 +270,19 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
         return fail({
           message: "app.api.v1.core.user.userRoles.errors.add_failed",
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-                    messageParams: { error: "app.api.v1.core.user.userRoles.errors.no_data_returned" },
-      });
+          messageParams: {
+            error: "app.api.v1.core.user.userRoles.errors.no_data_returned",
+          },
+        });
       }
 
       return success(results[0]);
     } catch (error) {
       logger.error("Error adding role to user", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.userRoles.errors.add_failed",
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-                  messageParams: {
+        message: "app.api.v1.core.user.userRoles.errors.add_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: {
           userId: data.userId,
           role: data.role,
           error: parseError(error).message,
@@ -312,9 +314,9 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
     } catch (error) {
       logger.error("Error removing role from user", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.userRoles.errors.remove_failed",
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-                  messageParams: { userId, role, error: parseError(error).message },
+        message: "app.api.v1.core.user.userRoles.errors.remove_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: { userId, role, error: parseError(error).message },
       });
     }
   }
@@ -343,9 +345,9 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
     } catch (error) {
       logger.error("Error checking if user has role", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.userRoles.errors.check_failed",
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-                  messageParams: { userId, role, error: parseError(error).message },
+        message: "app.api.v1.core.user.userRoles.errors.check_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: { userId, role, error: parseError(error).message },
       });
     }
   }
@@ -368,9 +370,9 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
     } catch (error) {
       logger.error("Error deleting user roles by user ID", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.userRoles.errors.delete_failed",
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-                  messageParams: { userId, error: parseError(error).message },
+        message: "app.api.v1.core.user.userRoles.errors.delete_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: { userId, error: parseError(error).message },
       });
     }
   }
@@ -393,8 +395,8 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
         return fail({
           message: "app.api.v1.core.user.userRoles.errors.find_failed",
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-                    messageParams: { userId },
-      });
+          messageParams: { userId },
+        });
       }
 
       const roleValues = rolesResult.data.map((r) => r.role);
@@ -402,9 +404,9 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
     } catch (error) {
       logger.error("Error getting user role values", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.userRoles.errors.find_failed",
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-                  messageParams: { userId, error: parseError(error).message },
+        message: "app.api.v1.core.user.userRoles.errors.find_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: { userId, error: parseError(error).message },
       });
     }
   }

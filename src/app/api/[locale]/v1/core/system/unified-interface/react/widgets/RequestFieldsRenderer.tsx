@@ -76,7 +76,7 @@ function getTypeIcon(value: unknown): string {
     return "#";
   }
   if (typeof value === "string") {
-    return "\"";
+    return '"';
   }
   if (Array.isArray(value)) {
     return "[]";
@@ -115,24 +115,19 @@ function getTypeColor(value: unknown): string {
 /**
  * Render a single field
  */
-function renderField(
-  key: string,
-  value: unknown,
-  depth = 0,
-): JSX.Element {
+function renderField(key: string, value: unknown, depth = 0): JSX.Element {
   const isComplex = typeof value === "object" && value !== null;
   const indent = depth * 16; // 16px per level
 
   return (
-    <Div key={key} className="space-y-1" style={{ marginLeft: `${indent}px` }}>
+    <Div
+      key={key}
+      className="flex flex-col gap-1"
+      style={{ marginLeft: `${indent}px` }}
+    >
       <Div className="flex items-start gap-2">
         {/* Type Icon */}
-        <Span
-          className={cn(
-            "text-xs font-mono mt-0.5",
-            getTypeColor(value),
-          )}
-        >
+        <Span className={cn("text-xs font-mono mt-0.5", getTypeColor(value))}>
           {getTypeIcon(value)}
         </Span>
 
@@ -151,19 +146,17 @@ function renderField(
 
       {/* Nested Fields */}
       {isComplex && (
-        <Div className="space-y-1">
-          {Array.isArray(value) ? (
-            // Render array items
-            value.map((item, index) =>
-              renderField(`[${index}]`, item, depth + 1),
-            )
-          ) : (
-            // Render object fields
-            Object.entries(value as Record<string, unknown>).map(
-              ([nestedKey, nestedValue]) =>
-                renderField(nestedKey, nestedValue, depth + 1),
-            )
-          )}
+        <Div className="flex flex-col gap-1">
+          {Array.isArray(value)
+            ? // Render array items
+              value.map((item, index) =>
+                renderField(`[${index}]`, item, depth + 1),
+              )
+            : // Render object fields
+              Object.entries(value as Record<string, unknown>).map(
+                ([nestedKey, nestedValue]) =>
+                  renderField(nestedKey, nestedValue, depth + 1),
+              )}
         </Div>
       )}
     </Div>
@@ -185,16 +178,17 @@ export function RequestFieldsRenderer({
   if (!args || typeof args !== "object" || Object.keys(args).length === 0) {
     return (
       <Div className="text-sm text-muted-foreground italic py-2">
-        {t("app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.messages.noArguments")}
+        {t(
+          "app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.messages.noArguments",
+        )}
       </Div>
     );
   }
 
   // Render all fields
   return (
-    <Div className="space-y-2 rounded-md bg-muted border border-border/30 p-3">
+    <Div className="flex flex-col gap-2 rounded-md bg-muted border border-border/30 p-3">
       {Object.entries(args).map(([key, value]) => renderField(key, value))}
     </Div>
   );
 }
-

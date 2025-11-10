@@ -29,24 +29,30 @@ export const translations: typeof enTranslations = {
       },
       features: {
         title: "Plattformfunktionen",
-        description: "Diese Seite funktioniert sowohl im Web als auch auf Mobilgeräten",
+        description:
+          "Diese Seite funktioniert sowohl im Web als auch auf Mobilgeräten",
         unified: {
           title: "✅ Einheitliche Komponenten",
-          description: "Verwendung von next-vibe-ui Komponenten, die nahtlos über Plattformen hinweg funktionieren",
+          description:
+            "Verwendung von next-vibe-ui Komponenten, die nahtlos über Plattformen hinweg funktionieren",
         },
         types: {
           title: "✅ Typsicherheit",
-          description: "Vollständige TypeScript-Unterstützung mit korrekter Typinferenz",
+          description:
+            "Vollständige TypeScript-Unterstützung mit korrekter Typinferenz",
         },
         async: {
           title: "✅ Asynchrone Serverkomponenten",
-          description: "Next.js 15 asynchrone Seitkomponenten funktionieren in React Native",
+          description:
+            "Next.js 15 asynchrone Seitkomponenten funktionieren in React Native",
         },
       },
       links: {
         chat: "Zum Chat gehen",
         help: "Zur Hilfe gehen",
         about: "Über uns",
+        story: "Unsere Geschichte",
+        designTest: "Design Test",
       },
       status: {
         title: "Systemstatus",

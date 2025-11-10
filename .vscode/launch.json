@@ -1,124 +1,97 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Vibe Dev Client",
-            "type": "chrome",
-            "request": "launch",
-            "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}",
-            "sourceMaps": true
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Vibe Dev Server",
-            "program": "${workspaceFolder}/src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts",
-            "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
-            "runtimeArgs": [
-                "--inspect-brk",
-            ],
-            "args": [
-                "dev"
-            ],
-            "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "skipFiles": [
-                "<node_internals>/**"
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Vibe Native",
-            // "program": "${workspaceFolder}/src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts",
-            "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
-            "runtimeArgs": [
-                "--inspect-brk",
-            ],
-            "args": [
-                "native"
-            ],
-            "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "skipFiles": [
-                "<node_internals>/**"
-            ]
-        },
-        {
-            "name": "Vibe Fast Dev Server (Turbo)",
-            "type": "node",
-            "request": "launch",
-            "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
-            "runtimeArgs": [
-                "src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts",
-                "dev",
-                "--turbo"
-            ],
-            "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "skipFiles": [
-                "<node_internals>/**"
-            ]
-        },
-        {
-            "name": "Vibe Test",
-            "type": "node",
-            "request": "launch",
-            "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
-            "runtimeArgs": [
-                "test"
-            ],
-            "cwd": "${workspaceFolder}",
-            "smartStep": true,
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "env": {
-                "NODE_ENV": "test",
-                "DEBUG_TESTS": "true"
-            }
-        },
-        {
-            "name": "Vibe CLI",
-            "type": "node",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts",
-            "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
-            "runtimeArgs": [
-                "--inspect-brk",
-            ],
-            "args": [
-                "${input:vibeCommand}"
-            ],
-            "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "skipFiles": [
-                "<node_internals>/**"
-            ]
-        }
-    ],
-    "compounds": [
-        {
-            "name": "Vibe Dev Server & Client",
-            "configurations": [
-                "Vibe Dev Server",
-                "Vibe Dev Client"
-            ]
-        }
-    ],
-    "inputs": [
-        {
-            "id": "vibeCommand",
-            "type": "promptString",
-            "description": "Vibe CLI command (e.g., 'check src/app', 'tc src/app/api')",
-            "default": "check src/app"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Vibe Dev Client",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Vibe Dev Server",
+      "program": "${workspaceFolder}/src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts",
+      "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
+      "runtimeArgs": ["--inspect-brk"],
+      "args": ["dev"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Vibe Native",
+      // "program": "${workspaceFolder}/src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts",
+      "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
+      "runtimeArgs": ["--inspect-brk"],
+      "args": ["native"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Vibe Fast Dev Server (Turbo)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
+      "runtimeArgs": [
+        "src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts",
+        "dev",
+        "--turbo"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Vibe Test",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
+      "runtimeArgs": ["test"],
+      "cwd": "${workspaceFolder}",
+      "smartStep": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "NODE_ENV": "test",
+        "DEBUG_TESTS": "true"
+      }
+    },
+    {
+      "name": "Vibe CLI",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/app/api/[locale]/v1/core/system/unified-interface/cli/vibe-runtime.ts",
+      "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
+      "runtimeArgs": ["--inspect-brk"],
+      "args": ["${input:vibeCommand}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Vibe Dev Server & Client",
+      "configurations": ["Vibe Dev Server", "Vibe Dev Client"]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "vibeCommand",
+      "type": "promptString",
+      "description": "Vibe CLI command (e.g., 'check src/app', 'tc src/app/api')",
+      "default": "check src/app"
+    }
+  ]
 }

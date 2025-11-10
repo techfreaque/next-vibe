@@ -107,7 +107,10 @@ export class PerformanceMonitor {
     this.addCompletedMetric(completedMetric);
 
     if (process.env.NODE_ENV !== "production") {
-      const metaStr = JSON.stringify({ duration, metadata: completedMetric.metadata });
+      const metaStr = JSON.stringify({
+        duration,
+        metadata: completedMetric.metadata,
+      });
       process.stdout.write(
         `Performance: ${name} completed in ${duration.toFixed(2)}ms ${metaStr}\n`,
       );

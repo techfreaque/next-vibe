@@ -23,7 +23,7 @@ export default async function AdminDashboardPage({
   const { t } = simpleT(locale);
 
   return (
-    <Div className="p-6 space-y-8">
+    <Div className="p-6 flex flex-col gap-8">
       <Div>
         <H1 className="text-3xl font-bold text-gray-900 dark:text-white">
           {t("app.admin.dashboard.title")}

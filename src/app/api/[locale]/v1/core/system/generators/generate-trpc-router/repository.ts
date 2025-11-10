@@ -55,9 +55,9 @@ export class GenerateTrpcRouterRepositoryImpl
       return success(response);
     } catch (error) {
       return fail({
-          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: String(error) },
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: String(error) },
       });
     }
   }

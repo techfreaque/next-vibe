@@ -2,7 +2,6 @@ import { translations as optionsTranslations } from "../../options/i18n/pl";
 import type { translations as enTranslations } from "../en";
 import { translations as _componentsTranslations } from "../../_components/i18n/pl";
 
-
 export const translations: typeof enTranslations = {
   _components: _componentsTranslations,
   title: "Logowanie",

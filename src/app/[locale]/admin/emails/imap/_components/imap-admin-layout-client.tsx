@@ -5,7 +5,13 @@
 
 "use client";
 
-import { BarChart3, Mail, RefreshCw, Settings, Users } from 'next-vibe-ui/ui/icons';
+import {
+  BarChart3,
+  Mail,
+  RefreshCw,
+  Settings,
+  Users,
+} from "next-vibe-ui/ui/icons";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Link } from "next-vibe-ui/ui/link";
 import { cn } from "next-vibe/shared/utils";
@@ -88,11 +94,11 @@ export function ImapAdminLayoutClient({
   );
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* IMAP Sub-Navigation */}
       <Card>
         <CardContent className="p-4">
-          <Div className="flex flex-col space-y-4">
+          <Div className="flex flex-col gap-4">
             <Div>
               <H2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {t("app.admin.emails.imap.title")}
@@ -105,7 +111,7 @@ export function ImapAdminLayoutClient({
             {/* Sub Navigation Tabs */}
             <Div className="border-b border-gray-200 dark:border-gray-700">
               <nav
-                className="flex space-x-8"
+                className="flex flex flex-row gap-8"
                 aria-label={t("app.admin.emails.imap.title")}
               >
                 {subNavigationItems.map((item) => {

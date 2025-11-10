@@ -34,7 +34,11 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         typeof definitions.GET.allowedRoles
       >,
     ): Promise<ResponseType<FolderGetResponseOutput>> => {
-      return await getFolder(props.user, { id: props.urlPathParams.id }, props.logger);
+      return await getFolder(
+        props.user,
+        { id: props.urlPathParams.id },
+        props.logger,
+      );
     },
   },
   [Methods.PATCH]: {
@@ -62,7 +66,11 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         typeof definitions.DELETE.allowedRoles
       >,
     ): Promise<ResponseType<FolderDeleteResponseOutput>> => {
-      return await deleteFolder(props.user, { id: props.urlPathParams.id }, props.logger);
+      return await deleteFolder(
+        props.user,
+        { id: props.urlPathParams.id },
+        props.logger,
+      );
     },
   },
 });

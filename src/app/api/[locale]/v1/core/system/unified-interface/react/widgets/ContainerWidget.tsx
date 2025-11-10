@@ -72,7 +72,9 @@ export function ContainerWidget({
         )}
         <CardContent>
           <P className="italic text-muted-foreground">
-            {t("app.api.v1.core.system.unifiedInterface.react.widgets.container.noContent")}
+            {t(
+              "app.api.v1.core.system.unifiedInterface.react.widgets.container.noContent",
+            )}
           </P>
         </CardContent>
       </Card>
@@ -84,8 +86,8 @@ export function ContainerWidget({
     {
       grid: `grid gap-${layout.gap ?? "4"} ${layout.columns ? `grid-cols-${layout.columns}` : "grid-cols-1"}`,
       flex: `flex flex-wrap gap-${layout.gap ?? "4"}`,
-      stack: `space-y-${layout.gap ?? "4"}`,
-    }[layout.type] ?? "space-y-4";
+      stack: `flex flex-col gap-${layout.gap ?? "4"}`,
+    }[layout.type] ?? "flex flex-col gap-4";
   /* eslint-enable i18next/no-literal-string */
 
   return (

@@ -1,5 +1,5 @@
 import { FlashList } from "@shopify/flash-list";
-import type { ColumnDef, Row, SortingState } from "@tanstack/react-table";
+import type { Row, SortingState } from "@tanstack/react-table";
 import {
   flexRender,
   getCoreRowModel,
@@ -15,7 +15,6 @@ import {
   ScrollView,
 } from "react-native";
 import { FadeInUp, FadeOutUp } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { StyledAnimatedView } from "../lib/styled";
 import { cn } from "next-vibe/shared/utils/utils";
@@ -28,18 +27,8 @@ import {
   TableRow,
 } from "./table";
 
-// Cross-platform DataTable props
-export interface DataTableProps<TData, TValue = string> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  onRowPress?: (row: Row<TData>) => void;
-  estimatedItemSize?: number;
-  ListEmptyComponent?: React.ComponentType;
-  ListFooterComponent?: React.ComponentType;
-  isRefreshing?: boolean;
-  onRefresh?: () => void;
-  className?: string;
-}
+// Import ALL types from web - ZERO definitions here
+import type { DataTableProps } from "@/packages/next-vibe-ui/web/ui/data-table";
 
 /**
  * @docs https://tanstack.com/table
@@ -49,13 +38,12 @@ export function DataTable<TData, TValue = string>({
   columns,
   data,
   onRowPress,
-  estimatedItemSize = 45,
+  estimatedItemSize = 60,
   ListEmptyComponent,
   ListFooterComponent,
   isRefreshing = false,
   onRefresh,
 }: DataTableProps<TData, TValue>): JSX.Element {
-  const insets = useSafeAreaInsets();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const table = useReactTable({
     data,
@@ -115,9 +103,6 @@ export function DataTable<TData, TValue = string>({
               ListEmptyComponent={ListEmptyComponent}
               ListFooterComponent={ListFooterComponent}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{
-                paddingBottom: insets.bottom,
-              }}
               refreshControl={
                 <RefreshControl
                   refreshing={isRefreshing}
@@ -125,7 +110,13 @@ export function DataTable<TData, TValue = string>({
                   style={{ opacity: 0 }}
                 />
               }
-              renderItem={({ item: row, index }: { item: Row<TData>; index: number }): JSX.Element => {
+              renderItem={({
+                item: row,
+                index,
+              }: {
+                item: Row<TData>;
+                index: number;
+              }): JSX.Element => {
                 const rowClassName = cn(
                   "active:opacity-70",
                   index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50",
@@ -136,26 +127,25 @@ export function DataTable<TData, TValue = string>({
                     }
                   : undefined;
                 return (
-                  <TableRow
-                    className={rowClassName}
-                    onPress={handlePress}
-                  >
-                    {row.getVisibleCells().map((cell): JSX.Element => (
-                      <TableCell
-                        key={cell.id}
-                        style={{
-                          width: getColumnWidth(
-                            cell.column.getSize(),
-                            columns.length,
-                          ),
-                        }}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
+                  <TableRow className={rowClassName} onPress={handlePress}>
+                    {row.getVisibleCells().map(
+                      (cell): JSX.Element => (
+                        <TableCell
+                          key={cell.id}
+                          style={{
+                            width: getColumnWidth(
+                              cell.column.getSize(),
+                              columns.length,
+                            ),
+                          }}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ),
+                    )}
                   </TableRow>
                 );
               }}

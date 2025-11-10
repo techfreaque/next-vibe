@@ -6,7 +6,7 @@
 "use client";
 
 import { render } from "@react-email/render";
-import { Mail, Send } from 'next-vibe-ui/ui/icons';
+import { Mail, Send } from "next-vibe-ui/ui/icons";
 import { parseError } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { H2, P } from "next-vibe-ui/ui/typography";
@@ -82,7 +82,7 @@ export function EmailPreviewClient({
             </Div>
             <Dialog open={isTestEmailOpen} onOpenChange={setIsTestEmailOpen}>
               <DialogTrigger asChild>
-                <Button className="flex items-center space-x-2">
+                <Button className="flex items-center flex flex-row gap-2">
                   <Send className="h-4 w-4" />
                   <Span>
                     {t("app.admin.leads.leads.admin.emails.testEmail.button")}
@@ -142,7 +142,7 @@ export function EmailPreviewClient({
                   <Span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     {t("app.admin.leads.leads.admin.emails.email_preview")}
                   </Span>
-                  <Div className="flex items-center space-x-2">
+                  <Div className="flex items-center flex flex-row gap-2">
                     <Mail className="h-4 w-4 text-gray-500" />
                     <Span className="text-xs text-gray-500">
                       {t("app.admin.leads.leads.admin.emails.preview.live")}

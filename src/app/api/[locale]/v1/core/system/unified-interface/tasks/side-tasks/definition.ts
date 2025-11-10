@@ -44,7 +44,9 @@ const sideTasksPostEndpoint = createEndpoint({
   description:
     "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.description",
   category: "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.category",
-  tags: ["app.api.v1.core.system.unifiedInterface.tasks.sideTasks.tags.sidetasks"],
+  tags: [
+    "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.tags.sidetasks",
+  ],
   allowedRoles: [UserRole.ADMIN],
   aliases: ["tasks:side", "side-tasks"],
 
@@ -291,7 +293,8 @@ const sideTasksPostEndpoint = createEndpoint({
   },
 
   successTypes: {
-    title: "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.title",
+    title:
+      "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.title",
     description:
       "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.description",
   },
@@ -308,7 +311,9 @@ const sideTasksGetEndpoint = createEndpoint({
   description:
     "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.description",
   category: "app.api.v1.core.system.unifiedInterface.tasks.category",
-  tags: ["app.api.v1.core.system.unifiedInterface.tasks.sideTasks.tags.sidetasks"],
+  tags: [
+    "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.tags.sidetasks",
+  ],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["tasks:side:status"],
 
@@ -431,7 +436,8 @@ const sideTasksGetEndpoint = createEndpoint({
   },
 
   successTypes: {
-    title: "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.title",
+    title:
+      "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.title",
     description:
       "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.success.description",
   },

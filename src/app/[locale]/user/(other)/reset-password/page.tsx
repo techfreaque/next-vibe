@@ -1,4 +1,4 @@
-import { ArrowLeft } from 'next-vibe-ui/ui/icons';
+import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import type { Metadata } from "next";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { Link } from "next-vibe-ui/ui/link";
@@ -75,7 +75,11 @@ export default async function ResetPasswordPage({
   );
 
   // Redirect to dashboard if already authenticated
-  if (verifiedUserResponse.success && verifiedUserResponse.data && !verifiedUserResponse.data.isPublic) {
+  if (
+    verifiedUserResponse.success &&
+    verifiedUserResponse.data &&
+    !verifiedUserResponse.data.isPublic
+  ) {
     redirect(`/${locale}/`);
   }
 

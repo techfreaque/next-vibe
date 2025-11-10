@@ -5,11 +5,11 @@
 
 "use client";
 
-import { Plus, RefreshCw } from 'next-vibe-ui/ui/icons';
+import { Plus, RefreshCw } from "next-vibe-ui/ui/icons";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { Div} from "next-vibe-ui/ui/div";
-import { P} from "next-vibe-ui/ui/typography";
+import { Div } from "next-vibe-ui/ui/div";
+import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import { useState } from "react";
 
@@ -35,7 +35,7 @@ export function CronTasksClient({
   const tasksEndpoint = useCronTasksList(logger);
 
   return (
-    <Div className="space-y-6">
+    <Div className="flex flex-col gap-6">
       {/* Tasks Table */}
       <Card>
         <CardHeader>
@@ -47,7 +47,7 @@ export function CronTasksClient({
                 {t("app.admin.cron.nav.tasks_description")}
               </P>
             </Div>
-            <Div className="flex space-x-2">
+            <Div className="flex flex flex-row gap-2">
               <Button
                 variant="outline"
                 size="sm"

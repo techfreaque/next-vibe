@@ -72,7 +72,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     logger.debug("payment.webhook.nowpayments.processed.success");
     return NextResponse.json({ received: true });
   } catch (error) {
-    logger.error("payment.webhook.nowpayments.handler.error", parseError(error));
+    logger.error(
+      "payment.webhook.nowpayments.handler.error",
+      parseError(error),
+    );
     return NextResponse.json({ error: ERROR_INTERNAL_SERVER }, { status: 500 });
   }
 }

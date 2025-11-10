@@ -1,10 +1,5 @@
 /**
- * Endpoint Form Field Component (Native)
- * Production-ready implementation with web interface alignment
- * Imports types from web version using relative paths to ensure type safety - NO EXCEPTIONS
- *
- * ✅ 100% TYPE INFERENCE FROM DEFINITION.TS
- * ✅ Web interface compatibility enforced
+ * Endpoint Form Field Component
  */
 
 "use client";
@@ -14,24 +9,26 @@ import { cn } from "next-vibe/shared/utils";
 import { safeGetRequiredFields } from "next-vibe/shared/utils/zod-required-fields";
 import type { JSX } from "react";
 import type {
-  Control,
   ControllerRenderProps,
+  FieldPath,
   FieldValues,
   Path,
 } from "react-hook-form";
-import type { z } from "zod";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
-// Import types from web version using relative paths - WEB IS SOURCE OF TRUTH
 import type {
   FieldConfig,
   FieldStyleClassName,
   FieldValidationState,
   RequiredFieldTheme,
 } from "../../../web/ui/form/endpoint-form-field-types";
-import type { EndpointFieldStructure } from "../../../web/ui/form/infer-field-config";
+import type {
+  EndpointFormFieldProps,
+  EndpointFormFieldsProps,
+  FormFieldError,
+} from "../../../web/ui/form/endpoint-form-field";
 import { getFieldConfig } from "../../../web/ui/form/infer-field-config";
 
 import { AutocompleteField } from "../autocomplete-field";
@@ -68,7 +65,12 @@ import { Div } from "../div";
 // Styled View for proper NativeWind support
 const StyledView = styled(View);
 import { Span } from "../span";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../tooltip";
 import { Info } from "../icons/Info";
 
 // Default theme for required fields
@@ -81,12 +83,6 @@ const DEFAULT_THEME: RequiredFieldTheme = {
 
 // Constants
 const OPTION_KEY_PREFIX = "option-";
-
-// Type for form field errors
-interface FormFieldError {
-  message?: string;
-  type?: string;
-}
 
 /**
  * Get field validation state
@@ -136,7 +132,7 @@ function getFieldStyleClassName(
     "transition-colors duration-200",
   );
 
-  const baseContainerClassName = "space-y-3";
+  const baseContainerClassName = "flex flex-col gap-3";
 
   // Error state - consistent red styling with better spacing and improved dark mode readability
   if (hasError) {
@@ -291,16 +287,14 @@ function renderLabel(
       <StyledView className="flex flex-row items-center gap-1.5">
         <Span className={labelClassName}>{t(config.label)}</Span>
         {style === "asterisk" && isRequired && (
-          <Span className="text-blue-600 dark:text-blue-400 font-bold">
-            *
-          </Span>
+          <Span className="text-blue-600 dark:text-blue-400 font-bold">*</Span>
         )}
         {config.description && (
           <TooltipProvider delayDuration={300}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <StyledView className="cursor-help">
-                  <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                  <Info className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                 </StyledView>
               </TooltipTrigger>
               <TooltipContent className="max-w-[250px]">
@@ -326,8 +320,8 @@ function renderLabel(
  * Render field input based on type
  */
 function renderFieldInput<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends Path<TFieldValues> = Path<TFieldValues>,
+  TFieldValues extends FieldValues,
+  TName extends Path<TFieldValues>,
 >(
   config: FieldConfig,
   field: ControllerRenderProps<TFieldValues, TName>,
@@ -399,13 +393,10 @@ function renderFieldInput<
         <Select
           // Force re-render when value changes
           key={`${field.name}-${String(field.value) || "empty"}`}
-          onValueChange={(option) => {
-            // Extract the value from the Option object
-            const value =
-              typeof option === "string" ? option : option?.value;
+          onValueChange={(value) => {
             field.onChange(value);
           }}
-          value={selectedValue}
+          value={selectedValue?.value}
           disabled={disabled || config.disabled}
         >
           <SelectTrigger className={inputClassName}>
@@ -633,7 +624,10 @@ function renderFieldInput<
               multiselectValue.length <= config.maxSelections;
 
             return (
-              <Div key={option.value} className="flex flex-row items-center space-x-2">
+              <Div
+                key={option.value}
+                className="flex flex-row items-center space-x-2"
+              >
                 <Checkbox
                   checked={isSelected}
                   disabled={isDisabled || (!isSelected && !canSelect)}
@@ -681,20 +675,6 @@ function renderFieldInput<
   }
 }
 
-// Generic field props interface - imports from web
-export interface EndpointFormFieldProps<
-  TFieldValues extends FieldValues,
-  TName extends Path<TFieldValues>,
-> {
-  name: TName;
-  config?: FieldConfig;
-  control: Control<TFieldValues>;
-  schema?: z.ZodTypeAny;
-  endpointFields?: EndpointFieldStructure;
-  theme?: RequiredFieldTheme;
-  className?: string;
-}
-
 /**
  * Main Endpoint Form Field Component
  * Integrates with useEndpoint hook and provides comprehensive form field functionality
@@ -703,7 +683,7 @@ export interface EndpointFormFieldProps<
  */
 export function EndpointFormField<
   TFieldValues extends FieldValues,
-  TName extends Path<TFieldValues>,
+  TName extends FieldPath<TFieldValues>,
 >({
   name,
   config: providedConfig,
@@ -788,20 +768,6 @@ export function EndpointFormField<
  * Convenience component for creating multiple form fields
  * Config is auto-inferred from endpointFields if not provided
  */
-export interface EndpointFormFieldsProps<TFieldValues extends FieldValues> {
-  fields: Array<{
-    name: Path<TFieldValues>;
-    config?: FieldConfig;
-  }>;
-  control: Control<TFieldValues>;
-  requiredFields?: string[];
-  schema?: z.ZodTypeAny;
-  endpointFields?: EndpointFieldStructure;
-  theme?: RequiredFieldTheme;
-  className?: string;
-  fieldClassName?: string;
-}
-
 export function EndpointFormFields<TFieldValues extends FieldValues>({
   fields,
   control,

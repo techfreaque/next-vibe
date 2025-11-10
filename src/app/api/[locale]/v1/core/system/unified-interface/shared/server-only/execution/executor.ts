@@ -128,7 +128,9 @@ export abstract class BaseExecutor {
   /**
    * Execute a tool via route delegation
    */
-  protected async executeViaRoute<TData extends { [key: string]: ParameterValue }>(
+  protected async executeViaRoute<
+    TData extends { [key: string]: ParameterValue },
+  >(
     context: BaseExecutionContext<TData>,
     options: BaseExecutionOptions,
     t: TFunction,

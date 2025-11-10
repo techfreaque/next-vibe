@@ -189,7 +189,8 @@ const { POST } = createEndpoint({
         success: true,
         url: "https://local.drizzle.studio/?port=5555",
         portUsed: 5555,
-        output: "✅ Database Studio opened at https://local.drizzle.studio/?port=5555",
+        output:
+          "✅ Database Studio opened at https://local.drizzle.studio/?port=5555",
         duration: 1200,
       },
       customPort: {
@@ -204,7 +205,8 @@ const { POST } = createEndpoint({
         success: true,
         url: "https://local.drizzle.studio/?port=5555",
         portUsed: 5555,
-        output: "✅ Database Studio started at https://local.drizzle.studio/?port=5555",
+        output:
+          "✅ Database Studio started at https://local.drizzle.studio/?port=5555",
         duration: 600,
       },
     },

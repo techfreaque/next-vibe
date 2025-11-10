@@ -85,7 +85,7 @@ export function ToolDisplay({
   const defaultOpen = false;
 
   return (
-    <Div className="space-y-3 mb-3">
+    <Div className="flex flex-col gap-3 mb-3">
       {toolCalls.map((toolCall, index) => (
         <ToolCallRenderer
           key={index}

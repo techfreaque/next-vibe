@@ -41,9 +41,9 @@ export const translations: typeof enTranslations = {
         errorLabel: "Błąd:",
         noArguments: "Brak argumentów",
         noResult: "Brak wyniku",
-        metadataNotAvailable: "Metadane widgetu niedostępne. Pokazywanie surowych danych.",
+        metadataNotAvailable:
+          "Metadane widgetu niedostępne. Pokazywanie surowych danych.",
       },
     },
   },
 };
-

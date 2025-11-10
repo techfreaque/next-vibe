@@ -1,9 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable i18next/no-literal-string */
-import Constants from 'expo-constants';
-import {
-  Environment,
-} from "next-vibe/shared/utils/env-util";
+import Constants from "expo-constants";
+import { Environment } from "next-vibe/shared/utils/env-util";
 
 import type { EnvFrontend } from "@/config/env-client";
 
@@ -22,8 +20,7 @@ const platform = {
 };
 
 // Get dev server IP from Expo config with null checks
-const devServerIp =
-  Constants.expoConfig?.hostUri?.split(":")[0] ?? "localhost";
+const devServerIp = Constants.expoConfig?.hostUri?.split(":")[0] ?? "localhost";
 
 // Export validated environment for use throughout the application
 export const envClient: EnvFrontend = {
@@ -38,7 +35,7 @@ export const envClient: EnvFrontend = {
   NEXT_PUBLIC_SUPPORT_EMAIL_PL: "dfg",
   NEXT_PUBLIC_SUPPORT_EMAIL_GLOBAL: "dfgd",
   platform,
-} 
+};
 // // Export validated environment for use throughout the application
 // export const envClient: EnvFrontend = validateEnv(
 //   {

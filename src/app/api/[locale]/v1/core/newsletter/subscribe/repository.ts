@@ -250,9 +250,9 @@ export class NewsletterSubscribeRepositoryImpl
       );
 
       return fail({
-          message: "app.api.v1.core.newsletter.subscribe.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        message: "app.api.v1.core.newsletter.subscribe.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }

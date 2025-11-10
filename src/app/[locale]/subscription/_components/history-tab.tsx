@@ -1,5 +1,5 @@
 import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { History } from 'next-vibe-ui/ui/icons';
+import { History } from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import {
@@ -52,7 +52,7 @@ export function HistoryTab({
         </CardHeader>
         <CardContent>
           {!initialHistory || initialHistory.transactions.length === 0 ? (
-            <Div className="text-center py-12 space-y-4">
+            <Div className="text-center py-12 flex flex-col gap-4">
               <History className="h-12 w-12 text-muted-foreground mx-auto" />
               <Div>
                 <P className="text-lg font-medium">
@@ -64,7 +64,7 @@ export function HistoryTab({
               </Div>
             </Div>
           ) : (
-            <Div className="space-y-3">
+            <Div className="flex flex-col gap-3">
               {initialHistory.transactions.map((transaction) => (
                 <Div
                   key={transaction.id}
@@ -75,7 +75,7 @@ export function HistoryTab({
                       : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800",
                   )}
                 >
-                  <Div className="space-y-1">
+                  <Div className="flex flex-col gap-1">
                     <Div className="flex items-center gap-2">
                       <Span className="font-medium capitalize">
                         {t(getTransactionTypeKey(transaction.type))}
@@ -90,7 +90,7 @@ export function HistoryTab({
                       {formatDate(transaction.createdAt, locale)}
                     </Div>
                   </Div>
-                  <Div className="text-right space-y-1">
+                  <Div className="text-right flex flex-col gap-1">
                     <Div
                       className={cn(
                         "text-lg font-bold",

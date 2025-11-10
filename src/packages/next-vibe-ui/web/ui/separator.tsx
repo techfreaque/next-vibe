@@ -5,22 +5,21 @@ import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
 // Cross-platform types for native import
-export interface SeparatorProps {
+export interface SeparatorRootProps
+  extends React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root> {
   className?: string;
   orientation?: "horizontal" | "vertical";
   decorative?: boolean;
 }
 
-const Separator = React.forwardRef<
-  React.ElementRef<typeof SeparatorPrimitive.Root>,
-  SeparatorProps
->(
-  (
-    { className, orientation = "horizontal", decorative = true, ...props },
-    ref,
-  ) => (
+export function Separator({
+  className,
+  orientation = "horizontal",
+  decorative = true,
+  ...props
+}: SeparatorRootProps): React.JSX.Element {
+  return (
     <SeparatorPrimitive.Root
-      ref={ref}
       decorative={decorative}
       orientation={orientation}
       className={cn(
@@ -30,8 +29,5 @@ const Separator = React.forwardRef<
       )}
       {...props}
     />
-  ),
-);
-Separator.displayName = SeparatorPrimitive.Root.displayName;
-
-export { Separator };
+  );
+}

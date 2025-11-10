@@ -68,12 +68,12 @@ export function ImapAccountEditForm({
   }
 
   return (
-    <Form form={form} onSubmit={handleSubmit} className="space-y-6">
+    <Form form={form} onSubmit={handleSubmit} className="flex flex-col gap-6">
       <FormAlert alert={alert} />
 
       <Div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Basic Information */}
-        <Div className="space-y-4">
+        <Div className="flex flex-col gap-4">
           <EndpointFormField
             name="name"
             config={{
@@ -132,7 +132,7 @@ export function ImapAccountEditForm({
         </Div>
 
         {/* Authentication */}
-        <Div className="space-y-4">
+        <Div className="flex flex-col gap-4">
           <EndpointFormField
             name="username"
             config={{
@@ -206,7 +206,7 @@ export function ImapAccountEditForm({
       </Div>
 
       {/* Advanced Settings */}
-      <Div className="space-y-4">
+      <Div className="flex flex-col gap-4">
         <H3 className="text-lg font-medium">
           {t("app.admin.emails.imap.account.sections.advanced")}
         </H3>
@@ -284,7 +284,7 @@ export function ImapAccountEditForm({
       </Div>
 
       {/* Form Actions */}
-      <Div className="flex items-center justify-end space-x-4">
+      <Div className="flex items-center justify-end flex flex-row gap-4">
         <Button type="button" variant="outline" onClick={onCancel}>
           {t("app.admin.emails.imap.common.cancel")}
         </Button>

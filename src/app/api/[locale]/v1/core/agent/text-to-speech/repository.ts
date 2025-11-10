@@ -89,8 +89,8 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
     if (!env.EDEN_AI_API_KEY) {
       logger.error("Eden AI API key not configured");
       return fail({
-          message: "app.api.v1.core.agent.textToSpeech.post.errors.apiKeyMissing",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        message: "app.api.v1.core.agent.textToSpeech.post.errors.apiKeyMissing",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
 
@@ -130,7 +130,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
           message:
             "app.api.v1.core.agent.textToSpeech.post.errors.conversionFailed",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                    messageParams: {
+          messageParams: {
             error: errorText,
           },
         });
@@ -157,7 +157,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
           message:
             "app.api.v1.core.agent.textToSpeech.post.errors.providerError",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                    messageParams: {
+          messageParams: {
             error: errorMessage,
           },
         });
@@ -239,10 +239,10 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
       });
 
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.textToSpeech.post.errors.conversionFailed",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                  messageParams: {
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: {
           error: errorMessage,
         },
       });

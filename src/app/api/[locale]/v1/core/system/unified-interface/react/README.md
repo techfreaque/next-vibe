@@ -38,8 +38,8 @@ Main hook for interacting with endpoints.
 
 ```typescript
 const endpoint = useEndpoint(
-  definitions,           // Endpoint definitions
-  { queryOptions }       // React Query options (optional)
+  definitions, // Endpoint definitions
+  { queryOptions }, // React Query options (optional)
 );
 ```
 
@@ -86,9 +86,9 @@ const endpoint = useEndpoint(
 
 ```typescript
 const endpoint = useEndpoint(definitions, {
-  enabled: true,              // Auto-fetch on mount
+  enabled: true, // Auto-fetch on mount
   refetchOnWindowFocus: true, // Refetch on focus
-  staleTime: 60000,          // 1 minute
+  staleTime: 60000, // 1 minute
 });
 
 // Access data
@@ -147,8 +147,8 @@ const endpoint = useEndpoint(definitions);
 
 // TypeScript knows the exact types
 const result = await endpoint.create?.mutateAsync({
-  email: "john@example.com",  // ✓ Type-safe
-  name: "John Doe",           // ✓ Type-safe
+  email: "john@example.com", // ✓ Type-safe
+  name: "John Doe", // ✓ Type-safe
   // invalid: "field"         // ✗ Type error
 });
 ```
@@ -159,7 +159,7 @@ React Query handles caching automatically:
 
 ```typescript
 const endpoint = useEndpoint(definitions, {
-  staleTime: 5 * 60 * 1000,  // 5 minutes
+  staleTime: 5 * 60 * 1000, // 5 minutes
 });
 ```
 
@@ -175,23 +175,23 @@ import { useApiMutation } from "@/app/api/[locale]/v1/core/system/unified-interf
 const mutation = useApiMutation(definitions.POST, {
   onMutate: async (newData) => {
     // Cancel outgoing refetches
-    await queryClient.cancelQueries(['users']);
+    await queryClient.cancelQueries(["users"]);
 
     // Snapshot previous value
-    const previous = queryClient.getQueryData(['users']);
+    const previous = queryClient.getQueryData(["users"]);
 
     // Optimistically update
-    queryClient.setQueryData(['users'], (old) => [...old, newData]);
+    queryClient.setQueryData(["users"], (old) => [...old, newData]);
 
     return { previous };
   },
   onError: (err, newData, context) => {
     // Rollback on error
-    queryClient.setQueryData(['users'], context.previous);
+    queryClient.setQueryData(["users"], context.previous);
   },
   onSettled: () => {
     // Refetch after mutation
-    queryClient.invalidateQueries(['users']);
+    queryClient.invalidateQueries(["users"]);
   },
 });
 ```
@@ -207,7 +207,7 @@ if (endpoint.error) {
 }
 
 // Alert state provides formatted errors
-if (endpoint.alert?.variant === 'destructive') {
+if (endpoint.alert?.variant === "destructive") {
   // Show error alert
 }
 
@@ -357,7 +357,7 @@ function CreateUserForm() {
 
 ```typescript
 const endpoint = useEndpoint(definitions, {
-  urlPathParams: { userId },  // Pass dynamic URL parameters
+  urlPathParams: { userId }, // Pass dynamic URL parameters
 });
 ```
 
@@ -374,7 +374,7 @@ if (endpoint.error) return <Error />;
 const handleSubmit = async (data) => {
   const result = await endpoint.create?.mutateAsync(data);
   if (result?.success) {
-    queryClient.invalidateQueries(['users']);
+    queryClient.invalidateQueries(["users"]);
   }
 };
 ```

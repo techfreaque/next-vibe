@@ -235,12 +235,13 @@ export function FolderList({
   // If no active root folder, show message (shouldn't happen in normal flow)
   // Get direct children (subfolders) of the active root folder
   // Filter folders where parentId is null (direct children of root folder)
-  const filderedChilds = Object.values(chat.folders).filter(
+  const filderedChilds =
+    Object.values(chat.folders).filter(
       (folder) =>
         folder.rootFolderId === activeRootFolderId && folder.parentId === null,
     ) || [];
-  const childFolders =filderedChilds
-    .toSorted?.((a, b) => {
+  const childFolders =
+    filderedChilds.toSorted?.((a, b) => {
       // First sort by sortOrder
       if (a.sortOrder !== b.sortOrder) {
         return a.sortOrder - b.sortOrder;
@@ -253,13 +254,13 @@ export function FolderList({
   const childThreads = Object.values(chat.threads).filter(
     (thread) =>
       thread.rootFolderId === activeRootFolderId && thread.folderId === null,
-  ) ;
+  );
 
   // Group threads by time
   const groupedThreads = groupThreadsByTime(childThreads);
 
   return (
-    <Div className="space-y-1 py-2">
+    <Div className="flex flex-col gap-1 py-2">
       {/* Render child folders */}
       {childFolders.map((folder) => (
         <FolderItem

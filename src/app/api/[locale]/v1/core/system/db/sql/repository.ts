@@ -73,8 +73,8 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
       parseError(error);
 
       return fail({
-          message: "app.api.v1.core.system.db.sql.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.system.db.sql.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

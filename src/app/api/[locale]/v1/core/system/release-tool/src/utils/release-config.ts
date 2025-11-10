@@ -52,9 +52,9 @@ export async function loadConfig(
   if (!existsSync(resolvedConfigPath)) {
     logger.error("Config file not found", { path: resolvedConfigPath });
     return fail({
-          message: "app.api.v1.core.system.releaseTool.config.fileNotFound",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                messageParams: { path: resolvedConfigPath },
+      message: "app.api.v1.core.system.releaseTool.config.fileNotFound",
+      errorType: ErrorResponseTypes.NOT_FOUND,
+      messageParams: { path: resolvedConfigPath },
     });
   }
 
@@ -64,8 +64,8 @@ export async function loadConfig(
     if (!isReleaseConfigModule(importedModule)) {
       logger.error("Invalid config format", { path: resolvedConfigPath });
       return fail({
-          message: "app.api.v1.core.system.releaseTool.config.invalidFormat",
-          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+        message: "app.api.v1.core.system.releaseTool.config.invalidFormat",
+        errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
       });
     }
 
@@ -77,9 +77,9 @@ export async function loadConfig(
       path: resolvedConfigPath,
     });
     return fail({
-          message: "app.api.v1.core.system.releaseTool.config.errorLoading",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { error: String(error) },
+      message: "app.api.v1.core.system.releaseTool.config.errorLoading",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { error: String(error) },
     });
   }
 }

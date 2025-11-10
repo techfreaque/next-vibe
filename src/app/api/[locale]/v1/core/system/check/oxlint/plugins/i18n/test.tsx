@@ -130,12 +130,7 @@ function TestDottedKeys() {
 }
 
 function TestImageExtensions() {
-  return (
-    <img
-      src="image.jpg"
-      alt="test.png"
-    />
-  );
+  return <img src="image.jpg" alt="test.png" />;
 }
 
 function TestURLs() {

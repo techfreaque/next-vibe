@@ -109,9 +109,10 @@ export class StudioRepositoryImpl implements StudioRepositoryInterface {
       if (exitResult.error) {
         return await Promise.resolve(
           fail({
-          message: "app.api.v1.core.system.db.studio.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                      messageParams: {
+            message:
+              "app.api.v1.core.system.db.studio.post.errors.server.title",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: {
               error: exitResult.error.message,
               output: `Failed to start Drizzle Studio: ${exitResult.error.message}`,
               duration,
@@ -145,7 +146,7 @@ export class StudioRepositoryImpl implements StudioRepositoryInterface {
         fail({
           message: "app.api.v1.core.system.db.studio.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: {
+          messageParams: {
             error: parsedError.message,
             output: `Failed to start Drizzle Studio: ${parsedError.message}`,
             duration,

@@ -1,7 +1,7 @@
 "use client";
 
 import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { Loader2 } from 'next-vibe-ui/ui/icons';
+import { Loader2 } from "next-vibe-ui/ui/icons";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { Link } from "next-vibe-ui/ui/link";
 import { Environment } from "next-vibe/shared/utils/env-util";
@@ -119,7 +119,7 @@ export default function ResetPasswordConfirmForm({
       transition={{ duration: 0.5 }}
     >
       <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
-        <CardHeader className="space-y-1 pb-2">
+        <CardHeader className="flex flex-col gap-1 pb-2">
           <CardTitle className="text-2xl font-bold text-center">
             {t(
               "app.user.other.resetPassword.auth.resetPassword.createNewPasswordTitle",
@@ -135,7 +135,11 @@ export default function ResetPasswordConfirmForm({
           {/* Show form alert if any */}
           {alert && <FormAlert alert={alert} className="mb-6" />}
 
-          <Form form={form} onSubmit={submitForm} className="space-y-6">
+          <Form
+            form={form}
+            onSubmit={submitForm}
+            className="flex flex-col gap-6"
+          >
             <EndpointFormField
               name="verification.email"
               config={{

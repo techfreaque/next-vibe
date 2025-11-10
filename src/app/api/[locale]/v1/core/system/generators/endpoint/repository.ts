@@ -107,9 +107,10 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       });
 
       return fail({
-          message: "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           duration,
         },
       });
@@ -165,7 +166,8 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       }
 
       // Extract and add real aliases from definition file
-      const definitionAliases = await this.extractAliasesFromDefinition(defFile);
+      const definitionAliases =
+        await this.extractAliasesFromDefinition(defFile);
       for (const alias of definitionAliases) {
         // Only add if not already present (first wins)
         if (!pathMap[alias]) {

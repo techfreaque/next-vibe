@@ -1,20 +1,22 @@
 import * as LabelPrimitive from "@rn-primitives/label";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
-import { cn } from "next-vibe/shared/utils/utils";
+// Import types from web
+import type { LabelRootProps } from "next-vibe-ui/ui/label";
 
-// Import all public types from web version (web is source of truth)
-import type { LabelProps } from "../../web/ui/label";
+// Re-export types
+export type { LabelRootProps };
 
-// Native label props extend web props with native-specific properties
-type NativeLabelProps = LabelProps & {
-  nativeID?: string;
-};
-
-const Label = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Text>,
-  NativeLabelProps
->(({ className, ...props }, ref) => {
+export function Label({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  className,
+  children,
+  nativeID,
+  // Web-only prop - destructured but not used on native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  htmlFor,
+}: LabelRootProps): React.JSX.Element {
   const textClassName = cn(
     "text-sm text-foreground text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-default",
     className,
@@ -22,10 +24,10 @@ const Label = React.forwardRef<
 
   return (
     <LabelPrimitive.Root>
-      <LabelPrimitive.Text ref={ref} className={textClassName} {...(props)} />
+      <LabelPrimitive.Text className={textClassName} nativeID={nativeID}>
+        {children}
+      </LabelPrimitive.Text>
     </LabelPrimitive.Root>
   );
-});
+}
 Label.displayName = "Label";
-
-export { Label };

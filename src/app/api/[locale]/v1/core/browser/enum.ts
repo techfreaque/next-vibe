@@ -36,7 +36,8 @@ export const {
   RESIZE_PAGE: "app.api.v1.core.browser.tool.resizePage",
 
   // Performance tools (3)
-  PERFORMANCE_ANALYZE_INSIGHT: "app.api.v1.core.browser.tool.performanceAnalyzeInsight",
+  PERFORMANCE_ANALYZE_INSIGHT:
+    "app.api.v1.core.browser.tool.performanceAnalyzeInsight",
   PERFORMANCE_START_TRACE: "app.api.v1.core.browser.tool.performanceStartTrace",
   PERFORMANCE_STOP_TRACE: "app.api.v1.core.browser.tool.performanceStopTrace",
 

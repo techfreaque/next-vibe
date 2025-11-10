@@ -7,10 +7,7 @@ import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-inte
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import {
-  getThreadPermissions,
-  updateThreadPermissions,
-} from "./repository";
+import { getThreadPermissions, updateThreadPermissions } from "./repository";
 
 export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
@@ -31,7 +28,11 @@ export const { GET, PATCH, tools } = endpointsHandler({
         ...props.data,
         threadId: props.urlPathParams.threadId,
       };
-      return await updateThreadPermissions(props.user, dataWithId, props.logger);
+      return await updateThreadPermissions(
+        props.user,
+        dataWithId,
+        props.logger,
+      );
     },
   },
 });

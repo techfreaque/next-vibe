@@ -15,6 +15,7 @@ import type { JSX } from "react";
 import type {
   Control,
   ControllerRenderProps,
+  FieldPath,
   FieldValues,
   Path,
 } from "react-hook-form";
@@ -45,7 +46,12 @@ import {
 import { Switch } from "../switch";
 import { TagsField } from "../tags-field";
 import { Textarea } from "../textarea";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../tooltip";
 import { Info } from "../icons/Info";
 import type {
   EndpointFormFieldProps as EndpointFormFieldPropsType,
@@ -76,7 +82,7 @@ const DEFAULT_THEME: RequiredFieldTheme = {
 const OPTION_KEY_PREFIX = "option-";
 
 // Type for form field errors
-interface FormFieldError {
+export interface FormFieldError {
   message?: string;
   type?: string;
 }
@@ -129,7 +135,7 @@ function getFieldStyleClassName(
     "transition-colors duration-200",
   );
 
-  const baseContainerClassName = "space-y-3";
+  const baseContainerClassName = "flex flex-col gap-3";
 
   // Error state - consistent red styling with better spacing and improved dark mode readability
   if (hasError) {
@@ -271,8 +277,8 @@ function getFieldStyleClassName(
  * Render field input based on type
  */
 function renderFieldInput<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends Path<TFieldValues> = Path<TFieldValues>,
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
 >(
   config: FieldConfig,
   field: ControllerRenderProps<TFieldValues, TName>,
@@ -593,7 +599,7 @@ function renderFieldInput<
 // Generic field props interface with full type inference from endpoint fields
 export interface EndpointFormFieldProps<
   TFieldValues extends FieldValues,
-  TName extends Path<TFieldValues>,
+  TName extends FieldPath<TFieldValues>,
   TFields extends EndpointFieldStructure = EndpointFieldStructure,
 > extends Omit<
     EndpointFormFieldPropsType<TFieldValues, TName>,
@@ -616,7 +622,7 @@ export interface EndpointFormFieldProps<
  */
 export function EndpointFormField<
   TFieldValues extends FieldValues,
-  TName extends Path<TFieldValues>,
+  TName extends FieldPath<TFieldValues>,
   TFields extends EndpointFieldStructure = EndpointFieldStructure,
 >({
   name,
@@ -663,7 +669,8 @@ export function EndpointFormField<
         const { style } = theme;
 
         // For checkbox/switch, skip the top label since they have inline labels
-        const skipTopLabel = config.type === "checkbox" || config.type === "switch";
+        const skipTopLabel =
+          config.type === "checkbox" || config.type === "switch";
 
         return (
           <FormItem
@@ -671,7 +678,12 @@ export function EndpointFormField<
           >
             {!skipTopLabel && (
               <div className="flex flex-row items-start gap-2">
-                <FormLabel className={cn(styleClassName.labelClassName, "flex items-center gap-1.5")}>
+                <FormLabel
+                  className={cn(
+                    styleClassName.labelClassName,
+                    "flex items-center gap-1.5",
+                  )}
+                >
                   <span>{config.label && t(config.label)}</span>
                   {config.label && style === "asterisk" && isRequired && (
                     <span className="text-blue-600 dark:text-blue-400 font-bold">
@@ -682,12 +694,17 @@ export function EndpointFormField<
                     <TooltipProvider delayDuration={300}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button type="button" className="cursor-help inline-flex">
+                          <button
+                            type="button"
+                            className="cursor-help inline-flex"
+                          >
                             <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-[250px]">
-                          <span className="text-sm">{t(config.description)}</span>
+                          <span className="text-sm">
+                            {t(config.description)}
+                          </span>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>

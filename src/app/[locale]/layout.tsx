@@ -5,8 +5,6 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import { Html } from "next-vibe-ui/ui/html";
-import { Head } from "next-vibe-ui/ui/head";
-import { Body } from "next-vibe-ui/ui/body";
 import type { JSX, ReactNode } from "react";
 
 import { env } from "@/config/env";
@@ -16,6 +14,7 @@ import { simpleT } from "@/i18n/core/shared";
 import { translations } from "@/config/i18n/en/index";
 
 import { RootProviders } from "./layout-shared";
+import { Body } from "@/packages/next-vibe-ui/web/ui/body";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -66,24 +65,24 @@ export default async function RootLayoutServer({
   const structuredData = {
     "@context": "https://schema.org",
     "@type": t("app.layout.structuredData.organization.types.organization"),
-    "name": t("config.group.name"),
-    "url": translations.websiteUrl,
-    "logo": `${translations.websiteUrl}/logo.png`,
-    "sameAs": [
+    name: t("config.group.name"),
+    url: translations.websiteUrl,
+    logo: `${translations.websiteUrl}/logo.png`,
+    sameAs: [
       t("config.social.facebookUrl"),
       t("config.social.twitterUrl"),
       t("config.social.instagramUrl"),
       t("config.social.linkedinUrl"),
     ],
-    "contactPoint": {
+    contactPoint: {
       "@type": t("app.layout.structuredData.organization.types.contactPoint"),
-      "telephone": t(
+      telephone: t(
         "app.layout.structuredData.organization.contactPoint.telephone",
       ),
-      "contactType": t(
+      contactType: t(
         "app.layout.structuredData.organization.contactPoint.contactType",
       ),
-      "availableLanguage": [
+      availableLanguage: [
         t("app.constants.languages.en"),
         t("app.constants.languages.de"),
         t("app.constants.languages.pl"),
@@ -93,15 +92,13 @@ export default async function RootLayoutServer({
 
   return (
     <Html lang={locale} suppressHydrationWarning>
-      <Head>
+      <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/images/apple-icon.png" />
         <link rel="manifest" href={`/api/${locale}/v1/core/manifest`} />
-      </Head>
+      </head>
       <Body className={inter.className}>
-        <RootProviders locale={locale}>
-          {children}
-        </RootProviders>
+        <RootProviders locale={locale}>{children}</RootProviders>
         <Script
           id="structured-data"
           type="application/ld+json"

@@ -132,9 +132,9 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
     } catch (error) {
       logger.error("Database health check failed:", parseError(error));
       return fail({
-          message: "app.api.v1.core.system.db.utils.errors.health_check_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.system.db.utils.errors.health_check_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -153,9 +153,9 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
     } catch (error) {
       logger.error("Database connection test failed:", parseError(error));
       return fail({
-          message: "app.api.v1.core.system.db.utils.errors.connection_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.system.db.utils.errors.connection_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -192,9 +192,9 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
         parseError(error),
       );
       return fail({
-          message: "app.api.v1.core.system.db.utils.errors.stats_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.system.db.utils.errors.stats_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -223,9 +223,9 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
       });
     } catch (error) {
       return fail({
-          message: "app.api.v1.core.system.db.utils.errors.docker_check_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.system.db.utils.errors.docker_check_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -283,9 +283,9 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
           );
           logger.error("Failed to reset database:", errorMessage);
           return fail({
-          message: "app.api.v1.core.system.db.utils.errors.reset_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                      messageParams: { error: errorMessage },
+            message: "app.api.v1.core.system.db.utils.errors.reset_failed",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: { error: errorMessage },
             cause: resetResult,
           });
         }
@@ -294,15 +294,15 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
         return fail({
           message: "app.api.v1.core.system.db.utils.errors.reset_failed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: { error: parseError(error).message },
+          messageParams: { error: parseError(error).message },
         });
       }
     } catch (error) {
       logger.error("Failed to manage database:", parseError(error));
       return fail({
-          message: "app.api.v1.core.system.db.utils.errors.manage_failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.system.db.utils.errors.manage_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

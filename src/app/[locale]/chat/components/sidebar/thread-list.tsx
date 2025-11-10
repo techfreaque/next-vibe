@@ -79,7 +79,7 @@ export function ThreadList({
   logger,
 }: ThreadListProps): JSX.Element {
   return (
-    <Div className="space-y-0.5">
+    <Div className="flex flex-col gap-0.5">
       {threads.map((thread) => (
         <ThreadItem
           key={thread.id}

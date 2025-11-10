@@ -156,9 +156,9 @@ export const branchRepository = {
     } catch (error) {
       logger.error("Failed to create branch", parseError(error));
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.createFailed.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   },

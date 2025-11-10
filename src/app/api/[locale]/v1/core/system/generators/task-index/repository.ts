@@ -87,9 +87,12 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       );
       if (!validationResult.success) {
         return fail({
-          message: "app.api.v1.core.system.generators.taskIndex.post.errors.validation.title",
+          message:
+            "app.api.v1.core.system.generators.taskIndex.post.errors.validation.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: { error: validationResult.error || "Validation failed" },
+          messageParams: {
+            error: validationResult.error || "Validation failed",
+          },
         });
       }
 
@@ -120,9 +123,10 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
         error: parseError(error),
       });
       return fail({
-          message: "app.api.v1.core.system.generators.taskIndex.post.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.system.generators.taskIndex.post.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           error: `Task index generation failed: ${parseError(error).message}`,
           duration,
         },
@@ -276,7 +280,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       "AUTO-GENERATED TASK INDEX",
       "Task Index Generator",
       {
-        "Implements": "spec.md unified task registry requirements",
+        Implements: "spec.md unified task registry requirements",
         "Task files": taskFiles.length,
         "Task runner files": taskRunnerFiles.length,
         "Side task config files": sideTaskFiles.length,

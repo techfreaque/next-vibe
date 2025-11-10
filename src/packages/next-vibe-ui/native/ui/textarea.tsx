@@ -14,57 +14,46 @@ const StyledView = styled(View);
 export type TextareaProps = WebTextareaProps &
   Omit<TextInputProps, "className" | "disabled" | "minRows" | "variant">;
 
-const Textarea = React.forwardRef<
-  React.ElementRef<typeof TextInput>,
-  TextareaProps
->(
-  (
-    {
-      className,
-      multiline = true,
-      numberOfLines,
-      placeholderClassName: _placeholderClassName,
-      onChangeText,
-      minRows = 4,
-      editable,
-      disabled,
-      style,
-      ...props
-    },
-    ref,
-  ) => {
-    // Use minRows as numberOfLines if not explicitly set
-    const lines = numberOfLines ?? minRows;
+function Textarea({
+  className,
+  multiline = true,
+  numberOfLines,
+  placeholderClassName: _placeholderClassName,
+  onChangeText,
+  minRows = 4,
+  editable,
+  disabled,
+  style,
+  ...props
+}: TextareaProps): React.JSX.Element {
+  // Use minRows as numberOfLines if not explicitly set
+  const lines = numberOfLines ?? minRows;
 
-    // Handle disabled state
-    const isEditable = editable !== undefined ? editable : !disabled;
+  // Handle disabled state
+  const isEditable = editable !== undefined ? editable : !disabled;
 
-    return (
-      <StyledView
-        className={cn(
-          "flex min-h-[80px] w-full flex-row rounded-md border border-input bg-background px-3 py-2 shadow-sm",
-          !isEditable && "opacity-50",
-          className,
-        )}
-        pointerEvents="box-none"
-      >
-        <TextInput
-          ref={ref}
-          className="flex-1 text-base text-foreground"
-          style={style}
-          placeholderTextColor="hsl(var(--muted-foreground))"
-          multiline={multiline}
-          numberOfLines={lines}
-          textAlignVertical="top"
-          onChangeText={onChangeText}
-          editable={isEditable}
-          {...props}
-        />
-      </StyledView>
-    );
-  },
-);
-
-Textarea.displayName = "Textarea";
+  return (
+    <StyledView
+      className={cn(
+        "flex min-h-[80px] w-full flex-row rounded-md border border-input bg-background px-3 py-2 shadow-sm",
+        !isEditable && "opacity-50",
+        className,
+      )}
+      pointerEvents="box-none"
+    >
+      <TextInput
+        className="flex-1 text-base text-foreground"
+        style={style}
+        placeholderTextColor="hsl(var(--muted-foreground))"
+        multiline={multiline}
+        numberOfLines={lines}
+        textAlignVertical="top"
+        onChangeText={onChangeText}
+        editable={isEditable}
+        {...props}
+      />
+    </StyledView>
+  );
+}
 
 export { Textarea };

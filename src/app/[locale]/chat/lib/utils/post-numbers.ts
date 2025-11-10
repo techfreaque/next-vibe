@@ -33,7 +33,9 @@ function isPostNumberMap(
 /**
  * Get post number map from storage
  */
-async function getPostNumberMap(logger: EndpointLogger): Promise<PostNumberMap> {
+async function getPostNumberMap(
+  logger: EndpointLogger,
+): Promise<PostNumberMap> {
   if (typeof window === "undefined") {
     return {};
   }
@@ -65,7 +67,10 @@ async function getPostNumberMap(logger: EndpointLogger): Promise<PostNumberMap> 
 /**
  * Save post number map to storage
  */
-async function savePostNumberMap(map: PostNumberMap, logger: EndpointLogger): Promise<void> {
+async function savePostNumberMap(
+  map: PostNumberMap,
+  logger: EndpointLogger,
+): Promise<void> {
   if (typeof window === "undefined") {
     return;
   }
@@ -97,7 +102,10 @@ async function getCounter(logger: EndpointLogger): Promise<number> {
 /**
  * Save counter value
  */
-async function saveCounter(counter: number, logger: EndpointLogger): Promise<void> {
+async function saveCounter(
+  counter: number,
+  logger: EndpointLogger,
+): Promise<void> {
   if (typeof window === "undefined") {
     return;
   }

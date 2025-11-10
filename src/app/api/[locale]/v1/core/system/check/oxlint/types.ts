@@ -100,7 +100,9 @@ export function isJSXLiteral(node: OxlintASTNode): node is JSXLiteral {
 }
 
 export function isProperty(node: OxlintASTNode): node is Property {
-  return node.type === "Property" && typeof (node as Property).method === "boolean";
+  return (
+    node.type === "Property" && typeof (node as Property).method === "boolean"
+  );
 }
 
 export interface OxlintLabel {
@@ -125,7 +127,7 @@ export interface OxlintConfig {
     nursery?: Severity;
     restriction?: Severity;
   };
-  rules?: LintConfigElement
+  rules?: LintConfigElement;
   settings?: {
     "jsx-a11y"?: {
       polymorphicPropName?: string | null;

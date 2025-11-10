@@ -225,8 +225,8 @@ export type TypeSafeFieldConfig<
 
 // Generic field props for type safety with form control
 export interface EndpointFormFieldProps<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
 > {
   name: TName;
   config?: FieldConfig; // Optional - auto-inferred from endpointFields if not provided

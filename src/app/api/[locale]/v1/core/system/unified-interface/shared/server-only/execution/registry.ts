@@ -46,7 +46,8 @@ export abstract class BaseRegistry {
   protected lastRefresh = 0;
 
   constructor(config: BaseRegistryConfig, logger?: EndpointLogger) {
-    this.logger = logger || createEndpointLogger(false, Date.now(), config.locale);
+    this.logger =
+      logger || createEndpointLogger(false, Date.now(), config.locale);
     this.config = config;
   }
 

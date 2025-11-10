@@ -18,10 +18,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import {
-  CountriesOptions,
-  LanguagesOptions,
-} from "@/i18n/core/config";
+import { CountriesOptions, LanguagesOptions } from "@/i18n/core/config";
 
 import { UserRole } from "../../user/user-roles/enum";
 import { LeadSource, LeadSourceOptions, LeadStatus } from "../enum";

@@ -106,9 +106,9 @@ export class SignupRepositoryImpl implements SignupRepository {
         return fail({
           message: "app.api.v1.core.user.auth.errors.validation_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: {
+          messageParams: {
             field: "confirmPassword",
-                    message: t(
+            message: t(
               "app.api.v1.core.user.public.signup.fields.confirmPassword.validation.mismatch",
             ),
           },
@@ -128,9 +128,9 @@ export class SignupRepositoryImpl implements SignupRepository {
         return fail({
           message: "app.api.v1.core.user.public.signup.errors.conflict.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: {
+          messageParams: {
             field: "email",
-                    message: t("app.api.v1.core.user.errors.emailAlreadyInUse"),
+            message: t("app.api.v1.core.user.errors.emailAlreadyInUse"),
           },
         });
       }
@@ -247,9 +247,12 @@ export class SignupRepositoryImpl implements SignupRepository {
       logger.error("Registration error", parseError(error));
       const parsedError = parseError(error);
       return fail({
-          message: "app.api.v1.core.user.public.signup.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { email: data.personalInfo.email, error: parsedError.message },
+        message: "app.api.v1.core.user.public.signup.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
+          email: data.personalInfo.email,
+          error: parsedError.message,
+        },
       });
     }
   }
@@ -297,9 +300,10 @@ export class SignupRepositoryImpl implements SignupRepository {
       logger.error("Error checking email availability", parseError(error));
       const parsedError = parseError(error);
       return fail({
-          message: "app.api.v1.core.user.public.signup.emailCheck.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { email: data.email, error: parsedError.message },
+        message:
+          "app.api.v1.core.user.public.signup.emailCheck.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { email: data.email, error: parsedError.message },
       });
     }
   }
@@ -348,7 +352,7 @@ export class SignupRepositoryImpl implements SignupRepository {
         return fail({
           message: "app.api.v1.core.user.public.signup.errors.conflict.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: { email },
+          messageParams: { email },
         });
       }
 
@@ -422,9 +426,9 @@ export class SignupRepositoryImpl implements SignupRepository {
     } catch (error) {
       logger.error("User creation error", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.public.signup.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message: "app.api.v1.core.user.public.signup.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           email: userInput.personalInfo.email,
           error: parseError(error).message,
         },
@@ -454,9 +458,10 @@ export class SignupRepositoryImpl implements SignupRepository {
     } catch (error) {
       logger.error("Error checking email registration", parseError(error));
       return fail({
-          message: "app.api.v1.core.user.public.signup.emailCheck.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message, email },
+        message:
+          "app.api.v1.core.user.public.signup.emailCheck.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message, email },
       });
     }
   }

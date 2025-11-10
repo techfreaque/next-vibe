@@ -137,9 +137,9 @@ export function ImapAccountsList({
   }
 
   return (
-    <Div className="space-y-4">
+    <Div className="flex flex-col gap-4">
       {/* Search and Filters */}
-      <Div className="flex items-center space-x-4">
+      <Div className="flex items-center flex flex-row gap-4">
         <Input
           placeholder={t("app.admin.emails.imap.account.search_placeholder")}
           value={searchValue}
@@ -205,7 +205,7 @@ export function ImapAccountsList({
                   </TableCell>
                   <TableCell>{account.maxMessages}</TableCell>
                   <TableCell>
-                    <Div className="flex items-center space-x-2">
+                    <Div className="flex items-center flex flex-row gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -249,7 +249,7 @@ export function ImapAccountsList({
               total: totalAccounts,
             })}
           </Div>
-          <Div className="flex items-center space-x-2">
+          <Div className="flex items-center flex flex-row gap-2">
             <Button
               variant="outline"
               size="sm"

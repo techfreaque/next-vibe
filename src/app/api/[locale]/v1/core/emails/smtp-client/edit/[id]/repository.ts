@@ -89,10 +89,11 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       if (!account) {
         return fail({
-          message: "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
+          message:
+            "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { accountId: urlPathParams.id },
-      });
+          messageParams: { accountId: urlPathParams.id },
+        });
       }
 
       // Transform to response format - match endpoint definition exactly
@@ -126,8 +127,9 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
     } catch (error) {
       logger.error("Error getting SMTP account", parseError(error));
       return fail({
-          message: "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
     }
@@ -158,10 +160,11 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       if (!existingAccount) {
         return fail({
-          message: "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
+          message:
+            "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { accountId: data.id },
-      });
+          messageParams: { accountId: data.id },
+        });
       }
 
       // Check if setting as default and unset other defaults for overlapping campaign types
@@ -208,13 +211,14 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       if (!updatedAccount) {
         return fail({
-          message: "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
+          message:
+            "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+          messageParams: {
             error:
               "app.api.v1.core.emails.smtpClient.edit.id.errors.server.description",
           },
-      });
+        });
       }
 
       // Transform to response format - match endpoint definition exactly
@@ -255,15 +259,17 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
         errorMessage.includes("duplicate")
       ) {
         return fail({
-          message: "app.api.v1.core.emails.smtpClient.edit.id.errors.conflict.title",
+          message:
+            "app.api.v1.core.emails.smtpClient.edit.id.errors.conflict.title",
           errorType: ErrorResponseTypes.CONFLICT,
-        messageParams: { error: errorMessage },
-      });
+          messageParams: { error: errorMessage },
+        });
       }
 
       return fail({
-          message: "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage },
       });
     }

@@ -81,18 +81,16 @@ export function getAwsSnsProvider(): SmsProvider {
         // Validate required parameters
         if (!params.to) {
           return fail({
-          message: "app.api.v1.core.sms.sms.error.missing_recipient",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            message: "app.api.v1.core.sms.sms.error.missing_recipient",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
-          
         }
 
         if (!params.message || params.message.trim() === "") {
           return fail({
-          message: "app.api.v1.core.sms.sms.error.empty_message",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            message: "app.api.v1.core.sms.sms.error.empty_message",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
-          
         }
 
         // Prepare AWS SNS request
@@ -257,10 +255,10 @@ export function getAwsSnsProvider(): SmsProvider {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
-            "Host": host,
+            Host: host,
             "X-Amz-Date": amzDate,
             "X-Amz-Content-Sha256": contentHash,
-            "Authorization": authorizationHeader,
+            Authorization: authorizationHeader,
           },
           body: payload,
         });
@@ -274,13 +272,13 @@ export function getAwsSnsProvider(): SmsProvider {
           const errorMessage = errorMatch?.[1] ?? "Unknown AWS SNS error";
 
           return fail({
-          message: "app.api.v1.core.sms.sms.error.aws_sns_api_error",
-          errorType: ErrorResponseTypes.SMS_ERROR,
-        messageParams: {
+            message: "app.api.v1.core.sms.sms.error.aws_sns_api_error",
+            errorType: ErrorResponseTypes.SMS_ERROR,
+            messageParams: {
               error: errorMessage,
               statusCode: response.status,
             },
-      });
+          });
         }
 
         // Parse XML response with proper error handling

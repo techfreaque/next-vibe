@@ -478,10 +478,10 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
         error: parsedError.message,
       });
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           error: parsedError.message,
           typeCategory: data.typeCategory || "all",
           operation: data.operation,
@@ -510,10 +510,10 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
         error: parsedError.message,
       });
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -564,10 +564,10 @@ export interface TaskStatus { /* ... */ }`;
           // Handle unsupported format with proper error response
           logger.error("Unsupported export format", { format });
           return fail({
-          message:
+            message:
               "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.validation.title",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                      messageParams: { format },
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            messageParams: { format },
           });
       }
 
@@ -580,10 +580,10 @@ export interface TaskStatus { /* ... */ }`;
         error: parsedError.message,
       });
       return fail({
-          message:
+        message:
           "app.api.v1.core.system.unifiedInterface.tasks.types.get.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parsedError.message, format },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message, format },
       });
     }
   }

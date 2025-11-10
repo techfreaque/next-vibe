@@ -5,7 +5,20 @@ import type { JSX } from "react";
 import { DataTable } from "next-vibe-ui/ui/data-table";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Image } from "next-vibe-ui/ui/image";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "next-vibe-ui/ui/sidebar";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "next-vibe-ui/ui/sidebar";
 import { Div } from "next-vibe-ui/ui/div";
 import { Section } from "next-vibe-ui/ui/section";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
@@ -108,7 +121,9 @@ export function SpecialPreview(): JSX.Element {
                         </SidebarGroup>
                       </SidebarContent>
                       <SidebarFooter>
-                        <P className="text-xs p-4 text-muted-foreground">Footer</P>
+                        <P className="text-xs p-4 text-muted-foreground">
+                          Footer
+                        </P>
                       </SidebarFooter>
                     </Sidebar>
                     <Div className="flex-1 p-4">

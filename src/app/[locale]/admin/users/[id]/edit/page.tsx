@@ -62,7 +62,7 @@ export default async function UserEditPage({
   }
 
   return (
-    <Div className="container mx-auto py-6 space-y-6">
+    <Div className="container mx-auto py-6 flex flex-col gap-6">
       {/* Header */}
       <Div>
         <H1 className="text-3xl font-bold tracking-tight">

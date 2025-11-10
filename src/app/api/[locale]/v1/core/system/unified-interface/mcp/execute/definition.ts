@@ -25,12 +25,22 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "unified-interface", "mcp", "execute"],
   aliases: ["mcp-execute", "mcp:exec", "mcp:run"],
-  title: "app.api.v1.core.system.unifiedInterface.mcp.execute.post.title" as const,
+  title:
+    "app.api.v1.core.system.unifiedInterface.mcp.execute.post.title" as const,
   description:
     "app.api.v1.core.system.unifiedInterface.mcp.execute.post.description" as const,
-  category: "app.api.v1.core.system.unifiedInterface.mcp.execute.category" as const,
-  tags: ["app.api.v1.core.system.unifiedInterface.mcp.execute.tags.mcp" as const],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF] as const,
+  category:
+    "app.api.v1.core.system.unifiedInterface.mcp.execute.category" as const,
+  tags: [
+    "app.api.v1.core.system.unifiedInterface.mcp.execute.tags.mcp" as const,
+  ],
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+  ] as const,
 
   fields: objectField(
     {
@@ -165,7 +175,8 @@ const { POST } = createEndpoint({
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.system.unifiedInterface.mcp.execute.post.success.title",
+    title:
+      "app.api.v1.core.system.unifiedInterface.mcp.execute.post.success.title",
     description:
       "app.api.v1.core.system.unifiedInterface.mcp.execute.post.success.description",
   },

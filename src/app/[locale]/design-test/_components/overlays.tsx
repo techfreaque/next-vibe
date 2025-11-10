@@ -2,16 +2,98 @@
 "use client";
 import type { JSX } from "react";
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "next-vibe-ui/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "next-vibe-ui/ui/alert-dialog";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "next-vibe-ui/ui/sheet";
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "next-vibe-ui/ui/drawer";
-import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "next-vibe-ui/ui/hover-card";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "next-vibe-ui/ui/tooltip";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuCheckboxItem, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuShortcut } from "next-vibe-ui/ui/dropdown-menu";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuCheckboxItem, ContextMenuRadioGroup, ContextMenuRadioItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuShortcut } from "next-vibe-ui/ui/context-menu";
-import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from "next-vibe-ui/ui/command";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "next-vibe-ui/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "next-vibe-ui/ui/alert-dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "next-vibe-ui/ui/sheet";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "next-vibe-ui/ui/drawer";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "next-vibe-ui/ui/popover";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "next-vibe-ui/ui/hover-card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuShortcut,
+} from "next-vibe-ui/ui/dropdown-menu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuCheckboxItem,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+} from "next-vibe-ui/ui/context-menu";
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "next-vibe-ui/ui/command";
 import { Button } from "next-vibe-ui/ui/button";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
@@ -65,8 +147,8 @@ export function OverlaysPreview(): JSX.Element {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete your account
-                    and remove your data from our servers.
+                    This action cannot be undone. This will permanently delete
+                    your account and remove your data from our servers.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -149,7 +231,8 @@ export function OverlaysPreview(): JSX.Element {
                 <Div className="space-y-2">
                   <H4>Popover</H4>
                   <Small className="text-muted-foreground">
-                    This is a popover component for displaying contextual content.
+                    This is a popover component for displaying contextual
+                    content.
                   </Small>
                 </Div>
               </PopoverContent>
@@ -219,8 +302,12 @@ export function OverlaysPreview(): JSX.Element {
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup value="apple">
-                  <DropdownMenuRadioItem value="apple">Apple</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="banana">Banana</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="apple">
+                    Apple
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="banana">
+                    Banana
+                  </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -249,7 +336,9 @@ export function OverlaysPreview(): JSX.Element {
                 <ContextMenuSeparator />
                 <ContextMenuLabel>People</ContextMenuLabel>
                 <ContextMenuRadioGroup value="pedro">
-                  <ContextMenuRadioItem value="pedro">Pedro</ContextMenuRadioItem>
+                  <ContextMenuRadioItem value="pedro">
+                    Pedro
+                  </ContextMenuRadioItem>
                   <ContextMenuRadioItem value="colm">Colm</ContextMenuRadioItem>
                 </ContextMenuRadioGroup>
               </ContextMenuContent>
@@ -259,7 +348,9 @@ export function OverlaysPreview(): JSX.Element {
           <Div className="space-y-2">
             <H3>Command</H3>
             <Div className="space-y-2">
-              <Button onClick={() => setCommandOpen(true)}>Open Command Dialog</Button>
+              <Button onClick={() => setCommandOpen(true)}>
+                Open Command Dialog
+              </Button>
               <CommandDialog open={commandOpen} onOpenChange={setCommandOpen}>
                 <CommandInput placeholder="Type a command or search..." />
                 <CommandList>

@@ -51,6 +51,8 @@ export const translations: typeof enTranslations = {
         chat: "Przejdź do czatu",
         help: "Przejdź do pomocy",
         about: "O nas",
+        story: "Nasza Historia",
+        designTest: "Test Projektu",
       },
       status: {
         title: "Status systemu",

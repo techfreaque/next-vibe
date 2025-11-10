@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Filter, List, RefreshCw, Table, Users } from 'next-vibe-ui/ui/icons';
+import { Filter, List, RefreshCw, Table, Users } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Link } from "next-vibe-ui/ui/link";
 import { Div } from "next-vibe-ui/ui/div";
@@ -171,7 +171,7 @@ export function LeadsListClient({
             })}
           </CardTitle>
 
-          <Div className="flex items-center space-x-2">
+          <Div className="flex items-center flex flex-row gap-2">
             {/* View Toggle */}
             <Div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg">
               <Button
@@ -212,14 +212,14 @@ export function LeadsListClient({
       <CardContent>
         {/* Filter Form */}
         <Div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <Div className="flex items-center space-x-2 mb-4">
+          <Div className="flex items-center flex flex-row gap-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <Span className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {t("app.admin.leads.leads.list.filters.title")}:
             </Span>
           </Div>
 
-          <Div className="space-y-4">
+          <Div className="flex flex-col gap-4">
             <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Search Field */}
               <EndpointFormField
@@ -598,14 +598,14 @@ export function LeadsListClient({
         ) : viewMode === "table" ? (
           <LeadsTable locale={locale} leads={leads} isLoading={queryLoading} />
         ) : (
-          <Div className="space-y-3">
+          <Div className="flex flex-col gap-3">
             {leads.map((lead) => (
               <Div
                 key={lead.id}
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 <Div className="flex items-center justify-between">
-                  <Div className="flex items-center space-x-4">
+                  <Div className="flex items-center flex flex-row gap-4">
                     <Div>
                       <Link
                         href={`/${locale}/admin/leads/${lead.id}/edit`}
@@ -619,7 +619,7 @@ export function LeadsListClient({
                     </Div>
                   </Div>
 
-                  <Div className="flex items-center space-x-4">
+                  <Div className="flex items-center flex flex-row gap-4">
                     <Div className="text-right">
                       <Div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {lead.status}

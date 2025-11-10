@@ -6,40 +6,40 @@ import { translations as sessionCleanupTranslations } from "../../session-cleanu
 import { translations as userRolesTranslations } from "../../user-roles/i18n/en";
 
 export const translations = {
-  "category": "User Management",
-  "auth": authTranslations,
-  "private": privateTranslations,
-  "public": publicTranslations,
-  "search": searchTranslations,
+  category: "User Management",
+  auth: authTranslations,
+  private: privateTranslations,
+  public: publicTranslations,
+  search: searchTranslations,
   "session-cleanup": sessionCleanupTranslations,
-  "userRoles": userRolesTranslations,
-  "profileVisibility": {
+  userRoles: userRolesTranslations,
+  profileVisibility: {
     public: "Public",
     private: "Private",
     contactsOnly: "Contacts Only",
   },
-  "contactMethods": {
+  contactMethods: {
     email: "Email",
     phone: "Phone",
     sms: "SMS",
     whatsapp: "WhatsApp",
   },
-  "theme": {
+  theme: {
     light: "Light",
     dark: "Dark",
     system: "System",
   },
-  "userDetailLevel": {
+  userDetailLevel: {
     minimal: "Minimal",
     standard: "Standard",
     complete: "Complete",
   },
-  "language": {
+  language: {
     en: "English",
     de: "German",
     pl: "Polish",
   },
-  "timezone": {
+  timezone: {
     utc: "UTC",
     america_new_york: "America/New_York",
     america_los_angeles: "America/Los_Angeles",
@@ -49,7 +49,7 @@ export const translations = {
     asia_tokyo: "Asia/Tokyo",
     australia_sydney: "Australia/Sydney",
   },
-  "errors": {
+  errors: {
     emailAlreadyInUse: "Email address is already in use",
     locale_required: "Locale is required",
     auth_required: "Authentication is required",
@@ -68,7 +68,7 @@ export const translations = {
     not_implemented_on_native:
       "This feature is not implemented on React Native",
   },
-  "notifications": {
+  notifications: {
     profileUpdated: {
       title: "Profile Updated",
       description: "Your profile has been successfully updated",

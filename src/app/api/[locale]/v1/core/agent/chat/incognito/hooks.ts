@@ -106,7 +106,9 @@ export function useIncognitoChat(
     : null;
 
   // Get active thread messages
-  const [activeThreadMessages, setActiveThreadMessages] = useState<ChatMessage[]>([]);
+  const [activeThreadMessages, setActiveThreadMessages] = useState<
+    ChatMessage[]
+  >([]);
 
   useEffect(() => {
     async function loadMessages(): Promise<void> {
@@ -250,7 +252,7 @@ export function useIncognitoChat(
         isAI: role === "assistant",
         model,
         persona,
-          errorType: null,
+        errorType: null,
         errorMessage: null,
         edited: false,
         tokens: null,

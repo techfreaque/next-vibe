@@ -4,7 +4,13 @@ import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
 import { P } from "next-vibe-ui/ui/typography";
@@ -16,7 +22,7 @@ import {
   ChevronRight,
   Search,
   X,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
@@ -165,7 +171,9 @@ export function AIToolsModal({
       logger.debug("AIToolsModal", "All visible tools disabled");
     } else {
       // Enable all visible tools (merge with existing)
-      const uniqueEnabled = [...new Set([...enabledToolIds, ...allEndpointIds])];
+      const uniqueEnabled = [
+        ...new Set([...enabledToolIds, ...allEndpointIds]),
+      ];
       onToolsChange(uniqueEnabled);
       logger.debug("AIToolsModal", "All visible tools enabled");
     }
@@ -176,7 +184,9 @@ export function AIToolsModal({
     if (filteredTools.length === 0) {
       return false;
     }
-    return filteredTools.every((tool) => enabledToolIds.includes(tool.endpointId));
+    return filteredTools.every((tool) =>
+      enabledToolIds.includes(tool.endpointId),
+    );
   }, [filteredTools, enabledToolIds]);
 
   // Toggle category expansion
@@ -231,9 +241,9 @@ export function AIToolsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <Div className="space-y-4 flex-1 flex flex-col">
+        <Div className="flex flex-col gap-4 flex-1 flex flex-col">
           {/* Search and Controls */}
-          <Div className="space-y-2 shrink-0">
+          <Div className="flex flex-col gap-2 shrink-0">
             {/* Search Input */}
             <Div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -303,7 +313,7 @@ export function AIToolsModal({
                   : t("app.chat.aiTools.modal.noToolsAvailable")}
               </Div>
             ) : (
-              <Div className="space-y-4">
+              <Div className="flex flex-col gap-4">
                 {Object.entries(toolsByCategory).map(([category, tools]) => {
                   const isExpanded = expandedCategories.has(category);
                   const categoryEndpointIds = tools.map((t) => t.endpointId);
@@ -344,7 +354,7 @@ export function AIToolsModal({
 
                       {/* Tools in Category - Collapsible */}
                       {isExpanded && (
-                        <Div className="px-4 pb-3 space-y-2 border-t">
+                        <Div className="px-4 pb-3 flex flex-col gap-2 border-t">
                           {tools.map((tool) => {
                             const isEnabled = enabledToolIds.includes(
                               tool.endpointId,
@@ -353,7 +363,9 @@ export function AIToolsModal({
                             return (
                               <Div
                                 key={tool.endpointId}
-                                onClick={() => handleToggleTool(tool.endpointId)}
+                                onClick={() =>
+                                  handleToggleTool(tool.endpointId)
+                                }
                                 className={cn(
                                   "w-full text-left px-3 py-2 rounded-md border transition-all cursor-pointer",
                                   "hover:border-primary/50 hover:bg-accent/50",

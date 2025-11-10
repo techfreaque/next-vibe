@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop, 'feature/*', 'fix/*']
+    branches: [main, develop, "feature/*", "fix/*"]
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
@@ -41,7 +41,6 @@ jobs:
   #         NODE_TLS_REJECT_UNAUTHORIZED: 0
   #       run: vibe build
 
-
   #     - name: Deploy to Vercel
   #       uses: amondnet/vercel-action@v25
   #       with:
@@ -49,7 +48,6 @@ jobs:
   #         vercel-org-id: ${{ secrets.VERCEL_TEAM_ID }}
   #         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
   #         vercel-args: '--prod'
-
 
   # For all other branches: just check and build (skip migrations/seeding)
   other-check:
@@ -61,9 +59,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'yarn'
-          cache-dependency-path: 'yarn.lock'
+          node-version: "22"
+          cache: "yarn"
+          cache-dependency-path: "yarn.lock"
 
       - name: Setup environment variables
         run: cp .env.example .env

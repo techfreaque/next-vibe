@@ -245,9 +245,10 @@ export class CampaignStarterRepositoryImpl
         locale,
       });
       return fail({
-          message: "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR, }
-      );
+        message:
+          "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -310,9 +311,10 @@ export class CampaignStarterRepositoryImpl
         locale,
       });
       return fail({
-          message: "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR, }
-      );
+        message:
+          "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -374,9 +376,10 @@ export class CampaignStarterRepositoryImpl
         locale,
       });
       return fail({
-          message: "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR, }
-      );
+        message:
+          "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }

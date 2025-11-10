@@ -236,8 +236,9 @@ async function processRouteFile(
     });
 
     // Validate the route file structure
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    validation = validateRouteFileForTRPC(routeModule as RouteFileStructure & Record<string, any>);
+    validation = validateRouteFileForTRPC(
+      routeModule as RouteFileStructure & Record<string, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+    );
   } catch {
     validation.errors = ["app.error.general.route_import_failed"];
   }

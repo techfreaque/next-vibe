@@ -378,7 +378,6 @@ export function platformToAuthPlatform(platform: Platform): AuthPlatform {
       // Email uses web auth
       return "web";
     default: {
-       
       const _exhaustiveCheck: never = platform;
       return "web";
     }

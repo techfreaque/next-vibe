@@ -131,7 +131,7 @@ export function RootFolderBar({
                 variant="ghost"
                 size="icon"
                 className={`h-11 w-11 ${colorClasses}`}
-                onClick={()=>handleClick(folderConfig.id)}
+                onClick={() => handleClick(folderConfig.id)}
                 suppressHydrationWarning
               >
                 <FolderIcon className="h-6 w-6 flex items-center justify-center" />

@@ -105,7 +105,8 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
     try {
       if (!user.id) {
         return fail({
-          message: "app.api.v1.core.user.private.me.get.errors.unauthorized.title",
+          message:
+            "app.api.v1.core.user.private.me.get.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -123,7 +124,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
         return fail({
           message: "app.api.v1.core.user.private.me.get.errors.internal.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId },
+          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -136,9 +137,12 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       logger.error("Error getting user profile", parseError(error));
       const parsedError = parseError(error);
       return fail({
-          message: "app.api.v1.core.user.private.me.get.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { userId: user.id ?? "unknown", error: parsedError.message },
+        message: "app.api.v1.core.user.private.me.get.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
+          userId: user.id ?? "unknown",
+          error: parsedError.message,
+        },
       });
     }
   }
@@ -162,7 +166,8 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
     try {
       if (!user.id) {
         return fail({
-          message: "app.api.v1.core.user.private.me.update.errors.unauthorized.title",
+          message:
+            "app.api.v1.core.user.private.me.update.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -178,9 +183,10 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: "app.api.v1.core.user.private.me.update.errors.unauthorized.title",
+          message:
+            "app.api.v1.core.user.private.me.update.errors.unauthorized.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId },
+          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -197,11 +203,11 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
 
         if (emailExistsResponse.success && emailExistsResponse.data) {
           return fail({
-          message: "app.api.v1.core.user.auth.errors.validation_failed",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                      messageParams: {
+            message: "app.api.v1.core.user.auth.errors.validation_failed",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            messageParams: {
               field: "email",
-                      message: t("app.api.v1.core.user.errors.emailAlreadyInUse"),
+              message: t("app.api.v1.core.user.errors.emailAlreadyInUse"),
             },
           });
         }
@@ -251,7 +257,8 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       );
       if (!updatedUserResponse.success) {
         return fail({
-          message: "app.api.v1.core.user.private.me.update.errors.internal.title",
+          message:
+            "app.api.v1.core.user.private.me.update.errors.internal.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: updatedUserResponse,
         });
@@ -283,9 +290,12 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       logger.error("Error updating user profile", parseError(error));
       const parsedError = parseError(error);
       return fail({
-          message: "app.api.v1.core.user.private.me.update.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { userId: user.id ?? "unknown", error: parsedError.message },
+        message: "app.api.v1.core.user.private.me.update.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
+          userId: user.id ?? "unknown",
+          error: parsedError.message,
+        },
       });
     }
   }
@@ -307,7 +317,8 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
     try {
       if (!user.id) {
         return fail({
-          message: "app.api.v1.core.user.private.me.delete.errors.unauthorized.title",
+          message:
+            "app.api.v1.core.user.private.me.delete.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -323,9 +334,10 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: "app.api.v1.core.user.private.me.delete.errors.unauthorized.title",
+          message:
+            "app.api.v1.core.user.private.me.delete.errors.unauthorized.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId },
+          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -343,9 +355,12 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       logger.error("Error deleting user account", parseError(error));
       const parsedError = parseError(error);
       return fail({
-          message: "app.api.v1.core.user.private.me.delete.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { userId: user.id ?? "unknown", error: parsedError.message },
+        message: "app.api.v1.core.user.private.me.delete.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
+          userId: user.id ?? "unknown",
+          error: parsedError.message,
+        },
       });
     }
   }

@@ -172,11 +172,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           } else {
             errors.push(
               fail({
-          message:
-                "app.api.v1.core.emails.imapClient.imap.sync.errors.account_failed",
-          errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-                          messageParams: { error: accountResult.message },}
-              ),
+                message:
+                  "app.api.v1.core.emails.imapClient.imap.sync.errors.account_failed",
+                errorType: ErrorResponseTypes.UNKNOWN_ERROR,
+                messageParams: { error: accountResult.message },
+              }),
             );
 
             // Update account sync status to error
@@ -197,11 +197,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           const errorMessage = parseError(error).message;
           errors.push(
             fail({
-          message:
-              "app.api.v1.core.emails.imapClient.imapErrors.sync.account.failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                        messageParams: { error: errorMessage },}
-            ),
+              message:
+                "app.api.v1.core.emails.imapClient.imapErrors.sync.account.failed",
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              messageParams: { error: errorMessage },
+            }),
           );
 
           // Update account sync status to error
@@ -249,8 +249,8 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       logger.error("Error in syncAllAccounts", parseError(error));
 
       return fail({
-          message: "app.api.v1.core.emails.imapClient.imapErrors.sync.failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.emails.imapClient.imapErrors.sync.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -396,9 +396,9 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       );
 
       return fail({
-          message:
+        message:
           "app.api.v1.core.emails.imapClient.imapErrors.sync.account.failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -504,11 +504,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           logger.error("Error syncing folder", parseError(error));
           errors.push(
             fail({
-          message:
-              "app.api.v1.core.emails.imapClient.imap.sync.errors.folder_sync_failed",
-          errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-                        messageParams: { error: parseError(error).message },}
-            ),
+              message:
+                "app.api.v1.core.emails.imapClient.imap.sync.errors.folder_sync_failed",
+              errorType: ErrorResponseTypes.UNKNOWN_ERROR,
+              messageParams: { error: parseError(error).message },
+            }),
           );
           logger.error(
             `Error syncing folder ${remoteFolder.name}`,
@@ -549,9 +549,9 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       );
 
       return fail({
-          message:
+        message:
           "app.api.v1.core.emails.imapClient.imapErrors.sync.folder.failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -706,9 +706,9 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       );
 
       return fail({
-          message:
+        message:
           "app.api.v1.core.emails.imapClient.imapErrors.sync.message.failed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

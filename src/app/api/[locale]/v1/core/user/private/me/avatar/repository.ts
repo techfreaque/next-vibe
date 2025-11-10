@@ -68,7 +68,12 @@ export class AvatarRepositoryImpl implements AvatarRepository {
     try {
       logger.debug(
         "app.api.v1.core.user.private.me.avatar.debug.uploadingUserAvatar",
-        { userId, fileName: file.name, fileSize: file.size, fileType: file.type },
+        {
+          userId,
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type,
+        },
       );
 
       // Check if user exists
@@ -80,20 +85,31 @@ export class AvatarRepositoryImpl implements AvatarRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: "app.api.v1.core.user.private.me.avatar.errors.user_not_found",
+          message:
+            "app.api.v1.core.user.private.me.avatar.errors.user_not_found",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId },
+          messageParams: { userId },
           cause: userResponse,
         });
       }
 
       // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+      ];
       if (!allowedTypes.includes(file.type)) {
         return fail({
-          message: "app.api.v1.core.user.private.me.avatar.errors.invalid_file_type",
+          message:
+            "app.api.v1.core.user.private.me.avatar.errors.invalid_file_type",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: { allowedTypes: allowedTypes.join(", "), providedType: file.type },
+          messageParams: {
+            allowedTypes: allowedTypes.join(", "),
+            providedType: file.type,
+          },
         });
       }
 
@@ -101,9 +117,13 @@ export class AvatarRepositoryImpl implements AvatarRepository {
       const maxSizeBytes = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSizeBytes) {
         return fail({
-          message: "app.api.v1.core.user.private.me.avatar.errors.file_too_large",
+          message:
+            "app.api.v1.core.user.private.me.avatar.errors.file_too_large",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                    messageParams: { maxSize: "5MB", providedSize: `${Math.round(file.size / 1024 / 1024)}MB` },
+          messageParams: {
+            maxSize: "5MB",
+            providedSize: `${Math.round(file.size / 1024 / 1024)}MB`,
+          },
         });
       }
 
@@ -111,7 +131,7 @@ export class AvatarRepositoryImpl implements AvatarRepository {
       // In a production environment, this should upload to a cloud storage service (S3, Cloudinary, etc.)
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      const base64 = buffer.toString('base64');
+      const base64 = buffer.toString("base64");
       const avatarUrl = `data:${file.type};base64,${base64}`;
 
       // Update user avatar in database
@@ -155,9 +175,10 @@ export class AvatarRepositoryImpl implements AvatarRepository {
         parseError(error),
       );
       return fail({
-          message: "app.api.v1.core.user.private.me.avatar.errors.failed_to_upload_avatar",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { userId, error: String(error) },
+        message:
+          "app.api.v1.core.user.private.me.avatar.errors.failed_to_upload_avatar",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { userId, error: String(error) },
       });
     }
   }
@@ -188,9 +209,10 @@ export class AvatarRepositoryImpl implements AvatarRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: "app.api.v1.core.user.private.me.avatar.errors.user_not_found",
+          message:
+            "app.api.v1.core.user.private.me.avatar.errors.user_not_found",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId },
+          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -228,9 +250,10 @@ export class AvatarRepositoryImpl implements AvatarRepository {
         parseError(error),
       );
       return fail({
-          message: "app.api.v1.core.user.private.me.avatar.errors.failed_to_delete_avatar",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { userId, error: String(error) },
+        message:
+          "app.api.v1.core.user.private.me.avatar.errors.failed_to_delete_avatar",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { userId, error: String(error) },
       });
     }
   }

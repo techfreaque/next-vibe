@@ -66,7 +66,7 @@ export function PasswordStrengthIndicator({
   const widthPercentage = Math.max(20, Math.min(100, (strength / 5) * 100));
 
   return (
-    <Div className="mt-2 space-y-1">
+    <Div className="mt-2 flex flex-col gap-1">
       <Div className="flex justify-between text-xs">
         <Span>
           {t("app.user.components.auth.common.passwordStrength.label")}

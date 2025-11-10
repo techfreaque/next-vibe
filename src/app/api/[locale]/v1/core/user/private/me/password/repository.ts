@@ -84,7 +84,8 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
       // Safely access nested properties
       if (!passwords.currentCredentials || !passwords.newCredentials) {
         return fail({
-          message: "app.api.v1.core.user.private.me.password.errors.invalid_request.title",
+          message:
+            "app.api.v1.core.user.private.me.password.errors.invalid_request.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -103,7 +104,8 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
       // Validate passwords match
       if (newPassword !== confirmPassword) {
         return fail({
-          message: "app.api.v1.core.user.private.me.password.errors.passwords_do_not_match",
+          message:
+            "app.api.v1.core.user.private.me.password.errors.passwords_do_not_match",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -117,9 +119,10 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: "app.api.v1.core.user.private.me.password.errors.user_not_found",
+          message:
+            "app.api.v1.core.user.private.me.password.errors.user_not_found",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId },
+          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -137,9 +140,10 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
 
       if (!user) {
         return fail({
-          message: "app.api.v1.core.user.private.me.password.errors.user_not_found",
+          message:
+            "app.api.v1.core.user.private.me.password.errors.user_not_found",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: { userId },
+          messageParams: { userId },
         });
       }
 
@@ -150,7 +154,8 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
       );
       if (!isPasswordValid) {
         return fail({
-          message: "app.api.v1.core.user.private.me.password.errors.incorrect_password",
+          message:
+            "app.api.v1.core.user.private.me.password.errors.incorrect_password",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -158,14 +163,17 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
       // Check 2FA if enabled
       if (user.twoFactorEnabled && user.twoFactorSecret) {
         // Get 2FA code from request (if provided via passwords parameter)
-        const twoFactorCode = (passwords as { twoFactorCode?: string }).twoFactorCode;
+        const twoFactorCode = (passwords as { twoFactorCode?: string })
+          .twoFactorCode;
 
         if (!twoFactorCode) {
           return fail({
-          message: "app.api.v1.core.user.private.me.password.errors.two_factor_code_required",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                      messageParams: {
-                      message: "Two-factor authentication is enabled. Please provide your 2FA code.",
+            message:
+              "app.api.v1.core.user.private.me.password.errors.two_factor_code_required",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            messageParams: {
+              message:
+                "Two-factor authentication is enabled. Please provide your 2FA code.",
             },
           });
         }
@@ -176,19 +184,25 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         // Example with speakeasy: speakeasy.totp.verify({ secret: user.twoFactorSecret, token: twoFactorCode })
 
         // Placeholder: Simple 6-digit code validation
-        const is2FAValid = this.verify2FACode(twoFactorCode, user.twoFactorSecret);
+        const is2FAValid = this.verify2FACode(
+          twoFactorCode,
+          user.twoFactorSecret,
+        );
 
         if (!is2FAValid) {
           return fail({
-          message: "app.api.v1.core.user.private.me.password.errors.invalid_two_factor_code",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                      messageParams: {
-                      message: "Invalid 2FA code. Please try again.",
+            message:
+              "app.api.v1.core.user.private.me.password.errors.invalid_two_factor_code",
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            messageParams: {
+              message: "Invalid 2FA code. Please try again.",
             },
           });
         }
 
-        logger.info("2FA verification successful for password change", { userId });
+        logger.info("2FA verification successful for password change", {
+          userId,
+        });
       }
 
       const setPasswordResponse = await this.setPassword(
@@ -218,9 +232,10 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         parseError(error),
       );
       return fail({
-          message: "app.api.v1.core.user.private.me.password.errors.update_failed",
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.user.private.me.password.errors.update_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: {
           userId,
           error: parseError(error).message,
         },
@@ -289,9 +304,10 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         parseError(error),
       );
       return fail({
-          message: "app.api.v1.core.user.private.me.password.errors.token_creation_failed",
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-                  messageParams: {
+        message:
+          "app.api.v1.core.user.private.me.password.errors.token_creation_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: {
           userId,
           error: parseError(error).message,
         },

@@ -105,8 +105,9 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
     // Validate user permissions
     if (!user?.id) {
       return fail({
-          message: "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        message:
+          "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: {
           error: t(
             "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.description",
@@ -168,7 +169,8 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
           break;
         default:
           return fail({
-            message: "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
+            message:
+              "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
               error: t(

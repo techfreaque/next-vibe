@@ -1,4 +1,3 @@
-
 import { translations as _componentsTranslations } from "../../_components/i18n/de";
 import type { translations as enTranslations } from "../en";
 
@@ -333,9 +332,11 @@ export const translations: typeof enTranslations = {
   email: {
     title: "Willkommen bei {{appName}}!",
     subject: "Willkommen bei {{appName}}!",
-    previewText: "Willkommen bei {{appName}}! Starten Sie Ihr KI-Chat-Erlebnis.",
+    previewText:
+      "Willkommen bei {{appName}}! Starten Sie Ihr KI-Chat-Erlebnis.",
     welcomeMessage: "Willkommen bei {{appName}}!",
-    description: "Sie sind jetzt bereit, mit KI zu chatten und unserem Community-Forum beizutreten.",
+    description:
+      "Sie sind jetzt bereit, mit KI zu chatten und unserem Community-Forum beizutreten.",
     ctaTitle: "Loslegen",
     ctaButton: "Zu Abonnement",
     signoff: "Mit freundlichen Grüßen,\nDas {{appName}} Team",

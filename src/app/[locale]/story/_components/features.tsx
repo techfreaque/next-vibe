@@ -10,7 +10,7 @@ import {
   TrendingUp,
   Users,
   Zap,
-} from 'next-vibe-ui/ui/icons';
+} from "next-vibe-ui/ui/icons";
 import {
   Card,
   CardContent,

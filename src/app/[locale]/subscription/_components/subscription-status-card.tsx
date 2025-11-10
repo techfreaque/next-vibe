@@ -1,5 +1,10 @@
 import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { CreditCard, Bitcoin, ExternalLink, AlertCircle } from 'next-vibe-ui/ui/icons';
+import {
+  CreditCard,
+  Bitcoin,
+  ExternalLink,
+  AlertCircle,
+} from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import {
@@ -84,7 +89,7 @@ export function SubscriptionStatusCard({
       <Card className="border-2 border-primary">
         <CardHeader>
           <Div className="flex items-start justify-between">
-            <Div className="space-y-1">
+            <Div className="flex flex-col gap-1">
               <CardTitle className="flex items-center gap-3">
                 <Div className="p-2 rounded-lg bg-primary/10">
                   <CreditCard className="h-6 w-6 text-primary" />
@@ -96,7 +101,13 @@ export function SubscriptionStatusCard({
               </CardDescription>
             </Div>
             <Div className="flex gap-2">
-              <Badge className={initialSubscription.cancelAt ? "bg-amber-600 text-white" : "bg-green-600 text-white"}>
+              <Badge
+                className={
+                  initialSubscription.cancelAt
+                    ? "bg-amber-600 text-white"
+                    : "bg-green-600 text-white"
+                }
+              >
                 {initialSubscription.cancelAt
                   ? t("app.api.v1.core.subscription.enums.status.canceling")
                   : t(initialSubscription.status)}
@@ -152,11 +163,14 @@ export function SubscriptionStatusCard({
                     {t("app.subscription.subscription.cancellation.title")}
                   </Div>
                   <Div>
-                    {t("app.subscription.subscription.cancellation.description", {
-                      date: initialSubscription.cancelAt
-                        ? formatDate(initialSubscription.cancelAt, locale)
-                        : t("app.common.notAvailable"),
-                    })}
+                    {t(
+                      "app.subscription.subscription.cancellation.description",
+                      {
+                        date: initialSubscription.cancelAt
+                          ? formatDate(initialSubscription.cancelAt, locale)
+                          : t("app.common.notAvailable"),
+                      },
+                    )}
                   </Div>
                 </Div>
               </Div>

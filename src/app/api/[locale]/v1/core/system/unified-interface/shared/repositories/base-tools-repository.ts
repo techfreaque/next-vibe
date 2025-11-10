@@ -37,7 +37,7 @@ export abstract class BaseToolsRepositoryImpl<
   TRequest,
   // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Parameter extraction requires 'unknown' for dynamic tool arguments
   TResponse extends Record<string, unknown>,
->implements BaseToolsRepository<TRequest, TResponse>
+> implements BaseToolsRepository<TRequest, TResponse>
 {
   protected platformName: string;
 

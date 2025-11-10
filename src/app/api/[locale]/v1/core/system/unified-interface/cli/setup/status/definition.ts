@@ -27,7 +27,8 @@ const { POST } = createEndpoint({
   title: "app.api.v1.core.system.unifiedInterface.cli.setup.status.post.title",
   description:
     "app.api.v1.core.system.unifiedInterface.cli.setup.status.post.description",
-  category: "app.api.v1.core.system.unifiedInterface.cli.setup.status.post.title",
+  category:
+    "app.api.v1.core.system.unifiedInterface.cli.setup.status.post.title",
   tags: ["app.api.v1.core.system.unifiedInterface.cli.setup.status.post.title"],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["status", "setup:status"],
@@ -42,7 +43,8 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.system.unifiedInterface.cli.setup.status.post.title",
+      title:
+        "app.api.v1.core.system.unifiedInterface.cli.setup.status.post.title",
       description:
         "app.api.v1.core.system.unifiedInterface.cli.setup.status.post.description",
       layout: { type: LayoutType.GRID, columns: 12 },

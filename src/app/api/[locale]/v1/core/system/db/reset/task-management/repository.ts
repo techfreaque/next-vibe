@@ -163,10 +163,11 @@ export class ResetTaskManagementRepositoryImpl
           break;
         default:
           return fail({
-          message: "app.api.v1.core.system.db.reset.taskManagement.errors.validation.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { operation },
-      });
+            message:
+              "app.api.v1.core.system.db.reset.taskManagement.errors.validation.title",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: { operation },
+          });
       }
 
       logger.info("Task operation completed", {
@@ -190,8 +191,9 @@ export class ResetTaskManagementRepositoryImpl
       logger.error("Task operation execution failed", parsedError);
 
       return fail({
-          message: "app.api.v1.core.system.db.reset.taskManagement.errors.internal.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.system.db.reset.taskManagement.errors.internal.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
     }

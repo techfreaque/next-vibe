@@ -89,8 +89,8 @@ async function verifyExistingThread(params: {
     if (!existing?.id) {
       logger.error("Thread not found", { threadId, userId });
       return fail({
-          message: "app.api.v1.core.agent.chat.threads.get.errors.notFound.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
+        message: "app.api.v1.core.agent.chat.threads.get.errors.notFound.title",
+        errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
@@ -114,9 +114,9 @@ async function verifyExistingThread(params: {
         rootFolderId: existing.rootFolderId,
       });
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.chat.threads.get.errors.forbidden.title",
-          errorType: ErrorResponseTypes.FORBIDDEN,
+        errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
 
@@ -215,9 +215,7 @@ export async function ensureThread({
       // Creating thread directly in a root folder (no subfolder)
       // Check permission using DEFAULT_FOLDER_CONFIGS rolesCreateThread
       const { getDefaultFolderConfig } = await import("../config");
-      const { hasRolePermission } = await import(
-        "../permissions/permissions"
-      );
+      const { hasRolePermission } = await import("../permissions/permissions");
 
       const rootConfig = getDefaultFolderConfig(rootFolderId);
       if (!rootConfig) {
@@ -226,9 +224,7 @@ export async function ensureThread({
       }
 
       // Any authenticated user can create threads in their private/shared root folders
-      if (
-        rootFolderId === "public"
-      ) {
+      if (rootFolderId === "public") {
         const hasPermission = await hasRolePermission(
           user,
           rootConfig.rolesCreateThread,
@@ -657,9 +653,9 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
     } catch (error) {
       logger.error("Error listing threads", parseError(error));
       return fail({
-          message: "app.api.v1.core.agent.chat.threads.get.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.agent.chat.threads.get.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -721,11 +717,11 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
 
         if (!folderResult) {
           return fail({
-          message:
+            message:
               "app.api.v1.core.agent.chat.threads.post.errors.notFound.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-                      messageParams: {
-                      message: "Folder not found",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+            messageParams: {
+              message: "Folder not found",
             },
           });
         }
@@ -765,8 +761,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
           message:
             "app.api.v1.core.agent.chat.threads.post.errors.forbidden.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
-                    messageParams: {
-                    message: "Cannot create thread in this location",
+          messageParams: {
+            message: "Cannot create thread in this location",
           },
         });
       }
@@ -823,9 +819,9 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
     } catch (error) {
       logger.error("Error creating thread", parseError(error));
       return fail({
-          message: "app.api.v1.core.agent.chat.threads.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.agent.chat.threads.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

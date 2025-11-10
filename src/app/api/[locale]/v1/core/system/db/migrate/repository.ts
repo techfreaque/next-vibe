@@ -130,9 +130,9 @@ export class DatabaseMigrationRepositoryImpl
       const parsedError = parseError(error);
 
       return fail({
-          message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
+        message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
           error: parsedError.message,
           output: output.trim(),
           duration,
@@ -308,9 +308,9 @@ export class DatabaseMigrationRepositoryImpl
       return success({ repaired: true, message });
     } catch (error) {
       return fail({
-          message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -342,9 +342,9 @@ export class DatabaseMigrationRepositoryImpl
       return success({ migrated: true, message });
     } catch (error) {
       return fail({
-          message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -371,9 +371,9 @@ export class DatabaseMigrationRepositoryImpl
       return success({ synced: true, message });
     } catch (error) {
       return fail({
-          message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

@@ -30,7 +30,9 @@ export interface AlertProps {
   className?: string;
   variant?: AlertVariant;
   children?: React.ReactNode;
-  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>> | React.ComponentType<{ size?: number; color?: string }>; // Support both SVG and Lucide icons
+  icon?:
+    | React.ComponentType<React.SVGProps<SVGSVGElement>>
+    | React.ComponentType<{ size?: number; color?: string }>; // Support both SVG and Lucide icons
   iconSize?: number;
   iconClassName?: string;
 }
@@ -45,7 +47,13 @@ export interface AlertDescriptionProps {
   children?: React.ReactNode;
 }
 
-const Alert = ({ className, variant, icon: Icon, children, ...props }: AlertProps): React.JSX.Element => (
+const Alert = ({
+  className,
+  variant,
+  icon: Icon,
+  children,
+  ...props
+}: AlertProps): React.JSX.Element => (
   <div
     role="alert"
     className={cn(alertVariants({ variant }), className)}
@@ -56,7 +64,11 @@ const Alert = ({ className, variant, icon: Icon, children, ...props }: AlertProp
   </div>
 );
 
-const AlertTitle = ({ className, children, ...props }: AlertTitleProps): React.JSX.Element => (
+const AlertTitle = ({
+  className,
+  children,
+  ...props
+}: AlertTitleProps): React.JSX.Element => (
   <h5
     className={cn("mb-1 font-medium leading-none tracking-tight", className)}
     {...props}
@@ -65,11 +77,11 @@ const AlertTitle = ({ className, children, ...props }: AlertTitleProps): React.J
   </h5>
 );
 
-const AlertDescription = ({ className, ...props }: AlertDescriptionProps): React.JSX.Element => (
-  <div
-    className={cn("text-sm [&_p]:leading-relaxed", className)}
-    {...props}
-  />
+const AlertDescription = ({
+  className,
+  ...props
+}: AlertDescriptionProps): React.JSX.Element => (
+  <div className={cn("text-sm [&_p]:leading-relaxed", className)} {...props} />
 );
 
 export { Alert, AlertDescription, AlertTitle, alertVariants };

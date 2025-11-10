@@ -48,4 +48,3 @@ export function updateCreditBalanceForTTS(logger: EndpointLogger): void {
     creditCost,
   });
 }
-

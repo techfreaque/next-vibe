@@ -39,7 +39,8 @@ export const { POST, tools } = endpointsHandler({
       // Validate passwords match
       if (data.newPassword.password !== data.newPassword.confirmPassword) {
         return fail({
-          message: "app.api.v1.core.user.public.resetPassword.confirm.errors.validation.passwordsDoNotMatch",
+          message:
+            "app.api.v1.core.user.public.resetPassword.confirm.errors.validation.passwordsDoNotMatch",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }

@@ -78,7 +78,12 @@ const { POST } = createEndpoint({
     "app.api.v1.core.leads.tracking.engagement.tags.tracking" as const,
     "app.api.v1.core.leads.tracking.engagement.tags.engagement" as const,
   ],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.AI_TOOL_OFF] as const,
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+  ] as const,
   aliases: ["record-engagement", "track-engagement"] as const,
 
   cli: {
@@ -410,7 +415,12 @@ const { GET } = createEndpoint({
     "app.api.v1.core.leads.tracking.engagement.tags.tracking" as const,
     "app.api.v1.core.leads.tracking.engagement.tags.engagement" as const,
   ],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.AI_TOOL_OFF] as const,
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+  ] as const,
   aliases: ["track-click", "click-tracking"] as const,
 
   cli: {

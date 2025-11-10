@@ -63,7 +63,7 @@ export default function ContactForm({
       </H2>
       {/* Show form alert if any */}
       <FormAlert alert={contactResult.alert} className="mb-6" />
-      <Form form={form} onSubmit={submitForm} className="space-y-6">
+      <Form form={form} onSubmit={submitForm} className="flex flex-col gap-6">
         <Div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <EndpointFormField
             name="name"
@@ -83,7 +83,6 @@ export default function ContactForm({
               showAllRequired: false,
             }}
             endpointFields={contactDefinitions.POST.fields}
-
           />
         </Div>
 
@@ -94,8 +93,7 @@ export default function ContactForm({
             style: "none",
             showAllRequired: false,
           }}
-            endpointFields={contactDefinitions.POST.fields}
-
+          endpointFields={contactDefinitions.POST.fields}
         />
 
         <EndpointFormField
@@ -105,8 +103,7 @@ export default function ContactForm({
             style: "none",
             showAllRequired: false,
           }}
-            endpointFields={contactDefinitions.POST.fields}
-
+          endpointFields={contactDefinitions.POST.fields}
         />
 
         <EndpointFormField
@@ -116,8 +113,7 @@ export default function ContactForm({
             style: "none",
             showAllRequired: false,
           }}
-            endpointFields={contactDefinitions.POST.fields}
-
+          endpointFields={contactDefinitions.POST.fields}
         />
 
         <Button

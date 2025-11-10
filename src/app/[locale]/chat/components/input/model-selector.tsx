@@ -6,7 +6,7 @@ import React, { useMemo } from "react";
 import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import { MODEL_UTILITIES } from "@/app/api/[locale]/v1/core/agent/chat/model-access/model-utilities";
 import {
-DEFAULT_FAVORITES,
+  DEFAULT_FAVORITES,
   type ModelId,
   modelOptions,
   modelProviders,

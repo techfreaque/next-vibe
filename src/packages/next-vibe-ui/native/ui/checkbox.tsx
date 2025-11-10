@@ -5,47 +5,49 @@ import * as React from "react";
 import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
 
-import type { CheckboxBaseProps } from "@/packages/next-vibe-ui/web/ui/checkbox";
+// Import ALL types from web
+import type {
+  CheckboxRootProps,
+  CheckboxIndicatorProps,
+} from "@/packages/next-vibe-ui/web/ui/checkbox";
 
-export type CheckboxProps = Omit<
-  CheckboxBaseProps,
-  "defaultChecked" | "value" | "name" | "required"
->;
+// Re-export all types
+export type { CheckboxRootProps, CheckboxIndicatorProps };
+
 const StyledCheckboxRoot = styled(CheckboxPrimitive.Root);
 const StyledCheckboxIndicator = styled(CheckboxPrimitive.Indicator);
 
-const Checkbox = React.forwardRef<
-  React.ElementRef<typeof CheckboxPrimitive.Root>,
-  CheckboxProps
->(({ className, checked, onCheckedChange, disabled }, ref) => {
-  const isChecked = checked ?? false;
-  // oxlint-disable-next-line explicit-function-return-type
-  const handleCheckedChange = onCheckedChange ?? (() => undefined);
-  const isDisabled = disabled ?? false;
-
+export function Checkbox({ className, checked, onCheckedChange, disabled, children }: CheckboxRootProps): React.JSX.Element {
   return (
     <StyledCheckboxRoot
-      ref={ref}
-      checked={isChecked}
-      onCheckedChange={handleCheckedChange}
-      disabled={isDisabled}
+      checked={checked ?? false}
+      onCheckedChange={onCheckedChange ?? ((): void => undefined)}
+      disabled={disabled ?? false}
       className={cn(
-        "peer h-5 w-5 h-5 w-5 shrink-0 rounded-sm rounded border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-        isChecked && "bg-primary",
+        "peer h-5 w-5 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        checked && "bg-primary",
         className,
       )}
     >
-      <StyledCheckboxIndicator
-        className={cn("flex flex-row items-center justify-center text-current")}
-      >
-        <Check
-          size={14}
-          className="text-primary-foreground"
-        />
-      </StyledCheckboxIndicator>
+      {children ?? (
+        <StyledCheckboxIndicator
+          className={cn("flex flex-row items-center justify-center text-current")}
+        >
+          <Check size={14} className="text-primary-foreground" />
+        </StyledCheckboxIndicator>
+      )}
     </StyledCheckboxRoot>
   );
-});
+}
 Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
-export { Checkbox };
+export function CheckboxIndicator({ className, children }: CheckboxIndicatorProps): React.JSX.Element {
+  return (
+    <StyledCheckboxIndicator
+      className={cn("flex flex-row items-center justify-center text-current", className)}
+    >
+      {children ?? <Check size={14} className="text-primary-foreground" />}
+    </StyledCheckboxIndicator>
+  );
+}
+CheckboxIndicator.displayName = CheckboxPrimitive.Indicator.displayName;

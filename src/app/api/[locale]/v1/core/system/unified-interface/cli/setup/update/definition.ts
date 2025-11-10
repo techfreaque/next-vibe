@@ -29,7 +29,8 @@ const { POST } = createEndpoint({
   title: "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.title",
   description:
     "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.description",
-  category: "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.title",
+  category:
+    "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.title",
   tags: ["app.api.v1.core.system.unifiedInterface.cli.setup.update.post.title"],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["update", "setup:update"],
@@ -44,7 +45,8 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.title",
+      title:
+        "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.title",
       description:
         "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.description",
       layout: { type: LayoutType.GRID, columns: 12 },
@@ -56,7 +58,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.title",
+          label:
+            "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.title",
           description:
             "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.description",
           layout: { columns: 6 },

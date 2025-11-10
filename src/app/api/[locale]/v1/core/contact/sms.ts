@@ -94,7 +94,8 @@ export class ContactSmsServiceImpl implements ContactSmsService {
 
       if (!smsResult.success) {
         return fail({
-          message: "app.api.v1.core.contact.error.general.internal_server_error",
+          message:
+            "app.api.v1.core.contact.error.general.internal_server_error",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: smsResult,
         });
@@ -110,8 +111,8 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         parseError(error),
       );
       return fail({
-          message: "app.api.v1.core.contact.error.general.internal_server_error",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.contact.error.general.internal_server_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -162,7 +163,8 @@ export class ContactSmsServiceImpl implements ContactSmsService {
 
       if (!smsResult.success) {
         return fail({
-          message: "app.api.v1.core.contact.error.general.internal_server_error",
+          message:
+            "app.api.v1.core.contact.error.general.internal_server_error",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: smsResult,
         });
@@ -178,8 +180,8 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         parseError(error),
       );
       return fail({
-          message: "app.api.v1.core.contact.error.general.internal_server_error",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.contact.error.general.internal_server_error",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

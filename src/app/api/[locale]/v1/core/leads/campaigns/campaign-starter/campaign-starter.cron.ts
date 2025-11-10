@@ -119,8 +119,9 @@ export async function execute(
 
     if (!configResult.success || !configResult.data) {
       return fail({
-          message: "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: "Failed to load configuration" },
       });
     }
@@ -229,10 +230,11 @@ export async function execute(
     });
 
     return fail({
-          message: "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage, executionTimeMs },
-      });
+      message:
+        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { error: errorMessage, executionTimeMs },
+    });
   }
 }
 
@@ -259,8 +261,9 @@ export function validate(
       });
 
       return fail({
-          message: "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage },
       });
     }
@@ -271,16 +274,18 @@ export function validate(
     // Validate business logic
     if (typedConfig.enabledHours.start >= typedConfig.enabledHours.end) {
       return fail({
-          message: "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: "Start hour must be less than end hour" },
       });
     }
 
     if (typedConfig.enabledDays.length === 0) {
       return fail({
-          message: "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: "At least one enabled day must be specified" },
       });
     }
@@ -293,10 +298,11 @@ export function validate(
     });
 
     return fail({
-          message: "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage },
-      });
+      message:
+        "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { error: errorMessage },
+    });
   }
 }
 

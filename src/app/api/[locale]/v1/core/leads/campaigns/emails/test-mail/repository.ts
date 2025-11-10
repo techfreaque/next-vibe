@@ -96,9 +96,10 @@ class TestEmailRepository {
         )
       ) {
         return fail({
-          message: "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
+          message:
+            "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: {
+          messageParams: {
             emailJourneyVariant: data.emailJourneyVariant,
             emailCampaignStage: data.emailCampaignStage,
           },
@@ -126,9 +127,10 @@ class TestEmailRepository {
 
       if (!emailContent) {
         return fail({
-          message: "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
+          message:
+            "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-                    messageParams: {
+          messageParams: {
             emailJourneyVariant: data.emailJourneyVariant,
             emailCampaignStage: data.emailCampaignStage,
           },
@@ -176,9 +178,10 @@ class TestEmailRepository {
             errorParams: emailResponse.messageParams,
           });
           return fail({
-          message: "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
-                      messageParams: {
+            message:
+              "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
+            errorType: ErrorResponseTypes.EMAIL_ERROR,
+            messageParams: {
               recipient: data.testEmail,
               subject: emailContent.subject,
               error:
@@ -216,9 +219,10 @@ class TestEmailRepository {
       } catch (error) {
         logger.error("test.email.send.error", parseError(error));
         return fail({
-          message: "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
+          message:
+            "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
           errorType: ErrorResponseTypes.EMAIL_ERROR,
-                    messageParams: {
+          messageParams: {
             recipient: data.testEmail,
             subject: emailContent.subject,
             error: parseError(error).message,
@@ -228,9 +232,10 @@ class TestEmailRepository {
     } catch (error) {
       logger.error("test.email.send.server.error", parseError(error));
       return fail({
-          message: "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: parseError(error).message },
+        message:
+          "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

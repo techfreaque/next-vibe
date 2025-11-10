@@ -88,9 +88,10 @@ export class DatabaseMigrateProdRepositoryImpl
       const generateResult = await this.generateMigrations(logger);
       if (!generateResult.success) {
         return fail({
-          message: "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
+          message:
+            "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: { error: generateResult.error || UNKNOWN_ERROR },
+          messageParams: { error: generateResult.error || UNKNOWN_ERROR },
         });
       }
       migrationsGenerated = true;
@@ -100,9 +101,10 @@ export class DatabaseMigrateProdRepositoryImpl
       const applyResult = await this.applyMigrations(logger);
       if (!applyResult.success) {
         return fail({
-          message: "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
+          message:
+            "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: { error: applyResult.error || UNKNOWN_ERROR },
+          messageParams: { error: applyResult.error || UNKNOWN_ERROR },
         });
       }
       migrationsApplied = true;
@@ -115,9 +117,10 @@ export class DatabaseMigrateProdRepositoryImpl
         const seedResult = await this.runProductionSeeding(logger);
         if (!seedResult.success) {
           return fail({
-          message: "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                      messageParams: { error: seedResult.error || UNKNOWN_ERROR },
+            message:
+              "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: { error: seedResult.error || UNKNOWN_ERROR },
           });
         }
         seedingCompleted = true;
@@ -143,9 +146,10 @@ export class DatabaseMigrateProdRepositoryImpl
     } catch (error) {
       logger.error("Production migration failed", { error: String(error) });
       return fail({
-          message: "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: { error: String(error) },
+        message:
+          "app.api.v1.core.system.db.migrateProd.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: String(error) },
       });
     }
   }

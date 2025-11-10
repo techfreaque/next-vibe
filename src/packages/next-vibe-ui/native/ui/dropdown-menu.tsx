@@ -1,75 +1,40 @@
 import * as DropdownMenuPrimitive from "@rn-primitives/dropdown-menu";
 import * as React from "react";
 import {
-  Platform,
-  type StyleProp,
   StyleSheet,
-  type TextProps,
   View,
-  type ViewStyle,
 } from "react-native";
 
 import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
-import { ChevronDown } from "./icons/ChevronDown";
 import { ChevronRight } from "./icons/ChevronRight";
-import { ChevronUp } from "./icons/ChevronUp";
 import { Span } from "./span";
 import { TextClassContext } from "./text";
 
+// Import ALL types from web - ZERO definitions here
+import type {
+  DropdownMenuRootProps,
+  DropdownMenuTriggerProps,
+  DropdownMenuGroupProps,
+  DropdownMenuPortalProps,
+  DropdownMenuSubProps,
+  DropdownMenuRadioGroupProps,
+  DropdownMenuSubTriggerProps,
+  DropdownMenuSubContentProps,
+  DropdownMenuContentProps,
+  DropdownMenuItemProps,
+  DropdownMenuCheckboxItemProps,
+  DropdownMenuRadioItemProps,
+  DropdownMenuLabelProps,
+  DropdownMenuSeparatorProps,
+  DropdownMenuShortcutProps,
+} from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+
+
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
-const TEXT_CLASS_ITEM = "select-none text-sm text-lg text-popover-foreground group-focus:text-accent-foreground";
+const TEXT_CLASS_ITEM =
+  "select-none text-sm text-lg text-popover-foreground group-focus:text-accent-foreground";
 /* eslint-enable i18next/no-literal-string */
-
-// Cross-platform type definitions for native
-export interface DropdownMenuSubTriggerProps {
-  className?: string;
-  inset?: boolean;
-  children?: React.ReactNode;
-}
-
-export interface DropdownMenuSubContentProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface DropdownMenuContentProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface DropdownMenuItemProps {
-  className?: string;
-  inset?: boolean;
-  disabled?: boolean;
-  children?: React.ReactNode;
-}
-
-export interface DropdownMenuCheckboxItemProps {
-  className?: string;
-  disabled?: boolean;
-  children?: React.ReactNode;
-}
-
-export interface DropdownMenuRadioItemProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface DropdownMenuLabelProps {
-  className?: string;
-  inset?: boolean;
-  children?: React.ReactNode;
-}
-
-export interface DropdownMenuSeparatorProps {
-  className?: string;
-}
-
-export interface DropdownMenuShortcutProps {
-  className?: string;
-  children?: React.ReactNode;
-}
 
 // Local styled components - use direct primitives to avoid type instantiation issues
 // The styled() function from nativewind has overly complex type inference for these components
@@ -83,27 +48,55 @@ const StyledDropdownMenuLabel = DropdownMenuPrimitive.Label;
 const StyledDropdownMenuSeparator = DropdownMenuPrimitive.Separator;
 const StyledDropdownMenuItemIndicator = DropdownMenuPrimitive.ItemIndicator;
 
-const DropdownMenu = DropdownMenuPrimitive.Root;
+function DropdownMenu({ children, ...props }: DropdownMenuRootProps): React.JSX.Element {
+  return <DropdownMenuPrimitive.Root {...props}>{children}</DropdownMenuPrimitive.Root>;
+}
+DropdownMenu.displayName = DropdownMenuPrimitive.Root.displayName;
 
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
+function DropdownMenuTrigger({ children, asChild, ...props }: DropdownMenuTriggerProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.Trigger asChild={asChild} {...props}>
+      {children}
+    </DropdownMenuPrimitive.Trigger>
+  );
+}
+DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName;
 
-const DropdownMenuGroup = DropdownMenuPrimitive.Group;
+function DropdownMenuGroup({ children }: DropdownMenuGroupProps): React.JSX.Element {
+  return <DropdownMenuPrimitive.Group>{children}</DropdownMenuPrimitive.Group>;
+}
+DropdownMenuGroup.displayName = DropdownMenuPrimitive.Group.displayName;
 
-const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
+function DropdownMenuPortal({ children }: DropdownMenuPortalProps): React.JSX.Element {
+  return <DropdownMenuPrimitive.Portal>{children}</DropdownMenuPrimitive.Portal>;
+}
+DropdownMenuPortal.displayName = "DropdownMenuPortal";
 
-const DropdownMenuSub = DropdownMenuPrimitive.Sub;
+function DropdownMenuSub({ children, ...props }: DropdownMenuSubProps): React.JSX.Element {
+  return <DropdownMenuPrimitive.Sub {...props}>{children}</DropdownMenuPrimitive.Sub>;
+}
+DropdownMenuSub.displayName = DropdownMenuPrimitive.Sub.displayName;
 
-const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
+function DropdownMenuRadioGroup({ children, value, onValueChange, ...props }: DropdownMenuRadioGroupProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.RadioGroup
+      value={value ?? ""}
+      onValueChange={onValueChange ?? (() => {})} // eslint-disable-line no-empty-function
+      {...props}
+    >
+      {children}
+    </DropdownMenuPrimitive.RadioGroup>
+  );
+}
+DropdownMenuRadioGroup.displayName = DropdownMenuPrimitive.RadioGroup.displayName;
 
 function DropdownMenuSubTrigger({
   className,
   inset,
   children,
   ...props
-}: DropdownMenuSubTriggerProps & DropdownMenuPrimitive.SubTriggerProps): React.JSX.Element {
+}: DropdownMenuSubTriggerProps): React.JSX.Element {
   const { open } = DropdownMenuPrimitive.useSubContext();
-  const Icon =
-    Platform.OS === "web" ? ChevronRight : open ? ChevronUp : ChevronDown;
   return (
     <TextClassContext.Provider
       value={cn(
@@ -120,12 +113,8 @@ function DropdownMenuSubTrigger({
         )}
         {...props}
       >
-        {typeof children === "function"
-          ? (
-              children as (props: { pressed: boolean }) => React.ReactNode
-            )({ pressed: open })
-          : children}
-        <Icon size={18} className="ml-auto text-foreground" />
+        {children}
+        <ChevronRight size={18} className="ml-auto text-foreground" />
       </StyledDropdownMenuSubTrigger>
     </TextClassContext.Provider>
   );
@@ -135,8 +124,9 @@ DropdownMenuSubTrigger.displayName =
 
 function DropdownMenuSubContent({
   className,
+  children,
   ...props
-}: DropdownMenuSubContentProps & DropdownMenuPrimitive.SubContentProps): React.JSX.Element {
+}: DropdownMenuSubContentProps): React.JSX.Element {
   const { open } = DropdownMenuPrimitive.useSubContext();
   return (
     <StyledDropdownMenuSubContent
@@ -148,7 +138,9 @@ function DropdownMenuSubContent({
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </StyledDropdownMenuSubContent>
   );
 }
 DropdownMenuSubContent.displayName =
@@ -156,33 +148,16 @@ DropdownMenuSubContent.displayName =
 
 function DropdownMenuContent({
   className,
-  overlayClassName,
-  overlayStyle,
-  portalHost,
+  children,
+  sideOffset = 4,
   ...props
-}: DropdownMenuContentProps &
-  DropdownMenuPrimitive.ContentProps & {
-    overlayStyle?: StyleProp<ViewStyle>;
-    overlayClassName?: string;
-    portalHost?: string;
-  }): React.JSX.Element {
+}: DropdownMenuContentProps): React.JSX.Element {
   const { open } = DropdownMenuPrimitive.useRootContext();
   return (
-    <DropdownMenuPrimitive.Portal hostName={portalHost}>
-      <DropdownMenuPrimitive.Overlay
-        style={
-          overlayStyle
-            ? StyleSheet.flatten([
-                Platform.OS !== "web" ? StyleSheet.absoluteFill : undefined,
-                overlayStyle,
-              ])
-            : Platform.OS !== "web"
-              ? StyleSheet.absoluteFill
-              : undefined
-        }
-        className={overlayClassName}
-      >
+    <DropdownMenuPrimitive.Portal>
+      <DropdownMenuPrimitive.Overlay style={StyleSheet.absoluteFill}>
         <StyledDropdownMenuContent
+          sideOffset={sideOffset}
           className={cn(
             "z-50 min-w-32 overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md shadow-foreground/5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
             open
@@ -191,7 +166,9 @@ function DropdownMenuContent({
             className,
           )}
           {...props}
-        />
+        >
+          {children}
+        </StyledDropdownMenuContent>
       </DropdownMenuPrimitive.Overlay>
     </DropdownMenuPrimitive.Portal>
   );
@@ -201,21 +178,21 @@ DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 function DropdownMenuItem({
   className,
   inset,
+  children,
   ...props
-}: DropdownMenuItemProps & DropdownMenuPrimitive.ItemProps): React.JSX.Element {
+}: DropdownMenuItemProps): React.JSX.Element {
   return (
-    <TextClassContext.Provider
-      value={TEXT_CLASS_ITEM}
-    >
+    <TextClassContext.Provider value={TEXT_CLASS_ITEM}>
       <StyledDropdownMenuItem
         className={cn(
           "relative flex flex-row cursor-default gap-2 items-center rounded-sm px-2 py-1.5 py-2 outline-none focus:bg-accent active:bg-accent hover:bg-accent group",
           inset && "pl-8",
-          props.disabled && "opacity-50 pointer-events-none",
           className,
         )}
         {...props}
-      />
+      >
+        {children}
+      </StyledDropdownMenuItem>
     </TextClassContext.Provider>
   );
 }
@@ -224,15 +201,18 @@ DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
 function DropdownMenuCheckboxItem({
   className,
   children,
+  checked,
+  onCheckedChange,
   ...props
-}: DropdownMenuCheckboxItemProps & DropdownMenuPrimitive.CheckboxItemProps): React.JSX.Element {
+}: DropdownMenuCheckboxItemProps): React.JSX.Element {
   return (
     <StyledDropdownMenuCheckboxItem
       className={cn(
         "relative flex flex-row cursor-default items-center group rounded-sm py-1.5 py-2 pl-8 pr-2 outline-none focus:bg-accent active:bg-accent",
-        props.disabled && "pointer-events-none opacity-50",
         className,
       )}
+      checked={checked ?? false}
+      onCheckedChange={onCheckedChange ?? (() => {})} // eslint-disable-line no-empty-function
       {...props}
     >
       <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
@@ -240,11 +220,7 @@ function DropdownMenuCheckboxItem({
           <Check size={14} strokeWidth={3} className="text-foreground" />
         </StyledDropdownMenuItemIndicator>
       </View>
-      {typeof children === "function"
-        ? (children as (props: { pressed: boolean }) => React.ReactNode)({
-            pressed: false,
-          })
-        : children}
+      {children}
     </StyledDropdownMenuCheckboxItem>
   );
 }
@@ -254,14 +230,16 @@ DropdownMenuCheckboxItem.displayName =
 function DropdownMenuRadioItem({
   className,
   children,
+  value,
   ...props
-}: DropdownMenuRadioItemProps & DropdownMenuPrimitive.RadioItemProps): React.JSX.Element {
+}: DropdownMenuRadioItemProps): React.JSX.Element {
   return (
     <StyledDropdownMenuRadioItem
       className={cn(
         "relative flex flex-row cursor-default group items-center rounded-sm py-1.5 py-2 pl-8 pr-2 outline-none focus:bg-accent active:bg-accent",
         className,
       )}
+      value={value ?? ""}
       {...props}
     >
       <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
@@ -278,8 +256,9 @@ DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 function DropdownMenuLabel({
   className,
   inset,
+  children,
   ...props
-}: DropdownMenuLabelProps & DropdownMenuPrimitive.LabelProps): React.JSX.Element {
+}: DropdownMenuLabelProps): React.JSX.Element {
   return (
     <StyledDropdownMenuLabel
       className={cn(
@@ -288,7 +267,9 @@ function DropdownMenuLabel({
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </StyledDropdownMenuLabel>
   );
 }
 DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
@@ -296,7 +277,7 @@ DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
 function DropdownMenuSeparator({
   className,
   ...props
-}: DropdownMenuSeparatorProps & DropdownMenuPrimitive.SeparatorProps): React.JSX.Element {
+}: DropdownMenuSeparatorProps): React.JSX.Element {
   return (
     <StyledDropdownMenuSeparator
       className={cn("-mx-1 my-1 h-px bg-border", className)}
@@ -306,10 +287,11 @@ function DropdownMenuSeparator({
 }
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
 
-const DropdownMenuShortcut = ({
+function DropdownMenuShortcut({
   className,
+  children,
   ...props
-}: DropdownMenuShortcutProps & TextProps): React.JSX.Element => {
+}: DropdownMenuShortcutProps): React.JSX.Element {
   return (
     <Span
       className={cn(
@@ -317,9 +299,11 @@ const DropdownMenuShortcut = ({
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </Span>
   );
-};
+}
 DropdownMenuShortcut.displayName = "DropdownMenuShortcut";
 
 export {

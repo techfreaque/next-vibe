@@ -292,11 +292,15 @@ export function useChat(
       activeThreadId,
       totalMessagesInStore: Object.keys(messages).length,
       filteredCount: filtered.length,
-      allThreadIdsInStore: [...new Set(Object.values(messages).map((m) => m.threadId))],
+      allThreadIdsInStore: [
+        ...new Set(Object.values(messages).map((m) => m.threadId)),
+      ],
       currentRootFolderId,
     });
 
-    return filtered.toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    return filtered.toSorted(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+    );
   }, [activeThreadId, messages, logger, currentRootFolderId]);
 
   return {

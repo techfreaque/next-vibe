@@ -9,7 +9,8 @@ export const translations = {
     endsOn: "Subscription Ends On",
     cancellation: {
       title: "Subscription Scheduled for Cancellation",
-      description: "Your subscription will end on {{date}}. You will retain access until then.",
+      description:
+        "Your subscription will end on {{date}}. You will retain access until then.",
     },
     manage: {
       stripe: {

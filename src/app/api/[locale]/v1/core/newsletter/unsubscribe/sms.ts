@@ -111,10 +111,13 @@ export class NewsletterUnsubscribeSmsServiceImpl
 
       if (!smsResult.success) {
         return fail({
-          message: "app.api.v1.core.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
+          message:
+            "app.api.v1.core.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: smsResult.message || t("app.common.error.sending_sms") },
-      });
+          messageParams: {
+            error: smsResult.message || t("app.common.error.sending_sms"),
+          },
+        });
       }
 
       return success({
@@ -127,8 +130,9 @@ export class NewsletterUnsubscribeSmsServiceImpl
         parseError(error),
       );
       return fail({
-          message: "app.api.v1.core.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
     }
@@ -191,10 +195,13 @@ export class NewsletterUnsubscribeSmsServiceImpl
 
       if (!smsResult.success) {
         return fail({
-          message: "app.api.v1.core.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
+          message:
+            "app.api.v1.core.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: t(smsResult.message) || t("app.common.error.sending_sms") },
-      });
+          messageParams: {
+            error: t(smsResult.message) || t("app.common.error.sending_sms"),
+          },
+        });
       }
 
       return success({
@@ -204,8 +211,9 @@ export class NewsletterUnsubscribeSmsServiceImpl
     } catch (error) {
       logger.error("Error sending admin notification SMS", parseError(error));
       return fail({
-          message: "app.api.v1.core.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message:
+          "app.api.v1.core.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
     }

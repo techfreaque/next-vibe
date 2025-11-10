@@ -11,7 +11,8 @@ export const translations: typeof enTranslations = {
     endsOn: "Abonnement endet am",
     cancellation: {
       title: "Abonnement zur Kündigung vorgemerkt",
-      description: "Ihr Abonnement endet am {{date}}. Sie behalten bis dahin den Zugriff.",
+      description:
+        "Ihr Abonnement endet am {{date}}. Sie behalten bis dahin den Zugriff.",
     },
     manage: {
       stripe: {
@@ -31,7 +32,8 @@ export const translations: typeof enTranslations = {
       nextExpiration: "Nächster Ablauf",
       expiring: {
         title: "Abonnement-Credits",
-        description: "Aus monatlichem Abonnement ({{subCredits}} Credits/Monat)",
+        description:
+          "Aus monatlichem Abonnement ({{subCredits}} Credits/Monat)",
       },
       permanent: {
         title: "Permanente Credits",

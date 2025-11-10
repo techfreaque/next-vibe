@@ -166,7 +166,7 @@ export function useEdenAISpeech({
           const errorMessage =
             error.message ?? t("app.chat.hooks.stt.transcription-failed");
           logger.error("STT: API returned error", {
-          errorType: error.errorType,
+            errorType: error.errorType,
             errorMessage: error.message,
           });
           setError(errorMessage);
@@ -186,7 +186,16 @@ export function useEdenAISpeech({
       setIsProcessing(false);
       cleanup();
     }
-  }, [lang, endpoint, logger, t, onTranscript, onError, cleanup, deductCredits]);
+  }, [
+    lang,
+    endpoint,
+    logger,
+    t,
+    onTranscript,
+    onError,
+    cleanup,
+    deductCredits,
+  ]);
 
   const startRecording = useCallback(async (): Promise<void> => {
     try {

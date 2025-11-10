@@ -22,8 +22,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { leadAuthRepository } from "../leads/auth/repository";
 import { authRepository } from "./auth/repository";
-import type {
-  NewUser, User } from "./db";
+import type { NewUser, User } from "./db";
 import { users } from "./db";
 import { UserDetailLevel } from "./enum";
 import type {
@@ -72,8 +71,8 @@ export interface UserRepository {
    */
   getUserByAuth<
     T extends
-    | typeof UserDetailLevel.MINIMAL
-    | ExtendedUserDetailLevel = typeof UserDetailLevel.MINIMAL,
+      | typeof UserDetailLevel.MINIMAL
+      | ExtendedUserDetailLevel = typeof UserDetailLevel.MINIMAL,
   >(
     options: Omit<UserFetchOptions, "detailLevel"> & { detailLevel?: T },
     locale: CountryLanguage,
@@ -177,8 +176,8 @@ export class BaseUserRepositoryImpl implements UserRepository {
    */
   async getUserByAuth<
     T extends
-    | typeof UserDetailLevel.MINIMAL
-    | ExtendedUserDetailLevel = typeof UserDetailLevel.MINIMAL,
+      | typeof UserDetailLevel.MINIMAL
+      | ExtendedUserDetailLevel = typeof UserDetailLevel.MINIMAL,
   >(
     options: Omit<UserFetchOptions, "detailLevel"> & { detailLevel?: T },
     locale: CountryLanguage,
@@ -452,7 +451,11 @@ export class BaseUserRepositoryImpl implements UserRepository {
       return fail({
         message: "app.api.v1.core.user.errors.email_duplicate_check_failed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { email, excludeUserId, error: parseError(error).message },
+        messageParams: {
+          email,
+          excludeUserId,
+          error: parseError(error).message,
+        },
       });
     }
   }
@@ -676,13 +679,15 @@ export class BaseUserRepositoryImpl implements UserRepository {
       const hashedData: NewUser = {
         ...data,
         password: hashedPassword,
-      }
+      };
       const results = await db.insert(users).values(hashedData).returning();
       if (results.length === 0) {
         return fail({
           message: "app.api.v1.core.user.errors.creation_failed",
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: { error: "app.api.v1.core.user.errors.no_data_returned" },
+          messageParams: {
+            error: "app.api.v1.core.user.errors.no_data_returned",
+          },
         });
       }
       const createdUser = results[0] as User;

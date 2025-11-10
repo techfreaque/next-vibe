@@ -100,7 +100,7 @@ export function MessageEditor({
         </Div>
 
         {/* Controls */}
-        <Div className="space-y-2">
+        <Div className="flex flex-col gap-2">
           {/* Model and Tone Selectors */}
           <Div className="flex items-center gap-2 flex-wrap">
             {onModelChange && (

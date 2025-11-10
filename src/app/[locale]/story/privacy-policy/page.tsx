@@ -1,4 +1,4 @@
-import { Lock, Shield } from 'next-vibe-ui/ui/icons';
+import { Lock, Shield } from "next-vibe-ui/ui/icons";
 import type { Metadata, ResolvingMetadata } from "next";
 import type { JSX } from "react";
 
@@ -107,7 +107,7 @@ export default async function PrivacyPolicyPage({
                 "app.story._components.home.privacyPolicy.sections.personalData.description",
               )}
             </P>
-            <ul className="space-y-1">
+            <ul className="flex flex-col gap-1">
               <li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
@@ -180,7 +180,7 @@ export default async function PrivacyPolicyPage({
                 "app.story._components.home.privacyPolicy.sections.useOfInformation.description",
               )}
             </P>
-            <ul className="space-y-1">
+            <ul className="flex flex-col gap-1">
               <li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
@@ -290,7 +290,7 @@ export default async function PrivacyPolicyPage({
                 "app.story._components.home.privacyPolicy.sections.rights.description",
               )}
             </P>
-            <ul className="space-y-1">
+            <ul className="flex flex-col gap-1">
               <li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(

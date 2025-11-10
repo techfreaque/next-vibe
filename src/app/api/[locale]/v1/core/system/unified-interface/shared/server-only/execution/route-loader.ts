@@ -114,9 +114,9 @@ export function extractHandlerFromModule<
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const platformHandlers = (module.tools as Record<string, any>)?.[
-    platform
-  ] as PlatformHandlers | undefined;
+  const platformHandlers = (module.tools as Record<string, any>)?.[platform] as
+    | PlatformHandlers
+    | undefined;
 
   if (!platformHandlers) {
     logger.warn(`[Route Loader] No ${platform} handlers found`);

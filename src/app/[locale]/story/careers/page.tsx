@@ -223,7 +223,7 @@ export default async function CareersPage({
                   <P className="text-gray-700 dark:text-gray-300 mb-4">
                     {position.description}
                   </P>
-                  <Div className="flex flex-col space-y-2 mb-4">
+                  <Div className="flex flex-col gap-2 mb-4">
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm text-gray-500 dark:text-gray-400">
                         {t(
@@ -269,7 +269,7 @@ export default async function CareersPage({
                       </Span>
                     </Div>
                   </Div>
-                  <Div className="flex space-x-3">
+                  <Div className="flex flex flex-row gap-3">
                     <Button className="flex-1" asChild>
                       <Link href={`/${locale}/story/careers/${position.id}`}>
                         {t(

@@ -10,4 +10,3 @@ export enum Platform {
   MOBILE = "mobile",
   EMAIL = "email",
 }
-

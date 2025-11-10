@@ -56,7 +56,10 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.oxlint.fields.path.placeholder",
           layout: { columns: 6 },
         },
-        z.union([z.string(), z.array(z.string())]).optional().default("./"),
+        z
+          .union([z.string(), z.array(z.string())])
+          .optional()
+          .default("./"),
       ),
 
       verbose: requestDataField(
@@ -96,7 +99,6 @@ const { POST } = createEndpoint({
         },
         z.number().min(1).max(3600).default(3600),
       ),
-
 
       // === RESPONSE FIELDS ===
       success: responseField(

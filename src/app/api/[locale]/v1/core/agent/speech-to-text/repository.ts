@@ -128,7 +128,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
           message:
             "app.api.v1.core.agent.speechToText.post.errors.transcriptionFailed",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                    messageParams: {
+          messageParams: {
             error: errorText,
           },
         });
@@ -189,10 +189,10 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
       });
 
       return fail({
-          message:
+        message:
           "app.api.v1.core.agent.speechToText.post.errors.transcriptionFailed",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                  messageParams: {
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: {
           error: errorMessage,
         },
       });
@@ -231,9 +231,9 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
             publicId,
           });
           return fail({
-          message:
+            message:
               "app.api.v1.core.agent.speechToText.post.errors.pollFailed",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
 
@@ -257,8 +257,8 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
         } else if (resultData.status === "failed") {
           logger.error("Transcription failed", { publicId, provider });
           return fail({
-          message: "app.api.v1.core.agent.speechToText.post.errors.failed",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+            message: "app.api.v1.core.agent.speechToText.post.errors.failed",
+            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
 
@@ -278,7 +278,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
           message:
             "app.api.v1.core.agent.speechToText.post.errors.transcriptionFailed",
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-                    messageParams: {
+          messageParams: {
             error: errorMessage,
           },
         });
@@ -287,8 +287,8 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
 
     logger.error("Transcription timeout", { publicId, provider });
     return fail({
-          message: "app.api.v1.core.agent.speechToText.post.errors.timeout",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      message: "app.api.v1.core.agent.speechToText.post.errors.timeout",
+      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   }
 }
