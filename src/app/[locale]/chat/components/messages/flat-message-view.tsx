@@ -94,65 +94,6 @@ function getPostsByUserId(
 }
 
 /**
- * Render content with clickable >>references (post numbers)
- */
-function renderContentWithReferences(
-  content: string,
-  onMessageClick?: (messageId: string) => void,
-): JSX.Element {
-  const parts: JSX.Element[] = [];
-  const regex = />>\s*([0-9]+)/g; // Match >>1234567 style references
-  let lastIndex = 0;
-  let match;
-  let key = 0;
-
-  while ((match = regex.exec(content)) !== null) {
-    // Add text before the reference
-    if (match.index > lastIndex) {
-      parts.push(
-        // eslint-disable-next-line i18next/no-literal-string
-        <Span key={`text-${key++}`}>
-          {content.substring(lastIndex, match.index)}
-        </Span>,
-      );
-    }
-
-    // Add the reference as a clickable link
-    const postNumber = parseInt(match[1], 10);
-    const messageId = postNumber.split("-")[0];
-
-    parts.push(
-      <Button
-        key={`ref-${key++}`}
-        onClick={(): void => {
-          if (messageId) {
-            onMessageClick?.(messageId);
-          }
-        }}
-        variant="ghost"
-        size="unset"
-        className="text-primary hover:text-primary/80 hover:underline cursor-pointer"
-      >
-        {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
-        {`>>${postNumber}`}
-      </Button>,
-    );
-
-    lastIndex = regex.lastIndex;
-  }
-
-  // Add remaining text
-  if (lastIndex < content.length) {
-    parts.push(
-      // eslint-disable-next-line i18next/no-literal-string
-      <Span key={`text-${key++}`}>{content.substring(lastIndex)}</Span>,
-    );
-  }
-
-  return <>{parts}</>;
-}
-
-/**
  * Preview popup component for >>references
  */
 function MessagePreview({
@@ -315,7 +256,7 @@ function UserIdHoverCard({
 interface FlatMessageProps {
   message: ChatMessage;
   index: number;
-  postNum: number;
+  postNum: string;
   messages: ChatMessage[];
   messageGroup?: ReturnType<typeof groupMessagesBySequence>[0];
   personas: Record<string, { id: string; name: string; icon: string }>;
@@ -359,6 +300,7 @@ function FlatMessage({
   selectedPersona,
   locale,
   logger,
+  index,
   messageActions,
   isTouch,
   hoveredRef,
@@ -370,7 +312,6 @@ function FlatMessage({
   onDeleteMessage,
   onModelChange,
   onPersonaChange,
-  onInsertQuote,
   rootFolderId: _rootFolderId = "private",
   collapseState,
   currentUserId,
@@ -447,7 +388,7 @@ function FlatMessage({
       )}
     >
       {/* Logo watermark for first message */}
-      {postNum === 1 && (
+      {index === 0 && (
         <Div className="absolute top-3 right-3 pointer-events-none bg-card backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10 opacity-70">
           <Logo locale={locale} pathName="/" size="h-6" />
         </Div>
@@ -751,11 +692,9 @@ function FlatMessage({
                       msgIndex > 0 && "mt-3",
                     )}
                   >
-                             <Markdown
+                  <Markdown
                     content={msg.content}
                     messageId={msg.id}
-                    hasContentAfter={true}
-                    collapseState={true}
                   />
                   </Div>
                 )}

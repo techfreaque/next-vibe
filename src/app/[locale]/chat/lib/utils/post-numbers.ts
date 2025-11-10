@@ -190,7 +190,7 @@ export async function clearPostNumbers(logger: EndpointLogger): Promise<void> {
  * Format post number for display (e.g., "No.1234567")
  */
 export function formatPostNumber(
-  postNumber: number,
+  postNumber: string,
   locale: CountryLanguage,
 ): string {
   const { t } = simpleT(locale);

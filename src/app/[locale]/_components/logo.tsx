@@ -40,7 +40,7 @@ export function Logo({
       <Div className={cn("shrink-0", size)}>
         <Image
           fetchPriority="high"
-          src={`${envClient.platform.isReactNative ?envClient.NEXT_PUBLIC_APP_URL: ""}/unbottled-icon-white.png`}
+          src={`${envClient.platform.isReactNative ?envClient.NEXT_PUBLIC_APP_URL: ""}/images/unbottled-icon-white.png`}
           alt={t("config.appName")}
           className={cn(
             "hidden dark:block h-full w-auto object-contain",
@@ -52,7 +52,7 @@ export function Logo({
         />
         <Image
           fetchPriority="high"
-          src={`${envClient.platform.isReactNative ?envClient.NEXT_PUBLIC_APP_URL: ""}/unbottled-icon.png`}
+          src={`${envClient.platform.isReactNative ?envClient.NEXT_PUBLIC_APP_URL: ""}/images/unbottled-icon.png`}
           alt={t("config.appName")}
           className={cn(
             "hidden light:block h-full w-auto object-contain",

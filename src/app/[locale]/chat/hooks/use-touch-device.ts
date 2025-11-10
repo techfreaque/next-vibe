@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { envClient } from "@/config/env-client";
 
 /**
  * Detects if the device supports touch input
@@ -12,6 +13,10 @@ export function useTouchDevice(): boolean {
   const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
+    if (envClient.platform.isReactNative) {
+      setIsTouch(true);
+      return;
+    }
     // Check if touch is supported
     const checkTouch = (): void => {
       // Multiple checks for better compatibility
