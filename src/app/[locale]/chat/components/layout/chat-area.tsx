@@ -239,7 +239,7 @@ export function ChatArea({
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 h-screen"
+      className="h-screen h-max-screen "
       style={{ flex: 1 }}
       keyboardVerticalOffset={0}
     >
@@ -247,7 +247,7 @@ export function ChatArea({
         className={
           envClient.platform.isReactNative
             ? "flex-1 flex flex-col min-w-0 relative w-full"
-            : "flex-1 flex flex-col min-w-0 relative w-full h-screen max-h-screen"
+            : "w-full h-screen max-h-screen"
         }
         style={
           envClient.platform.isReactNative
@@ -308,9 +308,8 @@ export function ChatArea({
             </Div>
           </Div>
         )}
-
         {/* Messages Area - Full height, scrollable inside */}
-        <Div className="flex-1 max-w-screen overflow-hidden min-h-0">
+        <Div className="max-w-screen overflow-hidden h-screen h-max-screen">
           {thread ? (
             <ChatMessages
               thread={thread}
@@ -344,7 +343,7 @@ export function ChatArea({
           ) : (
             // Empty state for new threads - show suggestions (including public subfolders)
             <Div
-              className="h-full overflow-y-auto scroll-smooth scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full"
+              className="h-screen h-max-screen overflow-y-auto scroll-smooth scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full"
               id={DOM_IDS.MESSAGES_CONTAINER}
             >
               <Div
@@ -372,10 +371,6 @@ export function ChatArea({
           )}
         </Div>
 
-        {/* Input Area - Positioned at bottom with max-width */}
-        {/* z-20: Above messages, below sidebar on mobile (z-50), below top bar (z-50) */}
-        {/* Show input except when viewing public feed (public root folder without subfolder) */}
-        {/* On native: use normal flex layout (not absolute) for proper keyboard handling */}
         {!(
           rootFolderId === "public" &&
           !chat.currentSubFolderId &&
@@ -388,6 +383,7 @@ export function ChatArea({
                 ? "w-full z-20"
                 : "absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
             }
+            // style={{ marginTop: `-${inputHeight}px` }}
           >
             <Div
               className={

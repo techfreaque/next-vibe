@@ -64,7 +64,6 @@ export function SidebarWrapper({
 }: SidebarWrapperProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  // Detect if we're on mobile (window width < 768px)
   const [isMobile, setIsMobile] = React.useState(false);
 
   React.useEffect(() => {
@@ -73,7 +72,7 @@ export function SidebarWrapper({
       return;
     }
     const checkMobile = (): void => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 930);
     };
 
     // Check on mount
@@ -242,7 +241,7 @@ export function SidebarWrapper({
   // Mobile: use overlay (NO RESIZE - fixed width)
   if (isMobile) {
     return (
-      <Div className="flex flex-row h-full w-full relative">
+      <Div className="flex flex-row h-screen h-max-screen w-full">
         {/* Mobile Sidebar Container - Fixed Overlay (NO RESIZE) */}
         <Div
           suppressHydrationWarning
@@ -287,7 +286,7 @@ export function SidebarWrapper({
         )}
 
         {/* Chat Area for Mobile */}
-        <Div className="flex-1 h-full w-full">{children}</Div>
+        <Div className="h-screen h-max-screen w-full">{children}</Div>
       </Div>
     );
   }
@@ -338,7 +337,7 @@ export function SidebarWrapper({
       </ResizableContainer>
 
       {/* Main Content Panel - Chat Area (flexes to fill remaining space) */}
-      <Div className="flex-1  h-screen">{children}</Div>
+      <Div className="flex h-screen w-full relative">{children}</Div>
     </Div>
   );
 }
