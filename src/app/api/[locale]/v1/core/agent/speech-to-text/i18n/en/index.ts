@@ -2,7 +2,10 @@
  * Speech-to-Text English translations
  */
 
+import { hotkeyTranslations } from "./hotkey";
+
 export const translations = {
+  hotkey: hotkeyTranslations,
   post: {
     title: "Speech to Text",
     description: "Convert audio to text using AI transcription",
