@@ -247,7 +247,7 @@ export function ChatArea({
         className={
           envClient.platform.isReactNative
             ? "flex-1 flex flex-col min-w-0 relative w-full"
-            : "flex-1 flex flex-col min-w-0 relative w-full h-full"
+            : "flex-1 flex flex-col min-w-0 relative w-full h-screen max-h-screen"
         }
         style={
           envClient.platform.isReactNative
