@@ -1,7 +1,6 @@
 /**
  * Resizable Component for React Native
- * Simple implementation without actual resizing (React Native doesn't support drag-to-resize)
- * Provides layout structure similar to web version
+ * Simple fixed-width container (React Native doesn't support mouse drag-to-resize)
  */
 import { GripVertical } from "lucide-react-native";
 import React from "react";
@@ -9,8 +8,7 @@ import { View } from "react-native";
 
 import { cn } from "next-vibe/shared/utils/utils";
 import type {
-  ResizablePanelGroupProps,
-  ResizablePanelProps,
+  ResizableContainerProps,
   ResizableHandleProps,
 } from "@/packages/next-vibe-ui/web/ui/resizable";
 
@@ -19,36 +17,22 @@ import { styled } from "nativewind";
 // Type-safe View with className support (NativeWind)
 const StyledView = styled(View, { className: "style" });
 
-export function ResizablePanelGroup({
-  className,
-  direction = "horizontal",
+export function ResizableContainer({
   children,
-}: ResizablePanelGroupProps): React.JSX.Element {
+  className,
+  defaultWidth = 260,
+}: ResizableContainerProps): React.JSX.Element {
   return (
     <StyledView
-      className={cn(
-        "flex h-full w-full",
-        direction === "vertical" ? "flex-col" : "flex-row",
-        className,
-      )}
+      className={cn("relative h-full flex-shrink-0", className)}
+      style={{ width: defaultWidth }}
     >
       {children}
     </StyledView>
   );
 }
 
-ResizablePanelGroup.displayName = "ResizablePanelGroup";
-
-export function ResizablePanel({
-  className,
-  children,
-}: ResizablePanelProps): React.JSX.Element {
-  return (
-    <StyledView className={cn("flex-1", className)}>{children}</StyledView>
-  );
-}
-
-ResizablePanel.displayName = "ResizablePanel";
+ResizableContainer.displayName = "ResizableContainer";
 
 export function ResizableHandle({
   withHandle,
@@ -57,7 +41,7 @@ export function ResizableHandle({
   return (
     <StyledView
       className={cn(
-        "relative flex w-px items-center justify-center bg-border",
+        "absolute top-0 right-0 bottom-0 w-px items-center justify-center bg-border",
         className,
       )}
     >
@@ -71,3 +55,5 @@ export function ResizableHandle({
 }
 
 ResizableHandle.displayName = "ResizableHandle";
+
+export type { ResizableContainerProps, ResizableHandleProps };

@@ -383,7 +383,7 @@ export function ChatMessages({
       {/* On native: no bottom padding needed since input is in normal flow */}
       <Div
         id={DOM_IDS.MESSAGES_CONTENT}
-        className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-5 md:pt-15 flex flex-col gap-5"
+        className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-35 md:pt-15 flex flex-col gap-5"
         style={
           envClient.platform.isReactNative
             ? { paddingBottom: LAYOUT.MESSAGES_BOTTOM_PADDING }

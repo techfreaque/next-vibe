@@ -561,7 +561,7 @@ function FolderItem({
   // Handle folder click to navigate
   const handleFolderClick = (e: DivMouseEvent): void => {
     // Don't navigate if clicking on buttons
-    if (e.target.closest("button")) {
+    if (e.target.closest?.("button")) {
       return;
     }
 

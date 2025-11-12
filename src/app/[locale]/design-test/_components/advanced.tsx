@@ -2,11 +2,7 @@
 "use client";
 import type { JSX } from "react";
 
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "next-vibe-ui/ui/resizable";
+import { ResizableContainer } from "next-vibe-ui/ui/resizable";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { AspectRatio } from "next-vibe-ui/ui/aspect-ratio";
 import { NumberInput } from "next-vibe-ui/ui/number-input";
@@ -28,23 +24,23 @@ export function AdvancedPreview(): JSX.Element {
 
         <Div className="space-y-6">
           <Div className="space-y-2">
-            <H3>Resizable Panels</H3>
-            <ResizablePanelGroup
-              direction="horizontal"
-              className="min-h-[200px] rounded-lg border"
-            >
-              <ResizablePanel defaultSize={50}>
+            <H3>Resizable Container</H3>
+            <Div className="flex flex-row gap-0 min-h-[200px] rounded-lg border overflow-hidden">
+              <ResizableContainer
+                defaultWidth={300}
+                minWidth={200}
+                maxWidth={600}
+                storageId="design-test-advanced"
+                className="bg-muted"
+              >
                 <Div className="flex h-full items-center justify-center p-6">
-                  <P>Panel 1</P>
+                  <P>Resizable Panel (drag edge →)</P>
                 </Div>
-              </ResizablePanel>
-              <ResizableHandle />
-              <ResizablePanel defaultSize={50}>
-                <Div className="flex h-full items-center justify-center p-6">
-                  <P>Panel 2</P>
-                </Div>
-              </ResizablePanel>
-            </ResizablePanelGroup>
+              </ResizableContainer>
+              <Div className="flex-1 flex items-center justify-center p-6 bg-background">
+                <P>Main Content (auto-flexes)</P>
+              </Div>
+            </Div>
           </Div>
 
           <Div className="space-y-2">

@@ -239,7 +239,7 @@ export function ChatArea({
 
   return (
     <KeyboardAvoidingView
-      className="flex-1"
+      className="flex-1 h-screen"
       style={{ flex: 1 }}
       keyboardVerticalOffset={0}
     >
@@ -300,9 +300,9 @@ export function ChatArea({
 
         {/* Logo - Only show in linear view (ChatGPT style) */}
         {viewMode === "linear" && messages.length > 0 && (
-          <Div className="w-full md:h-0 h-auto">
+          <Div className="w-full h-0">
             <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15 flex flex-col gap-5">
-              <Div className="flex bg-card backdrop-blur-xl rounded-lg p-2 shadow-sm border border-border/20 w-fit">
+              <Div className="flex bg-card backdrop-blur-xl rounded-lg p-2 shadow-sm border border-border/20 w-fit z-10">
                 <Logo locale={locale} disabled size="h-10" />
               </Div>
             </Div>

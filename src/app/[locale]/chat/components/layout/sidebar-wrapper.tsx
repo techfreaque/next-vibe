@@ -2,6 +2,8 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
+import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
+import { ResizableContainer } from "next-vibe-ui/ui/resizable";
 import type { JSX } from "react";
 import React from "react";
 
@@ -18,6 +20,8 @@ import { ChatSidebar } from "../sidebar/chat-sidebar";
 import { envClient } from "@/config/env-client";
 
 const SIDEBAR_WIDTH = "w-65";
+const SIDEBAR_MIN_WIDTH_PX = 235; // Minimum 235px
+const SIDEBAR_MAX_WIDTH_VW = 90; // Maximum 90vw
 
 interface SidebarWrapperProps {
   threads: Record<string, ChatThread>;
@@ -39,6 +43,7 @@ interface SidebarWrapperProps {
   currentSubFolderId: string | null;
   chat: UseChatReturn;
   user: JwtPayloadType | undefined;
+  children?: React.ReactNode;
 }
 
 export function SidebarWrapper({
@@ -55,6 +60,7 @@ export function SidebarWrapper({
   onUpdateThreadTitle,
   chat,
   user,
+  children,
 }: SidebarWrapperProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -63,6 +69,7 @@ export function SidebarWrapper({
 
   React.useEffect(() => {
     if (envClient.platform.isReactNative) {
+      setIsMobile(true);
       return;
     }
     const checkMobile = (): void => {
@@ -232,53 +239,106 @@ export function SidebarWrapper({
     [chat.folders, onUpdateFolder, logger],
   );
 
-  return (
-    <>
-      {/* Sidebar Container */}
-      <Div
-        suppressHydrationWarning
-        className={cn(
-          // Desktop: flexible width with smooth transition, z-10 to stay below input (z-20)
-          "hidden md:block transition-all duration-200 ease-in-out overflow-hidden border-r border-border shrink-0",
-          collapsed ? "w-0 border-r-0" : SIDEBAR_WIDTH,
-          // Mobile: fixed overlay with z-50 (same as top bar, above input z-20, above backdrop z-30)
-          "md:relative md:z-10 fixed inset-y-0 left-0 z-50",
-          !collapsed && "block",
-        )}
-      >
-        <Div className={`h-full ${SIDEBAR_WIDTH} bg-background`}>
-          <ChatSidebar
-            user={user}
-            chat={chat}
-            activeThreadId={activeThreadId}
-            activeFolderId={activeSubFolderId}
-            locale={locale}
-            logger={logger}
-            onCreateThread={handleCreateThread}
-            onSelectThread={handleSelectThread}
-            onDeleteThread={onDeleteThread}
-            onMoveThread={handleMoveThread}
-            onPinThread={handlePinThread}
-            onArchiveThread={handleArchiveThread}
-            onCreateFolder={handleCreateFolder}
-            onUpdateFolder={onUpdateFolder}
-            onDeleteFolder={chat.deleteFolder}
-            onReorderFolder={handleReorderFolder}
-            onMoveFolderToParent={handleMoveFolderToParent}
-            onUpdateThreadTitle={onUpdateThreadTitle}
-            searchThreads={() => []}
-          />
-        </Div>
-      </Div>
-
-      {/* Mobile Overlay Backdrop */}
-      {!collapsed && (
+  // Mobile: use overlay (NO RESIZE - fixed width)
+  if (isMobile) {
+    return (
+      <Div className="flex flex-row h-full w-full relative">
+        {/* Mobile Sidebar Container - Fixed Overlay (NO RESIZE) */}
         <Div
-          className="md:hidden fixed inset-0 bg-black/50 z-30"
-          onClick={onToggle}
-          aria-label={t("app.chat.common.closeSidebar")}
-        />
-      )}
-    </>
+          suppressHydrationWarning
+          className={cn(
+            "fixed inset-y-0 left-0 z-50 bg-background border-r border-border transition-transform duration-200 ease-in-out",
+            SIDEBAR_WIDTH,
+            collapsed ? "-translate-x-full" : "translate-x-0",
+          )}
+        >
+          <Div className="h-full w-full bg-background">
+            <ChatSidebar
+              user={user}
+              chat={chat}
+              activeThreadId={activeThreadId}
+              activeFolderId={activeSubFolderId}
+              locale={locale}
+              logger={logger}
+              onCreateThread={handleCreateThread}
+              onSelectThread={handleSelectThread}
+              onDeleteThread={onDeleteThread}
+              onMoveThread={handleMoveThread}
+              onPinThread={handlePinThread}
+              onArchiveThread={handleArchiveThread}
+              onCreateFolder={handleCreateFolder}
+              onUpdateFolder={onUpdateFolder}
+              onDeleteFolder={chat.deleteFolder}
+              onReorderFolder={handleReorderFolder}
+              onMoveFolderToParent={handleMoveFolderToParent}
+              onUpdateThreadTitle={onUpdateThreadTitle}
+              searchThreads={() => []}
+            />
+          </Div>
+        </Div>
+
+        {/* Mobile Overlay Backdrop */}
+        {!collapsed && (
+          <Div
+            className="fixed inset-0 bg-black/50 z-30"
+            onClick={onToggle}
+            aria-label={t("app.chat.common.closeSidebar")}
+          />
+        )}
+
+        {/* Chat Area for Mobile */}
+        <Div className="flex-1 h-full w-full">{children}</Div>
+      </Div>
+    );
+  }
+  // Desktop: Resizable sidebar with custom ResizableContainer
+  return (
+    <Div className="flex flex-row h-full w-full">
+      <ResizableContainer
+        defaultWidth={260}
+        minWidth={SIDEBAR_MIN_WIDTH_PX}
+        maxWidth={`${SIDEBAR_MAX_WIDTH_VW}vw`}
+        storageId="chat-sidebar"
+        className="bg-background"
+        collapsed={collapsed}
+      >
+        <AnimatePresence mode="sync">
+          {!collapsed && (
+            <MotionDiv
+              key="sidebar"
+              animate={{ width: "auto", opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              className="h-full"
+            >
+              <ChatSidebar
+                user={user}
+                chat={chat}
+                activeThreadId={activeThreadId}
+                activeFolderId={activeSubFolderId}
+                locale={locale}
+                logger={logger}
+                onCreateThread={handleCreateThread}
+                onSelectThread={handleSelectThread}
+                onDeleteThread={onDeleteThread}
+                onMoveThread={handleMoveThread}
+                onPinThread={handlePinThread}
+                onArchiveThread={handleArchiveThread}
+                onCreateFolder={handleCreateFolder}
+                onUpdateFolder={onUpdateFolder}
+                onDeleteFolder={chat.deleteFolder}
+                onReorderFolder={handleReorderFolder}
+                onMoveFolderToParent={handleMoveFolderToParent}
+                onUpdateThreadTitle={onUpdateThreadTitle}
+                searchThreads={() => []}
+              />
+            </MotionDiv>
+          )}
+        </AnimatePresence>
+      </ResizableContainer>
+
+      {/* Main Content Panel - Chat Area (flexes to fill remaining space) */}
+      <Div className="flex-1  h-screen">{children}</Div>
+    </Div>
   );
 }

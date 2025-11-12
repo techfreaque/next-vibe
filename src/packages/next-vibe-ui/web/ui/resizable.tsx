@@ -2,90 +2,149 @@
 
 import { DragHandleDots2Icon } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils/utils";
-import type { ComponentProps, JSX, ReactNode } from "react";
-import * as ResizablePrimitive from "react-resizable-panels";
+import type { JSX, ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
-// Cross-platform props interfaces
-export interface ResizablePanelGroupProps {
+export interface ResizableContainerProps {
   children: ReactNode;
   className?: string;
-  direction: "horizontal" | "vertical";
-  autoSaveId?: string | null;
-  id?: string | null;
-  keyboardResizeBy?: number | null;
-  onLayout?: (sizes: number[]) => void;
-  storage?: {
-    getItem: (name: string) => string | null;
-    setItem: (name: string, value: string) => void;
-  };
-  tagName?: keyof HTMLElementTagNameMap;
+  collapsed?: boolean;
+  /** Default width in pixels */
+  defaultWidth?: number;
+  /** Minimum width in pixels */
+  minWidth?: number;
+  /** Maximum width in pixels or vw string */
+  maxWidth?: number | string;
+  /** Callback when width changes */
+  onWidthChange?: (width: number) => void;
+  /** ID for localStorage persistence */
+  storageId?: string;
 }
 
-export interface ResizablePanelProps
-  extends ComponentProps<typeof ResizablePrimitive.Panel> {
-  children: ReactNode;
-  className?: string;
-  defaultSize?: number;
-}
-
-export interface ResizableHandleProps
-  extends ComponentProps<typeof ResizablePrimitive.PanelResizeHandle> {
+export interface ResizableHandleProps {
   className?: string;
   withHandle?: boolean;
+  onMouseDown?: (e: React.MouseEvent) => void;
 }
 
-function ResizablePanelGroup({
-  className,
+export function ResizableContainer({
   children,
-  direction,
-  autoSaveId,
-  id,
-  keyboardResizeBy,
-  onLayout,
-  storage,
-  tagName,
-}: ResizablePanelGroupProps): JSX.Element {
+  className,
+  defaultWidth = 260,
+  minWidth = 235,
+  maxWidth = "90vw",
+  onWidthChange,
+  storageId,
+  collapsed,
+}: ResizableContainerProps): JSX.Element {
+  const [width, setWidth] = useState<number>(defaultWidth);
+  const [isResizing, setIsResizing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const startXRef = useRef<number>(0);
+  const startWidthRef = useRef<number>(0);
+
+  const getMaxWidthPx = useCallback((): number => {
+    if (typeof maxWidth === "number") {
+      return maxWidth;
+    }
+    if (typeof maxWidth === "string" && maxWidth.endsWith("vw")) {
+      const vw = parseFloat(maxWidth);
+      return (window.innerWidth * vw) / 100;
+    }
+    return 9999;
+  }, [maxWidth]);
+
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      setIsResizing(true);
+      startXRef.current = e.clientX;
+      startWidthRef.current = width;
+    },
+    [width],
+  );
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isResizing) {
+        return;
+      }
+      const deltaX = e.clientX - startXRef.current;
+      const newWidth = startWidthRef.current + deltaX;
+      const maxWidthPx = getMaxWidthPx();
+      const clampedWidth = Math.max(minWidth, Math.min(maxWidthPx, newWidth));
+      setWidth(clampedWidth);
+      onWidthChange?.(clampedWidth);
+      if (storageId) {
+        localStorage.setItem(`resizable-${storageId}`, clampedWidth.toString());
+      }
+    },
+    [isResizing, minWidth, getMaxWidthPx, onWidthChange, storageId],
+  );
+
+  const handleMouseUp = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isResizing) {
+      return;
+    }
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = "ew-resize";
+    return (): void => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+    };
+  }, [isResizing, handleMouseMove, handleMouseUp]);
+
   return (
-    <ResizablePrimitive.PanelGroup
-      direction={direction}
-      autoSaveId={autoSaveId}
-      id={id}
-      keyboardResizeBy={keyboardResizeBy}
-      onLayout={onLayout}
-      storage={storage}
-      tagName={tagName}
-      className={cn(
-        "flex h-full w-full data-[panel-group-direction=vertical]:flex-col",
-        className,
-      )}
-    >
-      {children}
-    </ResizablePrimitive.PanelGroup>
+    <div className="relative h-full shrink-0 overflow-hidden">
+      <motion.div
+        ref={containerRef}
+        className={cn("relative h-full shrink-0", className)}
+        key="sidebar"
+        initial={false}
+        // Keep the width fixed; slide out using negative margin
+        style={{ width }}
+        animate={{
+          marginLeft: collapsed ? -width : 0,
+        }}
+        transition={{
+          marginLeft: { duration: 0.3, ease: "easeInOut" },
+        }}
+      >
+        {children}
+        <ResizableHandle withHandle onMouseDown={handleMouseDown} />
+      </motion.div>
+    </div>
   );
 }
 
-ResizablePanelGroup.displayName = "ResizablePanelGroup";
-
-const ResizablePanel = ResizablePrimitive.Panel;
-
-const ResizableHandle = ({
+export function ResizableHandle({
   withHandle,
   className,
-  ...props
-}: ResizableHandleProps): JSX.Element => (
-  <ResizablePrimitive.PanelResizeHandle
-    className={cn(
-      "relative flex w-px items-center justify-center bg-border after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 data-[panel-group-direction=vertical]:h-px data-[panel-group-direction=vertical]:w-full data-[panel-group-direction=vertical]:after:left-0 data-[panel-group-direction=vertical]:after:h-1 data-[panel-group-direction=vertical]:after:w-full data-[panel-group-direction=vertical]:after:-translate-y-1/2 data-[panel-group-direction=vertical]:after:translate-x-0 [&[data-panel-group-direction=vertical]>div]:rotate-90",
-      className,
-    )}
-    {...props}
-  >
-    {withHandle && (
-      <div className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border bg-border">
-        <DragHandleDots2Icon className="h-2.5 w-2.5" />
-      </div>
-    )}
-  </ResizablePrimitive.PanelResizeHandle>
-);
-
-export { ResizableHandle, ResizablePanel, ResizablePanelGroup };
+  onMouseDown,
+}: ResizableHandleProps): JSX.Element {
+  return (
+    <div
+      className={cn(
+        "absolute top-0 right-[-5px] bottom-0 w-[10px] cursor-ew-resize flex items-center justify-center z-100",
+        className,
+      )}
+      onMouseDown={onMouseDown}
+    >
+      <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[4px] bg-border" />
+      {withHandle && (
+        <div className="relative z-10 flex h-5 w-4 items-center justify-center rounded-sm bg-background">
+          <DragHandleDots2Icon className="h-3 w-3" />
+        </div>
+      )}
+    </div>
+  );
+}

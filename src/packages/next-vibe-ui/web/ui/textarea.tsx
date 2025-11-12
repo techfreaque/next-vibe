@@ -37,10 +37,10 @@ export interface TextareaFocusEvent<T = string> {
 }
 
 export interface TextareaKeyboardEvent {
-  // key: string;
-  // code: string;
-  // preventDefault: () => void;
-  // stopPropagation: () => void;
+  key: string;
+  code: string;
+  preventDefault: () => void;
+  stopPropagation: () => void;
   // currentTarget: InputGenericTarget<T>;
   // target: InputGenericTarget<T>;
   shiftKey: boolean;
@@ -85,7 +85,6 @@ export interface TextareaBaseProps {
   onFocus?: (e: TextareaFocusEvent) => void;
   minRows?: number;
   maxRows?: number;
-  placeholderClassName?: string;
   onKeyDown?: (e: TextareaKeyboardEvent) => void;
   ref?: React.RefObject<TextareaRefObject | null>;
 }
@@ -128,7 +127,6 @@ function Textarea({
   maxLength,
   onKeyDown,
   placeholder,
-  placeholderClassName,
   readOnly,
   required,
   rows,
@@ -218,7 +216,6 @@ function Textarea({
       maxLength={maxLength}
       onKeyDown={onKeyDown}
       placeholder={placeholder}
-      placeholderClassName={placeholderClassName}
       readOnly={readOnly}
       required={required}
       rows={rows}

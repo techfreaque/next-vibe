@@ -16,10 +16,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import {
   Menu,
   MessageSquarePlus,
-  Moon,
-  Search,
   Settings,
-  Sun,
   Volume2,
   VolumeX,
 } from "next-vibe-ui/ui/icons";
@@ -32,34 +29,27 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { ChatMessage } from "../../types";
 import { LocaleSelectorContent } from "../locale-selector-content";
+import { ThemeToggleDropdown } from "@/app/[locale]/_components/theme-toggle";
 
 interface TopBarProps {
-  theme: "light" | "dark";
   currentCountry: { flag: string; name: string };
   onToggleSidebar: () => void;
-  onToggleTheme: () => void;
   onToggleTTSAutoplay: () => void;
   ttsAutoplay: boolean;
-  onOpenSearch: () => void;
   sidebarCollapsed: boolean;
   onNewChat: () => void;
   locale: CountryLanguage;
-  onNavigateToThreads?: () => void;
   messages: Record<string, ChatMessage>;
 }
 
 export function TopBar({
-  theme,
   currentCountry,
   onToggleSidebar,
-  onToggleTheme,
   onToggleTTSAutoplay,
   ttsAutoplay,
-  onOpenSearch,
   sidebarCollapsed,
   onNewChat,
   locale,
-  onNavigateToThreads,
   messages,
 }: TopBarProps): JSX.Element {
   const { t } = simpleT(locale);
@@ -97,19 +87,7 @@ export function TopBar({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-56">
           {/* Theme Toggle */}
-          <DropdownMenuItem onClick={onToggleTheme} className="cursor-pointer">
-            {theme === "dark" ? (
-              <>
-                <Sun className="h-4 w-4 mr-2" />
-                {t("app.chat.common.lightMode")}
-              </>
-            ) : (
-              <>
-                <Moon className="h-4 w-4 mr-2" />
-                {t("app.chat.common.darkMode")}
-              </>
-            )}
-          </DropdownMenuItem>
+          <ThemeToggleDropdown locale={locale} />
 
           {/* TTS Autoplay Toggle */}
           <DropdownMenuItem

@@ -17,6 +17,9 @@ export const translations: typeof enTranslations = {
     credits: "Kredyty",
     balance: "Saldo",
     permissions: "Uprawnienia",
+    hotkey: "Skrót klawiszowy",
+    cli: "CLI",
+    speech: "Mowa",
   },
   config: {
     folders: {

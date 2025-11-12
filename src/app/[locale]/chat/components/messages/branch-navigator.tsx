@@ -45,7 +45,6 @@ export function BranchNavigator({
       currentBranchIndex < totalBranches - 1 ? currentBranchIndex + 1 : 0;
     onSwitchBranch(newIndex);
   };
-
   return (
     <Div
       className={cn(

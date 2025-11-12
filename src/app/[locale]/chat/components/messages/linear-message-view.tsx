@@ -113,22 +113,24 @@ export function LinearMessageView({
     <>
       {/* Show root-level branch navigator if there are multiple root messages */}
       {hasRootBranches && (
-        <Div className="my-3">
-          <BranchNavigator
-            currentBranchIndex={rootBranches.currentIndex}
-            totalBranches={rootBranches.siblings.length}
-            branches={rootBranches.siblings.map((sibling) => ({
-              id: sibling.id,
-              preview:
-                sibling.content.slice(0, 50) +
-                (sibling.content.length > 50 ? "..." : ""),
-            }))}
-            onSwitchBranch={(index) =>
-              // eslint-disable-next-line i18next/no-literal-string
-              onSwitchBranch("__root__", index)
-            }
-            locale={locale}
-          />
+        <Div className="md:flex md:justify-end">
+          <Div className="mb-3 md:w-[75%]">
+            <BranchNavigator
+              currentBranchIndex={rootBranches.currentIndex}
+              totalBranches={rootBranches.siblings.length}
+              branches={rootBranches.siblings.map((sibling) => ({
+                id: sibling.id,
+                preview:
+                  sibling.content.slice(0, 50) +
+                  (sibling.content.length > 50 ? "..." : ""),
+              }))}
+              onSwitchBranch={(index) =>
+                // eslint-disable-next-line i18next/no-literal-string
+                onSwitchBranch("__root__", index)
+              }
+              locale={locale}
+            />
+          </Div>
         </Div>
       )}
 

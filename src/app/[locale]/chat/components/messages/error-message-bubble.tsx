@@ -15,7 +15,7 @@ export function ErrorMessageBubble({
 }: ErrorMessageBubbleProps): JSX.Element {
   return (
     <Div className="flex items-start gap-3">
-      <Div className="flex-1">
+      <Div className="max-w-full">
         <Div
           className={cn(
             "rounded-2xl px-4 py-3 border",

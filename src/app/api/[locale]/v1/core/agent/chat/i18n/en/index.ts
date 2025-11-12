@@ -16,6 +16,9 @@ export const translations = {
     credits: "Credits",
     balance: "Balance",
     permissions: "Permissions",
+    hotkey: "Hotkey",
+    cli: "CLI",
+    speech: "Speech",
   },
   config: {
     folders: {

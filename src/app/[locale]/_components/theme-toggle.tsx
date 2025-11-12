@@ -9,34 +9,52 @@ import { type JSX, useEffect, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { DropdownMenuItem } from "next-vibe-ui/ui/dropdown-menu";
+
+export function useThemeToggle(): {
+  onToggleTheme: () => void;
+  theme: "light" | "dark";
+  isMounted: boolean;
+} {
+  const { setTheme, resolvedTheme } = useTheme();
+  const theme = resolvedTheme === "dark" ? "dark" : "light";
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  function onToggleTheme(): void {
+    setTheme(theme === "dark" ? "light" : "dark");
+  }
+
+  return {
+    onToggleTheme,
+    theme,
+    isMounted,
+  };
+}
 
 export function ThemeToggle({
   locale,
 }: {
   locale: CountryLanguage;
 }): JSX.Element {
-  const { setTheme, resolvedTheme } = useTheme();
+  const { onToggleTheme, theme, isMounted } = useThemeToggle();
   const { t } = simpleT(locale);
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => {
-        setTheme(resolvedTheme === "dark" ? "light" : "dark");
-      }}
+      onClick={onToggleTheme}
       className="my-auto transition-colors hover:text-blue-600 dark:hover:text-blue-400"
       suppressHydrationWarning
       aria-label={
-        resolvedTheme === "dark" || !isMounted
+        theme === "dark" || !isMounted
           ? t("app.common.accessibility.srOnly.enableLightMode")
           : t("app.common.accessibility.srOnly.enableDarkMode")
       }
     >
-      {resolvedTheme === "dark" || !isMounted ? (
+      {theme === "dark" || !isMounted ? (
         <Sun className="h-5 w-5" />
       ) : (
         <Moon className="h-5 w-5" />
@@ -50,30 +68,47 @@ export function ThemeToggleMobile({
 }: {
   locale: CountryLanguage;
 }): JSX.Element {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { onToggleTheme, theme, isMounted } = useThemeToggle();
   const { t } = simpleT(locale);
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   return (
     <Div
-      className="flex flex flex-row gap-2 pb-7 border-b text-base font-medium hover:text-primary transition-colors py-2 cursor-pointer"
-      onClick={() =>
-        setTheme(resolvedTheme === "dark" || !isMounted ? "light" : "dark")
-      }
+      className="flex flex-row gap-2 pb-7 border-b text-base font-medium hover:text-primary transition-colors py-2 cursor-pointer"
+      onClick={onToggleTheme}
     >
-      {resolvedTheme === "dark" ? (
+      {theme === "dark" ? (
         <Sun className="h-5 w-5 my-auto" />
       ) : (
         <Moon className="h-5 w-5 my-auto" />
       )}
       <Span className="text-base font-medium my-auto">
-        {resolvedTheme === "dark" || !isMounted
+        {theme === "dark" || !isMounted
           ? t("app.story._components.nav.enableLightMode")
           : t("app.story._components.nav.enableDarkMode")}
       </Span>
     </Div>
+  );
+}
+
+export function ThemeToggleDropdown({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element {
+  const { onToggleTheme, theme } = useThemeToggle();
+  const { t } = simpleT(locale);
+  return (
+    <DropdownMenuItem onClick={onToggleTheme} className="cursor-pointer">
+      {theme === "dark" ? (
+        <>
+          <Sun className="h-4 w-4 mr-2" />
+          {t("app.chat.common.lightMode")}
+        </>
+      ) : (
+        <>
+          <Moon className="h-4 w-4 mr-2" />
+          {t("app.chat.common.darkMode")}
+        </>
+      )}
+    </DropdownMenuItem>
   );
 }

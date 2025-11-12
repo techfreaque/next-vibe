@@ -82,12 +82,10 @@ export function ChatInterface({
     // UI settings (persisted)
     ttsAutoplay,
     sidebarCollapsed,
-    theme,
     viewMode,
     enabledToolIds,
     setTTSAutoplay,
     setSidebarCollapsed,
-    setTheme,
     setViewMode,
     setEnabledToolIds,
   } = chat;
@@ -235,54 +233,6 @@ export function ChatInterface({
       router.push(url);
     }
   }, [isAuthenticated, currentRootFolderId, locale, router, logger]);
-  // URL is the single source of truth - no syncing needed
-  // All navigation state comes from props (activeThreadId, currentRootFolderId, currentSubFolderId)
-
-  // DISABLED: This effect was causing issues with new thread navigation
-  // The onThreadCreated callback in sendMessage already handles setting the active thread
-  // and navigating to the new thread, so this effect is redundant and causes conflicts
-  // Update active thread when new thread is created (without navigation)
-  // const prevThreadCountRef = React.useRef(Object.keys(threads).length);
-  // const initialLoadCompleteRef = React.useRef(false);
-  // useEffect(() => {
-  //   const currentThreadCount = Object.keys(threads).length;
-  //   const prevThreadCount = prevThreadCountRef.current;
-
-  //   // Mark initial load as complete after first render with threads
-  //   if (!initialLoadCompleteRef.current && currentThreadCount > 0) {
-  //     initialLoadCompleteRef.current = true;
-  //     prevThreadCountRef.current = currentThreadCount;
-  //     return;
-  //   }
-
-  //   // Only auto-select if:
-  //   // 1. Thread count increased (new thread created)
-  //   // 2. We're on "new" page
-  //   // 3. Initial load is complete (not just loading existing threads from server)
-  //   if (
-  //     currentThreadCount > prevThreadCount &&
-  //     initialThreadId &&
-  //     isNewThread(initialThreadId) &&
-  //     initialLoadCompleteRef.current
-  //   ) {
-  //     // Find the newest thread (highest createdAt)
-  //     const newestThread = Object.values(threads).reduce<ChatThread | null>(
-  //       (newest, thread) =>
-  //         !newest || thread.createdAt > newest.createdAt ? thread : newest,
-  //       null,
-  //     );
-
-  //     if (newestThread) {
-  //       logger.debug("Chat", "New thread created, setting active thread", {
-  //         threadId: newestThread.id,
-  //       });
-  //       // Only set active thread, don't navigate away from current page
-  //       setActiveThread(newestThread.id);
-  //     }
-  //   }
-
-  //   prevThreadCountRef.current = currentThreadCount;
-  // }, [threads, initialThreadId, setActiveThread, logger]);
 
   // Handle thread selection with navigation
   // Uses the navigation hook from chat context
@@ -441,31 +391,20 @@ export function ChatInterface({
             ? "flex flex-1 overflow-hidden bg-background"
             : "flex h-dvh overflow-hidden bg-background"
         }
-        style={envClient.platform.isReactNative ? { flex: 1 } : undefined}
       >
         {/* Top Bar - Menu, Search, Settings */}
         <TopBar
-          theme={theme}
           currentCountry={currentCountry}
           onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
-          onToggleTheme={() => {
-            setTheme(theme === "dark" ? "light" : "dark");
-          }}
           onToggleTTSAutoplay={() => setTTSAutoplay(!ttsAutoplay)}
           ttsAutoplay={ttsAutoplay}
-          onOpenSearch={() => {
-            // Search modal implementation pending Phase 2
-          }}
           sidebarCollapsed={sidebarCollapsed}
           onNewChat={() => handleCreateThread(null)}
           locale={locale}
-          onNavigateToThreads={() =>
-            router.push(`/${locale}/threads/${currentRootFolderId}`)
-          }
           messages={messagesRecord}
         />
 
-        {/* Sidebar */}
+        {/* Sidebar and Main Chat Area */}
         <SidebarWrapper
           user={user}
           threads={threads}
@@ -488,62 +427,45 @@ export function ChatInterface({
           currentRootFolderId={currentRootFolderId}
           currentSubFolderId={currentSubFolderId}
           chat={chat}
-        />
-
-        {/* Main Chat Area */}
-        <ChatArea
-          locale={locale}
-          thread={activeThread}
-          messages={activeThreadMessages}
-          selectedModel={selectedModel}
-          selectedPersona={selectedPersona}
-          ttsAutoplay={ttsAutoplay}
-          input={input}
-          isLoading={isLoading}
-          inputRef={inputRef}
-          onInputChange={setInput}
-          onSubmit={handleSubmit}
-          onKeyDown={handleKeyDown}
-          onStop={stopGeneration}
-          onBranchMessage={branchMessage}
-          onDeleteMessage={handleDeleteMessage}
-          onSwitchBranch={handleSwitchBranch}
-          onRetryMessage={retryMessage}
-          onAnswerAsModel={async (
-            messageId: string,
-            content: string,
-          ): Promise<void> => {
-            // Answer as AI: Generate an AI response to this message
-            // Use the content provided by the user (or empty string to let AI generate)
-            await answerAsAI(messageId, content);
-          }}
-          onVoteMessage={
-            currentRootFolderId === "incognito" ? undefined : voteMessage
-          }
-          onModelChange={handleModelChange}
-          onPersonaChange={setSelectedPersona}
-          onSendMessage={handleFillInputWithPrompt}
-          showBranchIndicators={true}
-          branchIndices={branchIndices}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          onScreenshot={handleScreenshot}
-          rootFolderId={currentRootFolderId}
-          logger={logger}
-          chat={chat}
-          currentUserId={user?.id}
-        />
+        >
+          {/* Main Chat Area */}
+          <ChatArea
+            locale={locale}
+            thread={activeThread}
+            messages={activeThreadMessages}
+            selectedModel={selectedModel}
+            selectedPersona={selectedPersona}
+            ttsAutoplay={ttsAutoplay}
+            input={input}
+            isLoading={isLoading}
+            inputRef={inputRef}
+            onInputChange={setInput}
+            onSubmit={handleSubmit}
+            onKeyDown={handleKeyDown}
+            onStop={stopGeneration}
+            onBranchMessage={branchMessage}
+            onDeleteMessage={handleDeleteMessage}
+            onSwitchBranch={handleSwitchBranch}
+            onRetryMessage={retryMessage}
+            onAnswerAsModel={answerAsAI}
+            onVoteMessage={
+              currentRootFolderId === "incognito" ? undefined : voteMessage
+            }
+            onModelChange={handleModelChange}
+            onPersonaChange={setSelectedPersona}
+            onSendMessage={handleFillInputWithPrompt}
+            showBranchIndicators={true}
+            branchIndices={branchIndices}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            onScreenshot={handleScreenshot}
+            rootFolderId={currentRootFolderId}
+            logger={logger}
+            chat={chat}
+            currentUserId={user?.id}
+          />
+        </SidebarWrapper>
       </Div>
-
-      {/* Search Modal */}
-      {/* <SearchModal
-        open={searchModalOpen}
-        onOpenChange={setSearchModalOpen}
-        onCreateThread={() => handleCreateThread(null)}
-        onSelectThread={handleSelectThread}
-        threads={threads}
-        locale={locale}
-      /> */}
 
       {/* Delete Message Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

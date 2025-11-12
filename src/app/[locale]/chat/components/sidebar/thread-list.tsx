@@ -223,7 +223,7 @@ function ThreadItem({
       return;
     }
 
-    if (e.target.closest("button") || e.target.closest("input")) {
+    if (e.target.closest?.("button") || e.target.closest?.("input")) {
       return;
     }
 

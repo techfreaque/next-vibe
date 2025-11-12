@@ -46,6 +46,7 @@ export interface MotionDivProps {
     | boolean;
   animate?:
     | {
+        width?: string | number;
         opacity?: number;
         scale?: number;
         x?: number;
@@ -55,6 +56,7 @@ export interface MotionDivProps {
     | string;
   exit?:
     | {
+        width?: string | number;
         opacity?: number;
         scale?: number;
         x?: number;

@@ -118,8 +118,7 @@ export function GroupedAssistantMessage({
           </Div>
         )}
 
-        <Div className={cn(chatProse.all, "px-3 py-2.5 sm:px-4 sm:py-3")}>
-          {/* NEW ARCHITECTURE: Render messages in sequence order */}
+        <Div className={cn(chatProse.all, "pl-2 py-2.5 sm:py-3")}>
           {allMessages.map((message, index) => {
             // Check if there's content after this message
             const hasContentAfter = allMessages

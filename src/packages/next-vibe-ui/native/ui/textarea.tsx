@@ -18,7 +18,6 @@ function Textarea({
   className,
   multiline = true,
   numberOfLines,
-  placeholderClassName: _placeholderClassName,
   onChangeText,
   minRows = 4,
   editable,

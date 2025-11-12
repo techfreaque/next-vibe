@@ -68,7 +68,6 @@ export interface UseChatReturn {
   maxTokens: number;
   ttsAutoplay: boolean;
   sidebarCollapsed: boolean;
-  theme: "light" | "dark";
   viewMode: "linear" | "flat" | "threaded";
   enabledToolIds: string[];
   setSelectedPersona: (persona: string) => void;
@@ -77,7 +76,6 @@ export interface UseChatReturn {
   setMaxTokens: (tokens: number) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
-  setTheme: (theme: "light" | "dark") => void;
   setViewMode: (mode: "linear" | "flat" | "threaded") => void;
   setEnabledToolIds: (toolIds: string[]) => void;
 
@@ -334,7 +332,6 @@ export function useChat(
     maxTokens: settingsOps.settings.maxTokens,
     ttsAutoplay: settingsOps.settings.ttsAutoplay,
     sidebarCollapsed: settingsOps.settings.sidebarCollapsed,
-    theme: settingsOps.settings.theme,
     viewMode: settingsOps.settings.viewMode,
     enabledToolIds: settingsOps.settings.enabledToolIds,
     setSelectedPersona: settingsOps.setSelectedPersona,
@@ -343,7 +340,6 @@ export function useChat(
     setMaxTokens: settingsOps.setMaxTokens,
     setTTSAutoplay: settingsOps.setTTSAutoplay,
     setSidebarCollapsed: settingsOps.setSidebarCollapsed,
-    setTheme: settingsOps.setTheme,
     setViewMode: settingsOps.setViewMode,
     setEnabledToolIds: settingsOps.setEnabledToolIds,
 
