@@ -35,12 +35,12 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
   /**
    * Get all available AI tools for current user
    */
-  getTools(
+  async getTools(
     data: AIToolsListRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): AIToolsListResponseOutput {
+  ): Promise<AIToolsListResponseOutput> {
     this.logFetchStart(logger, user);
 
     // Get tool registry
@@ -52,17 +52,34 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
     // 2. User role-based permissions (allowedRoles from endpoint definitions)
     // 3. Public vs authenticated user access
     //
-    // NOTE: We don't need to fetch user roles from database here.
+    // NOTE: We fetch user roles from database to properly check permissions.
     // The authentication layer already validated that the user can access THIS endpoint.
     // The registry will filter OTHER endpoints based on their allowedRoles:
     // - If user.isPublic === true → only return endpoints with PUBLIC in allowedRoles
-    // - If user.isPublic === false → return endpoints with CUSTOMER, ADMIN, etc. (not PUBLIC-only)
+    // - If user.isPublic === false → fetch user roles from DB and return endpoints where user has required role
     const userContext = this.createUserContext(user);
 
     let filteredEndpoints: DiscoveredEndpoint[];
     try {
-      filteredEndpoints = registry.getEndpoints(userContext, Platform.AI);
+      // eslint-disable-next-line no-console
+      console.log("[AI Tools Repository] Calling getEndpointsAsync", {
+        hasRegistry: !!registry,
+        hasMethod: typeof registry.getEndpointsAsync === "function",
+        userContext,
+        platform: Platform.AI,
+      });
+      filteredEndpoints = await registry.getEndpointsAsync(
+        userContext,
+        Platform.AI,
+        logger,
+      );
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("[AI Tools Repository] Caught error:", error);
+      logger.error("[AI Tools Repository] Error calling getEndpointsAsync", {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       this.logError(logger, error instanceof Error ? error : String(error));
       // Return empty array on error - route handler will handle error response
       filteredEndpoints = [];
@@ -72,15 +89,34 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
       totalEndpoints: registry.getStats().totalEndpoints,
       filteredEndpoints: filteredEndpoints.length,
       isPublic: user.isPublic,
+      userId: user.isPublic ? undefined : user.id,
+    });
+
+    // Filter out alias endpoints - only keep the canonical "core_" prefixed endpoints
+    // Aliases create separate route files, but we want to show them as metadata on the main endpoint
+    const canonicalEndpoints = filteredEndpoints.filter((endpoint) => {
+      // Keep endpoints that start with "core_" (canonical endpoints)
+      // Filter out alias endpoints (e.g., "newsletter-unsubscribe", "unsubscribe", "search")
+      return endpoint.toolName.startsWith("core_");
+    });
+
+    logger.info("[AI Tools Repository] Filtered alias endpoints", {
+      beforeFiltering: filteredEndpoints.length,
+      afterFiltering: canonicalEndpoints.length,
+      removedAliases: filteredEndpoints.length - canonicalEndpoints.length,
     });
 
     // Get translation function
     const { t } = simpleT(locale);
 
     // Transform endpoints to serializable format and resolve translation keys
-    const serializableTools = filteredEndpoints.map(
+    const serializableTools = canonicalEndpoints.map(
       (endpoint: DiscoveredEndpoint) => {
         const definition = endpoint.definition;
+
+        // Extract method from endpoint ID (format: "get_v1_path_to_endpoint")
+        const methodMatch = endpoint.id.match(/^([a-z]+)_v1_/);
+        const method = methodMatch ? methodMatch[1].toUpperCase() : "GET";
 
         // Resolve translation keys to actual text
         const descriptionKey = definition.description || definition.title;
@@ -120,6 +156,7 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
 
         return {
           name: endpoint.toolName,
+          method,
           description: description || "",
           category: category || undefined,
           tags: translatedTags,
@@ -127,6 +164,9 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
           allowedRoles: endpoint.definition.allowedRoles
             ? [...endpoint.definition.allowedRoles]
             : [],
+          aliases: endpoint.definition.aliases
+            ? [...endpoint.definition.aliases]
+            : undefined,
           // Omit parameters as Zod schemas cannot be JSON serialized
         };
       },
@@ -135,6 +175,17 @@ export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
     const result = {
       tools: serializableTools,
     };
+
+    // Log a few sample tools to verify structure
+    logger.info("[AI Tools Repository] Sample tools", {
+      count: serializableTools.length,
+      samples: serializableTools.slice(0, 3).map((t) => ({
+        name: t.name,
+        method: t.method,
+        endpointId: t.endpointId,
+        aliases: t.aliases,
+      })),
+    });
 
     this.logResult(
       logger,

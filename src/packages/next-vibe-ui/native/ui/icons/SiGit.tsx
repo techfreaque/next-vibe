@@ -2,4 +2,4 @@
 import { GitBranch as SiGitIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiGit = styled(SiGitIcon);
+export const SiGit = styled(SiGitIcon, { className: "style" });

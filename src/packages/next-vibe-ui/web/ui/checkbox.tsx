@@ -25,7 +25,11 @@ export interface CheckboxIndicatorProps {
   children?: React.ReactNode;
 }
 
-export function Checkbox({ className, children, ...props }: CheckboxRootProps): React.JSX.Element {
+export function Checkbox({
+  className,
+  children,
+  ...props
+}: CheckboxRootProps): React.JSX.Element {
   return (
     <CheckboxPrimitive.Root
       className={cn(
@@ -36,7 +40,9 @@ export function Checkbox({ className, children, ...props }: CheckboxRootProps): 
     >
       {children ?? (
         <CheckboxPrimitive.Indicator
-          className={cn("flex flex-row items-center justify-center text-current")}
+          className={cn(
+            "flex flex-row items-center justify-center text-current",
+          )}
         >
           <CheckIcon className="h-3.5 w-3.5" />
         </CheckboxPrimitive.Indicator>
@@ -46,10 +52,17 @@ export function Checkbox({ className, children, ...props }: CheckboxRootProps): 
 }
 Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
-export function CheckboxIndicator({ className, children, ...props }: CheckboxIndicatorProps): React.JSX.Element {
+export function CheckboxIndicator({
+  className,
+  children,
+  ...props
+}: CheckboxIndicatorProps): React.JSX.Element {
   return (
     <CheckboxPrimitive.Indicator
-      className={cn("flex flex-row items-center justify-center text-current", className)}
+      className={cn(
+        "flex flex-row items-center justify-center text-current",
+        className,
+      )}
       {...props}
     >
       {children ?? <CheckIcon className="h-3.5 w-3.5" />}

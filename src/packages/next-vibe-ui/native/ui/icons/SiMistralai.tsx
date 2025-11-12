@@ -2,4 +2,4 @@
 import { Bot as SiMistralaiIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiMistralai = styled(SiMistralaiIcon);
+export const SiMistralai = styled(SiMistralaiIcon, { className: "style" });

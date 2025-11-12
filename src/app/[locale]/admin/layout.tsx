@@ -3,6 +3,7 @@
  * Layout for admin pages with navigation
  */
 
+import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type React from "react";
 import type { ReactNode } from "react";
 
@@ -25,8 +26,10 @@ export default async function AdminLayout({
   const user = await requireAdminUser(locale, `/${locale}/admin`);
 
   return (
-    <AdminLayoutClient locale={locale} user={user}>
-      {children}
-    </AdminLayoutClient>
+    <PageLayout scrollable={true}>
+      <AdminLayoutClient locale={locale} user={user}>
+        {children}
+      </AdminLayoutClient>
+    </PageLayout>
   );
 }

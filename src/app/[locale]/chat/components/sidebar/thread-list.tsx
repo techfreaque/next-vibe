@@ -13,6 +13,7 @@ import { AlertDialogTitle } from "next-vibe-ui/ui/alert-dialog";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { DropdownMenu } from "next-vibe-ui/ui/dropdown-menu";
+import { Input } from "next-vibe-ui/ui/input";
 import { DropdownMenuContent } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuItem } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuSeparator } from "next-vibe-ui/ui/dropdown-menu";
@@ -37,6 +38,9 @@ import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import type { JSX } from "react";
 import React, { useState } from "react";
+
+import type { DivMouseEvent } from "@/packages/next-vibe-ui/web/ui/div";
+import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks/hooks";
 import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
@@ -184,7 +188,7 @@ function ThreadItem({
     setIsEditing(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent): void => {
+  const handleKeyDown = (e: InputKeyboardEvent): void => {
     if (e.key === "Enter") {
       handleSaveEdit();
     } else if (e.key === "Escape") {
@@ -213,14 +217,13 @@ function ThreadItem({
   const currentFolderId = thread.folderId;
 
   // Handle thread click to navigate
-  const handleThreadClick = (e: React.MouseEvent<HTMLDivElement>): void => {
+  const handleThreadClick = (e: DivMouseEvent): void => {
     // Don't navigate if editing or clicking on buttons
     if (isEditing) {
       return;
     }
 
-    const target = e.target as HTMLElement;
-    if (target.closest("button") || target.closest("input")) {
+    if (e.target.closest("button") || e.target.closest("input")) {
       return;
     }
 
@@ -257,7 +260,7 @@ function ThreadItem({
     >
       {isEditing ? (
         <Div className="flex-1 min-w-0">
-          <input
+          <Input
             type="text"
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}

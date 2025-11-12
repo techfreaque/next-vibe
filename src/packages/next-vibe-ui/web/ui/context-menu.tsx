@@ -101,12 +101,21 @@ export interface ContextMenuShortcutProps {
   children?: React.ReactNode;
 }
 
-export function ContextMenu({ children, ...props }: ContextMenuRootProps): React.JSX.Element {
-  return <ContextMenuPrimitive.Root {...props}>{children}</ContextMenuPrimitive.Root>;
+export function ContextMenu({
+  children,
+  ...props
+}: ContextMenuRootProps): React.JSX.Element {
+  return (
+    <ContextMenuPrimitive.Root {...props}>{children}</ContextMenuPrimitive.Root>
+  );
 }
 ContextMenu.displayName = ContextMenuPrimitive.Root.displayName;
 
-export function ContextMenuTrigger({ children, asChild, ...props }: ContextMenuTriggerProps): React.JSX.Element {
+export function ContextMenuTrigger({
+  children,
+  asChild,
+  ...props
+}: ContextMenuTriggerProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -115,12 +124,18 @@ export function ContextMenuTrigger({ children, asChild, ...props }: ContextMenuT
 }
 ContextMenuTrigger.displayName = ContextMenuPrimitive.Trigger.displayName;
 
-export function ContextMenuGroup({ children }: ContextMenuGroupProps): React.JSX.Element {
+export function ContextMenuGroup({
+  children,
+}: ContextMenuGroupProps): React.JSX.Element {
   return <ContextMenuPrimitive.Group>{children}</ContextMenuPrimitive.Group>;
 }
 ContextMenuGroup.displayName = ContextMenuPrimitive.Group.displayName;
 
-export function ContextMenuPortal({ children, forceMount, container }: ContextMenuPortalProps): React.JSX.Element {
+export function ContextMenuPortal({
+  children,
+  forceMount,
+  container,
+}: ContextMenuPortalProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.Portal forceMount={forceMount} container={container}>
       {children}
@@ -129,17 +144,34 @@ export function ContextMenuPortal({ children, forceMount, container }: ContextMe
 }
 ContextMenuPortal.displayName = ContextMenuPrimitive.Portal.displayName;
 
-export function ContextMenuSub({ children, ...props }: ContextMenuSubProps): React.JSX.Element {
-  return <ContextMenuPrimitive.Sub {...props}>{children}</ContextMenuPrimitive.Sub>;
+export function ContextMenuSub({
+  children,
+  ...props
+}: ContextMenuSubProps): React.JSX.Element {
+  return (
+    <ContextMenuPrimitive.Sub {...props}>{children}</ContextMenuPrimitive.Sub>
+  );
 }
 ContextMenuSub.displayName = ContextMenuPrimitive.Sub.displayName;
 
-export function ContextMenuRadioGroup({ children, ...props }: ContextMenuRadioGroupProps): React.JSX.Element {
-  return <ContextMenuPrimitive.RadioGroup {...props}>{children}</ContextMenuPrimitive.RadioGroup>;
+export function ContextMenuRadioGroup({
+  children,
+  ...props
+}: ContextMenuRadioGroupProps): React.JSX.Element {
+  return (
+    <ContextMenuPrimitive.RadioGroup {...props}>
+      {children}
+    </ContextMenuPrimitive.RadioGroup>
+  );
 }
 ContextMenuRadioGroup.displayName = ContextMenuPrimitive.RadioGroup.displayName;
 
-export function ContextMenuSubTrigger({ className, inset, children, ...props }: ContextMenuSubTriggerProps): React.JSX.Element {
+export function ContextMenuSubTrigger({
+  className,
+  inset,
+  children,
+  ...props
+}: ContextMenuSubTriggerProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.SubTrigger
       className={cn(
@@ -156,7 +188,10 @@ export function ContextMenuSubTrigger({ className, inset, children, ...props }: 
 }
 ContextMenuSubTrigger.displayName = ContextMenuPrimitive.SubTrigger.displayName;
 
-export function ContextMenuSubContent({ className, ...props }: ContextMenuSubContentProps): React.JSX.Element {
+export function ContextMenuSubContent({
+  className,
+  ...props
+}: ContextMenuSubContentProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.SubContent
       className={cn(
@@ -169,7 +204,10 @@ export function ContextMenuSubContent({ className, ...props }: ContextMenuSubCon
 }
 ContextMenuSubContent.displayName = ContextMenuPrimitive.SubContent.displayName;
 
-export function ContextMenuContent({ className, ...props }: ContextMenuContentProps): React.JSX.Element {
+export function ContextMenuContent({
+  className,
+  ...props
+}: ContextMenuContentProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.Portal>
       <ContextMenuPrimitive.Content
@@ -185,7 +223,12 @@ export function ContextMenuContent({ className, ...props }: ContextMenuContentPr
 }
 ContextMenuContent.displayName = ContextMenuPrimitive.Content.displayName;
 
-export function ContextMenuItem({ className, inset, children, ...props }: ContextMenuItemProps): React.JSX.Element {
+export function ContextMenuItem({
+  className,
+  inset,
+  children,
+  ...props
+}: ContextMenuItemProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.Item
       className={cn(
@@ -201,7 +244,13 @@ export function ContextMenuItem({ className, inset, children, ...props }: Contex
 }
 ContextMenuItem.displayName = ContextMenuPrimitive.Item.displayName;
 
-export function ContextMenuCheckboxItem({ className, children, checked, onCheckedChange, ...props }: ContextMenuCheckboxItemProps): React.JSX.Element {
+export function ContextMenuCheckboxItem({
+  className,
+  children,
+  checked,
+  onCheckedChange,
+  ...props
+}: ContextMenuCheckboxItemProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.CheckboxItem
       className={cn(
@@ -224,7 +273,12 @@ export function ContextMenuCheckboxItem({ className, children, checked, onChecke
 ContextMenuCheckboxItem.displayName =
   ContextMenuPrimitive.CheckboxItem.displayName;
 
-export function ContextMenuRadioItem({ className, children, value, ...props }: ContextMenuRadioItemProps): React.JSX.Element {
+export function ContextMenuRadioItem({
+  className,
+  children,
+  value,
+  ...props
+}: ContextMenuRadioItemProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.RadioItem
       className={cn(
@@ -245,7 +299,12 @@ export function ContextMenuRadioItem({ className, children, value, ...props }: C
 }
 ContextMenuRadioItem.displayName = ContextMenuPrimitive.RadioItem.displayName;
 
-export function ContextMenuLabel({ className, inset, children, ...props }: ContextMenuLabelProps): React.JSX.Element {
+export function ContextMenuLabel({
+  className,
+  inset,
+  children,
+  ...props
+}: ContextMenuLabelProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.Label
       className={cn(
@@ -261,7 +320,10 @@ export function ContextMenuLabel({ className, inset, children, ...props }: Conte
 }
 ContextMenuLabel.displayName = ContextMenuPrimitive.Label.displayName;
 
-export function ContextMenuSeparator({ className, ...props }: ContextMenuSeparatorProps): React.JSX.Element {
+export function ContextMenuSeparator({
+  className,
+  ...props
+}: ContextMenuSeparatorProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.Separator
       className={cn("-mx-1 my-1 h-px bg-muted", className)}
@@ -271,7 +333,11 @@ export function ContextMenuSeparator({ className, ...props }: ContextMenuSeparat
 }
 ContextMenuSeparator.displayName = ContextMenuPrimitive.Separator.displayName;
 
-export function ContextMenuShortcut({ className, children, ...props }: ContextMenuShortcutProps): React.JSX.Element {
+export function ContextMenuShortcut({
+  className,
+  children,
+  ...props
+}: ContextMenuShortcutProps): React.JSX.Element {
   return (
     <span
       className={cn("ml-auto text-xs tracking-widest opacity-60", className)}

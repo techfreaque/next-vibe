@@ -1,4 +1,5 @@
 import { Div } from "next-vibe-ui/ui/div";
+import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type { JSX, ReactNode } from "react";
 
 export default function SignupLayout({
@@ -6,5 +7,9 @@ export default function SignupLayout({
 }: {
   children: ReactNode;
 }): JSX.Element {
-  return <Div className="container max-w-xl mx-auto py-8 px-4">{children}</Div>;
+  return (
+    <PageLayout scrollable={true}>
+      <Div className="container max-w-xl mx-auto py-8 px-4">{children}</Div>
+    </PageLayout>
+  );
 }

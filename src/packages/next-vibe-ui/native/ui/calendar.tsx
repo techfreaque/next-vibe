@@ -18,7 +18,7 @@ export type CalendarProps = CalendarBaseProps &
   };
 
 // Type-safe View with className support (NativeWind)
-const StyledView = styled(View);
+const StyledView = styled(View, { className: "style" });
 
 // Type-safe Text with className support (NativeWind)
 // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax

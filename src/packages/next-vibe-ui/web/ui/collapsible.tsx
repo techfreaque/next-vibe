@@ -24,25 +24,39 @@ export interface CollapsibleContentProps {
   className?: string;
 }
 
-export function Collapsible({ children, ...props }: CollapsibleRootProps): React.JSX.Element {
-  return <CollapsiblePrimitive.Root {...props}>{children}</CollapsiblePrimitive.Root>;
+export function Collapsible({
+  children,
+  ...props
+}: CollapsibleRootProps): React.JSX.Element {
+  return (
+    <CollapsiblePrimitive.Root {...props}>{children}</CollapsiblePrimitive.Root>
+  );
 }
 Collapsible.displayName = CollapsiblePrimitive.Root.displayName;
 
-export function CollapsibleTrigger({ children, asChild, ...props }: CollapsibleTriggerProps): React.JSX.Element {
+export function CollapsibleTrigger({
+  children,
+  asChild,
+  ...props
+}: CollapsibleTriggerProps): React.JSX.Element {
   return (
     <CollapsiblePrimitive.CollapsibleTrigger asChild={asChild} {...props}>
       {children}
     </CollapsiblePrimitive.CollapsibleTrigger>
   );
 }
-CollapsibleTrigger.displayName = CollapsiblePrimitive.CollapsibleTrigger.displayName;
+CollapsibleTrigger.displayName =
+  CollapsiblePrimitive.CollapsibleTrigger.displayName;
 
-export function CollapsibleContent({ children, ...props }: CollapsibleContentProps): React.JSX.Element {
+export function CollapsibleContent({
+  children,
+  ...props
+}: CollapsibleContentProps): React.JSX.Element {
   return (
     <CollapsiblePrimitive.CollapsibleContent {...props}>
       {children}
     </CollapsiblePrimitive.CollapsibleContent>
   );
 }
-CollapsibleContent.displayName = CollapsiblePrimitive.CollapsibleContent.displayName;
+CollapsibleContent.displayName =
+  CollapsiblePrimitive.CollapsibleContent.displayName;

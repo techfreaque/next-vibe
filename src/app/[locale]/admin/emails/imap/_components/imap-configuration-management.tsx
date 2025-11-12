@@ -5,11 +5,12 @@
 
 "use client";
 
-import { Form } from "next-vibe-ui/ui/form/form";
-import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { JSX } from "react";
 
@@ -51,9 +52,9 @@ export function ImapConfigurationManagement({
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">
+          <Div className="text-center">
             {t("app.admin.emails.imap.common.loading")}
-          </div>
+          </Div>
         </CardContent>
       </Card>
     );
@@ -63,23 +64,23 @@ export function ImapConfigurationManagement({
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center text-red-600">
+          <Div className="text-center text-red-600">
             {t("app.admin.emails.imap.admin.health.error.title")}
-          </div>
+          </Div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <Div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <Div className="flex items-center justify-between">
             <CardTitle>
               {t("app.admin.emails.imap.admin.config.settings.title")}
             </CardTitle>
-            <div className="flex flex-row gap-2">
+            <Div className="flex flex-row gap-2">
               <Button variant="outline" onClick={configEndpoint.read.refetch}>
                 {t("app.admin.emails.imap.common.refresh")}
               </Button>
@@ -89,8 +90,8 @@ export function ImapConfigurationManagement({
               >
                 {t("app.admin.emails.imap.common.reset")}
               </Button>
-            </div>
-          </div>
+            </Div>
+          </Div>
         </CardHeader>
         <CardContent>
           <Form
@@ -154,7 +155,7 @@ export function ImapConfigurationManagement({
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-col gap-4">
+                    <Div className="flex flex-col gap-4">
                       <EndpointFormField
                         name="maxRetries"
                         config={{
@@ -182,7 +183,7 @@ export function ImapConfigurationManagement({
                         }}
                         control={configEndpoint.create.form.control}
                       />
-                    </div>
+                    </Div>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -195,7 +196,7 @@ export function ImapConfigurationManagement({
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-col gap-4">
+                    <Div className="flex flex-col gap-4">
                       <EndpointFormField
                         name="healthCheckInterval"
                         config={{
@@ -242,7 +243,7 @@ export function ImapConfigurationManagement({
                         }}
                         control={configEndpoint.create.form.control}
                       />
-                    </div>
+                    </Div>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -257,7 +258,7 @@ export function ImapConfigurationManagement({
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-col gap-4">
+                    <Div className="flex flex-col gap-4">
                       <EndpointFormField
                         name="debugMode"
                         config={{
@@ -276,14 +277,14 @@ export function ImapConfigurationManagement({
                         }}
                         control={configEndpoint.create.form.control}
                       />
-                    </div>
+                    </Div>
                   </CardContent>
                 </Card>
               </TabsContent>
             </Tabs>
 
             {/* Form Actions */}
-            <div className="flex justify-end flex flex-row gap-4 pt-6 border-t">
+            <Div className="flex justify-end flex flex-row gap-4 pt-6 border-t">
               <Button
                 type="button"
                 variant="outline"
@@ -299,7 +300,7 @@ export function ImapConfigurationManagement({
                   ? t("app.admin.emails.imap.common.saving")
                   : t("app.admin.emails.imap.common.save")}
               </Button>
-            </div>
+            </Div>
           </Form>
         </CardContent>
       </Card>
@@ -313,40 +314,40 @@ export function ImapConfigurationManagement({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
+          <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Div className="text-center">
+              <Div className="text-2xl font-bold text-green-600">
                 {configData
                   ? t("app.admin.emails.imap.common.active")
                   : t("app.admin.emails.imap.common.inactive")}
-              </div>
-              <div className="text-sm text-gray-600">
+              </Div>
+              <Div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.common.status")}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">
+              </Div>
+            </Div>
+            <Div className="text-center">
+              <Div className="text-2xl font-bold">
                 {configData
                   ? t("app.admin.emails.imap.common.justNow")
                   : t("app.admin.emails.imap.common.never")}
-              </div>
-              <div className="text-sm text-gray-600">
+              </Div>
+              <Div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.common.updated")}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
+              </Div>
+            </Div>
+            <Div className="text-center">
+              <Div className="text-2xl font-bold text-blue-600">
                 {configData
                   ? t("app.admin.emails.imap.common.valid")
                   : t("app.admin.emails.imap.common.invalid")}
-              </div>
-              <div className="text-sm text-gray-600">
+              </Div>
+              <Div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.common.configuration")}
-              </div>
-            </div>
-          </div>
+              </Div>
+            </Div>
+          </Div>
         </CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }

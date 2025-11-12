@@ -10,8 +10,13 @@ export const { GET, tools } = endpointsHandler({
   endpoint: toolsDefinition,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, user, logger, locale }) => {
-      const toolsData = aiToolsRepository.getTools(data, user, logger, locale);
+    handler: async ({ data, user, logger, locale }) => {
+      const toolsData = await aiToolsRepository.getTools(
+        data,
+        user,
+        logger,
+        locale,
+      );
       return success(toolsData);
     },
   },

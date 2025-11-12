@@ -19,8 +19,8 @@ import type {
 import { cn } from "../lib/utils";
 import { styled } from "nativewind";
 
-const StyledView = styled(View);
-const StyledPressable = styled(Pressable);
+const StyledView = styled(View, { className: "style" });
+const StyledPressable = styled(Pressable, { className: "style" });
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 

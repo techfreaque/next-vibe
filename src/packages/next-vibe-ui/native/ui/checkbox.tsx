@@ -14,10 +14,16 @@ import type {
 // Re-export all types
 export type { CheckboxRootProps, CheckboxIndicatorProps };
 
-const StyledCheckboxRoot = styled(CheckboxPrimitive.Root);
-const StyledCheckboxIndicator = styled(CheckboxPrimitive.Indicator);
+const StyledCheckboxRoot = styled(CheckboxPrimitive.Root, { className: "style" });
+const StyledCheckboxIndicator = styled(CheckboxPrimitive.Indicator, { className: "style" });
 
-export function Checkbox({ className, checked, onCheckedChange, disabled, children }: CheckboxRootProps): React.JSX.Element {
+export function Checkbox({
+  className,
+  checked,
+  onCheckedChange,
+  disabled,
+  children,
+}: CheckboxRootProps): React.JSX.Element {
   return (
     <StyledCheckboxRoot
       checked={checked ?? false}
@@ -31,7 +37,9 @@ export function Checkbox({ className, checked, onCheckedChange, disabled, childr
     >
       {children ?? (
         <StyledCheckboxIndicator
-          className={cn("flex flex-row items-center justify-center text-current")}
+          className={cn(
+            "flex flex-row items-center justify-center text-current",
+          )}
         >
           <Check size={14} className="text-primary-foreground" />
         </StyledCheckboxIndicator>
@@ -41,10 +49,16 @@ export function Checkbox({ className, checked, onCheckedChange, disabled, childr
 }
 Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
-export function CheckboxIndicator({ className, children }: CheckboxIndicatorProps): React.JSX.Element {
+export function CheckboxIndicator({
+  className,
+  children,
+}: CheckboxIndicatorProps): React.JSX.Element {
   return (
     <StyledCheckboxIndicator
-      className={cn("flex flex-row items-center justify-center text-current", className)}
+      className={cn(
+        "flex flex-row items-center justify-center text-current",
+        className,
+      )}
     >
       {children ?? <Check size={14} className="text-primary-foreground" />}
     </StyledCheckboxIndicator>

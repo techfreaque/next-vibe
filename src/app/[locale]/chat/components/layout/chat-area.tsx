@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
+import { type DivRefObject, Div } from "next-vibe-ui/ui/div";
 import { KeyboardAvoidingView } from "next-vibe-ui/ui/keyboard-avoiding-view";
 import { Camera } from "next-vibe-ui/ui/icons/Camera";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
@@ -15,6 +15,11 @@ import React, {
   useState,
 } from "react";
 
+import type {
+  TextareaRefObject,
+  TextareaKeyboardEvent,
+} from "@/packages/next-vibe-ui/web/ui/textarea";
+
 import { useAIStreamStore } from "@/app/api/[locale]/v1/core/agent/ai-stream/hooks/store";
 import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -26,7 +31,7 @@ import type { ChatContextValue } from "../../features/chat/context";
 import { DOM_IDS, LAYOUT } from "../../lib/config/constants";
 import type { ChatMessage, ChatThread, ModelId, ViewMode } from "../../types";
 import { AIToolsModal } from "../ai-tools-modal";
-import { ChatInputV2 } from "../input/chat-input-v2";
+import { ChatInputV2 } from "../input/chat-input";
 import { ChatMessages } from "../messages/chat-messages";
 import { SuggestedPrompts } from "../messages/suggested-prompts";
 import { ViewModeToggle } from "../messages/view-mode-toggle";
@@ -43,10 +48,10 @@ interface ChatAreaProps {
   ttsAutoplay: boolean;
   input: string;
   isLoading: boolean;
-  inputRef: React.RefObject<HTMLTextAreaElement | null>;
+  inputRef: React.RefObject<TextareaRefObject | null>;
   onInputChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
-  onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  onKeyDown: (e: TextareaKeyboardEvent) => void;
   onStop: () => void;
   onDeleteMessage: (messageId: string) => void;
   onSwitchBranch: (messageId: string, branchIndex: number) => void;
@@ -102,7 +107,7 @@ export function ChatArea({
   currentUserId,
 }: ChatAreaProps): JSX.Element {
   const { t } = simpleT(locale);
-  const inputContainerRef = useRef<HTMLDivElement>(null);
+  const inputContainerRef = useRef<DivRefObject>(null);
   const [inputHeight, setInputHeight] = useState<number>(
     LAYOUT.DEFAULT_INPUT_HEIGHT,
   );
@@ -144,6 +149,7 @@ export function ChatArea({
   // Measure input height dynamically
   useEffect(() => {
     if (envClient.platform.isReactNative) {
+      // TODO: Handle dynamic input height on native
       return;
     }
     if (!inputContainerRef.current) {
@@ -304,7 +310,7 @@ export function ChatArea({
         )}
 
         {/* Messages Area - Full height, scrollable inside */}
-        <Div className="flex-1 overflow-hidden min-h-0">
+        <Div className="flex-1 max-w-screen overflow-hidden min-h-0">
           {thread ? (
             <ChatMessages
               thread={thread}
@@ -396,7 +402,7 @@ export function ChatArea({
               }
             >
               <ChatInputV2
-                ref={inputRef}
+                inputRef={inputRef}
                 value={input}
                 onChange={onInputChange}
                 onSubmit={onSubmit}

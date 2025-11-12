@@ -2,9 +2,9 @@ import * as SelectPrimitive from "@rn-primitives/select";
 import * as React from "react";
 import type { JSX } from "react";
 import { StyleSheet, View } from "react-native";
-import { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { styled } from "nativewind";
 
-import { StyledAnimatedView } from "../lib/styled";
 import type { WithClassName } from "../lib/types";
 import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
@@ -23,6 +23,8 @@ import type {
   SelectSeparatorProps,
 } from "@/packages/next-vibe-ui/web/ui/select";
 
+// Styled components for NativeWind support
+const StyledAnimatedView = styled(Animated.View, { className: "style" });
 
 type Option = SelectPrimitive.Option;
 

@@ -126,7 +126,7 @@ export function AdminLayoutClient({
               <X className="h-6 w-6" />
             </Button>
           </Div>
-          <nav className="flex-1 flex flex-col gap-1 px-2 py-4">
+          <Div className="flex-1 flex flex-col gap-1 px-2 py-4">
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -150,7 +150,7 @@ export function AdminLayoutClient({
                 {item.name}
               </Link>
             ))}
-          </nav>
+          </Div>
         </Div>
       </Div>
 
@@ -163,7 +163,7 @@ export function AdminLayoutClient({
               {t("app.admin.components.navigation.adminPanel")}
             </Span>
           </Div>
-          <nav className="flex-1 flex flex-col gap-1 px-2 py-4">
+          <Div className="flex-1 flex flex-col gap-1 px-2 py-4">
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -186,7 +186,7 @@ export function AdminLayoutClient({
                 {item.name}
               </Link>
             ))}
-          </nav>
+          </Div>
 
           {/* User info */}
           <Div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 p-4">

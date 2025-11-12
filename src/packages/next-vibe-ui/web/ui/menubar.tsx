@@ -115,7 +115,11 @@ export interface MenubarShortcutProps {
   children?: React.ReactNode;
 }
 
-export function Menubar({ className, children, ...props }: MenubarRootProps): React.JSX.Element {
+export function Menubar({
+  className,
+  children,
+  ...props
+}: MenubarRootProps): React.JSX.Element {
   return (
     <MenubarPrimitive.Root
       className={cn(
@@ -130,12 +134,19 @@ export function Menubar({ className, children, ...props }: MenubarRootProps): Re
 }
 Menubar.displayName = MenubarPrimitive.Root.displayName;
 
-export function MenubarMenu({ children, ...props }: MenubarMenuProps): React.JSX.Element {
+export function MenubarMenu({
+  children,
+  ...props
+}: MenubarMenuProps): React.JSX.Element {
   return <MenubarPrimitive.Menu {...props}>{children}</MenubarPrimitive.Menu>;
 }
 MenubarMenu.displayName = MenubarPrimitive.Menu.displayName;
 
-export function MenubarTrigger({ className, children, ...props }: MenubarTriggerProps): React.JSX.Element {
+export function MenubarTrigger({
+  className,
+  children,
+  ...props
+}: MenubarTriggerProps): React.JSX.Element {
   return (
     <MenubarPrimitive.Trigger
       className={cn(
@@ -150,12 +161,18 @@ export function MenubarTrigger({ className, children, ...props }: MenubarTrigger
 }
 MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName;
 
-export function MenubarGroup({ children }: MenubarGroupProps): React.JSX.Element {
+export function MenubarGroup({
+  children,
+}: MenubarGroupProps): React.JSX.Element {
   return <MenubarPrimitive.Group>{children}</MenubarPrimitive.Group>;
 }
 MenubarGroup.displayName = MenubarPrimitive.Group.displayName;
 
-export function MenubarPortal({ children, forceMount, container }: MenubarPortalProps): React.JSX.Element {
+export function MenubarPortal({
+  children,
+  forceMount,
+  container,
+}: MenubarPortalProps): React.JSX.Element {
   return (
     <MenubarPrimitive.Portal forceMount={forceMount} container={container}>
       {children}
@@ -164,17 +181,32 @@ export function MenubarPortal({ children, forceMount, container }: MenubarPortal
 }
 MenubarPortal.displayName = MenubarPrimitive.Portal.displayName;
 
-export function MenubarSub({ children, ...props }: MenubarSubProps): React.JSX.Element {
+export function MenubarSub({
+  children,
+  ...props
+}: MenubarSubProps): React.JSX.Element {
   return <MenubarPrimitive.Sub {...props}>{children}</MenubarPrimitive.Sub>;
 }
 MenubarSub.displayName = MenubarPrimitive.Sub.displayName;
 
-export function MenubarRadioGroup({ children, ...props }: MenubarRadioGroupProps): React.JSX.Element {
-  return <MenubarPrimitive.RadioGroup {...props}>{children}</MenubarPrimitive.RadioGroup>;
+export function MenubarRadioGroup({
+  children,
+  ...props
+}: MenubarRadioGroupProps): React.JSX.Element {
+  return (
+    <MenubarPrimitive.RadioGroup {...props}>
+      {children}
+    </MenubarPrimitive.RadioGroup>
+  );
 }
 MenubarRadioGroup.displayName = MenubarPrimitive.RadioGroup.displayName;
 
-export function MenubarSubTrigger({ className, inset, children, ...props }: MenubarSubTriggerProps): React.JSX.Element {
+export function MenubarSubTrigger({
+  className,
+  inset,
+  children,
+  ...props
+}: MenubarSubTriggerProps): React.JSX.Element {
   return (
     <MenubarPrimitive.SubTrigger
       className={cn(
@@ -191,7 +223,10 @@ export function MenubarSubTrigger({ className, inset, children, ...props }: Menu
 }
 MenubarSubTrigger.displayName = MenubarPrimitive.SubTrigger.displayName;
 
-export function MenubarSubContent({ className, ...props }: MenubarSubContentProps): React.JSX.Element {
+export function MenubarSubContent({
+  className,
+  ...props
+}: MenubarSubContentProps): React.JSX.Element {
   return (
     <MenubarPrimitive.SubContent
       className={cn(
@@ -204,7 +239,13 @@ export function MenubarSubContent({ className, ...props }: MenubarSubContentProp
 }
 MenubarSubContent.displayName = MenubarPrimitive.SubContent.displayName;
 
-export function MenubarContent({ className, align = "start", alignOffset = -4, sideOffset = 8, ...props }: MenubarContentProps): React.JSX.Element {
+export function MenubarContent({
+  className,
+  align = "start",
+  alignOffset = -4,
+  sideOffset = 8,
+  ...props
+}: MenubarContentProps): React.JSX.Element {
   return (
     <MenubarPrimitive.Portal>
       <MenubarPrimitive.Content
@@ -222,7 +263,12 @@ export function MenubarContent({ className, align = "start", alignOffset = -4, s
 }
 MenubarContent.displayName = MenubarPrimitive.Content.displayName;
 
-export function MenubarItem({ className, inset, children, ...props }: MenubarItemProps): React.JSX.Element {
+export function MenubarItem({
+  className,
+  inset,
+  children,
+  ...props
+}: MenubarItemProps): React.JSX.Element {
   return (
     <MenubarPrimitive.Item
       className={cn(
@@ -238,7 +284,13 @@ export function MenubarItem({ className, inset, children, ...props }: MenubarIte
 }
 MenubarItem.displayName = MenubarPrimitive.Item.displayName;
 
-export function MenubarCheckboxItem({ className, children, checked, onCheckedChange, ...props }: MenubarCheckboxItemProps): React.JSX.Element {
+export function MenubarCheckboxItem({
+  className,
+  children,
+  checked,
+  onCheckedChange,
+  ...props
+}: MenubarCheckboxItemProps): React.JSX.Element {
   return (
     <MenubarPrimitive.CheckboxItem
       className={cn(
@@ -260,7 +312,12 @@ export function MenubarCheckboxItem({ className, children, checked, onCheckedCha
 }
 MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName;
 
-export function MenubarRadioItem({ className, children, value, ...props }: MenubarRadioItemProps): React.JSX.Element {
+export function MenubarRadioItem({
+  className,
+  children,
+  value,
+  ...props
+}: MenubarRadioItemProps): React.JSX.Element {
   return (
     <MenubarPrimitive.RadioItem
       className={cn(
@@ -281,7 +338,12 @@ export function MenubarRadioItem({ className, children, value, ...props }: Menub
 }
 MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName;
 
-export function MenubarLabel({ className, inset, children, ...props }: MenubarLabelProps): React.JSX.Element {
+export function MenubarLabel({
+  className,
+  inset,
+  children,
+  ...props
+}: MenubarLabelProps): React.JSX.Element {
   return (
     <MenubarPrimitive.Label
       className={cn(
@@ -297,7 +359,10 @@ export function MenubarLabel({ className, inset, children, ...props }: MenubarLa
 }
 MenubarLabel.displayName = MenubarPrimitive.Label.displayName;
 
-export function MenubarSeparator({ className, ...props }: MenubarSeparatorProps): React.JSX.Element {
+export function MenubarSeparator({
+  className,
+  ...props
+}: MenubarSeparatorProps): React.JSX.Element {
   return (
     <MenubarPrimitive.Separator
       className={cn("-mx-1 my-1 h-px bg-muted", className)}
@@ -307,7 +372,11 @@ export function MenubarSeparator({ className, ...props }: MenubarSeparatorProps)
 }
 MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName;
 
-export function MenubarShortcut({ className, children, ...props }: MenubarShortcutProps): React.JSX.Element {
+export function MenubarShortcut({
+  className,
+  children,
+  ...props
+}: MenubarShortcutProps): React.JSX.Element {
   return (
     <span
       className={cn(

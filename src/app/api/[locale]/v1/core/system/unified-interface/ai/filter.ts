@@ -12,6 +12,8 @@ import {
   UserRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { userRolesRepository } from "@/app/api/[locale]/v1/core/user/user-roles/repository";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 
 import {
   AI_CONFIG,
@@ -31,7 +33,8 @@ import type {
  */
 export class ToolFilter implements IToolFilter {
   /**
-   * Filter endpoints by user permissions
+   * Filter endpoints by user permissions (synchronous - uses fallback role assumptions)
+   * For proper role checking, use filterEndpointsByPermissionsAsync
    */
   filterEndpointsByPermissions(
     endpoints: DiscoveredEndpoint[],
@@ -41,6 +44,98 @@ export class ToolFilter implements IToolFilter {
     return endpoints.filter((endpoint) =>
       this.hasEndpointPermission(endpoint, user, platform),
     );
+  }
+
+  /**
+   * Filter endpoints by user permissions (async - fetches actual user roles from database)
+   * This is the preferred method for accurate permission checking
+   */
+  async filterEndpointsByPermissionsAsync(
+    endpoints: DiscoveredEndpoint[],
+    user: AIToolExecutionContext["user"],
+    platform: Platform = Platform.AI,
+    logger: EndpointLogger,
+  ): Promise<DiscoveredEndpoint[]> {
+    // For public users, use synchronous check (no DB lookup needed)
+    if (user.isPublic) {
+      return this.filterEndpointsByPermissions(endpoints, user, platform);
+    }
+
+    // For authenticated users, fetch their actual roles from database
+    if (!user.id) {
+      logger.warn(
+        "Authenticated user has no ID, falling back to synchronous check",
+      );
+      return this.filterEndpointsByPermissions(endpoints, user, platform);
+    }
+
+    // Fetch user roles from database
+    const userRolesResult = await userRolesRepository.getUserRoles(
+      user.id,
+      logger,
+    );
+    if (!userRolesResult.success || !userRolesResult.data) {
+      logger.warn(
+        "Failed to fetch user roles, falling back to synchronous check",
+        {
+          userId: user.id,
+          error: userRolesResult.success ? undefined : userRolesResult.message,
+        },
+      );
+      return this.filterEndpointsByPermissions(endpoints, user, platform);
+    }
+
+    const userRoles = userRolesResult.data;
+    logger.debug("Filtering endpoints with user roles", {
+      userId: user.id,
+      userRoles,
+      totalEndpoints: endpoints.length,
+    });
+
+    // Filter endpoints based on actual user roles
+    const filtered = endpoints.filter((endpoint) => {
+      // Check platform opt-out first
+      if (this.isEndpointOptedOutOfPlatform(endpoint, platform)) {
+        return false;
+      }
+
+      // Safety check: if allowedRoles is undefined or not an array, deny access
+      if (
+        !endpoint.definition?.allowedRoles ||
+        !Array.isArray(endpoint.definition.allowedRoles)
+      ) {
+        return false;
+      }
+
+      // Filter out opt-out roles from allowed roles for permission check
+      const effectiveAllowedRoles = endpoint.definition.allowedRoles.filter(
+        (role: typeof UserRoleValue) => !this.isOptOutRole(role),
+      );
+
+      // Check if endpoint is PUBLIC-only (authenticated users cannot access)
+      const isPublicOnly =
+        effectiveAllowedRoles.length === 1 &&
+        effectiveAllowedRoles[0] === UserRole.PUBLIC;
+
+      if (isPublicOnly) {
+        return false;
+      }
+
+      // Check if user has at least one of the required roles
+      const hasRequiredRole = effectiveAllowedRoles.some((role) =>
+        userRoles.includes(role),
+      );
+
+      return hasRequiredRole;
+    });
+
+    logger.debug("Filtered endpoints by user roles", {
+      userId: user.id,
+      totalEndpoints: endpoints.length,
+      filteredEndpoints: filtered.length,
+    });
+
+    return filtered;
   }
 
   /**
@@ -104,8 +199,12 @@ export class ToolFilter implements IToolFilter {
    *
    * Permission Logic:
    * - Public users (isPublic: true) → only endpoints with PUBLIC in allowedRoles
-   * - Authenticated users (isPublic: false) → all endpoints EXCEPT PUBLIC-only endpoints
-   *   (endpoints that ONLY have PUBLIC in allowedRoles are excluded for authenticated users)
+   * - Authenticated users (isPublic: false) → must have at least one of the required roles
+   *   (roles are fetched from database via userRolesRepository)
+   *
+   * NOTE: This method is synchronous and cannot fetch user roles from database.
+   * Use filterEndpointsByPermissionsAsync for proper role checking.
+   * This method assumes authenticated users have CUSTOMER role for backwards compatibility.
    */
   hasEndpointPermission(
     endpoint: DiscoveredEndpoint,
@@ -135,14 +234,20 @@ export class ToolFilter implements IToolFilter {
       return effectiveAllowedRoles.includes(UserRole.PUBLIC);
     }
 
-    // Authenticated user - has access to all non-PUBLIC-only endpoints
-    // If endpoint ONLY allows PUBLIC role, authenticated users cannot access it
-    // If endpoint allows PUBLIC + other roles, authenticated users CAN access it
+    // Authenticated user - for backwards compatibility, assume CUSTOMER role
+    // This is a fallback when user roles cannot be fetched (synchronous context)
+    // For proper role checking, use filterEndpointsByPermissionsAsync
     const isPublicOnly =
       effectiveAllowedRoles.length === 1 &&
       effectiveAllowedRoles[0] === UserRole.PUBLIC;
 
-    return !isPublicOnly;
+    // If endpoint is PUBLIC-only, authenticated users cannot access it
+    if (isPublicOnly) {
+      return false;
+    }
+
+    // Check if user has CUSTOMER role (backwards compatibility assumption)
+    return effectiveAllowedRoles.includes(UserRole.CUSTOMER);
   }
 
   /**

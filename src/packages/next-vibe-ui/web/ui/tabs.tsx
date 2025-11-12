@@ -41,7 +41,11 @@ export function Tabs({ children, ...props }: TabsRootProps): React.JSX.Element {
 }
 Tabs.displayName = TabsPrimitive.Root.displayName;
 
-export function TabsList({ className, children, ...props }: TabsListProps): React.JSX.Element {
+export function TabsList({
+  className,
+  children,
+  ...props
+}: TabsListProps): React.JSX.Element {
   return (
     <TabsPrimitive.List
       className={cn(
@@ -56,7 +60,11 @@ export function TabsList({ className, children, ...props }: TabsListProps): Reac
 }
 TabsList.displayName = TabsPrimitive.List.displayName;
 
-export function TabsTrigger({ className, children, ...props }: TabsTriggerProps): React.JSX.Element {
+export function TabsTrigger({
+  className,
+  children,
+  ...props
+}: TabsTriggerProps): React.JSX.Element {
   return (
     <TabsPrimitive.Trigger
       className={cn(
@@ -71,7 +79,11 @@ export function TabsTrigger({ className, children, ...props }: TabsTriggerProps)
 }
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
-export function TabsContent({ className, children, ...props }: TabsContentProps): React.JSX.Element {
+export function TabsContent({
+  className,
+  children,
+  ...props
+}: TabsContentProps): React.JSX.Element {
   return (
     <TabsPrimitive.Content
       className={cn(

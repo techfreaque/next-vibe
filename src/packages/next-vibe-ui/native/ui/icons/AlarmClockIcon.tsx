@@ -1,4 +1,4 @@
 import { AlarmClockIcon as AlarmClockIconIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const AlarmClockIcon = styled(AlarmClockIconIcon);
+export const AlarmClockIcon = styled(AlarmClockIconIcon, { className: "style" });

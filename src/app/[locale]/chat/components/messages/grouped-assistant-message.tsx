@@ -98,7 +98,7 @@ export function GroupedAssistantMessage({
 
   return (
     <Div className="flex items-start gap-3">
-      <Div className="flex-1 group/message">
+      <Div className="flex-1 group/message max-w-full">
         {/* Author info - shown once for the entire sequence */}
         {showAuthor && (
           <Div className="mb-2">

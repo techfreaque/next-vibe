@@ -52,7 +52,9 @@ export function Accordion({
         <AccordionPrimitive.Root
           type="multiple"
           value={value as string[] | undefined}
-          onValueChange={onValueChange as ((value: string[]) => void) | undefined}
+          onValueChange={
+            onValueChange as ((value: string[]) => void) | undefined
+          }
           defaultValue={defaultValue as string[] | undefined}
           disabled={disabled}
           className={className}
@@ -66,7 +68,9 @@ export function Accordion({
     );
   }
 
-  const [_value, setValue] = React.useState((defaultValue as string | undefined) || "");
+  const [_value, setValue] = React.useState(
+    (defaultValue as string | undefined) || "",
+  );
   const handleValueChange = React.useCallback(
     (newValue: string | undefined) => {
       setValue(newValue || "");

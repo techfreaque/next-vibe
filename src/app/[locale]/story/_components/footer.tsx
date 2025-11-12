@@ -1,4 +1,5 @@
 import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import {
   Bot,
@@ -219,7 +220,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
             })}
           </P>
           <Div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <span>{t("app.story._components.footer.builtWith")}</span>
+            <Span>{t("app.story._components.footer.builtWith")}</Span>
             <Link
               href="https://github.com/techfreaque/next-vibe"
               className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"

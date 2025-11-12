@@ -8,6 +8,8 @@ import React from "react";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { DivDragEvent } from "@/packages/next-vibe-ui/web/ui/div";
+import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import definitions from "./definition";
 
@@ -21,8 +23,8 @@ export function useLeadsImportEndpoint(
   selectedFile: File | null;
   setSelectedFile: React.Dispatch<React.SetStateAction<File | null>>;
   handleFileSelect: (file: File) => void;
-  handleDrop: (e: React.DragEvent) => void;
-  handleFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleDrop: (e: DivDragEvent) => void;
+  handleFileInputChange: (e: InputChangeEvent) => void;
   dragOver: boolean;
   setDragOver: React.Dispatch<React.SetStateAction<boolean>>;
   downloadTemplate: () => void;
@@ -104,11 +106,11 @@ export function useLeadsImportEndpoint(
 
   // Drag and drop handlers
   const handleDrop = React.useCallback(
-    (e: React.DragEvent): void => {
-      e.preventDefault();
+    (e: DivDragEvent): void => {
+      e.preventDefault?.();
       setDragOver(false);
 
-      const files = [...e.dataTransfer.files];
+      const files = e.dataTransfer?.files ? [...e.dataTransfer.files] : [];
       if (files.length > 0) {
         handleFileSelect(files[0]);
       }
@@ -117,7 +119,7 @@ export function useLeadsImportEndpoint(
   );
 
   const handleFileInputChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>): void => {
+    (e: InputChangeEvent): void => {
       const files = e.target.files;
       if (files && files.length > 0) {
         handleFileSelect(files[0]);

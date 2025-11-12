@@ -565,7 +565,7 @@ export async function LucideEmailIcon(
   const response = await fetch(url);
   if (!response.ok) {
     // Return empty div if icon fetch fails
-    return <div />;
+    return <Div />;
   }
 
   // Fetch the SVG content

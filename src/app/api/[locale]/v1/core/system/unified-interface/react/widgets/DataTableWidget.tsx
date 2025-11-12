@@ -7,6 +7,14 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe-ui/ui/table";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -105,11 +113,11 @@ export const DataTableWidget = ({
 
   return (
     <Div className={`overflow-x-auto ${className}`} style={style}>
-      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="bg-gray-50 dark:bg-gray-800">
-          <tr>
+      <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <TableHeader className="bg-gray-50 dark:bg-gray-800">
+          <TableRow>
             {typedData.columns.map((column) => (
-              <th
+              <TableHead
                 key={column.key}
                 className={`px-6 py-3 text-${column.align ?? "left"} text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 ${
                   column.sortable
@@ -147,13 +155,13 @@ export const DataTableWidget = ({
                     </Span>
                   )}
                 </Div>
-              </th>
+              </TableHead>
             ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
+          </TableRow>
+        </TableHeader>
+        <TableBody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
           {sortedRows.map((row, rowIndex) => (
-            <tr
+            <TableRow
               key={rowIndex}
               className="hover:bg-gray-50 dark:hover:bg-gray-800"
             >
@@ -166,18 +174,18 @@ export const DataTableWidget = ({
                     : String(value ?? "");
 
                 return (
-                  <td
+                  <TableCell
                     key={column.key}
                     className={`whitespace-nowrap px-6 py-4 text-sm text-${column.align ?? "left"} text-gray-900 dark:text-gray-100`}
                   >
                     {formattedValue}
-                  </td>
+                  </TableCell>
                 );
               })}
-            </tr>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
 
       {typedData.totalRows !== undefined &&
         typedData.totalRows > typedData.rows.length && (

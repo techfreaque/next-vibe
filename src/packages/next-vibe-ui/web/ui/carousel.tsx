@@ -204,7 +204,11 @@ const CarouselItem = React.forwardRef<
 });
 CarouselItem.displayName = "CarouselItem";
 
-function CarouselPrevious({ className, variant = "outline", size = "icon" }: Omit<
+function CarouselPrevious({
+  className,
+  variant = "outline",
+  size = "icon",
+}: Omit<
   React.ComponentProps<typeof Button>,
   "onClick" | "disabled" | "onMouseEnter" | "onMouseLeave" | "tabIndex"
 >): React.JSX.Element {
@@ -237,7 +241,11 @@ function CarouselPrevious({ className, variant = "outline", size = "icon" }: Omi
   );
 }
 
-function CarouselNext({ className, variant = "outline", size = "icon" }: Omit<
+function CarouselNext({
+  className,
+  variant = "outline",
+  size = "icon",
+}: Omit<
   React.ComponentProps<typeof Button>,
   "onClick" | "disabled" | "onMouseEnter" | "onMouseLeave" | "tabIndex"
 >): React.JSX.Element {

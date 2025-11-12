@@ -62,7 +62,11 @@ export type NavigationMenuTriggerStyleProps = VariantProps<
   typeof navigationMenuTriggerStyle
 >;
 
-export function NavigationMenu({ className, children, ...props }: NavigationMenuProps): React.JSX.Element {
+export function NavigationMenu({
+  className,
+  children,
+  ...props
+}: NavigationMenuProps): React.JSX.Element {
   return (
     <NavigationMenuPrimitive.Root
       className={cn(
@@ -78,7 +82,11 @@ export function NavigationMenu({ className, children, ...props }: NavigationMenu
 }
 NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName;
 
-export function NavigationMenuList({ className, children, ...props }: NavigationMenuListProps): React.JSX.Element {
+export function NavigationMenuList({
+  className,
+  children,
+  ...props
+}: NavigationMenuListProps): React.JSX.Element {
   return (
     <NavigationMenuPrimitive.List
       className={cn(
@@ -93,12 +101,23 @@ export function NavigationMenuList({ className, children, ...props }: Navigation
 }
 NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 
-export function NavigationMenuItem({ value, children }: NavigationMenuItemProps): React.JSX.Element {
-  return <NavigationMenuPrimitive.Item value={value}>{children}</NavigationMenuPrimitive.Item>;
+export function NavigationMenuItem({
+  value,
+  children,
+}: NavigationMenuItemProps): React.JSX.Element {
+  return (
+    <NavigationMenuPrimitive.Item value={value}>
+      {children}
+    </NavigationMenuPrimitive.Item>
+  );
 }
 NavigationMenuItem.displayName = NavigationMenuPrimitive.Item.displayName;
 
-export function NavigationMenuTrigger({ className, children, ...props }: NavigationMenuTriggerProps): React.JSX.Element {
+export function NavigationMenuTrigger({
+  className,
+  children,
+  ...props
+}: NavigationMenuTriggerProps): React.JSX.Element {
   return (
     <NavigationMenuPrimitive.Trigger
       className={cn(navigationMenuTriggerStyle(), "group", className)}
@@ -114,7 +133,11 @@ export function NavigationMenuTrigger({ className, children, ...props }: Navigat
 }
 NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName;
 
-export function NavigationMenuContent({ className, children, ...props }: NavigationMenuContentProps): React.JSX.Element {
+export function NavigationMenuContent({
+  className,
+  children,
+  ...props
+}: NavigationMenuContentProps): React.JSX.Element {
   return (
     <NavigationMenuPrimitive.Content
       className={cn(
@@ -129,12 +152,22 @@ export function NavigationMenuContent({ className, children, ...props }: Navigat
 }
 NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
 
-export function NavigationMenuLink({ children, ...props }: NavigationMenuLinkProps): React.JSX.Element {
-  return <NavigationMenuPrimitive.Link {...props}>{children}</NavigationMenuPrimitive.Link>;
+export function NavigationMenuLink({
+  children,
+  ...props
+}: NavigationMenuLinkProps): React.JSX.Element {
+  return (
+    <NavigationMenuPrimitive.Link {...props}>
+      {children}
+    </NavigationMenuPrimitive.Link>
+  );
 }
 NavigationMenuLink.displayName = NavigationMenuPrimitive.Link.displayName;
 
-export function NavigationMenuViewport({ className, ...props }: NavigationMenuViewportProps): React.JSX.Element {
+export function NavigationMenuViewport({
+  className,
+  ...props
+}: NavigationMenuViewportProps): React.JSX.Element {
   return (
     <div className={cn("absolute left-0 top-full flex justify-center")}>
       <NavigationMenuPrimitive.Viewport
@@ -147,9 +180,13 @@ export function NavigationMenuViewport({ className, ...props }: NavigationMenuVi
     </div>
   );
 }
-NavigationMenuViewport.displayName = NavigationMenuPrimitive.Viewport.displayName;
+NavigationMenuViewport.displayName =
+  NavigationMenuPrimitive.Viewport.displayName;
 
-export function NavigationMenuIndicator({ className, ...props }: NavigationMenuIndicatorProps): React.JSX.Element {
+export function NavigationMenuIndicator({
+  className,
+  ...props
+}: NavigationMenuIndicatorProps): React.JSX.Element {
   return (
     <NavigationMenuPrimitive.Indicator
       className={cn(
@@ -162,6 +199,7 @@ export function NavigationMenuIndicator({ className, ...props }: NavigationMenuI
     </NavigationMenuPrimitive.Indicator>
   );
 }
-NavigationMenuIndicator.displayName = NavigationMenuPrimitive.Indicator.displayName;
+NavigationMenuIndicator.displayName =
+  NavigationMenuPrimitive.Indicator.displayName;
 
 export { navigationMenuTriggerStyle };

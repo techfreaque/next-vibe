@@ -2,29 +2,67 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils";
 import React from "react";
 
+import type { InputGenericTarget } from "./input";
+
 export interface TextareaChangeEvent {
   target: {
     value: string;
     name?: string;
     id?: string;
   };
-  currentTarget?: {
-    value?: string;
-  };
-  preventDefault?: () => void;
-  stopPropagation?: () => void;
+  currentTarget: InputGenericTarget<string>;
+  preventDefault: () => void;
+  stopPropagation: () => void;
+  bubbles: boolean;
+  cancelable: boolean;
+  defaultPrevented: boolean;
+  eventPhase: number;
+  isTrusted: boolean;
+  timeStamp: number;
+  type: string;
 }
 
-export interface TextareaFocusEvent {
-  target?: {
-    focus?: () => void;
-    blur?: () => void;
-    value?: string;
-  };
-  currentTarget?: {
-    focus?: () => void;
-    blur?: () => void;
-  };
+export interface TextareaFocusEvent<T = string> {
+  target: InputGenericTarget<T>;
+  currentTarget: InputGenericTarget<T>;
+  preventDefault: () => void;
+  stopPropagation: () => void;
+  bubbles: boolean;
+  cancelable: boolean;
+  defaultPrevented: boolean;
+  eventPhase: number;
+  isTrusted: boolean;
+  timeStamp: number;
+  type: string;
+}
+
+export interface TextareaKeyboardEvent {
+  // key: string;
+  // code: string;
+  // preventDefault: () => void;
+  // stopPropagation: () => void;
+  // currentTarget: InputGenericTarget<T>;
+  // target: InputGenericTarget<T>;
+  shiftKey: boolean;
+  ctrlKey: boolean;
+  altKey: boolean;
+  metaKey: boolean;
+  repeat: boolean;
+  location: number;
+  bubbles: boolean;
+  cancelable: boolean;
+  defaultPrevented: boolean;
+  eventPhase: number;
+  isTrusted: boolean;
+  timeStamp: number;
+  type: string;
+}
+
+export interface TextareaRefObject {
+  focus: () => void;
+  blur?: () => void;
+  select: () => void;
+  value?: string;
 }
 
 // Cross-platform props interface
@@ -39,6 +77,7 @@ export interface TextareaBaseProps {
   rows?: number;
   name?: string;
   id?: string;
+  title?: string;
   maxLength?: number;
   onChangeText?: (text: string) => void;
   onChange?: (e: TextareaChangeEvent) => void;
@@ -47,10 +86,8 @@ export interface TextareaBaseProps {
   minRows?: number;
   maxRows?: number;
   placeholderClassName?: string;
-  editable?: boolean;
-  numberOfLines?: number;
-  multiline?: boolean;
-  ref?: (node: { focus?: () => void; blur?: () => void; select?: () => void; value?: string } | null) => void;
+  onKeyDown?: (e: TextareaKeyboardEvent) => void;
+  ref?: React.RefObject<TextareaRefObject | null>;
 }
 
 export const textareaVariants = cva(
@@ -81,13 +118,36 @@ function Textarea({
   maxRows = 10,
   onChange,
   onChangeText,
-  ref: _ref,
-  ...props
+  ref,
+  onBlur,
+  onFocus,
+  defaultValue,
+  disabled,
+  id,
+  name,
+  maxLength,
+  onKeyDown,
+  placeholder,
+  placeholderClassName,
+  readOnly,
+  required,
+  rows,
+  title,
+  value,
 }: TextareaProps): React.JSX.Element {
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const internalRef = React.useRef<HTMLTextAreaElement | null>(null);
+
+  React.useEffect(() => {
+    if (ref && typeof ref === "object" && internalRef.current) {
+      if ("current" in ref) {
+        const mutableRef = ref;
+        mutableRef.current = internalRef.current;
+      }
+    }
+  }, [ref]);
 
   const adjustHeight = React.useCallback(() => {
-    const textarea = textareaRef.current;
+    const textarea = internalRef.current;
     if (!textarea) {
       return;
     }
@@ -119,20 +179,51 @@ function Textarea({
 
   React.useEffect(() => {
     adjustHeight();
-  }, [adjustHeight, props.value, props.defaultValue]);
+  }, [adjustHeight, value, defaultValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     adjustHeight();
-    onChange?.({ target: { value: e.target.value, name: e.target.name } });
+    const changeEvent: TextareaChangeEvent = {
+      target: {
+        value: e.target.value,
+        name: e.target.name,
+        id: e.target.id,
+      },
+      currentTarget: e.currentTarget,
+      preventDefault: (): void => e.preventDefault(),
+      stopPropagation: (): void => e.stopPropagation(),
+      bubbles: e.bubbles,
+      cancelable: e.cancelable,
+      defaultPrevented: e.defaultPrevented,
+      eventPhase: e.eventPhase,
+      isTrusted: e.isTrusted,
+      timeStamp: e.timeStamp,
+      type: e.type,
+    };
+    onChange?.(changeEvent);
     onChangeText?.(e.target.value);
   };
 
   const content = (
     <textarea
       className={cn(textareaVariants({ variant }), className)}
-      ref={textareaRef}
+      ref={internalRef}
       onChange={handleChange}
-      {...props}
+      onBlur={onBlur}
+      onFocus={onFocus}
+      defaultValue={defaultValue}
+      disabled={disabled}
+      id={id}
+      name={name}
+      maxLength={maxLength}
+      onKeyDown={onKeyDown}
+      placeholder={placeholder}
+      placeholderClassName={placeholderClassName}
+      readOnly={readOnly}
+      required={required}
+      rows={rows}
+      title={title}
+      value={value}
     />
   );
 

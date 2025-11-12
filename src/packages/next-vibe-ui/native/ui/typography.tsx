@@ -7,7 +7,7 @@ import { cn } from "../lib/utils";
 import type { TextPropsWithClassName } from "../lib/types";
 
 // Styled Text for NativeWind support
-const StyledText = styled(RNText);
+const StyledText = styled(RNText, { className: "style" });
 import type { TypographyProps as WebTypographyProps } from "../../web/ui/typography";
 
 // Re-export web types for cross-platform compatibility
@@ -15,60 +15,150 @@ export type { TypographyProps } from "../../web/ui/typography";
 
 // Native typography components use RNText directly (no asChild pattern for semantic elements)
 // We only use className from web TypographyProps, children comes from TextPropsWithClassName
-export type H1Props = Omit<WebTypographyProps, "children"> & TextPropsWithClassName;
-export type H2Props = Omit<WebTypographyProps, "children"> & TextPropsWithClassName;
-export type H3Props = Omit<WebTypographyProps, "children"> & TextPropsWithClassName;
-export type H4Props = Omit<WebTypographyProps, "children"> & TextPropsWithClassName;
-export type PProps = Omit<WebTypographyProps, "children"> & TextPropsWithClassName;
-export type BlockQuoteProps = Omit<WebTypographyProps, "children"> & TextPropsWithClassName;
-export type CodeProps = Omit<WebTypographyProps, "children"> & TextPropsWithClassName;
-export type LeadProps = Omit<WebTypographyProps, "children"> & TextPropsWithClassName;
-export type LargeProps = Omit<WebTypographyProps, "children"> & TextPropsWithClassName;
-export type SmallProps = Omit<WebTypographyProps, "children"> & TextPropsWithClassName;
-export type MutedProps = Omit<WebTypographyProps, "children"> & TextPropsWithClassName;
+export type H1Props = Omit<WebTypographyProps, "children"> &
+  TextPropsWithClassName;
+export type H2Props = Omit<WebTypographyProps, "children"> &
+  TextPropsWithClassName;
+export type H3Props = Omit<WebTypographyProps, "children"> &
+  TextPropsWithClassName;
+export type H4Props = Omit<WebTypographyProps, "children"> &
+  TextPropsWithClassName;
+export type PProps = Omit<WebTypographyProps, "children"> &
+  TextPropsWithClassName;
+export type BlockQuoteProps = Omit<WebTypographyProps, "children"> &
+  TextPropsWithClassName;
+export type CodeProps = Omit<WebTypographyProps, "children"> &
+  TextPropsWithClassName;
+export type LeadProps = Omit<WebTypographyProps, "children"> &
+  TextPropsWithClassName;
+export type LargeProps = Omit<WebTypographyProps, "children"> &
+  TextPropsWithClassName;
+export type SmallProps = Omit<WebTypographyProps, "children"> &
+  TextPropsWithClassName;
+export type MutedProps = Omit<WebTypographyProps, "children"> &
+  TextPropsWithClassName;
 
 function H1({ className, ...props }: H1Props): React.JSX.Element {
-  return <StyledText className={cn("text-4xl text-foreground font-extrabold tracking-tight lg:text-5xl", className)} {...props} />;
+  return (
+    <StyledText
+      className={cn(
+        "text-4xl text-foreground font-extrabold tracking-tight lg:text-5xl",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 function H2({ className, ...props }: H2Props): React.JSX.Element {
-  return <StyledText className={cn("border-b border-border pb-2 text-3xl text-foreground font-semibold tracking-tight first:mt-0", className)} {...props} />;
+  return (
+    <StyledText
+      className={cn(
+        "border-b border-border pb-2 text-3xl text-foreground font-semibold tracking-tight first:mt-0",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 function H3({ className, ...props }: H3Props): React.JSX.Element {
-  return <StyledText className={cn("text-2xl text-foreground font-semibold tracking-tight", className)} {...props} />;
+  return (
+    <StyledText
+      className={cn(
+        "text-2xl text-foreground font-semibold tracking-tight",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 function H4({ className, ...props }: H4Props): React.JSX.Element {
-  return <StyledText className={cn("text-xl text-foreground font-semibold tracking-tight", className)} {...props} />;
+  return (
+    <StyledText
+      className={cn(
+        "text-xl text-foreground font-semibold tracking-tight",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 function P({ className, ...props }: PProps): React.JSX.Element {
-  return <StyledText className={cn("text-base text-foreground", className)} {...props} />;
+  return (
+    <StyledText
+      className={cn("text-base text-foreground", className)}
+      {...props}
+    />
+  );
 }
 
-function BlockQuote({ className, ...props }: BlockQuoteProps): React.JSX.Element {
-  return <StyledText className={cn("mt-6 border-l-2 border-border pl-6 text-base text-foreground italic", className)} {...props} />;
+function BlockQuote({
+  className,
+  ...props
+}: BlockQuoteProps): React.JSX.Element {
+  return (
+    <StyledText
+      className={cn(
+        "mt-6 border-l-2 border-border pl-6 text-base text-foreground italic",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 function Code({ className, ...props }: CodeProps): React.JSX.Element {
-  return <StyledText className={cn("relative rounded-md bg-muted px-[0.3rem] py-[0.2rem] text-sm text-foreground font-semibold", className)} {...props} />;
+  return (
+    <StyledText
+      className={cn(
+        "relative rounded-md bg-muted px-[0.3rem] py-[0.2rem] text-sm text-foreground font-semibold",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 function Lead({ className, ...props }: LeadProps): React.JSX.Element {
-  return <StyledText className={cn("text-xl text-muted-foreground", className)} {...props} />;
+  return (
+    <StyledText
+      className={cn("text-xl text-muted-foreground", className)}
+      {...props}
+    />
+  );
 }
 
 function Large({ className, ...props }: LargeProps): React.JSX.Element {
-  return <StyledText className={cn("text-xl text-foreground font-semibold", className)} {...props} />;
+  return (
+    <StyledText
+      className={cn("text-xl text-foreground font-semibold", className)}
+      {...props}
+    />
+  );
 }
 
 function Small({ className, ...props }: SmallProps): React.JSX.Element {
-  return <StyledText className={cn("text-sm text-foreground font-medium leading-none", className)} {...props} />;
+  return (
+    <StyledText
+      className={cn(
+        "text-sm text-foreground font-medium leading-none",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 function Muted({ className, ...props }: MutedProps): React.JSX.Element {
-  return <StyledText className={cn("text-sm text-muted-foreground", className)} {...props} />;
+  return (
+    <StyledText
+      className={cn("text-sm text-muted-foreground", className)}
+      {...props}
+    />
+  );
 }
 
 export { BlockQuote, Code, H1, H2, H3, H4, Large, Lead, Muted, P, Small };

@@ -5,7 +5,7 @@ import { styled } from "nativewind";
 import type { SectionProps } from "@/packages/next-vibe-ui/web/ui/section";
 
 // Type-safe View with className support (NativeWind)
-const StyledView = styled(View);
+const StyledView = styled(View, { className: "style" });
 
 /**
  * Platform-agnostic Section component for native

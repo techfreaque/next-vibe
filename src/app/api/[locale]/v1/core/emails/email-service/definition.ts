@@ -36,7 +36,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.emails.emailService.send.description",
   category: "app.api.v1.core.emails.category",
   tags: ["app.api.v1.core.emails.emailService.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER],
+  allowedRoles: [UserRole.ADMIN],
 
   fields: objectField(
     {

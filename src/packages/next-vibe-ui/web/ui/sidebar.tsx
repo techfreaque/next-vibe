@@ -389,7 +389,10 @@ const SidebarInset = React.forwardRef<
 });
 SidebarInset.displayName = "SidebarInset";
 
-function SidebarInput({ className, ...props }: React.ComponentProps<typeof Input>): React.JSX.Element {
+function SidebarInput({
+  className,
+  ...props
+}: React.ComponentProps<typeof Input>): React.JSX.Element {
   return (
     <Input
       data-sidebar="input"

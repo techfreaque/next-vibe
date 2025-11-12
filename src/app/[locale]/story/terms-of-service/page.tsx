@@ -4,6 +4,8 @@ import type { JSX } from "react";
 
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
+import { Li } from "next-vibe-ui/ui/li";
+import { Ul } from "next-vibe-ui/ui/ul";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
@@ -217,32 +219,32 @@ export default async function TermsOfServicePage({
                 "app.story._components.home.termsOfService.sections.userContent.guidelines.intro",
               )}
             </P>
-            <ul className="flex flex-col gap-1 mt-4">
-              <li className="flex items-start">
+            <Ul className="flex flex-col gap-1 mt-4">
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.termsOfService.sections.userContent.guidelines.items.item1",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.termsOfService.sections.userContent.guidelines.items.item2",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.termsOfService.sections.userContent.guidelines.items.item3",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.termsOfService.sections.userContent.guidelines.items.item4",
                 )}
-              </li>
-            </ul>
+              </Li>
+            </Ul>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 

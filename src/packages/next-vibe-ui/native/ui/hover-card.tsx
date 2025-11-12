@@ -1,8 +1,6 @@
 import * as HoverCardPrimitive from "@rn-primitives/hover-card";
 import * as React from "react";
-import {
-  StyleSheet,
-} from "react-native";
+import { StyleSheet } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
 import { cn } from "next-vibe/shared/utils/utils";
@@ -16,16 +14,24 @@ import type {
   HoverCardContentProps,
 } from "@/packages/next-vibe-ui/web/ui/hover-card";
 
-
 // Local styled components - use direct primitives to avoid type instantiation issues
 const StyledHoverCardContent = HoverCardPrimitive.Content;
 
-function HoverCard({ children, ...props }: HoverCardRootProps): React.JSX.Element {
-  return <HoverCardPrimitive.Root {...props}>{children}</HoverCardPrimitive.Root>;
+function HoverCard({
+  children,
+  ...props
+}: HoverCardRootProps): React.JSX.Element {
+  return (
+    <HoverCardPrimitive.Root {...props}>{children}</HoverCardPrimitive.Root>
+  );
 }
 HoverCard.displayName = HoverCardPrimitive.Root.displayName;
 
-function HoverCardTrigger({ children, asChild, ...props }: HoverCardTriggerProps): React.JSX.Element {
+function HoverCardTrigger({
+  children,
+  asChild,
+  ...props
+}: HoverCardTriggerProps): React.JSX.Element {
   return (
     <HoverCardPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -34,7 +40,9 @@ function HoverCardTrigger({ children, asChild, ...props }: HoverCardTriggerProps
 }
 HoverCardTrigger.displayName = HoverCardPrimitive.Trigger.displayName;
 
-function HoverCardPortal({ children }: HoverCardPortalProps): React.JSX.Element {
+function HoverCardPortal({
+  children,
+}: HoverCardPortalProps): React.JSX.Element {
   return <HoverCardPrimitive.Portal>{children}</HoverCardPrimitive.Portal>;
 }
 HoverCardPortal.displayName = "HoverCardPortal";
@@ -103,9 +111,4 @@ function HoverCardContent({
 }
 HoverCardContent.displayName = HoverCardPrimitive.Content.displayName;
 
-export {
-  HoverCard,
-  HoverCardContent,
-  HoverCardPortal,
-  HoverCardTrigger,
-};
+export { HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger };

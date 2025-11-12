@@ -2,4 +2,4 @@
 import { Globe as SiGoogleIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiGoogle = styled(SiGoogleIcon);
+export const SiGoogle = styled(SiGoogleIcon, { className: "style" });

@@ -90,12 +90,19 @@ export interface SheetContentProps extends VariantProps<typeof sheetVariants> {
   portalHost?: string;
 }
 
-export function Sheet({ children, ...props }: SheetRootProps): React.JSX.Element {
+export function Sheet({
+  children,
+  ...props
+}: SheetRootProps): React.JSX.Element {
   return <SheetPrimitive.Root {...props}>{children}</SheetPrimitive.Root>;
 }
 Sheet.displayName = SheetPrimitive.Root.displayName;
 
-export function SheetTrigger({ children, asChild, ...props }: SheetTriggerProps): React.JSX.Element {
+export function SheetTrigger({
+  children,
+  asChild,
+  ...props
+}: SheetTriggerProps): React.JSX.Element {
   return (
     <SheetPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -104,7 +111,11 @@ export function SheetTrigger({ children, asChild, ...props }: SheetTriggerProps)
 }
 SheetTrigger.displayName = SheetPrimitive.Trigger.displayName;
 
-export function SheetClose({ children, asChild, ...props }: SheetCloseProps): React.JSX.Element {
+export function SheetClose({
+  children,
+  asChild,
+  ...props
+}: SheetCloseProps): React.JSX.Element {
   return (
     <SheetPrimitive.Close asChild={asChild} {...props}>
       {children}
@@ -113,7 +124,11 @@ export function SheetClose({ children, asChild, ...props }: SheetCloseProps): Re
 }
 SheetClose.displayName = SheetPrimitive.Close.displayName;
 
-export function SheetPortal({ children, forceMount, container }: SheetPortalProps): React.JSX.Element {
+export function SheetPortal({
+  children,
+  forceMount,
+  container,
+}: SheetPortalProps): React.JSX.Element {
   return (
     <SheetPrimitive.Portal forceMount={forceMount} container={container}>
       {children}
@@ -122,7 +137,10 @@ export function SheetPortal({ children, forceMount, container }: SheetPortalProp
 }
 SheetPortal.displayName = SheetPrimitive.Portal.displayName;
 
-export function SheetOverlay({ className, ...props }: SheetOverlayProps): React.JSX.Element {
+export function SheetOverlay({
+  className,
+  ...props
+}: SheetOverlayProps): React.JSX.Element {
   return (
     <SheetPrimitive.Overlay
       className={cn(
@@ -135,7 +153,12 @@ export function SheetOverlay({ className, ...props }: SheetOverlayProps): React.
 }
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
-export function SheetContent({ side = "right", className, children, ...props }: SheetContentProps): React.JSX.Element {
+export function SheetContent({
+  side = "right",
+  className,
+  children,
+  ...props
+}: SheetContentProps): React.JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -158,7 +181,11 @@ export function SheetContent({ side = "right", className, children, ...props }: 
 }
 SheetContent.displayName = SheetPrimitive.Content.displayName;
 
-export function SheetHeader({ className, children, ...props }: SheetHeaderProps): React.JSX.Element {
+export function SheetHeader({
+  className,
+  children,
+  ...props
+}: SheetHeaderProps): React.JSX.Element {
   return (
     <div
       className={cn(
@@ -173,7 +200,11 @@ export function SheetHeader({ className, children, ...props }: SheetHeaderProps)
 }
 SheetHeader.displayName = "SheetHeader";
 
-export function SheetFooter({ className, children, ...props }: SheetFooterProps): React.JSX.Element {
+export function SheetFooter({
+  className,
+  children,
+  ...props
+}: SheetFooterProps): React.JSX.Element {
   return (
     <div
       className={cn(
@@ -188,7 +219,11 @@ export function SheetFooter({ className, children, ...props }: SheetFooterProps)
 }
 SheetFooter.displayName = "SheetFooter";
 
-export function SheetTitle({ className, children, ...props }: SheetTitleProps): React.JSX.Element {
+export function SheetTitle({
+  className,
+  children,
+  ...props
+}: SheetTitleProps): React.JSX.Element {
   return (
     <SheetPrimitive.Title
       className={cn("text-lg font-semibold text-foreground", className)}
@@ -200,7 +235,11 @@ export function SheetTitle({ className, children, ...props }: SheetTitleProps): 
 }
 SheetTitle.displayName = SheetPrimitive.Title.displayName;
 
-export function SheetDescription({ className, children, ...props }: SheetDescriptionProps): React.JSX.Element {
+export function SheetDescription({
+  className,
+  children,
+  ...props
+}: SheetDescriptionProps): React.JSX.Element {
   return (
     <SheetPrimitive.Description
       className={cn("text-sm text-muted-foreground", className)}

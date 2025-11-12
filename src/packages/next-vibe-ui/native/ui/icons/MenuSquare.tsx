@@ -1,4 +1,4 @@
 import { MenuSquare as MenuSquareIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const MenuSquare = styled(MenuSquareIcon);
+export const MenuSquare = styled(MenuSquareIcon, { className: "style" });

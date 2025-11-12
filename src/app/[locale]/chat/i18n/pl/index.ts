@@ -112,6 +112,7 @@ export const translations: typeof enTranslations = {
       deselectAll: "Odznacz wszystkie",
       enableAll: "Włącz wszystkie",
       stats: "{{enabled}} z {{total}} narzędzi włączonych",
+      aliases: "Aliasy",
     },
   },
 

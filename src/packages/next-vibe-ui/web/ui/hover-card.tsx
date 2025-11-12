@@ -37,7 +37,9 @@ export interface HoverCardContentProps {
   alignOffset?: number;
   avoidCollisions?: boolean;
   collisionBoundary?: Element | Element[] | null;
-  collisionPadding?: number | Partial<Record<"top" | "right" | "bottom" | "left", number>>;
+  collisionPadding?:
+    | number
+    | Partial<Record<"top" | "right" | "bottom" | "left", number>>;
   arrowPadding?: number;
   sticky?: "partial" | "always";
   hideWhenDetached?: boolean;
@@ -45,12 +47,21 @@ export interface HoverCardContentProps {
   onPointerDownOutside?: (event: Event) => void;
 }
 
-export function HoverCard({ children, ...props }: HoverCardRootProps): React.JSX.Element {
-  return <HoverCardPrimitive.Root {...props}>{children}</HoverCardPrimitive.Root>;
+export function HoverCard({
+  children,
+  ...props
+}: HoverCardRootProps): React.JSX.Element {
+  return (
+    <HoverCardPrimitive.Root {...props}>{children}</HoverCardPrimitive.Root>
+  );
 }
 HoverCard.displayName = HoverCardPrimitive.Root.displayName;
 
-export function HoverCardTrigger({ children, asChild, ...props }: HoverCardTriggerProps): React.JSX.Element {
+export function HoverCardTrigger({
+  children,
+  asChild,
+  ...props
+}: HoverCardTriggerProps): React.JSX.Element {
   return (
     <HoverCardPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -59,7 +70,11 @@ export function HoverCardTrigger({ children, asChild, ...props }: HoverCardTrigg
 }
 HoverCardTrigger.displayName = HoverCardPrimitive.Trigger.displayName;
 
-export function HoverCardPortal({ children, forceMount, container }: HoverCardPortalProps): React.JSX.Element {
+export function HoverCardPortal({
+  children,
+  forceMount,
+  container,
+}: HoverCardPortalProps): React.JSX.Element {
   return (
     <HoverCardPrimitive.Portal forceMount={forceMount} container={container}>
       {children}
@@ -68,7 +83,12 @@ export function HoverCardPortal({ children, forceMount, container }: HoverCardPo
 }
 HoverCardPortal.displayName = "HoverCardPortal";
 
-export function HoverCardContent({ className, align = "center", sideOffset = 4, ...props }: HoverCardContentProps): React.JSX.Element {
+export function HoverCardContent({
+  className,
+  align = "center",
+  sideOffset = 4,
+  ...props
+}: HoverCardContentProps): React.JSX.Element {
   return (
     <HoverCardPrimitive.Content
       align={align}

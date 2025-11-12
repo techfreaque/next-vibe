@@ -419,8 +419,8 @@ function FlatMessage({
 
         {/* ID Badge - Hoverable */}
         <Div
-          onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => {
-            const rect = e.currentTarget.getBoundingClientRect();
+          onMouseEnter={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect!();
             onSetHoveredUserId(userId, {
               x: rect.left + rect.width / 2,
               y: rect.bottom,

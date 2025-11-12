@@ -2,4 +2,4 @@
 import { Bot as SiAnthropicIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiAnthropic = styled(SiAnthropicIcon);
+export const SiAnthropic = styled(SiAnthropicIcon, { className: "style" });

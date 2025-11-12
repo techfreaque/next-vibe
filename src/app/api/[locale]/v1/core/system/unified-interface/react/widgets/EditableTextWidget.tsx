@@ -6,8 +6,10 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
 import { Input } from "next-vibe-ui/ui/input";
-import type { JSX, KeyboardEvent } from "react";
+import type { JSX } from "react";
 import { useState } from "react";
+
+import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import type { WidgetComponentProps } from "../types";
 import { useWidgetActions } from "./ToolActionHandler";
@@ -59,7 +61,7 @@ export function EditableTextWidget({
     setIsEditing(false);
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
+  const handleKeyDown = (e: InputKeyboardEvent): void => {
     if (e.key === "Enter") {
       void handleSave();
     } else if (e.key === "Escape") {

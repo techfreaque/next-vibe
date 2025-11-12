@@ -5,6 +5,7 @@
 
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
@@ -92,7 +93,8 @@ export const GroupedListWidget = ({
             className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
           >
             {/* Group Header */}
-            <button
+            <Button
+              variant="ghost"
               onClick={() => toggleGroup(String(group.key))}
               className="flex w-full items-center justify-between bg-gray-50 px-4 py-3 text-left hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
               type="button"
@@ -120,7 +122,7 @@ export const GroupedListWidget = ({
                   d="M19 9l-7 7-7-7"
                 />
               </svg>
-            </button>
+            </Button>
 
             {/* Group Summary */}
             {data.showGroupSummary && group.summary && (
@@ -171,7 +173,8 @@ export const GroupedListWidget = ({
                 {typedData.maxItemsPerGroup &&
                   !isExpanded &&
                   itemCount > typedData.maxItemsPerGroup && (
-                    <button
+                    <Button
+                      variant="ghost"
                       onClick={() => {
                         toggleGroup(group.key);
                       }}
@@ -179,7 +182,7 @@ export const GroupedListWidget = ({
                     >
                       {/* eslint-disable-next-line i18next/no-literal-string */}
                       {`Show ${itemCount - (typedData.maxItemsPerGroup ?? 0)} more`}
-                    </button>
+                    </Button>
                   )}
               </Div>
             )}

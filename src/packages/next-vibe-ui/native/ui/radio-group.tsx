@@ -11,12 +11,18 @@ import type {
   RadioGroupItemProps,
 } from "@/packages/next-vibe-ui/web/ui/radio-group";
 
-
 // Local styled components - use direct primitives to avoid type instantiation issues
 const StyledRadioGroupItem = RadioGroupPrimitive.Item;
 const StyledRadioGroupIndicator = RadioGroupPrimitive.Indicator;
 
-function RadioGroup({ className, children, value, onValueChange, disabled, ...props }: RadioGroupRootProps): React.JSX.Element {
+function RadioGroup({
+  className,
+  children,
+  value,
+  onValueChange,
+  disabled,
+  ...props
+}: RadioGroupRootProps): React.JSX.Element {
   return (
     <RadioGroupPrimitive.Root
       className={cn("grid gap-2", className)}
@@ -31,7 +37,14 @@ function RadioGroup({ className, children, value, onValueChange, disabled, ...pr
 }
 RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
 
-function RadioGroupItem({ className, children, value, disabled, id, ...props }: RadioGroupItemProps): React.JSX.Element {
+function RadioGroupItem({
+  className,
+  children,
+  value,
+  disabled,
+  id,
+  ...props
+}: RadioGroupItemProps): React.JSX.Element {
   return (
     <StyledRadioGroupItem
       className={cn(

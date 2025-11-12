@@ -6,7 +6,8 @@
 
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { type RefObject,
+useMemo, useRef, useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -33,6 +34,7 @@ import { useMessageOperations } from "../threads/[threadId]/messages/hooks/use-o
 import { useNavigation } from "./use-navigation";
 import { useCredits } from "../../../credits/hooks";
 import { type CreditsGetResponseOutput } from "../../../credits/definition";
+import { type TextareaRefObject } from "@/packages/next-vibe-ui/web/ui/textarea";
 
 /**
  * Return type for useChat hook
@@ -126,7 +128,7 @@ export interface UseChatReturn {
   ) => void;
 
   // Refs
-  inputRef: React.RefObject<HTMLTextAreaElement | null>;
+  inputRef: RefObject<TextareaRefObject | null>;
 
   // Logger
   logger: EndpointLogger;
@@ -186,7 +188,7 @@ export function useChat(
 
   // Local state
   const [input, setInput] = useState("");
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<TextareaRefObject>(null);
 
   // Use modular hooks
   useDataLoader(

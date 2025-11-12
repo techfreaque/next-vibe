@@ -22,9 +22,9 @@ const THUMB_CLASSNAME =
   "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0";
 /* eslint-enable i18next/no-literal-string */
 
-const StyledAnimatedView = styled(Animated.View);
-const StyledSwitchRoot = styled(SwitchPrimitives.Root);
-const StyledSwitchThumb = styled(SwitchPrimitives.Thumb);
+const StyledAnimatedView = styled(Animated.View, { className: "style" });
+const StyledSwitchRoot = styled(SwitchPrimitives.Root, { className: "style" });
+const StyledSwitchThumb = styled(SwitchPrimitives.Thumb, { className: "style" });
 
 // eslint-disable-next-line i18n/no-literal-string
 const RGB_COLORS = {
@@ -57,17 +57,22 @@ export function Switch({
   const { colorScheme } = useColorScheme();
 
   // Handle controlled/uncontrolled state with defaultChecked
-  const [internalChecked, setInternalChecked] = React.useState(defaultChecked ?? false);
+  const [internalChecked, setInternalChecked] = React.useState(
+    defaultChecked ?? false,
+  );
   const isControlled = checked !== undefined;
   const isChecked = isControlled ? (checked ?? false) : internalChecked;
 
-  const handleCheckedChange = React.useCallback((newChecked: boolean) => {
-    if (!isControlled) {
-      setInternalChecked(newChecked);
-    }
-    onCheckedChange?.(newChecked);
-    onBlur?.();
-  }, [isControlled, onCheckedChange, onBlur]);
+  const handleCheckedChange = React.useCallback(
+    (newChecked: boolean) => {
+      if (!isControlled) {
+        setInternalChecked(newChecked);
+      }
+      onCheckedChange?.(newChecked);
+      onBlur?.();
+    },
+    [isControlled, onCheckedChange, onBlur],
+  );
 
   const translateX = useDerivedValue(() => (isChecked ? 18 : 0));
   const animatedRootStyle = useAnimatedStyle(() => {
@@ -88,7 +93,11 @@ export function Switch({
   return (
     <StyledAnimatedView
       style={animatedRootStyle}
-      className={cn("h-8 w-[46px] rounded-full", disabled && "opacity-50", className)}
+      className={cn(
+        "h-8 w-[46px] rounded-full",
+        disabled && "opacity-50",
+        className,
+      )}
       nativeID={id}
     >
       <StyledSwitchRoot

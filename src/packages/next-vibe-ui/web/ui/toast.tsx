@@ -82,12 +82,20 @@ const toastVariants = cva(
   },
 );
 
-export function ToastProvider({ children, ...props }: ToastProviderProps): React.JSX.Element {
-  return <ToastPrimitives.Provider {...props}>{children}</ToastPrimitives.Provider>;
+export function ToastProvider({
+  children,
+  ...props
+}: ToastProviderProps): React.JSX.Element {
+  return (
+    <ToastPrimitives.Provider {...props}>{children}</ToastPrimitives.Provider>
+  );
 }
 ToastProvider.displayName = ToastPrimitives.Provider.displayName;
 
-export function ToastViewport({ className, ...props }: ToastViewportProps): React.JSX.Element {
+export function ToastViewport({
+  className,
+  ...props
+}: ToastViewportProps): React.JSX.Element {
   return (
     <ToastPrimitives.Viewport
       className={cn(
@@ -100,7 +108,11 @@ export function ToastViewport({ className, ...props }: ToastViewportProps): Reac
 }
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
-export function Toast({ className, variant, ...props }: ToastRootProps): React.JSX.Element {
+export function Toast({
+  className,
+  variant,
+  ...props
+}: ToastRootProps): React.JSX.Element {
   return (
     <ToastPrimitives.Root
       className={cn(toastVariants({ variant }), className)}
@@ -110,7 +122,10 @@ export function Toast({ className, variant, ...props }: ToastRootProps): React.J
 }
 Toast.displayName = ToastPrimitives.Root.displayName;
 
-export function ToastAction({ className, ...props }: ToastActionProps): React.JSX.Element {
+export function ToastAction({
+  className,
+  ...props
+}: ToastActionProps): React.JSX.Element {
   return (
     <ToastPrimitives.Action
       className={cn(
@@ -123,7 +138,10 @@ export function ToastAction({ className, ...props }: ToastActionProps): React.JS
 }
 ToastAction.displayName = ToastPrimitives.Action.displayName;
 
-export function ToastClose({ className, ...props }: ToastCloseProps): React.JSX.Element {
+export function ToastClose({
+  className,
+  ...props
+}: ToastCloseProps): React.JSX.Element {
   return (
     <ToastPrimitives.Close
       className={cn(
@@ -139,7 +157,10 @@ export function ToastClose({ className, ...props }: ToastCloseProps): React.JSX.
 }
 ToastClose.displayName = ToastPrimitives.Close.displayName;
 
-export function ToastTitle({ className, ...props }: ToastTitleProps): React.JSX.Element {
+export function ToastTitle({
+  className,
+  ...props
+}: ToastTitleProps): React.JSX.Element {
   return (
     <ToastPrimitives.Title
       className={cn("text-sm font-semibold", className)}
@@ -149,7 +170,10 @@ export function ToastTitle({ className, ...props }: ToastTitleProps): React.JSX.
 }
 ToastTitle.displayName = ToastPrimitives.Title.displayName;
 
-export function ToastDescription({ className, ...props }: ToastDescriptionProps): React.JSX.Element {
+export function ToastDescription({
+  className,
+  ...props
+}: ToastDescriptionProps): React.JSX.Element {
   return (
     <ToastPrimitives.Description
       className={cn("text-sm opacity-90", className)}

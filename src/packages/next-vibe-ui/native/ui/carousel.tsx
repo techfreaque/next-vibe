@@ -22,10 +22,10 @@ export type CarouselProps = Pick<WebCarouselProps, "orientation"> & {
 } & Omit<ScrollViewProps, "horizontal" | "children">;
 
 // Type-safe ScrollView with className support (NativeWind)
-const StyledScrollView = styled(ScrollView);
+const StyledScrollView = styled(ScrollView, { className: "style" });
 
 // Type-safe View with className support (NativeWind)
-const StyledView = styled(View);
+const StyledView = styled(View, { className: "style" });
 
 export function Carousel({
   className,

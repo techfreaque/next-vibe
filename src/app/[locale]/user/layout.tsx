@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Div } from "next-vibe-ui/ui/div";
+import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type { JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -45,8 +46,10 @@ export default function UserLayout({
   children: ReactNode;
 }): JSX.Element {
   return (
-    <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
-      {children}
-    </Div>
+    <PageLayout scrollable={true}>
+      <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
+        {children}
+      </Div>
+    </PageLayout>
   );
 }

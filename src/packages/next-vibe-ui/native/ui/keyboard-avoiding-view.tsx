@@ -8,7 +8,7 @@ import { styled } from "nativewind";
 // Import ALL types from web - ZERO definitions here
 import type { KeyboardAvoidingViewProps } from "@/packages/next-vibe-ui/web/ui/keyboard-avoiding-view";
 
-const StyledKeyboardAvoidingView = styled(RNKeyboardAvoidingView);
+const StyledKeyboardAvoidingView = styled(RNKeyboardAvoidingView, { className: "style" });
 
 /**
  * Platform-agnostic KeyboardAvoidingView component for React Native

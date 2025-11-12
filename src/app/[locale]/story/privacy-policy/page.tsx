@@ -4,6 +4,8 @@ import type { JSX } from "react";
 
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
+import { Li } from "next-vibe-ui/ui/li";
+import { Ul } from "next-vibe-ui/ui/ul";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
@@ -107,44 +109,44 @@ export default async function PrivacyPolicyPage({
                 "app.story._components.home.privacyPolicy.sections.personalData.description",
               )}
             </P>
-            <ul className="flex flex-col gap-1">
-              <li className="flex items-start">
+            <Ul className="flex flex-col gap-1">
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.personalData.items.name",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.personalData.items.email",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.personalData.items.phone",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.personalData.items.company",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.personalData.items.billing",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.personalData.items.payment",
                 )}
-              </li>
-            </ul>
+              </Li>
+            </Ul>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
               {t(
@@ -180,44 +182,44 @@ export default async function PrivacyPolicyPage({
                 "app.story._components.home.privacyPolicy.sections.useOfInformation.description",
               )}
             </P>
-            <ul className="flex flex-col gap-1">
-              <li className="flex items-start">
+            <Ul className="flex flex-col gap-1">
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.useOfInformation.items.provide",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.useOfInformation.items.process",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.useOfInformation.items.send",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.useOfInformation.items.respond",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.useOfInformation.items.monitor",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.useOfInformation.items.personalize",
                 )}
-              </li>
-            </ul>
+              </Li>
+            </Ul>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
@@ -290,38 +292,38 @@ export default async function PrivacyPolicyPage({
                 "app.story._components.home.privacyPolicy.sections.rights.description",
               )}
             </P>
-            <ul className="flex flex-col gap-1">
-              <li className="flex items-start">
+            <Ul className="flex flex-col gap-1">
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.rights.items.access",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.rights.items.correction",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.rights.items.deletion",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.rights.items.objection",
                 )}
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 {t(
                   "app.story._components.home.privacyPolicy.sections.rights.items.portability",
                 )}
-              </li>
-            </ul>
+              </Li>
+            </Ul>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 

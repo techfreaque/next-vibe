@@ -30,7 +30,6 @@ import type {
   SheetContentProps,
 } from "@/packages/next-vibe-ui/web/ui/sheet";
 
-
 const sheetVariants = cva("fixed z-50 gap-4 bg-background p-6 shadow-lg", {
   variants: {
     side: {
@@ -50,7 +49,11 @@ function Sheet({ children, ...props }: SheetRootProps): React.JSX.Element {
 }
 Sheet.displayName = DialogPrimitive.Root.displayName;
 
-function SheetTrigger({ children, asChild, ...props }: SheetTriggerProps): React.JSX.Element {
+function SheetTrigger({
+  children,
+  asChild,
+  ...props
+}: SheetTriggerProps): React.JSX.Element {
   return (
     <DialogPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -59,7 +62,11 @@ function SheetTrigger({ children, asChild, ...props }: SheetTriggerProps): React
 }
 SheetTrigger.displayName = DialogPrimitive.Trigger.displayName;
 
-function SheetClose({ children, asChild, ...props }: SheetCloseProps): React.JSX.Element {
+function SheetClose({
+  children,
+  asChild,
+  ...props
+}: SheetCloseProps): React.JSX.Element {
   return (
     <DialogPrimitive.Close asChild={asChild} {...props}>
       {children}
@@ -73,7 +80,10 @@ function SheetPortal({ children }: SheetPortalProps): React.JSX.Element {
 }
 SheetPortal.displayName = "SheetPortal";
 
-function SheetOverlay({ className, ...props }: SheetOverlayProps): React.JSX.Element {
+function SheetOverlay({
+  className,
+  ...props
+}: SheetOverlayProps): React.JSX.Element {
   return (
     <DialogPrimitive.Overlay
       className={cn(
@@ -159,16 +169,27 @@ function SheetContent({
 }
 SheetContent.displayName = "SheetContent";
 
-function SheetHeader({ className, children, ...props }: SheetHeaderProps): React.JSX.Element {
+function SheetHeader({
+  className,
+  children,
+  ...props
+}: SheetHeaderProps): React.JSX.Element {
   return (
-    <View className={cn("flex flex-col space-y-2 text-center", className)} {...props}>
+    <View
+      className={cn("flex flex-col space-y-2 text-center", className)}
+      {...props}
+    >
       {children}
     </View>
   );
 }
 SheetHeader.displayName = "SheetHeader";
 
-function SheetFooter({ className, children, ...props }: SheetFooterProps): React.JSX.Element {
+function SheetFooter({
+  className,
+  children,
+  ...props
+}: SheetFooterProps): React.JSX.Element {
   return (
     <View
       className={cn(
@@ -183,7 +204,11 @@ function SheetFooter({ className, children, ...props }: SheetFooterProps): React
 }
 SheetFooter.displayName = "SheetFooter";
 
-function SheetTitle({ className, children, ...props }: SheetTitleProps): React.JSX.Element {
+function SheetTitle({
+  className,
+  children,
+  ...props
+}: SheetTitleProps): React.JSX.Element {
   return (
     <DialogPrimitive.Title
       className={cn("text-lg font-semibold text-foreground", className)}
@@ -195,7 +220,11 @@ function SheetTitle({ className, children, ...props }: SheetTitleProps): React.J
 }
 SheetTitle.displayName = "SheetTitle";
 
-function SheetDescription({ className, children, ...props }: SheetDescriptionProps): React.JSX.Element {
+function SheetDescription({
+  className,
+  children,
+  ...props
+}: SheetDescriptionProps): React.JSX.Element {
   return (
     <DialogPrimitive.Description
       className={cn("text-sm text-muted-foreground", className)}

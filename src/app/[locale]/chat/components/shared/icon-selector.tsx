@@ -15,6 +15,8 @@ import { H4 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
+
 import {
   getIconComponent,
   ICON_REGISTRY,
@@ -88,7 +90,7 @@ export function IconSelector({
     : value;
 
   // Handle emoji input change
-  const handleEmojiChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleEmojiChange = (e: InputChangeEvent): void => {
     setEmojiInput(e.target.value);
   };
 

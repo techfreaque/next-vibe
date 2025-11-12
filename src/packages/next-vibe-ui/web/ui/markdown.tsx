@@ -511,6 +511,7 @@ function CodeBlock({
           fontSize: "0.875rem",
           background: CODE_BLOCK_BG_COLOR,
           lineHeight: "1.6",
+          border: "unset",
         }}
         showLineNumbers
         wrapLines

@@ -4,8 +4,10 @@ import { Button } from "next-vibe-ui/ui/button";
 import { notFound } from "next-vibe-ui/lib/not-found";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import { Li } from "next-vibe-ui/ui/li";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
+import { Ul } from "next-vibe-ui/ui/ul";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import { Separator } from "next-vibe-ui/ui/separator";
 import type { JSX } from "react";
@@ -321,18 +323,18 @@ export default async function JobPostingPage({
                       "app.story._components.home.careers.jobDetail.responsibilities",
                     )}
                   </H2>
-                  <ul className="list-disc pl-6 flex flex-col gap-2">
+                  <Ul className="list-disc pl-6 flex flex-col gap-2">
                     {Object.values(job.responsibilities).map(
                       (responsibility: string, index: number) => (
-                        <li
+                        <Li
                           key={index}
                           className="text-gray-700 dark:text-gray-300"
                         >
                           {responsibility}
-                        </li>
+                        </Li>
                       ),
                     )}
-                  </ul>
+                  </Ul>
                 </section>
 
                 <section>
@@ -341,18 +343,18 @@ export default async function JobPostingPage({
                       "app.story._components.home.careers.jobDetail.requirements",
                     )}
                   </H2>
-                  <ul className="list-disc pl-6 flex flex-col gap-2">
+                  <Ul className="list-disc pl-6 flex flex-col gap-2">
                     {Object.values(job.requirements).map(
                       (requirement: string, index: number) => (
-                        <li
+                        <Li
                           key={index}
                           className="text-gray-700 dark:text-gray-300"
                         >
                           {requirement}
-                        </li>
+                        </Li>
                       ),
                     )}
-                  </ul>
+                  </Ul>
                 </section>
 
                 <section>
@@ -367,36 +369,36 @@ export default async function JobPostingPage({
                       "app.story._components.home.careers.jobDetail.qualificationsRequired",
                     )}
                   </H3>
-                  <ul className="list-disc pl-6 flex flex-col gap-2 mb-4">
+                  <Ul className="list-disc pl-6 flex flex-col gap-2 mb-4">
                     {Object.values(job.qualifications.required).map(
                       (qualification: string, index: number) => (
-                        <li
+                        <Li
                           key={index}
                           className="text-gray-700 dark:text-gray-300"
                         >
                           {qualification}
-                        </li>
+                        </Li>
                       ),
                     )}
-                  </ul>
+                  </Ul>
 
                   <H3 className="text-xl font-semibold mb-2">
                     {t(
                       "app.story._components.home.careers.jobDetail.qualificationsPreferred",
                     )}
                   </H3>
-                  <ul className="list-disc pl-6 flex flex-col gap-2">
+                  <Ul className="list-disc pl-6 flex flex-col gap-2">
                     {Object.values(job.qualifications.preferred).map(
                       (qualification: string, index: number) => (
-                        <li
+                        <Li
                           key={index}
                           className="text-gray-700 dark:text-gray-300"
                         >
                           {qualification}
-                        </li>
+                        </Li>
                       ),
                     )}
-                  </ul>
+                  </Ul>
                 </section>
 
                 <section>

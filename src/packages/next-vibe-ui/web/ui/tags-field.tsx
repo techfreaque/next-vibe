@@ -7,7 +7,7 @@
 
 import { Plus, X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
-import type { JSX, KeyboardEvent } from "react";
+import type { JSX } from "react";
 import { useRef, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
@@ -15,7 +15,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { Badge } from "./badge";
 import { Button } from "./button";
-import { Input } from "./input";
+import { Input, type InputKeyboardEvent } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 // Cross-platform base interface (no TranslationKey dependency)
@@ -123,9 +123,9 @@ export function TagsField({
     onChange(value.filter((tag) => tag !== tagToRemove));
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
+  const handleKeyDown = (e: InputKeyboardEvent): void => {
     if (e.key === "Enter" && inputValue.trim()) {
-      e.preventDefault();
+      e.preventDefault?.();
       if (allowCustom) {
         addTag(inputValue);
       }

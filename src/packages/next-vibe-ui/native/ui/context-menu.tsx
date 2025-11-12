@@ -1,9 +1,6 @@
 import * as ContextMenuPrimitive from "@rn-primitives/context-menu";
 import * as React from "react";
-import {
-  StyleSheet,
-  View,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
@@ -30,7 +27,6 @@ import type {
   ContextMenuShortcutProps,
 } from "@/packages/next-vibe-ui/web/ui/context-menu";
 
-
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_ITEM =
   "select-none text-sm text-lg text-popover-foreground group-focus:text-accent-foreground";
@@ -48,12 +44,21 @@ const StyledContextMenuLabel = ContextMenuPrimitive.Label;
 const StyledContextMenuSeparator = ContextMenuPrimitive.Separator;
 const StyledContextMenuItemIndicator = ContextMenuPrimitive.ItemIndicator;
 
-function ContextMenu({ children, ...props }: ContextMenuRootProps): React.JSX.Element {
-  return <ContextMenuPrimitive.Root {...props}>{children}</ContextMenuPrimitive.Root>;
+function ContextMenu({
+  children,
+  ...props
+}: ContextMenuRootProps): React.JSX.Element {
+  return (
+    <ContextMenuPrimitive.Root {...props}>{children}</ContextMenuPrimitive.Root>
+  );
 }
 ContextMenu.displayName = ContextMenuPrimitive.Root.displayName;
 
-function ContextMenuTrigger({ children, asChild, ...props }: ContextMenuTriggerProps): React.JSX.Element {
+function ContextMenuTrigger({
+  children,
+  asChild,
+  ...props
+}: ContextMenuTriggerProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -62,22 +67,36 @@ function ContextMenuTrigger({ children, asChild, ...props }: ContextMenuTriggerP
 }
 ContextMenuTrigger.displayName = ContextMenuPrimitive.Trigger.displayName;
 
-function ContextMenuGroup({ children }: ContextMenuGroupProps): React.JSX.Element {
+function ContextMenuGroup({
+  children,
+}: ContextMenuGroupProps): React.JSX.Element {
   return <ContextMenuPrimitive.Group>{children}</ContextMenuPrimitive.Group>;
 }
 ContextMenuGroup.displayName = ContextMenuPrimitive.Group.displayName;
 
-function ContextMenuPortal({ children }: ContextMenuPortalProps): React.JSX.Element {
+function ContextMenuPortal({
+  children,
+}: ContextMenuPortalProps): React.JSX.Element {
   return <ContextMenuPrimitive.Portal>{children}</ContextMenuPrimitive.Portal>;
 }
 ContextMenuPortal.displayName = "ContextMenuPortal";
 
-function ContextMenuSub({ children, ...props }: ContextMenuSubProps): React.JSX.Element {
-  return <ContextMenuPrimitive.Sub {...props}>{children}</ContextMenuPrimitive.Sub>;
+function ContextMenuSub({
+  children,
+  ...props
+}: ContextMenuSubProps): React.JSX.Element {
+  return (
+    <ContextMenuPrimitive.Sub {...props}>{children}</ContextMenuPrimitive.Sub>
+  );
 }
 ContextMenuSub.displayName = ContextMenuPrimitive.Sub.displayName;
 
-function ContextMenuRadioGroup({ children, value, onValueChange, ...props }: ContextMenuRadioGroupProps): React.JSX.Element {
+function ContextMenuRadioGroup({
+  children,
+  value,
+  onValueChange,
+  ...props
+}: ContextMenuRadioGroupProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.RadioGroup
       value={value ?? ""}
@@ -119,8 +138,7 @@ function ContextMenuSubTrigger({
     </TextClassContext.Provider>
   );
 }
-ContextMenuSubTrigger.displayName =
-  ContextMenuPrimitive.SubTrigger.displayName;
+ContextMenuSubTrigger.displayName = ContextMenuPrimitive.SubTrigger.displayName;
 
 function ContextMenuSubContent({
   className,
@@ -143,8 +161,7 @@ function ContextMenuSubContent({
     </StyledContextMenuSubContent>
   );
 }
-ContextMenuSubContent.displayName =
-  ContextMenuPrimitive.SubContent.displayName;
+ContextMenuSubContent.displayName = ContextMenuPrimitive.SubContent.displayName;
 
 function ContextMenuContent({
   className,

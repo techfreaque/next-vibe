@@ -25,7 +25,11 @@ export interface RadioGroupItemProps {
   children?: React.ReactNode;
 }
 
-export function RadioGroup({ className, children, ...props }: RadioGroupRootProps): React.JSX.Element {
+export function RadioGroup({
+  className,
+  children,
+  ...props
+}: RadioGroupRootProps): React.JSX.Element {
   return (
     <RadioGroupPrimitive.Root
       className={cn("grid gap-2", className)}
@@ -37,7 +41,11 @@ export function RadioGroup({ className, children, ...props }: RadioGroupRootProp
 }
 RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
 
-export function RadioGroupItem({ className, children, ...props }: RadioGroupItemProps): React.JSX.Element {
+export function RadioGroupItem({
+  className,
+  children,
+  ...props
+}: RadioGroupItemProps): React.JSX.Element {
   return (
     <RadioGroupPrimitive.Item
       className={cn(

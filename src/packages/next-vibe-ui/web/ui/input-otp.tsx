@@ -35,7 +35,14 @@ export interface OTPContextValue {
   maxLength: number;
 }
 
-function InputOTP({ className, containerClassName, maxLength = 6, value, onChange, children }: InputOTPProps): React.JSX.Element {
+function InputOTP({
+  className,
+  containerClassName,
+  maxLength = 6,
+  value,
+  onChange,
+  children,
+}: InputOTPProps): React.JSX.Element {
   return (
     <OTPInput
       maxLength={maxLength}
@@ -53,16 +60,18 @@ function InputOTP({ className, containerClassName, maxLength = 6, value, onChang
 }
 InputOTP.displayName = "InputOTP";
 
-function InputOTPGroup({ className, children }: InputOTPGroupProps): React.JSX.Element {
-  return (
-    <div className={cn("flex items-center", className)}>
-      {children}
-    </div>
-  );
+function InputOTPGroup({
+  className,
+  children,
+}: InputOTPGroupProps): React.JSX.Element {
+  return <div className={cn("flex items-center", className)}>{children}</div>;
 }
 InputOTPGroup.displayName = "InputOTPGroup";
 
-function InputOTPSlot({ index, className }: InputOTPSlotProps): React.JSX.Element | null {
+function InputOTPSlot({
+  index,
+  className,
+}: InputOTPSlotProps): React.JSX.Element | null {
   const inputOTPContext = React.useContext(OTPInputContext);
   const slotProps = inputOTPContext.slots[index];
   if (!slotProps) {
@@ -89,7 +98,9 @@ function InputOTPSlot({ index, className }: InputOTPSlotProps): React.JSX.Elemen
 }
 InputOTPSlot.displayName = "InputOTPSlot";
 
-function InputOTPSeparator({ className }: InputOTPSeparatorProps): React.JSX.Element {
+function InputOTPSeparator({
+  className,
+}: InputOTPSeparatorProps): React.JSX.Element {
   return (
     <div role="separator" className={className}>
       <DashIcon />

@@ -2,4 +2,4 @@
 import { Cog as SiRustIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiRust = styled(SiRustIcon);
+export const SiRust = styled(SiRustIcon, { className: "style" });

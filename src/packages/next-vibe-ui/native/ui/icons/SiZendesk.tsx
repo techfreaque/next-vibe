@@ -2,4 +2,4 @@
 import { Headphones as SiZendeskIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiZendesk = styled(SiZendeskIcon);
+export const SiZendesk = styled(SiZendeskIcon, { className: "style" });

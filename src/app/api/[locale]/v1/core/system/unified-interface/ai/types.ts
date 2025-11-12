@@ -40,6 +40,9 @@ export interface AIToolMetadataSerialized {
   /** Tool name (snake_case) */
   name: string;
 
+  /** HTTP method (GET, POST, PUT, DELETE, etc.) */
+  method: string;
+
   /** Tool description for AI */
   description: string;
 
@@ -57,6 +60,9 @@ export interface AIToolMetadataSerialized {
 
   /** Allowed roles (serialized as strings) */
   allowedRoles: string[];
+
+  /** CLI aliases for this tool */
+  aliases?: string[];
 }
 
 /**

@@ -30,7 +30,18 @@ export interface SliderThumbProps {
   className?: string;
 }
 
-export function Slider({ className, value, defaultValue, onValueChange, min, max, step, disabled, children, ...props }: SliderRootProps): React.JSX.Element {
+export function Slider({
+  className,
+  value,
+  defaultValue,
+  onValueChange,
+  min,
+  max,
+  step,
+  disabled,
+  children,
+  ...props
+}: SliderRootProps): React.JSX.Element {
   return (
     <SliderPrimitive.Root
       className={cn(
@@ -52,7 +63,11 @@ export function Slider({ className, value, defaultValue, onValueChange, min, max
 }
 Slider.displayName = SliderPrimitive.Root.displayName;
 
-export function SliderTrack({ className, children, ...props }: SliderTrackProps): React.JSX.Element {
+export function SliderTrack({
+  className,
+  children,
+  ...props
+}: SliderTrackProps): React.JSX.Element {
   return (
     <SliderPrimitive.Track
       className={cn(
@@ -67,7 +82,10 @@ export function SliderTrack({ className, children, ...props }: SliderTrackProps)
 }
 SliderTrack.displayName = SliderPrimitive.Track.displayName;
 
-export function SliderRange({ className, ...props }: SliderRangeProps): React.JSX.Element {
+export function SliderRange({
+  className,
+  ...props
+}: SliderRangeProps): React.JSX.Element {
   return (
     <SliderPrimitive.Range
       className={cn("absolute h-full bg-primary", className)}
@@ -77,7 +95,10 @@ export function SliderRange({ className, ...props }: SliderRangeProps): React.JS
 }
 SliderRange.displayName = SliderPrimitive.Range.displayName;
 
-export function SliderThumb({ className, ...props }: SliderThumbProps): React.JSX.Element {
+export function SliderThumb({
+  className,
+  ...props
+}: SliderThumbProps): React.JSX.Element {
   return (
     <SliderPrimitive.Thumb
       className={cn(

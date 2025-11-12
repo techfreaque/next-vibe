@@ -321,7 +321,7 @@ export function LeadEditForm({
 
               {/* User Selector for Converted User */}
               {/* TODO: Implement UserSelector component
- <div className="flex flex-col gap-2">
+ <Div className="flex flex-col gap-2">
  <UserSelector
  locale={locale}
  value={
@@ -334,7 +334,7 @@ export function LeadEditForm({
  )
  }
  />
- </div>
+ </Div>
  */}
 
               <EndpointFormField

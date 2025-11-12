@@ -9,7 +9,12 @@ import { cn } from "next-vibe/shared/utils/utils";
 import type { LinkBaseProps } from "../../web/ui/link";
 
 // Styled Text for NativeWind support
-const StyledText = styled(RNText);
+const StyledText = styled(RNText, {
+  className: "style",
+});
+const StyledLink = styled(ExpoLink, {
+  className: "style",
+})
 
 // Native-specific LinkProps that uses Expo Router's Href type and extends base props
 interface LinkProps extends LinkBaseProps {
@@ -28,7 +33,7 @@ export function Link({
   ...props
 }: LinkProps): React.JSX.Element {
   return (
-    <ExpoLink href={href} asChild {...props}>
+    <StyledLink href={href} asChild {...props}>
       <StyledText
         className={cn(
           "text-primary underline-offset-4 active:underline",
@@ -37,6 +42,6 @@ export function Link({
       >
         {children}
       </StyledText>
-    </ExpoLink>
+    </StyledLink>
   );
 }

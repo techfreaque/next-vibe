@@ -10,13 +10,16 @@ import type {
   AvatarFallbackProps,
 } from "@/packages/next-vibe-ui/web/ui/avatar";
 
-
 // Local styled components - use direct primitives to avoid type instantiation issues
 const StyledAvatarRoot = AvatarPrimitive.Root;
 const StyledAvatarImage = AvatarPrimitive.Image;
 const StyledAvatarFallback = AvatarPrimitive.Fallback;
 
-function Avatar({ className, children, ...props }: AvatarRootProps): React.JSX.Element {
+function Avatar({
+  className,
+  children,
+  ...props
+}: AvatarRootProps): React.JSX.Element {
   return (
     <StyledAvatarRoot
       alt=""
@@ -32,7 +35,11 @@ function Avatar({ className, children, ...props }: AvatarRootProps): React.JSX.E
 }
 Avatar.displayName = AvatarPrimitive.Root.displayName;
 
-function AvatarImage({ className, src, ...props }: AvatarImageProps): React.JSX.Element {
+function AvatarImage({
+  className,
+  src,
+  ...props
+}: AvatarImageProps): React.JSX.Element {
   return (
     <StyledAvatarImage
       src={src}
@@ -43,7 +50,11 @@ function AvatarImage({ className, src, ...props }: AvatarImageProps): React.JSX.
 }
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 
-function AvatarFallback({ className, children, ...props }: AvatarFallbackProps): React.JSX.Element {
+function AvatarFallback({
+  className,
+  children,
+  ...props
+}: AvatarFallbackProps): React.JSX.Element {
   return (
     <StyledAvatarFallback
       className={cn(
@@ -58,8 +69,4 @@ function AvatarFallback({ className, children, ...props }: AvatarFallbackProps):
 }
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
-export {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-};
+export { Avatar, AvatarImage, AvatarFallback };

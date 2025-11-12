@@ -14,7 +14,6 @@
  * - Type-safe params forwarding
  */
 
-import RootLayoutNative  from "@/app/[locale]/layout";
+import RootLayoutNative from "@/app/[locale]/layout";
 
 export default RootLayoutNative;
-  

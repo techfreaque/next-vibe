@@ -3,6 +3,8 @@ import type { Metadata, ResolvingMetadata } from "next";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
+import { Li } from "next-vibe-ui/ui/li";
+import { Ul } from "next-vibe-ui/ui/ul";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
@@ -124,28 +126,28 @@ export default async function ImprintPage({
                 },
               )}
             </P>
-            <ul className="flex flex-col gap-2 mt-4">
-              <li className="flex items-start">
+            <Ul className="flex flex-col gap-2 mt-4">
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 <Span>{t("config.group.name")}</Span>
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 <Span>{t("config.group.legalForm")}</Span>
-              </li>
-              <li className="flex items-start">
+              </Li>
+              <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
                 <Span>{t("config.group.registrationNumber")}</Span>
-              </li>
-              {/* <li className="flex items-start">
+              </Li>
+              {/* <Li className="flex items-start">
  <Span className="mr-2 text-blue-500">•</Span>
  <Span>{t("app.common.company.vatId")}</Span>
- </li> */}
-              {/* <li className="flex items-start">
+ </Li> */}
+              {/* <Li className="flex items-start">
  <Span className="mr-2 text-blue-500">•</Span>
  <Span>{t("app.common.company.registrationCourt")}</Span>
- </li> */}
-            </ul>
+ </Li> */}
+            </Ul>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 

@@ -9,9 +9,9 @@ import {
 import { styled } from "nativewind";
 
 // Create styled wrappers for Moti components
-const StyledMotiView = styled(MotiView);
-const StyledMotiText = styled(MotiText);
-const StyledMotiImage = styled(MotiImage);
+const StyledMotiView = styled(MotiView, { className: "style" });
+const StyledMotiText = styled(MotiText, { className: "style" });
+const StyledMotiImage = styled(MotiImage, { className: "style" });
 
 // Import and re-export shared interfaces from web (source of truth)
 export type {

@@ -5,10 +5,12 @@
 
 "use client";
 
-import { Filter, Mail, RefreshCw } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { Filter, Mail, RefreshCw } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import type React from "react";
 
 import type { EmailsListResponseType } from "@/app/api/[locale]/v1/core/emails/messages/list/definition";
@@ -53,13 +55,13 @@ export function EmailsListClient({
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <Div className="flex justify-between items-center">
           <CardTitle className="flex items-center">
             <Mail className="h-5 w-5 mr-2" />
             {t("app.admin.emails.list.admin.title")} {totalEmails}
           </CardTitle>
 
-          <div className="flex items-center flex flex-row gap-2">
+          <Div className="flex items-center flex flex-row gap-2">
             {/* Refresh */}
             <Button
               variant="outline"
@@ -71,26 +73,26 @@ export function EmailsListClient({
                 className={cn("h-4 w-4", queryLoading && "animate-spin")}
               />
             </Button>
-          </div>
-        </div>
+          </Div>
+        </Div>
       </CardHeader>
       <CardContent>
         {/* Filter Form */}
-        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div className="flex items-center flex flex-row gap-2 mb-4">
+        <Div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <Div className="flex items-center flex flex-row gap-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <Span className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {t("app.admin.emails.list.admin.filters.title")}:
-            </span>
-          </div>
+            </Span>
+          </Div>
 
-          <div className="flex flex-col gap-4">
+          <Div className="flex flex-col gap-4">
             <EmailsListFilters
               form={emailsEndpoint.read.form}
               locale={locale}
             />
-          </div>
-        </div>
+          </Div>
+        </Div>
 
         {/* Results */}
         <EmailsListTable

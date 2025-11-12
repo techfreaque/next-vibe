@@ -3,10 +3,6 @@
  * Production-ready multi-select tags input with suggestions and custom values
  */
 import React, { useState } from "react";
-import type {
-  NativeSyntheticEvent,
-  TextInputKeyPressEventData,
-} from "react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { Plus, X } from "./icons";
 
@@ -15,6 +11,7 @@ import type {
   TagOptionBase,
   TagsFieldPropsBase,
 } from "@/packages/next-vibe-ui/web/ui/tags-field";
+import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import { useTranslation } from "../../../../i18n/core/client";
 import { cn } from "../lib/utils";
@@ -92,18 +89,14 @@ export function TagsField({
     onChange(value.filter((tag: string) => tag !== tagToRemove));
   };
 
-  const handleKeyPress = (
-    e: NativeSyntheticEvent<TextInputKeyPressEventData>,
-  ): void => {
-    if (e.nativeEvent.key === "Enter" && inputValue.trim()) {
+  const handleKeyPress = (e: InputKeyboardEvent): void => {
+    // Input component doesn't actually use onKeyPress on native, but we accept it for API compatibility
+    // This handler won't be called on native TextInput
+    if (e.key === "Enter" && inputValue.trim()) {
       if (allowCustom) {
         addTag(inputValue);
       }
-    } else if (
-      e.nativeEvent.key === "Backspace" &&
-      !inputValue &&
-      value.length > 0
-    ) {
+    } else if (e.key === "Backspace" && !inputValue && value.length > 0) {
       removeTag(value[value.length - 1]);
     }
   };

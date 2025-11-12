@@ -4,28 +4,6 @@ import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 /**
  * Create a standardized error response with a translation key
- * @deprecated Use new object style fail({ ... }) instead
- * @param message - The already translated error message
- * @param translationKey - The translation key for the error message
- * @param errorType - The type of error
- * @param errorCode - Optional error code
- * @returns A standardized error response with translation key
- */
-export function createErrorResponse(
-  message: TranslationKey,
-  errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements],
-  messageParams?: TParams,
-): ErrorResponseType {
-  return {
-    success: false,
-    message,
-    messageParams,
-    errorType,
-  };
-}
-
-/**
- * Create a standardized error response with a translation key
  * @param message - The already translated error message
  * @param errorType - The type of error
  * @param messageParams - Optional parameters for the translation
@@ -79,7 +57,7 @@ export function throwErrorResponse(
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements],
   messageParams?: TParams,
 ): never {
-  const errorResponse = createErrorResponse(message, errorType, messageParams);
+  const errorResponse = fail({message, errorType, messageParams});
   // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Core utility function that intentionally throws for error propagation
   throw new ErrorResponseError(errorResponse);
 }

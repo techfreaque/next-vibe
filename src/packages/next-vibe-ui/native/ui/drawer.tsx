@@ -20,7 +20,6 @@ import type {
   DrawerDescriptionProps,
 } from "@/packages/next-vibe-ui/web/ui/drawer";
 
-
 interface DrawerContextValue {
   open: boolean;
   setOpen: (open: boolean) => void;

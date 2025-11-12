@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import type { JSX } from "react";
 
@@ -41,12 +42,12 @@ export function MarkdownWidget({
 
   if (!isMarkdownWidgetData(data)) {
     return (
-      <div
+      <Div
         className={cn("text-muted-foreground italic", className)}
         style={style}
       >
         —
-      </div>
+      </Div>
     );
   }
 
@@ -54,19 +55,19 @@ export function MarkdownWidget({
 
   if (!content) {
     return (
-      <div
+      <Div
         className={cn("text-muted-foreground italic", className)}
         style={style}
       >
         {t(
           "app.api.v1.core.system.unifiedInterface.react.widgets.markdown.noContent",
         )}
-      </div>
+      </Div>
     );
   }
 
   return (
-    <div
+    <Div
       className={cn(
         "prose prose-sm dark:prose-invert max-w-none",
         "prose-headings:font-semibold prose-headings:tracking-tight",
@@ -78,7 +79,7 @@ export function MarkdownWidget({
       style={style}
     >
       <Markdown content={content} />
-    </div>
+    </Div>
   );
 }
 

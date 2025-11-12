@@ -8,7 +8,7 @@ import type { TextareaProps as WebTextareaProps } from "@/packages/next-vibe-ui/
 import { cn } from "../lib/utils";
 
 // Styled View for NativeWind - TextInput cannot be styled (animations not supported)
-const StyledView = styled(View);
+const StyledView = styled(View, { className: "style" });
 
 // Native textarea props combine web interface with native TextInput props
 export type TextareaProps = WebTextareaProps &

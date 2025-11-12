@@ -14,4 +14,7 @@ export type {
   InferFormValues,
 } from "../../../web/ui/form/endpoint-field-types";
 
-export { isValidFieldPath, getFieldStructureByPath } from "../../../web/ui/form/endpoint-field-types";
+export {
+  isValidFieldPath,
+  getFieldStructureByPath,
+} from "../../../web/ui/form/endpoint-field-types";

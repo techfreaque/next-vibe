@@ -14,7 +14,11 @@ export interface KeyboardAvoidingViewProps {
  * Platform-agnostic KeyboardAvoidingView component for web
  * On web, keyboard handling is automatic, so this is just a passthrough div
  */
-export function KeyboardAvoidingView({ children, className, style }: KeyboardAvoidingViewProps): React.JSX.Element {
+export function KeyboardAvoidingView({
+  children,
+  className,
+  style,
+}: KeyboardAvoidingViewProps): React.JSX.Element {
   // On web, we don't need special keyboard handling
   // Just render a div with the provided props
   return (

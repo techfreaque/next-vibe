@@ -22,7 +22,6 @@ import type {
   AlertDialogCancelProps,
 } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
 
-
 function AlertDialog({
   children,
   ...props

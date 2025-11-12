@@ -103,9 +103,7 @@ export function Button({
   const Comp = asChild ? Slot : "button";
   return (
     <Comp
-      {...(suppressHydrationWarning
-        ? { suppressHydrationWarning: true }
-        : {})}
+      {...(suppressHydrationWarning ? { suppressHydrationWarning: true } : {})}
       className={cn(
         buttonVariants({ variant, size, className }),
         "cursor-pointer",

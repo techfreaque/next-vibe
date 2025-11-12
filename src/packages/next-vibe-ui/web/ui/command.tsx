@@ -56,7 +56,10 @@ export interface CommandShortcutProps {
 
 export type CommandDialogProps = DialogProps;
 
-function Command({ className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive>): React.JSX.Element {
+function Command({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof CommandPrimitive>): React.JSX.Element {
   return (
     <CommandPrimitive
       className={cn(
@@ -84,7 +87,12 @@ const CommandDialog = ({
   );
 };
 
-function CommandInput({ className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>): React.JSX.Element {
+function CommandInput({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<
+  typeof CommandPrimitive.Input
+>): React.JSX.Element {
   return (
     <div className="flex items-center border-b px-3" data-cmdk-input-wrapper="">
       <MagnifyingGlassIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
@@ -101,10 +109,18 @@ function CommandInput({ className, ...props }: React.ComponentPropsWithoutRef<ty
 
 CommandInput.displayName = CommandPrimitive.Input.displayName;
 
-function CommandList({ className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>): React.JSX.Element {
+function CommandList({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<
+  typeof CommandPrimitive.List
+>): React.JSX.Element {
   return (
     <CommandPrimitive.List
-      className={cn("max-h-[300px] overflow-y-auto overflow-x-hidden", className)}
+      className={cn(
+        "max-h-[300px] overflow-y-auto overflow-x-hidden",
+        className,
+      )}
       {...props}
     />
   );
@@ -112,18 +128,22 @@ function CommandList({ className, ...props }: React.ComponentPropsWithoutRef<typ
 
 CommandList.displayName = CommandPrimitive.List.displayName;
 
-function CommandEmpty(props: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>): React.JSX.Element {
+function CommandEmpty(
+  props: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>,
+): React.JSX.Element {
   return (
-    <CommandPrimitive.Empty
-      className="py-6 text-center text-sm"
-      {...props}
-    />
+    <CommandPrimitive.Empty className="py-6 text-center text-sm" {...props} />
   );
 }
 
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName;
 
-function CommandGroup({ className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>): React.JSX.Element {
+function CommandGroup({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<
+  typeof CommandPrimitive.Group
+>): React.JSX.Element {
   return (
     <CommandPrimitive.Group
       className={cn(
@@ -137,7 +157,12 @@ function CommandGroup({ className, ...props }: React.ComponentPropsWithoutRef<ty
 
 CommandGroup.displayName = CommandPrimitive.Group.displayName;
 
-function CommandSeparator({ className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>): React.JSX.Element {
+function CommandSeparator({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<
+  typeof CommandPrimitive.Separator
+>): React.JSX.Element {
   return (
     <CommandPrimitive.Separator
       className={cn("-mx-1 h-px bg-border", className)}
@@ -147,7 +172,12 @@ function CommandSeparator({ className, ...props }: React.ComponentPropsWithoutRe
 }
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
 
-function CommandItem({ className, ...props }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>): React.JSX.Element {
+function CommandItem({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<
+  typeof CommandPrimitive.Item
+>): React.JSX.Element {
   return (
     <CommandPrimitive.Item
       className={cn(

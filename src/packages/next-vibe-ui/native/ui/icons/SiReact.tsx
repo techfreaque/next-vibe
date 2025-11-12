@@ -2,4 +2,4 @@
 import { Atom as SiReactIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiReact = styled(SiReactIcon);
+export const SiReact = styled(SiReactIcon, { className: "style" });

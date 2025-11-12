@@ -82,7 +82,12 @@ const DrawerPortal = DrawerPrimitive.Portal;
 
 const DrawerClose = DrawerPrimitive.Close;
 
-function DrawerOverlay({ className, ...props }: React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay>): React.JSX.Element {
+function DrawerOverlay({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<
+  typeof DrawerPrimitive.Overlay
+>): React.JSX.Element {
   return (
     <DrawerPrimitive.Overlay
       className={cn("fixed inset-0 z-50 bg-black/80", className)}
@@ -92,7 +97,13 @@ function DrawerOverlay({ className, ...props }: React.ComponentPropsWithoutRef<t
 }
 DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName;
 
-function DrawerContent({ className, children, ...props }: React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>): React.JSX.Element {
+function DrawerContent({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<
+  typeof DrawerPrimitive.Content
+>): React.JSX.Element {
   return (
     <DrawerPortal>
       <DrawerOverlay />
@@ -131,7 +142,12 @@ const DrawerFooter = ({
 );
 DrawerFooter.displayName = "DrawerFooter";
 
-function DrawerTitle({ className, ...props }: React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Title>): React.JSX.Element {
+function DrawerTitle({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<
+  typeof DrawerPrimitive.Title
+>): React.JSX.Element {
   return (
     <DrawerPrimitive.Title
       className={cn(
@@ -144,7 +160,12 @@ function DrawerTitle({ className, ...props }: React.ComponentPropsWithoutRef<typ
 }
 DrawerTitle.displayName = DrawerPrimitive.Title.displayName;
 
-function DrawerDescription({ className, ...props }: React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Description>): React.JSX.Element {
+function DrawerDescription({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<
+  typeof DrawerPrimitive.Description
+>): React.JSX.Element {
   return (
     <DrawerPrimitive.Description
       className={cn("text-sm text-muted-foreground", className)}

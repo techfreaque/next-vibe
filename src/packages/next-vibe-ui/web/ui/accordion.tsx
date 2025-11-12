@@ -34,7 +34,16 @@ export interface AccordionContentProps {
   children?: React.ReactNode;
 }
 
-export function Accordion({ children, type = "single", collapsible = false, value, onValueChange, defaultValue, disabled, className }: AccordionRootProps): React.JSX.Element {
+export function Accordion({
+  children,
+  type = "single",
+  collapsible = false,
+  value,
+  onValueChange,
+  defaultValue,
+  disabled,
+  className,
+}: AccordionRootProps): React.JSX.Element {
   if (type === "single") {
     return (
       <AccordionPrimitive.Root
@@ -66,12 +75,21 @@ export function Accordion({ children, type = "single", collapsible = false, valu
 }
 Accordion.displayName = AccordionPrimitive.Root.displayName;
 
-export function AccordionItem({ className, ...props }: AccordionItemProps): React.JSX.Element {
-  return <AccordionPrimitive.Item className={cn("border-b", className)} {...props} />;
+export function AccordionItem({
+  className,
+  ...props
+}: AccordionItemProps): React.JSX.Element {
+  return (
+    <AccordionPrimitive.Item className={cn("border-b", className)} {...props} />
+  );
 }
 AccordionItem.displayName = AccordionPrimitive.Item.displayName;
 
-export function AccordionTrigger({ className, children, ...props }: AccordionTriggerProps): React.JSX.Element {
+export function AccordionTrigger({
+  className,
+  children,
+  ...props
+}: AccordionTriggerProps): React.JSX.Element {
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
@@ -89,7 +107,11 @@ export function AccordionTrigger({ className, children, ...props }: AccordionTri
 }
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
-export function AccordionContent({ className, children, ...props }: AccordionContentProps): React.JSX.Element {
+export function AccordionContent({
+  className,
+  children,
+  ...props
+}: AccordionContentProps): React.JSX.Element {
   return (
     <AccordionPrimitive.Content
       className={cn(

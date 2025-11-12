@@ -781,10 +781,10 @@ function LoginForm() {
 }
 
 // In API responses
-return createErrorResponse(
-  "app.api.v1.core.user.errors.invalid_credentials",
-  ErrorResponseTypes.UNAUTHORIZED,
-);
+return fail({
+  message: "app.api.v1.core.user.errors.invalid_credentials",
+  errorType: ErrorResponseTypes.UNAUTHORIZED,
+});
 
 // In CLI output
 logger.info("app.api.v1.core.user.public.login.success");

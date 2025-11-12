@@ -16,7 +16,6 @@ import type {
   PopoverCloseProps,
 } from "@/packages/next-vibe-ui/web/ui/popover";
 
-
 // Local styled components - use direct primitives to avoid type instantiation issues
 const StyledPopoverContent = PopoverPrimitive.Content;
 
@@ -25,7 +24,11 @@ function Popover({ children, ...props }: PopoverRootProps): React.JSX.Element {
 }
 Popover.displayName = PopoverPrimitive.Root.displayName;
 
-function PopoverTrigger({ children, asChild, ...props }: PopoverTriggerProps): React.JSX.Element {
+function PopoverTrigger({
+  children,
+  asChild,
+  ...props
+}: PopoverTriggerProps): React.JSX.Element {
   return (
     <PopoverPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -34,7 +37,11 @@ function PopoverTrigger({ children, asChild, ...props }: PopoverTriggerProps): R
 }
 PopoverTrigger.displayName = PopoverPrimitive.Trigger.displayName;
 
-function PopoverAnchor({ children, asChild, ...props }: PopoverAnchorProps): React.JSX.Element {
+function PopoverAnchor({
+  children,
+  asChild,
+  ...props
+}: PopoverAnchorProps): React.JSX.Element {
   return (
     <PopoverPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -86,7 +93,11 @@ function PopoverContent({
 }
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-function PopoverClose({ children, asChild, ...props }: PopoverCloseProps): React.JSX.Element {
+function PopoverClose({
+  children,
+  asChild,
+  ...props
+}: PopoverCloseProps): React.JSX.Element {
   return (
     <PopoverPrimitive.Close asChild={asChild} {...props}>
       {children}

@@ -22,11 +22,13 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 // Note: parameters field is omitted as Zod schemas cannot be JSON serialized
 const aiToolMetadataSchema = z.object({
   name: z.string(),
+  method: z.string(),
   description: z.string(),
   category: z.string().optional(),
   tags: z.array(z.string()),
   endpointId: z.string(),
   allowedRoles: z.array(z.string()),
+  aliases: z.array(z.string()).optional(),
 });
 
 const { GET } = createEndpoint({

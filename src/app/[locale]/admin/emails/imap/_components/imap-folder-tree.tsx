@@ -144,16 +144,18 @@ function FolderTreeNode({
       >
         {/* Expand/Collapse Button */}
         {folder.hasChildren && (
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mr-2 p-1 hover:bg-gray-200 rounded"
+            className="mr-2 p-1 hover:bg-gray-200 rounded h-6 w-6"
           >
             {isExpanded ? (
               <ChevronDown className="h-4 w-4" />
             ) : (
               <ChevronRight className="h-4 w-4" />
             )}
-          </button>
+          </Button>
         )}
 
         {/* Folder Icon */}

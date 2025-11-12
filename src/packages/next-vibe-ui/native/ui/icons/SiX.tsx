@@ -2,4 +2,4 @@
 import { Bird as SiXIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiX = styled(SiXIcon);
+export const SiX = styled(SiXIcon, { className: "style" });

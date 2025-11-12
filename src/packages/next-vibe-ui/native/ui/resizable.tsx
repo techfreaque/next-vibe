@@ -17,7 +17,7 @@ import type {
 import { styled } from "nativewind";
 
 // Type-safe View with className support (NativeWind)
-const StyledView = styled(View);
+const StyledView = styled(View, { className: "style" });
 
 export function ResizablePanelGroup({
   className,

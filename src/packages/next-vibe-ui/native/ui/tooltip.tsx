@@ -25,7 +25,9 @@ export type {
   TooltipTriggerProps,
 };
 
-export function TooltipProvider(props: TooltipProviderProps): React.JSX.Element {
+export function TooltipProvider(
+  props: TooltipProviderProps,
+): React.JSX.Element {
   return <TooltipPrimitive.Root {...props} />;
 }
 

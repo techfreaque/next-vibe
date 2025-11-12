@@ -69,14 +69,15 @@ CommandList.displayName = "CommandList";
 
 export const CommandEmpty = React.forwardRef<View, CommandEmptyProps>(
   ({ className, children, ...props }, ref) => (
-  <View
-    ref={ref}
-    className={cn("py-6 text-center text-sm", className)}
-    {...props}
-  >
-    {children}
-  </View>
-));
+    <View
+      ref={ref}
+      className={cn("py-6 text-center text-sm", className)}
+      {...props}
+    >
+      {children}
+    </View>
+  ),
+);
 
 CommandEmpty.displayName = "CommandEmpty";
 

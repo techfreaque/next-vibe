@@ -1,4 +1,4 @@
 import { FolderPlus as FolderPlusIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const FolderPlus = styled(FolderPlusIcon);
+export const FolderPlus = styled(FolderPlusIcon, { className: "style" });

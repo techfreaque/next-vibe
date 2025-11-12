@@ -1,9 +1,6 @@
 import * as DropdownMenuPrimitive from "@rn-primitives/dropdown-menu";
 import * as React from "react";
-import {
-  StyleSheet,
-  View,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
@@ -30,7 +27,6 @@ import type {
   DropdownMenuShortcutProps,
 } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
 
-
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_ITEM =
   "select-none text-sm text-lg text-popover-foreground group-focus:text-accent-foreground";
@@ -48,12 +44,23 @@ const StyledDropdownMenuLabel = DropdownMenuPrimitive.Label;
 const StyledDropdownMenuSeparator = DropdownMenuPrimitive.Separator;
 const StyledDropdownMenuItemIndicator = DropdownMenuPrimitive.ItemIndicator;
 
-function DropdownMenu({ children, ...props }: DropdownMenuRootProps): React.JSX.Element {
-  return <DropdownMenuPrimitive.Root {...props}>{children}</DropdownMenuPrimitive.Root>;
+function DropdownMenu({
+  children,
+  ...props
+}: DropdownMenuRootProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.Root {...props}>
+      {children}
+    </DropdownMenuPrimitive.Root>
+  );
 }
 DropdownMenu.displayName = DropdownMenuPrimitive.Root.displayName;
 
-function DropdownMenuTrigger({ children, asChild, ...props }: DropdownMenuTriggerProps): React.JSX.Element {
+function DropdownMenuTrigger({
+  children,
+  asChild,
+  ...props
+}: DropdownMenuTriggerProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -62,22 +69,38 @@ function DropdownMenuTrigger({ children, asChild, ...props }: DropdownMenuTrigge
 }
 DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName;
 
-function DropdownMenuGroup({ children }: DropdownMenuGroupProps): React.JSX.Element {
+function DropdownMenuGroup({
+  children,
+}: DropdownMenuGroupProps): React.JSX.Element {
   return <DropdownMenuPrimitive.Group>{children}</DropdownMenuPrimitive.Group>;
 }
 DropdownMenuGroup.displayName = DropdownMenuPrimitive.Group.displayName;
 
-function DropdownMenuPortal({ children }: DropdownMenuPortalProps): React.JSX.Element {
-  return <DropdownMenuPrimitive.Portal>{children}</DropdownMenuPrimitive.Portal>;
+function DropdownMenuPortal({
+  children,
+}: DropdownMenuPortalProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.Portal>{children}</DropdownMenuPrimitive.Portal>
+  );
 }
 DropdownMenuPortal.displayName = "DropdownMenuPortal";
 
-function DropdownMenuSub({ children, ...props }: DropdownMenuSubProps): React.JSX.Element {
-  return <DropdownMenuPrimitive.Sub {...props}>{children}</DropdownMenuPrimitive.Sub>;
+function DropdownMenuSub({
+  children,
+  ...props
+}: DropdownMenuSubProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.Sub {...props}>{children}</DropdownMenuPrimitive.Sub>
+  );
 }
 DropdownMenuSub.displayName = DropdownMenuPrimitive.Sub.displayName;
 
-function DropdownMenuRadioGroup({ children, value, onValueChange, ...props }: DropdownMenuRadioGroupProps): React.JSX.Element {
+function DropdownMenuRadioGroup({
+  children,
+  value,
+  onValueChange,
+  ...props
+}: DropdownMenuRadioGroupProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.RadioGroup
       value={value ?? ""}
@@ -88,7 +111,8 @@ function DropdownMenuRadioGroup({ children, value, onValueChange, ...props }: Dr
     </DropdownMenuPrimitive.RadioGroup>
   );
 }
-DropdownMenuRadioGroup.displayName = DropdownMenuPrimitive.RadioGroup.displayName;
+DropdownMenuRadioGroup.displayName =
+  DropdownMenuPrimitive.RadioGroup.displayName;
 
 function DropdownMenuSubTrigger({
   className,

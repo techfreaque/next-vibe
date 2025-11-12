@@ -8,7 +8,7 @@ import { styled } from "nativewind";
 export type { AspectRatioRootProps };
 
 // Styled component using nativewind
-const StyledAspectRatioRoot = styled(AspectRatioPrimitive.Root);
+const StyledAspectRatioRoot = styled(AspectRatioPrimitive.Root, { className: "style" });
 
 export function AspectRatio({
   className,
@@ -16,10 +16,7 @@ export function AspectRatio({
   children,
 }: AspectRatioRootProps): React.JSX.Element {
   return (
-    <StyledAspectRatioRoot
-      ratio={ratio ?? 16 / 9}
-      className={cn(className)}
-    >
+    <StyledAspectRatioRoot ratio={ratio ?? 16 / 9} className={cn(className)}>
       {children}
     </StyledAspectRatioRoot>
   );

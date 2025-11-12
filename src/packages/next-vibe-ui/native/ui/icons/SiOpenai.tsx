@@ -2,4 +2,4 @@
 import { Bot as SiOpenaiIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiOpenai = styled(SiOpenaiIcon);
+export const SiOpenai = styled(SiOpenaiIcon, { className: "style" });

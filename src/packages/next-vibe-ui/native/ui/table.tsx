@@ -16,13 +16,13 @@ import type {
 import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 
-const StyledTableRoot = styled(TablePrimitive.Root);
-const StyledTableHeader = styled(TablePrimitive.Header);
-const StyledTableBody = styled(TablePrimitive.Body);
-const StyledTableFooter = styled(TablePrimitive.Footer);
-const StyledTableRow = styled(TablePrimitive.Row);
-const StyledTableHead = styled(TablePrimitive.Head);
-const StyledTableCell = styled(TablePrimitive.Cell);
+const StyledTableRoot = styled(TablePrimitive.Root, { className: "style" });
+const StyledTableHeader = styled(TablePrimitive.Header, { className: "style" });
+const StyledTableBody = styled(TablePrimitive.Body, { className: "style" });
+const StyledTableFooter = styled(TablePrimitive.Footer, { className: "style" });
+const StyledTableRow = styled(TablePrimitive.Row, { className: "style" });
+const StyledTableHead = styled(TablePrimitive.Head, { className: "style" });
+const StyledTableCell = styled(TablePrimitive.Cell, { className: "style" });
 
 function Table({ className, ...props }: TableProps): React.JSX.Element {
   return (

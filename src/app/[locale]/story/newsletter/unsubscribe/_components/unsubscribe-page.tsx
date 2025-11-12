@@ -97,7 +97,7 @@ export function UnsubscribePage({
                   className="text-center text-lg py-3"
                   autoComplete="email"
                   autoCorrect="off"
-                  spellCheck="false"
+                  spellCheck={false}
                   value={email}
                   onChange={handleEmailChange}
                   aria-label={t("app.story.newsletter.emailPlaceholder")}

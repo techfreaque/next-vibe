@@ -5,7 +5,6 @@
 
 "use client";
 
-import { RefreshCw } from "next-vibe-ui/ui/icons";
 import {
   ChartType,
   DateRangePreset,
@@ -13,7 +12,9 @@ import {
 } from "next-vibe/shared/types/stats-filtering.schema";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { RefreshCw } from "next-vibe-ui/ui/icons";
 import type { JSX, ReactNode } from "react";
 import type { Control } from "react-hook-form";
 
@@ -54,7 +55,7 @@ export function EmailStatsFiltersContainer({
   const { t } = simpleT(locale);
 
   return (
-    <div className="flex flex-col gap-4">
+    <Div className="flex flex-col gap-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-4">
           <CardTitle className="text-lg font-semibold">
@@ -74,7 +75,7 @@ export function EmailStatsFiltersContainer({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">{children}</CardContent>
       </Card>
-    </div>
+    </Div>
   );
 }
 
@@ -85,9 +86,9 @@ export function EmailStatsFilters({
   control,
 }: EmailStatsFiltersProps): JSX.Element {
   return (
-    <div className="flex flex-col gap-4">
+    <Div className="flex flex-col gap-4">
       {/* Base time and chart filters */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Time Period */}
         <EndpointFormField
           control={control}
@@ -223,10 +224,10 @@ export function EmailStatsFilters({
             ],
           }}
         />
-      </div>
+      </Div>
 
       {/* Email-specific filters */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Email Status Filter */}
         <EndpointFormField
           control={control}
@@ -350,10 +351,10 @@ export function EmailStatsFilters({
             ],
           }}
         />
-      </div>
+      </Div>
 
       {/* Additional filters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Sort Order */}
         <EndpointFormField
           control={control}
@@ -388,7 +389,7 @@ export function EmailStatsFilters({
               "app.admin.emails.stats.admin.stats.filters.includeComparisonDescription",
           }}
         />
-      </div>
+      </Div>
 
       {/* Search */}
       <EndpointFormField
@@ -401,6 +402,6 @@ export function EmailStatsFilters({
             "app.admin.emails.stats.admin.stats.filters.searchPlaceholder",
         }}
       />
-    </div>
+    </Div>
   );
 }

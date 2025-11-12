@@ -24,11 +24,10 @@ import type {
   FormComboboxProps,
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 import { Pressable, View } from "react-native";
-import { FadeInDown, FadeOut } from "react-native-reanimated";
-
-import { StyledAnimatedText } from "../lib/styled";
-import { cn } from "../lib/utils";
+import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 import { styled } from "nativewind";
+
+import { cn } from "../lib/utils";
 import {
   BottomSheet,
   BottomSheetContent,
@@ -56,7 +55,9 @@ import { Switch } from "./switch";
 import { Textarea } from "./textarea";
 import { Span } from "./span";
 
-const StyledView = styled(View);
+// Styled components for NativeWind support
+const StyledView = styled(View, { className: "style" });
+const StyledAnimatedText = styled(Animated.Text, { className: "style" });
 
 const Form = FormProvider;
 
@@ -338,7 +339,6 @@ function FormCheckbox({
 
 FormCheckbox.displayName = "FormCheckbox";
 
-
 function FormDatePicker({
   label,
   description,
@@ -449,7 +449,6 @@ function FormRadioGroup({
 
 FormRadioGroup.displayName = "FormRadioGroup";
 
-
 function FormCombobox({
   label,
   description,
@@ -457,9 +456,7 @@ function FormCombobox({
   onChange,
   options = [],
 }: FormComboboxProps): JSX.Element {
-  const {
-    formItemNativeID,
-  } = useFormField();
+  const { formItemNativeID } = useFormField();
 
   return (
     <FormItem>

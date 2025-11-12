@@ -25,7 +25,6 @@ import type {
   NavigationMenuIndicatorProps,
 } from "@/packages/next-vibe-ui/web/ui/navigation-menu";
 
-
 // navigationMenuTriggerStyle helper function (native implementation)
 function navigationMenuTriggerStyle(): string {
   return cn(
@@ -92,7 +91,11 @@ function NavigationMenuItem({
   value,
   children,
 }: NavigationMenuItemProps): React.JSX.Element {
-  return <NavigationMenuPrimitive.Item value={value}>{children}</NavigationMenuPrimitive.Item>;
+  return (
+    <NavigationMenuPrimitive.Item value={value}>
+      {children}
+    </NavigationMenuPrimitive.Item>
+  );
 }
 NavigationMenuItem.displayName = NavigationMenuPrimitive.Item.displayName;
 
@@ -162,7 +165,11 @@ function NavigationMenuLink({
   children,
   ...props
 }: NavigationMenuLinkProps): React.JSX.Element {
-  return <NavigationMenuPrimitive.Link {...props}>{children}</NavigationMenuPrimitive.Link>;
+  return (
+    <NavigationMenuPrimitive.Link {...props}>
+      {children}
+    </NavigationMenuPrimitive.Link>
+  );
 }
 NavigationMenuLink.displayName = NavigationMenuPrimitive.Link.displayName;
 
@@ -184,7 +191,8 @@ function NavigationMenuViewport({
     </View>
   );
 }
-NavigationMenuViewport.displayName = NavigationMenuPrimitive.Viewport.displayName;
+NavigationMenuViewport.displayName =
+  NavigationMenuPrimitive.Viewport.displayName;
 
 function NavigationMenuIndicator({
   className,
@@ -206,7 +214,8 @@ function NavigationMenuIndicator({
     </NavigationMenuPrimitive.Indicator>
   );
 }
-NavigationMenuIndicator.displayName = NavigationMenuPrimitive.Indicator.displayName;
+NavigationMenuIndicator.displayName =
+  NavigationMenuPrimitive.Indicator.displayName;
 
 export {
   NavigationMenu,

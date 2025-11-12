@@ -34,7 +34,17 @@ export interface ResizableHandleProps
   withHandle?: boolean;
 }
 
-function ResizablePanelGroup({ className, children, direction, autoSaveId, id, keyboardResizeBy, onLayout, storage, tagName }: ResizablePanelGroupProps): JSX.Element {
+function ResizablePanelGroup({
+  className,
+  children,
+  direction,
+  autoSaveId,
+  id,
+  keyboardResizeBy,
+  onLayout,
+  storage,
+  tagName,
+}: ResizablePanelGroupProps): JSX.Element {
   return (
     <ResizablePrimitive.PanelGroup
       direction={direction}

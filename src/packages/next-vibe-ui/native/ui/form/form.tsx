@@ -11,7 +11,7 @@ import { styled } from "nativewind";
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-const StyledView = styled(View);
+const StyledView = styled(View, { className: "style" });
 
 // ============================================================================
 // IMPORT ALL TYPES FROM WEB - DO NOT REDEFINE ANY TYPES
@@ -186,7 +186,10 @@ FormControl.displayName = "FormControl";
  * Type compatibility: FormDescriptionProps is HTMLAttributes on web, but we need
  * TextProps on native. We pick only the compatible props (className, children, etc.)
  */
-function FormDescription({ className, ...props }: Pick<FormDescriptionProps, "className" | "children">): React.JSX.Element {
+function FormDescription({
+  className,
+  ...props
+}: Pick<FormDescriptionProps, "className" | "children">): React.JSX.Element {
   const { formDescriptionId } = useFormField();
 
   return (
@@ -206,7 +209,11 @@ FormDescription.displayName = "FormDescription";
  * Type compatibility: FormMessageProps is HTMLAttributes on web, but we need
  * TextProps on native. We pick only the compatible props (className, children, etc.)
  */
-function FormMessage({ className, children, ...props }: Pick<FormMessageProps, "className" | "children">): React.JSX.Element | null {
+function FormMessage({
+  className,
+  children,
+  ...props
+}: Pick<FormMessageProps, "className" | "children">): React.JSX.Element | null {
   const { error, formMessageId } = useFormField();
   const { t } = useTranslation();
   const body = error ? String(error.message) : children;

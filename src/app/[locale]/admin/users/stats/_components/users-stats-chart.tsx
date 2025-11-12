@@ -9,6 +9,7 @@ import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schem
 import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
+import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { H4, P } from "next-vibe-ui/ui/typography";
@@ -76,24 +77,29 @@ function ChartLegend({
           {t("app.admin.users.stats.legend.title")}
         </H4>
         <Div className="flex gap-2">
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onShowAll}
             className="text-xs text-muted-foreground hover:text-foreground"
           >
             {t("app.admin.users.stats.legend.showAll")}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onHideAll}
             className="text-xs text-muted-foreground hover:text-foreground"
           >
             {t("app.admin.users.stats.legend.hideAll")}
-          </button>
+          </Button>
         </Div>
       </Div>
       <Div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-4">
         {series.map((item) => (
-          <button
+          <Button
             key={item.name}
+            variant="ghost"
             onClick={() => onToggle(item.name)}
             className={`flex items-center gap-2 p-2 rounded text-sm transition-opacity ${
               item.visible ? "opacity-100" : "opacity-50"
@@ -104,7 +110,7 @@ function ChartLegend({
               style={{ backgroundColor: item.color }}
             />
             <Span className="truncate">{t(item.name, item.nameParams)}</Span>
-          </button>
+          </Button>
         ))}
       </Div>
     </Div>

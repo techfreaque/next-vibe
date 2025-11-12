@@ -37,7 +37,7 @@ import { ImportDomain, ImportDomainOptions } from "./enum";
 const { POST: ImportCsvPost } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "import", "csv"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.ADMIN] as const,
   aliases: ["import:csv", "csv-import"],
 
   title: "app.api.v1.core.import.csv.post.title",
@@ -532,7 +532,7 @@ const { POST: ImportCsvPost } = createEndpoint({
 const { GET: ListImportJobsGet } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "import", "jobs"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.ADMIN] as const,
   aliases: ["import:jobs", "import-jobs-list"],
 
   title: "app.api.v1.core.import.jobs.get.title",

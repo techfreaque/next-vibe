@@ -5,8 +5,10 @@
 
 "use client";
 
-import { ChevronLeft, ChevronRight } from "next-vibe-ui/ui/icons";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { ChevronLeft, ChevronRight } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -80,31 +82,31 @@ export function EmailsListPagination({
 
   if (totalPages <= 1) {
     return (
-      <div className="flex justify-between items-center mt-4">
-        <div className="text-sm text-muted-foreground">
+      <Div className="flex justify-between items-center mt-4">
+        <Div className="text-sm text-muted-foreground">
           {t("app.admin.emails.list.pagination.showing", {
             start: startItem,
             end: endItem,
             total: totalEmails,
           })}
-        </div>
-      </div>
+        </Div>
+      </Div>
     );
   }
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
+    <Div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
       {/* Results info */}
-      <div className="text-sm text-muted-foreground">
+      <Div className="text-sm text-muted-foreground">
         {t("app.admin.emails.list.pagination.showing", {
           start: startItem,
           end: endItem,
           total: totalEmails,
         })}
-      </div>
+      </Div>
 
       {/* Pagination controls */}
-      <div className="flex items-center gap-2">
+      <Div className="flex items-center gap-2">
         {/* Previous button */}
         <Button
           variant="outline"
@@ -117,7 +119,7 @@ export function EmailsListPagination({
         </Button>
 
         {/* Page numbers */}
-        <div className="flex items-center gap-1">
+        <Div className="flex items-center gap-1">
           {/* First page if not in range */}
           {currentPage > 3 && totalPages > 5 && (
             <>
@@ -129,7 +131,7 @@ export function EmailsListPagination({
                 1
               </Button>
               {currentPage > 4 && (
-                <span className="px-2 text-muted-foreground">...</span>
+                <Span className="px-2 text-muted-foreground">...</Span>
               )}
             </>
           )}
@@ -150,7 +152,7 @@ export function EmailsListPagination({
           {currentPage < totalPages - 2 && totalPages > 5 && (
             <>
               {currentPage < totalPages - 3 && (
-                <span className="px-2 text-muted-foreground">...</span>
+                <Span className="px-2 text-muted-foreground">...</Span>
               )}
               <Button
                 variant="outline"
@@ -161,7 +163,7 @@ export function EmailsListPagination({
               </Button>
             </>
           )}
-        </div>
+        </Div>
 
         {/* Next button */}
         <Button
@@ -173,7 +175,7 @@ export function EmailsListPagination({
           {t("app.admin.emails.list.pagination.next")}
           <ChevronRight className="h-4 w-4" />
         </Button>
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }

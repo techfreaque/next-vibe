@@ -67,7 +67,7 @@ export function NewsletterSignupFooter({
             className="max-w-[220px]"
             autoComplete="email"
             autoCorrect="off"
-            spellCheck="false"
+            spellCheck={false}
             value={email}
             onChange={handleEmailChange}
             aria-label={t("app.newsletter.emailPlaceholder")}

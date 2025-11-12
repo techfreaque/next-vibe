@@ -7,7 +7,11 @@ import type { SlottableTextPropsWithClassName } from "../lib/types";
 
 const TextClassContext = React.createContext<string | undefined>(undefined);
 
-function Text({ className, asChild = false, ...props }: SlottableTextPropsWithClassName): React.JSX.Element {
+function Text({
+  className,
+  asChild = false,
+  ...props
+}: SlottableTextPropsWithClassName): React.JSX.Element {
   const textClass = React.useContext(TextClassContext);
   if (asChild) {
     return (

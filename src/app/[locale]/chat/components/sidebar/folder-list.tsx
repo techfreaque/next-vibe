@@ -31,6 +31,8 @@ import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
+import type { DivMouseEvent } from "@/packages/next-vibe-ui/web/ui/div";
+
 import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks/hooks";
 import type { FolderUpdate } from "@/app/api/[locale]/v1/core/agent/chat/folders/hooks/use-operations";
 import {
@@ -557,9 +559,9 @@ function FolderItem({
   const isActive = activeFolderId === folder.id;
 
   // Handle folder click to navigate
-  const handleFolderClick = (e: React.MouseEvent<HTMLDivElement>): void => {
+  const handleFolderClick = (e: DivMouseEvent): void => {
     // Don't navigate if clicking on buttons
-    if (e.target instanceof HTMLElement && e.target.closest("button")) {
+    if (e.target.closest("button")) {
       return;
     }
 

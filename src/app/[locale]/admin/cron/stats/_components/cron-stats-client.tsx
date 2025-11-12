@@ -1001,19 +1001,19 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                           </Div>
                           <Div className="text-right flex flex-col gap-1">
                             <Div className="flex items-center gap-2">
-                              <span className="text-sm font-medium">
+                              <Span className="text-sm font-medium">
                                 {formatNumber(priorityStat.executions)}{" "}
                                 {t("app.admin.cron.stats.executions")}
-                              </span>
-                              <span className="text-sm text-green-600">
+                              </Span>
+                              <Span className="text-sm text-green-600">
                                 {formatPercentage(priorityStat.successRate)}
-                              </span>
+                              </Span>
                             </Div>
                             <Div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">
+                              <Span className="text-sm text-muted-foreground">
                                 {formatNumber(priorityStat.avgDuration)}ms{" "}
                                 {t("app.admin.cron.stats.avg")}
-                              </span>
+                              </Span>
                             </Div>
                           </Div>
                         </Div>
@@ -1120,10 +1120,10 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
                             </Div>
                           </Div>
                           <Div className="text-right">
-                            <span className="text-sm text-muted-foreground">
+                            <Span className="text-sm text-muted-foreground">
                               {formatNumber(timeStat.avgDuration)}ms{" "}
                               {t("app.admin.cron.stats.avg")}
-                            </span>
+                            </Span>
                           </Div>
                         </Div>
                       ),

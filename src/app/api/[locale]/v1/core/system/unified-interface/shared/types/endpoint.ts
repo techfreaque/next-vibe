@@ -74,7 +74,7 @@ export interface ApiSection {
   readonly PUT?: CreateApiEndpointAny;
   readonly PATCH?: CreateApiEndpointAny;
   readonly DELETE?: CreateApiEndpointAny;
-  readonly [key: string]: CreateApiEndpointAny | ApiSection | undefined
+  readonly [key: string]: CreateApiEndpointAny | ApiSection | undefined;
 }
 
 // ============================================================================

@@ -110,7 +110,8 @@ export function createPageWrapperWithImport<
         try {
           // Dynamically import the component
           const componentModule = await importFn();
-          const PageComponent = componentModule.default as AnyNextPageComponent<TParams>;
+          const PageComponent =
+            componentModule.default as AnyNextPageComponent<TParams>;
 
           // Create a proper Promise<TParams> for Next.js 15 async params
           const paramsPromise: Promise<TParams> = Promise.resolve(params);

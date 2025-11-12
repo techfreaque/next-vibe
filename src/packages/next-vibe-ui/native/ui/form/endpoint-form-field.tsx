@@ -63,7 +63,7 @@ import { styled } from "nativewind";
 import { Div } from "../div";
 
 // Styled View for proper NativeWind support
-const StyledView = styled(View);
+const StyledView = styled(View, { className: "style" });
 import { Span } from "../span";
 import {
   Tooltip,
@@ -119,7 +119,7 @@ function getFieldStyleClassName(
 
   // Base classes with consistent blueish focus and improved styling
   const baseInputClassName = cn(
-    "transition-all duration-200 ease-in-out",
+    // "transition-all duration-200 ease-in-out",
     "border border-input bg-background",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20 focus-visible:border-blue-500",
     "hover:border-blue-400",

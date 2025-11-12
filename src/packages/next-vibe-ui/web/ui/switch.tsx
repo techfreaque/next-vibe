@@ -19,7 +19,11 @@ export interface SwitchRootProps {
   onBlur?: () => void;
 }
 
-export function Switch({ className, children, ...props }: SwitchRootProps): React.JSX.Element {
+export function Switch({
+  className,
+  children,
+  ...props
+}: SwitchRootProps): React.JSX.Element {
   return (
     <SwitchPrimitives.Root
       className={cn(

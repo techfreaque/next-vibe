@@ -1,53 +1,129 @@
 import type { JSX } from "react";
+import * as React from "react";
 
+// Custom event target type
+export interface DivGenericTarget {
+  addEventListener: (
+    type: string,
+    listener: EventListenerOrEventListenerObject | null,
+    options?: boolean | AddEventListenerOptions,
+  ) => void;
+  removeEventListener: (
+    type: string,
+    listener: EventListenerOrEventListenerObject | null,
+    options?: boolean | EventListenerOptions,
+  ) => void;
+  dispatchEvent: (event: Event) => boolean;
+  closest?: (selector: string) => Element | null;
+  getBoundingClientRect?: () => {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+  };
+}
+
+// Base types for cross-platform compatibility
 export interface DivMouseEvent {
-  currentTarget?: {
-    blur?: () => void;
-    focus?: () => void;
-  };
-  target?: {
-    blur?: () => void;
-    focus?: () => void;
-  };
-  preventDefault?: () => void;
-  stopPropagation?: () => void;
-  button?: number;
-  clientX?: number;
-  clientY?: number;
+  currentTarget: DivGenericTarget;
+  target: DivGenericTarget;
+  preventDefault: () => void;
+  stopPropagation: () => void;
+  isDefaultPrevented: () => boolean;
+  isPropagationStopped: () => boolean;
+  persist: () => void;
+  button: number;
+  buttons: number;
+  clientX: number;
+  clientY: number;
+  bubbles: boolean;
+  cancelable: boolean;
+  defaultPrevented: boolean;
+  eventPhase: number;
+  isTrusted: boolean;
+  timeStamp: number;
+  type: string;
 }
 
 export interface DivDragEvent {
-  preventDefault?: () => void;
-  stopPropagation?: () => void;
-  dataTransfer?: {
-    files?: FileList;
-    getData?: (format: string) => string;
-    setData?: (format: string, data: string) => void;
+  currentTarget: DivGenericTarget;
+  target: DivGenericTarget;
+  preventDefault: () => void;
+  stopPropagation: () => void;
+  dataTransfer: {
+    files: FileList;
+    getData: (format: string) => string;
+    setData: (format: string, data: string) => void;
+    dropEffect: string;
+    effectAllowed: string;
+    items: DataTransferItemList;
+    types: readonly string[];
   };
-  currentTarget?: {
-    blur?: () => void;
-    focus?: () => void;
-  };
+  bubbles: boolean;
+  cancelable: boolean;
+  defaultPrevented: boolean;
+  eventPhase: number;
+  isTrusted: boolean;
+  timeStamp: number;
+  type: string;
 }
 
 export interface DivKeyboardEvent {
+  currentTarget: DivGenericTarget;
+  target: DivGenericTarget;
   key: string;
-  code?: string;
-  preventDefault?: () => void;
-  stopPropagation?: () => void;
-  currentTarget?: {
-    blur?: () => void;
-    focus?: () => void;
-  };
+  code: string;
+  preventDefault: () => void;
+  stopPropagation: () => void;
+  shiftKey: boolean;
+  ctrlKey: boolean;
+  altKey: boolean;
+  metaKey: boolean;
+  repeat: boolean;
+  location: number;
+  bubbles: boolean;
+  cancelable: boolean;
+  defaultPrevented: boolean;
+  eventPhase: number;
+  isTrusted: boolean;
+  timeStamp: number;
+  type: string;
+}
+
+export interface DivRefObject extends Element {
+  focus?: () => void;
+  blur?: () => void;
+  scrollIntoView: (options?: {
+    behavior?: "auto" | "smooth";
+    block?: "start" | "center" | "end" | "nearest";
+    inline?: "start" | "center" | "end" | "nearest";
+  }) => void;
+  scrollTop: number;
+  scrollHeight: number;
+  clientHeight: number;
+  addEventListener: (
+    type: string,
+    listener: (event: Event) => void,
+    options?: boolean | AddEventListenerOptions,
+  ) => void;
+  removeEventListener: (
+    type: string,
+    listener: (event: Event) => void,
+    options?: boolean | EventListenerOptions,
+  ) => void;
 }
 
 export interface DivProps {
   className?: string;
   children?: React.ReactNode;
   style?: React.CSSProperties;
-  ref?: (node: { focus?: () => void; blur?: () => void; scrollTo?: (x: number, y: number) => void } | null) => void;
+  ref?: React.RefObject<DivRefObject | null>;
   role?: string;
-  "aria-label"?: string;
+  ariaLabel?: string;
   id?: string;
   title?: string;
   onClick?: (e: DivMouseEvent) => void;
@@ -70,12 +146,11 @@ export interface DivProps {
  * Alias for View to provide more traditional web naming
  */
 export function Div({
-  ref,
   className,
   children,
   style,
   role,
-  "aria-label": ariaLabel,
+  ariaLabel,
   id,
   title,
   onClick,
@@ -89,7 +164,8 @@ export function Div({
   suppressHydrationWarning,
   dangerouslySetInnerHTML,
   tabIndex,
-  onKeyDown
+  onKeyDown,
+  ref,
 }: DivProps): JSX.Element {
   return (
     <div

@@ -2,4 +2,4 @@
 import { FileCode as SiPythonIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiPython = styled(SiPythonIcon);
+export const SiPython = styled(SiPythonIcon, { className: "style" });

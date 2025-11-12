@@ -17,7 +17,7 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/chart";
 
 // Type-safe View with className support (NativeWind)
-const StyledView = styled(View);
+const StyledView = styled(View, { className: "style" });
 
 export function Chart({
   className,

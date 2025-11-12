@@ -8,6 +8,7 @@ import { Check, ChevronDown, Search, X } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
+import { Input } from "next-vibe-ui/ui/input";
 import {
   Command,
   CommandEmpty,
@@ -237,7 +238,7 @@ export function ScheduleAutocomplete({
       </Popover>
 
       {/* Hidden input for form submission */}
-      {name && <input type="hidden" name={name} value={value} />}
+      {name && <Input type="hidden" name={name} value={value} />}
     </Div>
   );
 }

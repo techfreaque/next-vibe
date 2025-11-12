@@ -2,4 +2,4 @@
 import { MessageSquare as SiRedditIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiReddit = styled(SiRedditIcon);
+export const SiReddit = styled(SiRedditIcon, { className: "style" });

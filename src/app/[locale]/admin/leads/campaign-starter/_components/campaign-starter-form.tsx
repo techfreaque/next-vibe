@@ -214,23 +214,22 @@ export function CampaignStarterForm({
                       className="flex items-center flex flex-row gap-4"
                     >
                       <Label className="w-24 font-medium">{locale}:</Label>
-                      <Input
+                      <Input<"number">
                         type="number"
-                        min="1"
+                        min={1}
                         value={
                           endpoint.create.form.watch("leadsPerWeek")?.[
                             locale
-                          ] || ""
+                          ] || 0
                         }
                         onChange={(e) => {
-                          const value = parseInt(e.target.value, 10);
-                          if (!Number.isNaN(value) && value >= 1) {
+                          if (!Number.isNaN(e.target.value) && e.target.value >= 1) {
                             const currentLeadsPerWeek =
                               endpoint.create.form.getValues("leadsPerWeek") ||
                               {};
                             endpoint.create.form.setValue("leadsPerWeek", {
                               ...currentLeadsPerWeek,
-                              [locale]: value,
+                              [locale]: e.target.value,
                             });
                           }
                         }}

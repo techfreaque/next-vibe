@@ -2,4 +2,4 @@
 import { Triangle as SiNextdotjsIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiNextdotjs = styled(SiNextdotjsIcon);
+export const SiNextdotjs = styled(SiNextdotjsIcon, { className: "style" });

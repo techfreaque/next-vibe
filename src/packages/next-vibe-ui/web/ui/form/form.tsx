@@ -250,7 +250,10 @@ function FormControl({ ...props }: FormControlProps): React.JSX.Element {
 }
 FormControl.displayName = "FormControl";
 
-function FormDescription({ className, ...props }: FormDescriptionProps): React.JSX.Element {
+function FormDescription({
+  className,
+  ...props
+}: FormDescriptionProps): React.JSX.Element {
   const { formDescriptionId } = useFormField();
 
   return (
@@ -263,7 +266,11 @@ function FormDescription({ className, ...props }: FormDescriptionProps): React.J
 }
 FormDescription.displayName = "FormDescription";
 
-function FormMessage({ className, children, ...props }: FormMessageProps): React.JSX.Element | null {
+function FormMessage({
+  className,
+  children,
+  ...props
+}: FormMessageProps): React.JSX.Element | null {
   const { error, formMessageId } = useFormField();
   const { t } = useTranslation();
   const body = error ? String(error.message) : children;

@@ -29,7 +29,7 @@ export type {
 };
 
 // Type-safe ScrollView with className support (NativeWind)
-const StyledScrollView = styled(ScrollView);
+const StyledScrollView = styled(ScrollView, { className: "style" });
 
 export function ScrollArea({
   className,

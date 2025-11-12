@@ -6,7 +6,7 @@ import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 
 // Styled View for NativeWind support
-const StyledView = styled(View);
+const StyledView = styled(View, { className: "style" });
 
 // Cross-platform props interface - use ViewProps directly
 // Note: className is added via nativewind-env.d.ts module augmentation

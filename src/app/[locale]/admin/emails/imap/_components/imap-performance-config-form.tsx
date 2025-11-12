@@ -5,6 +5,7 @@
 
 "use client";
 
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import type { JSX } from "react";
 import type { Control } from "react-hook-form";
@@ -22,7 +23,7 @@ export function ImapPerformanceConfigForm({
   control,
 }: ImapPerformanceConfigFormProps): JSX.Element {
   return (
-    <div className="flex flex-col gap-4">
+    <Div className="flex flex-col gap-4">
       <EndpointFormField
         name="cacheEnabled"
         config={{
@@ -103,6 +104,6 @@ export function ImapPerformanceConfigForm({
         }}
         control={control}
       />
-    </div>
+    </Div>
   );
 }

@@ -104,12 +104,23 @@ export interface DropdownMenuShortcutProps {
   children?: React.ReactNode;
 }
 
-export function DropdownMenu({ children, ...props }: DropdownMenuRootProps): React.JSX.Element {
-  return <DropdownMenuPrimitive.Root {...props}>{children}</DropdownMenuPrimitive.Root>;
+export function DropdownMenu({
+  children,
+  ...props
+}: DropdownMenuRootProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.Root {...props}>
+      {children}
+    </DropdownMenuPrimitive.Root>
+  );
 }
 DropdownMenu.displayName = DropdownMenuPrimitive.Root.displayName;
 
-export function DropdownMenuTrigger({ children, asChild, ...props }: DropdownMenuTriggerProps): React.JSX.Element {
+export function DropdownMenuTrigger({
+  children,
+  asChild,
+  ...props
+}: DropdownMenuTriggerProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -118,12 +129,18 @@ export function DropdownMenuTrigger({ children, asChild, ...props }: DropdownMen
 }
 DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName;
 
-export function DropdownMenuGroup({ children }: DropdownMenuGroupProps): React.JSX.Element {
+export function DropdownMenuGroup({
+  children,
+}: DropdownMenuGroupProps): React.JSX.Element {
   return <DropdownMenuPrimitive.Group>{children}</DropdownMenuPrimitive.Group>;
 }
 DropdownMenuGroup.displayName = DropdownMenuPrimitive.Group.displayName;
 
-export function DropdownMenuPortal({ children, forceMount, container }: DropdownMenuPortalProps): React.JSX.Element {
+export function DropdownMenuPortal({
+  children,
+  forceMount,
+  container,
+}: DropdownMenuPortalProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.Portal forceMount={forceMount} container={container}>
       {children}
@@ -132,17 +149,35 @@ export function DropdownMenuPortal({ children, forceMount, container }: Dropdown
 }
 DropdownMenuPortal.displayName = DropdownMenuPrimitive.Portal.displayName;
 
-export function DropdownMenuSub({ children, ...props }: DropdownMenuSubProps): React.JSX.Element {
-  return <DropdownMenuPrimitive.Sub {...props}>{children}</DropdownMenuPrimitive.Sub>;
+export function DropdownMenuSub({
+  children,
+  ...props
+}: DropdownMenuSubProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.Sub {...props}>{children}</DropdownMenuPrimitive.Sub>
+  );
 }
 DropdownMenuSub.displayName = DropdownMenuPrimitive.Sub.displayName;
 
-export function DropdownMenuRadioGroup({ children, ...props }: DropdownMenuRadioGroupProps): React.JSX.Element {
-  return <DropdownMenuPrimitive.RadioGroup {...props}>{children}</DropdownMenuPrimitive.RadioGroup>;
+export function DropdownMenuRadioGroup({
+  children,
+  ...props
+}: DropdownMenuRadioGroupProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.RadioGroup {...props}>
+      {children}
+    </DropdownMenuPrimitive.RadioGroup>
+  );
 }
-DropdownMenuRadioGroup.displayName = DropdownMenuPrimitive.RadioGroup.displayName;
+DropdownMenuRadioGroup.displayName =
+  DropdownMenuPrimitive.RadioGroup.displayName;
 
-export function DropdownMenuSubTrigger({ className, inset, children, ...props }: DropdownMenuSubTriggerProps): React.JSX.Element {
+export function DropdownMenuSubTrigger({
+  className,
+  inset,
+  children,
+  ...props
+}: DropdownMenuSubTriggerProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.SubTrigger
       className={cn(
@@ -157,9 +192,13 @@ export function DropdownMenuSubTrigger({ className, inset, children, ...props }:
     </DropdownMenuPrimitive.SubTrigger>
   );
 }
-DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName;
+DropdownMenuSubTrigger.displayName =
+  DropdownMenuPrimitive.SubTrigger.displayName;
 
-export function DropdownMenuSubContent({ className, ...props }: DropdownMenuSubContentProps): React.JSX.Element {
+export function DropdownMenuSubContent({
+  className,
+  ...props
+}: DropdownMenuSubContentProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.SubContent
       className={cn(
@@ -170,9 +209,14 @@ export function DropdownMenuSubContent({ className, ...props }: DropdownMenuSubC
     />
   );
 }
-DropdownMenuSubContent.displayName = DropdownMenuPrimitive.SubContent.displayName;
+DropdownMenuSubContent.displayName =
+  DropdownMenuPrimitive.SubContent.displayName;
 
-export function DropdownMenuContent({ className, sideOffset = 4, ...props }: DropdownMenuContentProps): React.JSX.Element {
+export function DropdownMenuContent({
+  className,
+  sideOffset = 4,
+  ...props
+}: DropdownMenuContentProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
@@ -189,7 +233,12 @@ export function DropdownMenuContent({ className, sideOffset = 4, ...props }: Dro
 }
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
-export function DropdownMenuItem({ className, inset, children, ...props }: DropdownMenuItemProps): React.JSX.Element {
+export function DropdownMenuItem({
+  className,
+  inset,
+  children,
+  ...props
+}: DropdownMenuItemProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.Item
       className={cn(
@@ -205,7 +254,13 @@ export function DropdownMenuItem({ className, inset, children, ...props }: Dropd
 }
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
 
-export function DropdownMenuCheckboxItem({ className, children, checked, onCheckedChange, ...props }: DropdownMenuCheckboxItemProps): React.JSX.Element {
+export function DropdownMenuCheckboxItem({
+  className,
+  children,
+  checked,
+  onCheckedChange,
+  ...props
+}: DropdownMenuCheckboxItemProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.CheckboxItem
       className={cn(
@@ -228,7 +283,12 @@ export function DropdownMenuCheckboxItem({ className, children, checked, onCheck
 DropdownMenuCheckboxItem.displayName =
   DropdownMenuPrimitive.CheckboxItem.displayName;
 
-export function DropdownMenuRadioItem({ className, children, value, ...props }: DropdownMenuRadioItemProps): React.JSX.Element {
+export function DropdownMenuRadioItem({
+  className,
+  children,
+  value,
+  ...props
+}: DropdownMenuRadioItemProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.RadioItem
       className={cn(
@@ -249,7 +309,12 @@ export function DropdownMenuRadioItem({ className, children, value, ...props }: 
 }
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 
-export function DropdownMenuLabel({ className, inset, children, ...props }: DropdownMenuLabelProps): React.JSX.Element {
+export function DropdownMenuLabel({
+  className,
+  inset,
+  children,
+  ...props
+}: DropdownMenuLabelProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.Label
       className={cn(
@@ -265,7 +330,10 @@ export function DropdownMenuLabel({ className, inset, children, ...props }: Drop
 }
 DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
 
-export function DropdownMenuSeparator({ className, ...props }: DropdownMenuSeparatorProps): React.JSX.Element {
+export function DropdownMenuSeparator({
+  className,
+  ...props
+}: DropdownMenuSeparatorProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.Separator
       className={cn("-mx-1 my-1 h-px bg-muted", className)}
@@ -275,7 +343,11 @@ export function DropdownMenuSeparator({ className, ...props }: DropdownMenuSepar
 }
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
 
-export function DropdownMenuShortcut({ className, children, ...props }: DropdownMenuShortcutProps): React.JSX.Element {
+export function DropdownMenuShortcut({
+  className,
+  children,
+  ...props
+}: DropdownMenuShortcutProps): React.JSX.Element {
   return (
     <span
       className={cn("ml-auto text-xs tracking-widest opacity-60", className)}

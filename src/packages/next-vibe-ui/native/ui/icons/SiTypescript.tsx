@@ -2,4 +2,4 @@
 import { FileCode as SiTypescriptIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiTypescript = styled(SiTypescriptIcon);
+export const SiTypescript = styled(SiTypescriptIcon, { className: "style" });

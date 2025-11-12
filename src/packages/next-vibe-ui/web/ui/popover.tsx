@@ -51,12 +51,19 @@ export interface PopoverCloseProps {
   asChild?: boolean;
 }
 
-export function Popover({ children, ...props }: PopoverRootProps): React.JSX.Element {
+export function Popover({
+  children,
+  ...props
+}: PopoverRootProps): React.JSX.Element {
   return <PopoverPrimitive.Root {...props}>{children}</PopoverPrimitive.Root>;
 }
 Popover.displayName = PopoverPrimitive.Root.displayName;
 
-export function PopoverTrigger({ children, asChild, ...props }: PopoverTriggerProps): React.JSX.Element {
+export function PopoverTrigger({
+  children,
+  asChild,
+  ...props
+}: PopoverTriggerProps): React.JSX.Element {
   return (
     <PopoverPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -65,7 +72,11 @@ export function PopoverTrigger({ children, asChild, ...props }: PopoverTriggerPr
 }
 PopoverTrigger.displayName = PopoverPrimitive.Trigger.displayName;
 
-export function PopoverAnchor({ children, asChild, ...props }: PopoverAnchorProps): React.JSX.Element {
+export function PopoverAnchor({
+  children,
+  asChild,
+  ...props
+}: PopoverAnchorProps): React.JSX.Element {
   return (
     <PopoverPrimitive.Anchor asChild={asChild} {...props}>
       {children}
@@ -74,7 +85,11 @@ export function PopoverAnchor({ children, asChild, ...props }: PopoverAnchorProp
 }
 PopoverAnchor.displayName = PopoverPrimitive.Anchor.displayName;
 
-export function PopoverPortal({ children, forceMount, container }: PopoverPortalProps): React.JSX.Element {
+export function PopoverPortal({
+  children,
+  forceMount,
+  container,
+}: PopoverPortalProps): React.JSX.Element {
   return (
     <PopoverPrimitive.Portal forceMount={forceMount} container={container}>
       {children}
@@ -83,7 +98,12 @@ export function PopoverPortal({ children, forceMount, container }: PopoverPortal
 }
 PopoverPortal.displayName = PopoverPrimitive.Portal.displayName;
 
-export function PopoverContent({ className, align = "center", sideOffset = 4, ...props }: PopoverContentProps): React.JSX.Element {
+export function PopoverContent({
+  className,
+  align = "center",
+  sideOffset = 4,
+  ...props
+}: PopoverContentProps): React.JSX.Element {
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
@@ -100,7 +120,11 @@ export function PopoverContent({ className, align = "center", sideOffset = 4, ..
 }
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-export function PopoverClose({ children, asChild, ...props }: PopoverCloseProps): React.JSX.Element {
+export function PopoverClose({
+  children,
+  asChild,
+  ...props
+}: PopoverCloseProps): React.JSX.Element {
   return (
     <PopoverPrimitive.Close asChild={asChild} {...props}>
       {children}

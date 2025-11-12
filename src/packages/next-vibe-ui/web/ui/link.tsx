@@ -21,7 +21,12 @@ export interface LinkProps
  * Link component for web using Next.js Link
  * Supports asChild pattern for composition
  */
-function Link({ asChild = false, className, children, ...props }: LinkProps): React.JSX.Element {
+function Link({
+  asChild = false,
+  className,
+  children,
+  ...props
+}: LinkProps): React.JSX.Element {
   const Comp = asChild ? Slot : NextLink;
 
   return (

@@ -8,7 +8,7 @@ import { styled } from "nativewind";
 export type { SeparatorRootProps };
 
 // Styled component using nativewind
-const StyledSeparatorRoot = styled(SeparatorPrimitive.Root);
+const StyledSeparatorRoot = styled(SeparatorPrimitive.Root, { className: "style" });
 
 export function Separator({
   className,

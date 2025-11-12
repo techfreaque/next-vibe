@@ -18,7 +18,7 @@ export function NotFoundBackButton({
   return (
     <Button variant="outline" asChild className="group">
       <Span>
-        <ChevronLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+        <ChevronLeft className="mr-2 h-4 w-4" />
         {t("app.pages.notFound.goBack")}
       </Span>
     </Button>

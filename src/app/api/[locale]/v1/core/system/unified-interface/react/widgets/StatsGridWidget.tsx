@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import type {
@@ -38,24 +39,24 @@ export function StatsGridWidget({
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
   if (!isStatsGridWidgetData(data)) {
     return (
-      <div
+      <Div
         className={cn("py-8 text-center text-muted-foreground", className)}
         style={style}
       >
         —
-      </div>
+      </Div>
     );
   }
 
   const { metrics, columns = 3, layout = "grid" } = data;
   if (!metrics || metrics.length === 0) {
     return (
-      <div
+      <Div
         className={cn("py-8 text-center text-muted-foreground", className)}
         style={style}
       >
         —
-      </div>
+      </Div>
     );
   }
 
@@ -70,7 +71,7 @@ export function StatsGridWidget({
   /* eslint-enable i18next/no-literal-string */
 
   return (
-    <div
+    <Div
       className={cn(
         "grid gap-4",
         layout === "grid" ? gridClass : "flex flex-wrap",
@@ -86,7 +87,7 @@ export function StatsGridWidget({
           context={context}
         />
       ))}
-    </div>
+    </Div>
   );
 }
 

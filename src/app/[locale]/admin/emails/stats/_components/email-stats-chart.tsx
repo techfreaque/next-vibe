@@ -5,15 +5,17 @@
 
 "use client";
 
+import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schema";
+import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   BarChart3Icon,
   LineChartIcon,
   TrendingUpIcon,
 } from "next-vibe-ui/ui/icons";
-import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schema";
-import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import {
   Area,
@@ -87,11 +89,11 @@ export function EmailStatsChart({
           <CardTitle>{t("app.admin.emails.stats.common.noResults")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center" style={{ height }}>
-            <p className="text-muted-foreground">
+          <Div className="flex items-center justify-center" style={{ height }}>
+            <P className="text-muted-foreground">
               {t("app.admin.emails.stats.common.noResults")}
-            </p>
-          </div>
+            </P>
+          </Div>
         </CardContent>
       </Card>
     );
@@ -227,7 +229,7 @@ export function EmailStatsChart({
           {data.title || t("app.admin.emails.stats.admin.stats.chart.title")}
         </CardTitle>
         {data.subtitle && (
-          <p className="text-sm text-muted-foreground">{data.subtitle}</p>
+          <P className="text-sm text-muted-foreground">{data.subtitle}</P>
         )}
       </CardHeader>
       <CardContent>

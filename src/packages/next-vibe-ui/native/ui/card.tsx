@@ -16,7 +16,7 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/card";
 
 // Type-safe View with className support (NativeWind)
-const StyledView = styled(View);
+const StyledView = styled(View, { className: "style" });
 
 function Card({ className, children }: CardProps): React.JSX.Element {
   return (

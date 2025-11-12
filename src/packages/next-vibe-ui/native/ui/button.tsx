@@ -9,8 +9,8 @@ import {
 } from "@/packages/next-vibe-ui/web/ui/button";
 import { cn } from "next-vibe/shared/utils/utils";
 
-const StyledPressable = styled(Pressable);
-const StyledText = styled(RNText);
+const StyledPressable = styled(Pressable, { className: "style" });
+const StyledText = styled(RNText, { className: "style" });
 
 function Button({
   className,

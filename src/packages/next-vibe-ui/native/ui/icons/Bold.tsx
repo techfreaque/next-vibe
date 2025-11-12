@@ -1,4 +1,4 @@
 import { Bold as BoldIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const Bold = styled(BoldIcon);
+export const Bold = styled(BoldIcon, { className: "style" });

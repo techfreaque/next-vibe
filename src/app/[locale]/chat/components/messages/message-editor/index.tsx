@@ -4,6 +4,7 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
+import { Kbd } from "next-vibe-ui/ui/kbd";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import { GitBranch, X } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
@@ -87,13 +88,13 @@ export function MessageEditor({
           {!editor.content && (
             <Div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden sm:block">
               {t("app.chat.input.keyboardShortcuts.press")}{" "}
-              <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+              <Kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
                 {t("app.chat.input.keyboardShortcuts.enter")}
-              </kbd>{" "}
+              </Kbd>{" "}
               {t("app.chat.messageEditor.hint.branch")},{" "}
-              <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+              <Kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
                 {t("app.chat.input.keyboardShortcuts.shiftEnter")}
-              </kbd>{" "}
+              </Kbd>{" "}
               {t("app.chat.input.keyboardShortcuts.forNewLine")}
             </Div>
           )}

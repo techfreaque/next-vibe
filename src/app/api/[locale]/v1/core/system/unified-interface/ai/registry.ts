@@ -9,7 +9,8 @@ import { defaultLocale } from "@/i18n/core/config";
 
 import { Platform } from "../shared/server-only/config";
 import { BaseRegistry } from "../shared/server-only/execution/registry";
-import { toolFilter } from "../shared/server-only/permissions/filter";
+import type { EndpointLogger } from "../shared/types/logger";
+import { toolFilter } from "./filter";
 /**
  * Singleton instance
  */
@@ -61,7 +62,8 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
   }
 
   /**
-   * Get all endpoints with optional filtering by user permissions and platform
+   * Get all endpoints with optional filtering by user permissions and platform (synchronous)
+   * For proper role checking, use getEndpointsAsync
    * @param user - User context for permission filtering (optional)
    * @param platform - Platform to filter by (optional, defaults to AI)
    * @param criteria - Additional filter criteria (optional)
@@ -77,6 +79,38 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
     let filtered = user
       ? super.getEndpointsByPermissions(user, platform || Platform.AI)
       : super.getEndpoints();
+
+    // Apply additional criteria if provided
+    if (criteria) {
+      filtered = toolFilter.filterEndpointsByCriteria(filtered, criteria);
+    }
+
+    return filtered;
+  }
+
+  /**
+   * Get all endpoints with optional filtering by user permissions and platform (async - fetches user roles)
+   * This is the preferred method for accurate permission checking
+   * @param user - User context for permission filtering (optional)
+   * @param platform - Platform to filter by (optional, defaults to AI)
+   * @param logger - Logger for debugging
+   * @param criteria - Additional filter criteria (optional)
+   */
+  async getEndpointsAsync(
+    user: AIToolExecutionContext["user"],
+    platform: Platform = Platform.AI,
+    logger: EndpointLogger,
+    criteria?: ToolFilterCriteria,
+  ): Promise<DiscoveredEndpoint[]> {
+    this.ensureInitialized();
+
+    // Use async permission filtering that fetches user roles from database
+    let filtered = await toolFilter.filterEndpointsByPermissionsAsync(
+      this.endpoints,
+      user,
+      platform,
+      logger,
+    );
 
     // Apply additional criteria if provided
     if (criteria) {

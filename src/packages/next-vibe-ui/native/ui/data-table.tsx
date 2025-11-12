@@ -1,4 +1,5 @@
 import { FlashList } from "@shopify/flash-list";
+import type { FlashListProps, ListRenderItemInfo } from "@shopify/flash-list";
 import type { Row, SortingState } from "@tanstack/react-table";
 import {
   flexRender,
@@ -14,9 +15,9 @@ import {
   RefreshControl,
   ScrollView,
 } from "react-native";
-import { FadeInUp, FadeOutUp } from "react-native-reanimated";
+import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
+import { styled } from "nativewind";
 
-import { StyledAnimatedView } from "../lib/styled";
 import { cn } from "next-vibe/shared/utils/utils";
 import {
   Table,
@@ -30,6 +31,9 @@ import {
 // Import ALL types from web - ZERO definitions here
 import type { DataTableProps } from "@/packages/next-vibe-ui/web/ui/data-table";
 
+// Styled components for NativeWind support
+const StyledAnimatedView = styled(Animated.View, { className: "style" });
+
 /**
  * @docs https://tanstack.com/table
  */
@@ -38,7 +42,7 @@ export function DataTable<TData, TValue = string>({
   columns,
   data,
   onRowPress,
-  estimatedItemSize = 60,
+  estimatedItemSize: _estimatedItemSize = 60,
   ListEmptyComponent,
   ListFooterComponent,
   isRefreshing = false,
@@ -56,6 +60,145 @@ export function DataTable<TData, TValue = string>({
     },
   });
 
+  const rows = table.getRowModel().rows;
+  const hasNoData = rows.length === 0;
+
+  const HeaderComponent = (): React.ReactElement => (
+    <ScrollView
+      horizontal
+      bounces={false}
+      showsHorizontalScrollIndicator={false}
+    >
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead
+                    key={header.id}
+                    style={{
+                      width: getColumnWidth(header.getSize(), columns.length),
+                    }}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+      </Table>
+    </ScrollView>
+  );
+
+  const EmptyComponent = (): React.ReactElement => (
+    <ScrollView
+      horizontal
+      bounces={false}
+      showsHorizontalScrollIndicator={false}
+    >
+      <Table>
+        <TableBody>
+          <TableRow>
+            <TableCell
+              style={{
+                width: width,
+              }}
+            >
+              {ListEmptyComponent ? (
+                React.isValidElement(ListEmptyComponent) ? (
+                  ListEmptyComponent
+                ) : (
+                  <ListEmptyComponent />
+                )
+              ) : null}
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </ScrollView>
+  );
+
+  const FooterComponent = (): React.ReactElement | null => {
+    if (!ListFooterComponent || hasNoData) {
+      return null;
+    }
+    return React.isValidElement(ListFooterComponent) ? (
+      ListFooterComponent
+    ) : (
+      <ListFooterComponent />
+    );
+  };
+
+  const renderItem = (info: ListRenderItemInfo<Row<TData>>): React.ReactElement => {
+    const { item: row, index } = info;
+    const rowClassName = cn(
+      "active:opacity-70",
+      index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50",
+    );
+    const handlePress = onRowPress
+      ? (): void => {
+          onRowPress(row);
+        }
+      : undefined;
+    return (
+      <ScrollView
+        horizontal
+        bounces={false}
+        showsHorizontalScrollIndicator={false}
+      >
+        <Table>
+          <TableBody>
+            <TableRow className={rowClassName} onPress={handlePress}>
+              {row.getVisibleCells().map(
+                (cell): React.ReactElement => (
+                  <TableCell
+                    key={cell.id}
+                    style={{
+                      width: getColumnWidth(
+                        cell.column.getSize(),
+                        columns.length,
+                      ),
+                    }}
+                  >
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext(),
+                    )}
+                  </TableCell>
+                ),
+              )}
+            </TableRow>
+          </TableBody>
+        </Table>
+      </ScrollView>
+    );
+  };
+
+  const refreshControlElement = (
+    <RefreshControl
+      refreshing={isRefreshing}
+      onRefresh={onRefresh}
+      style={{ opacity: 0 }}
+    />
+  );
+
+  const flashListProps: FlashListProps<Row<TData>> = {
+    data: rows,
+    ListHeaderComponent: HeaderComponent,
+    ListEmptyComponent: hasNoData ? EmptyComponent : null,
+    ListFooterComponent: FooterComponent,
+    showsVerticalScrollIndicator: false,
+    refreshControl: refreshControlElement,
+    renderItem,
+  };
+
   return (
     <>
       {isRefreshing && (
@@ -67,92 +210,7 @@ export function DataTable<TData, TValue = string>({
           <ActivityIndicator size="small" />
         </StyledAnimatedView>
       )}
-      <ScrollView
-        horizontal
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-      >
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      style={{
-                        width: getColumnWidth(header.getSize(), columns.length),
-                      }}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            <FlashList<Row<TData>>
-              data={table.getRowModel().rows}
-              estimatedItemSize={estimatedItemSize}
-              ListEmptyComponent={ListEmptyComponent}
-              ListFooterComponent={ListFooterComponent}
-              showsVerticalScrollIndicator={false}
-              refreshControl={
-                <RefreshControl
-                  refreshing={isRefreshing}
-                  onRefresh={onRefresh}
-                  style={{ opacity: 0 }}
-                />
-              }
-              renderItem={({
-                item: row,
-                index,
-              }: {
-                item: Row<TData>;
-                index: number;
-              }): JSX.Element => {
-                const rowClassName = cn(
-                  "active:opacity-70",
-                  index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50",
-                );
-                const handlePress = onRowPress
-                  ? (): void => {
-                      onRowPress(row);
-                    }
-                  : undefined;
-                return (
-                  <TableRow className={rowClassName} onPress={handlePress}>
-                    {row.getVisibleCells().map(
-                      (cell): JSX.Element => (
-                        <TableCell
-                          key={cell.id}
-                          style={{
-                            width: getColumnWidth(
-                              cell.column.getSize(),
-                              columns.length,
-                            ),
-                          }}
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      ),
-                    )}
-                  </TableRow>
-                );
-              }}
-            />
-          </TableBody>
-        </Table>
-      </ScrollView>
+      <FlashList<Row<TData>> {...flashListProps} />
     </>
   );
 }

@@ -146,16 +146,6 @@ export function TopBar({
 
       {mounted && sidebarCollapsed && (
         <>
-          {/* Search Button - Navigate to threads page when sidebar collapsed */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onNavigateToThreads || onOpenSearch}
-            className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
-            title={t("app.chat.common.search")}
-          >
-            <Search className="h-5 w-5" />
-          </Button>
           {/* New Chat Button */}
           <Button
             variant="ghost"

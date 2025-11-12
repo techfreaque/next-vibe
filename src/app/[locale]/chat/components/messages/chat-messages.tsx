@@ -2,6 +2,7 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
+import type { DivRefObject } from "@/packages/next-vibe-ui/web/ui/div";
 import type { JSX } from "react";
 import React, {
   useCallback,
@@ -91,8 +92,8 @@ export function ChatMessages({
   chat,
   currentUserId,
 }: ChatMessagesProps): JSX.Element {
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<DivRefObject>(null);
+  const messagesEndRef = useRef<DivRefObject>(null);
   const [userScrolledUp, setUserScrolledUp] = useState(false);
   const lastMessageContentRef = useRef<string>("");
   const wasAtBottomBeforeStreamingRef = useRef<boolean>(true);

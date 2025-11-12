@@ -52,7 +52,8 @@
     "types/**/*.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "nativewind-env.d.ts"
   ],
   "exclude": [
     "node_modules",

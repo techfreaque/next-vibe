@@ -3,6 +3,7 @@
  * Server-side page for email list management
  */
 
+import { Div } from "next-vibe-ui/ui/div";
 import type { Metadata } from "next";
 import type { JSX } from "react";
 
@@ -35,9 +36,9 @@ export default async function EmailsListPage({
   const { locale } = await params;
 
   return (
-    <div className="flex flex-col gap-6">
+    <Div className="flex flex-col gap-6">
       {/* List Content */}
       <EmailsListClient locale={locale} />
-    </div>
+    </Div>
   );
 }

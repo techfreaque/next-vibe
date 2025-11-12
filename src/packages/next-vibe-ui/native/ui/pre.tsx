@@ -7,7 +7,7 @@ import type { PreProps } from "@/packages/next-vibe-ui/web/ui/pre";
 import { cn } from "next-vibe/shared/utils/utils";
 
 // Type-safe Text with className support (NativeWind)
-const StyledText = styled(Text);
+const StyledText = styled(Text, { className: "style" });
 
 export function Pre({ className, children, id }: PreProps): JSX.Element {
   return (

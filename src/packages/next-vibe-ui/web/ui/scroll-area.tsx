@@ -33,9 +33,7 @@ export interface ScrollAreaThumbProps
 }
 
 export interface ScrollAreaCornerProps
-  extends React.ComponentPropsWithoutRef<
-    typeof ScrollAreaPrimitive.Corner
-  > {
+  extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Corner> {
   className?: string;
 }
 
@@ -43,7 +41,11 @@ export interface ScrollAreaCornerProps
 export type ScrollAreaProps = ScrollAreaRootProps;
 export type ScrollBarProps = ScrollAreaBarProps;
 
-export function ScrollArea({ className, children, ...props }: ScrollAreaRootProps): React.JSX.Element {
+export function ScrollArea({
+  className,
+  children,
+  ...props
+}: ScrollAreaRootProps): React.JSX.Element {
   return (
     <ScrollAreaPrimitive.Root
       className={cn("relative overflow-hidden", className)}
@@ -64,7 +66,11 @@ export function ScrollArea({ className, children, ...props }: ScrollAreaRootProp
 
 ScrollArea.displayName = "ScrollArea";
 
-export function ScrollBar({ className, orientation = "vertical", ...props }: ScrollAreaBarProps): React.JSX.Element {
+export function ScrollBar({
+  className,
+  orientation = "vertical",
+  ...props
+}: ScrollAreaBarProps): React.JSX.Element {
   return (
     <ScrollAreaPrimitive.ScrollAreaScrollbar
       orientation={orientation}

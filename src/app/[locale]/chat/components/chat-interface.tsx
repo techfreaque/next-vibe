@@ -14,6 +14,8 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
+import type { TextareaKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/textarea";
+
 import {
   DEFAULT_FOLDER_IDS,
   isDefaultFolderId,
@@ -33,7 +35,7 @@ import { TopBar } from "./layout/top-bar";
 
 // Utility functions
 const isValidInput = (input: string): boolean => input.trim().length > 0;
-const isSubmitKeyPress = (e: React.KeyboardEvent): boolean =>
+const isSubmitKeyPress = (e: TextareaKeyboardEvent): boolean =>
   e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey;
 
 interface ChatInterfaceProps {
@@ -330,46 +332,50 @@ export function ChatInterface({
     ],
   );
 
+  const submitMessage = useCallback(async () => {
+    logger.debug("Chat", "submitMessage called", {
+      hasInput: Boolean(input),
+      isValidInput: isValidInput(input),
+      isLoading,
+    });
+
+    if (isValidInput(input) && !isLoading) {
+      logger.debug("Chat", "submitMessage calling sendMessage");
+      await sendMessage(input, (threadId, rootFolderId, subFolderId) => {
+        // Navigate to the newly created thread
+        logger.debug("Chat", "Navigating to newly created thread", {
+          threadId,
+          rootFolderId,
+          subFolderId,
+        });
+        // Build URL with proper subfolder path if present
+        const url = subFolderId
+          ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
+          : `/${locale}/threads/${rootFolderId}/${threadId}`;
+        router.push(url);
+      });
+      logger.debug("Chat", "submitMessage completed");
+    } else {
+      logger.debug("Chat", "submitMessage blocked");
+    }
+  }, [input, isLoading, sendMessage, logger, locale, router]);
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      logger.debug("Chat", "handleSubmit called", {
-        hasInput: Boolean(input),
-        isValidInput: isValidInput(input),
-        isLoading,
-      });
-
-      if (isValidInput(input) && !isLoading) {
-        logger.debug("Chat", "handleSubmit calling sendMessage");
-        await sendMessage(input, (threadId, rootFolderId, subFolderId) => {
-          // Navigate to the newly created thread
-          logger.debug("Chat", "Navigating to newly created thread", {
-            threadId,
-            rootFolderId,
-            subFolderId,
-          });
-          // Build URL with proper subfolder path if present
-          const url = subFolderId
-            ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
-            : `/${locale}/threads/${rootFolderId}/${threadId}`;
-          router.push(url);
-        });
-        logger.debug("Chat", "handleSubmit sendMessage completed");
-      } else {
-        logger.debug("Chat", "handleSubmit blocked");
-      }
+      await submitMessage();
     },
-    [input, isLoading, sendMessage, logger, locale, router],
+    [submitMessage],
   );
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    (e: TextareaKeyboardEvent) => {
       if (isSubmitKeyPress(e)) {
         e.preventDefault();
-        void handleSubmit(e);
+        void submitMessage();
       }
     },
-    [handleSubmit],
+    [submitMessage],
   );
 
   // Handler for model changes - auto-disable search tool if model doesn't support tools

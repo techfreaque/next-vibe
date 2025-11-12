@@ -6,6 +6,12 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import type {
+  TextareaKeyboardEvent,
+  TextareaRefObject,
+} from "@/packages/next-vibe-ui/web/ui/textarea";
+import type { DivRefObject } from "@/packages/next-vibe-ui/web/ui/div";
+
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import { TIMING } from "../../lib/config/constants";
@@ -27,13 +33,13 @@ export interface UseMessageEditorReturn {
   actionType: EditorActionType;
 
   // Refs
-  editorRef: React.RefObject<HTMLDivElement | null>;
-  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
+  editorRef: React.RefObject<DivRefObject | null>;
+  textareaRef: React.RefObject<TextareaRefObject | null>;
 
   // Handlers
   setContent: (content: string) => void;
   handleBranch: () => Promise<void>;
-  handleKeyDown: (e: React.KeyboardEvent) => void;
+  handleKeyDown: (e: TextareaKeyboardEvent) => void;
   handleCancel: () => void;
 }
 
@@ -49,8 +55,8 @@ export function useMessageEditor({
   const [content, setContent] = useState(message.content);
   const [isLoading, setIsLoading] = useState(false);
   const [actionType, setActionType] = useState<EditorActionType>(null);
-  const editorRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<DivRefObject>(null);
+  const textareaRef = useRef<TextareaRefObject>(null);
 
   // Initialize content when message changes
   useEffect(() => {
@@ -68,9 +74,11 @@ export function useMessageEditor({
 
     // Focus textarea after a short delay to ensure it's rendered
     const timeoutId = setTimeout(() => {
-      textareaRef.current?.focus();
-      // Select all text for easy editing
-      textareaRef.current?.select();
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        // Select all text for easy editing
+        textareaRef.current.select();
+      }
     }, TIMING.MESSAGE_EDITOR_FOCUS_DELAY);
 
     return (): void => clearTimeout(timeoutId);
@@ -96,7 +104,7 @@ export function useMessageEditor({
   }, [content, isLoading, message.id, onBranch, logger]);
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent): void => {
+    (e: TextareaKeyboardEvent): void => {
       // Enter without Shift = submit (branch)
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();

@@ -44,8 +44,21 @@ export interface TooltipPortalProps {
   forceMount?: boolean;
 }
 
-export function TooltipProvider({ children, delayDuration, skipDelayDuration, disableHoverableContent }: TooltipProviderProps): React.JSX.Element {
-  return <TooltipPrimitive.Provider delayDuration={delayDuration} skipDelayDuration={skipDelayDuration} disableHoverableContent={disableHoverableContent}>{children}</TooltipPrimitive.Provider>;
+export function TooltipProvider({
+  children,
+  delayDuration,
+  skipDelayDuration,
+  disableHoverableContent,
+}: TooltipProviderProps): React.JSX.Element {
+  return (
+    <TooltipPrimitive.Provider
+      delayDuration={delayDuration}
+      skipDelayDuration={skipDelayDuration}
+      disableHoverableContent={disableHoverableContent}
+    >
+      {children}
+    </TooltipPrimitive.Provider>
+  );
 }
 
 export function Tooltip(props: TooltipRootProps): React.JSX.Element {

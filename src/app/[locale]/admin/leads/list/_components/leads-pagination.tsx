@@ -120,9 +120,9 @@ export function LeadsPagination({
             className="h-8 w-8 p-0"
           >
             <ChevronsLeft className="h-4 w-4" />
-            <span className="sr-only">
+            <Span className="sr-only">
               {t("app.admin.leads.leads.pagination.first")}
-            </span>
+            </Span>
           </Button>
 
           {/* Previous page */}
@@ -134,9 +134,9 @@ export function LeadsPagination({
             className="h-8 w-8 p-0"
           >
             <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">
+            <Span className="sr-only">
               {t("app.admin.leads.leads.pagination.previous")}
-            </span>
+            </Span>
           </Button>
 
           {/* Page numbers */}

@@ -7,7 +7,9 @@
 
 import { Eye, Mail, MousePointer } from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
+import { Div } from "next-vibe-ui/ui/div";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
+import { Span } from "next-vibe-ui/ui/span";
 import {
   Table,
   TableBody,
@@ -16,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { EmailsListResponseType } from "@/app/api/[locale]/v1/core/emails/messages/list/definition";
@@ -75,35 +78,35 @@ export function EmailsListTable({
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-4">
+      <Div className="flex flex-col gap-4">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="flex items-center flex flex-row gap-4">
+          <Div key={i} className="flex items-center flex flex-row gap-4">
             <Skeleton className="h-4 w-48" />
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-4 w-20" />
-          </div>
+          </Div>
         ))}
-      </div>
+      </Div>
     );
   }
 
   if (emails.length === 0) {
     return (
-      <div className="text-center py-8">
+      <Div className="text-center py-8">
         <Mail className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-muted-foreground mb-2">
+        <H3 className="text-lg font-medium text-muted-foreground mb-2">
           {t("app.admin.emails.list.admin.messages.noEmails")}
-        </h3>
-        <p className="text-sm text-muted-foreground">
+        </H3>
+        <P className="text-sm text-muted-foreground">
           {t("app.admin.emails.list.admin.messages.noEmailsDescription")}
-        </p>
-      </div>
+        </P>
+      </Div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <Div className="flex flex-col gap-4">
       <Table>
         <TableHeader>
           <TableRow>
@@ -129,21 +132,21 @@ export function EmailsListTable({
           {emails.map((email) => (
             <TableRow key={email.emailCore.id}>
               <TableCell className="font-medium">
-                <div className="max-w-48 truncate">
+                <Div className="max-w-48 truncate">
                   {email.emailCore.subject}
-                </div>
+                </Div>
               </TableCell>
               <TableCell>
-                <div className="flex flex-col gap-1">
-                  <div className="text-sm font-medium">
+                <Div className="flex flex-col gap-1">
+                  <Div className="text-sm font-medium">
                     {email.emailParties.recipient.recipientEmail}
-                  </div>
+                  </Div>
                   {email.emailParties.recipient.recipientName && (
-                    <div className="text-xs text-muted-foreground">
+                    <Div className="text-xs text-muted-foreground">
                       {email.emailParties.recipient.recipientName}
-                    </div>
+                    </Div>
                   )}
-                </div>
+                </Div>
               </TableCell>
               <TableCell>
                 <Badge variant={getStatusBadgeVariant(email.emailCore.status)}>
@@ -157,29 +160,29 @@ export function EmailsListTable({
               </TableCell>
               <TableCell>
                 {email.emailEngagement.sentAt ? (
-                  <div className="text-sm">
+                  <Div className="text-sm">
                     {new Date(email.emailEngagement.sentAt).toLocaleDateString(
                       locale,
                     )}
-                  </div>
+                  </Div>
                 ) : (
-                  <span className="text-muted-foreground">-</span>
+                  <Span className="text-muted-foreground">-</Span>
                 )}
               </TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
+                <Div className="flex items-center gap-2">
                   {email.emailEngagement.openedAt && (
                     <Eye className="h-4 w-4 text-green-600" />
                   )}
                   {email.emailEngagement.clickedAt && (
                     <MousePointer className="h-4 w-4 text-blue-600" />
                   )}
-                </div>
+                </Div>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-    </div>
+    </Div>
   );
 }

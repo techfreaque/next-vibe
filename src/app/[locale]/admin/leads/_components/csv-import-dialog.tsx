@@ -206,11 +206,11 @@ export function CsvImportDialog({
                 )}
 
                 {/* Hidden form fields for validation */}
-                <input
+                <Input
                   type="hidden"
                   {...endpoint.create.form.register("file", { required: true })}
                 />
-                <input
+                <Input
                   type="hidden"
                   {...endpoint.create.form.register("fileName", {
                     required: true,

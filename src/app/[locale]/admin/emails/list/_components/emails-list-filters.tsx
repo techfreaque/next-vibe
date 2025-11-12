@@ -6,7 +6,9 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -54,7 +56,7 @@ export function EmailsListFilters({
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* Search Field */}
         <EndpointFormField
           name="filters.search"
@@ -212,10 +214,10 @@ export function EmailsListFilters({
             showAllRequired: false,
           }}
         />
-      </div>
+      </Div>
 
       {/* Second row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* Sort Order */}
         <EndpointFormField
           name="displayOptions.sortOrder"
@@ -243,7 +245,7 @@ export function EmailsListFilters({
         />
 
         {/* Clear Filters Button */}
-        <div className="flex items-end">
+        <Div className="flex items-end">
           <Button
             type="button"
             variant="outline"
@@ -252,14 +254,14 @@ export function EmailsListFilters({
           >
             {t("app.admin.emails.list.admin.filters.clear")}
           </Button>
-        </div>
-      </div>
+        </Div>
+      </Div>
 
       {/* Quick filter buttons */}
-      <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-        <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+      <Div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+        <Span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
           {t("app.admin.emails.list.admin.filters.quick_filters")}:
-        </span>
+        </Span>
         <Button
           type="button"
           variant="outline"
@@ -300,7 +302,7 @@ export function EmailsListFilters({
         >
           {t("app.admin.emails.list.admin.filters.quick.lead_campaigns")}
         </Button>
-      </div>
+      </Div>
     </>
   );
 }

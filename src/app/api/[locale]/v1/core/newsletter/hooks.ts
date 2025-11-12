@@ -5,7 +5,9 @@
  * Type-safe hooks for newsletter subscription management
  */
 
-import { useCallback, useMemo, type ChangeEvent } from "react";
+import { useCallback, useMemo } from "react";
+
+import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -137,7 +139,7 @@ interface NewsletterManagerResult {
     type: "error" | "success" | "confirm" | "info";
     message: TranslationKey;
   } | null;
-  handleEmailChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleEmailChange: (e: InputChangeEvent) => void;
   clearMessages: () => void;
 }
 
@@ -182,7 +184,7 @@ export function useNewsletterManager(): NewsletterManagerResult {
 
   // Handle email change - only allow changes when not logged in
   const handleEmailChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>): void => {
+    (e: InputChangeEvent): void => {
       if (!isLoggedIn) {
         setManualEmail(e.target.value);
       }

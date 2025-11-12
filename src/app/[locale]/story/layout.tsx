@@ -1,4 +1,5 @@
 import { Div } from "next-vibe-ui/ui/div";
+import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type { JSX, ReactNode } from "react";
 
 import Footer from "@/app/[locale]/story/_components/footer";
@@ -47,15 +48,17 @@ export default async function SiteLayoutServer({
   }
 
   return (
-    <Div role="main" className="min-h-screen ">
-      <Navbar
-        user={userResponse.success ? userResponse.data : undefined}
-        locale={locale}
-        hasSubscription={hasSubscription}
-        navigationItems={navItems}
-      />
-      {children}
-      <Footer locale={locale} />
-    </Div>
+    <PageLayout scrollable={true}>
+      <Div role="main" className="min-h-screen ">
+        <Navbar
+          user={userResponse.success ? userResponse.data : undefined}
+          locale={locale}
+          hasSubscription={hasSubscription}
+          navigationItems={navItems}
+        />
+        {children}
+        <Footer locale={locale} />
+      </Div>
+    </PageLayout>
   );
 }

@@ -2,4 +2,4 @@
 import { Smartphone as SiAndroidIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiAndroid = styled(SiAndroidIcon);
+export const SiAndroid = styled(SiAndroidIcon, { className: "style" });

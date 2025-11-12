@@ -17,7 +17,10 @@ export interface LabelRootProps {
   nativeID?: string;
 }
 
-export function Label({ className, ...props }: LabelRootProps): React.JSX.Element {
+export function Label({
+  className,
+  ...props
+}: LabelRootProps): React.JSX.Element {
   return (
     <LabelPrimitive.Root
       className={cn(labelVariants(), className)}

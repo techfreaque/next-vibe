@@ -12,24 +12,34 @@ import type {
   TabsContentProps,
 } from "@/packages/next-vibe-ui/web/ui/tabs";
 
-
 // Local styled components
 const StyledTabsList = TabsPrimitive.List;
 const StyledTabsTrigger = TabsPrimitive.Trigger;
 const StyledTabsContent = TabsPrimitive.Content;
 
-function Tabs({ children, value, onValueChange, defaultValue, orientation, activationMode, dir: _dir }: TabsRootProps): React.JSX.Element {
+function Tabs({
+  children,
+  value,
+  onValueChange,
+  defaultValue,
+  orientation,
+  activationMode,
+  dir: _dir,
+}: TabsRootProps): React.JSX.Element {
   // Handle controlled/uncontrolled state with defaultValue
   const [internalValue, setInternalValue] = React.useState(defaultValue ?? "");
   const isControlled = value !== undefined;
   const currentValue = isControlled ? value : internalValue;
 
-  const handleValueChange = React.useCallback((newValue: string) => {
-    if (!isControlled) {
-      setInternalValue(newValue);
-    }
-    onValueChange?.(newValue);
-  }, [isControlled, onValueChange]);
+  const handleValueChange = React.useCallback(
+    (newValue: string) => {
+      if (!isControlled) {
+        setInternalValue(newValue);
+      }
+      onValueChange?.(newValue);
+    },
+    [isControlled, onValueChange],
+  );
 
   return (
     <TabsPrimitive.Root
@@ -44,7 +54,11 @@ function Tabs({ children, value, onValueChange, defaultValue, orientation, activ
 }
 Tabs.displayName = TabsPrimitive.Root.displayName;
 
-function TabsList({ className, children, ...props }: TabsListProps): React.JSX.Element {
+function TabsList({
+  className,
+  children,
+  ...props
+}: TabsListProps): React.JSX.Element {
   return (
     <StyledTabsList
       className={cn(
@@ -59,7 +73,13 @@ function TabsList({ className, children, ...props }: TabsListProps): React.JSX.E
 }
 TabsList.displayName = TabsPrimitive.List.displayName;
 
-function TabsTrigger({ className, value, disabled, children, ...props }: TabsTriggerProps): React.JSX.Element {
+function TabsTrigger({
+  className,
+  value,
+  disabled,
+  children,
+  ...props
+}: TabsTriggerProps): React.JSX.Element {
   const { value: selectedValue } = TabsPrimitive.useRootContext();
   return (
     <TextClassContext.Provider
@@ -86,7 +106,12 @@ function TabsTrigger({ className, value, disabled, children, ...props }: TabsTri
 }
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
-function TabsContent({ className, value, children, ...props }: TabsContentProps): React.JSX.Element {
+function TabsContent({
+  className,
+  value,
+  children,
+  ...props
+}: TabsContentProps): React.JSX.Element {
   return (
     <StyledTabsContent
       value={value}

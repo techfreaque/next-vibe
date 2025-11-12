@@ -20,7 +20,6 @@ import type {
   DialogCloseProps,
 } from "@/packages/next-vibe-ui/web/ui/dialog";
 
-
 // CSS className for close button
 const CLOSE_BUTTON_CLASSNAME =
   "absolute right-4 top-4 p-0.5 group rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none";
@@ -194,10 +193,16 @@ function DialogContent({
 }
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
-function DialogHeader({ className, children }: DialogHeaderProps): React.JSX.Element {
+function DialogHeader({
+  className,
+  children,
+}: DialogHeaderProps): React.JSX.Element {
   return (
     <View
-      className={cn("flex flex-col gap-1.5 text-center sm:text-left", className)}
+      className={cn(
+        "flex flex-col gap-1.5 text-center sm:text-left",
+        className,
+      )}
     >
       {children}
     </View>
@@ -205,7 +210,10 @@ function DialogHeader({ className, children }: DialogHeaderProps): React.JSX.Ele
 }
 DialogHeader.displayName = "DialogHeader";
 
-function DialogFooter({ className, children }: DialogFooterProps): React.JSX.Element {
+function DialogFooter({
+  className,
+  children,
+}: DialogFooterProps): React.JSX.Element {
   return (
     <View
       className={cn(
@@ -219,7 +227,10 @@ function DialogFooter({ className, children }: DialogFooterProps): React.JSX.Ele
 }
 DialogFooter.displayName = "DialogFooter";
 
-function DialogTitle({ className, ...props }: DialogTitleProps): React.JSX.Element {
+function DialogTitle({
+  className,
+  ...props
+}: DialogTitleProps): React.JSX.Element {
   return (
     <DialogPrimitive.Title
       className={cn(
@@ -232,7 +243,10 @@ function DialogTitle({ className, ...props }: DialogTitleProps): React.JSX.Eleme
 }
 DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
-function DialogDescription({ className, ...props }: DialogDescriptionProps): React.JSX.Element {
+function DialogDescription({
+  className,
+  ...props
+}: DialogDescriptionProps): React.JSX.Element {
   return (
     <DialogPrimitive.Description
       className={cn("text-sm text-base text-muted-foreground", className)}

@@ -2,4 +2,4 @@
 import { Building as SiAlibabadotcomIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiAlibabadotcom = styled(SiAlibabadotcomIcon);
+export const SiAlibabadotcom = styled(SiAlibabadotcomIcon, { className: "style" });

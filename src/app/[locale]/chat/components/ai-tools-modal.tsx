@@ -383,12 +383,28 @@ export function AIToolsModal({
                                 />
 
                                 <Div className="flex-1 min-w-0">
-                                  <P className="text-sm font-medium truncate">
-                                    {tool.name}
-                                  </P>
+                                  <Div className="flex items-center gap-2">
+                                    <P className="text-sm font-medium truncate">
+                                      {tool.name}
+                                    </P>
+                                    <Badge
+                                      variant="outline"
+                                      className="text-[10px] px-1.5 py-0 font-mono shrink-0"
+                                    >
+                                      {tool.method}
+                                    </Badge>
+                                  </Div>
                                   <P className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
                                     {tool.description}
                                   </P>
+
+                                  {/* Aliases */}
+                                  {tool.aliases && tool.aliases.length > 0 && (
+                                    <P className="text-[10px] text-muted-foreground/70 mt-1 font-mono">
+                                      {t("app.chat.aiTools.modal.aliases")}:{" "}
+                                      {tool.aliases.join(", ")}
+                                    </P>
+                                  )}
 
                                   {/* Tags */}
                                   {tool.tags.length > 0 && (

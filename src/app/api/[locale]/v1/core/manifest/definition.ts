@@ -34,7 +34,7 @@ import {
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "manifest"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
   title: "app.api.v1.core.manifest.title",
   description: "app.api.v1.core.manifest.description",

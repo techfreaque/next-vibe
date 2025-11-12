@@ -1,9 +1,6 @@
 import * as MenubarPrimitive from "@rn-primitives/menubar";
 import * as React from "react";
-import {
-  StyleSheet,
-  View,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
@@ -31,7 +28,6 @@ import type {
   MenubarShortcutProps,
 } from "@/packages/next-vibe-ui/web/ui/menubar";
 
-
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_ITEM =
   "select-none text-sm text-lg text-popover-foreground group-focus:text-accent-foreground";
@@ -50,12 +46,21 @@ const StyledMenubarLabel = MenubarPrimitive.Label;
 const StyledMenubarSeparator = MenubarPrimitive.Separator;
 const StyledMenubarItemIndicator = MenubarPrimitive.ItemIndicator;
 
-function Menubar({ className, children, value, onValueChange, ...props }: MenubarRootProps): React.JSX.Element {
-  const handleValueChange = React.useCallback((newValue: string | undefined) => {
-    if (onValueChange) {
-      onValueChange(newValue ?? "");
-    }
-  }, [onValueChange]);
+function Menubar({
+  className,
+  children,
+  value,
+  onValueChange,
+  ...props
+}: MenubarRootProps): React.JSX.Element {
+  const handleValueChange = React.useCallback(
+    (newValue: string | undefined) => {
+      if (onValueChange) {
+        onValueChange(newValue ?? "");
+      }
+    },
+    [onValueChange],
+  );
 
   return (
     <MenubarPrimitive.Root
@@ -73,12 +78,24 @@ function Menubar({ className, children, value, onValueChange, ...props }: Menuba
 }
 Menubar.displayName = MenubarPrimitive.Root.displayName;
 
-function MenubarMenu({ children, value, ...props }: MenubarMenuProps): React.JSX.Element {
-  return <MenubarPrimitive.Menu value={value} {...props}>{children}</MenubarPrimitive.Menu>;
+function MenubarMenu({
+  children,
+  value,
+  ...props
+}: MenubarMenuProps): React.JSX.Element {
+  return (
+    <MenubarPrimitive.Menu value={value} {...props}>
+      {children}
+    </MenubarPrimitive.Menu>
+  );
 }
 MenubarMenu.displayName = MenubarPrimitive.Menu.displayName;
 
-function MenubarTrigger({ className, children, ...props }: MenubarTriggerProps): React.JSX.Element {
+function MenubarTrigger({
+  className,
+  children,
+  ...props
+}: MenubarTriggerProps): React.JSX.Element {
   const { value } = MenubarPrimitive.useRootContext();
   const { value: itemValue } = MenubarPrimitive.useMenuContext();
 
@@ -107,12 +124,20 @@ function MenubarPortal({ children }: MenubarPortalProps): React.JSX.Element {
 }
 MenubarPortal.displayName = "MenubarPortal";
 
-function MenubarSub({ children, ...props }: MenubarSubProps): React.JSX.Element {
+function MenubarSub({
+  children,
+  ...props
+}: MenubarSubProps): React.JSX.Element {
   return <MenubarPrimitive.Sub {...props}>{children}</MenubarPrimitive.Sub>;
 }
 MenubarSub.displayName = MenubarPrimitive.Sub.displayName;
 
-function MenubarRadioGroup({ children, value, onValueChange, ...props }: MenubarRadioGroupProps): React.JSX.Element {
+function MenubarRadioGroup({
+  children,
+  value,
+  onValueChange,
+  ...props
+}: MenubarRadioGroupProps): React.JSX.Element {
   return (
     <MenubarPrimitive.RadioGroup
       value={value ?? ""}

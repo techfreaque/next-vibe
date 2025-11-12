@@ -53,7 +53,10 @@ const Pagination = ({
 );
 Pagination.displayName = "Pagination";
 
-function PaginationContent({ className, children }: PaginationContentProps): React.JSX.Element {
+function PaginationContent({
+  className,
+  children,
+}: PaginationContentProps): React.JSX.Element {
   return (
     <ul className={cn("flex flex-row items-center gap-1", className)}>
       {children}
@@ -62,12 +65,11 @@ function PaginationContent({ className, children }: PaginationContentProps): Rea
 }
 PaginationContent.displayName = "PaginationContent";
 
-function PaginationItem({ className, children }: PaginationItemProps): React.JSX.Element {
-  return (
-    <li className={cn("", className)}>
-      {children}
-    </li>
-  );
+function PaginationItem({
+  className,
+  children,
+}: PaginationItemProps): React.JSX.Element {
+  return <li className={cn("", className)}>{children}</li>;
 }
 PaginationItem.displayName = "PaginationItem";
 

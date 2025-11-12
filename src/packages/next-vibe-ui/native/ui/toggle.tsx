@@ -58,7 +58,7 @@ const toggleTextVariants = cva(
 
 export type { ToggleRootProps, ToggleSize, ToggleVariant };
 
-const StyledToggleRoot = styled(TogglePrimitive.Root);
+const StyledToggleRoot = styled(TogglePrimitive.Root, { className: "style" });
 
 export function Toggle({
   className,

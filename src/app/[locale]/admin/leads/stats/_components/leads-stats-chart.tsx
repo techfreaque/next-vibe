@@ -10,6 +10,7 @@ import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
 import { H4, P } from "next-vibe-ui/ui/typography";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
+import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import type { JSX } from "react";
@@ -537,24 +538,29 @@ export function LeadsStatsChart({
                   {t("app.admin.leads.leads.admin.stats.legend.title")}
                 </H4>
                 <Div className="flex gap-2">
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={showAllSeries}
                     className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                   >
                     {t("app.admin.leads.leads.admin.stats.legend.showAll")}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={hideAllSeries}
                     className="text-xs text-muted-foreground hover:text-foreground"
                   >
                     {t("app.admin.leads.leads.admin.stats.legend.hideAll")}
-                  </button>
+                  </Button>
                 </Div>
               </Div>
               <Div className="flex flex-wrap gap-4 p-4">
                 {legendData.map((item) => (
-                  <button
+                  <Button
                     key={item.name}
+                    variant="ghost"
                     onClick={() => toggleSeries(item.name)}
                     className={`flex items-center gap-2 text-sm transition-opacity hover:opacity-80 ${
                       item.visible ? "opacity-100" : "opacity-50"
@@ -576,7 +582,7 @@ export function LeadsStatsChart({
                     >
                       {t(item.name)}
                     </Span>
-                  </button>
+                  </Button>
                 ))}
               </Div>
             </Div>
