@@ -48,7 +48,7 @@ export function BranchNavigator({
   return (
     <Div
       className={cn(
-        "flex items-center gap-2 px-3 py-2 bg-accent/30 border border-border/40 rounded-lg relative z-10",
+        "flex items-center gap-2 px-3 py-2 bg-accent/30 border border-border/40 rounded-lg relative",
         className,
       )}
     >

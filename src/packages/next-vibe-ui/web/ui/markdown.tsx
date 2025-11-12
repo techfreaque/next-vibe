@@ -470,7 +470,7 @@ function CodeBlock({
   return (
     <div className="relative my-4 group rounded-xl overflow-hidden shadow-lg border border-slate-800 dark:border-slate-700">
       {/* Language label */}
-      <div className="flex items-center justify-between bg-slate-800 dark:bg-slate-900 px-4 py-2 border-b border-slate-700">
+      <div className="flex items-center justify-between bg-slate-900 px-4 py-2 border-b border-slate-700">
         <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
           {language}
         </span>
@@ -512,6 +512,7 @@ function CodeBlock({
           background: CODE_BLOCK_BG_COLOR,
           lineHeight: "1.6",
           border: "unset",
+          borderRadius: "",
         }}
         showLineNumbers
         wrapLines
