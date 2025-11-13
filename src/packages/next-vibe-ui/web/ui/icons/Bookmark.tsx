@@ -1,3 +1,4 @@
 import { Bookmark as LucideBookmark } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const Bookmark = LucideBookmark;
+export const Bookmark: IconComponent = LucideBookmark;

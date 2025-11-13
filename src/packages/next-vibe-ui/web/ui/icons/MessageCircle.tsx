@@ -1,3 +1,4 @@
 import { MessageCircle as LucideMessageCircle } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const MessageCircle = LucideMessageCircle;
+export const MessageCircle: IconComponent = LucideMessageCircle;

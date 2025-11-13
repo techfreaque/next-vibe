@@ -23,14 +23,6 @@ import { cn } from "../lib/utils";
 import { ChevronDown } from "./icons/ChevronDown";
 import { TextClassContext } from "./text";
 
-// Re-export all types
-export type {
-  AccordionContentProps,
-  AccordionItemProps,
-  AccordionRootProps,
-  AccordionTriggerProps,
-};
-
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_TRIGGER = "text-lg font-medium group-hover:underline";
 const TEXT_CLASS_CONTENT = "text-lg";

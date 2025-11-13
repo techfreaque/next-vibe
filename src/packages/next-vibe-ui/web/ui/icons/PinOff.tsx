@@ -1,3 +1,4 @@
 import { PinOff as LucidePinOff } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const PinOff = LucidePinOff;
+export const PinOff: IconComponent = LucidePinOff;

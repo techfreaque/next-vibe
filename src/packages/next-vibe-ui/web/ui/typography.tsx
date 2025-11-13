@@ -1,48 +1,133 @@
-// Web typography components - using semantic HTML elements
-
 import { cn } from "next-vibe/shared/utils/utils";
-import type { ComponentPropsWithoutRef, JSX } from "react";
+import type { JSX } from "react";
 
-// Cross-platform prop types
+// Cross-platform prop types - base interface that both web and native use
 export interface TypographyProps {
   className?: string;
   children?: React.ReactNode;
 }
 
-// Web-specific prop types
-export interface H1Props
-  extends ComponentPropsWithoutRef<"h1">,
-    TypographyProps {}
-export interface H2Props
-  extends ComponentPropsWithoutRef<"h2">,
-    TypographyProps {}
-export interface H3Props
-  extends ComponentPropsWithoutRef<"h3">,
-    TypographyProps {}
-export interface H4Props
-  extends ComponentPropsWithoutRef<"h4">,
-    TypographyProps {}
-export interface PProps
-  extends ComponentPropsWithoutRef<"p">,
-    TypographyProps {}
-export interface BlockQuoteProps
-  extends ComponentPropsWithoutRef<"blockquote">,
-    TypographyProps {}
-export interface CodeProps
-  extends ComponentPropsWithoutRef<"code">,
-    TypographyProps {}
-export interface LeadProps
-  extends ComponentPropsWithoutRef<"p">,
-    TypographyProps {}
-export interface LargeProps
-  extends ComponentPropsWithoutRef<"div">,
-    TypographyProps {}
-export interface SmallProps
-  extends ComponentPropsWithoutRef<"small">,
-    TypographyProps {}
-export interface MutedProps
-  extends ComponentPropsWithoutRef<"p">,
-    TypographyProps {}
+// Explicit prop types that both web and native implement
+export interface H1Props extends TypographyProps {
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
+  testID?: string;
+}
+
+export interface H2Props extends TypographyProps {
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
+  testID?: string;
+}
+
+export interface H3Props extends TypographyProps {
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
+  testID?: string;
+}
+
+export interface H4Props extends TypographyProps {
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
+  testID?: string;
+}
+
+export interface PProps extends TypographyProps {
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
+  testID?: string;
+}
+
+export interface BlockQuoteProps extends TypographyProps {
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
+  testID?: string;
+}
+
+export interface CodeProps extends TypographyProps {
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
+  testID?: string;
+}
+
+export interface LeadProps extends TypographyProps {
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
+  testID?: string;
+}
+
+export interface LargeProps extends TypographyProps {
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
+  testID?: string;
+}
+
+export interface SmallProps extends TypographyProps {
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
+  testID?: string;
+}
+
+export interface MutedProps extends TypographyProps {
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
+  testID?: string;
+}
 
 export function H1({ className, children, ...props }: H1Props): JSX.Element {
   return (

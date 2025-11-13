@@ -1,3 +1,5 @@
 import { SiAndroid as ReactSimpleIcon } from "@icons-pack/react-simple-icons";
+import { type IconComponent } from "../../lib/helper";
 
-export const SiAndroid = ReactSimpleIcon;
+
+export const SiAndroid: IconComponent = ReactSimpleIcon;

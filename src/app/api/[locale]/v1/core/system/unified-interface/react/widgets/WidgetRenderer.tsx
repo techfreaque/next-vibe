@@ -5,7 +5,10 @@ import type { JSX } from "react";
 import type { ResponseFieldMetadata } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/types";
 import { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
-import type { RenderableValue, WidgetRenderContext } from "../types";
+import {
+  type WidgetRenderContext,
+  type RenderableValue,
+} from "../../shared/ui/types";
 import { CodeOutputWidget } from "./CodeOutputWidget";
 import { ContainerWidget } from "./ContainerWidget";
 import { DataTableWidget } from "./DataTableWidget";

@@ -11,7 +11,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
 import React from "react";
-import { Span } from "next-vibe-ui/ui/span";
 
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
 import {
@@ -56,7 +55,7 @@ function UnsubscribeConfirmationEmailContent({
       previewText={t("app.api.v1.core.newsletter.email.unsubscribe.preview")}
       tracking={tracking}
     >
-      <Span
+      <div
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -65,9 +64,9 @@ function UnsubscribeConfirmationEmailContent({
         }}
       >
         {t("app.api.v1.core.newsletter.email.unsubscribe.greeting")}
-      </Span>
+      </div>
 
-      <Span
+      <div
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -78,9 +77,9 @@ function UnsubscribeConfirmationEmailContent({
         {t("app.api.v1.core.newsletter.email.unsubscribe.confirmation", {
           email: requestData.email,
         })}
-      </Span>
+      </div>
 
-      <Span
+      <div
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -89,7 +88,7 @@ function UnsubscribeConfirmationEmailContent({
         }}
       >
         {t("app.api.v1.core.newsletter.email.unsubscribe.resubscribe_info")}
-      </Span>
+      </div>
 
       <Section style={{ textAlign: "center", marginTop: "32px" }}>
         <Button
@@ -110,7 +109,7 @@ function UnsubscribeConfirmationEmailContent({
 
       <Hr style={{ borderColor: "#e5e7eb", margin: "32px 0" }} />
 
-      <Span
+      <div
         style={{
           fontSize: "12px",
           color: "#6b7280",
@@ -118,7 +117,7 @@ function UnsubscribeConfirmationEmailContent({
         }}
       >
         {t("app.api.v1.core.newsletter.email.unsubscribe.support_message")}
-      </Span>
+      </div>
     </EmailTemplate>
   );
 }
@@ -155,7 +154,7 @@ function AdminUnsubscribeNotificationEmailContent({
       )}
       tracking={tracking}
     >
-      <Span
+      <div
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -166,11 +165,11 @@ function AdminUnsubscribeNotificationEmailContent({
         {t(
           "app.api.v1.core.newsletter.email.unsubscribe.admin_unsubscribe_notification.message",
         )}
-      </Span>
+      </div>
 
       <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
 
-      <Span
+      <div
         style={{
           fontSize: "14px",
           lineHeight: "1.6",
@@ -185,9 +184,9 @@ function AdminUnsubscribeNotificationEmailContent({
           :
         </strong>{" "}
         {requestData.email}
-      </Span>
+      </div>
 
-      <Span
+      <div
         style={{
           fontSize: "14px",
           lineHeight: "1.6",
@@ -202,7 +201,7 @@ function AdminUnsubscribeNotificationEmailContent({
           :
         </strong>{" "}
         {new Date().toLocaleDateString()}
-      </Span>
+      </div>
 
       <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
 

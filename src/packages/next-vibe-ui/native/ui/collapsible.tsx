@@ -1,18 +1,11 @@
 import * as CollapsiblePrimitive from "@rn-primitives/collapsible";
 import * as React from "react";
 
-// Import types from web for cross-platform compatibility
 import type {
   CollapsibleRootProps,
   CollapsibleTriggerProps,
   CollapsibleContentProps,
-} from "next-vibe-ui/ui/collapsible";
-
-export type {
-  CollapsibleRootProps,
-  CollapsibleTriggerProps,
-  CollapsibleContentProps,
-};
+} from "../../web/ui/collapsible";
 
 export function Collapsible({
   children,

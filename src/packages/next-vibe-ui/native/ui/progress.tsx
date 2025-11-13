@@ -10,7 +10,6 @@ import Animated, {
 
 import { cn } from "next-vibe/shared/utils/utils";
 
-// Import ALL types from web - ZERO definitions here
 import type {
   ProgressRootProps,
   ProgressIndicatorProps,

@@ -11,7 +11,6 @@ import { Check } from "./icons/Check";
 import { ChevronDown } from "./icons/ChevronDown";
 import { ChevronUp } from "./icons/ChevronUp";
 
-// Import ALL types from web - ZERO definitions here
 import type {
   SelectRootProps,
   SelectGroupProps,
@@ -23,7 +22,6 @@ import type {
   SelectSeparatorProps,
 } from "@/packages/next-vibe-ui/web/ui/select";
 
-// Styled components for NativeWind support
 const StyledAnimatedView = styled(Animated.View, { className: "style" });
 
 type Option = SelectPrimitive.Option;

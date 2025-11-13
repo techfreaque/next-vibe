@@ -11,11 +11,11 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
-import type {
-  GroupedListWidgetData,
-  RenderableValue,
-  WidgetComponentProps,
-} from "../types";
+import {
+  type GroupedListWidgetData,
+  type WidgetComponentProps,
+  type RenderableValue,
+} from "../../shared/ui/types";
 
 /**
  * Type guard for GroupedListWidgetData

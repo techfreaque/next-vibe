@@ -68,4 +68,3 @@ function Badge({
 }
 
 export { Badge, badgeTextVariants, badgeVariants };
-export type { BadgeProps };

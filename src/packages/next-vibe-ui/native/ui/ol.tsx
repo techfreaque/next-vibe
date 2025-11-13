@@ -1,12 +1,11 @@
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
-import { View } from "react-native";
+import { View, Pressable, type AccessibilityRole } from "react-native";
 import { styled } from "nativewind";
 
-// Import ALL types from web - ZERO definitions here
 import type { OlProps, OlMouseEvent } from "@/packages/next-vibe-ui/web/ui/ol";
 
-// Styled components for NativeWind support
+const StyledPressable = styled(Pressable, { className: "style" });
 const StyledView = styled(View, { className: "style" });
 
 function Ol({
@@ -19,7 +18,11 @@ function Ol({
   start,
   reversed: _reversed,
   type: _type,
-  ...props
+  id: _id,
+  role,
+  "aria-label": ariaLabel,
+  "aria-labelledby": _ariaLabelledby,
+  "aria-describedby": _ariaDescribedby,
 }: OlProps): React.JSX.Element {
   const handlePress = onClick
     ? (): void => {
@@ -65,14 +68,44 @@ function Ol({
 
   // Native doesn't support list styling (start, reversed, type, style) - these are CSS-only
   // But we accept them for API compatibility
+
+  // Valid React Native accessibility roles
+  const validRoles: AccessibilityRole[] = [
+    'none', 'button', 'link', 'search', 'image', 'keyboardkey', 'text',
+    'adjustable', 'imagebutton', 'header', 'summary', 'alert', 'checkbox',
+    'combobox', 'menu', 'menubar', 'menuitem', 'progressbar', 'radio',
+    'radiogroup', 'scrollbar', 'spinbutton', 'switch', 'tab', 'tablist',
+    'timer', 'toolbar', 'list', 
+  ];
+
+  const accessibilityRole: AccessibilityRole | undefined =
+    role && validRoles.includes(role as AccessibilityRole)
+      ? (role as AccessibilityRole)
+      : undefined;
+
+  // If we have click handlers, use Pressable, otherwise use View
+  if (onClick || onMouseEnter || onMouseLeave) {
+    return (
+      <StyledPressable
+        className={cn(className)}
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        accessibilityRole={accessibilityRole}
+        accessibilityLabel={ariaLabel}
+        accessibilityValue={start !== undefined ? { text: String(start) } : undefined}
+      >
+        {children}
+      </StyledPressable>
+    );
+  }
+
   return (
     <StyledView
       className={cn(className)}
-      onTouchEnd={handlePress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
+      accessibilityRole={accessibilityRole}
+      accessibilityLabel={ariaLabel}
       accessibilityValue={start !== undefined ? { text: String(start) } : undefined}
-      {...props}
     >
       {children}
     </StyledView>

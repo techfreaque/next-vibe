@@ -1,9 +1,9 @@
+// oxlint-disable no-html-link-for-pages
 /**
  * Lead Creation Email Templates
  * React Email templates for lead creation operations
  */
 
-import { Button, Hr, Section } from "@react-email/components";
 import {
   fail,
   success,
@@ -11,7 +11,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
 import React from "react";
-import { Span } from "next-vibe-ui/ui/span";
 
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
 import {
@@ -66,7 +65,7 @@ function WelcomeEmailContent({
       previewText={t("app.api.v1.core.leads.create.email.welcome.preview")}
       tracking={tracking}
     >
-      <Span
+      <span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -79,9 +78,9 @@ function WelcomeEmailContent({
             lead.summary.businessName ||
             t("app.api.v1.core.leads.create.email.welcome.defaultName"),
         })}
-      </Span>
+      </span>
 
-      <Span
+      <span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -90,10 +89,10 @@ function WelcomeEmailContent({
         }}
       >
         {t("app.api.v1.core.leads.create.email.welcome.introduction")}
-      </Span>
+      </span>
 
-      {/* Next Steps Section */}
-      <Section
+      {/* Next Steps section */}
+      <section
         style={{
           backgroundColor: "#f9fafb",
           padding: "20px",
@@ -101,7 +100,7 @@ function WelcomeEmailContent({
           marginBottom: "24px",
         }}
       >
-        <Span
+        <span
           style={{
             fontSize: "18px",
             fontWeight: "700",
@@ -110,62 +109,62 @@ function WelcomeEmailContent({
           }}
         >
           {t("app.api.v1.core.leads.create.email.welcome.nextSteps.title")}
-        </Span>
+        </span>
 
-        <Span
+        <span
           style={{
             fontSize: "14px",
             color: "#4b5563",
             marginBottom: "8px",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
+          <span style={{ fontWeight: "700" }}>
             {t(
               "app.api.v1.core.leads.create.email.welcome.nextSteps.step1Number",
             )}
-          </Span>
+          </span>
           {"  "}
           {t("app.api.v1.core.leads.create.email.welcome.nextSteps.step1")}
-        </Span>
+        </span>
 
-        <Span
+        <span
           style={{
             fontSize: "14px",
             color: "#4b5563",
             marginBottom: "8px",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
+          <span style={{ fontWeight: "700" }}>
             {t(
               "app.api.v1.core.leads.create.email.welcome.nextSteps.step2Number",
             )}
-          </Span>
+          </span>
           {"  "}
           {t("app.api.v1.core.leads.create.email.welcome.nextSteps.step2")}
-        </Span>
+        </span>
 
-        <Span
+        <span
           style={{
             fontSize: "14px",
             color: "#4b5563",
             marginBottom: "0",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
+          <span style={{ fontWeight: "700" }}>
             {t(
               "app.api.v1.core.leads.create.email.welcome.nextSteps.step3Number",
             )}
-          </Span>
+          </span>
           {"  "}
           {t("app.api.v1.core.leads.create.email.welcome.nextSteps.step3")}
-        </Span>
-      </Section>
+        </span>
+      </section>
 
-      <Hr style={{ borderColor: "#e5e7eb", margin: "24px 0" }} />
+      <hr style={{ borderColor: "#e5e7eb", margin: "24px 0" }} />
 
       {/* Call to Action */}
-      <Section style={{ textAlign: "center", marginBottom: "24px" }}>
-        <Button
+      <section style={{ textAlign: "center", marginBottom: "24px" }}>
+        <a
           href={`${env.NEXT_PUBLIC_APP_URL}/consultation/onboarding`}
           style={{
             backgroundColor: "#4f46e5",
@@ -179,10 +178,10 @@ function WelcomeEmailContent({
           }}
         >
           {t("app.api.v1.core.leads.create.email.welcome.cta.getStarted")}
-        </Button>
-      </Section>
+        </a>
+      </section>
 
-      <Span
+      <span
         style={{
           fontSize: "14px",
           lineHeight: "1.6",
@@ -193,7 +192,7 @@ function WelcomeEmailContent({
         {t("app.api.v1.core.leads.create.email.welcome.support", {
           supportEmail: contactClientRepository.getSupportEmail(locale),
         })}
-      </Span>
+      </span>
     </EmailTemplate>
   );
 }
@@ -237,7 +236,7 @@ function AdminNotificationEmailContent({
       )}
       tracking={tracking}
     >
-      <Span
+      <span
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -251,10 +250,10 @@ function AdminNotificationEmailContent({
             lead.summary.email ||
             t("app.api.v1.core.leads.create.email.admin.newLead.defaultName"),
         })}
-      </Span>
+      </span>
 
-      {/* Lead Details Section */}
-      <Section
+      {/* Lead Details section */}
+      <section
         style={{
           backgroundColor: "#f9fafb",
           padding: "20px",
@@ -262,7 +261,7 @@ function AdminNotificationEmailContent({
           marginBottom: "24px",
         }}
       >
-        <Span
+        <span
           style={{
             fontSize: "18px",
             fontWeight: "700",
@@ -271,77 +270,77 @@ function AdminNotificationEmailContent({
           }}
         >
           {t("app.api.v1.core.leads.create.email.admin.newLead.leadDetails")}
-        </Span>
+        </span>
 
-        <Span
+        <span
           style={{
             fontSize: "14px",
             marginBottom: "8px",
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
+          <span style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.leads.create.email.admin.newLead.businessName")}
             :
-          </Span>{" "}
+          </span>{" "}
           {lead.summary.businessName ||
             t("app.api.v1.core.leads.create.email.admin.newLead.notProvided")}
-        </Span>
+        </span>
 
-        <Span
+        <span
           style={{
             fontSize: "14px",
             marginBottom: "8px",
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
+          <span style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.leads.create.email.admin.newLead.email")}:
-          </Span>{" "}
+          </span>{" "}
           {lead.summary.email ||
             t("app.api.v1.core.leads.create.email.admin.newLead.notProvided")}
-        </Span>
+        </span>
 
         {lead.contactDetails.phone && (
-          <Span
+          <span
             style={{
               fontSize: "14px",
               marginBottom: "8px",
               color: "#4b5563",
             }}
           >
-            <Span style={{ fontWeight: "700" }}>
+            <span style={{ fontWeight: "700" }}>
               {t("app.api.v1.core.leads.create.email.admin.newLead.phone")}:
-            </Span>{" "}
+            </span>{" "}
             {lead.contactDetails.phone}
-          </Span>
+          </span>
         )}
 
         {lead.contactDetails.website && (
-          <Span
+          <span
             style={{
               fontSize: "14px",
               marginBottom: "8px",
               color: "#4b5563",
             }}
           >
-            <Span style={{ fontWeight: "700" }}>
+            <span style={{ fontWeight: "700" }}>
               {t("app.api.v1.core.leads.create.email.admin.newLead.website")}:
-            </Span>{" "}
+            </span>{" "}
             {lead.contactDetails.website}
-          </Span>
+          </span>
         )}
 
-        <Span
+        <span
           style={{
             fontSize: "14px",
             marginBottom: "8px",
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
+          <span style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.leads.create.email.admin.newLead.source")}:
-          </Span>{" "}
+          </span>{" "}
           {lead.trackingInfo.source
             ? t(
                 LeadSourceOptions.find(
@@ -350,29 +349,29 @@ function AdminNotificationEmailContent({
                   "app.api.v1.core.leads.create.email.admin.newLead.notProvided",
               )
             : t("app.api.v1.core.leads.create.email.admin.newLead.notProvided")}
-        </Span>
+        </span>
 
-        <Span
+        <span
           style={{
             fontSize: "14px",
             marginBottom: "8px",
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
+          <span style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.leads.create.email.admin.newLead.status")}:
-          </Span>{" "}
+          </span>{" "}
           {t(
             LeadStatusOptions.find((opt) => opt.label === lead.summary.status)
               ?.label ??
               "app.api.v1.core.leads.create.email.admin.newLead.notProvided",
           )}
-        </Span>
+        </span>
 
         {lead.metadata.notes && (
           <>
-            <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
-            <Span
+            <hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
+            <span
               style={{
                 fontSize: "14px",
                 fontWeight: "700",
@@ -381,8 +380,8 @@ function AdminNotificationEmailContent({
               }}
             >
               {t("app.api.v1.core.leads.create.email.admin.newLead.notes")}:
-            </Span>
-            <Span
+            </span>
+            <span
               style={{
                 fontSize: "14px",
                 color: "#4b5563",
@@ -394,14 +393,14 @@ function AdminNotificationEmailContent({
               }}
             >
               {lead.metadata.notes}
-            </Span>
+            </span>
           </>
         )}
-      </Section>
+      </section>
 
       {/* Admin Actions */}
-      <Section style={{ textAlign: "center", marginTop: "24px" }}>
-        <Button
+      <section style={{ textAlign: "center", marginTop: "24px" }}>
+        <a
           href={`${env.NEXT_PUBLIC_APP_URL}/admin/leads/lead/${lead.summary.id}`}
           style={{
             backgroundColor: "#4f46e5",
@@ -416,9 +415,9 @@ function AdminNotificationEmailContent({
           }}
         >
           {t("app.api.v1.core.leads.create.email.admin.newLead.viewLead")}
-        </Button>
+        </a>
 
-        <Button
+        <a
           href={`${env.NEXT_PUBLIC_APP_URL}/admin/leads`}
           style={{
             backgroundColor: "#6b7280",
@@ -432,8 +431,8 @@ function AdminNotificationEmailContent({
           }}
         >
           {t("app.api.v1.core.leads.create.email.admin.newLead.viewAllLeads")}
-        </Button>
-      </Section>
+        </a>
+      </section>
     </EmailTemplate>
   );
 }

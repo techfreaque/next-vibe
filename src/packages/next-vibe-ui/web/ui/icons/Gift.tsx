@@ -1,3 +1,4 @@
 import { Gift as LucideGift } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const Gift = LucideGift;
+export const Gift: IconComponent = LucideGift;

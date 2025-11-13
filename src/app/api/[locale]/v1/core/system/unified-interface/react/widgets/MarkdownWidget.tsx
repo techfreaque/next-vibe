@@ -7,11 +7,11 @@ import type { JSX } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import type {
-  MarkdownWidgetData,
-  RenderableValue,
-  WidgetComponentProps,
-} from "../types";
+import {
+  type MarkdownWidgetData,
+  type WidgetComponentProps,
+  type RenderableValue,
+} from "../../shared/ui/types";
 
 /**
  * Type guard for MarkdownWidgetData

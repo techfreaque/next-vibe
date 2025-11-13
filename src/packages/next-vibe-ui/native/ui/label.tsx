@@ -2,11 +2,7 @@ import * as LabelPrimitive from "@rn-primitives/label";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
-// Import types from web
-import type { LabelRootProps } from "next-vibe-ui/ui/label";
-
-// Re-export types
-export type { LabelRootProps };
+import type { LabelRootProps } from "../../web/ui/label";
 
 export function Label({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1,3 +1,4 @@
 import { Clock as LucideClock } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const Clock = LucideClock;
+export const Clock: IconComponent = LucideClock;

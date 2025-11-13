@@ -1,3 +1,4 @@
 import { Cloud as LucideCloud } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const Cloud = LucideCloud;
+export const Cloud: IconComponent = LucideCloud;

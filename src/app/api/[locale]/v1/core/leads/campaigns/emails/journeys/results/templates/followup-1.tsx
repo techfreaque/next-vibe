@@ -6,8 +6,6 @@
 
 import React from "react";
 
-import { Span } from "next-vibe-ui/ui/span";
-
 import {
   CTAButton,
   EmailContent,
@@ -39,7 +37,7 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
       <EmailHeader backgroundColor="#2c82c9" t={t} />
       <EmailContent>
         {/* Main Headline */}
-        <Span
+        <span
           style={{
             fontSize: "36px",
             fontWeight: "700",
@@ -52,9 +50,9 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.headline",
           )}
-        </Span>
+        </span>
 
-        <Span
+        <span
           style={{
             fontSize: "18px",
             color: "#374151",
@@ -66,10 +64,10 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.subheadline",
           )}
-        </Span>
+        </span>
 
         {/* Case Study Section */}
-        <Span
+        <span
           style={{
             fontSize: "24px",
             fontWeight: "700",
@@ -81,7 +79,7 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.caseStudyTitle",
           )}
-        </Span>
+        </span>
 
         {/* Case Study Box */}
         <div
@@ -93,7 +91,7 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
             margin: "0 0 32px 0",
           }}
         >
-          <Span
+          <span
             style={{
               fontSize: "16px",
               fontWeight: "600",
@@ -104,9 +102,9 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.caseStudyCompany",
             )}
-          </Span>
+          </span>
 
-          <Span
+          <span
             style={{
               fontSize: "14px",
               color: "#0c4a6e",
@@ -117,9 +115,9 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.caseStudyIndustry",
             )}
-          </Span>
+          </span>
 
-          <Span
+          <span
             style={{
               fontSize: "16px",
               lineHeight: "1.6",
@@ -130,7 +128,7 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.caseStudyResults",
             )}
-          </Span>
+          </span>
 
           {/* Results Grid */}
           <div
@@ -142,7 +140,7 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
             }}
           >
             <div style={{ textAlign: "center" }}>
-              <Span
+              <span
                 style={{
                   fontSize: "24px",
                   fontWeight: "700",
@@ -153,8 +151,8 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
                 {t(
                   "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.metric1Value",
                 )}
-              </Span>
-              <Span
+              </span>
+              <span
                 style={{
                   fontSize: "12px",
                   color: "#64748b",
@@ -164,10 +162,10 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
                 {t(
                   "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.metric1Label",
                 )}
-              </Span>
+              </span>
             </div>
             <div style={{ textAlign: "center" }}>
-              <Span
+              <span
                 style={{
                   fontSize: "24px",
                   fontWeight: "700",
@@ -178,8 +176,8 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
                 {t(
                   "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.metric2Value",
                 )}
-              </Span>
-              <Span
+              </span>
+              <span
                 style={{
                   fontSize: "12px",
                   color: "#64748b",
@@ -189,11 +187,11 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
                 {t(
                   "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.metric2Label",
                 )}
-              </Span>
+              </span>
             </div>
           </div>
 
-          <Span
+          <span
             style={{
               fontSize: "14px",
               color: "#0c4a6e",
@@ -204,11 +202,11 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.caseStudyTimeframe",
             )}
-          </Span>
+          </span>
         </div>
 
         {/* ROI Section */}
-        <Span
+        <span
           style={{
             fontSize: "28px",
             fontWeight: "700",
@@ -220,9 +218,9 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.roiTitle",
           )}
-        </Span>
+        </span>
 
-        <Span
+        <span
           style={{
             fontSize: "18px",
             color: "#374151",
@@ -234,7 +232,7 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.roiExplanation",
           )}
-        </Span>
+        </span>
 
         {/* CTA Section */}
         <CTAButton
@@ -248,7 +246,7 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
         />
 
         {/* Urgency */}
-        <Span
+        <span
           style={{
             fontSize: "16px",
             color: "#dc2626",
@@ -260,7 +258,7 @@ export const resultsFollowup1Email: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup1.urgency",
           )}
-        </Span>
+        </span>
       </EmailContent>
       <EmailFooter
         companyName={companyName}

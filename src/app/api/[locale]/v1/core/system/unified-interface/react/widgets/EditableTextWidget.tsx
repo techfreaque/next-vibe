@@ -11,7 +11,7 @@ import { useState } from "react";
 
 import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
-import type { WidgetComponentProps } from "../types";
+import { type WidgetComponentProps } from "../../shared/ui/types";
 import { useWidgetActions } from "./ToolActionHandler";
 
 /**
@@ -24,7 +24,6 @@ export function EditableTextWidget({
   context,
   onAction,
   className,
-  style,
 }: WidgetComponentProps): JSX.Element {
   const value =
     typeof data === "string" ||
@@ -71,15 +70,13 @@ export function EditableTextWidget({
 
   if (!context.isInteractive) {
     return (
-      <Span className={cn("text-foreground", className)} style={style}>
-        {value || "—"}
-      </Span>
+      <Span className={cn("text-foreground", className)}>{value || "—"}</Span>
     );
   }
 
   if (isEditing) {
     return (
-      <Div className={cn("flex items-center gap-2", className)} style={style}>
+      <Div className={cn("flex items-center gap-2", className)}>
         <Input
           value={editValue}
           onChange={(e): void => setEditValue(e.target.value)}
@@ -110,10 +107,7 @@ export function EditableTextWidget({
   }
 
   return (
-    <Div
-      className={cn("group flex items-center gap-2", className)}
-      style={style}
-    >
+    <Div className={cn("group flex items-center gap-2", className)}>
       <Span className="text-foreground">{value || "—"}</Span>
       <Button
         size="sm"

@@ -1,3 +1,4 @@
 import { EyeOff as LucideEyeOff } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const EyeOff = LucideEyeOff;
+export const EyeOff: IconComponent = LucideEyeOff;

@@ -2,20 +2,33 @@ import * as React from "react";
 import type { TextInputProps } from "react-native";
 import { TextInput, View } from "react-native";
 import { styled } from "nativewind";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import type { TextareaProps as WebTextareaProps } from "@/packages/next-vibe-ui/web/ui/textarea";
+import type { TextareaProps } from "@/packages/next-vibe-ui/web/ui/textarea";
 
 import { cn } from "../lib/utils";
 
-// Styled View for NativeWind - TextInput cannot be styled (animations not supported)
 const StyledView = styled(View, { className: "style" });
 
-// Native textarea props combine web interface with native TextInput props
-export type TextareaProps = WebTextareaProps &
-  Omit<TextInputProps, "className" | "disabled" | "minRows" | "variant">;
+// Native textarea variants using CVA
+export const textareaVariants = cva(
+  "flex min-h-[80px] w-full rounded-md border bg-background px-3 py-2 shadow-sm",
+  {
+    variants: {
+      variant: {
+        default: "border-input",
+        ghost: "border-none bg-transparent rounded-t-md rounded-b-none px-6 pb-4 border-b py-2",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  },
+);
 
 function Textarea({
   className,
+  variant,
   multiline = true,
   numberOfLines,
   onChangeText,
@@ -34,7 +47,8 @@ function Textarea({
   return (
     <StyledView
       className={cn(
-        "flex min-h-[80px] w-full flex-row rounded-md border border-input bg-background px-3 py-2 shadow-sm",
+        textareaVariants({ variant }),
+        "flex-row",
         !isEditable && "opacity-50",
         className,
       )}

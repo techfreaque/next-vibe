@@ -8,11 +8,11 @@ import type { JSX, MouseEvent } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import type {
-  LinkWidgetData,
-  RenderableValue,
-  WidgetComponentProps,
-} from "../types";
+import {
+  type LinkWidgetData,
+  type WidgetComponentProps,
+  type RenderableValue,
+} from "../../shared/ui/types";
 
 /**
  * Type guard for LinkWidgetData
@@ -35,16 +35,12 @@ export function LinkWidget({
   data,
   context,
   className,
-  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
   const { t } = simpleT(context.locale);
 
   if (!isLinkWidgetData(data)) {
     return (
-      <Span
-        className={cn("text-muted-foreground italic", className)}
-        style={style}
-      >
+      <Span className={cn("text-muted-foreground italic", className)}>
         {t(
           "app.api.v1.core.system.unifiedInterface.react.widgets.link.invalidData",
         )}

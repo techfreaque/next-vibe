@@ -1,2 +1,4 @@
-// Radix UI icon alias
-export { Minus as DashIcon } from "./Minus";
+import { Minus as DashIconBase } from "./Minus";
+import { type IconComponent } from "../../lib/helper";
+
+export const DashIcon: IconComponent = DashIconBase;

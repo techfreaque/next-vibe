@@ -17,13 +17,6 @@ import type {
 const TEXT_CLASS_CONTENT = "text-sm text-base text-popover-foreground";
 /* eslint-enable i18next/no-literal-string */
 
-export type {
-  TooltipContentProps,
-  TooltipPortalProps,
-  TooltipProviderProps,
-  TooltipRootProps,
-  TooltipTriggerProps,
-};
 
 export function TooltipProvider(
   props: TooltipProviderProps,

@@ -10,11 +10,11 @@ import { CardHeader } from "next-vibe-ui/ui/card";
 import { CardTitle } from "next-vibe-ui/ui/card";
 import type { JSX } from "react";
 
-import type {
-  MetricCardWidgetData,
-  RenderableValue,
-  WidgetComponentProps,
-} from "../types";
+import {
+  type MetricCardWidgetData,
+  type WidgetComponentProps,
+  type RenderableValue,
+} from "../../shared/ui/types";
 
 /**
  * Type guard for MetricCardWidgetData

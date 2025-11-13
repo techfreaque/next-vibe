@@ -94,7 +94,7 @@ export interface DivKeyboardEvent {
   type: string;
 }
 
-export interface DivRefObject extends Element {
+export type DivRefObject = Element & {
   focus?: () => void;
   blur?: () => void;
   scrollIntoView: (options?: {
@@ -115,13 +115,14 @@ export interface DivRefObject extends Element {
     listener: (event: Event) => void,
     options?: boolean | EventListenerOptions,
   ) => void;
-}
+};
 
 export interface DivProps {
   className?: string;
   children?: React.ReactNode;
-  style?: React.CSSProperties;
-  ref?: React.RefObject<DivRefObject | null>;
+  ref?:
+    | React.RefObject<DivRefObject | null>
+    | ((node: DivRefObject | null) => void);
   role?: string;
   ariaLabel?: string;
   id?: string;
@@ -148,7 +149,6 @@ export interface DivProps {
 export function Div({
   className,
   children,
-  style,
   role,
   ariaLabel,
   id,
@@ -171,7 +171,6 @@ export function Div({
     <div
       ref={ref}
       className={className}
-      style={style}
       role={role}
       aria-label={ariaLabel}
       id={id}

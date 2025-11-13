@@ -1,3 +1,4 @@
 import { Hash as LucideHash } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const Hash = LucideHash;
+export const Hash: IconComponent = LucideHash;

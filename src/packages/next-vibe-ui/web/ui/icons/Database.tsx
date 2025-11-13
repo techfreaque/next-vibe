@@ -1,3 +1,4 @@
 import { Database as LucideDatabase } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const Database = LucideDatabase;
+export const Database: IconComponent = LucideDatabase;

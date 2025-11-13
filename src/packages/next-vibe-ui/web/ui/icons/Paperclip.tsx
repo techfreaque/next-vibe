@@ -1,3 +1,4 @@
 import { Paperclip as LucidePaperclip } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const Paperclip = LucidePaperclip;
+export const Paperclip: IconComponent = LucidePaperclip;

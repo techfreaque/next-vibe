@@ -51,7 +51,6 @@ export default function DesignTestPage(): JSX.Element {
 
         <Separator />
         <SpecialPreview />
-
       </Container>
       <Toaster />
     </>

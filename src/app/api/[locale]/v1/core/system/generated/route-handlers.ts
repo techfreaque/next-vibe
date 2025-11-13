@@ -4,7 +4,7 @@
  *
  * Routes found: 151
  * Total paths (with aliases): 267
- * Generated at: 2025-11-12T15:47:12.386Z
+ * Generated at: 2025-11-13T08:36:26.351Z
  */
 
 /* eslint-disable prettier/prettier */

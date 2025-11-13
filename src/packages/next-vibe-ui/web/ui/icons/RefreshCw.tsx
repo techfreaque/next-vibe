@@ -1,3 +1,4 @@
 import { RefreshCw as LucideRefreshCw } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const RefreshCw = LucideRefreshCw;
+export const RefreshCw: IconComponent = LucideRefreshCw;

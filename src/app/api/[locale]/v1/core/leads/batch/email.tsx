@@ -9,7 +9,6 @@ import {
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React from "react";
 
@@ -70,7 +69,7 @@ function BatchUpdateCompletionEmailContent({
       )}
       tracking={tracking}
     >
-      <Span
+      <div
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -81,7 +80,7 @@ function BatchUpdateCompletionEmailContent({
         {t("app.api.v1.core.leads.batch.email.admin.batchUpdate.message", {
           totalProcessed: responseData?.totalProcessed || 0,
         })}
-      </Span>
+      </div>
 
       {/* Operation Summary Section */}
       <Section
@@ -92,7 +91,7 @@ function BatchUpdateCompletionEmailContent({
           marginBottom: "24px",
         }}
       >
-        <Span
+        <div
           style={{
             fontSize: "18px",
             fontWeight: "700",
@@ -103,80 +102,80 @@ function BatchUpdateCompletionEmailContent({
           {t(
             "app.api.v1.core.leads.batch.email.admin.batchUpdate.operationSummary",
           )}
-        </Span>
+        </div>
 
-        <Span
+        <div
           style={{
             fontSize: "14px",
             marginBottom: "8px",
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
+          <div style={{ fontWeight: "700" }}>
             {t(
               "app.api.v1.core.leads.batch.email.admin.batchUpdate.totalMatched",
             )}
             :
-          </Span>{" "}
+          </div>{" "}
           {responseData?.totalMatched || 0}
-        </Span>
+        </div>
 
-        <Span
+        <div
           style={{
             fontSize: "14px",
             marginBottom: "8px",
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
+          <div style={{ fontWeight: "700" }}>
             {t(
               "app.api.v1.core.leads.batch.email.admin.batchUpdate.totalProcessed",
             )}
             :
-          </Span>{" "}
+          </div>{" "}
           {responseData?.totalProcessed || 0}
-        </Span>
+        </div>
 
         {responseData?.totalUpdated && (
-          <Span
+          <div
             style={{
               fontSize: "14px",
               marginBottom: "8px",
               color: "#4b5563",
             }}
           >
-            <Span style={{ fontWeight: "700" }}>
+            <div style={{ fontWeight: "700" }}>
               {t(
                 "app.api.v1.core.leads.batch.email.admin.batchUpdate.totalUpdated",
               )}
               :
-            </Span>{" "}
+            </div>{" "}
             {responseData.totalUpdated}
-          </Span>
+          </div>
         )}
 
         {responseData.errors.length > 0 && (
           <>
-            <Span
+            <div
               style={{
                 fontSize: "14px",
                 marginBottom: "8px",
                 color: "#dc2626",
               }}
             >
-              <Span style={{ fontWeight: "700" }}>
+              <div style={{ fontWeight: "700" }}>
                 {t(
                   "app.api.v1.core.leads.batch.email.admin.batchUpdate.errors",
                 )}
                 :
-              </Span>{" "}
+              </div>{" "}
               {responseData.errors.length}
-            </Span>
+            </div>
           </>
         )}
 
         {data?.dryRun && (
-          <Span
+          <div
             style={{
               fontSize: "14px",
               marginBottom: "0",
@@ -187,7 +186,7 @@ function BatchUpdateCompletionEmailContent({
             {t(
               "app.api.v1.core.leads.batch.email.admin.batchUpdate.dryRunNote",
             )}
-          </Span>
+          </div>
         )}
       </Section>
 
@@ -251,7 +250,7 @@ function BatchDeleteCompletionEmailContent({
       )}
       tracking={tracking}
     >
-      <Span
+      <div
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -262,7 +261,7 @@ function BatchDeleteCompletionEmailContent({
         {t("app.api.v1.core.leads.batch.email.admin.batchDelete.message", {
           totalProcessed: responseData?.totalProcessed || 0,
         })}
-      </Span>
+      </div>
 
       {/* Operation Summary Section */}
       <Section
@@ -273,7 +272,7 @@ function BatchDeleteCompletionEmailContent({
           marginBottom: "24px",
         }}
       >
-        <Span
+        <div
           style={{
             fontSize: "18px",
             fontWeight: "700",
@@ -284,80 +283,80 @@ function BatchDeleteCompletionEmailContent({
           {t(
             "app.api.v1.core.leads.batch.email.admin.batchDelete.operationSummary",
           )}
-        </Span>
+        </div>
 
-        <Span
+        <div
           style={{
             fontSize: "14px",
             marginBottom: "8px",
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
+          <div style={{ fontWeight: "700" }}>
             {t(
               "app.api.v1.core.leads.batch.email.admin.batchDelete.totalMatched",
             )}
             :
-          </Span>{" "}
+          </div>{" "}
           {responseData?.totalMatched || 0}
-        </Span>
+        </div>
 
-        <Span
+        <div
           style={{
             fontSize: "14px",
             marginBottom: "8px",
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
+          <div style={{ fontWeight: "700" }}>
             {t(
               "app.api.v1.core.leads.batch.email.admin.batchDelete.totalProcessed",
             )}
             :
-          </Span>{" "}
+          </div>{" "}
           {responseData?.totalProcessed || 0}
-        </Span>
+        </div>
 
         {responseData?.totalDeleted && (
-          <Span
+          <div
             style={{
               fontSize: "14px",
               marginBottom: "8px",
               color: "#4b5563",
             }}
           >
-            <Span style={{ fontWeight: "700" }}>
+            <div style={{ fontWeight: "700" }}>
               {t(
                 "app.api.v1.core.leads.batch.email.admin.batchDelete.totalDeleted",
               )}
               :
-            </Span>{" "}
+            </div>{" "}
             {responseData.totalDeleted}
-          </Span>
+          </div>
         )}
 
         {responseData.errors.length > 0 && (
           <>
-            <Span
+            <div
               style={{
                 fontSize: "14px",
                 marginBottom: "8px",
                 color: "#dc2626",
               }}
             >
-              <Span style={{ fontWeight: "700" }}>
+              <div style={{ fontWeight: "700" }}>
                 {t(
                   "app.api.v1.core.leads.batch.email.admin.batchDelete.errors",
                 )}
                 :
-              </Span>{" "}
+              </div>{" "}
               {responseData.errors.length}
-            </Span>
+            </div>
           </>
         )}
 
         {data?.dryRun && (
-          <Span
+          <div
             style={{
               fontSize: "14px",
               marginBottom: "0",
@@ -368,7 +367,7 @@ function BatchDeleteCompletionEmailContent({
             {t(
               "app.api.v1.core.leads.batch.email.admin.batchDelete.dryRunNote",
             )}
-          </Span>
+          </div>
         )}
       </Section>
 

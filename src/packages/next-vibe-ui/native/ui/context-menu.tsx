@@ -8,7 +8,6 @@ import { ChevronRight } from "./icons/ChevronRight";
 import { Span } from "./span";
 import { TextClassContext } from "./text";
 
-// Import ALL types from web - ZERO definitions here
 import type {
   ContextMenuRootProps,
   ContextMenuTriggerProps,
@@ -32,7 +31,6 @@ const TEXT_CLASS_ITEM =
   "select-none text-sm text-lg text-popover-foreground group-focus:text-accent-foreground";
 /* eslint-enable i18next/no-literal-string */
 
-// Local styled components - use direct primitives to avoid type instantiation issues
 // The styled() function from nativewind has overly complex type inference for these components
 const StyledContextMenuSubTrigger = ContextMenuPrimitive.SubTrigger;
 const StyledContextMenuSubContent = ContextMenuPrimitive.SubContent;

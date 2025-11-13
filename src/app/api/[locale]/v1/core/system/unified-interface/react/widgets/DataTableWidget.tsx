@@ -20,11 +20,11 @@ import { useEffect, useState } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import type {
-  DataTableWidgetData,
-  RenderableValue,
-  WidgetComponentProps,
-} from "../types";
+import {
+  type DataTableWidgetData,
+  type WidgetComponentProps,
+  type RenderableValue,
+} from "../../shared/ui/types";
 
 /**
  * Type guard for DataTableWidgetData

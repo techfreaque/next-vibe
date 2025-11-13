@@ -1,2 +1,4 @@
-// Radix UI icon alias
-export { ChevronDown as ChevronDownIcon } from "./ChevronDown";
+import { ChevronDown as ChevronDownIconBase } from "./ChevronDown";
+import { type IconComponent } from "../../lib/helper";
+
+export const ChevronDownIcon: IconComponent = ChevronDownIconBase;

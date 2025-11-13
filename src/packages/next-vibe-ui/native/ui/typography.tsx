@@ -4,39 +4,22 @@ import { Text as RNText } from "react-native";
 import { styled } from "nativewind";
 
 import { cn } from "../lib/utils";
-import type { TextPropsWithClassName } from "../lib/types";
 
-// Styled Text for NativeWind support
+import type {
+  H1Props,
+  H2Props,
+  H3Props,
+  H4Props,
+  PProps,
+  BlockQuoteProps,
+  CodeProps,
+  LeadProps,
+  LargeProps,
+  SmallProps,
+  MutedProps,
+} from "../../web/ui/typography";
+
 const StyledText = styled(RNText, { className: "style" });
-import type { TypographyProps as WebTypographyProps } from "../../web/ui/typography";
-
-// Re-export web types for cross-platform compatibility
-export type { TypographyProps } from "../../web/ui/typography";
-
-// Native typography components use RNText directly (no asChild pattern for semantic elements)
-// We only use className from web TypographyProps, children comes from TextPropsWithClassName
-export type H1Props = Omit<WebTypographyProps, "children"> &
-  TextPropsWithClassName;
-export type H2Props = Omit<WebTypographyProps, "children"> &
-  TextPropsWithClassName;
-export type H3Props = Omit<WebTypographyProps, "children"> &
-  TextPropsWithClassName;
-export type H4Props = Omit<WebTypographyProps, "children"> &
-  TextPropsWithClassName;
-export type PProps = Omit<WebTypographyProps, "children"> &
-  TextPropsWithClassName;
-export type BlockQuoteProps = Omit<WebTypographyProps, "children"> &
-  TextPropsWithClassName;
-export type CodeProps = Omit<WebTypographyProps, "children"> &
-  TextPropsWithClassName;
-export type LeadProps = Omit<WebTypographyProps, "children"> &
-  TextPropsWithClassName;
-export type LargeProps = Omit<WebTypographyProps, "children"> &
-  TextPropsWithClassName;
-export type SmallProps = Omit<WebTypographyProps, "children"> &
-  TextPropsWithClassName;
-export type MutedProps = Omit<WebTypographyProps, "children"> &
-  TextPropsWithClassName;
 
 function H1({ className, ...props }: H1Props): React.JSX.Element {
   return (

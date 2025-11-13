@@ -1,14 +1,24 @@
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
-export interface InputEventTarget<T extends string = string> {
-  value: T extends "number" ? number : string;
+// No-op functions to avoid empty function linting errors
+const noop = (): void => {
+  return undefined;
+};
+const noopBool = (): boolean => {
+  return false;
+};
+
+type InferValueType<T> = T extends "number" ? number : string;
+
+export interface InputEventTarget<T = undefined> {
+  value: InferValueType<T>;
   name?: string;
   id?: string;
   files?: FileList | null;
 }
 
-export interface InputGenericTarget<T = string> {
+export interface InputGenericTarget<T = undefined> {
   addEventListener: (type: string, listener: (event: Event) => void) => void;
   removeEventListener: (type: string, listener: (event: Event) => void) => void;
   dispatchEvent: (event: Event) => boolean;
@@ -22,14 +32,12 @@ export interface InputGenericTarget<T = string> {
     x: number;
     y: number;
   };
-  value?: T;
+  value?: InferValueType<T>;
 }
 
-export interface InputChangeEvent<T extends string = string> {
+export interface InputChangeEvent<T = undefined> {
   target: InputEventTarget<T>;
-  currentTarget: InputGenericTarget<
-    T extends "number" ? number : string
-  >;
+  currentTarget: InputGenericTarget<T>;
   preventDefault: () => void;
   stopPropagation: () => void;
   bubbles: boolean;
@@ -41,7 +49,7 @@ export interface InputChangeEvent<T extends string = string> {
   type: string;
 }
 
-export interface InputFocusEvent<T = string> {
+export interface InputFocusEvent<T = undefined> {
   target: InputGenericTarget<T>;
   currentTarget: InputGenericTarget<T>;
   preventDefault: () => void;
@@ -55,7 +63,7 @@ export interface InputFocusEvent<T = string> {
   type: string;
 }
 
-export interface InputKeyboardEvent<T = string> {
+export interface InputKeyboardEvent<T = undefined> {
   key: string;
   code: string;
   preventDefault: () => void;
@@ -77,7 +85,7 @@ export interface InputKeyboardEvent<T = string> {
   type: string;
 }
 
-export interface InputMouseEvent<T = string> {
+export interface InputMouseEvent<T = undefined> {
   currentTarget: InputGenericTarget<T>;
   target: InputGenericTarget<T>;
   preventDefault: () => void;
@@ -101,9 +109,8 @@ export interface InputRefObject {
   value?: string;
 }
 
-export interface InputProps<T extends string = string> {
-  className?: string;
-  type?:
+export interface InputProps<
+  T extends
     | "text"
     | "email"
     | "tel"
@@ -113,9 +120,13 @@ export interface InputProps<T extends string = string> {
     | "date"
     | "time"
     | "file"
-    | "hidden";
-  value?: T extends "number" ? number : string;
-  defaultValue?: T extends "number" ? number : string;
+    | "hidden"
+    | undefined,
+> {
+  className?: string;
+  type?: T;
+  value?: InferValueType<T>;
+  defaultValue?: InferValueType<T>;
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
@@ -130,11 +141,11 @@ export interface InputProps<T extends string = string> {
   accept?: string;
   onChange?: (e: InputChangeEvent<T>) => void;
   onChangeText?: (text: string) => void;
-  onBlur?: ((e: InputFocusEvent) => void) | (() => void);
-  onFocus?: ((e: InputFocusEvent) => void) | (() => void);
-  onClick?: (e: InputMouseEvent) => void;
-  onKeyPress?: (e: InputKeyboardEvent) => void;
-  onKeyDown?: (e: InputKeyboardEvent) => void;
+  onBlur?: ((e: InputFocusEvent<T>) => void) | (() => void);
+  onFocus?: ((e: InputFocusEvent<T>) => void) | (() => void);
+  onClick?: (e: InputMouseEvent<T>) => void;
+  onKeyPress?: (e: InputKeyboardEvent<T>) => void;
+  onKeyDown?: (e: InputKeyboardEvent<T>) => void;
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   secureTextEntry?: boolean;
   keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";
@@ -145,7 +156,20 @@ export interface InputProps<T extends string = string> {
   ref?: React.RefObject<InputRefObject | null>;
 }
 
-function Input<T extends string = string>({
+const Input = <
+  T extends
+    | "text"
+    | "email"
+    | "tel"
+    | "url"
+    | "password"
+    | "number"
+    | "date"
+    | "time"
+    | "file"
+    | "hidden"
+    | undefined = undefined,
+>({
   className,
   type,
   value,
@@ -177,7 +201,7 @@ function Input<T extends string = string>({
   id,
   "aria-label": ariaLabel,
   ref,
-}: InputProps<T>): React.JSX.Element {
+}: InputProps<T>): React.JSX.Element => {
   return (
     <input
       ref={ref}
@@ -206,10 +230,9 @@ function Input<T extends string = string>({
       )}
       onChange={(e) => {
         const rawValue = e.target.value;
-        const typedValue:
-          | string
-          | number =
-          type === "number" && rawValue !== "" ? Number(rawValue) : rawValue;
+        const typedValue: InferValueType<T> = (
+          type === "number" && rawValue !== "" ? Number(rawValue) : rawValue
+        ) as InferValueType<T>;
 
         const elem =
           e.currentTarget instanceof HTMLInputElement ? e.currentTarget : null;
@@ -222,12 +245,9 @@ function Input<T extends string = string>({
             files: e.target.files,
           },
           currentTarget: {
-            addEventListener:
-              elem?.addEventListener.bind(elem) ?? ((): void => {}),
-            removeEventListener:
-              elem?.removeEventListener.bind(elem) ?? ((): void => {}),
-            dispatchEvent:
-              elem?.dispatchEvent.bind(elem) ?? ((): boolean => false),
+            addEventListener: elem?.addEventListener.bind(elem) ?? noop,
+            removeEventListener: elem?.removeEventListener.bind(elem) ?? noop,
+            dispatchEvent: elem?.dispatchEvent.bind(elem) ?? noopBool,
             getBoundingClientRect: (): {
               left: number;
               top: number;
@@ -248,6 +268,7 @@ function Input<T extends string = string>({
                 x: 0,
                 y: 0,
               },
+            value: typedValue,
           },
           preventDefault: (): void => e.preventDefault(),
           stopPropagation: (): void => e.stopPropagation(),
@@ -260,7 +281,7 @@ function Input<T extends string = string>({
           type: e.type,
         };
         onChange?.(changeEvent);
-        onChangeText?.(e.target.value);
+        onChangeText?.(rawValue);
       }}
       onClick={
         onClick
@@ -271,14 +292,12 @@ function Input<T extends string = string>({
                   : null;
               const targetElem =
                 e.target instanceof HTMLInputElement ? e.target : null;
-              const customEvent: InputMouseEvent = {
+              const customEvent: InputMouseEvent<T> = {
                 currentTarget: {
-                  addEventListener:
-                    elem?.addEventListener.bind(elem) ?? ((): void => {}),
+                  addEventListener: elem?.addEventListener.bind(elem) ?? noop,
                   removeEventListener:
-                    elem?.removeEventListener.bind(elem) ?? ((): void => {}),
-                  dispatchEvent:
-                    elem?.dispatchEvent.bind(elem) ?? ((): boolean => false),
+                    elem?.removeEventListener.bind(elem) ?? noop,
+                  dispatchEvent: elem?.dispatchEvent.bind(elem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
                     top: number;
@@ -302,14 +321,11 @@ function Input<T extends string = string>({
                 },
                 target: {
                   addEventListener:
-                    targetElem?.addEventListener.bind(targetElem) ??
-                    ((): void => {}),
+                    targetElem?.addEventListener.bind(targetElem) ?? noop,
                   removeEventListener:
-                    targetElem?.removeEventListener.bind(targetElem) ??
-                    ((): void => {}),
+                    targetElem?.removeEventListener.bind(targetElem) ?? noop,
                   dispatchEvent:
-                    targetElem?.dispatchEvent.bind(targetElem) ??
-                    ((): boolean => false),
+                    targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
                     top: number;
@@ -348,8 +364,162 @@ function Input<T extends string = string>({
             }
           : undefined
       }
-      onBlur={onBlur}
-      onFocus={onFocus}
+      onBlur={
+        onBlur
+          ? (e): void => {
+              const elem =
+                e.currentTarget instanceof HTMLInputElement
+                  ? e.currentTarget
+                  : null;
+              const targetElem =
+                e.target instanceof HTMLInputElement ? e.target : null;
+              const customEvent: InputFocusEvent<T> = {
+                target: {
+                  addEventListener:
+                    targetElem?.addEventListener.bind(targetElem) ?? noop,
+                  removeEventListener:
+                    targetElem?.removeEventListener.bind(targetElem) ?? noop,
+                  dispatchEvent:
+                    targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
+                  getBoundingClientRect: (): {
+                    left: number;
+                    top: number;
+                    right: number;
+                    bottom: number;
+                    width: number;
+                    height: number;
+                    x: number;
+                    y: number;
+                  } =>
+                    targetElem?.getBoundingClientRect() ?? {
+                      left: 0,
+                      top: 0,
+                      right: 0,
+                      bottom: 0,
+                      width: 0,
+                      height: 0,
+                      x: 0,
+                      y: 0,
+                    },
+                },
+                currentTarget: {
+                  addEventListener: elem?.addEventListener.bind(elem) ?? noop,
+                  removeEventListener:
+                    elem?.removeEventListener.bind(elem) ?? noop,
+                  dispatchEvent: elem?.dispatchEvent.bind(elem) ?? noopBool,
+                  getBoundingClientRect: (): {
+                    left: number;
+                    top: number;
+                    right: number;
+                    bottom: number;
+                    width: number;
+                    height: number;
+                    x: number;
+                    y: number;
+                  } =>
+                    elem?.getBoundingClientRect() ?? {
+                      left: 0,
+                      top: 0,
+                      right: 0,
+                      bottom: 0,
+                      width: 0,
+                      height: 0,
+                      x: 0,
+                      y: 0,
+                    },
+                },
+                preventDefault: (): void => e.preventDefault(),
+                stopPropagation: (): void => e.stopPropagation(),
+                bubbles: e.bubbles,
+                cancelable: e.cancelable,
+                defaultPrevented: e.defaultPrevented,
+                eventPhase: e.eventPhase,
+                isTrusted: e.isTrusted,
+                timeStamp: e.timeStamp,
+                type: e.type,
+              };
+              onBlur(customEvent);
+            }
+          : undefined
+      }
+      onFocus={
+        onFocus
+          ? (e): void => {
+              const elem =
+                e.currentTarget instanceof HTMLInputElement
+                  ? e.currentTarget
+                  : null;
+              const targetElem =
+                e.target instanceof HTMLInputElement ? e.target : null;
+              const customEvent: InputFocusEvent<T> = {
+                target: {
+                  addEventListener:
+                    targetElem?.addEventListener.bind(targetElem) ?? noop,
+                  removeEventListener:
+                    targetElem?.removeEventListener.bind(targetElem) ?? noop,
+                  dispatchEvent:
+                    targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
+                  getBoundingClientRect: (): {
+                    left: number;
+                    top: number;
+                    right: number;
+                    bottom: number;
+                    width: number;
+                    height: number;
+                    x: number;
+                    y: number;
+                  } =>
+                    targetElem?.getBoundingClientRect() ?? {
+                      left: 0,
+                      top: 0,
+                      right: 0,
+                      bottom: 0,
+                      width: 0,
+                      height: 0,
+                      x: 0,
+                      y: 0,
+                    },
+                },
+                currentTarget: {
+                  addEventListener: elem?.addEventListener.bind(elem) ?? noop,
+                  removeEventListener:
+                    elem?.removeEventListener.bind(elem) ?? noop,
+                  dispatchEvent: elem?.dispatchEvent.bind(elem) ?? noopBool,
+                  getBoundingClientRect: (): {
+                    left: number;
+                    top: number;
+                    right: number;
+                    bottom: number;
+                    width: number;
+                    height: number;
+                    x: number;
+                    y: number;
+                  } =>
+                    elem?.getBoundingClientRect() ?? {
+                      left: 0,
+                      top: 0,
+                      right: 0,
+                      bottom: 0,
+                      width: 0,
+                      height: 0,
+                      x: 0,
+                      y: 0,
+                    },
+                },
+                preventDefault: (): void => e.preventDefault(),
+                stopPropagation: (): void => e.stopPropagation(),
+                bubbles: e.bubbles,
+                cancelable: e.cancelable,
+                defaultPrevented: e.defaultPrevented,
+                eventPhase: e.eventPhase,
+                isTrusted: e.isTrusted,
+                timeStamp: e.timeStamp,
+                type: e.type,
+              };
+              onFocus(customEvent);
+            }
+          : undefined
+      }
       onKeyPress={
         onKeyPress
           ? (e): void => {
@@ -359,18 +529,16 @@ function Input<T extends string = string>({
                   : null;
               const targetElem =
                 e.target instanceof HTMLInputElement ? e.target : null;
-              const customEvent: InputKeyboardEvent = {
+              const customEvent: InputKeyboardEvent<T> = {
                 key: e.key,
                 code: e.code,
                 preventDefault: (): void => e.preventDefault(),
                 stopPropagation: (): void => e.stopPropagation(),
                 currentTarget: {
-                  addEventListener:
-                    elem?.addEventListener.bind(elem) ?? ((): void => {}),
+                  addEventListener: elem?.addEventListener.bind(elem) ?? noop,
                   removeEventListener:
-                    elem?.removeEventListener.bind(elem) ?? ((): void => {}),
-                  dispatchEvent:
-                    elem?.dispatchEvent.bind(elem) ?? ((): boolean => false),
+                    elem?.removeEventListener.bind(elem) ?? noop,
+                  dispatchEvent: elem?.dispatchEvent.bind(elem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
                     top: number;
@@ -394,14 +562,11 @@ function Input<T extends string = string>({
                 },
                 target: {
                   addEventListener:
-                    targetElem?.addEventListener.bind(targetElem) ??
-                    ((): void => {}),
+                    targetElem?.addEventListener.bind(targetElem) ?? noop,
                   removeEventListener:
-                    targetElem?.removeEventListener.bind(targetElem) ??
-                    ((): void => {}),
+                    targetElem?.removeEventListener.bind(targetElem) ?? noop,
                   dispatchEvent:
-                    targetElem?.dispatchEvent.bind(targetElem) ??
-                    ((): boolean => false),
+                    targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
                     top: number;
@@ -450,18 +615,16 @@ function Input<T extends string = string>({
                   : null;
               const targetElem =
                 e.target instanceof HTMLInputElement ? e.target : null;
-              const customEvent: InputKeyboardEvent = {
+              const customEvent: InputKeyboardEvent<T> = {
                 key: e.key,
                 code: e.code,
                 preventDefault: (): void => e.preventDefault(),
                 stopPropagation: (): void => e.stopPropagation(),
                 currentTarget: {
-                  addEventListener:
-                    elem?.addEventListener.bind(elem) ?? ((): void => {}),
+                  addEventListener: elem?.addEventListener.bind(elem) ?? noop,
                   removeEventListener:
-                    elem?.removeEventListener.bind(elem) ?? ((): void => {}),
-                  dispatchEvent:
-                    elem?.dispatchEvent.bind(elem) ?? ((): boolean => false),
+                    elem?.removeEventListener.bind(elem) ?? noop,
+                  dispatchEvent: elem?.dispatchEvent.bind(elem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
                     top: number;
@@ -485,14 +648,11 @@ function Input<T extends string = string>({
                 },
                 target: {
                   addEventListener:
-                    targetElem?.addEventListener.bind(targetElem) ??
-                    ((): void => {}),
+                    targetElem?.addEventListener.bind(targetElem) ?? noop,
                   removeEventListener:
-                    targetElem?.removeEventListener.bind(targetElem) ??
-                    ((): void => {}),
+                    targetElem?.removeEventListener.bind(targetElem) ?? noop,
                   dispatchEvent:
-                    targetElem?.dispatchEvent.bind(targetElem) ??
-                    ((): boolean => false),
+                    targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
                     top: number;
@@ -534,6 +694,6 @@ function Input<T extends string = string>({
       }
     />
   );
-}
+};
 
 export { Input };

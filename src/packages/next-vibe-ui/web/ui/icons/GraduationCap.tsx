@@ -1,3 +1,4 @@
 import { GraduationCap as LucideGraduationCap } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const GraduationCap = LucideGraduationCap;
+export const GraduationCap: IconComponent = LucideGraduationCap;

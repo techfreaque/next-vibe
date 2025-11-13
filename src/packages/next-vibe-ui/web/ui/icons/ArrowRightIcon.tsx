@@ -1,2 +1,4 @@
-// Radix UI icon alias
-export { ArrowRight as ArrowRightIcon } from "./ArrowRight";
+import { ArrowRight as ArrowRightIconBase } from "./ArrowRight";
+import { type IconComponent } from "../../lib/helper";
+
+export const ArrowRightIcon: IconComponent = ArrowRightIconBase;

@@ -6,7 +6,6 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 
-// Import ALL types from web - ZERO definitions here
 import type {
   PopoverRootProps,
   PopoverTriggerProps,
@@ -16,7 +15,6 @@ import type {
   PopoverCloseProps,
 } from "@/packages/next-vibe-ui/web/ui/popover";
 
-// Local styled components - use direct primitives to avoid type instantiation issues
 const StyledPopoverContent = PopoverPrimitive.Content;
 
 function Popover({ children, ...props }: PopoverRootProps): React.JSX.Element {

@@ -16,11 +16,7 @@ import type {
   ToggleGroupRootProps,
 } from "../../web/ui/toggle-group";
 
-export type { ToggleGroupItemProps, ToggleGroupRootProps };
-
-const StyledToggleGroupRoot = styled(
-  ToggleGroupPrimitive.Root,
-) as React.ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+const StyledToggleGroupRoot = styled(ToggleGroupPrimitive.Root);
 
 const ToggleGroupContext = React.createContext<{
   size?: ToggleSize;

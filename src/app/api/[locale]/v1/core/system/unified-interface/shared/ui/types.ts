@@ -103,9 +103,6 @@ export interface WidgetComponentProps<TData = RenderableValue> {
 
   /** Optional CSS class name */
   className?: string;
-
-  /** Optional inline styles */
-  style?: React.CSSProperties;
 }
 
 /**

@@ -1,3 +1,4 @@
 import { Printer as LucidePrinter } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const Printer = LucidePrinter;
+export const Printer: IconComponent = LucidePrinter;

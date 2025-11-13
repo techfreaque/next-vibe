@@ -8,7 +8,10 @@ import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import type { WidgetEmptyStateProps, WidgetLoadingProps } from "../types";
+import {
+  type WidgetEmptyStateProps,
+  type WidgetLoadingProps,
+} from "../../shared/ui/types";
 
 /**
  * Widget Loading Component

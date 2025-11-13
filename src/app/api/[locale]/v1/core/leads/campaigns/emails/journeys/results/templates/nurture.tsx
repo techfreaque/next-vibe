@@ -5,8 +5,6 @@
 
 import React from "react";
 
-import { Span } from "next-vibe-ui/ui/span";
-
 import {
   CTAButton,
   EmailContent,
@@ -35,7 +33,7 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
     >
       <EmailContent>
         {/* Header */}
-        <Span
+        <span
           style={{
             fontSize: "24px",
             fontWeight: "700",
@@ -48,10 +46,10 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.subject",
           )}
-        </Span>
+        </span>
 
         {/* Personal Greeting */}
-        <Span
+        <span
           style={{
             fontSize: "18px",
             color: "#374151",
@@ -62,7 +60,7 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.greeting",
           )}
-        </Span>
+        </span>
 
         {/* Industry Insights */}
         <div
@@ -74,7 +72,7 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             border: "1px solid #bbf7d0",
           }}
         >
-          <Span
+          <span
             style={{
               fontSize: "20px",
               fontWeight: "600",
@@ -86,9 +84,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.insightsTitle",
             )}
-          </Span>
+          </span>
 
-          <Span
+          <span
             style={{
               fontSize: "16px",
               lineHeight: "1.6",
@@ -99,9 +97,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.insight1",
             )}
-          </Span>
+          </span>
 
-          <Span
+          <span
             style={{
               fontSize: "16px",
               lineHeight: "1.6",
@@ -112,11 +110,11 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.insight2",
             )}
-          </Span>
+          </span>
         </div>
 
         {/* Free Resource Offer */}
-        <Span
+        <span
           style={{
             fontSize: "22px",
             fontWeight: "600",
@@ -128,9 +126,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.freeResourceTitle",
           )}
-        </Span>
+        </span>
 
-        <Span
+        <span
           style={{
             fontSize: "16px",
             lineHeight: "1.6",
@@ -142,7 +140,7 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.freeResourceDescription",
           )}
-        </Span>
+        </span>
 
         {/* Tip 1 */}
         <div
@@ -154,7 +152,7 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             margin: "0 0 16px 0",
           }}
         >
-          <Span
+          <span
             style={{
               fontSize: "16px",
               fontWeight: "600",
@@ -165,8 +163,8 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.greeting",
             )}
-          </Span>
-          <Span
+          </span>
+          <span
             style={{
               fontSize: "16px",
               color: "#374151",
@@ -177,7 +175,7 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.intro",
             )}
-          </Span>
+          </span>
         </div>
 
         {/* Tip 2 */}
@@ -190,7 +188,7 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             margin: "0 0 16px 0",
           }}
         >
-          <Span
+          <span
             style={{
               fontSize: "16px",
               fontWeight: "600",
@@ -201,8 +199,8 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.greeting",
             )}
-          </Span>
-          <Span
+          </span>
+          <span
             style={{
               fontSize: "16px",
               color: "#374151",
@@ -213,7 +211,7 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.intro",
             )}
-          </Span>
+          </span>
         </div>
 
         {/* Tip 3 */}
@@ -226,7 +224,7 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             margin: "0 0 24px 0",
           }}
         >
-          <Span
+          <span
             style={{
               fontSize: "16px",
               fontWeight: "600",
@@ -237,8 +235,8 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.greeting",
             )}
-          </Span>
-          <Span
+          </span>
+          <span
             style={{
               fontSize: "16px",
               color: "#374151",
@@ -249,11 +247,11 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.intro",
             )}
-          </Span>
+          </span>
         </div>
 
         {/* Industry Insights */}
-        <Span
+        <span
           style={{
             fontSize: "18px",
             fontWeight: "600",
@@ -264,10 +262,10 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.insightsTitle",
           )}
-        </Span>
+        </span>
 
         <div style={{ paddingLeft: "20px", margin: "0 0 24px 0" }}>
-          <Span
+          <span
             style={{
               fontSize: "16px",
               color: "#374151",
@@ -279,8 +277,8 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.insight1",
             )}
-          </Span>
-          <Span
+          </span>
+          <span
             style={{
               fontSize: "16px",
               color: "#374151",
@@ -292,8 +290,8 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.insight2",
             )}
-          </Span>
-          <Span
+          </span>
+          <span
             style={{
               fontSize: "16px",
               color: "#374151",
@@ -305,11 +303,11 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.intro",
             )}
-          </Span>
+          </span>
         </div>
 
         {/* Soft CTA */}
-        <Span
+        <span
           style={{
             fontSize: "18px",
             fontWeight: "600",
@@ -325,7 +323,7 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.greeting",
           )}
-        </Span>
+        </span>
 
         {/* CTA Button */}
         <CTAButton
@@ -338,7 +336,7 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
           tracking={tracking}
         />
 
-        <Span
+        <span
           style={{
             fontSize: "14px",
             lineHeight: "1.5",
@@ -350,7 +348,7 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.noObligationText",
           )}
-        </Span>
+        </span>
       </EmailContent>
       <EmailFooter
         companyName={companyName}

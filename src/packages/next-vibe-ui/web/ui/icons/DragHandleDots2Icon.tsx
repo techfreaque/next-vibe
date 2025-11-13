@@ -1,4 +1,4 @@
-// Radix UI icon alias - using GripVertical as closest match
-import { GripVertical } from "lucide-react";
+import { GripVertical as DragHandleDots2IconBase } from "./GripVertical";
+import { type IconComponent } from "../../lib/helper";
 
-export const DragHandleDots2Icon = GripVertical;
+export const DragHandleDots2Icon: IconComponent = DragHandleDots2IconBase;

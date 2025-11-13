@@ -1,3 +1,4 @@
 import { ArrowUp as LucideArrowUp } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const ArrowUp = LucideArrowUp;
+export const ArrowUp: IconComponent = LucideArrowUp;

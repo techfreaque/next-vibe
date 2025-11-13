@@ -14,11 +14,11 @@ import type { JSX } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import type {
-  ContainerWidgetData,
-  RenderableValue,
-  WidgetComponentProps,
-} from "../types";
+import {
+  type ContainerWidgetData,
+  type WidgetComponentProps,
+  type RenderableValue,
+} from "../../shared/ui/types";
 import { WidgetRenderer } from "./WidgetRenderer";
 
 /**

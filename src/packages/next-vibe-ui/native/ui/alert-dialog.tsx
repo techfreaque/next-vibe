@@ -7,7 +7,6 @@ import { cn } from "../lib/utils";
 import { buttonTextVariants, buttonVariants } from "./button";
 import { TextClassContext } from "./text";
 
-// Import ALL types from web - ZERO definitions here
 import type {
   AlertDialogRootProps,
   AlertDialogTriggerProps,
@@ -57,7 +56,7 @@ function AlertDialogPortal({
 }
 AlertDialogPortal.displayName = "AlertDialogPortal";
 
-function AlertDialogOverlay({
+export function AlertDialogOverlay({
   className,
   children,
 }: AlertDialogOverlayProps): React.JSX.Element {
@@ -208,7 +207,6 @@ export {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogOverlay,
   AlertDialogPortal,
   AlertDialogTitle,
   AlertDialogTrigger,

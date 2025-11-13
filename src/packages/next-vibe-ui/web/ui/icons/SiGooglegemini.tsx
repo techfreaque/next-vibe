@@ -1,3 +1,5 @@
 import { SiGooglegemini as ReactSimpleIcon } from "@icons-pack/react-simple-icons";
+import { type IconComponent } from "../../lib/helper";
 
-export const SiGooglegemini = ReactSimpleIcon;
+
+export const SiGooglegemini: IconComponent = ReactSimpleIcon;

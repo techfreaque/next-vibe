@@ -12,12 +12,12 @@ import { useEffect } from "react";
 
 import { Button } from "./button";
 import { Div } from "./div";
-import { Input, type InputChangeEvent } from "./input";
+import { Input, type InputChangeEvent, type InputFocusEvent } from "./input";
 
 export interface NumberInputProps {
   value?: number;
   onChange?: (value: number) => void;
-  onBlur?: () => void;
+  onBlur?: (e: InputFocusEvent<"number">) => void;
   min?: number;
   max?: number;
   step?: number;
@@ -55,15 +55,12 @@ export function NumberInput({
 
   const handleInputChange = (e: InputChangeEvent<"number">): void => {
     const inputValue = e.target.value;
-    if (!inputValue && inputValue !== 0) {
+    if (inputValue === 0 || !inputValue) {
       onChange?.(min);
       return;
     }
-    const numValue = Number(inputValue);
-    if (!Number.isNaN(numValue)) {
-      const clampedValue = Math.max(min, Math.min(max, numValue));
-      onChange?.(clampedValue);
-    }
+    const clampedValue = Math.max(min, Math.min(max, inputValue));
+    onChange?.(clampedValue);
   };
 
   return (

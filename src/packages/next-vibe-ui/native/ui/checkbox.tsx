@@ -5,14 +5,10 @@ import * as React from "react";
 import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
 
-// Import ALL types from web
 import type {
   CheckboxRootProps,
   CheckboxIndicatorProps,
 } from "@/packages/next-vibe-ui/web/ui/checkbox";
-
-// Re-export all types
-export type { CheckboxRootProps, CheckboxIndicatorProps };
 
 const StyledCheckboxRoot = styled(CheckboxPrimitive.Root, { className: "style" });
 const StyledCheckboxIndicator = styled(CheckboxPrimitive.Indicator, { className: "style" });

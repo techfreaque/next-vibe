@@ -1,25 +1,12 @@
 import * as React from "react";
-import type { ViewProps } from "react-native";
 import { View, Text as RNText } from "react-native";
 import { styled } from "nativewind";
 
 import { cn } from "next-vibe/shared/utils/utils";
+import type { DivProps } from "@/packages/next-vibe-ui/web/ui/div";
 
-// Styled View for NativeWind support
 const StyledView = styled(View, { className: "style" });
 
-// Cross-platform props interface - use ViewProps directly
-// Note: className is added via nativewind-env.d.ts module augmentation
-export type DivProps = ViewProps & {
-  className?: string;
-};
-
-/**
- * Platform-agnostic Div component for React Native
- * On native, this is a View component with NativeWind className support
- * Alias for View to provide more traditional web naming
- * Automatically wraps text strings in Text components for React Native
- */
 export function Div({
   className,
   children,

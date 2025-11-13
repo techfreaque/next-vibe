@@ -1,4 +1,4 @@
-// Radix UI icon alias - using Circle as closest match
-import { Circle } from "lucide-react";
+import { Circle as DotFilledIconBase } from "./Circle";
+import { type IconComponent } from "../../lib/helper";
 
-export const DotFilledIcon = Circle;
+export const DotFilledIcon: IconComponent = DotFilledIconBase;

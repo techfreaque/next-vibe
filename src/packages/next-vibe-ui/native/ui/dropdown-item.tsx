@@ -1,12 +1,5 @@
-/**
- * DropdownItem Component for React Native
- * Reusable dropdown item with icon, label, and description
- */
 import React, { useState } from "react";
-import type { GestureResponderEvent } from "react-native";
 import { Pressable, Text as RNText, View } from "react-native";
-
-// Import ALL types from web - ZERO definitions here
 import type { DropdownItemProps } from "@/packages/next-vibe-ui/web/ui/dropdown-item";
 
 export function DropdownItem({
@@ -21,9 +14,9 @@ export function DropdownItem({
   const [isPressed, setIsPressed] = useState(false);
   const shouldShowHighlight = isSelected || isPressed;
 
-  const handlePress = (e?: GestureResponderEvent): void => {
+  const handlePress = (): void => {
     if (!disabled && onClick) {
-      onClick(e as never);
+      onClick();
     }
   };
 

@@ -9,7 +9,6 @@ import { getPricingPlansArray } from "@/app/api/[locale]/v1/core/products/reposi
 import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { formatCurrencyNoDecimals } from "@/i18n/core/localization-utils";
 import { getCountryFromLocale } from "@/i18n/core/translation-utils";
-import { Span } from "next-vibe-ui/ui/span";
 
 import {
   CTAButton,
@@ -50,7 +49,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
     >
       <EmailHeader backgroundColor="#7c3aed" t={t} />
       <EmailContent>
-        <Span
+        <span
           style={{
             fontSize: "24px",
             fontWeight: "600",
@@ -62,9 +61,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.greeting",
           )}
-        </Span>
+        </span>
 
-        <Span
+        <span
           style={{
             fontSize: "18px",
             lineHeight: "1.6",
@@ -76,7 +75,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
           )}
-        </Span>
+        </span>
 
         {/* Special Offer Section */}
         <div
@@ -88,7 +87,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             border: "1px solid #e9d5ff",
           }}
         >
-          <Span
+          <span
             style={{
               fontSize: "20px",
               fontWeight: "600",
@@ -100,9 +99,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.specialOfferTitle",
             )}
-          </Span>
+          </span>
 
-          <Span
+          <span
             style={{
               fontSize: "16px",
               lineHeight: "1.6",
@@ -114,9 +113,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
             )}
-          </Span>
+          </span>
 
-          <Span
+          <span
             style={{
               fontSize: "24px",
               fontWeight: "700",
@@ -126,7 +125,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             }}
           >
             {formatCurrencyNoDecimals(starterPrice, starterCurrency, locale)}
-          </Span>
+          </span>
         </div>
 
         {/* Special Offer */}
@@ -140,7 +139,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             textAlign: "center",
           }}
         >
-          <Span
+          <span
             style={{
               fontSize: "24px",
               fontWeight: "700",
@@ -151,8 +150,8 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.specialOfferTitle",
             )}
-          </Span>
-          <Span
+          </span>
+          <span
             style={{
               fontSize: "18px",
               color: "#374151",
@@ -170,7 +169,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
                 ),
               },
             )}
-          </Span>
+          </span>
 
           {/* Discount Badge */}
           <div
@@ -191,7 +190,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
         </div>
 
         {/* Success Stories Since You Left */}
-        <Span
+        <span
           style={{
             fontSize: "18px",
             fontWeight: "600",
@@ -202,7 +201,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.greeting",
           )}
-        </Span>
+        </span>
 
         <div
           style={{
@@ -213,7 +212,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             margin: "0 0 16px 0",
           }}
         >
-          <Span
+          <span
             style={{
               fontSize: "16px",
               color: "#374151",
@@ -225,8 +224,8 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
             )}
-          </Span>
-          <Span
+          </span>
+          <span
             style={{
               fontSize: "14px",
               color: "#6b7280",
@@ -237,7 +236,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.greeting",
             )}
-          </Span>
+          </span>
         </div>
 
         <div
@@ -249,7 +248,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             margin: "0 0 24px 0",
           }}
         >
-          <Span
+          <span
             style={{
               fontSize: "16px",
               color: "#374151",
@@ -261,8 +260,8 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
             )}
-          </Span>
-          <Span
+          </span>
+          <span
             style={{
               fontSize: "14px",
               color: "#6b7280",
@@ -273,7 +272,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.greeting",
             )}
-          </Span>
+          </span>
         </div>
 
         {/* Limited Time Offer */}
@@ -287,7 +286,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             textAlign: "center",
           }}
         >
-          <Span
+          <span
             style={{
               fontSize: "18px",
               fontWeight: "700",
@@ -298,8 +297,8 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.greeting",
             )}
-          </Span>
-          <Span
+          </span>
+          <span
             style={{
               fontSize: "16px",
               color: "#374151",
@@ -310,10 +309,10 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             {t(
               "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
             )}
-          </Span>
+          </span>
         </div>
 
-        {/* CTA Button */}
+        {/* CTA button */}
         <CTAButton
           href={trackingUrl}
           text={t(
@@ -325,7 +324,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
         />
 
         {/* Final Message */}
-        <Span
+        <span
           style={{
             fontSize: "16px",
             color: "#7c3aed",
@@ -341,10 +340,10 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
           )}
-        </Span>
+        </span>
 
         {/* Closing */}
-        <Span
+        <span
           style={{
             fontSize: "16px",
             color: "#374151",
@@ -355,7 +354,7 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
           {t(
             "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
           )}
-        </Span>
+        </span>
       </EmailContent>
       <EmailFooter
         companyName={companyName}

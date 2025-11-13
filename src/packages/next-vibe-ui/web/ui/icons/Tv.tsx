@@ -1,3 +1,4 @@
 import { Tv as LucideTv } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const Tv = LucideTv;
+export const Tv: IconComponent = LucideTv;

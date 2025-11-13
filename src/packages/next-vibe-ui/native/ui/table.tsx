@@ -1,7 +1,8 @@
 import * as TablePrimitive from "@rn-primitives/table";
 import { styled } from "nativewind";
 import * as React from "react";
-import type { StyleProp, ViewStyle } from "react-native";
+import type { StyleProp, TextStyle, ViewStyle } from "react-native";
+import { Text as RNText } from "react-native";
 
 import type {
   TableProps,
@@ -134,9 +135,29 @@ function TableCell({
 }
 TableCell.displayName = "TableCell";
 
+// TableCaption - table caption/description
+const TableCaption = React.forwardRef<
+  RNText,
+  Omit<React.ComponentPropsWithoutRef<typeof RNText>, "style"> & {
+    style?: StyleProp<TextStyle>;
+  }
+>(({ className, style, ...props }, ref) => {
+  return (
+    <RNText
+      ref={ref}
+      className={cn("mt-4 text-sm text-muted-foreground", className)}
+      style={style as StyleProp<TextStyle>}
+      {...props}
+    />
+  );
+});
+
+TableCaption.displayName = "TableCaption";
+
 export {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableFooter,
   TableHead,

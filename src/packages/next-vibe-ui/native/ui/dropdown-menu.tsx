@@ -8,7 +8,6 @@ import { ChevronRight } from "./icons/ChevronRight";
 import { Span } from "./span";
 import { TextClassContext } from "./text";
 
-// Import ALL types from web - ZERO definitions here
 import type {
   DropdownMenuRootProps,
   DropdownMenuTriggerProps,
@@ -26,23 +25,42 @@ import type {
   DropdownMenuSeparatorProps,
   DropdownMenuShortcutProps,
 } from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+import { styled } from "nativewind";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_ITEM =
   "select-none text-sm text-lg text-popover-foreground group-focus:text-accent-foreground";
 /* eslint-enable i18next/no-literal-string */
 
-// Local styled components - use direct primitives to avoid type instantiation issues
-// The styled() function from nativewind has overly complex type inference for these components
-const StyledDropdownMenuSubTrigger = DropdownMenuPrimitive.SubTrigger;
-const StyledDropdownMenuSubContent = DropdownMenuPrimitive.SubContent;
-const StyledDropdownMenuContent = DropdownMenuPrimitive.Content;
-const StyledDropdownMenuItem = DropdownMenuPrimitive.Item;
-const StyledDropdownMenuCheckboxItem = DropdownMenuPrimitive.CheckboxItem;
-const StyledDropdownMenuRadioItem = DropdownMenuPrimitive.RadioItem;
-const StyledDropdownMenuLabel = DropdownMenuPrimitive.Label;
-const StyledDropdownMenuSeparator = DropdownMenuPrimitive.Separator;
-const StyledDropdownMenuItemIndicator = DropdownMenuPrimitive.ItemIndicator;
+const StyledDropdownMenuContent = styled(DropdownMenuPrimitive.Content, {
+  className: "style",
+});
+const StyledDropdownMenuSubTrigger = styled(DropdownMenuPrimitive.SubTrigger, {
+  className: "style",
+});
+const StyledDropdownMenuSubContent = styled(DropdownMenuPrimitive.SubContent, {
+  className: "style",
+});
+const StyledDropdownMenuItem = styled(DropdownMenuPrimitive.Item, {
+  className: "style",
+});
+const StyledDropdownMenuCheckboxItem = styled(
+  DropdownMenuPrimitive.CheckboxItem,
+  { className: "style" },
+);
+const StyledDropdownMenuRadioItem = styled(DropdownMenuPrimitive.RadioItem, {
+  className: "style",
+});
+const StyledDropdownMenuLabel = styled(DropdownMenuPrimitive.Label, {
+  className: "style",
+});
+const StyledDropdownMenuSeparator = styled(DropdownMenuPrimitive.Separator, {
+  className: "style",
+});
+const StyledDropdownMenuItemIndicator = styled(
+  DropdownMenuPrimitive.ItemIndicator,
+  { className: "style" },
+);
 
 function DropdownMenu({
   children,

@@ -1,3 +1,4 @@
 import { Atom as LucideAtom } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const Atom = LucideAtom;
+export const Atom: IconComponent = LucideAtom;

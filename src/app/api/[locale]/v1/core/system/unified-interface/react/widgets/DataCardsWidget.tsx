@@ -12,8 +12,10 @@ import { H3 } from "next-vibe-ui/ui/typography";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import type { RenderableValue, WidgetComponentProps } from "../types";
-
+import {
+  type WidgetComponentProps,
+  type RenderableValue,
+} from "../../shared/ui/types";
 /**
  * Data Cards Widget Data
  */

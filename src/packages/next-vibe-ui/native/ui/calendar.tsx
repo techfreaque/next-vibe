@@ -1,32 +1,11 @@
-/**
- * Calendar Component for React Native
- * TODO: Implement full calendar functionality with date selection
- * Currently a placeholder that accepts date props
- */
 import React from "react";
 import { Text as RNText, View } from "react-native";
-import type { ViewProps } from "react-native";
 import { styled } from "nativewind";
-
-import type { CalendarBaseProps } from "@/packages/next-vibe-ui/web/ui/calendar";
+import type { CalendarProps } from "@/packages/next-vibe-ui/web/ui/calendar";
 import { cn } from "next-vibe/shared/utils/utils";
 
-// Native calendar props extend base props with native View props
-export type CalendarProps = CalendarBaseProps &
-  Omit<ViewProps, "children"> & {
-    children?: React.ReactNode;
-  };
-
-// Type-safe View with className support (NativeWind)
 const StyledView = styled(View, { className: "style" });
-
-// Type-safe Text with className support (NativeWind)
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-const StyledText = RNText as unknown as React.ForwardRefExoticComponent<
-  React.ComponentProps<typeof RNText> & {
-    className?: string;
-  } & React.RefAttributes<RNText>
->;
+const StyledText = styled(RNText, { className: "style" });
 
 export function Calendar({
   className,

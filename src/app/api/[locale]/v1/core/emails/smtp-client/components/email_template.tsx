@@ -6,7 +6,6 @@ import {
   Preview,
   Section,
 } from "@react-email/components";
-import { Span } from "next-vibe-ui/ui/span";
 import type { JSX, ReactNode } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
@@ -88,7 +87,7 @@ export function EmailTemplate({
                   display: "block",
                 }}
               />
-              <Span
+              <div
                 style={{
                   fontSize: "16px",
                   fontWeight: "700",
@@ -100,7 +99,7 @@ export function EmailTemplate({
                 }}
               >
                 {t("config.appName")}
-              </Span>
+              </div>
             </div>
             <div
               style={{
@@ -110,7 +109,7 @@ export function EmailTemplate({
               }}
             >
               {/* Tagline - below logo, left aligned */}
-              <Span
+              <div
                 style={{
                   fontSize: "14px",
                   fontWeight: "500",
@@ -121,7 +120,7 @@ export function EmailTemplate({
                 }}
               >
                 {t("app.api.v1.core.emails.template.tagline")}
-              </Span>
+              </div>
             </div>
           </Section>
 
@@ -136,7 +135,7 @@ export function EmailTemplate({
             }}
           >
             {/* Title */}
-            <Span
+            <div
               style={{
                 fontSize: "24px",
                 fontWeight: "700",
@@ -146,7 +145,7 @@ export function EmailTemplate({
               }}
             >
               {title}
-            </Span>
+            </div>
 
             {/* Decorative line under title */}
             <div
@@ -200,7 +199,7 @@ export function EmailTemplate({
               </TrackedLink>
             </div>
 
-            <Span
+            <div
               style={{
                 fontSize: "14px",
                 color: "#6b7280",
@@ -212,9 +211,9 @@ export function EmailTemplate({
                 currentYear,
                 appName: t("config.appName"),
               })}
-            </Span>
+            </div>
 
-            <Span
+            <div
               style={{
                 fontSize: "14px",
                 color: "#6b7280",
@@ -232,9 +231,9 @@ export function EmailTemplate({
               >
                 {contactClientRepository.getSupportEmail(locale)}
               </TrackedLink>
-            </Span>
+            </div>
 
-            <Span
+            <div
               style={{
                 fontSize: "12px",
                 color: "#9ca3af",
@@ -249,7 +248,7 @@ export function EmailTemplate({
                   appName: t("config.appName"),
                 },
               )}
-            </Span>
+            </div>
           </Section>
         </Container>
 

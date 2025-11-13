@@ -4,7 +4,6 @@ import * as React from "react";
 import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 
-// Import ALL types from web - ZERO definitions here
 import type {
   TabsRootProps,
   TabsListProps,
@@ -12,7 +11,6 @@ import type {
   TabsContentProps,
 } from "@/packages/next-vibe-ui/web/ui/tabs";
 
-// Local styled components
 const StyledTabsList = TabsPrimitive.List;
 const StyledTabsTrigger = TabsPrimitive.Trigger;
 const StyledTabsContent = TabsPrimitive.Content;

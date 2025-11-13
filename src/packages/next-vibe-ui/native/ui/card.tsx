@@ -5,7 +5,6 @@ import { cn } from "next-vibe/shared/utils/utils";
 import { Span } from "./span";
 import { TextClassContext } from "./text";
 
-// Import all public types from web version (web is source of truth)
 import type {
   CardProps,
   CardHeaderProps,
@@ -15,7 +14,6 @@ import type {
   CardFooterProps,
 } from "@/packages/next-vibe-ui/web/ui/card";
 
-// Type-safe View with className support (NativeWind)
 const StyledView = styled(View, { className: "style" });
 
 function Card({ className, children }: CardProps): React.JSX.Element {

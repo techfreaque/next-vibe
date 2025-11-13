@@ -11,7 +11,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
 import React from "react";
-import { Span } from "next-vibe-ui/ui/span";
 
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
 import {
@@ -63,7 +62,7 @@ function WelcomeEmailContent({
       tracking={tracking}
     >
       {/* Greeting */}
-      <Span
+      <div
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -76,10 +75,10 @@ function WelcomeEmailContent({
               name: requestData.name,
             })
           : t("app.api.v1.core.newsletter.email.welcome.greeting")}
-      </Span>
+      </div>
 
       {/* Welcome message */}
-      <Span
+      <div
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -88,10 +87,10 @@ function WelcomeEmailContent({
         }}
       >
         {t("app.api.v1.core.newsletter.email.welcome.message", { appName })}
-      </Span>
+      </div>
 
       {/* What to expect */}
-      <Span
+      <div
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -100,7 +99,7 @@ function WelcomeEmailContent({
         }}
       >
         {t("app.api.v1.core.newsletter.email.welcome.what_to_expect")}
-      </Span>
+      </div>
 
       <ul
         style={{
@@ -124,7 +123,7 @@ function WelcomeEmailContent({
       </ul>
 
       {/* Frequency note */}
-      <Span
+      <div
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -133,10 +132,10 @@ function WelcomeEmailContent({
         }}
       >
         {t("app.api.v1.core.newsletter.email.welcome.frequency")}
-      </Span>
+      </div>
 
       {/* Unsubscribe link */}
-      <Span
+      <div
         style={{
           fontSize: "12px",
           color: "#6b7280",
@@ -153,7 +152,7 @@ function WelcomeEmailContent({
         >
           {t("app.api.v1.core.newsletter.email.welcome.unsubscribe_link")}
         </Link>
-      </Span>
+      </div>
     </EmailTemplate>
   );
 }
@@ -188,7 +187,7 @@ function AdminNotificationEmailContent({
       )}
       tracking={tracking}
     >
-      <Span
+      <div
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
@@ -197,12 +196,12 @@ function AdminNotificationEmailContent({
         }}
       >
         {t("app.api.v1.core.newsletter.email.admin_notification.message")}
-      </Span>
+      </div>
 
       <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
 
       {/* Subscriber details */}
-      <Span
+      <div
         style={{
           fontSize: "16px",
           fontWeight: "700",
@@ -214,9 +213,9 @@ function AdminNotificationEmailContent({
           "app.api.v1.core.newsletter.email.admin_notification.subscriber_details",
         )}
         :
-      </Span>
+      </div>
 
-      <Span
+      <div
         style={{
           fontSize: "14px",
           lineHeight: "1.6",
@@ -228,10 +227,10 @@ function AdminNotificationEmailContent({
           {t("app.api.v1.core.newsletter.email.admin_notification.email")}:
         </strong>{" "}
         {requestData.email}
-      </Span>
+      </div>
 
       {requestData.name && (
-        <Span
+        <div
           style={{
             fontSize: "14px",
             lineHeight: "1.6",
@@ -243,12 +242,12 @@ function AdminNotificationEmailContent({
             {t("app.api.v1.core.newsletter.email.admin_notification.name")}:
           </strong>{" "}
           {requestData.name}
-        </Span>
+        </div>
       )}
 
       {requestData.preferences && requestData.preferences.length > 0 && (
         <>
-          <Span
+          <div
             style={{
               fontSize: "14px",
               lineHeight: "1.6",
@@ -262,7 +261,7 @@ function AdminNotificationEmailContent({
               )}
               :
             </strong>
-          </Span>
+          </div>
           <ul style={{ color: "#4b5563", paddingLeft: "20px" }}>
             {requestData.preferences.map((preference: string) => (
               <li key={preference} style={{ margin: "4px 0" }}>

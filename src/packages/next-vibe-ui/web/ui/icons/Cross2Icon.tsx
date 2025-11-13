@@ -1,2 +1,4 @@
-// Radix UI icon alias
-export { X as Cross2Icon } from "./X";
+import { X as Cross2IconBase } from "./X";
+import { type IconComponent } from "../../lib/helper";
+
+export const Cross2Icon: IconComponent = Cross2IconBase;

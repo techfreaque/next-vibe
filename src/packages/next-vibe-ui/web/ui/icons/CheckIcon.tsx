@@ -1,2 +1,4 @@
-// Radix UI icon alias
-export { Check as CheckIcon } from "./Check";
+import { Check as CheckIconBase } from "./Check";
+import { type IconComponent } from "../../lib/helper";
+
+export const CheckIcon: IconComponent = CheckIconBase;

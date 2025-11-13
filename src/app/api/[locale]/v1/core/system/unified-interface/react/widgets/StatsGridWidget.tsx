@@ -4,11 +4,11 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import type {
-  RenderableValue,
-  StatsGridWidgetData,
-  WidgetComponentProps,
-} from "../types";
+import {
+  type StatsGridWidgetData,
+  type WidgetComponentProps,
+  type RenderableValue,
+} from "../../shared/ui/types";
 import { MetricCardWidget } from "./MetricCardWidget";
 
 /**
@@ -35,14 +35,10 @@ export function StatsGridWidget({
   metadata,
   context,
   className,
-  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
   if (!isStatsGridWidgetData(data)) {
     return (
-      <Div
-        className={cn("py-8 text-center text-muted-foreground", className)}
-        style={style}
-      >
+      <Div className={cn("py-8 text-center text-muted-foreground", className)}>
         —
       </Div>
     );
@@ -51,10 +47,7 @@ export function StatsGridWidget({
   const { metrics, columns = 3, layout = "grid" } = data;
   if (!metrics || metrics.length === 0) {
     return (
-      <Div
-        className={cn("py-8 text-center text-muted-foreground", className)}
-        style={style}
-      >
+      <Div className={cn("py-8 text-center text-muted-foreground", className)}>
         —
       </Div>
     );
@@ -77,7 +70,6 @@ export function StatsGridWidget({
         layout === "grid" ? gridClass : "flex flex-wrap",
         className,
       )}
-      style={style}
     >
       {metrics.map((metric, index) => (
         <MetricCardWidget

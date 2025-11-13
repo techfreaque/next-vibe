@@ -8,18 +8,18 @@ import { DayPicker } from "react-day-picker";
 
 import { buttonVariants } from "./button";
 
-// Cross-platform base props interface for native
-export interface CalendarBaseProps {
+// Single universal props interface for both web and native
+export interface CalendarProps {
   children?: ReactNode;
   className?: string;
   selected?: Date;
   onSelect?: (date: Date | undefined) => void;
   mode?: "single" | "multiple" | "range";
   disabled?: boolean | ((date: Date) => boolean);
+  showOutsideDays?: boolean;
+  classNames?: ComponentProps<typeof DayPicker>["classNames"];
+  components?: ComponentProps<typeof DayPicker>["components"];
 }
-
-// Web uses full DayPicker props
-export type CalendarProps = ComponentProps<typeof DayPicker>;
 
 function Calendar({
   className,

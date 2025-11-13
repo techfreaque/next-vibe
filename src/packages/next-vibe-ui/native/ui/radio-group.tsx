@@ -5,13 +5,11 @@ import { View } from "react-native";
 import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
 
-// Import ALL types from web - ZERO definitions here
 import type {
   RadioGroupRootProps,
   RadioGroupItemProps,
 } from "@/packages/next-vibe-ui/web/ui/radio-group";
 
-// Local styled components - use direct primitives to avoid type instantiation issues
 const StyledRadioGroupItem = RadioGroupPrimitive.Item;
 const StyledRadioGroupIndicator = RadioGroupPrimitive.Indicator;
 

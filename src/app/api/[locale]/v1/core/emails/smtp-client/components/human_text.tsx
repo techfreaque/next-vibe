@@ -6,8 +6,6 @@
 import type React from "react";
 import type { ReactNode } from "react";
 
-import { Span } from "next-vibe-ui/ui/span";
-
 /**
  * Human Text Component Props
  */
@@ -52,5 +50,5 @@ export function HumanText({
   children,
   variant = "body",
 }: HumanTextProps): React.JSX.Element {
-  return <Span style={TEXT_STYLES[variant]}>{children}</Span>;
+  return <span style={TEXT_STYLES[variant]}>{children}</span>;
 }

@@ -10,7 +10,7 @@ export interface TextareaChangeEvent {
     name?: string;
     id?: string;
   };
-  currentTarget: InputGenericTarget<string>;
+  currentTarget: InputGenericTarget;
   preventDefault: () => void;
   stopPropagation: () => void;
   bubbles: boolean;
@@ -22,9 +22,9 @@ export interface TextareaChangeEvent {
   type: string;
 }
 
-export interface TextareaFocusEvent<T = string> {
-  target: InputGenericTarget<T>;
-  currentTarget: InputGenericTarget<T>;
+export interface TextareaFocusEvent {
+  target: InputGenericTarget;
+  currentTarget: InputGenericTarget;
   preventDefault: () => void;
   stopPropagation: () => void;
   bubbles: boolean;

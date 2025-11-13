@@ -2,7 +2,6 @@ import { TextInput } from "react-native";
 import { styled } from "nativewind";
 
 import { cn } from "next-vibe/shared/utils/utils";
-
 import type { InputProps as WebInputProps } from "@/packages/next-vibe-ui/web/ui/input";
 
 const StyledTextInput = styled(TextInput, { className: "style" });
@@ -15,6 +14,7 @@ export function Input({
   onFocus: _onFocus,
   onKeyPress: _onKeyPress,
   onKeyDown: _onKeyDown,
+  onClick: _onClick,
   onChangeText,
   disabled,
   editable,
@@ -22,10 +22,10 @@ export function Input({
   defaultValue,
   placeholder,
   readOnly,
-  required,
+  required: _required,
   autoComplete: _autoComplete,
   autoCorrect,
-  spellCheck,
+  spellCheck: _spellCheck,
   autoCapitalize,
   secureTextEntry,
   keyboardType,
@@ -36,7 +36,14 @@ export function Input({
   min: _min,
   max: _max,
   step: _step,
+  maxLength,
+  accept: _accept,
 }: WebInputProps): React.JSX.Element {
+  const stringValue: string | undefined =
+    value !== undefined ? String(value) : undefined;
+  const stringDefaultValue: string | undefined =
+    defaultValue !== undefined ? String(defaultValue) : undefined;
+
   return (
     <StyledTextInput
       className={cn(
@@ -45,17 +52,16 @@ export function Input({
         className,
       )}
       placeholderClassName="text-muted-foreground"
-      value={value}
-      defaultValue={defaultValue}
+      value={stringValue}
+      defaultValue={stringDefaultValue}
       placeholder={placeholder}
       onChangeText={onChangeText}
       editable={editable ?? (!disabled && !readOnly)}
-      required={required}
       secureTextEntry={secureTextEntry}
       keyboardType={keyboardType}
       autoCapitalize={autoCapitalize}
       autoCorrect={autoCorrect === "on"}
-      spellCheck={spellCheck}
+      maxLength={maxLength}
       scrollEnabled={false}
     />
   );

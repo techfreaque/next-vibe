@@ -12,8 +12,8 @@ import { CardHeader } from "next-vibe-ui/ui/card";
 import { CardTitle } from "next-vibe-ui/ui/card";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX, MouseEvent } from "react";
-
-import type { RenderableValue, WidgetComponentProps } from "../types";
+import { type WidgetComponentProps,
+type RenderableValue } from "../../shared/ui/types";
 
 /**
  * Link Card Data Interface

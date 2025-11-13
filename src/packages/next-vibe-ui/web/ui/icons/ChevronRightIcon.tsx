@@ -1,2 +1,4 @@
-// Radix UI icon alias
-export { ChevronRight as ChevronRightIcon } from "./ChevronRight";
+import { ChevronRight as ChevronRightIconBase } from "./ChevronRight";
+import { type IconComponent } from "../../lib/helper";
+
+export const ChevronRightIcon: IconComponent = ChevronRightIconBase;

@@ -3,8 +3,10 @@
 import type { JSX } from "react";
 import { useState } from "react";
 
-import type { WidgetAction, WidgetActionType } from "../types";
-
+import {
+  type WidgetActionType,
+  type WidgetAction,
+} from "../../shared/ui/types";
 /**
  * Tool Action Handler Props
  */

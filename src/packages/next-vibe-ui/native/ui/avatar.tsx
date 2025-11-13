@@ -3,14 +3,12 @@ import * as React from "react";
 
 import { cn } from "next-vibe/shared/utils/utils";
 
-// Import ALL types from web - ZERO definitions here
 import type {
   AvatarRootProps,
   AvatarImageProps,
   AvatarFallbackProps,
 } from "@/packages/next-vibe-ui/web/ui/avatar";
 
-// Local styled components - use direct primitives to avoid type instantiation issues
 const StyledAvatarRoot = AvatarPrimitive.Root;
 const StyledAvatarImage = AvatarPrimitive.Image;
 const StyledAvatarFallback = AvatarPrimitive.Fallback;

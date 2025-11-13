@@ -6,8 +6,7 @@ import React, { Component, type ErrorInfo, type ReactNode } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import type { WidgetErrorBoundaryProps } from "../types";
-
+import { type WidgetErrorBoundaryProps } from "../../shared/ui/types";
 /**
  * Widget Error Boundary State
  */

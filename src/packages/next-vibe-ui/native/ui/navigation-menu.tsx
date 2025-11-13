@@ -13,7 +13,6 @@ import { cn } from "next-vibe/shared/utils/utils";
 import { buttonVariants } from "./button";
 import { ChevronDown } from "./icons/ChevronDown";
 
-// Import ALL types from web - ZERO definitions here
 import type {
   NavigationMenuProps,
   NavigationMenuListProps,
@@ -132,7 +131,7 @@ function NavigationMenuTrigger({
         <ChevronDown
           size={12}
           className={cn(
-            "relative text-foreground h-3 w-3 transition duration-200",
+            "relative text-foreground h-3 w-3",
           )}
           aria-hidden={true}
         />

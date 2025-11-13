@@ -1,3 +1,4 @@
 import { TestTube as LucideTestTube } from "lucide-react";
+import { type IconComponent } from "../../lib/helper";
 
-export const TestTube = LucideTestTube;
+export const TestTube: IconComponent = LucideTestTube;

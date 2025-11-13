@@ -5,9 +5,6 @@ import type { AspectRatioRootProps } from "@/packages/next-vibe-ui/web/ui/aspect
 import { cn } from "next-vibe/shared/utils/utils";
 import { styled } from "nativewind";
 
-export type { AspectRatioRootProps };
-
-// Styled component using nativewind
 const StyledAspectRatioRoot = styled(AspectRatioPrimitive.Root, { className: "style" });
 
 export function AspectRatio({

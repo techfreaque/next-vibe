@@ -8,7 +8,10 @@ import type { JSX } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import type { RenderableValue, WidgetComponentProps } from "../types";
+import {
+  type WidgetComponentProps,
+  type RenderableValue,
+} from "../../shared/ui/types";
 import type { LinkCardData } from "./LinkCardWidget";
 import { LinkCardWidget } from "./LinkCardWidget";
 

@@ -12,13 +12,11 @@ import {
   Preview,
   Section,
 } from "@react-email/components";
-import { Span } from "next-vibe-ui/ui/span";
 import type * as icons from "next-vibe-ui/ui/icons";
 import {
   createDataUrl,
   createTransparentPixelDataUrl,
 } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui/div";
 import type React from "react";
 import type { JSX, ReactNode } from "react";
 
@@ -94,21 +92,21 @@ export function EmailHeader({
         borderBottom: "3px solid #3b82f6",
       }}
     >
-      <Div
+      <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
-        <Div
+        <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-start",
           }}
         >
-          <Span
+          <span
             style={{
               fontSize: "24px",
               fontWeight: "700",
@@ -123,9 +121,9 @@ export function EmailHeader({
             }}
           >
             {t("config.appName")}
-          </Span>
-        </Div>
-        <Span
+          </span>
+        </div>
+        <span
           style={{
             fontSize: "14px",
             color: "#64748b",
@@ -134,8 +132,8 @@ export function EmailHeader({
           }}
         >
           {t("app.api.v1.core.leads.campaigns.emails.email.template.tagline")}
-        </Span>
-      </Div>
+        </span>
+      </div>
     </Section>
   );
 }
@@ -200,7 +198,7 @@ export function EmailFooter({
         border: "1px solid #e5e7eb",
       }}
     >
-      <Span
+      <span
         style={{
           fontSize: "14px",
           color: "#6b7280",
@@ -214,9 +212,9 @@ export function EmailFooter({
             companyName,
           },
         )}
-      </Span>
+      </span>
 
-      <Span
+      <span
         style={{
           fontSize: "12px",
           color: "#9ca3af",
@@ -236,9 +234,9 @@ export function EmailFooter({
         >
           {companyEmail}
         </TrackedLink>
-      </Span>
+      </span>
 
-      <Span
+      <span
         style={{
           fontSize: "12px",
           color: "#9ca3af",
@@ -260,7 +258,7 @@ export function EmailFooter({
             "app.api.v1.core.leads.campaigns.emails.emailJourneys.components.footer.unsubscribeLink",
           )}
         </TrackedLink>
-      </Span>
+      </span>
     </Section>
   );
 }
@@ -292,7 +290,7 @@ export function CTAButton({
   };
 
   return (
-    <Div style={{ textAlign: "center", margin: "32px 0" }}>
+    <div style={{ textAlign: "center", margin: "32px 0" }}>
       <TrackedLink
         href={href}
         tracking={tracking}
@@ -309,7 +307,7 @@ export function CTAButton({
       >
         {text}
       </TrackedLink>
-    </Div>
+    </div>
   );
 }
 
@@ -341,7 +339,7 @@ export function SocialProofBox({
         borderLeft: "4px solid #3b82f6",
       }}
     >
-      <Span
+      <span
         style={{
           fontSize: "16px",
           fontStyle: "italic",
@@ -357,8 +355,8 @@ export function SocialProofBox({
         {t(
           "app.api.v1.core.leads.campaigns.emails.emailJourneys.components.socialProof.quoteSuffix",
         )}
-      </Span>
-      <Span
+      </span>
+      <span
         style={{
           fontSize: "14px",
           fontWeight: "600",
@@ -373,7 +371,7 @@ export function SocialProofBox({
             company,
           },
         )}
-      </Span>
+      </span>
     </Section>
   );
 }
@@ -396,7 +394,7 @@ export function StatsGrid({ stats }: StatsGridProps): React.JSX.Element {
         margin: "32px 0",
       }}
     >
-      <Div
+      <div
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${stats.length}, 1fr)`,
@@ -404,7 +402,7 @@ export function StatsGrid({ stats }: StatsGridProps): React.JSX.Element {
         }}
       >
         {stats.map((stat, index) => (
-          <Div
+          <div
             key={index}
             style={{
               textAlign: "center",
@@ -415,7 +413,7 @@ export function StatsGrid({ stats }: StatsGridProps): React.JSX.Element {
               border: "1px solid #e5e7eb",
             }}
           >
-            <Span
+            <span
               style={{
                 fontSize: "24px",
                 fontWeight: "800",
@@ -424,8 +422,8 @@ export function StatsGrid({ stats }: StatsGridProps): React.JSX.Element {
               }}
             >
               {stat.value}
-            </Span>
-            <Span
+            </span>
+            <span
               style={{
                 fontSize: "12px",
                 color: "#6b7280",
@@ -434,10 +432,10 @@ export function StatsGrid({ stats }: StatsGridProps): React.JSX.Element {
               }}
             >
               {stat.label}
-            </Span>
-          </Div>
+            </span>
+          </div>
         ))}
-      </Div>
+      </div>
     </Section>
   );
 }
@@ -564,8 +562,8 @@ export async function LucideEmailIcon(
   // Fetch the SVG
   const response = await fetch(url);
   if (!response.ok) {
-    // Return empty div if icon fetch fails
-    return <Div />;
+    // Return empty span if icon fetch fails
+    return <div />;
   }
 
   // Fetch the SVG content

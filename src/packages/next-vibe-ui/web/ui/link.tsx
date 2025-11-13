@@ -1,13 +1,12 @@
-import { Slot } from "@radix-ui/react-slot";
 import NextLink from "next/link";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
 // Cross-platform base props interface
 export interface LinkBaseProps {
-  asChild?: boolean;
   className?: string;
   children?: React.ReactNode;
+  href: string;
 }
 
 // Web-specific props interface that extends Next.js Link
@@ -21,16 +20,9 @@ export interface LinkProps
  * Link component for web using Next.js Link
  * Supports asChild pattern for composition
  */
-function Link({
-  asChild = false,
-  className,
-  children,
-  ...props
-}: LinkProps): React.JSX.Element {
-  const Comp = asChild ? Slot : NextLink;
-
+function Link({ className, children, ...props }: LinkProps): React.JSX.Element {
   return (
-    <Comp
+    <NextLink
       className={cn(
         "text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         className,
@@ -38,7 +30,7 @@ function Link({
       {...props}
     >
       {children}
-    </Comp>
+    </NextLink>
   );
 }
 

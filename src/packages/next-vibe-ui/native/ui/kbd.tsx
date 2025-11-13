@@ -3,10 +3,8 @@ import * as React from "react";
 import { Text } from "react-native";
 import { styled } from "nativewind";
 
-// Import ALL types from web - ZERO definitions here
 import type { KbdProps, KbdMouseEvent } from "@/packages/next-vibe-ui/web/ui/kbd";
 
-// Styled components for NativeWind support
 const StyledText = styled(Text, { className: "style" });
 
 function Kbd({ className, children, style: _style, onClick, ...props }: KbdProps): React.JSX.Element {

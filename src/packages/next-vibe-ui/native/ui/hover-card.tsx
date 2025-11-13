@@ -6,7 +6,6 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { cn } from "next-vibe/shared/utils/utils";
 import { TextClassContext } from "./text";
 
-// Import ALL types from web - ZERO definitions here
 import type {
   HoverCardRootProps,
   HoverCardTriggerProps,
@@ -14,7 +13,6 @@ import type {
   HoverCardContentProps,
 } from "@/packages/next-vibe-ui/web/ui/hover-card";
 
-// Local styled components - use direct primitives to avoid type instantiation issues
 const StyledHoverCardContent = HoverCardPrimitive.Content;
 
 function HoverCard({

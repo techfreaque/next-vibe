@@ -9,8 +9,10 @@ import type { FC } from "react";
 
 import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
-import type { RenderableValue, WidgetComponentProps } from "../types";
-
+import {
+  type WidgetComponentProps,
+  type RenderableValue,
+} from "../../shared/ui/types";
 /**
  * Widget component type
  * Accepts any data type to support typed widget components

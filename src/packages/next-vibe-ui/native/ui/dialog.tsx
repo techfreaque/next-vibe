@@ -6,7 +6,6 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { cn } from "../lib/utils";
 import { X } from "./icons/X";
 
-// Import ALL types from web - ZERO definitions here
 import type {
   DialogRootProps,
   DialogTriggerProps,

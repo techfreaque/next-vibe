@@ -12,7 +12,7 @@ import {
   Preview,
   Section,
 } from "@react-email/components";
-import { Span } from "next-vibe-ui/ui/span";
+
 import type { JSX, ReactNode } from "react";
 
 import { envClient } from "@/config/env-client";
@@ -114,7 +114,7 @@ export function HumanEmailLayout({
                     display: "block",
                   }}
                 />
-                <Span
+                <div
                   style={{
                     fontSize: "16px",
                     fontWeight: "700",
@@ -126,9 +126,9 @@ export function HumanEmailLayout({
                   }}
                 >
                   {t("config.appName")}
-                </Span>
+                </div>
               </div>
-              <Span
+              <div
                 style={{
                   fontSize: "12px",
                   color: "#64748b",
@@ -137,11 +137,11 @@ export function HumanEmailLayout({
                 }}
               >
                 {t("app.api.v1.core.emails.template.tagline")}
-              </Span>
+              </div>
             </div>
 
             {/* Contact info */}
-            <Span
+            <div
               style={{
                 fontSize: "14px",
                 color: "#6b7280",
@@ -161,10 +161,10 @@ export function HumanEmailLayout({
               >
                 {companyEmail}
               </TrackedLink>
-            </Span>
+            </div>
 
             {/* Unsubscribe */}
-            <Span
+            <div
               style={{
                 fontSize: "12px",
                 color: "#9ca3af",
@@ -186,10 +186,10 @@ export function HumanEmailLayout({
                   "app.api.v1.core.emails.smtpClient.components.email.footer.unsubscribeLink",
                 )}
               </TrackedLink>
-            </Span>
+            </div>
 
             {/* Copyright */}
-            <Span
+            <div
               style={{
                 fontSize: "12px",
                 color: "#9ca3af",
@@ -203,7 +203,7 @@ export function HumanEmailLayout({
                   companyName,
                 },
               )}
-            </Span>
+            </div>
           </Section>
         </Container>
         <TrackedPixel tracking={tracking} />
