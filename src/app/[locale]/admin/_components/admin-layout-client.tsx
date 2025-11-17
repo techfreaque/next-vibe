@@ -156,7 +156,7 @@ export function AdminLayoutClient({
 
       {/* Desktop sidebar */}
       <Div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <Div className="flex flex-col flex-grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+        <Div className="flex flex-col grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
           <Div className="flex h-16 items-center px-4">
             <Shield className="h-8 w-8 text-blue-600" />
             <Span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
@@ -189,7 +189,7 @@ export function AdminLayoutClient({
           </Div>
 
           {/* User info */}
-          <Div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 p-4">
+          <Div className="shrink-0 border-t border-gray-200 dark:border-gray-700 p-4">
             <Div className="flex items-center">
               <Div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
                 <Span className="text-sm font-medium text-white">
@@ -229,7 +229,7 @@ export function AdminLayoutClient({
               </H1>
             </Div>
 
-            <Div className="flex items-center flex flex-row gap-4">
+            <Div className="items-center flex flex-row gap-4">
               {/* Theme toggle */}
               <ThemeToggle locale={locale} />
 

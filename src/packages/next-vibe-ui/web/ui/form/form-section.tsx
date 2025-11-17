@@ -6,31 +6,34 @@
 "use client";
 
 import type { JSX, ReactNode } from "react";
+import type { StyleType } from "../../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
+
 
 /**
  * Form Field Group Component
  * Groups multiple form fields with consistent spacing
  */
-export interface FormFieldGroupProps {
+
+export type FormFieldGroupProps = {
   children: ReactNode;
   title?: TranslationKey;
   description?: TranslationKey;
-  className?: string;
-}
+} & StyleType;
 
 export function FormFieldGroup({
   children,
   title,
   description,
-  className = "",
+  className,
+  style,
 }: FormFieldGroupProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`space-y-4 ${className || ""}`} style={style}>
       {title && (
         <div className="space-y-1">
           <h3 className="text-lg font-semibold">{t(title)}</h3>
@@ -48,7 +51,8 @@ export function FormFieldGroup({
  * Form Section Component
  * Wraps form content with consistent styling and completion status
  */
-export interface FormSectionProps {
+
+export type FormSectionProps = {
   children: ReactNode;
   title: TranslationKey;
   description?: TranslationKey;
@@ -59,20 +63,20 @@ export interface FormSectionProps {
     completionPercentage: number;
     missingRequiredFields: string[];
   };
-  className?: string;
-}
+} & StyleType;
 
 export function FormSection({
   children,
   title,
   description,
   completionStatus,
-  className = "",
+  className,
+  style,
 }: FormSectionProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={`space-y-6 ${className || ""}`} style={style}>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">{t(title)}</h2>

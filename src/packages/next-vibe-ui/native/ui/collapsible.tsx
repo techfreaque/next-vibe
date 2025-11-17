@@ -1,18 +1,45 @@
 import * as CollapsiblePrimitive from "@rn-primitives/collapsible";
 import * as React from "react";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  LayoutAnimationConfig,
+  LinearTransition,
+} from "react-native-reanimated";
+import { styled } from "nativewind";
 
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 import type {
-  CollapsibleRootProps,
+  CollapsibleProps,
   CollapsibleTriggerProps,
   CollapsibleContentProps,
 } from "../../web/ui/collapsible";
 
+const StyledAnimatedView = styled(Animated.View, { className: "style" });
+
 export function Collapsible({
   children,
+  className,
+  style,
   ...props
-}: CollapsibleRootProps): React.JSX.Element {
+}: CollapsibleProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <CollapsiblePrimitive.Root {...props}>{children}</CollapsiblePrimitive.Root>
+    <LayoutAnimationConfig skipEntering>
+      <CollapsiblePrimitive.Root {...props} asChild>
+        <StyledAnimatedView
+          {...applyStyleType({
+            nativeStyle,
+            className,
+          })}
+          layout={LinearTransition.duration(200)}
+        >
+          {children}
+        </StyledAnimatedView>
+      </CollapsiblePrimitive.Root>
+    </LayoutAnimationConfig>
   );
 }
 Collapsible.displayName = CollapsiblePrimitive.Root.displayName;
@@ -20,10 +47,21 @@ Collapsible.displayName = CollapsiblePrimitive.Root.displayName;
 export function CollapsibleTrigger({
   children,
   asChild,
+  className,
+  style,
   ...props
 }: CollapsibleTriggerProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <CollapsiblePrimitive.Trigger asChild={asChild} {...props}>
+    <CollapsiblePrimitive.Trigger
+      asChild={asChild}
+      {...applyStyleType({
+        nativeStyle,
+        className,
+      })}
+      {...props}
+    >
       {children}
     </CollapsiblePrimitive.Trigger>
   );
@@ -32,11 +70,23 @@ CollapsibleTrigger.displayName = CollapsiblePrimitive.Trigger.displayName;
 
 export function CollapsibleContent({
   children,
+  className,
+  style,
   ...props
 }: CollapsibleContentProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <CollapsiblePrimitive.Content {...props}>
-      {children}
+    <CollapsiblePrimitive.Content className={className} {...props}>
+      <StyledAnimatedView
+        entering={FadeIn}
+        exiting={FadeOut.duration(200)}
+        {...applyStyleType({
+          nativeStyle,
+        })}
+      >
+        {children}
+      </StyledAnimatedView>
     </CollapsiblePrimitive.Content>
   );
 }

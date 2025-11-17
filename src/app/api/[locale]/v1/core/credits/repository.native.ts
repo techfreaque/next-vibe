@@ -124,7 +124,11 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     );
   }
 
-  async getLeadBalance(leadId: string): Promise<ResponseType<number>> {
+  async getLeadBalance(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<number>> {
+    logger.error("getLeadBalance not implemented on native");
     void leadId;
     return await Promise.resolve(
       this.createNotImplementedError<number>("getLeadBalance"),
@@ -167,7 +171,7 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     userId: string,
     limit: number,
     offset: number,
-    logger?: EndpointLogger,
+    logger: EndpointLogger,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
@@ -234,6 +238,28 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     void cost;
     void feature;
     return { success: false };
+  }
+
+  async mergePendingLeadWallets(
+    userId: string,
+    leadIds: string[],
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    logger.error("mergePendingLeadWallets not implemented on native");
+    void userId;
+    void leadIds;
+    return await Promise.resolve(
+      this.createNotImplementedError<void>("mergePendingLeadWallets"),
+    );
+  }
+
+  async cleanupOrphanedLeadWallets(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<number>> {
+    logger.error("cleanupOrphanedLeadWallets not implemented on native");
+    return await Promise.resolve(
+      this.createNotImplementedError<number>("cleanupOrphanedLeadWallets"),
+    );
   }
 }
 

@@ -1,9 +1,12 @@
 import * as DialogPrimitive from "@rn-primitives/dialog";
 import * as React from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { styled } from "nativewind";
 
 import { cn } from "../lib/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 import { X } from "./icons/X";
 
 import type {
@@ -18,6 +21,10 @@ import type {
   DialogDescriptionProps,
   DialogCloseProps,
 } from "@/packages/next-vibe-ui/web/ui/dialog";
+
+const StyledView = styled(View, { className: "style" });
+const StyledText = styled(Text, { className: "style" });
+const StyledPressable = styled(Pressable, { className: "style" });
 
 // CSS className for close button
 const CLOSE_BUTTON_CLASSNAME =
@@ -62,63 +69,12 @@ function DialogClose({
 }
 DialogClose.displayName = DialogPrimitive.Close.displayName;
 
-function DialogOverlayWeb({
-  className,
-  ...props
-}: DialogPrimitive.OverlayProps & { className?: string }): React.JSX.Element {
-  const { open } = DialogPrimitive.useRootContext();
-  return (
-    <DialogPrimitive.Overlay
-      className={cn(
-        "bg-black/80 flex justify-center items-center p-2 absolute top-0 right-0 bottom-0 left-0",
-        open ? "animate-in fade-in-0" : "animate-out fade-out-0",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-DialogOverlayWeb.displayName = "DialogOverlayWeb";
-
-function DialogOverlayNative({
-  className,
-  children,
-  ...props
-}: DialogPrimitive.OverlayProps & { className?: string }): React.JSX.Element {
-  const renderChildren = (): React.ReactNode => {
-    if (typeof children === "function") {
-      return (children as (props: { pressed: boolean }) => React.ReactNode)({
-        pressed: false,
-      });
-    }
-    return children;
-  };
-
-  return (
-    <DialogPrimitive.Overlay
-      style={StyleSheet.absoluteFill}
-      className={cn(
-        "flex bg-black/80 justify-center items-center p-2",
-        className,
-      )}
-      {...props}
-    >
-      <Animated.View
-        entering={FadeIn.duration(150)}
-        exiting={FadeOut.duration(150)}
-      >
-        {renderChildren()}
-      </Animated.View>
-    </DialogPrimitive.Overlay>
-  );
-}
-DialogOverlayNative.displayName = "DialogOverlayNative";
-
 function DialogOverlay({
   className,
+  style,
   children,
-  ...props
 }: DialogOverlayProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   const renderChildren = (): React.ReactNode => {
     if (typeof children === "function") {
       return (children as (props: { pressed: boolean }) => React.ReactNode)({
@@ -129,20 +85,24 @@ function DialogOverlay({
   };
 
   return (
-    <DialogPrimitive.Overlay
-      style={StyleSheet.absoluteFill}
-      className={cn(
-        "flex bg-black/80 justify-center items-center p-2",
-        className,
-      )}
-      {...props}
-    >
-      <Animated.View
-        entering={FadeIn.duration(150)}
-        exiting={FadeOut.duration(150)}
+    <DialogPrimitive.Overlay asChild style={StyleSheet.absoluteFill}>
+      <StyledView
+        {...applyStyleType({
+          nativeStyle,
+          className: cn(
+            "flex bg-black/80 justify-center items-center p-2",
+            className,
+          ),
+        })}
       >
-        {renderChildren()}
-      </Animated.View>
+        <Animated.View
+          entering={FadeIn.duration(150)}
+          exiting={FadeOut.duration(150)}
+          style={convertCSSToViewStyle({ flex: 1 })}
+        >
+          {renderChildren()}
+        </Animated.View>
+      </StyledView>
     </DialogPrimitive.Overlay>
   );
 }
@@ -150,6 +110,7 @@ DialogOverlay.displayName = "DialogOverlay";
 
 function DialogContent({
   className,
+  style,
   children,
   onOpenAutoFocus,
   onCloseAutoFocus,
@@ -158,33 +119,43 @@ function DialogContent({
   onInteractOutside,
 }: DialogContentProps): React.JSX.Element {
   const { open } = DialogPrimitive.useRootContext();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <DialogPortal>
       <DialogOverlay>
         <DialogPrimitive.Content
-          className={cn(
-            "max-w-lg gap-4 border border-border cursor-default bg-background p-6 shadow-lg duration-200 rounded-lg",
-            open
-              ? "animate-in fade-in-0 zoom-in-95"
-              : "animate-out fade-out-0 zoom-out-95",
-            className,
-          )}
+          asChild
           onOpenAutoFocus={onOpenAutoFocus}
           onCloseAutoFocus={onCloseAutoFocus}
           onEscapeKeyDown={onEscapeKeyDown}
           onPointerDownOutside={onPointerDownOutside}
           onInteractOutside={onInteractOutside}
         >
-          {children}
-          <DialogPrimitive.Close className={CLOSE_BUTTON_CLASSNAME}>
-            <X
-              size={Platform.OS === "web" ? 16 : 18}
-              className={cn(
-                "text-muted-foreground",
-                open && "text-accent-foreground",
-              )}
-            />
-          </DialogPrimitive.Close>
+          <StyledView
+            {...applyStyleType({
+              nativeStyle,
+              className: cn(
+                "max-w-lg gap-4 border border-border cursor-default bg-background p-6 shadow-lg duration-200 rounded-lg",
+                open
+                  ? "animate-in fade-in-0 zoom-in-95"
+                  : "animate-out fade-out-0 zoom-out-95",
+                className,
+              ),
+            })}
+          >
+            {children}
+            <DialogPrimitive.Close asChild>
+              <StyledPressable className={CLOSE_BUTTON_CLASSNAME}>
+                <X
+                  size={Platform.OS === "web" ? 16 : 18}
+                  className={cn(
+                    "text-muted-foreground",
+                    open && "text-accent-foreground",
+                  )}
+                />
+              </StyledPressable>
+            </DialogPrimitive.Close>
+          </StyledView>
         </DialogPrimitive.Content>
       </DialogOverlay>
     </DialogPortal>
@@ -194,63 +165,91 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 function DialogHeader({
   className,
+  style,
   children,
 }: DialogHeaderProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
-    <View
-      className={cn(
-        "flex flex-col gap-1.5 text-center sm:text-left",
-        className,
-      )}
+    <StyledView
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "flex flex-col gap-1.5 text-center sm:text-left",
+          className,
+        ),
+      })}
     >
       {children}
-    </View>
+    </StyledView>
   );
 }
 DialogHeader.displayName = "DialogHeader";
 
 function DialogFooter({
   className,
+  style,
   children,
 }: DialogFooterProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
-    <View
-      className={cn(
-        "flex flex-col-reverse sm:flex-row sm:justify-end gap-2",
-        className,
-      )}
+    <StyledView
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "flex flex-col-reverse sm:flex-row sm:justify-end gap-2",
+          className,
+        ),
+      })}
     >
       {children}
-    </View>
+    </StyledView>
   );
 }
 DialogFooter.displayName = "DialogFooter";
 
 function DialogTitle({
   className,
+  style,
+  children,
   ...props
 }: DialogTitleProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
-    <DialogPrimitive.Title
-      className={cn(
-        "text-lg text-xl text-foreground font-semibold leading-none tracking-tight",
-        className,
-      )}
-      {...props}
-    />
+    <DialogPrimitive.Title asChild {...props}>
+      <StyledText
+        {...applyStyleType({
+          nativeStyle,
+          className: cn(
+            "text-lg text-xl text-foreground font-semibold leading-none tracking-tight",
+            className,
+          ),
+        })}
+      >
+        {children}
+      </StyledText>
+    </DialogPrimitive.Title>
   );
 }
 DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
 function DialogDescription({
   className,
+  style,
+  children,
   ...props
 }: DialogDescriptionProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
-    <DialogPrimitive.Description
-      className={cn("text-sm text-base text-muted-foreground", className)}
-      {...props}
-    />
+    <DialogPrimitive.Description asChild {...props}>
+      <StyledText
+        {...applyStyleType({
+          nativeStyle,
+          className: cn("text-sm text-base text-muted-foreground", className),
+        })}
+      >
+        {children}
+      </StyledText>
+    </DialogPrimitive.Description>
   );
 }
 DialogDescription.displayName = DialogPrimitive.Description.displayName;

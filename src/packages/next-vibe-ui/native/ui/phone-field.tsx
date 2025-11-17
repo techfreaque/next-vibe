@@ -13,10 +13,17 @@ import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
 
 // Import all types and constants from web (web is source of truth)
-import type { PhoneFieldProps } from "@/packages/next-vibe-ui/web/ui/phone-field";
+import type {
+  PhoneFieldProps,
+  CountryData,
+} from "@/packages/next-vibe-ui/web/ui/phone-field";
 import { COUNTRIES } from "@/packages/next-vibe-ui/web/ui/phone-field";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 
-import type { CountryData } from "@/packages/next-vibe-ui/web/ui/phone-field";
+// Re-export COUNTRIES and types for use in other modules
+export { COUNTRIES };
+export type { CountryData, PhoneFieldProps };
 
 export function PhoneField({
   value = "",
@@ -27,10 +34,12 @@ export function PhoneField({
   preferredCountries = [],
   disabled = false,
   className,
+  style,
   name: _name,
 }: PhoneFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Parse the current value to extract country and number
   const parsePhoneValue = (
@@ -118,7 +127,12 @@ export function PhoneField({
   };
 
   return (
-    <View className={cn("flex-row", className)}>
+    <View
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("flex-row", className),
+      })}
+    >
       {/* Country selector */}
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger>

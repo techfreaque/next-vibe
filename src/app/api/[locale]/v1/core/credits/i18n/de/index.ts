@@ -15,12 +15,22 @@ export const translations: typeof enTranslations = {
       expiry: "Ablauf",
       freeTier: "Kostenlos",
       monthlyReset: "Monatliche Zurücksetzung",
+      freeGrant: "Kostenlose Gewährung",
+      freeReset: "Kostenlose Zurücksetzung",
+      refund: "Rückerstattung",
+      transfer: "Übertragung",
     },
   },
   expire: {
     task: {
       description: "Läuft alte Abonnement-Credits täglich ab",
       error: "Fehler beim Ablaufen von Credits",
+    },
+  },
+  cleanup: {
+    task: {
+      description: "Bereinigt verwaiste Lead-Wallets wöchentlich",
+      error: "Fehler beim Bereinigen verwaister Wallets",
     },
   },
   errors: {
@@ -39,12 +49,17 @@ export const translations: typeof enTranslations = {
     stripeCustomerFailed: "Fehler beim Erstellen des Stripe-Kunden",
     checkoutFailed: "Fehler beim Erstellen der Checkout-Sitzung",
     mergeFailed: "Fehler beim Zusammenführen der Lead-Credits",
+    mergeLeadWalletsFailed:
+      "Fehler beim Zusammenführen der Lead-Wallets mit dem Benutzerkonto",
+    cleanupOrphanedFailed:
+      "Fehler beim Bereinigen verwaister Lead-Wallets",
     monthlyResetFailed: "Fehler beim monatlichen Zurücksetzen der Credits",
     noLeadsToMerge: "Keine Leads zum Zusammenführen vorhanden",
     oldestLeadNotFound: "Ältester Lead im Cluster nicht gefunden",
     transactionFailed: "Fehler beim Erstellen des Transaktionsdatensatzes",
     not_implemented_on_native:
       "{{method}} ist auf der nativen Plattform nicht implementiert. Bitte verwenden Sie die Web-Version für diesen Vorgang.",
+    expireCreditsFailed: "Fehler beim Ablaufen von Credits",
   },
   get: {
     title: "Credit-Guthaben abrufen",

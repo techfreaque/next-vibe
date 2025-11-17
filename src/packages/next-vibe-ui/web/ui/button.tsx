@@ -3,9 +3,10 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
 import type { ReactNode, JSX } from "react";
 import React from "react";
+import type { StyleType } from "../utils/style-type";
 
 export const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex flex-row items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -14,11 +15,11 @@ export const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:text-blue-400",
+          "text-foreground hover:bg-accent hover:text-accent-foreground dark:hover:text-blue-400",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
@@ -64,40 +65,55 @@ export const buttonTextVariants = cva("text-sm font-medium text-foreground", {
 export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
 export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
 
-export interface BaseButtonProps {
+export interface ButtonMouseEvent {
+  stopPropagation: () => void;
+}
+
+type ButtonBaseProps = {
   suppressHydrationWarning?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;
-  className?: string;
   disabled?: boolean;
   children?: ReactNode;
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onClick?:
+    | ((e: ButtonMouseEvent) => void)
+    | ((e: ButtonMouseEvent) => Promise<void>);
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   type?: "button" | "submit" | "reset";
   title?: string;
-  role?: React.ComponentPropsWithoutRef<"button">["role"];
+  role?:
+    | "button"
+    | "link"
+    | "menuitem"
+    | "tab"
+    | "switch"
+    | "checkbox"
+    | "radio"
+    | "combobox";
   tabIndex?: number;
-}
+} & StyleType;
 
-export interface AsChildButtonProps extends BaseButtonProps {
+export type AsChildButtonProps = ButtonBaseProps & {
   asChild: true;
   children?: JSX.Element | string;
-}
+};
 
-export interface RegularButtonProps extends BaseButtonProps {
+export type RegularButtonProps = ButtonBaseProps & {
   asChild?: false;
   children?: ReactNode;
-}
+};
 
 export type ButtonProps = AsChildButtonProps | RegularButtonProps;
 
 export function Button({
   className,
+  style,
   variant,
   size,
   asChild = false,
   suppressHydrationWarning = false,
+  onClick,
   ...props
 }: ButtonProps): JSX.Element {
   const Comp = asChild ? Slot : "button";
@@ -108,6 +124,8 @@ export function Button({
         buttonVariants({ variant, size, className }),
         "cursor-pointer",
       )}
+      style={style}
+      onClick={onClick}
       {...props}
     />
   );

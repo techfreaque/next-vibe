@@ -4,34 +4,49 @@ import { Text as RNText } from "react-native";
 
 import { cn } from "../lib/utils";
 import type { SlottableTextPropsWithClassName } from "../lib/types";
+import { convertCSSToTextStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const TextClassContext = React.createContext<string | undefined>(undefined);
 
+type TextProps = SlottableTextPropsWithClassName & {
+  style?: React.CSSProperties;
+};
+
 function Text({
   className,
+  style,
   asChild = false,
   ...props
-}: SlottableTextPropsWithClassName): React.JSX.Element {
+}: TextProps): React.JSX.Element {
   const textClass = React.useContext(TextClassContext);
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   if (asChild) {
     return (
       <Slot.Text
-        className={cn(
-          "text-base text-foreground select-text",
-          textClass,
-          className,
-        )}
+        {...applyStyleType({
+          nativeStyle,
+          className: cn(
+            "text-base text-foreground select-text",
+            textClass,
+            className,
+          ),
+        })}
         {...props}
       />
     );
   }
   return (
     <RNText
-      className={cn(
-        "text-base text-foreground select-text",
-        textClass,
-        className,
-      )}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "text-base text-foreground select-text",
+          textClass,
+          className,
+        ),
+      })}
       {...props}
     />
   );

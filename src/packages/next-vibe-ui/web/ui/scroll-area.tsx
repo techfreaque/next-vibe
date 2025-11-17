@@ -3,39 +3,24 @@
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 // Cross-platform props interfaces
-export interface ScrollAreaRootProps
-  extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> {
-  className?: string;
+export type ScrollAreaRootProps = {
   children: React.ReactNode;
-}
+} & StyleType;
 
-export interface ScrollAreaViewportProps
-  extends React.ComponentPropsWithoutRef<"div"> {
-  className?: string;
+export type ScrollAreaViewportProps = {
   children: React.ReactNode;
-}
+} & StyleType;
 
-export interface ScrollAreaBarProps
-  extends React.ComponentPropsWithoutRef<
-    typeof ScrollAreaPrimitive.ScrollAreaScrollbar
-  > {
-  className?: string;
+export type ScrollAreaBarProps = {
   orientation?: "vertical" | "horizontal";
-}
+} & StyleType;
 
-export interface ScrollAreaThumbProps
-  extends React.ComponentPropsWithoutRef<
-    typeof ScrollAreaPrimitive.ScrollAreaThumb
-  > {
-  className?: string;
-}
+export type ScrollAreaThumbProps = StyleType;
 
-export interface ScrollAreaCornerProps
-  extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Corner> {
-  className?: string;
-}
+export type ScrollAreaCornerProps = StyleType;
 
 // Legacy alias for backwards compatibility
 export type ScrollAreaProps = ScrollAreaRootProps;
@@ -43,13 +28,13 @@ export type ScrollBarProps = ScrollAreaBarProps;
 
 export function ScrollArea({
   className,
+  style,
   children,
-  ...props
 }: ScrollAreaRootProps): React.JSX.Element {
   return (
     <ScrollAreaPrimitive.Root
       className={cn("relative overflow-hidden", className)}
-      {...props}
+      style={style}
     >
       <div
         className="h-full w-full rounded-[inherit]"
@@ -68,8 +53,8 @@ ScrollArea.displayName = "ScrollArea";
 
 export function ScrollBar({
   className,
+  style,
   orientation = "vertical",
-  ...props
 }: ScrollAreaBarProps): React.JSX.Element {
   return (
     <ScrollAreaPrimitive.ScrollAreaScrollbar
@@ -78,12 +63,12 @@ export function ScrollBar({
         "flex touch-none select-none transition-colors",
         "data-[state=hidden]:hidden",
         orientation === "vertical" &&
-          "h-full w-1.5 border-l border-l-transparent p-[1px]",
+          "h-full w-1.5 border-l border-l-transparent p-px",
         orientation === "horizontal" &&
-          "h-1.5 flex-col border-t border-t-transparent p-[1px]",
+          "h-1.5 flex-col border-t border-t-transparent p-px",
         className,
       )}
-      {...props}
+      style={style}
     >
       <ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-border" />
     </ScrollAreaPrimitive.ScrollAreaScrollbar>

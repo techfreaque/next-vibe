@@ -105,10 +105,9 @@ function ChartLegend({
               item.visible ? "opacity-100" : "opacity-50"
             }`}
           >
-            <Div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: item.color }}
-            />
+            <Div style={{ backgroundColor: item.color }}>
+              <Div className="w-3 h-3 rounded-full" />
+            </Div>
             <Span className="truncate">{t(item.name, item.nameParams)}</Span>
           </Button>
         ))}
@@ -180,7 +179,7 @@ export function UsersStatsChart({
           <Skeleton className="h-5 w-48" />
         </CardHeader>
         <CardContent>
-          <Skeleton className={`w-full`} style={{ height: `${height}px` }} />
+          <Skeleton style={{ height: `${height}px`, width: "100%" }} />
         </CardContent>
       </Card>
     );
@@ -193,11 +192,10 @@ export function UsersStatsChart({
           <CardTitle>{t("app.admin.users.stats.chart.title")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <Div
-            className="flex items-center justify-center text-muted-foreground"
-            style={{ height: `${height}px` }}
-          >
-            {t("app.admin.users.stats.chart.noData")}
+          <Div style={{ height: `${height}px` }}>
+            <Div className="flex items-center justify-center text-muted-foreground">
+              {t("app.admin.users.stats.chart.noData")}
+            </Div>
           </Div>
         </CardContent>
       </Card>
@@ -269,8 +267,10 @@ export function UsersStatsChart({
               : entry.name;
 
             return (
-              <P key={index} className="text-sm" style={{ color: entry.color }}>
-                {`${translatedName}: ${new Intl.NumberFormat(language).format(entry.value)}`}
+              <P key={index} style={{ color: entry.color }}>
+                <P className="text-sm">
+                  {`${translatedName}: ${new Intl.NumberFormat(language).format(entry.value)}`}
+                </P>
               </P>
             );
           })}

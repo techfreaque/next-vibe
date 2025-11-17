@@ -161,7 +161,7 @@ export function useCheckout(logger: EndpointLogger): {
         });
 
         // Submit form with onSuccess callback to get the response
-        void endpoint.create.submitForm(undefined, {
+        void endpoint.create.submitForm({
           onSuccess: ({ responseData }) => {
             resolve({
               success: true,

@@ -3,8 +3,8 @@
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
-// Cross-platform types
 export interface HoverCardRootProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -25,8 +25,7 @@ export interface HoverCardPortalProps {
   container?: HTMLElement | null;
 }
 
-export interface HoverCardContentProps {
-  className?: string;
+export type HoverCardContentProps = {
   children?: React.ReactNode;
   align?: "start" | "center" | "end";
   sideOffset?: number;
@@ -45,7 +44,7 @@ export interface HoverCardContentProps {
   hideWhenDetached?: boolean;
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
   onPointerDownOutside?: (event: Event) => void;
-}
+} & StyleType;
 
 export function HoverCard({
   children,
@@ -85,20 +84,48 @@ HoverCardPortal.displayName = "HoverCardPortal";
 
 export function HoverCardContent({
   className,
+  style,
   align = "center",
   sideOffset = 4,
-  ...props
+  children,
+  disablePositioningStyle: _disablePositioningStyle, // React Native-only prop
+  asChild,
+  forceMount,
+  side,
+  alignOffset,
+  avoidCollisions,
+  collisionBoundary,
+  collisionPadding,
+  arrowPadding,
+  sticky,
+  hideWhenDetached,
+  onEscapeKeyDown,
+  onPointerDownOutside,
 }: HoverCardContentProps): React.JSX.Element {
   return (
     <HoverCardPrimitive.Content
       align={align}
       sideOffset={sideOffset}
+      asChild={asChild}
+      forceMount={forceMount}
+      side={side}
+      alignOffset={alignOffset}
+      avoidCollisions={avoidCollisions}
+      collisionBoundary={collisionBoundary}
+      collisionPadding={collisionPadding}
+      arrowPadding={arrowPadding}
+      sticky={sticky}
+      hideWhenDetached={hideWhenDetached}
+      onEscapeKeyDown={onEscapeKeyDown}
+      onPointerDownOutside={onPointerDownOutside}
       className={cn(
         "z-50 w-64 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className,
       )}
-      {...props}
-    />
+      style={style}
+    >
+      {children}
+    </HoverCardPrimitive.Content>
   );
 }
 HoverCardContent.displayName = HoverCardPrimitive.Content.displayName;

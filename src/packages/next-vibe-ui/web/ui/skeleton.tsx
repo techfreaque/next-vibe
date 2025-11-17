@@ -1,13 +1,10 @@
 import { cn } from "next-vibe/shared/utils/utils";
 import type { JSX } from "react";
+import type { StyleType } from "../utils/style-type";
 
-// Cross-platform types for native import
-export interface SkeletonProps {
-  className?: string;
+export type SkeletonProps = {
   children?: React.ReactNode;
-  style?: React.CSSProperties;
-  [key: `data-${string}`]: string | undefined;
-}
+} & StyleType;
 
 function Skeleton({ className, ...props }: SkeletonProps): JSX.Element {
   return (

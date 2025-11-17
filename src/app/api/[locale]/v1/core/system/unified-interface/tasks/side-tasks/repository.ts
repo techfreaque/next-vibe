@@ -98,7 +98,7 @@ export interface ISideTasksRepository {
   ): ReturnType<SideTasksRepository["getHealthCheckHistory"]>;
 
   // Statistics
-  getTaskStatistics(logger?: EndpointLogger): Promise<
+  getTaskStatistics(logger: EndpointLogger): Promise<
     ResponseType<{
       totalTasks: number;
       runningTasks: number;

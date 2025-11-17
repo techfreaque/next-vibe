@@ -13,7 +13,7 @@
 
 import type { JSX } from "react";
 
-import { ChatProvider } from "@/app/[locale]/chat/features/chat/context";
+import { ChatProvider } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
 import { getFolder } from "@/app/api/[locale]/v1/core/agent/chat/folders/[id]/repository";
 import { rootFolderPermissionsRepository } from "@/app/api/[locale]/v1/core/agent/chat/folders/root-permissions/repository";

@@ -1,5 +1,6 @@
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 // No-op functions to avoid empty function linting errors
 const noop = (): void => {
@@ -9,7 +10,7 @@ const noopBool = (): boolean => {
   return false;
 };
 
-type InferValueType<T> = T extends "number" ? number : string;
+export type InferValueType<T> = T extends "number" ? number : string;
 
 export interface InputEventTarget<T = undefined> {
   value: InferValueType<T>;
@@ -109,7 +110,7 @@ export interface InputRefObject {
   value?: string;
 }
 
-export interface InputProps<
+export type InputProps<
   T extends
     | "text"
     | "email"
@@ -122,8 +123,7 @@ export interface InputProps<
     | "file"
     | "hidden"
     | undefined,
-> {
-  className?: string;
+> = {
   type?: T;
   value?: InferValueType<T>;
   defaultValue?: InferValueType<T>;
@@ -141,8 +141,8 @@ export interface InputProps<
   accept?: string;
   onChange?: (e: InputChangeEvent<T>) => void;
   onChangeText?: (text: string) => void;
-  onBlur?: ((e: InputFocusEvent<T>) => void) | (() => void);
-  onFocus?: ((e: InputFocusEvent<T>) => void) | (() => void);
+  onBlur?: (e: InputFocusEvent<T>) => void;
+  onFocus?: (e: InputFocusEvent<T>) => void;
   onClick?: (e: InputMouseEvent<T>) => void;
   onKeyPress?: (e: InputKeyboardEvent<T>) => void;
   onKeyDown?: (e: InputKeyboardEvent<T>) => void;
@@ -154,7 +154,7 @@ export interface InputProps<
   id?: string;
   "aria-label"?: string;
   ref?: React.RefObject<InputRefObject | null>;
-}
+} & StyleType;
 
 const Input = <
   T extends
@@ -171,6 +171,7 @@ const Input = <
     | undefined = undefined,
 >({
   className,
+  style,
   type,
   value,
   defaultValue,
@@ -228,6 +229,7 @@ const Input = <
         "flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
+      style={style}
       onChange={(e) => {
         const rawValue = e.target.value;
         const typedValue: InferValueType<T> = (

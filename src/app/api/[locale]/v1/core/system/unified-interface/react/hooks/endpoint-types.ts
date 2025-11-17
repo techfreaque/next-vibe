@@ -490,7 +490,7 @@ export type EndpointReturn<T> = Prettify<{
           key: K,
           value: PrimaryMutationTypes<T>["request"][K],
         ) => void;
-        onSubmit: (e: FormEvent | undefined) => Promise<void>;
+        onSubmit: () => Promise<void>;
         reset: () => void;
         isSubmitting: boolean;
         isDirty: boolean;

@@ -114,8 +114,7 @@ export function NewsletterPage({
           {/* Newsletter Form */}
           <Div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-16 max-w-md mx-auto">
             <Form
-              onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-                e.preventDefault();
+              onSubmit={() => {
                 // Validate email before submission
                 if (!email.includes("@")) {
                   return;
@@ -129,7 +128,7 @@ export function NewsletterPage({
               className="flex flex-col gap-4"
             >
               <Div className="flex flex-col gap-3">
-                <Input
+                <Input<"email">
                   type="email"
                   placeholder={t("app.story.newsletter.emailPlaceholder")}
                   className="text-center text-lg py-3"

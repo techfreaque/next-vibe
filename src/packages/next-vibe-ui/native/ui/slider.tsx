@@ -12,6 +12,8 @@ import type {
   SliderTrackProps,
 } from "@/packages/next-vibe-ui/web/ui/slider";
 import { cn } from "../lib/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 
 // Re-export all types from web
 export type {
@@ -29,8 +31,10 @@ export function Slider({
   max = 100,
   step = 1,
   disabled = false,
+  style,
   children,
 }: SliderRootProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   // Native primitive expects (value: number[]) => void for onChange
   // but we need to convert our single value to array for cross-platform compatibility
   const handleNativeValueChange = React.useCallback(
@@ -48,6 +52,7 @@ export function Slider({
       max={max}
       step={step}
       disabled={disabled}
+      {...applyStyleType({ nativeStyle })}
     >
       {children}
     </SliderPrimitive.Root>
@@ -57,15 +62,21 @@ Slider.displayName = SliderPrimitive.Root.displayName;
 
 export function SliderTrack({
   className,
+  style,
   children,
   ...props
 }: SliderTrackProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <SliderPrimitive.Track
-      className={cn(
-        "relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20",
-        className,
-      )}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20",
+          className,
+        ),
+      })}
       {...props}
     >
       {children}
@@ -76,11 +87,17 @@ SliderTrack.displayName = SliderPrimitive.Track.displayName;
 
 export function SliderRange({
   className,
+  style,
   ...props
 }: SliderRangeProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <SliderPrimitive.Range
-      className={cn("absolute h-full bg-primary", className)}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("absolute h-full bg-primary", className),
+      })}
       {...props}
     />
   );
@@ -89,14 +106,20 @@ SliderRange.displayName = SliderPrimitive.Range.displayName;
 
 export function SliderThumb({
   className,
+  style,
   ...props
 }: SliderThumbProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <SliderPrimitive.Thumb
-      className={cn(
-        "block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
-        className,
-      )}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+          className,
+        ),
+      })}
       {...props}
     />
   );

@@ -19,7 +19,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../user/auth/types";
 import { FEATURE_COSTS } from "../chat/model-access/costs";
-import { deductCredits } from "../shared/credit-deduction";
 import type { TextToSpeechPostRequestOutput } from "./definition";
 
 /**
@@ -217,7 +216,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
       });
 
       // Deduct credits AFTER successful completion
-      await deductCredits({
+      await creditRepository.deductCreditsForFeature({
         user,
         cost: FEATURE_COSTS.TTS,
         feature: "tts",

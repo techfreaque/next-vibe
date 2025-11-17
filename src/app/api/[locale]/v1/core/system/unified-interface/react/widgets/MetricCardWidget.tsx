@@ -40,16 +40,10 @@ export function MetricCardWidget({
   metadata: _metadata,
   context,
   className,
-  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
   if (!isMetricCardWidgetData(data)) {
     return (
-      <Div
-        className={cn("text-muted-foreground italic", className)}
-        style={style}
-      >
-        —
-      </Div>
+      <Div className={cn("text-muted-foreground italic", className)}>—</Div>
     );
   }
 
@@ -77,7 +71,7 @@ export function MetricCardWidget({
         : null;
 
   return (
-    <Card className={className} style={style}>
+    <Card className={className}>
       <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {label}
@@ -90,12 +84,11 @@ export function MetricCardWidget({
       </CardHeader>
       <CardContent>
         <Div className="flex items-baseline gap-2">
-          <Div
-            className="text-2xl font-bold"
-            style={color ? { color } : undefined}
-          >
-            {displayValue}
-            {unit && <Span className="ml-1 text-sm font-normal">{unit}</Span>}
+          <Div style={color ? { color } : undefined}>
+            <Div className="text-2xl font-bold">
+              {displayValue}
+              {unit && <Span className="ml-1 text-sm font-normal">{unit}</Span>}
+            </Div>
           </Div>
           {trend && TrendIcon && (
             <Div

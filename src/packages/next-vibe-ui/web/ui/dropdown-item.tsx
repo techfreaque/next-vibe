@@ -1,29 +1,19 @@
 "use client";
 
-import type { JSX, MouseEvent } from "react";
+import type { JSX } from "react";
 import React, { useState } from "react";
+import type { StyleType } from "../utils/style-type";
 
 import { Button } from "./button";
 
-/**
- * Props for the DropdownItem component
- */
-export interface DropdownItemProps {
-  /** Whether this dropdown item is currently selected/active */
+export type DropdownItemProps = {
   isSelected?: boolean;
-  /** Click handler for the dropdown item */
-  onClick?: (e?: MouseEvent<HTMLButtonElement>) => void;
-  /** Icon component to display */
+  onClick?: () => void;
   icon?: React.ComponentType<{ className?: string }> | React.ReactNode;
-  /** Display label */
   label: string;
-  /** Optional description text */
   description?: string;
-  /** Whether the item is disabled */
   disabled?: boolean;
-  /** Additional className for customization */
-  className?: string;
-}
+} & StyleType;
 
 export function DropdownItem({
   isSelected = false,
@@ -32,7 +22,8 @@ export function DropdownItem({
   label,
   description,
   disabled = false,
-  className = "",
+  className,
+  style,
 }: DropdownItemProps): JSX.Element {
   const [isHovered, setIsHovered] = useState(false);
   const shouldShowRainbow = isSelected || isHovered;
@@ -47,9 +38,9 @@ export function DropdownItem({
     setIsHovered(false);
   };
 
-  const handleClick = (e: MouseEvent<HTMLButtonElement>): void => {
+  const handleClick = (): void => {
     if (!disabled && onClick) {
-      onClick(e);
+      onClick();
     }
   };
 
@@ -57,6 +48,7 @@ export function DropdownItem({
     <Button
       variant={shouldShowRainbow ? "default" : "ghost"}
       size="sm"
+      style={style}
       className={`w-full justify-start font-medium rounded-md px-3 py-2.5 min-h-fit h-auto ${
         shouldShowRainbow
           ? "border-2 border-blue-500/50 bg-blue-500/10"

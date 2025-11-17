@@ -9,6 +9,7 @@ import { Check, ChevronDown, Search, X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
+import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -56,11 +57,10 @@ export interface AutocompleteFieldPropsBase {
   searchPlaceholder?: string;
   allowCustom?: boolean;
   disabled?: boolean;
-  className?: string;
   name?: string;
 }
 
-export interface AutocompleteFieldProps {
+export type AutocompleteFieldProps = {
   value?: string;
   onChange: (value: string) => void;
   onBlur?: () => void;
@@ -69,9 +69,8 @@ export interface AutocompleteFieldProps {
   searchPlaceholder?: TranslationKey;
   allowCustom?: boolean;
   disabled?: boolean;
-  className?: string;
   name?: string;
-}
+} & StyleType;
 
 export function AutocompleteField({
   value = "",
@@ -83,6 +82,7 @@ export function AutocompleteField({
   allowCustom = true,
   disabled = false,
   className,
+  style,
   name,
 }: AutocompleteFieldProps): JSX.Element {
   const { t } = useTranslation();
@@ -158,7 +158,7 @@ export function AutocompleteField({
   };
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative", className)} style={style}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button

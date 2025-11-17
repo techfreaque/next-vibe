@@ -120,45 +120,43 @@ function renderField(key: string, value: unknown, depth = 0): JSX.Element {
   const indent = depth * 16; // 16px per level
 
   return (
-    <Div
-      key={key}
-      className="flex flex-col gap-1"
-      style={{ marginLeft: `${indent}px` }}
-    >
-      <Div className="flex items-start gap-2">
-        {/* Type Icon */}
-        <Span className={cn("text-xs font-mono mt-0.5", getTypeColor(value))}>
-          {getTypeIcon(value)}
-        </Span>
-
-        {/* Field Label */}
-        <Span className="text-sm font-medium text-foreground min-w-[100px]">
-          {key}:
-        </Span>
-
-        {/* Field Value */}
-        {!isComplex ? (
-          <Span className="text-sm text-muted-foreground flex-1">
-            {formatValue(value)}
+    <Div key={key} style={{ marginLeft: `${indent}px` }}>
+      <Div className="flex flex-col gap-1">
+        <Div className="flex items-start gap-2">
+          {/* Type Icon */}
+          <Span className={cn("text-xs font-mono mt-0.5", getTypeColor(value))}>
+            {getTypeIcon(value)}
           </Span>
-        ) : null}
-      </Div>
 
-      {/* Nested Fields */}
-      {isComplex && (
-        <Div className="flex flex-col gap-1">
-          {Array.isArray(value)
-            ? // Render array items
-              value.map((item, index) =>
-                renderField(`[${index}]`, item, depth + 1),
-              )
-            : // Render object fields
-              Object.entries(value as Record<string, unknown>).map(
-                ([nestedKey, nestedValue]) =>
-                  renderField(nestedKey, nestedValue, depth + 1),
-              )}
+          {/* Field Label */}
+          <Span className="text-sm font-medium text-foreground min-w-[100px]">
+            {key}:
+          </Span>
+
+          {/* Field Value */}
+          {!isComplex ? (
+            <Span className="text-sm text-muted-foreground flex-1">
+              {formatValue(value)}
+            </Span>
+          ) : null}
         </Div>
-      )}
+
+        {/* Nested Fields */}
+        {isComplex && (
+          <Div className="flex flex-col gap-1">
+            {Array.isArray(value)
+              ? // Render array items
+                value.map((item, index) =>
+                  renderField(`[${index}]`, item, depth + 1),
+                )
+              : // Render object fields
+                Object.entries(value as Record<string, unknown>).map(
+                  ([nestedKey, nestedValue]) =>
+                    renderField(nestedKey, nestedValue, depth + 1),
+                )}
+          </Div>
+        )}
+      </Div>
     </Div>
   );
 }

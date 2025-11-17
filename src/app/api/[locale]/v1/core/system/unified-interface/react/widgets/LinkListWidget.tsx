@@ -48,7 +48,6 @@ export function LinkListWidget({
   metadata,
   context,
   className,
-  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
   const { t } = simpleT(context.locale);
 
@@ -56,7 +55,7 @@ export function LinkListWidget({
     return (
       <Div
         className={cn("text-muted-foreground italic", className)}
-        style={style}
+        
       >
         —
       </Div>
@@ -68,7 +67,7 @@ export function LinkListWidget({
     return (
       <Div
         className={cn("py-8 text-center text-muted-foreground", className)}
-        style={style}
+        
       >
         <P>
           {t(
@@ -91,7 +90,7 @@ export function LinkListWidget({
   /* eslint-enable i18next/no-literal-string */
 
   return (
-    <Div className={cn("flex flex-col gap-4", className)} style={style}>
+    <Div className={cn("flex flex-col gap-4", className)} >
       {title && (
         <Div className="flex flex-col gap-1">
           <H3 className="text-lg font-semibold">{title}</H3>

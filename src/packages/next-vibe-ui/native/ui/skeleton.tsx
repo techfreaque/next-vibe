@@ -6,16 +6,17 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-import type { ViewStyle } from "react-native";
 
 import type { SkeletonProps } from "@/packages/next-vibe-ui/web/ui/skeleton";
 import { cn } from "../lib/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const duration = 1000;
 
 function Skeleton({
   className,
-  style: customStyle,
+  style,
+  children,
   ...props
 }: SkeletonProps): React.JSX.Element {
   const sv = useSharedValue(1);
@@ -31,12 +32,20 @@ function Skeleton({
     opacity: sv.value,
   }));
 
+  const convertedStyle = style ? convertCSSToViewStyle(style) : undefined;
+
+  // Extract id from props if present and map to nativeID
+  const { id, ...restProps } = props as { id?: string };
+
   return (
     <Animated.View
-      style={[animStyle, customStyle as ViewStyle]}
+      nativeID={id}
+      style={[animStyle, convertedStyle]}
       className={cn("rounded-md bg-secondary dark:bg-muted", className)}
-      {...props}
-    />
+      {...restProps}
+    >
+      {children}
+    </Animated.View>
   );
 }
 

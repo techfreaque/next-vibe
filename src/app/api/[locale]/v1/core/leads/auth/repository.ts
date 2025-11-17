@@ -2,24 +2,24 @@
  * Lead Auth Repository
  * Centralized repository for all lead ID management and authentication integration
  * Handles lead creation, validation, linking to users, and cookie management
+ *
+ * Updated for wallet-based credit system (no isPrimary, no leadLinks)
  */
 
 import "server-only";
 
-import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { creditTransactions } from "@/app/api/[locale]/v1/core/credits/db";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
-import { leadLinks, leads, userLeads } from "../db";
+import { leads, userLeadLinks } from "../db";
 import { LeadSource, LeadStatus } from "../enum";
-import { creditTransactionManager } from "../../credits/repository";
 
 /**
  * Client information for lead creation
@@ -85,27 +85,6 @@ export interface LeadAuthRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<string[]>;
-
-  linkLeads(
-    primaryLeadId: string,
-    linkedLeadId: string,
-    reason: string,
-    metadata: Record<string, string | number | boolean>,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>>;
-
-  getLinkedLeadIds(
-    leadId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<string[]>;
-
-  getAllLinkedLeadIds(
-    leadId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<string[]>;
 }
 
 /**
@@ -126,25 +105,21 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
     if (cookieLeadId) {
       const isValid = await this.validateLeadId(cookieLeadId, locale, logger);
       if (isValid) {
-        logger.debug("app.api.v1.core.leads.auth.public.validCookie", {
-          leadId: cookieLeadId,
-        });
+        logger.debug("Valid lead cookie found", { leadId: cookieLeadId });
         return { leadId: cookieLeadId, isNew: false };
       }
-      logger.debug("app.api.v1.core.leads.auth.public.invalidCookie", {
-        invalidLeadId: cookieLeadId,
-      });
+      logger.debug("Invalid lead cookie", { invalidLeadId: cookieLeadId });
     }
 
     // Create new anonymous lead
     const leadId = await this.createAnonymousLead(clientInfo, locale, logger);
-    logger.debug("app.api.v1.core.leads.auth.public.created", { leadId });
+    logger.debug("Created new anonymous lead", { leadId });
     return { leadId, isNew: true };
   }
 
   /**
-   * Get primary leadId for authenticated user
-   * Compares with cookie and determines if cookie should be updated
+   * Get leadId for authenticated user
+   * With wallet-based system, we just get any linked lead (no primary concept)
    */
   async getAuthenticatedUserLeadId(
     userId: string,
@@ -152,123 +127,54 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<{ leadId: string; shouldUpdateCookie: boolean }> {
-    // Get primary leadId from user_leads table
-    const [primaryUserLead] = await db
-      .select()
-      .from(userLeads)
-      .where(and(eq(userLeads.userId, userId), eq(userLeads.isPrimary, true)))
+    // Get any leadId linked to this user
+    const [userLeadLink] = await db
+      .select({ leadId: userLeadLinks.leadId })
+      .from(userLeadLinks)
+      .where(eq(userLeadLinks.userId, userId))
       .limit(1);
 
-    if (!primaryUserLead) {
-      logger.error("app.api.v1.core.leads.auth.authenticated.noPrimary", {
-        userId,
-      });
-      // Create a lead for this user as fallback
+    if (!userLeadLink) {
+      logger.debug("No lead found for user, creating one", { userId });
       const newLeadId = await this.createLeadForUser(userId, locale, logger);
-      logger.debug(
-        "app.api.v1.core.leads.auth.authenticated.createdFallbackLead",
-        {
-          userId,
-          leadId: newLeadId,
-        },
-      );
       return {
         leadId: newLeadId,
         shouldUpdateCookie: true,
       };
     }
 
-    const shouldUpdate = cookieLeadId !== primaryUserLead.leadId;
-    logger.debug("app.api.v1.core.leads.auth.authenticated.primaryFound", {
+    const shouldUpdate = cookieLeadId !== userLeadLink.leadId;
+    logger.debug("Found lead for user", {
       userId,
-      leadId: primaryUserLead.leadId,
+      leadId: userLeadLink.leadId,
       shouldUpdateCookie: shouldUpdate,
     });
     return {
-      leadId: primaryUserLead.leadId,
+      leadId: userLeadLink.leadId,
       shouldUpdateCookie: shouldUpdate,
     };
   }
 
   /**
    * Link leadId to user
-   * Handles multiple leadIds per user
-   * First linked lead becomes primary
-   * Merges credits from duplicate leads
+   * Uses userLeadLinks table with UNIQUE constraint (prevents duplicates)
    */
   async linkLeadToUser(
     leadId: string,
     userId: string,
-    locale: CountryLanguage,
+    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
-      // Check if this link already exists
-      const [existing] = await db
-        .select()
-        .from(userLeads)
-        .where(and(eq(userLeads.userId, userId), eq(userLeads.leadId, leadId)))
-        .limit(1);
-
-      if (existing) {
-        logger.debug("app.api.v1.core.leads.auth.link.alreadyExists", {
-          leadId,
-          userId,
-        });
-        return success(undefined);
-      }
-
-      // Get all existing leads for this user
-      const existingLeads = await db
-        .select()
-        .from(userLeads)
-        .where(eq(userLeads.userId, userId));
-
-      // Check if this specific link already exists
-      const existingLink = existingLeads.find((link) => link.leadId === leadId);
-      if (existingLink) {
-        logger.debug("app.api.v1.core.leads.auth.link.already.exists", {
-          leadId,
-          userId,
-        });
-        return success(undefined);
-      }
-
-      // Create the link (isPrimary set to false - will be deprecated)
-      await db.insert(userLeads).values({
-        userId,
-        leadId,
-        isPrimary: false,
-      });
-
-      // Update all existing transactions for this lead to include userId
-      // This ensures transaction history shows up for logged-in users
+      // Try to insert (UNIQUE constraint handles duplicates)
       await db
-        .update(creditTransactions)
-        .set({ userId })
-        .where(eq(creditTransactions.leadId, leadId));
-
-      logger.debug("Updated transactions with userId", {
-        leadId,
-        userId,
-      });
-
-      // If user has other leads, merge credits using cluster resolver
-      if (existingLeads.length > 0) {
-        const allLeadIds = [...existingLeads.map((l) => l.leadId), leadId];
-        const mergeResult =
-          await creditTransactionManager.mergeCreditsIntoOldest(
-            allLeadIds,
-            logger,
-          );
-
-        if (!mergeResult.success) {
-          logger.error("Failed to merge credits after linking lead to user", {
-            userId,
-            leadId,
-          });
-        }
-      }
+        .insert(userLeadLinks)
+        .values({
+          userId,
+          leadId,
+          linkReason: "signup",
+        })
+        .onConflictDoNothing(); // Silently ignore if already exists
 
       // Update lead status to SIGNED_UP if not already
       await db
@@ -280,18 +186,11 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         })
         .where(eq(leads.id, leadId));
 
-      logger.debug("app.api.v1.core.leads.auth.link.created", {
-        leadId,
-        userId,
-      });
-
+      logger.debug("Linked lead to user", { leadId, userId });
       return success(undefined);
     } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.link.error",
-        parseError(error).message,
-      );
-      return success(undefined);
+      logger.error("Failed to link lead to user", parseError(error).message);
+      return success(undefined); // Don't fail the operation
     }
   }
 
@@ -300,7 +199,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
    */
   async validateLeadId(
     leadId: string,
-    locale: CountryLanguage,
+    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<boolean> {
     try {
@@ -312,10 +211,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
 
       return !!lead;
     } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.validate.error",
-        parseError(error).message,
-      );
+      logger.error("Failed to validate leadId", parseError(error).message);
       return false;
     }
   }
@@ -336,7 +232,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
       if (isValid) {
         return leadId;
       }
-      logger.debug("app.api.v1.core.leads.auth.getOrCreate.invalid", {
+      logger.debug("Invalid leadId provided, creating new one", {
         invalidLeadId: leadId,
       });
     }
@@ -353,11 +249,10 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<string> {
-    // Check for existing anonymous lead with same IP and user agent within last 5 minutes
+    // Check for existing anonymous lead with same IP within last 5 minutes
     // to prevent duplicate lead creation from multiple simultaneous requests
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
 
-    // Build conditions array, only adding metadata checks if values exist
     const conditions = [
       eq(leads.status, LeadStatus.WEBSITE_USER),
       eq(leads.source, LeadSource.WEBSITE),
@@ -384,13 +279,11 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
       .limit(1);
 
     if (existingLead) {
-      logger.debug("app.api.v1.core.leads.auth.create.existingFound", {
-        leadId: existingLead.id,
-      });
+      logger.debug("Found existing anonymous lead", { leadId: existingLead.id });
       return existingLead.id;
     }
 
-    // Extract country and language from locale using proper utility
+    // Extract country and language from locale
     const { language, country } = getLanguageAndCountryFromLocale(locale);
 
     // Create new anonymous lead
@@ -418,15 +311,12 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
       })
       .returning();
 
-    logger.debug("app.api.v1.core.leads.auth.create.success", {
-      leadId: newLead.id,
-    });
+    logger.debug("Created new anonymous lead", { leadId: newLead.id });
     return newLead.id;
   }
 
   /**
-   * Create lead for user (fallback when user has no leads)
-   * Public method - used by user repository to ensure all users have leadId
+   * Create lead for user (when user has no leads)
    */
   async createLeadForUser(
     userId: string,
@@ -441,13 +331,11 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
       .where(eq(users.id, userId))
       .limit(1);
 
+    const { language, country } = getLanguageAndCountryFromLocale(locale);
+
     if (!user) {
-      logger.error("app.api.v1.core.leads.auth.createForUser.userNotFound", {
-        userId,
-      });
-      // Create a lead with minimal data as fallback
-      // This should never happen in normal operation, but we handle it gracefully
-      const { language, country } = getLanguageAndCountryFromLocale(locale);
+      logger.error("User not found during lead creation", { userId });
+      // Create fallback lead
       const [fallbackLead] = await db
         .insert(leads)
         .values({
@@ -465,66 +353,53 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         })
         .returning();
 
-      await db.insert(userLeads).values({
+      // Link to user
+      await db.insert(userLeadLinks).values({
         userId,
         leadId: fallbackLead.id,
-        isPrimary: true,
+        linkReason: "fallback_creation",
       });
 
-      logger.error("app.api.v1.core.leads.auth.createForUser.createdFallback", {
-        userId,
-        leadId: fallbackLead.id,
-      });
       return fallbackLead.id;
     }
 
-    // Parse locale to get country and language using proper utility
-    const { language, country } = getLanguageAndCountryFromLocale(locale);
+    // Create lead with user email
+    const [newLead] = await db
+      .insert(leads)
+      .values({
+        email: user.email,
+        businessName: "",
+        status: LeadStatus.SIGNED_UP,
+        source: LeadSource.WEBSITE,
+        country,
+        language,
+      })
+      .returning();
 
-    // Create lead with proper locale from request context
-    const leadData = {
-      email: user.email,
-      businessName: "",
-      status: LeadStatus.SIGNED_UP,
-      source: LeadSource.WEBSITE,
-      country,
-      language,
-    };
-    const [newLead] = await db.insert(leads).values(leadData).returning();
-
-    // Link to user as primary
-    await db.insert(userLeads).values({
+    // Link to user
+    await db.insert(userLeadLinks).values({
       userId,
       leadId: newLead.id,
-      isPrimary: true,
+      linkReason: "user_creation",
     });
 
-    logger.debug("app.api.v1.core.leads.auth.createForUser.success", {
-      userId,
-      leadId: newLead.id,
-    });
+    logger.debug("Created lead for user", { userId, leadId: newLead.id });
     return newLead.id;
   }
 
   /**
    * Set leadId cookie (server-side)
-   * @deprecated This method is platform-specific and should not be used directly.
-   * Lead ID storage is now handled by platform-specific auth handlers.
-   * For web: cookies are set automatically by web-auth-handler
-   * For CLI/MCP: lead ID is stored in .vibe.session file
-   * For mobile: lead ID is stored in AsyncStorage
+   * @deprecated Platform-specific auth handlers now manage lead ID storage
    */
   setLeadIdCookie(
     leadId: string,
-    locale: CountryLanguage,
+    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<void> {
     logger.debug(
-      "setLeadIdCookie is deprecated - lead ID storage is now handled by platform-specific auth handlers",
+      "setLeadIdCookie is deprecated - lead ID storage is handled by platform-specific auth handlers",
       { leadId },
     );
-    // Return success to maintain backward compatibility
-    // Platform handlers will manage lead ID storage
     return success(undefined);
   }
 
@@ -533,204 +408,19 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
    */
   async getUserLeadIds(
     userId: string,
-    locale: CountryLanguage,
+    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<string[]> {
     try {
       const userLeadRecords = await db
-        .select({ leadId: userLeads.leadId })
-        .from(userLeads)
-        .where(eq(userLeads.userId, userId))
-        .orderBy(desc(userLeads.isPrimary), userLeads.linkedAt);
+        .select({ leadId: userLeadLinks.leadId })
+        .from(userLeadLinks)
+        .where(eq(userLeadLinks.userId, userId));
 
       return userLeadRecords.map((record) => record.leadId);
     } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.getUserLeads.error",
-        parseError(error).message,
-      );
+      logger.error("Failed to get user leads", parseError(error).message);
       return [];
-    }
-  }
-
-  /**
-   * Link two leadIds together (e.g., cookie leadId + email campaign leadId)
-   * This creates a bidirectional link so we can find all related leads
-   * IMPORTANT: Now also triggers credit merge into oldest lead
-   */
-  async linkLeads(
-    primaryLeadId: string,
-    linkedLeadId: string,
-    reason: string,
-    metadata: Record<string, string | number | boolean>,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>> {
-    try {
-      // Don't link a lead to itself
-      if (primaryLeadId === linkedLeadId) {
-        logger.debug("app.api.v1.core.leads.auth.linkLeads.sameId", {
-          leadId: primaryLeadId,
-        });
-        return success(undefined);
-      }
-
-      // Check if link already exists (either direction)
-      const [existingLink] = await db
-        .select()
-        .from(leadLinks)
-        .where(
-          or(
-            and(
-              eq(leadLinks.primaryLeadId, primaryLeadId),
-              eq(leadLinks.linkedLeadId, linkedLeadId),
-            ),
-            and(
-              eq(leadLinks.primaryLeadId, linkedLeadId),
-              eq(leadLinks.linkedLeadId, primaryLeadId),
-            ),
-          ),
-        )
-        .limit(1);
-
-      if (existingLink) {
-        logger.debug("app.api.v1.core.leads.auth.linkLeads.alreadyExists", {
-          primaryLeadId,
-          linkedLeadId,
-        });
-        return success(undefined);
-      }
-
-      // Create the link
-      await db.insert(leadLinks).values({
-        primaryLeadId,
-        linkedLeadId,
-        linkReason: reason,
-        metadata,
-      });
-
-      logger.debug("app.api.v1.core.leads.auth.linkLeads.created", {
-        primaryLeadId,
-        linkedLeadId,
-        reason,
-      });
-
-      // Merge credits into oldest lead
-      // Get all linked leads to find the complete cluster
-      const allLinkedLeadIds = await this.getAllLinkedLeadIds(
-        primaryLeadId,
-        locale,
-        logger,
-      );
-
-      // Trigger credit merge with all linked lead IDs
-      const mergeResult = await creditTransactionManager.mergeCreditsIntoOldest(
-        allLinkedLeadIds,
-        logger,
-      );
-
-      if (!mergeResult.success) {
-        logger.error("Failed to merge credits after linking leads", {
-          primaryLeadId,
-          linkedLeadId,
-          allLinkedLeadIds,
-        });
-        // Don't fail the link operation if credit merge fails
-      }
-
-      return success(undefined);
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.linkLeads.error",
-        parseError(error).message,
-      );
-      return success(undefined);
-    }
-  }
-
-  /**
-   * Get all linked leadIds for a given leadId
-   * Returns all leads that are linked to this lead (in either direction)
-   */
-  async getLinkedLeadIds(
-    leadId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<string[]> {
-    try {
-      // Get all links where this leadId is either primary or linked
-      const links = await db
-        .select()
-        .from(leadLinks)
-        .where(
-          or(
-            eq(leadLinks.primaryLeadId, leadId),
-            eq(leadLinks.linkedLeadId, leadId),
-          ),
-        );
-
-      // Extract all unique leadIds (excluding the input leadId)
-      const linkedIds = new Set<string>();
-      for (const link of links) {
-        if (link.primaryLeadId !== leadId) {
-          linkedIds.add(link.primaryLeadId);
-        }
-        if (link.linkedLeadId !== leadId) {
-          linkedIds.add(link.linkedLeadId);
-        }
-      }
-
-      return [...linkedIds];
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.getLinkedLeads.error",
-        parseError(error).message,
-      );
-      return [];
-    }
-  }
-
-  /**
-   * Get all leadIds in a lead cluster (including the input leadId)
-   * This recursively finds all linked leads
-   */
-  async getAllLinkedLeadIds(
-    leadId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<string[]> {
-    try {
-      const visited = new Set<string>();
-      const toVisit = [leadId];
-      const allLeadIds = new Set<string>([leadId]);
-
-      while (toVisit.length > 0) {
-        const currentLeadId = toVisit.pop()!;
-        if (visited.has(currentLeadId)) {
-          continue;
-        }
-        visited.add(currentLeadId);
-
-        const linked = await this.getLinkedLeadIds(
-          currentLeadId,
-          locale,
-          logger,
-        );
-        for (const linkedId of linked) {
-          allLeadIds.add(linkedId);
-          if (!visited.has(linkedId)) {
-            toVisit.push(linkedId);
-          }
-        }
-      }
-
-      return [...allLeadIds];
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.getAllLinkedLeads.error",
-        parseError(error).message,
-      );
-      return [leadId]; // Return at least the input leadId
     }
   }
 }

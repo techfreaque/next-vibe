@@ -2,13 +2,13 @@
 
 import { cn } from "next-vibe/shared/utils";
 import React from "react";
+import type { StyleType } from "../utils/style-type";
 
-export interface TitleProps {
+export type TitleProps = {
   children: React.ReactNode;
-  className?: string;
   customSizeClassName?: string;
   level: 1 | 2 | 3 | 4 | 5 | 6;
-}
+} & StyleType;
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 export const sizeClasses: Record<1 | 2 | 3 | 4 | 5 | 6, string> = {
@@ -23,7 +23,8 @@ export const sizeClasses: Record<1 | 2 | 3 | 4 | 5 | 6, string> = {
 
 export function Title({
   children,
-  className = "",
+  className,
+  style,
   customSizeClassName,
   level,
 }: TitleProps): React.JSX.Element {
@@ -36,6 +37,7 @@ export function Title({
         customSizeClassName || sizeClasses[level],
         className,
       )}
+      style={style}
     >
       {children}
     </Tag>

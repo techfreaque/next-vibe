@@ -4,6 +4,8 @@ import { View, Pressable, type AccessibilityRole } from "react-native";
 import { styled } from "nativewind";
 
 import type { UlProps, UlMouseEvent } from "@/packages/next-vibe-ui/web/ui/ul";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledPressable = styled(Pressable, { className: "style" });
 const StyledView = styled(View, { className: "style" });
@@ -11,7 +13,7 @@ const StyledView = styled(View, { className: "style" });
 function Ul({
   className,
   children,
-  style: _style,
+  style,
   onClick,
   onMouseEnter,
   onMouseLeave,
@@ -21,6 +23,8 @@ function Ul({
   "aria-labelledby": _ariaLabelledby,
   "aria-describedby": _ariaDescribedby,
 }: UlProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   const handlePress = onClick
     ? (): void => {
         const event: UlMouseEvent = {
@@ -81,7 +85,7 @@ function Ul({
   if (onClick || onMouseEnter || onMouseLeave) {
     return (
       <StyledPressable
-        className={cn(className)}
+        {...applyStyleType({ nativeStyle, className: cn(className) })}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -95,7 +99,7 @@ function Ul({
 
   return (
     <StyledView
-      className={cn(className)}
+      {...applyStyleType({ nativeStyle, className: cn(className) })}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={ariaLabel}
     >

@@ -215,7 +215,7 @@ export function LeadsStatsChart({
           <Skeleton className="h-5 w-48 " />
         </CardHeader>
         <CardContent>
-          <Skeleton className={`w-full`} style={{ height: `${height}px` }} />
+          <Skeleton style={{ height: `${height}px`, width: "100%" }} />
         </CardContent>
       </Card>
     );
@@ -230,11 +230,10 @@ export function LeadsStatsChart({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Div
-            className="flex items-center justify-center text-muted-foreground"
-            style={{ height: `${height}px` }}
-          >
-            {t("app.admin.leads.leads.admin.stats.chart.noData")}
+          <Div style={{ height: `${height}px` }}>
+            <Div className="flex items-center justify-center text-muted-foreground h-full">
+              {t("app.admin.leads.leads.admin.stats.chart.noData")}
+            </Div>
           </Div>
         </CardContent>
       </Card>
@@ -363,8 +362,10 @@ export function LeadsStatsChart({
               originalValue !== undefined ? originalValue : entry.value;
 
             return (
-              <P key={index} className="text-sm" style={{ color: entry.color }}>
-                {`${translatedName}: ${new Intl.NumberFormat(locale.split("-")[0]).format(displayValue)}`}
+              <P key={index} style={{ color: entry.color }}>
+                <P className="text-sm">
+                  {`${translatedName}: ${new Intl.NumberFormat(locale.split("-")[0]).format(displayValue)}`}
+                </P>
               </P>
             );
           })}
@@ -569,10 +570,9 @@ export function LeadsStatsChart({
                       "app.admin.leads.leads.admin.stats.legend.clickToToggle",
                     )}
                   >
-                    <Div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: item.color }}
-                    />
+                    <Div style={{ backgroundColor: item.color }}>
+                      <Div className="w-3 h-3 rounded-full" />
+                    </Div>
                     <Span
                       className={
                         item.visible

@@ -7,6 +7,8 @@ import { Modal, Pressable, Text as RNText, View } from "react-native";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
 import { cn } from "next-vibe/shared/utils/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 
 // Import ALL types from web - ZERO definitions here
 import type {
@@ -18,12 +20,8 @@ import type {
   DrawerFooterProps,
   DrawerTitleProps,
   DrawerDescriptionProps,
+  DrawerContextValue,
 } from "@/packages/next-vibe-ui/web/ui/drawer";
-
-interface DrawerContextValue {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-}
 
 const DrawerContext = createContext<DrawerContextValue | undefined>(undefined);
 
@@ -52,10 +50,12 @@ export function Drawer({
   );
 }
 
-export function DrawerTrigger({
-  children,
-  asChild,
-}: DrawerTriggerProps): React.JSX.Element {
+Drawer.displayName = "Drawer";
+
+export const DrawerTrigger = React.forwardRef<
+  React.ElementRef<typeof Pressable>,
+  DrawerTriggerProps
+>(({ children, asChild }, ref) => {
   const { setOpen } = useDrawer();
 
   if (asChild && React.isValidElement(children)) {
@@ -72,6 +72,7 @@ export function DrawerTrigger({
 
   return (
     <Pressable
+      ref={ref}
       onPress={() => {
         setOpen(true);
       }}
@@ -79,12 +80,14 @@ export function DrawerTrigger({
       {children}
     </Pressable>
   );
-}
+});
 
-export function DrawerClose({
-  children,
-  asChild,
-}: DrawerCloseProps): React.JSX.Element {
+DrawerTrigger.displayName = "DrawerTrigger";
+
+export const DrawerClose = React.forwardRef<
+  React.ElementRef<typeof Pressable>,
+  DrawerCloseProps
+>(({ children, asChild }, ref) => {
   const { setOpen } = useDrawer();
 
   if (asChild && React.isValidElement(children)) {
@@ -101,6 +104,7 @@ export function DrawerClose({
 
   return (
     <Pressable
+      ref={ref}
       onPress={() => {
         setOpen(false);
       }}
@@ -108,7 +112,9 @@ export function DrawerClose({
       {children}
     </Pressable>
   );
-}
+});
+
+DrawerClose.displayName = "DrawerClose";
 
 // Portal is a no-op in native, but exported for compatibility
 export function DrawerPortal({
@@ -119,16 +125,34 @@ export function DrawerPortal({
   return <>{children}</>;
 }
 
+DrawerPortal.displayName = "DrawerPortal";
+
 // Overlay is rendered as part of DrawerContent in native
-export function DrawerOverlay(): null {
-  return null;
+export function DrawerOverlay(): React.JSX.Element {
+  return <></>;
 }
+
+DrawerOverlay.displayName = "DrawerOverlay";
 
 export function DrawerContent({
   children,
   className,
+  style,
 }: DrawerContentProps): React.JSX.Element {
   const { open, setOpen } = useDrawer();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
+  const overlayStyle = convertCSSToViewStyle({
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+  });
+
+  const containerStyle = convertCSSToViewStyle({
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  });
 
   return (
     <Modal
@@ -139,30 +163,28 @@ export function DrawerContent({
         setOpen(false);
       }}
     >
-      <View className="flex-1">
+      <View style={convertCSSToViewStyle({ flex: 1 })}>
         <Pressable
-          className="flex-1 bg-black/80"
+          style={overlayStyle}
           onPress={() => {
             setOpen(false);
           }}
         >
-          <View style={{ flex: 1 }} />
+          <View style={convertCSSToViewStyle({ flex: 1 })} />
         </Pressable>
         <Animated.View
           entering={SlideInDown}
           exiting={SlideOutDown}
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-          }}
+          style={containerStyle}
         >
           <View
-            className={cn(
-              "mt-24 flex flex-col rounded-t-[10px] border bg-background",
-              className,
-            )}
+            {...applyStyleType({
+              nativeStyle,
+              className: cn(
+                "mt-24 flex flex-col rounded-t-[10px] border bg-background",
+                className,
+              ),
+            })}
           >
             <View className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
             {children}
@@ -173,21 +195,41 @@ export function DrawerContent({
   );
 }
 
+DrawerContent.displayName = "DrawerContent";
+
 export function DrawerHeader({
   className,
+  style,
   children,
 }: DrawerHeaderProps): React.JSX.Element {
-  return <View className={cn("flex gap-1.5 p-4", className)}>{children}</View>;
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+  return (
+    <View
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("flex gap-1.5 p-4", className),
+      })}
+    >
+      {children}
+    </View>
+  );
 }
 
 DrawerHeader.displayName = "DrawerHeader";
 
 export function DrawerFooter({
   className,
+  style,
   children,
 }: DrawerFooterProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
-    <View className={cn("mt-auto flex flex-col gap-2 p-4", className)}>
+    <View
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("mt-auto flex flex-col gap-2 p-4", className),
+      })}
+    >
       {children}
     </View>
   );
@@ -197,16 +239,22 @@ DrawerFooter.displayName = "DrawerFooter";
 
 export function DrawerTitle({
   className,
+  style,
   children,
 }: DrawerTitleProps): React.JSX.Element {
-  return (
-    <RNText
-      style={{
+  const nativeStyle = style
+    ? convertCSSToViewStyle(style)
+    : convertCSSToViewStyle({
         fontSize: 18,
         fontWeight: "600",
         lineHeight: 18,
-      }}
-      className={className}
+      });
+  return (
+    <RNText
+      {...applyStyleType({
+        nativeStyle,
+        className,
+      })}
     >
       {children}
     </RNText>
@@ -217,14 +265,20 @@ DrawerTitle.displayName = "DrawerTitle";
 
 export function DrawerDescription({
   className,
+  style,
   children,
 }: DrawerDescriptionProps): React.JSX.Element {
+  const nativeStyle = style
+    ? convertCSSToViewStyle(style)
+    : convertCSSToViewStyle({
+        fontSize: 14,
+      });
   return (
     <RNText
-      style={{
-        fontSize: 14,
-      }}
-      className={className}
+      {...applyStyleType({
+        nativeStyle,
+        className,
+      })}
     >
       {children}
     </RNText>

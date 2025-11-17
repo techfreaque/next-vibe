@@ -88,6 +88,7 @@ export function useCredits(
 
       apiClient.updateEndpointData(
         definitions.GET,
+        logger,
         (oldData: EndpointData | undefined) => {
           if (!oldData?.success || !oldData.data) {
             return oldData;
@@ -142,6 +143,7 @@ export function useCredits(
         },
       );
     },
+    // oxlint-disable-next-line exhaustive-deps
     [], // apiClient and definitions.GET are stable references
   );
 

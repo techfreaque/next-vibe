@@ -76,7 +76,9 @@ export function EmailStatsChart({
           <Skeleton className="h-6 w-48" />
         </CardHeader>
         <CardContent>
-          <Skeleton className="w-full" style={{ height }} />
+          <Div style={{ height }}>
+            <Skeleton className="w-full h-full" />
+          </Div>
         </CardContent>
       </Card>
     );
@@ -89,10 +91,12 @@ export function EmailStatsChart({
           <CardTitle>{t("app.admin.emails.stats.common.noResults")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <Div className="flex items-center justify-center" style={{ height }}>
-            <P className="text-muted-foreground">
-              {t("app.admin.emails.stats.common.noResults")}
-            </P>
+          <Div style={{ height }}>
+            <Div className="flex items-center justify-center h-full">
+              <P className="text-muted-foreground">
+                {t("app.admin.emails.stats.common.noResults")}
+              </P>
+            </Div>
           </Div>
         </CardContent>
       </Card>

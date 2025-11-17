@@ -57,8 +57,8 @@ export async function createLeadId(
   locale: CountryLanguage,
 ): Promise<NextResponse> {
   // Import here to avoid circular dependencies
-  const { leadAuthService } = await import(
-    "@/app/api/[locale]/v1/core/leads/auth-service"
+  const { leadAuthRepository } = await import(
+    "@/app/api/[locale]/v1/core/leads/auth/repository"
   );
   const { createEndpointLogger } = await import(
     "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint"
@@ -73,10 +73,9 @@ export async function createLeadId(
       request.headers.get("x-forwarded-for")?.split(",")[0] ||
       request.headers.get("x-real-ip") ||
       undefined,
-    timestamp: new Date().toISOString(),
   };
 
-  const result = await leadAuthService.ensurePublicLeadId(
+  const result = await leadAuthRepository.ensurePublicLeadId(
     undefined,
     clientInfo,
     locale,

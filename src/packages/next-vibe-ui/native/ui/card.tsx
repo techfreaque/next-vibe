@@ -1,9 +1,10 @@
 import * as React from "react";
-import { View } from "react-native";
+import { View, Text as RNText } from "react-native";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
-import { Span } from "./span";
 import { TextClassContext } from "./text";
+import { convertCSSToViewStyle, convertCSSToTextStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 
 import type {
   CardProps,
@@ -15,14 +16,21 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/card";
 
 const StyledView = styled(View, { className: "style" });
+const StyledText = styled(RNText, { className: "style" });
 
-function Card({ className, children }: CardProps): React.JSX.Element {
+function Card({ className, style, id, children }: CardProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <StyledView
-      className={cn(
-        "rounded-lg border border-border bg-card shadow-sm shadow-foreground/10",
-        className,
-      )}
+      nativeID={id}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "rounded-lg border border-border bg-card shadow-sm shadow-foreground/10",
+          className,
+        ),
+      })}
     >
       {children}
     </StyledView>
@@ -32,49 +40,87 @@ Card.displayName = "Card";
 
 function CardHeader({
   className,
+  style,
+  id,
   children,
 }: CardHeaderProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <StyledView className={cn("flex flex-col gap-1.5 p-6", className)}>
+    <StyledView
+      nativeID={id}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("flex flex-col gap-1.5 p-6", className),
+      })}
+    >
       {children}
     </StyledView>
   );
 }
 CardHeader.displayName = "CardHeader";
 
-function CardTitle({ className, children }: CardTitleProps): React.JSX.Element {
+function CardTitle({ className, style, id, children }: CardTitleProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
-    <Span
-      className={cn(
-        "text-2xl text-card-foreground font-semibold leading-none tracking-tight",
-        className,
-      )}
+    <StyledText
+      nativeID={id}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "text-2xl text-card-foreground font-semibold leading-none tracking-tight",
+          className,
+        ),
+      })}
     >
       {children}
-    </Span>
+    </StyledText>
   );
 }
 CardTitle.displayName = "CardTitle";
 
 function CardDescription({
   className,
+  style,
+  id,
   children,
 }: CardDescriptionProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
-    <Span className={cn("text-sm text-muted-foreground", className)}>
+    <StyledText
+      nativeID={id}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("text-sm text-muted-foreground", className),
+      })}
+    >
       {children}
-    </Span>
+    </StyledText>
   );
 }
 CardDescription.displayName = "CardDescription";
 
 function CardContent({
   className,
+  style,
+  id,
   children,
 }: CardContentProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <TextClassContext.Provider value="text-card-foreground">
-      <StyledView className={cn("p-6 pt-0", className)}>{children}</StyledView>
+      <StyledView
+        nativeID={id}
+        {...applyStyleType({
+          nativeStyle,
+          className: cn("p-6 pt-0", className),
+        })}
+      >
+        {children}
+      </StyledView>
     </TextClassContext.Provider>
   );
 }
@@ -82,11 +128,19 @@ CardContent.displayName = "CardContent";
 
 function CardFooter({
   className,
+  style,
+  id,
   children,
 }: CardFooterProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <StyledView
-      className={cn("flex flex-row items-center p-6 pt-0", className)}
+      nativeID={id}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("flex flex-row items-center p-6 pt-0", className),
+      })}
     >
       {children}
     </StyledView>

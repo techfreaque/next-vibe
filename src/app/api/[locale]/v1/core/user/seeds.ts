@@ -13,7 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 import { translations } from "@/config/i18n/en";
 
-import { leads, userLeads } from "../leads/db";
+import { leads, userLeadLinks } from "../leads/db";
 import { LeadSource, LeadStatus } from "../leads/enum";
 import { parseError } from "../shared/utils";
 import { authRepository } from "./auth/repository";
@@ -186,18 +186,18 @@ export async function dev(
       }
 
       // Check if user-lead link already exists
-      const existingUserLeads = await db
+      const existingUserLeadLinks = await db
         .select()
-        .from(userLeads)
-        .where(and(eq(userLeads.userId, user.id), eq(userLeads.leadId, leadId)))
+        .from(userLeadLinks)
+        .where(and(eq(userLeadLinks.userId, user.id), eq(userLeadLinks.leadId, leadId)))
         .limit(1);
 
-      if (existingUserLeads.length === 0) {
-        // Link to user as primary
-        await db.insert(userLeads).values({
+      if (existingUserLeadLinks.length === 0) {
+        // Link to user
+        await db.insert(userLeadLinks).values({
           userId: user.id,
           leadId,
-          isPrimary: true,
+          linkReason: "seed_creation",
         });
         logger.debug(`Linked lead ${leadId} to user ${user.id}`);
       } else {

@@ -139,7 +139,7 @@ export function ImapAccountsList({
   return (
     <Div className="flex flex-col gap-4">
       {/* Search and Filters */}
-      <Div className="flex items-center flex flex-row gap-4">
+      <Div className="items-center flex flex-row gap-4">
         <Input
           placeholder={t("app.admin.emails.imap.account.search_placeholder")}
           value={searchValue}
@@ -225,7 +225,7 @@ export function ImapAccountsList({
                             "accountId",
                             account.id,
                           );
-                          await testEndpoint.create.submitForm(undefined);
+                          await testEndpoint.create.onSubmit();
                         }}
                       >
                         {t("app.admin.emails.imap.account.test")}

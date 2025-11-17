@@ -4,6 +4,7 @@ import {
   AnimatePresence as FMAnimatePresence,
 } from "framer-motion";
 import type { JSX } from "react";
+import type { StyleType } from "../utils/style-type";
 
 // AnimatePresence interface
 export interface AnimatePresenceProps {
@@ -33,7 +34,7 @@ export function AnimatePresence({
 // Shared cross-platform motion interfaces - compatible with both framer-motion and moti
 export type MotionTransition = Transition;
 
-export interface MotionDivProps {
+export type MotionDivProps = {
   initial?:
     | {
         opacity?: number;
@@ -76,12 +77,10 @@ export interface MotionDivProps {
     }
   >;
   transition?: MotionTransition;
-  className?: string;
   children?: React.ReactNode;
-  style?: React.CSSProperties;
-}
+} & StyleType;
 
-export interface MotionSpanProps {
+export type MotionSpanProps = {
   initial?: {
     opacity?: number;
     scale?: number;
@@ -97,12 +96,10 @@ export interface MotionSpanProps {
     rotate?: number;
   };
   transition?: MotionTransition;
-  className?: string;
   children?: React.ReactNode;
-  style?: React.CSSProperties;
-}
+} & StyleType;
 
-export interface MotionButtonProps {
+export type MotionButtonProps = {
   initial?: {
     opacity?: number;
     scale?: number;
@@ -118,13 +115,11 @@ export interface MotionButtonProps {
     rotate?: number;
   };
   transition?: MotionTransition;
-  className?: string;
   children?: React.ReactNode;
-  style?: React.CSSProperties;
   onClick?: () => void;
-}
+} & StyleType;
 
-export interface MotionImgProps {
+export type MotionImgProps = {
   initial?: {
     opacity?: number;
     scale?: number;
@@ -140,11 +135,9 @@ export interface MotionImgProps {
     rotate?: number;
   };
   transition?: MotionTransition;
-  className?: string;
-  style?: React.CSSProperties;
   src?: string;
   alt?: string;
-}
+} & StyleType;
 
 export function MotionDiv({
   initial,

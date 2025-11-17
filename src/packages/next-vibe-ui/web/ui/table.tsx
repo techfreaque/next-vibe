@@ -1,46 +1,16 @@
 import { cn } from "next-vibe/shared/utils/utils";
 import type { ReactNode } from "react";
 import * as React from "react";
-import type { CSSProperties } from "react";
+import type { StyleType } from "../utils/style-type";
 
-// Cross-platform base props for table components
-export interface TableBaseProps {
+import type { DivKeyboardEvent } from "./div";
+
+// Table
+export type TableProps = {
   children?: ReactNode;
-  className?: string;
-}
+} & StyleType;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface TableProps extends TableBaseProps {}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface TableHeaderProps extends TableBaseProps {}
-
-export interface TableBodyProps extends TableBaseProps {
-  style?: CSSProperties;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface TableFooterProps extends TableBaseProps {}
-
-export interface TableRowProps extends TableBaseProps {
-  onPress?: () => void;
-}
-
-export interface TableHeadProps extends TableBaseProps {
-  style?: CSSProperties;
-}
-
-export interface TableCellProps extends TableBaseProps {
-  style?: CSSProperties;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface TableCaptionProps extends TableBaseProps {}
-
-function Table({
-  className,
-  ...props
-}: TableProps & React.HTMLAttributes<HTMLTableElement>): React.JSX.Element {
+export function Table({ className, ...props }: TableProps): React.JSX.Element {
   return (
     <div className="relative w-full overflow-auto">
       <table
@@ -52,31 +22,43 @@ function Table({
 }
 Table.displayName = "Table";
 
-function TableHeader({
+// TableHeader
+export type TableHeaderProps = {
+  children?: ReactNode;
+} & StyleType;
+
+export function TableHeader({
   className,
   ...props
-}: TableHeaderProps &
-  React.HTMLAttributes<HTMLTableSectionElement>): React.JSX.Element {
+}: TableHeaderProps): React.JSX.Element {
   return <thead className={cn("[&_tr]:border-b", className)} {...props} />;
 }
 TableHeader.displayName = "TableHeader";
 
-function TableBody({
+// TableBody
+export type TableBodyProps = {
+  children?: ReactNode;
+} & StyleType;
+
+export function TableBody({
   className,
   ...props
-}: TableBodyProps &
-  React.HTMLAttributes<HTMLTableSectionElement>): React.JSX.Element {
+}: TableBodyProps): React.JSX.Element {
   return (
     <tbody className={cn("[&_tr:last-child]:border-0", className)} {...props} />
   );
 }
 TableBody.displayName = "TableBody";
 
-function TableFooter({
+// TableFooter
+export type TableFooterProps = {
+  children?: ReactNode;
+} & StyleType;
+
+export function TableFooter({
   className,
   ...props
-}: TableFooterProps &
-  React.HTMLAttributes<HTMLTableSectionElement>): React.JSX.Element {
+}: TableFooterProps): React.JSX.Element {
   return (
     <tfoot
       className={cn(
@@ -89,73 +71,124 @@ function TableFooter({
 }
 TableFooter.displayName = "TableFooter";
 
-function TableRow({
+// TableRow
+export type TableRowProps = {
+  children?: ReactNode;
+  onClick?: () => void;
+  onKeyDown?: (e: DivKeyboardEvent) => void;
+  role?: string;
+  tabIndex?: number;
+} & StyleType;
+
+export function TableRow({
   className,
-  onPress,
+  onClick,
+  onKeyDown,
+  role,
+  tabIndex,
   ...props
-}: TableRowProps &
-  React.HTMLAttributes<HTMLTableRowElement>): React.JSX.Element {
+}: TableRowProps): React.JSX.Element {
   return (
     <tr
       className={cn(
         "border-b transition-colors hover:bg-accent data-[state=selected]:bg-muted",
-        onPress && "cursor-pointer",
+        onClick && "cursor-pointer",
         className,
       )}
-      onClick={onPress}
+      onClick={onClick}
       onKeyDown={(e) => {
-        if (onPress && (e.key === "Enter" || e.key === " ")) {
+        if (onKeyDown) {
+          onKeyDown(e);
+        }
+        if (onClick && (e.key === "Enter" || e.key === " ")) {
           e.preventDefault();
-          onPress();
+          onClick();
         }
       }}
-      role={onPress ? "button" : undefined}
-      tabIndex={onPress ? 0 : undefined}
+      role={role ?? (onClick ? "button" : undefined)}
+      tabIndex={tabIndex ?? (onClick ? 0 : undefined)}
       {...props}
     />
   );
 }
 TableRow.displayName = "TableRow";
 
-function TableHead({
+export interface TableHeadKeyboardEvent {
+  key: string;
+  preventDefault: () => void;
+  stopPropagation: () => void;
+}
+
+// TableHead
+export type TableHeadProps = {
+  children?: ReactNode;
+  width?: string | number;
+  onClick?: () => void;
+  onKeyDown?: (e: TableHeadKeyboardEvent) => void;
+  role?: string;
+  tabIndex?: number;
+  "aria-sort"?: "ascending" | "descending" | "none" | "other";
+} & StyleType;
+
+export function TableHead({
   className,
+  width,
+  onClick,
+  onKeyDown,
+  role,
+  tabIndex,
   ...props
-}: TableHeadProps &
-  React.ThHTMLAttributes<HTMLTableCellElement>): React.JSX.Element {
+}: TableHeadProps): React.JSX.Element {
   return (
     <th
       className={cn(
         "h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        onClick && "cursor-pointer",
         className,
       )}
+      style={{ width }}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      role={role}
+      tabIndex={tabIndex}
       {...props}
     />
   );
 }
 TableHead.displayName = "TableHead";
 
-function TableCell({
+export type TableCellProps = {
+  children?: ReactNode;
+  colSpan?: number;
+} & StyleType;
+
+export function TableCell({
   className,
+  colSpan,
   ...props
-}: TableCellProps &
-  React.TdHTMLAttributes<HTMLTableCellElement>): React.JSX.Element {
+}: TableCellProps): React.JSX.Element {
   return (
     <td
       className={cn(
         "p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className,
       )}
+      colSpan={colSpan}
       {...props}
     />
   );
 }
 TableCell.displayName = "TableCell";
 
-function TableCaption({
+// TableCaption
+export type TableCaptionProps = {
+  children?: ReactNode;
+} & StyleType;
+
+export function TableCaption({
   className,
   ...props
-}: TableCaptionProps &
-  React.HTMLAttributes<HTMLTableCaptionElement>): React.JSX.Element {
+}: TableCaptionProps): React.JSX.Element {
   return (
     <caption
       className={cn("mt-4 text-sm text-muted-foreground", className)}
@@ -164,14 +197,3 @@ function TableCaption({
   );
 }
 TableCaption.displayName = "TableCaption";
-
-export {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-};

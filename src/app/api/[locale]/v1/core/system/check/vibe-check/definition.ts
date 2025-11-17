@@ -39,9 +39,6 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.system.check.vibeCheck.container.title",
-      description:
-        "app.api.v1.core.system.check.vibeCheck.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },

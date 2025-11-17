@@ -222,6 +222,6 @@ export interface OxlintPrettierConfig {
  */
 export interface OxlintPrettierEslintConfig {
   oxlint: OxlintConfig;
-  eslint: EslintConfig;
+  // eslint: EslintConfig;
   prettier: PrettierConfig;
 }

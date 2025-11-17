@@ -15,6 +15,13 @@ import type {
   FormSectionProps,
 } from "../../../web/ui/form/form-section";
 
+import { Span } from "../span";
+import { Div } from "../div";
+import { H2, H3, P } from "../typography";
+
+// StyledView is kept for potential future use with dynamic styles
+// const _StyledView = styled(View, { className: "style" });
+
 export function FormFieldGroup({
   children,
   title,
@@ -24,17 +31,17 @@ export function FormFieldGroup({
   const { t } = useTranslation();
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <Div className={`space-y-4 ${className}`}>
       {title && (
-        <div className="space-y-1">
-          <h3 className="text-lg font-semibold">{t(title)}</h3>
+        <Div className="space-y-1">
+          <H3 className="text-lg font-semibold">{t(title)}</H3>
           {description && (
-            <p className="text-sm text-muted-foreground">{t(description)}</p>
+            <P className="text-sm text-muted-foreground">{t(description)}</P>
           )}
-        </div>
+        </Div>
       )}
-      <div className="space-y-6">{children}</div>
-    </div>
+      <Div className="space-y-6">{children}</Div>
+    </Div>
   );
 }
 
@@ -48,30 +55,29 @@ export function FormSection({
   const { t } = useTranslation();
 
   return (
-    <div className={`space-y-6 ${className}`}>
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">{t(title)}</h2>
+    <Div className={`space-y-6 ${className}`}>
+      <Div className="space-y-2">
+        <Div className="flex items-center justify-between">
+          <H2 className="text-2xl font-bold">{t(title)}</H2>
           {completionStatus && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">
+            <Div className="flex items-center gap-2">
+              <Span className="text-sm text-muted-foreground">
                 {completionStatus.completedFields} of{" "}
                 {completionStatus.totalFields} fields
-              </span>
-              <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary transition-all duration-300"
-                  style={{ width: `${completionStatus.completionPercentage}%` }}
+              </Span>
+              <Div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
+                <Div
+                  className={`h-full bg-primary transition-all duration-300 w-[${completionStatus.completionPercentage}%]`}
                 />
-              </div>
-            </div>
+              </Div>
+            </Div>
           )}
-        </div>
+        </Div>
         {description && (
-          <p className="text-muted-foreground">{t(description)}</p>
+          <P className="text-muted-foreground">{t(description)}</P>
         )}
-      </div>
+      </Div>
       {children}
-    </div>
+    </Div>
   );
 }

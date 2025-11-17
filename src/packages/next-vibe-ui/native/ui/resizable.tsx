@@ -11,6 +11,8 @@ import type {
   ResizableContainerProps,
   ResizableHandleProps,
 } from "@/packages/next-vibe-ui/web/ui/resizable";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 
 import { styled } from "nativewind";
 
@@ -37,13 +39,18 @@ ResizableContainer.displayName = "ResizableContainer";
 export function ResizableHandle({
   withHandle,
   className,
+  style,
 }: ResizableHandleProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <StyledView
-      className={cn(
-        "absolute top-0 right-0 bottom-0 w-px items-center justify-center bg-border",
-        className,
-      )}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "absolute top-0 right-0 bottom-0 w-px items-center justify-center bg-border",
+          className,
+        ),
+      })}
     >
       {withHandle && (
         <StyledView className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border bg-border">

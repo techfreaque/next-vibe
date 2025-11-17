@@ -4,24 +4,19 @@
 
 import * as React from "react";
 import type { JSX } from "react";
-import type {
-  ControllerProps,
-  FieldPath,
-  FieldValues,
-  Noop,
-  UseFormHandleSubmit,
-} from "react-hook-form";
+import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
 
 // Import ALL form types from web - ZERO definitions here
 import type {
-  FormFieldContextValue as FormFieldContextValueBase,
-  FormItemContextValue as FormItemContextValueBase,
-  UseFormFieldReturn as UseFormFieldReturnBase,
+  FormFieldContextValue,
+  FormItemContextValue,
+  UseFormFieldReturn,
   FormDescriptionProps,
   FormMessageProps,
   FormDatePickerProps,
   FormComboboxProps,
+  FormItemProps,
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 import { Pressable, View } from "react-native";
 import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
@@ -41,6 +36,7 @@ import { Calendar as CalendarIcon } from "./icons/Calendar";
 import { X } from "./icons/X";
 import { Input } from "./input";
 import { Label } from "./label";
+import type { LabelRootProps } from "../../web/ui/label";
 import { RadioGroup } from "./radio-group";
 import {
   type Option,
@@ -62,7 +58,7 @@ const StyledAnimatedText = styled(Animated.Text, { className: "style" });
 const Form = FormProvider;
 
 const FormFieldContext = React.createContext<
-  FormFieldContextValueBase<FieldValues, FieldPath<FieldValues>> | undefined
+  FormFieldContextValue<FieldValues, FieldPath<FieldValues>> | undefined
 >(undefined);
 
 const FormField = <
@@ -78,18 +74,10 @@ const FormField = <
   );
 };
 
-interface UseFormFieldReturn extends UseFormFieldReturnBase {
-  nativeID: string;
-  formItemNativeID: string;
-  formDescriptionNativeID: string;
-  formMessageNativeID: string;
-  handleSubmit: UseFormHandleSubmit<FieldValues, FieldValues>;
-}
-
 const useFormField = (): UseFormFieldReturn => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
-  const { getFieldState, formState, handleSubmit } = useFormContext();
+  const { getFieldState, formState } = useFormContext();
 
   if (!fieldContext) {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
@@ -103,44 +91,33 @@ const useFormField = (): UseFormFieldReturn => {
     throw new Error("useFormField should be used within <FormItem>");
   }
 
-  const { nativeID } = itemContext;
+  const { id } = itemContext;
 
   return {
-    id: nativeID,
-    nativeID,
+    id,
     name: fieldContext.name,
-    formItemId: `${nativeID}-form-item`,
-    formItemNativeID: `${nativeID}-form-item`,
-    formDescriptionId: `${nativeID}-form-item-description`,
-    formDescriptionNativeID: `${nativeID}-form-item-description`,
-    formMessageId: `${nativeID}-form-item-message`,
-    formMessageNativeID: `${nativeID}-form-item-message`,
-    handleSubmit,
+    formItemId: `${id}-form-item`,
+    formDescriptionId: `${id}-form-item-description`,
+    formMessageId: `${id}-form-item-message`,
     ...fieldState,
   };
 };
 
-interface FormItemContextValue extends FormItemContextValueBase {
-  nativeID: string;
-}
-
-const FormItemContext = React.createContext<FormItemContextValue | undefined>(
-  undefined,
-);
+const FormItemContext = React.createContext<
+  FormItemContextValue | undefined
+>(undefined);
 
 function FormItem({
   className,
-  ...props
-}: React.ComponentPropsWithoutRef<typeof View> & {
-  className?: string;
-}): JSX.Element {
-  const nativeID = React.useId();
-  const id = nativeID;
+  style: _style,
+  children,
+}: FormItemProps): JSX.Element {
+  const id = React.useId();
   const viewClassName = cn("space-y-2", className);
 
   return (
-    <FormItemContext.Provider value={{ id, nativeID }}>
-      <StyledView className={viewClassName} {...props} />
+    <FormItemContext.Provider value={{ id }}>
+      <StyledView className={viewClassName}>{children}</StyledView>
     </FormItemContext.Provider>
   );
 }
@@ -148,9 +125,10 @@ FormItem.displayName = "FormItem";
 
 function FormLabel({
   className,
-  ...props
-}: React.ComponentPropsWithoutRef<typeof Label>): JSX.Element {
-  const { error, formItemNativeID } = useFormField();
+  children,
+  htmlFor: _htmlFor,
+}: LabelRootProps): JSX.Element {
+  const { error, formItemId } = useFormField();
   const labelClassName = cn(
     "pb-1 pb-2 px-px",
     error && "text-destructive",
@@ -158,7 +136,9 @@ function FormLabel({
   );
 
   return (
-    <Label nativeID={formItemNativeID} className={labelClassName} {...props} />
+    <Label htmlFor={formItemId} className={labelClassName}>
+      {children}
+    </Label>
   );
 }
 FormLabel.displayName = "FormLabel";
@@ -167,11 +147,11 @@ function FormDescription({
   children,
   className,
 }: Pick<FormDescriptionProps, "children" | "className">): JSX.Element {
-  const { formDescriptionNativeID } = useFormField();
+  const { formDescriptionId } = useFormField();
 
   return (
     <Span
-      nativeID={formDescriptionNativeID}
+      id={formDescriptionId}
       className={className ?? "text-sm text-muted-foreground pt-1"}
     >
       {children}
@@ -184,7 +164,7 @@ function FormMessage({
   children,
   className,
 }: Pick<FormMessageProps, "children" | "className">): JSX.Element | null {
-  const { error, formMessageNativeID } = useFormField();
+  const { error, formMessageId } = useFormField();
   const body = error ? String(error?.message) : children;
 
   if (!body) {
@@ -195,7 +175,7 @@ function FormMessage({
     <StyledAnimatedText
       entering={FadeInDown}
       exiting={FadeOut.duration(275)}
-      nativeID={formMessageNativeID}
+      nativeID={formMessageId}
       className={className ?? "text-sm font-medium text-destructive"}
     >
       {body}
@@ -204,47 +184,31 @@ function FormMessage({
 }
 FormMessage.displayName = "FormMessage";
 
-type Override<T, U> = Omit<T, keyof U> & U;
-
-interface FormFieldFieldProps<T> {
-  name: string;
-  onBlur: Noop;
-  onChange: (val: T) => void;
-  value: T;
-  disabled?: boolean;
-}
-
-type FormItemProps<T extends React.ElementType, U> = Override<
-  React.ComponentPropsWithoutRef<T>,
-  FormFieldFieldProps<U>
-> & {
-  label?: string;
-  description?: string;
-};
-
 function FormInput({
   label,
   description,
   onChange,
+  style: _style,
   ...props
-}: FormItemProps<typeof Input, string>): JSX.Element {
-  const {
-    error,
-    formItemNativeID,
-    formDescriptionNativeID,
-    formMessageNativeID,
-  } = useFormField();
+}: Omit<React.ComponentPropsWithoutRef<typeof Input>, "onChangeText"> & {
+  label?: string;
+  description?: string;
+  onChange?: (value: string) => void;
+}): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
 
+  // Note: style prop is excluded due to StyleType discriminated union
   return (
     <FormItem>
-      {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
+      {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
 
       <Input
-        aria-labelledby={formItemNativeID}
+        aria-labelledby={formItemId}
         aria-describedby={
           error
-            ? `${formDescriptionNativeID} ${formMessageNativeID}`
-            : `${formDescriptionNativeID}`
+            ? `${formDescriptionId} ${formMessageId}`
+            : `${formDescriptionId}`
         }
         aria-invalid={!!error}
         onChangeText={onChange}
@@ -262,25 +226,27 @@ function FormTextarea({
   label,
   description,
   onChange,
+  style: _style,
   ...props
-}: FormItemProps<typeof Textarea, string>): JSX.Element {
-  const {
-    error,
-    formItemNativeID,
-    formDescriptionNativeID,
-    formMessageNativeID,
-  } = useFormField();
+}: Omit<React.ComponentPropsWithoutRef<typeof Textarea>, "onChangeText"> & {
+  label?: string;
+  description?: string;
+  onChange?: (value: string) => void;
+}): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
 
+  // Note: style prop is excluded due to StyleType discriminated union
   return (
     <FormItem>
-      {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
+      {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
 
       <Textarea
-        aria-labelledby={formItemNativeID}
+        aria-labelledby={formItemId}
         aria-describedby={
           error
-            ? `${formDescriptionNativeID} ${formMessageNativeID}`
-            : `${formDescriptionNativeID}`
+            ? `${formDescriptionId} ${formMessageId}`
+            : `${formDescriptionId}`
         }
         aria-invalid={!!error}
         onChangeText={onChange}
@@ -299,17 +265,19 @@ function FormCheckbox({
   description,
   value,
   onChange,
+  style: _style,
   ...props
 }: Omit<
-  FormItemProps<typeof Checkbox, boolean>,
+  React.ComponentPropsWithoutRef<typeof Checkbox>,
   "checked" | "onCheckedChange"
->): JSX.Element {
-  const {
-    error,
-    formItemNativeID,
-    formDescriptionNativeID,
-    formMessageNativeID,
-  } = useFormField();
+> & {
+  label?: string;
+  description?: string;
+  value?: boolean;
+  onChange?: (value: boolean) => void;
+}): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
 
   const formItemClassName = "px-1";
   const viewClassName = "flex-row gap-3 items-center";
@@ -318,18 +286,18 @@ function FormCheckbox({
     <FormItem className={formItemClassName}>
       <StyledView className={viewClassName}>
         <Checkbox
-          aria-labelledby={formItemNativeID}
+          aria-labelledby={formItemId}
           aria-describedby={
             error
-              ? `${formDescriptionNativeID} ${formMessageNativeID}`
-              : `${formDescriptionNativeID}`
+              ? `${formDescriptionId} ${formMessageId}`
+              : `${formDescriptionId}`
           }
           aria-invalid={!!error}
           onCheckedChange={onChange}
           checked={value}
           {...props}
         />
-        {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
+        {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
       </StyledView>
       {!!description && <FormDescription>{description}</FormDescription>}
       <FormMessage />
@@ -345,12 +313,8 @@ function FormDatePicker({
   value,
   onChange,
 }: FormDatePickerProps): JSX.Element {
-  const {
-    error,
-    formItemNativeID,
-    formDescriptionNativeID,
-    formMessageNativeID,
-  } = useFormField();
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
 
   const buttonClassName = "flex-row gap-3 justify-start px-3 relative";
   const clearButtonClassName = "absolute right-0 active:opacity-70 pr-3";
@@ -358,17 +322,17 @@ function FormDatePicker({
 
   return (
     <FormItem>
-      {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
+      {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
       <BottomSheet>
         <BottomSheetOpenTrigger asChild>
           <Button
             variant="outline"
             className={buttonClassName}
-            aria-labelledby={formItemNativeID}
+            aria-labelledby={formItemId}
             aria-describedby={
               error
-                ? `${formDescriptionNativeID} ${formMessageNativeID}`
-                : `${formDescriptionNativeID}`
+                ? `${formDescriptionId} ${formMessageId}`
+                : `${formDescriptionId}`
             }
             aria-invalid={!!error}
           >
@@ -412,30 +376,33 @@ function FormRadioGroup({
   description,
   value,
   onChange,
+  style: _style,
   ...props
 }: Omit<
-  FormItemProps<typeof RadioGroup, string>,
-  "onValueChange"
->): JSX.Element {
-  const {
-    error,
-    formItemNativeID,
-    formDescriptionNativeID,
-    formMessageNativeID,
-  } = useFormField();
+  React.ComponentPropsWithoutRef<typeof RadioGroup>,
+  "onValueChange" | "value"
+> & {
+  label?: string;
+  description?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+}): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
 
+  // Note: style prop is excluded due to StyleType discriminated union
   return (
     <FormItem className="gap-3">
       <View>
-        {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
+        {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
         {!!description && <FormDescription>{description}</FormDescription>}
       </View>
       <RadioGroup
-        aria-labelledby={formItemNativeID}
+        aria-labelledby={formItemId}
         aria-describedby={
           error
-            ? `${formDescriptionNativeID} ${formMessageNativeID}`
-            : `${formDescriptionNativeID}`
+            ? `${formDescriptionId} ${formMessageId}`
+            : `${formDescriptionId}`
         }
         aria-invalid={!!error}
         onValueChange={onChange}
@@ -456,11 +423,11 @@ function FormCombobox({
   onChange,
   options = [],
 }: FormComboboxProps): JSX.Element {
-  const { formItemNativeID } = useFormField();
+  const { formItemId } = useFormField();
 
   return (
     <FormItem>
-      {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
+      {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
       <Select
         value={value?.value}
         onValueChange={(val) => onChange?.({ label: val, value: val })}
@@ -493,7 +460,7 @@ function FormCombobox({
 FormCombobox.displayName = "FormCombobox";
 
 /**
- * @prop {children} 
+ * @prop {children}
  * @example
  *  <SelectTrigger className='w-[250px]'>
       <SelectValue
@@ -517,25 +484,26 @@ function FormSelect({
   value,
   ...props
 }: Omit<
-  FormItemProps<typeof Select, Partial<Option>>,
-  "open" | "onOpenChange" | "onValueChange"
->): JSX.Element {
-  const {
-    error,
-    formItemNativeID,
-    formDescriptionNativeID,
-    formMessageNativeID,
-  } = useFormField();
+  React.ComponentPropsWithoutRef<typeof Select>,
+  "open" | "onOpenChange" | "onValueChange" | "value"
+> & {
+  label?: string;
+  description?: string;
+  value?: Partial<Option>;
+  onChange: (value: { label: string; value: string }) => void;
+}): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
 
   return (
     <FormItem>
-      {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
+      {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
       <Select
-        aria-labelledby={formItemNativeID}
+        aria-labelledby={formItemId}
         aria-describedby={
           error
-            ? `${formDescriptionNativeID} ${formMessageNativeID}`
-            : `${formDescriptionNativeID}`
+            ? `${formDescriptionId} ${formMessageId}`
+            : `${formDescriptionId}`
         }
         aria-invalid={!!error}
         value={value?.value}
@@ -555,37 +523,40 @@ function FormSwitch({
   description,
   value,
   onChange,
+  style: _style,
   ...props
 }: Omit<
-  FormItemProps<typeof Switch, boolean>,
+  React.ComponentPropsWithoutRef<typeof Switch>,
   "checked" | "onCheckedChange"
->): JSX.Element {
-  const {
-    error,
-    formItemNativeID,
-    formDescriptionNativeID,
-    formMessageNativeID,
-  } = useFormField();
+> & {
+  label?: string;
+  description?: string;
+  value?: boolean;
+  onChange?: (value: boolean) => void;
+}): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
 
   const formItemClassName = "px-1";
   const viewClassName = "flex-row gap-3 items-center";
 
+  // Note: style prop is excluded due to StyleType discriminated union
   return (
     <FormItem className={formItemClassName}>
       <StyledView className={viewClassName}>
         <Switch
-          aria-labelledby={formItemNativeID}
+          aria-labelledby={formItemId}
           aria-describedby={
             error
-              ? `${formDescriptionNativeID} ${formMessageNativeID}`
-              : `${formDescriptionNativeID}`
+              ? `${formDescriptionId} ${formMessageId}`
+              : `${formDescriptionId}`
           }
           aria-invalid={!!error}
           onCheckedChange={onChange}
           checked={value}
           {...props}
         />
-        {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
+        {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
       </StyledView>
       {!!description && <FormDescription>{description}</FormDescription>}
       <FormMessage />

@@ -136,94 +136,103 @@ function FolderTreeNode({
 
   return (
     <Div>
-      <Div
-        className={`flex items-center py-2 px-4 hover:bg-gray-50 border-b ${
-          level > 0 ? `ml-${level * 4}` : ""
-        }`}
-        style={{ paddingLeft: `${level * 20 + 16}px` }}
-      >
-        {/* Expand/Collapse Button */}
-        {folder.hasChildren && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="mr-2 p-1 hover:bg-gray-200 rounded h-6 w-6"
-          >
-            {isExpanded ? (
-              <ChevronDown className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </Button>
-        )}
-
-        {/* Folder Icon */}
-        <Div className="mr-3">{getSpecialUseIcon(folder.specialUseType)}</Div>
-
-        {/* Folder Info */}
-        <Div className="flex-1 min-w-0">
-          <Div className="flex items-center flex flex-row gap-2">
-            <Span className="font-medium truncate">
-              {folder.displayName || folder.name}
-            </Span>
-            {folder.specialUseType && (
-              <Badge variant="outline" className="text-xs">
-                {folder.specialUseType}
-              </Badge>
-            )}
-          </Div>
-          <Div className="text-sm text-gray-500 truncate">{folder.path}</Div>
-        </Div>
-
-        {/* Message Counts */}
-        <Div className="flex items-center flex flex-row gap-4 text-sm">
-          <Div className="text-center">
-            <Div className="font-medium">{folder.messageCount}</Div>
-            <Div className="text-xs text-gray-500">
-              {t("app.admin.emails.imap.common.total")}
-            </Div>
-          </Div>
-          {folder.unseenCount > 0 && (
-            <Div className="text-center">
-              <Badge variant="default" className="bg-blue-100 text-blue-800">
-                {folder.unseenCount}
-              </Badge>
-              <Div className="text-xs text-gray-500">
-                {t("app.admin.emails.imap.common.unread")}
-              </Div>
-            </Div>
+      <Div style={{ paddingLeft: `${level * 20 + 16}px` }}>
+        <Div
+          className={`flex items-center py-2 px-4 hover:bg-gray-50 border-b ${
+            level > 0 ? `ml-${level * 4}` : ""
+          }`}
+        >
+          {/* Expand/Collapse Button */}
+          {folder.hasChildren && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="mr-2 p-1 hover:bg-gray-200 rounded h-6 w-6"
+            >
+              {isExpanded ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
+            </Button>
           )}
-          {folder.recentCount > 0 && (
+
+          {/* Folder Icon */}
+          <Div className="mr-3">{getSpecialUseIcon(folder.specialUseType)}</Div>
+
+          {/* Folder Info */}
+          <Div className="flex-1 min-w-0">
+            <Div className="flex items-center flex flex-row gap-2">
+              <Span className="font-medium truncate">
+                {folder.displayName || folder.name}
+              </Span>
+              {folder.specialUseType && (
+                <Badge variant="outline" className="text-xs">
+                  {folder.specialUseType}
+                </Badge>
+              )}
+            </Div>
+            <Div className="text-sm text-gray-500 truncate">{folder.path}</Div>
+          </Div>
+
+          {/* Message Counts */}
+          <Div className="flex items-center flex flex-row gap-4 text-sm">
             <Div className="text-center">
-              <Div className="font-medium text-green-600">
-                {folder.recentCount}
-              </Div>
+              <Div className="font-medium">{folder.messageCount}</Div>
               <Div className="text-xs text-gray-500">
-                {t("app.admin.emails.imap.common.recent")}
+                {t("app.admin.emails.imap.common.total")}
               </Div>
             </Div>
-          )}
-        </Div>
-
-        {/* Sync Status */}
-        <Div className="ml-4 text-center">
-          <Div
-            className={`text-sm font-medium ${getSyncStatusColor(folder.syncStatus)}`}
-          >
-            {folder.syncStatus}
+            {folder.unseenCount > 0 && (
+              <Div className="text-center">
+                <Badge variant="default" className="bg-blue-100 text-blue-800">
+                  {folder.unseenCount}
+                </Badge>
+                <Div className="text-xs text-gray-500">
+                  {t("app.admin.emails.imap.common.unread")}
+                </Div>
+              </Div>
+            )}
+            {folder.recentCount > 0 && (
+              <Div className="text-center">
+                <Div className="font-medium text-green-600">
+                  {folder.recentCount}
+                </Div>
+                <Div className="text-xs text-gray-500">
+                  {t("app.admin.emails.imap.common.recent")}
+                </Div>
+              </Div>
+            )}
           </Div>
-          <Div className="text-xs text-gray-500">{folder.lastSyncAt}</Div>
-        </Div>
 
-        {/* Actions */}
-        <Div className="ml-4 flex items-center flex flex-row gap-2">
-          <Button variant="outline" size="sm" onClick={() => onSync(folder.id)}>
-            {t("app.admin.emails.imap.folder.actions.sync")}
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => onView(folder.id)}>
-            {t("app.admin.emails.imap.common.view")}
-          </Button>
+          {/* Sync Status */}
+          <Div className="ml-4 text-center">
+            <Div
+              className={`text-sm font-medium ${getSyncStatusColor(folder.syncStatus)}`}
+            >
+              {folder.syncStatus}
+            </Div>
+            <Div className="text-xs text-gray-500">{folder.lastSyncAt}</Div>
+          </Div>
+
+          {/* Actions */}
+          <Div className="ml-4 flex items-center flex flex-row gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onSync(folder.id)}
+            >
+              {t("app.admin.emails.imap.folder.actions.sync")}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onView(folder.id)}
+            >
+              {t("app.admin.emails.imap.common.view")}
+            </Button>
+          </Div>
         </Div>
       </Div>
 

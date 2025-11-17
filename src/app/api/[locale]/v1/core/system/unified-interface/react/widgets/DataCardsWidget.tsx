@@ -50,11 +50,10 @@ export const DataCardsWidget = ({
   metadata: _metadata,
   context: _context,
   className = "",
-  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element => {
   if (!isDataCardsWidgetData(data)) {
     return (
-      <Div className={className} style={style}>
+      <Div className={className} >
         —
       </Div>
     );
@@ -72,7 +71,7 @@ export const DataCardsWidget = ({
   /* eslint-enable i18next/no-literal-string */
 
   return (
-    <Div className={`grid gap-4 ${gridCols} ${className}`} style={style}>
+    <Div className={`grid gap-4 ${gridCols} ${className}`} >
       {typedData.items.map((item, index) => {
         const titleValue = typedData.titleKey ? item[typedData.titleKey] : "";
         const title =

@@ -1,7 +1,7 @@
 import * as DialogPrimitive from "@rn-primitives/dialog";
 import { cva } from "class-variance-authority";
 import * as React from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import Animated, {
   SlideInDown,
   SlideInLeft,
@@ -12,9 +12,14 @@ import Animated, {
   SlideOutRight,
   SlideOutUp,
 } from "react-native-reanimated";
+import { styled } from "nativewind";
 
 import { cn } from "next-vibe/shared/utils/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 import { X } from "./icons/X";
+
+const StyledView = styled(View, { className: "style" });
 
 import type {
   SheetRootProps,
@@ -81,17 +86,34 @@ SheetPortal.displayName = "SheetPortal";
 
 function SheetOverlay({
   className,
+  style,
+  children,
   ...props
 }: SheetOverlayProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+  const renderChildren = (): React.ReactNode => {
+    if (typeof children === "function") {
+      return (children as (props: { pressed: boolean }) => React.ReactNode)({
+        pressed: false,
+      });
+    }
+    return children;
+  };
+
   return (
-    <DialogPrimitive.Overlay
-      className={cn(
-        "bg-black/80 flex justify-center items-center p-2 absolute top-0 right-0 bottom-0 left-0",
-        className,
-      )}
-      style={StyleSheet.absoluteFill}
-      {...props}
-    />
+    <DialogPrimitive.Overlay asChild style={StyleSheet.absoluteFill} {...props}>
+      <StyledView
+        {...applyStyleType({
+          nativeStyle,
+          className: cn(
+            "bg-black/80 flex justify-center items-center p-2",
+            className,
+          ),
+        })}
+      >
+        {renderChildren()}
+      </StyledView>
+    </DialogPrimitive.Overlay>
   );
 }
 SheetOverlay.displayName = "SheetOverlay";
@@ -99,27 +121,15 @@ SheetOverlay.displayName = "SheetOverlay";
 function SheetContent({
   side = "right",
   className,
-  children,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onCloseAutoFocus,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onEscapeKeyDown,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onPointerDownOutside,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onInteractOutside,
-  // Filter out web-only props
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   style,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  "data-sidebar": dataSidebar,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  "data-mobile": dataMobile,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  portalHost,
+  children,
   ...props
 }: SheetContentProps): React.JSX.Element {
-  const getEnteringAnimation = (): typeof SlideInUp => {
+  const getEnteringAnimation = ():
+    | typeof SlideInUp
+    | typeof SlideInDown
+    | typeof SlideInLeft
+    | typeof SlideInRight => {
     switch (side) {
       case "top":
         return SlideInUp;
@@ -134,7 +144,11 @@ function SheetContent({
     }
   };
 
-  const getExitingAnimation = (): typeof SlideOutUp => {
+  const getExitingAnimation = ():
+    | typeof SlideOutUp
+    | typeof SlideOutDown
+    | typeof SlideOutLeft
+    | typeof SlideOutRight => {
     switch (side) {
       case "top":
         return SlideOutUp;
@@ -149,17 +163,22 @@ function SheetContent({
     }
   };
 
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <DialogPrimitive.Portal>
       <SheetOverlay />
       <Animated.View
-        className={cn(sheetVariants({ side }), className)}
+        {...applyStyleType({
+          nativeStyle,
+          className: cn(sheetVariants({ side }), className),
+        })}
         entering={getEnteringAnimation()}
         exiting={getExitingAnimation()}
         {...props}
       >
         <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 p-2">
-          <X size={16} />
+          <X size={Platform.OS === "web" ? 16 : 18} />
         </DialogPrimitive.Close>
         {children}
       </Animated.View>
@@ -170,12 +189,17 @@ SheetContent.displayName = "SheetContent";
 
 function SheetHeader({
   className,
+  style,
   children,
   ...props
 }: SheetHeaderProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <View
-      className={cn("flex flex-col space-y-2 text-center", className)}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("flex flex-col space-y-2 text-center", className),
+      })}
       {...props}
     >
       {children}
@@ -186,15 +210,20 @@ SheetHeader.displayName = "SheetHeader";
 
 function SheetFooter({
   className,
+  style,
   children,
   ...props
 }: SheetFooterProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <View
-      className={cn(
-        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-        className,
-      )}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+          className,
+        ),
+      })}
       {...props}
     >
       {children}
@@ -205,12 +234,17 @@ SheetFooter.displayName = "SheetFooter";
 
 function SheetTitle({
   className,
+  style,
   children,
   ...props
 }: SheetTitleProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <DialogPrimitive.Title
-      className={cn("text-lg font-semibold text-foreground", className)}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("text-lg font-semibold text-foreground", className),
+      })}
       {...props}
     >
       {children}
@@ -221,12 +255,17 @@ SheetTitle.displayName = "SheetTitle";
 
 function SheetDescription({
   className,
+  style,
   children,
   ...props
 }: SheetDescriptionProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <DialogPrimitive.Description
-      className={cn("text-sm text-muted-foreground", className)}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("text-sm text-muted-foreground", className),
+      })}
       {...props}
     >
       {children}

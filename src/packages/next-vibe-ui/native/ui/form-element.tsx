@@ -7,9 +7,12 @@
 import type { ForwardedRef } from "react";
 import { forwardRef } from "react";
 import { View } from "react-native";
+import { styled } from "nativewind";
 
 // Import all types from web version (web is source of truth)
 import type { FormElementProps } from "../../web/ui/form-element";
+
+const StyledView = styled(View, { className: "style" });
 
 /**
  * Native implementation using View
@@ -23,8 +26,8 @@ export const FormElement = forwardRef(function FormElement(
   const { onSubmit: _onSubmit, className, children } = props;
 
   return (
-    <View ref={ref} className={className}>
+    <StyledView ref={ref} className={className}>
       {children}
-    </View>
+    </StyledView>
   );
 });

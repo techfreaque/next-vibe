@@ -54,7 +54,6 @@ export const DataTableWidget = ({
   metadata: _metadata,
   context,
   className = "",
-  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element => {
   const { t } = simpleT(context.locale);
   const [sortBy, setSortBy] = useState<string | null>(null);
@@ -71,11 +70,7 @@ export const DataTableWidget = ({
   }, [typedData]);
 
   if (!isValidData || !typedData) {
-    return (
-      <Div className={className} style={style}>
-        —
-      </Div>
-    );
+    return <Div className={className}>—</Div>;
   }
 
   // Handle column sort
@@ -112,7 +107,7 @@ export const DataTableWidget = ({
   });
 
   return (
-    <Div className={`overflow-x-auto ${className}`} style={style}>
+    <Div className={`overflow-x-auto ${className}`}>
       <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <TableHeader className="bg-gray-50 dark:bg-gray-800">
           <TableRow>

@@ -6,8 +6,11 @@ import * as Slot from "@rn-primitives/slot";
 import { ChevronRight } from "lucide-react-native";
 import React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
+import { styled } from "nativewind";
 
 import { useTranslation } from "@/i18n/core/client";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 
 import type {
   BreadcrumbEllipsisProps,
@@ -20,20 +23,29 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/breadcrumb";
 import { cn } from "next-vibe/shared/utils/utils";
 
+const StyledView = styled(View, { className: "style" });
+const StyledPressable = styled(Pressable, { className: "style" });
+
 export function Breadcrumb({
   className,
+  style,
   children,
 }: BreadcrumbProps): React.JSX.Element {
   const { t } = useTranslation();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <View
+    <StyledView
       accessibilityLabel={t(
         "packages.nextVibeUi.native.ui.breadcrumb.navigation",
       )}
-      className={className}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(className),
+      })}
     >
       {children}
-    </View>
+    </StyledView>
   );
 }
 
@@ -41,17 +53,28 @@ Breadcrumb.displayName = "Breadcrumb";
 
 export function BreadcrumbList({
   className,
+  style,
   children,
+  id: _id,
+  role: _role,
+  "aria-label": ariaLabel,
+  "aria-labelledby": _ariaLabelledby,
 }: BreadcrumbListProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <View
-      className={cn(
-        "flex flex-row flex-wrap items-center gap-1.5 text-sm text-muted-foreground gap-2.5",
-        className,
-      )}
+    <StyledView
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "flex flex-row flex-wrap items-center gap-1.5 text-sm text-muted-foreground gap-2.5",
+          className,
+        ),
+      })}
+      accessibilityLabel={ariaLabel}
     >
       {children}
-    </View>
+    </StyledView>
   );
 }
 
@@ -59,50 +82,100 @@ BreadcrumbList.displayName = "BreadcrumbList";
 
 export function BreadcrumbItem({
   className,
+  style,
   children,
+  id: _id,
+  role: _role,
+  "aria-label": ariaLabel,
+  "aria-current": _ariaCurrent,
 }: BreadcrumbItemProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <View className={cn("flex flex-row items-center gap-1.5", className)}>
+    <StyledView
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("flex flex-row items-center gap-1.5", className),
+      })}
+      accessibilityLabel={ariaLabel}
+    >
       {children}
-    </View>
+    </StyledView>
   );
 }
 
 BreadcrumbItem.displayName = "BreadcrumbItem";
 
-type NativeBreadcrumbLinkProps = BreadcrumbLinkProps & {
-  onPress?: () => void;
-};
-
 export function BreadcrumbLink({
   asChild,
   className,
+  style,
   children,
-  onPress,
-}: NativeBreadcrumbLinkProps): React.JSX.Element {
+  onClick,
+  href: _href,
+  target: _target,
+  rel: _rel,
+  download: _download,
+  hrefLang: _hrefLang,
+  ping: _ping,
+  referrerPolicy: _referrerPolicy,
+  type: _type,
+  "aria-label": ariaLabel,
+  "aria-current": _ariaCurrent,
+}: BreadcrumbLinkProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
+  const handlePress = React.useCallback(() => {
+    if (onClick) {
+      // Create a cross-platform event object for native
+      onClick({
+        preventDefault: () => {
+          // No-op for native
+        },
+        stopPropagation: () => {
+          // No-op for native
+        },
+      });
+    }
+  }, [onClick]);
+
   const combinedClassName = cn(
     "transition-colors active:text-foreground",
     className,
   );
   const content =
     typeof children === "string" ? (
-      <RNText className="text-muted-foreground">{children}</RNText>
+      <RNText className={cn("text-muted-foreground")}>{children}</RNText>
     ) : (
       children
     );
 
   if (asChild) {
     return (
-      <Slot.Pressable onPress={onPress} className={combinedClassName}>
+      <Slot.Pressable
+        onPress={handlePress}
+        {...applyStyleType({
+          nativeStyle,
+          className: cn(combinedClassName),
+        })}
+        accessibilityLabel={ariaLabel}
+      >
         {content}
       </Slot.Pressable>
     );
   }
 
   return (
-    <Pressable onPress={onPress} className={combinedClassName}>
+    <StyledPressable
+      onPress={handlePress}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(combinedClassName),
+      })}
+      accessibilityLabel={ariaLabel}
+    >
       {content}
-    </Pressable>
+    </StyledPressable>
   );
 }
 
@@ -110,13 +183,22 @@ BreadcrumbLink.displayName = "BreadcrumbLink";
 
 export function BreadcrumbPage({
   className,
+  style,
   children,
+  id: _id,
+  role: _role,
+  "aria-label": ariaLabel,
+  "aria-current": _ariaCurrent = "page",
 }: BreadcrumbPageProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <RNText
-      aria-disabled={true}
-      aria-current="page"
-      className={cn("font-normal text-foreground", className)}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("font-normal text-foreground", className),
+      })}
+      accessibilityLabel={ariaLabel}
     >
       {children}
     </RNText>
@@ -128,15 +210,24 @@ BreadcrumbPage.displayName = "BreadcrumbPage";
 export function BreadcrumbSeparator({
   children,
   className,
+  style,
+  id: _id,
+  role: _role = "presentation",
+  "aria-label": ariaLabel,
+  "aria-hidden": _ariaHidden = "true",
 }: BreadcrumbSeparatorProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <View
-      role="presentation"
-      aria-hidden={true}
-      className={cn("w-3.5 h-3.5", className)}
+    <StyledView
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("w-3.5 h-3.5", className),
+      })}
+      accessibilityLabel={ariaLabel}
     >
       {children ?? <ChevronRight size={14} color="currentColor" />}
-    </View>
+    </StyledView>
   );
 }
 
@@ -144,20 +235,28 @@ BreadcrumbSeparator.displayName = "BreadcrumbSeparator";
 
 export function BreadcrumbEllipsis({
   className,
+  style,
+  id: _id,
+  role: _role = "presentation",
+  "aria-label": ariaLabel,
+  "aria-hidden": _ariaHidden = "true",
 }: BreadcrumbEllipsisProps): React.JSX.Element {
   const { t } = useTranslation();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
-    <View
-      role="presentation"
-      aria-hidden={true}
-      className={cn("flex h-9 w-9 items-center justify-center", className)}
+    <StyledView
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("flex h-9 w-9 items-center justify-center", className),
+      })}
+      accessibilityLabel={ariaLabel}
     >
-      <RNText className="text-muted-foreground">...</RNText>
-      <RNText className="sr-only">
+      <RNText className={cn("text-muted-foreground")}>...</RNText>
+      <RNText className={cn("sr-only")}>
         {t("app.common.accessibility.srOnly.more")}
       </RNText>
-    </View>
+    </StyledView>
   );
 }
 

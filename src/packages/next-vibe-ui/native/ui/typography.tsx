@@ -4,6 +4,8 @@ import { Text as RNText } from "react-native";
 import { styled } from "nativewind";
 
 import { cn } from "../lib/utils";
+import { convertCSSToTextStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 
 import type {
   H1Props,
@@ -17,130 +19,411 @@ import type {
   LargeProps,
   SmallProps,
   MutedProps,
+  AccessibilityRoleValue,
 } from "../../web/ui/typography";
 
 const StyledText = styled(RNText, { className: "style" });
 
-function H1({ className, ...props }: H1Props): React.JSX.Element {
+const VALID_ACCESSIBILITY_ROLES: Record<string, AccessibilityRoleValue> = {
+  none: "none",
+  button: "button",
+  link: "link",
+  search: "search",
+  image: "image",
+  text: "text",
+  adjustable: "adjustable",
+  imagebutton: "imagebutton",
+  header: "header",
+  summary: "summary",
+  alert: "alert",
+  checkbox: "checkbox",
+  combobox: "combobox",
+  menu: "menu",
+  menubar: "menubar",
+  menuitem: "menuitem",
+  progressbar: "progressbar",
+  radio: "radio",
+  radiogroup: "radiogroup",
+  scrollbar: "scrollbar",
+  spinbutton: "spinbutton",
+  switch: "switch",
+  tab: "tab",
+  tablist: "tablist",
+  timer: "timer",
+  toolbar: "toolbar",
+};
+
+// Helper to safely convert role to React Native AccessibilityRole
+function toAccessibilityRole(
+  role: string | undefined,
+  fallback?: string,
+): AccessibilityRoleValue {
+  const value = role ?? fallback;
+  if (value === undefined) {
+    return undefined;
+  }
+  return VALID_ACCESSIBILITY_ROLES[value];
+}
+
+function H1({
+  className,
+  style,
+  children,
+  id,
+  role,
+  "aria-label": ariaLabel,
+
+  accessibilityLabel,
+  accessibilityRole,
+  testID,
+}: H1Props): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
     <StyledText
-      className={cn(
-        "text-4xl text-foreground font-extrabold tracking-tight lg:text-5xl",
-        className,
-      )}
-      {...props}
-    />
+      nativeID={id}
+      accessibilityLabel={accessibilityLabel || ariaLabel}
+      accessibilityRole={toAccessibilityRole(accessibilityRole, role)}
+      accessible={true}
+      testID={testID}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "text-4xl text-foreground font-extrabold tracking-tight lg:text-5xl",
+          className,
+        ),
+      })}
+    >
+      {children}
+    </StyledText>
   );
 }
 
-function H2({ className, ...props }: H2Props): React.JSX.Element {
+function H2({
+  className,
+  style,
+  children,
+  id,
+  role,
+  "aria-label": ariaLabel,
+
+  accessibilityLabel,
+  accessibilityRole,
+  testID,
+}: H2Props): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
     <StyledText
-      className={cn(
-        "border-b border-border pb-2 text-3xl text-foreground font-semibold tracking-tight first:mt-0",
-        className,
-      )}
-      {...props}
-    />
+      nativeID={id}
+      accessibilityLabel={accessibilityLabel || ariaLabel}
+      accessibilityRole={toAccessibilityRole(accessibilityRole, role)}
+      accessible={true}
+      testID={testID}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "border-b border-border pb-2 text-3xl text-foreground font-semibold tracking-tight first:mt-0",
+          className,
+        ),
+      })}
+    >
+      {children}
+    </StyledText>
   );
 }
 
-function H3({ className, ...props }: H3Props): React.JSX.Element {
+function H3({
+  className,
+  style,
+  children,
+  id,
+  role,
+  "aria-label": ariaLabel,
+
+  accessibilityLabel,
+  accessibilityRole,
+  testID,
+}: H3Props): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
     <StyledText
-      className={cn(
-        "text-2xl text-foreground font-semibold tracking-tight",
-        className,
-      )}
-      {...props}
-    />
+      nativeID={id}
+      accessibilityLabel={accessibilityLabel || ariaLabel}
+      accessibilityRole={toAccessibilityRole(accessibilityRole, role)}
+      accessible={true}
+      testID={testID}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "text-2xl text-foreground font-semibold tracking-tight",
+          className,
+        ),
+      })}
+    >
+      {children}
+    </StyledText>
   );
 }
 
-function H4({ className, ...props }: H4Props): React.JSX.Element {
+function H4({
+  className,
+  style,
+  children,
+  id,
+  role,
+  "aria-label": ariaLabel,
+
+  accessibilityLabel,
+  accessibilityRole,
+  testID,
+}: H4Props): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
     <StyledText
-      className={cn(
-        "text-xl text-foreground font-semibold tracking-tight",
-        className,
-      )}
-      {...props}
-    />
+      nativeID={id}
+      accessibilityLabel={accessibilityLabel || ariaLabel}
+      accessibilityRole={toAccessibilityRole(accessibilityRole, role)}
+      accessible={true}
+      testID={testID}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "text-xl text-foreground font-semibold tracking-tight",
+          className,
+        ),
+      })}
+    >
+      {children}
+    </StyledText>
   );
 }
 
-function P({ className, ...props }: PProps): React.JSX.Element {
+function P({
+  className,
+  style,
+  children,
+  id,
+  role,
+  "aria-label": ariaLabel,
+
+  accessibilityLabel,
+  accessibilityRole,
+  testID,
+}: PProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
     <StyledText
-      className={cn("text-base text-foreground", className)}
-      {...props}
-    />
+      nativeID={id}
+      accessibilityLabel={accessibilityLabel || ariaLabel}
+      accessibilityRole={toAccessibilityRole(accessibilityRole, role)}
+      accessible={true}
+      testID={testID}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("text-base text-foreground", className),
+      })}
+    >
+      {children}
+    </StyledText>
   );
 }
 
 function BlockQuote({
   className,
-  ...props
+  style,
+  children,
+  id,
+  role,
+  "aria-label": ariaLabel,
+
+  accessibilityLabel,
+  accessibilityRole,
+  testID,
 }: BlockQuoteProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
     <StyledText
-      className={cn(
-        "mt-6 border-l-2 border-border pl-6 text-base text-foreground italic",
-        className,
-      )}
-      {...props}
-    />
+      nativeID={id}
+      accessibilityLabel={accessibilityLabel || ariaLabel}
+      accessibilityRole={toAccessibilityRole(accessibilityRole, role)}
+      accessible={true}
+      testID={testID}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "mt-6 border-l-2 border-border pl-6 text-base text-foreground italic",
+          className,
+        ),
+      })}
+    >
+      {children}
+    </StyledText>
   );
 }
 
-function Code({ className, ...props }: CodeProps): React.JSX.Element {
+function Code({
+  className,
+  style,
+  children,
+  id,
+  role,
+  "aria-label": ariaLabel,
+
+  accessibilityLabel,
+  accessibilityRole,
+  testID,
+}: CodeProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
     <StyledText
-      className={cn(
-        "relative rounded-md bg-muted px-[0.3rem] py-[0.2rem] text-sm text-foreground font-semibold",
-        className,
-      )}
-      {...props}
-    />
+      nativeID={id}
+      accessibilityLabel={accessibilityLabel || ariaLabel}
+      accessibilityRole={toAccessibilityRole(accessibilityRole, role)}
+      accessible={true}
+      testID={testID}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "relative rounded-md bg-muted px-[0.3rem] py-[0.2rem] text-sm text-foreground font-semibold",
+          className,
+        ),
+      })}
+    >
+      {children}
+    </StyledText>
   );
 }
 
-function Lead({ className, ...props }: LeadProps): React.JSX.Element {
+function Lead({
+  className,
+  style,
+  children,
+  id,
+  role,
+  "aria-label": ariaLabel,
+
+  accessibilityLabel,
+  accessibilityRole,
+  testID,
+}: LeadProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
     <StyledText
-      className={cn("text-xl text-muted-foreground", className)}
-      {...props}
-    />
+      nativeID={id}
+      accessibilityLabel={accessibilityLabel || ariaLabel}
+      accessibilityRole={toAccessibilityRole(accessibilityRole, role)}
+      accessible={true}
+      testID={testID}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("text-xl text-muted-foreground", className),
+      })}
+    >
+      {children}
+    </StyledText>
   );
 }
 
-function Large({ className, ...props }: LargeProps): React.JSX.Element {
+function Large({
+  className,
+  style,
+  children,
+  id,
+  role,
+  "aria-label": ariaLabel,
+
+  accessibilityLabel,
+  accessibilityRole,
+  testID,
+}: LargeProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
     <StyledText
-      className={cn("text-xl text-foreground font-semibold", className)}
-      {...props}
-    />
+      nativeID={id}
+      accessibilityLabel={accessibilityLabel || ariaLabel}
+      accessibilityRole={toAccessibilityRole(accessibilityRole, role)}
+      accessible={true}
+      testID={testID}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("text-xl text-foreground font-semibold", className),
+      })}
+    >
+      {children}
+    </StyledText>
   );
 }
 
-function Small({ className, ...props }: SmallProps): React.JSX.Element {
+function Small({
+  className,
+  style,
+  children,
+  id,
+  role,
+  "aria-label": ariaLabel,
+
+  accessibilityLabel,
+  accessibilityRole,
+  testID,
+}: SmallProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
     <StyledText
-      className={cn(
-        "text-sm text-foreground font-medium leading-none",
-        className,
-      )}
-      {...props}
-    />
+      nativeID={id}
+      accessibilityLabel={accessibilityLabel || ariaLabel}
+      accessibilityRole={toAccessibilityRole(accessibilityRole, role)}
+      accessible={true}
+      testID={testID}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "text-sm text-foreground font-medium leading-none",
+          className,
+        ),
+      })}
+    >
+      {children}
+    </StyledText>
   );
 }
 
-function Muted({ className, ...props }: MutedProps): React.JSX.Element {
+function Muted({
+  className,
+  style,
+  children,
+  id,
+  role,
+  "aria-label": ariaLabel,
+
+  accessibilityLabel,
+  accessibilityRole,
+  testID,
+}: MutedProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
+
   return (
     <StyledText
-      className={cn("text-sm text-muted-foreground", className)}
-      {...props}
-    />
+      nativeID={id}
+      accessibilityLabel={accessibilityLabel || ariaLabel}
+      accessibilityRole={toAccessibilityRole(accessibilityRole, role)}
+      accessible={true}
+      testID={testID}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("text-sm text-muted-foreground", className),
+      })}
+    >
+      {children}
+    </StyledText>
   );
 }
 

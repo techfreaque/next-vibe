@@ -3,13 +3,15 @@
  * Displays and manages A/B testing configuration for email campaigns
  */
 
+import type { JSX } from "react";
+import * as React from "react";
+
 import { BarChart3, Settings, TestTube, Users } from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { H2, H3, H4, P } from "next-vibe-ui/ui/typography";
 import { Progress } from "next-vibe-ui/ui/progress";
-import type { CSSProperties, JSX } from "react";
 
 import { getABTestSummary } from "@/app/api/[locale]/v1/core/leads/campaigns/emails/services/ab-testing";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -134,10 +136,9 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
               >
                 <Div className="flex items-center justify-between">
                   <Div className="flex items-center gap-3">
-                    <Div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: variant.metadata.color }}
-                    />
+                    <Div style={{ backgroundColor: variant.metadata.color }}>
+                      <Div className="w-4 h-4 rounded-full" />
+                    </Div>
                     <Div>
                       <H3 className="font-semibold text-lg">
                         {variant.metadata.name}
@@ -171,11 +172,11 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                   </Div>
                   <Progress
                     value={variant.weight}
-                    className="h-2"
                     style={
                       {
                         "--progress-background": variant.metadata.color,
-                      } as CSSProperties
+                        height: "8px",
+                      } as React.CSSProperties
                     }
                   />
                 </Div>

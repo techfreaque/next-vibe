@@ -1,7 +1,7 @@
 import type { JSX } from "react";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
-// Custom event target type
 export interface DivGenericTarget {
   addEventListener: (
     type: string,
@@ -27,7 +27,6 @@ export interface DivGenericTarget {
   };
 }
 
-// Base types for cross-platform compatibility
 export interface DivMouseEvent {
   currentTarget: DivGenericTarget;
   target: DivGenericTarget;
@@ -117,8 +116,7 @@ export type DivRefObject = Element & {
   ) => void;
 };
 
-export interface DivProps {
-  className?: string;
+export type DivProps = {
   children?: React.ReactNode;
   ref?:
     | React.RefObject<DivRefObject | null>
@@ -139,15 +137,11 @@ export interface DivProps {
   dangerouslySetInnerHTML?: { __html: string };
   tabIndex?: number;
   onKeyDown?: (e: DivKeyboardEvent) => void;
-}
+} & StyleType;
 
-/**
- * Platform-agnostic Div component for web
- * On web, this is a div element
- * Alias for View to provide more traditional web naming
- */
 export function Div({
   className,
+  style,
   children,
   role,
   ariaLabel,
@@ -171,6 +165,7 @@ export function Div({
     <div
       ref={ref}
       className={className}
+      style={style}
       role={role}
       aria-label={ariaLabel}
       id={id}

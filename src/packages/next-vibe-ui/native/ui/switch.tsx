@@ -13,6 +13,7 @@ import type { SwitchRootProps } from "@/packages/next-vibe-ui/web/ui/switch";
 
 import { useColorScheme } from "../lib/useColorScheme";
 import { cn } from "next-vibe/shared/utils/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Re-export all types from web
 export type { SwitchRootProps };
@@ -48,12 +49,16 @@ export function Switch({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   value,
   className,
+  style,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   required,
   id,
   onBlur,
   children,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
 }: SwitchRootProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   const { colorScheme } = useColorScheme();
 
   // Handle controlled/uncontrolled state with defaultChecked
@@ -92,7 +97,7 @@ export function Switch({
 
   return (
     <StyledAnimatedView
-      style={animatedRootStyle}
+      style={[animatedRootStyle, nativeStyle]}
       className={cn(
         "h-8 w-[46px] rounded-full",
         disabled && "opacity-50",

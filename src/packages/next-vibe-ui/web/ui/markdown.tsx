@@ -10,6 +10,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
+import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 
@@ -17,15 +18,10 @@ import { useTranslation } from "@/i18n/core/client";
 const DECORATIVE_QUOTE = String.fromCharCode(0x201c); // Left double quotation mark
 const CODE_BLOCK_BG_COLOR = `rgb(${30} ${41} ${59})`; // Slate-800 background
 
-// Cross-platform interface - must match native version
-export interface MarkdownProps {
+export type MarkdownProps = {
   content: string;
-  className?: string;
-  /** Message ID for collapse state tracking */
   messageId?: string;
-  /** Whether there's content after this message in the sequence */
   hasContentAfter?: boolean;
-  /** Collapse state management callbacks */
   collapseState?: {
     isCollapsed: (
       key: {
@@ -44,7 +40,7 @@ export interface MarkdownProps {
       currentState: boolean,
     ) => void;
   };
-}
+} & StyleType;
 
 /**
  * Extract <think> tags and their content from markdown
@@ -92,6 +88,7 @@ function extractThinkingSections(content: string): {
 export function Markdown({
   content,
   className,
+  style,
   messageId,
   hasContentAfter = false,
   collapseState,
@@ -178,7 +175,7 @@ export function Markdown({
   };
 
   return (
-    <div className={cn("leading-relaxed max-w-none", className)}>
+    <div className={cn("leading-relaxed max-w-none", className)} style={style}>
       {/* Render thinking sections if any - NEW ARCHITECTURE: ReasoningDisplay design */}
       {allThinkingSections.length > 0 && (
         <div className="mb-3 space-y-3">
@@ -524,11 +521,11 @@ function CodeBlock({
 }
 
 // Helper functions for image modal
-function handleImageInModalClick(e: React.MouseEvent): void {
+function handleImageInModalClick(e: React.MouseEvent<HTMLImageElement>): void {
   e.stopPropagation();
 }
 
-function handleImageInModalKeyDown(e: React.KeyboardEvent): void {
+function handleImageInModalKeyDown(e: React.KeyboardEvent<HTMLImageElement>): void {
   e.stopPropagation();
 }
 
@@ -554,7 +551,7 @@ function MarkdownImage({
     setIsOpen(false);
   };
 
-  const handleModalKeyDown = (e: React.KeyboardEvent): void => {
+  const handleModalKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
     if (e.key === "Escape") {
       setIsOpen(false);
     }

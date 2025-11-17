@@ -1,15 +1,15 @@
 "use client";
 
 import type { ThemeProviderProps as NextThemesProviderProps } from "next-themes";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import React, { type JSX } from "react";
+import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
+import React, { type JSX, useEffect, useState } from "react";
+import type { StyleType } from "../utils/style-type";
 
-// Cross-platform interface - essential props only
-export interface ThemeProviderProps {
+export type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: "light" | "dark" | "system";
   storageKey?: string;
-}
+} & StyleType;
 
 export function ThemeProvider({
   children,
@@ -23,7 +23,7 @@ export function ThemeProvider({
     <NextThemesProvider
       defaultTheme={defaultTheme}
       enableSystem={true}
-      disableTransitionOnChange={true} // Disable transitions to prevent flashing
+      disableTransitionOnChange={true}
       storageKey={storageKey}
       attribute={attribute}
       {...props}
@@ -31,4 +31,30 @@ export function ThemeProvider({
       {children}
     </NextThemesProvider>
   );
+}
+
+export interface UseThemeToggleReturn {
+  onToggleTheme: () => void;
+  theme: "light" | "dark";
+  isMounted: boolean;
+}
+
+export function useThemeToggle(): UseThemeToggleReturn {
+  const { setTheme, resolvedTheme } = useTheme();
+  const theme = resolvedTheme === "dark" ? "dark" : "light";
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  function onToggleTheme(): void {
+    setTheme(theme === "dark" ? "light" : "dark");
+  }
+
+  return {
+    onToggleTheme,
+    theme,
+    isMounted,
+  };
 }

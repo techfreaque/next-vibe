@@ -133,7 +133,7 @@ export async function dev(
     }
 
     if (subscription) {
-      const userLead = await db.query.userLeads.findFirst({
+      const userLead = await db.query.userLeadLinks.findFirst({
         where: (userLeads, { eq }) => eq(userLeads.userId, demoUser.id),
       });
 
@@ -250,7 +250,7 @@ export async function dev(
       }
 
       if (adminSubscriptionData) {
-        const userLead = await db.query.userLeads.findFirst({
+        const userLead = await db.query.userLeadLinks.findFirst({
           where: (userLeads, { eq }) => eq(userLeads.userId, adminUser.id),
         });
 
@@ -386,7 +386,7 @@ export async function dev(
       }
 
       if (subscription) {
-        const userLead = await db.query.userLeads.findFirst({
+        const userLead = await db.query.userLeadLinks.findFirst({
           where: (userLeads, { eq }) => eq(userLeads.userId, lowCreditsUser.id),
         });
 

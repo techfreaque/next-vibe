@@ -11,14 +11,14 @@ import { H2, H3 } from "next-vibe-ui/ui/typography";
 
 export function ButtonsPreview(): JSX.Element {
   return (
-    <Div className="space-y-8">
+    <Div className="flex flex-col gap-8">
       <Section>
         <H2 className="mb-4">Button & Action Components</H2>
 
-        <Div className="space-y-6">
-          <Div className="space-y-2">
+        <Div className="flex flex-col gap-6">
+          <Div className="flex flex-col gap-2">
             <H3>Button Variants</H3>
-            <Div className="flex flex-wrap gap-2">
+            <Div className="flex flex-row flex-wrap gap-2">
               <Button variant="default">Default</Button>
               <Button variant="destructive">Destructive</Button>
               <Button variant="outline">Outline</Button>
@@ -28,18 +28,18 @@ export function ButtonsPreview(): JSX.Element {
             </Div>
           </Div>
 
-          <Div className="space-y-2">
+          <Div className="flex flex-col gap-2">
             <H3>Button Sizes</H3>
-            <Div className="flex flex-wrap items-center gap-2">
+            <Div className="flex flex-row flex-wrap items-center gap-2">
               <Button size="sm">Small</Button>
               <Button size="default">Default</Button>
               <Button size="lg">Large</Button>
             </Div>
           </Div>
 
-          <Div className="space-y-2">
+          <Div className="flex flex-col gap-2">
             <H3>Toggle</H3>
-            <Div className="flex flex-wrap gap-2">
+            <Div className="flex flex-row flex-wrap gap-2">
               <Toggle>Toggle</Toggle>
               <Toggle variant="outline">Toggle Outline</Toggle>
               <Toggle size="sm">Small</Toggle>
@@ -47,7 +47,7 @@ export function ButtonsPreview(): JSX.Element {
             </Div>
           </Div>
 
-          <Div className="space-y-2">
+          <Div className="flex flex-col gap-2">
             <H3>Toggle Group</H3>
             <ToggleGroup type="single">
               <ToggleGroupItem value="left">Left</ToggleGroupItem>

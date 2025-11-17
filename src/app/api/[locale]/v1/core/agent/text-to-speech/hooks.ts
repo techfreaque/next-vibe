@@ -131,7 +131,7 @@ export function useTTSAudio({
       endpoint.create.form.setValue("language", "EN");
 
       // Submit form with callbacks
-      await endpoint.create.submitForm(undefined, {
+      await endpoint.create.submitForm({
         onSuccess: ({ responseData }) => {
           const audioDataUrl = responseData.response.audioUrl;
           logger.debug("TTS: Got audio URL", {

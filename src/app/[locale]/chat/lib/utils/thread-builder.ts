@@ -1,4 +1,4 @@
-import type { ChatMessage } from "../../types";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
 
 /**
  * Get direct replies for a specific message

@@ -39,7 +39,7 @@ export function FeedbackPreview(): JSX.Element {
 
           <Div className="space-y-2">
             <H3>Badge</H3>
-            <Div className="flex flex-wrap gap-2">
+            <Div className="flex flex-row flex-wrap gap-2">
               <Badge>Default</Badge>
               <Badge variant="secondary">Secondary</Badge>
               <Badge variant="destructive">Destructive</Badge>
@@ -49,7 +49,7 @@ export function FeedbackPreview(): JSX.Element {
 
           <Div className="space-y-2">
             <H3>Avatar</H3>
-            <Div className="flex flex-wrap gap-2">
+            <Div className="flex flex-row flex-wrap gap-2">
               <Avatar>
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>CN</AvatarFallback>
@@ -80,7 +80,7 @@ export function FeedbackPreview(): JSX.Element {
 
           <Div className="space-y-2">
             <H3>Toast</H3>
-            <Div className="flex flex-wrap gap-2">
+            <Div className="flex flex-row flex-wrap gap-2">
               <Button onClick={() => toast("Default toast")}>
                 Default Toast
               </Button>

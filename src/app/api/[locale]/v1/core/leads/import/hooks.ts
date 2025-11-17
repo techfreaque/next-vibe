@@ -24,7 +24,7 @@ export function useLeadsImportEndpoint(
   setSelectedFile: React.Dispatch<React.SetStateAction<File | null>>;
   handleFileSelect: (file: File) => void;
   handleDrop: (e: DivDragEvent) => void;
-  handleFileInputChange: (e: InputChangeEvent) => void;
+  handleFileInputChange: (e: InputChangeEvent<"file">) => void;
   dragOver: boolean;
   setDragOver: React.Dispatch<React.SetStateAction<boolean>>;
   downloadTemplate: () => void;
@@ -119,7 +119,7 @@ export function useLeadsImportEndpoint(
   );
 
   const handleFileInputChange = React.useCallback(
-    (e: InputChangeEvent): void => {
+    (e: InputChangeEvent<"file">): void => {
       const files = e.target.files;
       if (files && files.length > 0) {
         handleFileSelect(files[0]);

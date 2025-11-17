@@ -1,49 +1,5 @@
-/**
- * Web Form Components
- * Production-ready implementation with react-hook-form integration
- *
- * TYPE SAFETY: This file exports ALL types used by both web and native
- * implementations to ensure cross-platform type consistency. The native
- * version imports these types to maintain identical public APIs.
- *
- * FEATURES:
- * ✅ react-hook-form integration (FormProvider, Controller, useFormContext)
- * ✅ All form components: Form, FormField, FormItem, FormLabel, FormControl,
- *    FormDescription, FormMessage
- * ✅ Error handling and validation with translation support
- * ✅ Accessibility (aria attributes, proper form semantics)
- * ✅ useFormField hook for form state access
- *
- * USAGE EXAMPLE:
- * ```tsx
- * <Form form={endpoint.create.form} onSubmit={endpoint.create.onSubmit}>
- *   <FormField
- *     control={endpoint.create.form.control}
- *     name="email"
- *     render={({ field }) => (
- *       <FormItem>
- *         <FormLabel>Email</FormLabel>
- *         <FormControl>
- *           <Input {...field} />
- *         </FormControl>
- *         <FormDescription>Enter your email address</FormDescription>
- *         <FormMessage />
- *       </FormItem>
- *     )}
- *   />
- *   <Button type="submit">Submit</Button>
- * </Form>
- * ```
- *
- * PLATFORM NOTES:
- * - Web: Uses HTML <form> element with native form submission
- * - Native: Uses View component, submission triggered by button handlers
- * - Both: Share identical type interfaces for seamless cross-platform development
- */
-
 "use client";
 
-import type * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
@@ -55,23 +11,19 @@ import type {
   UseFormReturn,
 } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
+import type { StyleType } from "../../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { LabelRootProps } from "../label";
 import { Label } from "../label";
 
-// ============================================================================
-// EXPORTED TYPES - Must be imported by native implementation
-// ============================================================================
-
-export interface FormProps<TRequest extends FieldValues> {
-  className?: string;
+export interface FormProps<TRequest extends FieldValues = FieldValues> {
   children: React.ReactNode;
   form?: UseFormReturn<TRequest>;
-  onSubmit:
-    | ((e: React.FormEvent<HTMLFormElement>) => void | Promise<void>)
-    | undefined;
+  onSubmit?: () => void | Promise<void>;
+  className?: string;
 }
 
 export interface FormFieldContextValue<
@@ -97,31 +49,29 @@ export interface UseFormFieldReturn {
   formDescriptionId: string;
   formMessageId: string;
 }
+export type FormItemProps = {
+  children?: React.ReactNode;
+} & StyleType;
 
-export type FormItemProps = React.HTMLAttributes<HTMLDivElement>;
+export type FormLabelProps = LabelRootProps;
 
-export type FormLabelProps = React.ComponentPropsWithoutRef<
-  typeof LabelPrimitive.Root
->;
+export interface FormControlProps {
+  children?: React.ReactNode;
+  asChild?: boolean;
+}
 
-export type FormControlProps = React.ComponentPropsWithoutRef<typeof Slot>;
+export type FormDescriptionProps = {
+  children?: React.ReactNode;
+} & StyleType;
 
-export type FormDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
-
-export type FormMessageProps = React.HTMLAttributes<HTMLParagraphElement>;
+export type FormMessageProps = {
+  children?: React.ReactNode;
+} & StyleType;
 
 export type FormFieldProps<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
 > = ControllerProps<TFieldValues, TName>;
-
-// Native-specific form component props (not implemented on web)
-export interface FormDatePickerProps {
-  label?: string;
-  description?: string;
-  value?: string;
-  onChange?: (value: string) => void;
-}
 
 export interface FormComboboxProps {
   label?: string;
@@ -131,18 +81,30 @@ export interface FormComboboxProps {
   options?: { label: string; value: string }[];
 }
 
-// ============================================================================
-// IMPLEMENTATION
-// ============================================================================
+export interface FormDatePickerProps {
+  label?: string;
+  description?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+}
 
 function Form<TRequest extends FieldValues>(
   props: FormProps<TRequest>,
 ): React.JSX.Element {
+  const handleSubmit = (e: {
+    preventDefault: () => void;
+    stopPropagation: () => void;
+  }): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    void props.onSubmit?.();
+  };
+
   // If form is provided, wrap with FormProvider for react-hook-form integration
   if (props.form) {
     return (
       <FormProvider {...props.form}>
-        <form className={cn(props.className)} onSubmit={props.onSubmit}>
+        <form className={cn(props.className)} onSubmit={handleSubmit}>
           {props.children}
         </form>
       </FormProvider>
@@ -151,7 +113,7 @@ function Form<TRequest extends FieldValues>(
 
   // Otherwise, render a simple form element
   return (
-    <form className={cn(props.className)} onSubmit={props.onSubmit}>
+    <form className={cn(props.className)} onSubmit={handleSubmit}>
       {props.children}
     </form>
   );

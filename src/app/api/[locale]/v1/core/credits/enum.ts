@@ -25,12 +25,14 @@ export const {
   options: CreditTransactionTypeOptions,
   Value: CreditTransactionTypeValues,
 } = createEnumOptions({
+  FREE_GRANT: "app.api.v1.core.credits.enums.transactionType.freeGrant",
+  FREE_RESET: "app.api.v1.core.credits.enums.transactionType.freeReset",
   PURCHASE: "app.api.v1.core.credits.enums.transactionType.purchase",
   SUBSCRIPTION: "app.api.v1.core.credits.enums.transactionType.subscription",
   USAGE: "app.api.v1.core.credits.enums.transactionType.usage",
   EXPIRY: "app.api.v1.core.credits.enums.transactionType.expiry",
-  FREE_TIER: "app.api.v1.core.credits.enums.transactionType.freeTier",
-  MONTHLY_RESET: "app.api.v1.core.credits.enums.transactionType.monthlyReset",
+  REFUND: "app.api.v1.core.credits.enums.transactionType.refund",
+  TRANSFER: "app.api.v1.core.credits.enums.transactionType.transfer",
 });
 
 /**
@@ -42,12 +44,14 @@ export const CreditTypeIdentifierDB = [
 ] as const;
 
 export const CreditTransactionTypeDB = [
+  CreditTransactionType.FREE_GRANT,
+  CreditTransactionType.FREE_RESET,
   CreditTransactionType.PURCHASE,
   CreditTransactionType.SUBSCRIPTION,
   CreditTransactionType.USAGE,
   CreditTransactionType.EXPIRY,
-  CreditTransactionType.FREE_TIER,
-  CreditTransactionType.MONTHLY_RESET,
+  CreditTransactionType.REFUND,
+  CreditTransactionType.TRANSFER,
 ] as const;
 
 /**

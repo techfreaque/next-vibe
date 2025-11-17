@@ -34,7 +34,7 @@ async function executeTask(
     logger.info("Starting credit expiration task");
 
     // Expire old subscription credits
-    const result = await creditRepository.expireCredits();
+    const result = await creditRepository.expireCredits(logger);
 
     if (!result.success) {
       logger.error("Failed to expire credits", {

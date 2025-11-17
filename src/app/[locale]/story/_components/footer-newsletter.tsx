@@ -6,7 +6,7 @@ import { Form } from "next-vibe-ui/ui/form/form";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import { Input } from "next-vibe-ui/ui/input";
 import { Check, Send, X } from "next-vibe-ui/ui/icons";
-import type { FormEvent, JSX } from "react";
+import type { JSX } from "react";
 
 import { useNewsletterManager } from "@/app/api/[locale]/v1/core/newsletter/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -47,8 +47,7 @@ export function NewsletterSignupFooter({
 
         {/* Email input and action button */}
         <Form
-          onSubmit={(e: FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
+          onSubmit={() => {
             // Validate email before submission
             if (!email?.includes("@")) {
               return;
@@ -61,7 +60,7 @@ export function NewsletterSignupFooter({
           }}
           className="flex items-center flex flex-row gap-2 mb-3"
         >
-          <Input
+          <Input<"email">
             type="email"
             placeholder={t("app.newsletter.emailPlaceholder")}
             className="max-w-[220px]"

@@ -9,22 +9,22 @@ import { Minus, Plus } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useEffect } from "react";
+import type { StyleType } from "../utils/style-type";
 
 import { Button } from "./button";
 import { Div } from "./div";
-import { Input, type InputChangeEvent, type InputFocusEvent } from "./input";
+import { Input, type InputChangeEvent } from "./input";
 
-export interface NumberInputProps {
+export type NumberInputProps = {
   value?: number;
   onChange?: (value: number) => void;
-  onBlur?: (e: InputFocusEvent<"number">) => void;
+  onBlur?: () => void;
   min?: number;
   max?: number;
   step?: number;
   disabled?: boolean;
-  className?: string;
   name?: string;
-}
+} & StyleType;
 
 export function NumberInput({
   value = 1,
@@ -35,6 +35,7 @@ export function NumberInput({
   step = 1,
   disabled = false,
   className,
+  style,
   name,
 }: NumberInputProps): JSX.Element {
   // Call onChange with initial value on mount to register the field
@@ -64,7 +65,7 @@ export function NumberInput({
   };
 
   return (
-    <Div className={cn("flex items-center gap-3", className)}>
+    <Div className={cn("flex items-center gap-3", className)} style={style}>
       <Button
         type="button"
         variant="outline"

@@ -3,26 +3,35 @@
 import * as SwitchPrimitives from "@radix-ui/react-switch";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 // Cross-platform types
-export interface SwitchRootProps {
+export type SwitchRootProps = {
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
   disabled?: boolean;
-  className?: string;
   name?: string;
   value?: string;
   required?: boolean;
   children?: React.ReactNode;
   id?: string;
   onBlur?: () => void;
-}
+} & StyleType;
 
 export function Switch({
   className,
+  style,
   children,
-  ...props
+  checked,
+  defaultChecked,
+  onCheckedChange,
+  disabled,
+  name,
+  value,
+  required,
+  id,
+  onBlur,
 }: SwitchRootProps): React.JSX.Element {
   return (
     <SwitchPrimitives.Root
@@ -30,7 +39,16 @@ export function Switch({
         "peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
         className,
       )}
-      {...props}
+      style={style}
+      checked={checked}
+      defaultChecked={defaultChecked}
+      onCheckedChange={onCheckedChange}
+      disabled={disabled}
+      name={name}
+      value={value}
+      required={required}
+      id={id}
+      onBlur={onBlur}
     >
       <SwitchPrimitives.Thumb
         className={cn(

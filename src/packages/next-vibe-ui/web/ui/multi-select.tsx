@@ -4,6 +4,8 @@ import { Check, X, ChevronDown } from "@/packages/next-vibe-ui/web/ui/icons";
 import { useTranslation } from "@/i18n/core/client";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
+
 import { Badge } from "./badge";
 import { Button } from "./button";
 import {
@@ -22,17 +24,16 @@ export interface MultiSelectOption {
   disabled?: boolean;
 }
 
-export interface MultiSelectProps {
+export type MultiSelectProps = {
   options: MultiSelectOption[];
   value: string[];
   onChange: (value: string[]) => void;
   placeholder?: string;
   emptyMessage?: string;
   disabled?: boolean;
-  className?: string;
   maxSelections?: number;
   searchable?: boolean;
-}
+} & StyleType;
 
 export function MultiSelect({
   options,
@@ -42,6 +43,7 @@ export function MultiSelect({
   emptyMessage,
   disabled = false,
   className,
+  style,
   maxSelections,
   searchable = true,
 }: MultiSelectProps): React.JSX.Element {
@@ -81,6 +83,7 @@ export function MultiSelect({
             !value.length && "text-muted-foreground",
             className,
           )}
+          style={style}
           disabled={disabled}
         >
           <div className="flex gap-1 flex-wrap">

@@ -5,6 +5,9 @@ import { cn } from "next-vibe/shared/utils/utils";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import type { StyleType } from "../utils/style-type";
+
+import type { DivMouseEvent } from "./div";
 
 export interface ResizableContainerProps {
   children: ReactNode;
@@ -22,11 +25,10 @@ export interface ResizableContainerProps {
   storageId?: string;
 }
 
-export interface ResizableHandleProps {
-  className?: string;
+export type ResizableHandleProps = {
   withHandle?: boolean;
-  onMouseDown?: (e: React.MouseEvent) => void;
-}
+  onMouseDown?: (e: DivMouseEvent) => void;
+} & StyleType;
 
 export function ResizableContainer({
   children,
@@ -56,7 +58,7 @@ export function ResizableContainer({
   }, [maxWidth]);
 
   const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
+    (e: DivMouseEvent) => {
       e.preventDefault();
       setIsResizing(true);
       startXRef.current = e.clientX;
@@ -104,7 +106,9 @@ export function ResizableContainer({
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
   return (
-    <div className="relative h-full shrink-0 overflow-hidden">
+    <div
+      className={`relative h-full shrink-0 ${collapsed ? "overflow-hidden" : ""}`}
+    >
       <motion.div
         ref={containerRef}
         className={cn("relative h-full shrink-0", className)}
@@ -129,17 +133,19 @@ export function ResizableContainer({
 export function ResizableHandle({
   withHandle,
   className,
+  style,
   onMouseDown,
 }: ResizableHandleProps): JSX.Element {
   return (
     <div
       className={cn(
-        "absolute top-0 right-[-5px] bottom-0 w-[10px] cursor-ew-resize flex items-center justify-center z-100",
+        "absolute top-0 right-[-5px] bottom-0 w-2.5 cursor-ew-resize flex items-center justify-center z-10",
         className,
       )}
+      style={style}
       onMouseDown={onMouseDown}
     >
-      <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[4px] bg-border" />
+      <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 bg-border" />
       {withHandle && (
         <div className="relative z-10 flex h-5 w-4 items-center justify-center rounded-sm bg-background">
           <DragHandleDots2Icon className="h-3 w-3" />

@@ -29,7 +29,7 @@ import {
 } from "next-vibe/shared/types/stats-filtering.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { userLeads } from "@/app/api/[locale]/v1/core/leads/db";
+import { userLeadLinks } from "@/app/api/[locale]/v1/core/leads/db";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -399,13 +399,13 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       usersWithoutStripeId: 0,
     };
 
-    // Get users with lead IDs using the userLeads junction table
+    // Get users with lead IDs using the userLeadLinks junction table
     const [leadStats] = await db
       .select({
-        usersWithLeadId: sql<number>`count(distinct ${userLeads.userId})::int`,
+        usersWithLeadId: sql<number>`count(distinct ${userLeadLinks.userId})::int`,
       })
-      .from(userLeads)
-      .innerJoin(users, eq(userLeads.userId, users.id))
+      .from(userLeadLinks)
+      .innerJoin(users, eq(userLeadLinks.userId, users.id))
       .where(whereClause ? sql`${whereClause}` : undefined);
 
     const usersWithLeadIdCount = leadStats?.usersWithLeadId ?? 0;

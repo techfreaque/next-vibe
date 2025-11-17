@@ -9,6 +9,7 @@ import { ChevronDown, Phone } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
+import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 
@@ -68,8 +69,7 @@ export const COUNTRIES: CountryData[] = [
   { code: "ZA", name: "South Africa", prefix: "+27", flag: "🇿🇦" },
 ];
 
-// Cross-platform props interface
-export interface PhoneFieldProps {
+export type PhoneFieldProps = {
   value?: string;
   onChange: (value: string) => void;
   onBlur?: () => void;
@@ -77,9 +77,8 @@ export interface PhoneFieldProps {
   defaultCountry?: string;
   preferredCountries?: string[];
   disabled?: boolean;
-  className?: string;
   name?: string;
-}
+} & StyleType;
 
 export function PhoneField({
   value = "",
@@ -90,6 +89,7 @@ export function PhoneField({
   preferredCountries = [],
   disabled = false,
   className,
+  style,
   name,
 }: PhoneFieldProps): JSX.Element {
   const { t: _t } = useTranslation();
@@ -158,7 +158,7 @@ export function PhoneField({
   };
 
   return (
-    <div className={cn("flex", className)}>
+    <div className={cn("flex", className)} style={style}>
       {/* Country selector */}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>

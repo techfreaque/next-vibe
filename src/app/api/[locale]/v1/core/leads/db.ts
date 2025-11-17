@@ -5,13 +5,14 @@
 
 import { relations } from "drizzle-orm";
 import {
-  boolean,
-  integer,
+  index,
   jsonb,
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
+  integer,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
@@ -194,13 +195,7 @@ export const leadsRelations = relations(leads, ({ one, many }) => ({
   }),
   emailCampaigns: many(emailCampaigns),
   engagements: many(leadEngagements),
-  userLeads: many(userLeads),
-  primaryLeadLinks: many(leadLinks, {
-    relationName: "primaryLeadLinks",
-  }),
-  linkedLeadLinks: many(leadLinks, {
-    relationName: "linkedLeadLinks",
-  }),
+  userLeadLinks: many(userLeadLinks),
 }));
 
 export const emailCampaignsRelations = relations(
@@ -229,84 +224,48 @@ export const leadEngagementsRelations = relations(
 );
 
 /**
- * Lead Credits Table
- * Tracks free tier credits for leads (20 credits per IP)
+ * User Lead Links Table
+ * Simplified: tracks user-to-lead relationships
+ * With proper UNIQUE constraint to prevent duplicates
  */
-export const leadCredits = pgTable("lead_credits", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  leadId: uuid("lead_id")
-    .notNull()
-    .references(() => leads.id, { onDelete: "cascade" }),
-  amount: integer("amount").notNull().default(20), // Free tier starts with 20
-  monthlyPeriodStart: timestamp("monthly_period_start").defaultNow().notNull(), // Track when current monthly period started
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-/**
- * User Leads Table
- * Tracks the relationship between users and leads
- * A user can have multiple leads (e.g., anonymous lead before signup, then linked on signup)
- * One lead is marked as primary for the user
- */
-export const userLeads = pgTable("user_leads", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  leadId: uuid("lead_id")
-    .notNull()
-    .references(() => leads.id, { onDelete: "cascade" }),
-  isPrimary: boolean("is_primary").notNull().default(false),
-  linkedAt: timestamp("linked_at").defaultNow().notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-/**
- * Lead Links Table
- * Tracks relationships between leads (e.g., when merging leads or linking anonymous leads)
- */
-export const leadLinks = pgTable("lead_links", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  primaryLeadId: uuid("primary_lead_id")
-    .notNull()
-    .references(() => leads.id, { onDelete: "cascade" }),
-  linkedLeadId: uuid("linked_lead_id")
-    .notNull()
-    .references(() => leads.id, { onDelete: "cascade" }),
-  linkReason: text("link_reason").notNull(),
-  metadata: jsonb("metadata")
-    .$type<Record<string, string | number | boolean>>()
-    .notNull()
-    .default({}),
-  linkedAt: timestamp("linked_at").defaultNow().notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const userLeadLinks = pgTable(
+  "user_lead_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    leadId: uuid("lead_id")
+      .notNull()
+      .references(() => leads.id, { onDelete: "cascade" }),
+    linkReason: text("link_reason").notNull(), // 'signup', 'merge', 'manual', etc.
+    metadata: jsonb("metadata")
+      .$type<Record<string, string | number | boolean | null>>()
+      .notNull()
+      .default({}),
+    linkedAt: timestamp("linked_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    // Prevent duplicate user-lead links
+    unique("uq_user_lead_link").on(table.userId, table.leadId),
+    // Fast lookups
+    index("idx_user_lead_links_user").on(table.userId),
+    index("idx_user_lead_links_lead").on(table.leadId),
+  ],
+);
 
 /**
  * Relations
  */
-export const userLeadsRelations = relations(userLeads, ({ one }) => ({
+export const userLeadLinksRelations = relations(userLeadLinks, ({ one }) => ({
   user: one(users, {
-    fields: [userLeads.userId],
+    fields: [userLeadLinks.userId],
     references: [users.id],
   }),
   lead: one(leads, {
-    fields: [userLeads.leadId],
+    fields: [userLeadLinks.leadId],
     references: [leads.id],
-  }),
-}));
-
-export const leadLinksRelations = relations(leadLinks, ({ one }) => ({
-  primaryLead: one(leads, {
-    fields: [leadLinks.primaryLeadId],
-    references: [leads.id],
-    relationName: "primaryLeadLinks",
-  }),
-  linkedLead: one(leads, {
-    fields: [leadLinks.linkedLeadId],
-    references: [leads.id],
-    relationName: "linkedLeadLinks",
   }),
 }));
 
@@ -319,12 +278,8 @@ export const selectEmailCampaignSchema = createSelectSchema(emailCampaigns);
 export const insertEmailCampaignSchema = createInsertSchema(emailCampaigns);
 export const selectLeadEngagementSchema = createSelectSchema(leadEngagements);
 export const insertLeadEngagementSchema = createInsertSchema(leadEngagements);
-export const selectLeadCreditSchema = createSelectSchema(leadCredits);
-export const insertLeadCreditSchema = createInsertSchema(leadCredits);
-export const selectUserLeadSchema = createSelectSchema(userLeads);
-export const insertUserLeadSchema = createInsertSchema(userLeads);
-export const selectLeadLinkSchema = createSelectSchema(leadLinks);
-export const insertLeadLinkSchema = createInsertSchema(leadLinks);
+export const selectUserLeadLinkSchema = createSelectSchema(userLeadLinks);
+export const insertUserLeadLinkSchema = createInsertSchema(userLeadLinks);
 
 /**
  * Types
@@ -335,9 +290,5 @@ export type EmailCampaign = z.infer<typeof selectEmailCampaignSchema>;
 export type NewEmailCampaign = z.infer<typeof insertEmailCampaignSchema>;
 export type LeadEngagement = z.infer<typeof selectLeadEngagementSchema>;
 export type NewLeadEngagement = z.infer<typeof insertLeadEngagementSchema>;
-export type LeadCredit = z.infer<typeof selectLeadCreditSchema>;
-export type NewLeadCredit = z.infer<typeof insertLeadCreditSchema>;
-export type UserLead = z.infer<typeof selectUserLeadSchema>;
-export type NewUserLead = z.infer<typeof insertUserLeadSchema>;
-export type LeadLink = z.infer<typeof selectLeadLinkSchema>;
-export type NewLeadLink = z.infer<typeof insertLeadLinkSchema>;
+export type UserLeadLink = z.infer<typeof selectUserLeadLinkSchema>;
+export type NewUserLeadLink = z.infer<typeof insertUserLeadLinkSchema>;

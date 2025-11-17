@@ -1,7 +1,6 @@
 /* eslint-disable react-compiler/react-compiler */
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { AlertDialog } from "next-vibe-ui/ui/alert-dialog";
 import { AlertDialogAction } from "next-vibe-ui/ui/alert-dialog";
 import { AlertDialogCancel } from "next-vibe-ui/ui/alert-dialog";
@@ -12,31 +11,20 @@ import { AlertDialogHeader } from "next-vibe-ui/ui/alert-dialog";
 import { AlertDialogTitle } from "next-vibe-ui/ui/alert-dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-
-import type { TextareaKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/textarea";
+import React, { useEffect, useMemo } from "react";
 
 import {
   DEFAULT_FOLDER_IDS,
-  isDefaultFolderId,
-  type DefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
-import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import { envClient } from "@/config/env-client";
 
-import { useChatContext } from "../features/chat/context";
-import type { ModelId } from "../types";
-import { ChatArea } from "./layout/chat-area";
-import { SidebarWrapper } from "./layout/sidebar-wrapper";
-import { TopBar } from "./layout/top-bar";
-
-// Utility functions
-const isValidInput = (input: string): boolean => input.trim().length > 0;
-const isSubmitKeyPress = (e: TextareaKeyboardEvent): boolean =>
-  e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey;
+import { ChatArea } from "./chat-area/chat-area";
+import { SidebarWrapper } from "./sidebar/sidebar-wrapper";
+import { TopBar } from "./sidebar/top-area/top-bar";
+import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 
 interface ChatInterfaceProps {
   /** URL path segments from /threads/[...path] route (for logging/debugging only) */
@@ -52,166 +40,22 @@ export function ChatInterface({
 
   // Destructure what we need from the chat context
   const {
-    threads,
-    messages: messagesRecord,
-    activeThread,
-    activeThreadMessages,
-    isLoading,
-    input,
-    setInput,
-    selectedPersona,
-    selectedModel,
-    setSelectedPersona,
-    setSelectedModel,
-    sendMessage,
-    branchMessage,
-    deleteMessage,
-    retryMessage,
-    answerAsAI,
-    voteMessage,
-    stopGeneration,
-    deleteThread,
-    updateThread,
-    updateFolder,
-    deleteFolder,
     currentRootFolderId,
-    currentSubFolderId,
-    navigateToThread,
-    navigateToNewThread,
-    inputRef,
-    // UI settings (persisted)
-    ttsAutoplay,
-    sidebarCollapsed,
-    viewMode,
-    enabledToolIds,
-    setTTSAutoplay,
-    setSidebarCollapsed,
-    setViewMode,
-    setEnabledToolIds,
+    // Message actions
+    deleteDialogOpen,
+    handleConfirmDelete,
+    handleCancelDelete,
   } = chat;
-
-  // Branch indices for linear view - tracks which branch is selected at each level
-  // Key: parent message ID, Value: index of selected child
-  const [branchIndices, setBranchIndices] = useState<Record<string, number>>(
-    {},
-  );
-
-  // Track the last message count to detect new messages
-  const lastMessageCountRef = useRef<number>(0);
-
-  // Delete confirmation dialog state
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
-
-  // Handler for switching branches in linear view
-  const handleSwitchBranch = useCallback(
-    (parentMessageId: string, branchIndex: number): void => {
-      setBranchIndices((prev) => ({
-        ...prev,
-        [parentMessageId]: branchIndex,
-      }));
-    },
-    [],
-  );
-
-  // Count children of a message (recursively)
-  const countMessageChildren = useCallback(
-    (messageId: string): number => {
-      const children = Object.values(messagesRecord).filter(
-        (msg) => msg.parentId === messageId,
-      );
-      if (children.length === 0) {
-        return 0;
-      }
-      // Count direct children + all descendants
-      return children.reduce(
-        (total, child) => total + 1 + countMessageChildren(child.id),
-        0,
-      );
-    },
-    [messagesRecord],
-  );
-
-  // Wrapper for delete message that ALWAYS shows confirmation dialog
-  const handleDeleteMessage = useCallback((messageId: string): void => {
-    // Always show confirmation dialog for better UX
-    setMessageToDelete(messageId);
-    setDeleteDialogOpen(true);
-  }, []);
-
-  // Confirm delete message with children
-  const handleConfirmDelete = useCallback((): void => {
-    if (messageToDelete) {
-      void deleteMessage(messageToDelete);
-      setDeleteDialogOpen(false);
-      setMessageToDelete(null);
-    }
-  }, [messageToDelete, deleteMessage]);
-
-  // Cancel delete
-  const handleCancelDelete = useCallback((): void => {
-    setDeleteDialogOpen(false);
-    setMessageToDelete(null);
-  }, []);
-
-  // Auto-switch to newly created branches
-  useEffect(() => {
-    const currentMessageCount = activeThreadMessages.length;
-
-    // Only process if we have new messages
-    if (currentMessageCount <= lastMessageCountRef.current) {
-      lastMessageCountRef.current = currentMessageCount;
-      return;
-    }
-
-    lastMessageCountRef.current = currentMessageCount;
-
-    // Find the most recently created message (any role)
-    const sortedMessages = [...activeThreadMessages].toSorted(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-    );
-    const latestMessage = sortedMessages[0];
-
-    if (!latestMessage?.parentId) {
-      return;
-    }
-
-    // Find all siblings (messages with the same parent)
-    const siblings = activeThreadMessages
-      .filter((msg) => msg.parentId === latestMessage.parentId)
-      .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-
-    if (siblings.length <= 1) {
-      return; // No branches to switch to
-    }
-
-    // Find the index of the latest message among its siblings
-    const latestIndex = siblings.findIndex(
-      (msg) => msg.id === latestMessage.id,
-    );
-
-    if (latestIndex >= 0 && latestMessage.parentId) {
-      // Auto-switch to the newly created branch
-      setBranchIndices((prev) => ({
-        ...prev,
-        [latestMessage.parentId!]: latestIndex,
-      }));
-    }
-  }, [activeThreadMessages]);
 
   const { t, locale, currentCountry } = useTranslation();
   // Create logger once - memoize to prevent recreating on every render
-  const logger = React.useMemo(
+  const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
   // Use server-provided user prop to determine authentication status immediately
   // This prevents hydration mismatch - no client-side delay
   const isAuthenticated = user !== undefined && !user.isPublic;
-  const router = useRouter();
-
-  // URL parsing is now done server-side and passed as props via ChatProvider
-  // currentRootFolderId, currentSubFolderId, activeThreadId come from chat context
 
   // Redirect public users to incognito if they try to access PRIVATE or SHARED folders
   // PUBLIC users can access PUBLIC and INCOGNITO folders
@@ -229,159 +73,9 @@ export function ChatInterface({
           attemptedFolder: currentRootFolderId,
         },
       );
-      const url = `/${locale}/threads/${DEFAULT_FOLDER_IDS.INCOGNITO}/new`;
-      router.push(url);
+      window.location.href = `/${locale}/threads/${DEFAULT_FOLDER_IDS.INCOGNITO}/new`;
     }
-  }, [isAuthenticated, currentRootFolderId, locale, router, logger]);
-
-  // Handle thread selection with navigation
-  // Uses the navigation hook from chat context
-  const handleSelectThread = useCallback(
-    (threadId: string): void => {
-      navigateToThread(threadId);
-    },
-    [navigateToThread],
-  );
-
-  // Handle new thread creation with navigation
-  // Uses the navigation hook from chat context
-  const handleCreateThread = useCallback(
-    (folderId?: string | null): void => {
-      // Determine root folder and subfolder from folderId
-      let rootFolderId: DefaultFolderId;
-      let subFolderId: string | null;
-
-      if (!folderId) {
-        // No folder specified, use current folder
-        rootFolderId = currentRootFolderId;
-        subFolderId = currentSubFolderId;
-      } else if (isDefaultFolderId(folderId)) {
-        // Root folder
-        rootFolderId = folderId;
-        subFolderId = null;
-      } else {
-        // Subfolder - need to get root folder ID
-        const folder = chat.folders[folderId];
-        if (folder) {
-          rootFolderId = folder.rootFolderId;
-          subFolderId = folderId;
-        } else {
-          // Fallback if folder not found
-          rootFolderId = DEFAULT_FOLDER_IDS.PRIVATE;
-          subFolderId = null;
-        }
-      }
-
-      navigateToNewThread(rootFolderId, subFolderId);
-    },
-    [
-      currentRootFolderId,
-      currentSubFolderId,
-      chat.folders,
-      navigateToNewThread,
-    ],
-  );
-
-  const submitMessage = useCallback(async () => {
-    logger.debug("Chat", "submitMessage called", {
-      hasInput: Boolean(input),
-      isValidInput: isValidInput(input),
-      isLoading,
-    });
-
-    if (isValidInput(input) && !isLoading) {
-      logger.debug("Chat", "submitMessage calling sendMessage");
-      await sendMessage(input, (threadId, rootFolderId, subFolderId) => {
-        // Navigate to the newly created thread
-        logger.debug("Chat", "Navigating to newly created thread", {
-          threadId,
-          rootFolderId,
-          subFolderId,
-        });
-        // Build URL with proper subfolder path if present
-        const url = subFolderId
-          ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
-          : `/${locale}/threads/${rootFolderId}/${threadId}`;
-        router.push(url);
-      });
-      logger.debug("Chat", "submitMessage completed");
-    } else {
-      logger.debug("Chat", "submitMessage blocked");
-    }
-  }, [input, isLoading, sendMessage, logger, locale, router]);
-
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      await submitMessage();
-    },
-    [submitMessage],
-  );
-
-  const handleKeyDown = useCallback(
-    (e: TextareaKeyboardEvent) => {
-      if (isSubmitKeyPress(e)) {
-        e.preventDefault();
-        void submitMessage();
-      }
-    },
-    [submitMessage],
-  );
-
-  // Handler for model changes - auto-disable search tool if model doesn't support tools
-  const handleModelChange = useCallback(
-    (modelId: ModelId) => {
-      const model = getModelById(modelId);
-
-      // Auto-remove search tool if the new model doesn't support tools
-      const SEARCH_TOOL_ID = "get_v1_core_agent_brave-search";
-      if (!model.supportsTools && enabledToolIds.includes(SEARCH_TOOL_ID)) {
-        setEnabledToolIds(enabledToolIds.filter((id) => id !== SEARCH_TOOL_ID));
-        logger.info("Auto-disabled search tool - model doesn't support tools", {
-          modelId,
-          modelName: model.name,
-        });
-      }
-
-      setSelectedModel(modelId);
-    },
-    [setSelectedModel, enabledToolIds, setEnabledToolIds, logger],
-  );
-
-  const handleFillInputWithPrompt = useCallback(
-    (prompt: string, _personaId: string, modelId?: ModelId) => {
-      // Switch to the persona's preferred model if provided
-      if (modelId) {
-        handleModelChange(modelId);
-      }
-
-      // Fill the input with the prompt (does NOT submit)
-      setInput(prompt);
-      inputRef.current?.focus();
-    },
-    [setInput, inputRef, handleModelChange],
-  );
-
-  const handleScreenshot = useCallback(() => {
-    // Screenshot functionality to be implemented
-    logger.info("Screenshot requested");
-    return Promise.resolve();
-  }, [logger]);
-
-  const handleDeleteThread = useCallback(
-    async (threadId: string): Promise<void> => {
-      logger.debug("Chat: Handling thread deletion", { threadId });
-
-      // Delete the thread
-      await deleteThread(threadId);
-
-      // Navigate to the root folder page
-      const url = `/${locale}/threads/${currentRootFolderId}`;
-      logger.debug("Chat: Navigating after thread deletion", { url });
-      router.push(url);
-    },
-    [deleteThread, logger, locale, currentRootFolderId, router],
-  );
+  }, [isAuthenticated, currentRootFolderId, locale, logger]);
 
   return (
     <>
@@ -395,80 +89,26 @@ export function ChatInterface({
         {/* Top Bar - Menu, Search, Settings */}
         <TopBar
           currentCountry={currentCountry}
-          onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
-          onToggleTTSAutoplay={() => setTTSAutoplay(!ttsAutoplay)}
-          ttsAutoplay={ttsAutoplay}
-          sidebarCollapsed={sidebarCollapsed}
-          onNewChat={() => handleCreateThread(null)}
           locale={locale}
-          messages={messagesRecord}
         />
 
         {/* Sidebar and Main Chat Area */}
         <SidebarWrapper
           user={user}
-          threads={threads}
-          folders={chat.folders}
-          activeThreadId={activeThread?.id || null}
-          activeRootFolderId={currentRootFolderId}
-          activeSubFolderId={currentSubFolderId}
-          collapsed={sidebarCollapsed}
           locale={locale}
           logger={logger}
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-          onCreateThread={handleCreateThread}
-          onSelectThread={handleSelectThread}
-          onDeleteThread={handleDeleteThread}
-          onUpdateFolder={updateFolder}
-          onDeleteFolder={deleteFolder}
-          onUpdateThreadTitle={(threadId, title) => {
-            void updateThread(threadId, { title });
-          }}
-          currentRootFolderId={currentRootFolderId}
-          currentSubFolderId={currentSubFolderId}
-          chat={chat}
         >
           {/* Main Chat Area */}
           <ChatArea
             locale={locale}
-            thread={activeThread}
-            messages={activeThreadMessages}
-            selectedModel={selectedModel}
-            selectedPersona={selectedPersona}
-            ttsAutoplay={ttsAutoplay}
-            input={input}
-            isLoading={isLoading}
-            inputRef={inputRef}
-            onInputChange={setInput}
-            onSubmit={handleSubmit}
-            onKeyDown={handleKeyDown}
-            onStop={stopGeneration}
-            onBranchMessage={branchMessage}
-            onDeleteMessage={handleDeleteMessage}
-            onSwitchBranch={handleSwitchBranch}
-            onRetryMessage={retryMessage}
-            onAnswerAsModel={answerAsAI}
-            onVoteMessage={
-              currentRootFolderId === "incognito" ? undefined : voteMessage
-            }
-            onModelChange={handleModelChange}
-            onPersonaChange={setSelectedPersona}
-            onSendMessage={handleFillInputWithPrompt}
-            showBranchIndicators={true}
-            branchIndices={branchIndices}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            onScreenshot={handleScreenshot}
-            rootFolderId={currentRootFolderId}
             logger={logger}
-            chat={chat}
             currentUserId={user?.id}
           />
         </SidebarWrapper>
       </Div>
 
       {/* Delete Message Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      <AlertDialog open={deleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>

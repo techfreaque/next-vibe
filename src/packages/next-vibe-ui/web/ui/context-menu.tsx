@@ -8,6 +8,7 @@ import {
 } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 // Cross-platform types
 export interface ContextMenuRootProps {
@@ -15,11 +16,10 @@ export interface ContextMenuRootProps {
   children?: React.ReactNode;
 }
 
-export interface ContextMenuTriggerProps {
+export type ContextMenuTriggerProps = {
   asChild?: boolean;
   children?: React.ReactNode;
-  className?: string;
-}
+} & StyleType;
 
 export interface ContextMenuGroupProps {
   children?: React.ReactNode;
@@ -43,27 +43,23 @@ export interface ContextMenuRadioGroupProps {
   children?: React.ReactNode;
 }
 
-export interface ContextMenuSubTriggerProps {
-  className?: string;
+export type ContextMenuSubTriggerProps = {
   children?: React.ReactNode;
   inset?: boolean;
-}
+} & StyleType;
 
-export interface ContextMenuSubContentProps {
-  className?: string;
+export type ContextMenuSubContentProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface ContextMenuContentProps {
-  className?: string;
+export type ContextMenuContentProps = {
   children?: React.ReactNode;
-  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onClick?: () => void;
   onCloseAutoFocus?: (event: Event) => void;
   forceMount?: true;
-}
+} & StyleType;
 
-export interface ContextMenuItemProps {
-  className?: string;
+export type ContextMenuItemProps = {
   children?: React.ReactNode;
   inset?: boolean;
   key?: string | number;
@@ -71,35 +67,29 @@ export interface ContextMenuItemProps {
   disabled?: boolean;
   asChild?: boolean;
   onClick?: () => void;
-}
+} & StyleType;
 
-export interface ContextMenuCheckboxItemProps {
-  className?: string;
+export type ContextMenuCheckboxItemProps = {
   children?: React.ReactNode;
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
-}
+} & StyleType;
 
-export interface ContextMenuRadioItemProps {
-  className?: string;
+export type ContextMenuRadioItemProps = {
   children?: React.ReactNode;
   value?: string;
-}
+} & StyleType;
 
-export interface ContextMenuLabelProps {
-  className?: string;
+export type ContextMenuLabelProps = {
   children?: React.ReactNode;
   inset?: boolean;
-}
+} & StyleType;
 
-export interface ContextMenuSeparatorProps {
-  className?: string;
-}
+export type ContextMenuSeparatorProps = StyleType;
 
-export interface ContextMenuShortcutProps {
-  className?: string;
+export type ContextMenuShortcutProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
 export function ContextMenu({
   children,
@@ -114,10 +104,17 @@ ContextMenu.displayName = ContextMenuPrimitive.Root.displayName;
 export function ContextMenuTrigger({
   children,
   asChild,
+  className,
+  style,
   ...props
 }: ContextMenuTriggerProps): React.JSX.Element {
   return (
-    <ContextMenuPrimitive.Trigger asChild={asChild} {...props}>
+    <ContextMenuPrimitive.Trigger
+      asChild={asChild}
+      className={className}
+      style={style}
+      {...props}
+    >
       {children}
     </ContextMenuPrimitive.Trigger>
   );
@@ -168,6 +165,7 @@ ContextMenuRadioGroup.displayName = ContextMenuPrimitive.RadioGroup.displayName;
 
 export function ContextMenuSubTrigger({
   className,
+  style,
   inset,
   children,
   ...props
@@ -179,6 +177,7 @@ export function ContextMenuSubTrigger({
         inset && "pl-8",
         className,
       )}
+      style={style}
       {...props}
     >
       {children}
@@ -190,6 +189,7 @@ ContextMenuSubTrigger.displayName = ContextMenuPrimitive.SubTrigger.displayName;
 
 export function ContextMenuSubContent({
   className,
+  style,
   ...props
 }: ContextMenuSubContentProps): React.JSX.Element {
   return (
@@ -198,6 +198,7 @@ export function ContextMenuSubContent({
         "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className,
       )}
+      style={style}
       {...props}
     />
   );
@@ -206,6 +207,7 @@ ContextMenuSubContent.displayName = ContextMenuPrimitive.SubContent.displayName;
 
 export function ContextMenuContent({
   className,
+  style,
   ...props
 }: ContextMenuContentProps): React.JSX.Element {
   return (
@@ -216,6 +218,7 @@ export function ContextMenuContent({
           "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           className,
         )}
+        style={style}
         {...props}
       />
     </ContextMenuPrimitive.Portal>
@@ -225,6 +228,7 @@ ContextMenuContent.displayName = ContextMenuPrimitive.Content.displayName;
 
 export function ContextMenuItem({
   className,
+  style,
   inset,
   children,
   ...props
@@ -236,6 +240,7 @@ export function ContextMenuItem({
         inset && "pl-8",
         className,
       )}
+      style={style}
       {...props}
     >
       {children}
@@ -246,6 +251,7 @@ ContextMenuItem.displayName = ContextMenuPrimitive.Item.displayName;
 
 export function ContextMenuCheckboxItem({
   className,
+  style,
   children,
   checked,
   onCheckedChange,
@@ -257,6 +263,7 @@ export function ContextMenuCheckboxItem({
         "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className,
       )}
+      style={style}
       checked={checked ?? false}
       onCheckedChange={onCheckedChange}
       {...props}
@@ -275,6 +282,7 @@ ContextMenuCheckboxItem.displayName =
 
 export function ContextMenuRadioItem({
   className,
+  style,
   children,
   value,
   ...props
@@ -285,6 +293,7 @@ export function ContextMenuRadioItem({
         "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className,
       )}
+      style={style}
       value={value ?? ""}
       {...props}
     >
@@ -301,6 +310,7 @@ ContextMenuRadioItem.displayName = ContextMenuPrimitive.RadioItem.displayName;
 
 export function ContextMenuLabel({
   className,
+  style,
   inset,
   children,
   ...props
@@ -312,6 +322,7 @@ export function ContextMenuLabel({
         inset && "pl-8",
         className,
       )}
+      style={style}
       {...props}
     >
       {children}
@@ -322,11 +333,13 @@ ContextMenuLabel.displayName = ContextMenuPrimitive.Label.displayName;
 
 export function ContextMenuSeparator({
   className,
+  style,
   ...props
 }: ContextMenuSeparatorProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.Separator
       className={cn("-mx-1 my-1 h-px bg-muted", className)}
+      style={style}
       {...props}
     />
   );
@@ -335,12 +348,14 @@ ContextMenuSeparator.displayName = ContextMenuPrimitive.Separator.displayName;
 
 export function ContextMenuShortcut({
   className,
+  style,
   children,
   ...props
 }: ContextMenuShortcutProps): React.JSX.Element {
   return (
     <span
       className={cn("ml-auto text-xs tracking-widest opacity-60", className)}
+      style={style}
       {...props}
     >
       {children}

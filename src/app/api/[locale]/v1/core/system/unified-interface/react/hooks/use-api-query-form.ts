@@ -9,7 +9,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
-import type { FormEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 
@@ -500,7 +499,6 @@ export function useApiQueryForm<
       InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
     >
   > = (
-    event: FormEvent<HTMLFormElement> | undefined,
     inputOptions?: SubmitFormFunctionOptions<
       ExtractOutput<
         InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
@@ -513,11 +511,6 @@ export function useApiQueryForm<
       >
     >,
   ): void => {
-    // Prevent default form submission behavior
-    if (event) {
-      event.preventDefault();
-    }
-
     // Create a properly typed options object with urlParamVariables
     const options: SubmitFormFunctionOptions<
       ExtractOutput<
@@ -701,7 +694,7 @@ export function useApiQueryForm<
           });
         }
       },
-    )(event);
+    )();
   };
 
   // Create a result object that combines form and query functionality

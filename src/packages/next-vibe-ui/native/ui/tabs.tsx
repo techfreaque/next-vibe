@@ -2,10 +2,12 @@ import * as TabsPrimitive from "@rn-primitives/tabs";
 import * as React from "react";
 
 import { cn } from "next-vibe/shared/utils/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 import { TextClassContext } from "./text";
 
 import type {
-  TabsRootProps,
+  TabsProps,
   TabsListProps,
   TabsTriggerProps,
   TabsContentProps,
@@ -22,8 +24,10 @@ function Tabs({
   defaultValue,
   orientation,
   activationMode,
+  className,
+  style,
   dir: _dir,
-}: TabsRootProps): React.JSX.Element {
+}: TabsProps): React.JSX.Element {
   // Handle controlled/uncontrolled state with defaultValue
   const [internalValue, setInternalValue] = React.useState(defaultValue ?? "");
   const isControlled = value !== undefined;
@@ -39,12 +43,18 @@ function Tabs({
     [isControlled, onValueChange],
   );
 
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <TabsPrimitive.Root
       value={currentValue}
       onValueChange={handleValueChange}
       orientation={orientation}
       activationMode={activationMode}
+      {...applyStyleType({
+        nativeStyle,
+        className,
+      })}
     >
       {children}
     </TabsPrimitive.Root>
@@ -54,16 +64,20 @@ Tabs.displayName = TabsPrimitive.Root.displayName;
 
 function TabsList({
   className,
+  style,
   children,
-  ...props
 }: TabsListProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <StyledTabsList
-      className={cn(
-        "inline-flex h-11 h-12 items-center justify-center rounded-lg bg-muted/50 p-1 px-1.5 border border-border",
-        className,
-      )}
-      {...props}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "inline-flex flex-row h-12 items-center justify-center rounded-lg bg-muted/50 p-1 px-1.5 border border-border",
+          className,
+        ),
+      })}
     >
       {children}
     </StyledTabsList>
@@ -73,12 +87,14 @@ TabsList.displayName = TabsPrimitive.List.displayName;
 
 function TabsTrigger({
   className,
+  style,
   value,
   disabled,
   children,
-  ...props
 }: TabsTriggerProps): React.JSX.Element {
   const { value: selectedValue } = TabsPrimitive.useRootContext();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <TextClassContext.Provider
       value={cn(
@@ -89,13 +105,15 @@ function TabsTrigger({
       <StyledTabsTrigger
         value={value}
         disabled={disabled}
-        className={cn(
-          "inline-flex items-center justify-center shadow-none whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-          disabled && "pointer-events-none opacity-50",
-          value === selectedValue && "bg-primary shadow-sm",
-          className,
-        )}
-        {...props}
+        {...applyStyleType({
+          nativeStyle,
+          className: cn(
+            "inline-flex flex-row items-center justify-center shadow-none whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            disabled && "pointer-events-none opacity-50",
+            value === selectedValue && "bg-primary shadow-sm",
+            className,
+          ),
+        })}
       >
         {children}
       </StyledTabsTrigger>
@@ -106,18 +124,22 @@ TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
 function TabsContent({
   className,
+  style,
   value,
   children,
-  ...props
 }: TabsContentProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <StyledTabsContent
       value={value}
-      className={cn(
-        "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        className,
-      )}
-      {...props}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          className,
+        ),
+      })}
     >
       {children}
     </StyledTabsContent>

@@ -1,6 +1,7 @@
 import { cva } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 const alertVariants = cva(
   "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-3.5 [&>svg~*]:pl-7",
@@ -23,41 +24,37 @@ const alertVariants = cva(
   },
 );
 
-// Cross-platform types for native import
 export type AlertVariant = "default" | "destructive" | "success" | "warning";
 
-export interface AlertProps {
-  className?: string;
+export type AlertProps = {
   variant?: AlertVariant;
   children?: React.ReactNode;
   icon?:
     | React.ComponentType<React.SVGProps<SVGSVGElement>>
-    | React.ComponentType<{ size?: number; color?: string }>; // Support both SVG and Lucide icons
+    | React.ComponentType<{ size?: number; color?: string }>;
   iconSize?: number;
   iconClassName?: string;
-}
+} & StyleType;
 
-export interface AlertTitleProps {
-  className?: string;
+export type AlertTitleProps = {
   children: React.ReactNode;
-}
+} & StyleType;
 
-export interface AlertDescriptionProps {
-  className?: string;
+export type AlertDescriptionProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
 const Alert = ({
   className,
+  style,
   variant,
   icon: Icon,
   children,
-  ...props
 }: AlertProps): React.JSX.Element => (
   <div
     role="alert"
     className={cn(alertVariants({ variant }), className)}
-    {...props}
+    style={style}
   >
     {Icon && <Icon />}
     {children}
@@ -66,12 +63,12 @@ const Alert = ({
 
 const AlertTitle = ({
   className,
+  style,
   children,
-  ...props
 }: AlertTitleProps): React.JSX.Element => (
   <h5
     className={cn("mb-1 font-medium leading-none tracking-tight", className)}
-    {...props}
+    style={style}
   >
     {children}
   </h5>
@@ -79,9 +76,12 @@ const AlertTitle = ({
 
 const AlertDescription = ({
   className,
-  ...props
+  style,
+  children,
 }: AlertDescriptionProps): React.JSX.Element => (
-  <div className={cn("text-sm [&_p]:leading-relaxed", className)} {...props} />
+  <div className={cn("text-sm [&_p]:leading-relaxed", className)} style={style}>
+    {children}
+  </div>
 );
 
 export { Alert, AlertDescription, AlertTitle, alertVariants };

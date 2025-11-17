@@ -38,10 +38,10 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
     readonly path: readonly string[];
     readonly method: Methods;
   },
-  requestData?: TRequestData,
-  urlPathParams?: TUrlPathParams,
-  customQueryKey?: QueryKey,
-  logger?: EndpointLogger,
+  logger: EndpointLogger,
+  requestData: TRequestData,
+  urlPathParams: TUrlPathParams,
+  customQueryKey: QueryKey,
 ): QueryKey {
   // If custom query key is provided, use it
   if (customQueryKey) {

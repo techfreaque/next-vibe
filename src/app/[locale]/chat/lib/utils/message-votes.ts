@@ -3,7 +3,7 @@
  * Utilities for handling message upvotes/downvotes
  */
 
-import type { ChatMessage } from "../../types";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
 
 export interface VoteStatus {
   userVote: "up" | "down" | null;

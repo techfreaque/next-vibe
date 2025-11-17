@@ -12,8 +12,6 @@ import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "@/app/api/[locale]/v1/core/user/auth/types";
-import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
-import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -314,46 +312,18 @@ export class CliAuthHandler extends BaseAuthHandler {
 
   /**
    * Authenticate user by email
+   * Delegates to authRepository for business logic
    */
   private async authenticateByEmail(
     email: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
-    try {
-      logger.debug("Authenticating CLI user by email", { email });
-
-      const userResult = await userRepository.getUserByEmail(
-        email,
-        UserDetailLevel.COMPLETE,
-        locale,
-        logger,
-      );
-
-      if (!userResult.success || !userResult.data) {
-        logger.debug("CLI user not found in database", { email });
-        return fail({
-          message:
-            "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.userNotFound",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { email },
-        });
-      }
-
-      const user = userResult.data;
-      const leadId = await this.getLeadIdFromDb(user.id, locale, logger);
-
-      return success(this.createPrivateUser(user.id, leadId || ""));
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Error authenticating by email", parsedError);
-      return fail({
-        message:
-          "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.authenticationFailed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
-      });
-    }
+    // Import dynamically to avoid circular dependencies
+    const { authRepository } = await import(
+      "@/app/api/[locale]/v1/core/user/auth/repository"
+    );
+    return authRepository.authenticateUserByEmail(email, locale, logger);
   }
 }
 

@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
 import type * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 const badgeVariants = cva(
   "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
@@ -24,30 +25,39 @@ const badgeVariants = cva(
   },
 );
 
-// Cross-platform types - exported for native
+const badgeTextVariants = cva("text-xs font-semibold", {
+  variants: {
+    variant: {
+      default: "text-primary-foreground",
+      secondary: "text-secondary-foreground",
+      destructive: "text-destructive-foreground",
+      outline: "text-foreground",
+      notification: "text-white",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+});
+
 export type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
 
-// Platform-agnostic props that work on both web and native
-export interface BadgeProps {
+export type BadgeProps = {
   variant?: BadgeVariant;
-  className?: string;
   children?: React.ReactNode;
-  asChild?: boolean; // Native-specific, optional for web
-}
-
-// Web-specific props with full HTML attributes
-export interface WebBadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+} & StyleType;
 
 function Badge({
   className,
+  style,
   variant,
-  ...props
-}: WebBadgeProps): React.JSX.Element {
+  children,
+}: BadgeProps): React.JSX.Element {
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    <div className={cn(badgeVariants({ variant }), className)} style={style}>
+      {children}
+    </div>
   );
 }
 
-export { Badge, badgeVariants };
+export { Badge, badgeTextVariants, badgeVariants };

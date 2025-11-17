@@ -75,9 +75,7 @@ export interface EndpointFormRendererProps<
   /** React Hook Form instance */
   form: UseFormReturn<TEndpoint["TRequestOutput"]>;
   /** Form submit handler */
-  onSubmit:
-    | ((e: React.FormEvent<HTMLFormElement>) => void | Promise<void>)
-    | undefined;
+  onSubmit: (() => void | Promise<void>) | undefined;
   /** Current locale */
   locale: CountryLanguage;
   /** Whether the form is submitting */

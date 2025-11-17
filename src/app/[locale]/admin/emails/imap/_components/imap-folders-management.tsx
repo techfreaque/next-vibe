@@ -72,7 +72,7 @@ export function ImapFoldersManagement({
 
             {/* Controls */}
             <Div className="flex items-center justify-between">
-              <Div className="flex items-center flex flex-row gap-4">
+              <Div className="items-center flex flex-row gap-4">
                 <Div className="flex flex-col gap-2">
                   <Label htmlFor="account-select">
                     {t("app.admin.emails.imap.common.selectAccount")}

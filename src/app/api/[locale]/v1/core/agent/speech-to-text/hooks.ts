@@ -129,7 +129,7 @@ export function useEdenAISpeech({
       endpoint.create.form.setValue("language", languageCode);
 
       // Submit form with callbacks
-      await endpoint.create.submitForm(undefined, {
+      await endpoint.create.submitForm({
         onSuccess: ({ responseData }) => {
           logger.debug("STT: Response received", {
             responseData: JSON.stringify(responseData),

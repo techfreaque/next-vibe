@@ -1,7 +1,6 @@
 "use client";
 
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-import type { FormEvent } from "react";
 import { useMemo } from "react";
 import type { z } from "zod";
 
@@ -210,12 +209,7 @@ export function useEndpoint<
         ...createOperation,
         values: createValues,
         setValue: createOperation.form.setValue.bind(createOperation.form),
-        onSubmit: async (
-          e: FormEvent<HTMLFormElement> | undefined,
-        ): Promise<void> => {
-          e?.preventDefault();
-          await createOperation.submitForm(e);
-        },
+        onSubmit: createOperation.submitForm,
         reset: (): void => createOperation.form.reset(resetData || {}),
         isSuccess: createOperation.isSubmitSuccessful,
         isDirty: createOperation.form.formState.isDirty,

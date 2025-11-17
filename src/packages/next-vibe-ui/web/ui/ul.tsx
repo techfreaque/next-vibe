@@ -1,15 +1,14 @@
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 export interface UlMouseEvent {
   preventDefault?: () => void;
   stopPropagation?: () => void;
 }
 
-export interface UlProps {
-  className?: string;
+export type UlProps = {
   children?: React.ReactNode;
-  style?: React.CSSProperties;
   id?: string;
   role?: string;
   "aria-label"?: string;
@@ -18,7 +17,7 @@ export interface UlProps {
   onClick?: (event: UlMouseEvent) => void;
   onMouseEnter?: (event: UlMouseEvent) => void;
   onMouseLeave?: (event: UlMouseEvent) => void;
-}
+} & StyleType;
 
 function Ul({ className, children, ...props }: UlProps): React.JSX.Element {
   return (

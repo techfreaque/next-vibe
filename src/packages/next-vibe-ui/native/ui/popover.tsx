@@ -1,9 +1,12 @@
 import * as PopoverPrimitive from "@rn-primitives/popover";
 import * as React from "react";
-import { StyleSheet } from "react-native";
+import { View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { styled } from "nativewind";
 
 import { cn } from "next-vibe/shared/utils/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 import { TextClassContext } from "./text";
 
 import type {
@@ -15,7 +18,7 @@ import type {
   PopoverCloseProps,
 } from "@/packages/next-vibe-ui/web/ui/popover";
 
-const StyledPopoverContent = PopoverPrimitive.Content;
+const StyledView = styled(View, { className: "style" });
 
 function Popover({ children, ...props }: PopoverRootProps): React.JSX.Element {
   return <PopoverPrimitive.Root {...props}>{children}</PopoverPrimitive.Root>;
@@ -55,34 +58,58 @@ PopoverPortal.displayName = "PopoverPortal";
 
 function PopoverContent({
   className,
+  style,
   align = "center",
   sideOffset = 4,
   children,
   alignOffset,
   side,
   forceMount,
+  onOpenAutoFocus,
+  onCloseAutoFocus,
+  onEscapeKeyDown,
+  onPointerDownOutside,
+  onInteractOutside,
 }: PopoverContentProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   // Filter side to only supported values for RN primitives
   const nativeSide = side === "left" || side === "right" ? undefined : side;
 
   return (
     <PopoverPrimitive.Portal>
-      <PopoverPrimitive.Overlay style={StyleSheet.absoluteFill}>
-        <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut}>
+      <PopoverPrimitive.Overlay>
+        <Animated.View
+          entering={FadeIn.duration(200)}
+          exiting={FadeOut}
+          style={convertCSSToViewStyle({ zIndex: 9999 })}
+        >
           <TextClassContext.Provider value="text-popover-foreground">
-            <StyledPopoverContent
+            <PopoverPrimitive.Content
+              asChild
               align={align}
               sideOffset={sideOffset}
               alignOffset={alignOffset}
               side={nativeSide}
               forceMount={forceMount}
-              className={cn(
-                "z-50 w-72 rounded-md cursor-auto border border-border bg-popover p-4 shadow-md shadow-foreground/5 outline-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 animate-in zoom-in-95 fade-in-0",
-                className,
-              )}
+              onOpenAutoFocus={onOpenAutoFocus}
+              onCloseAutoFocus={onCloseAutoFocus}
+              onEscapeKeyDown={onEscapeKeyDown}
+              onPointerDownOutside={onPointerDownOutside}
+              onInteractOutside={onInteractOutside}
             >
-              {children}
-            </StyledPopoverContent>
+              <StyledView
+                {...applyStyleType({
+                  nativeStyle,
+                  className: cn(
+                    "z-50 w-72 rounded-md cursor-auto border border-border bg-popover p-4 shadow-md shadow-foreground/5 outline-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 animate-in zoom-in-95 fade-in-0",
+                    className,
+                  ),
+                })}
+              >
+                {children}
+              </StyledView>
+            </PopoverPrimitive.Content>
           </TextClassContext.Provider>
         </Animated.View>
       </PopoverPrimitive.Overlay>
@@ -94,10 +121,18 @@ PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 function PopoverClose({
   children,
   asChild,
-  ...props
+  className,
+  style,
 }: PopoverCloseProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
-    <PopoverPrimitive.Close asChild={asChild} {...props}>
+    <PopoverPrimitive.Close
+      asChild={asChild}
+      {...applyStyleType({
+        nativeStyle,
+        className,
+      })}
+    >
       {children}
     </PopoverPrimitive.Close>
   );

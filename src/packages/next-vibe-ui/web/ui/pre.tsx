@@ -1,13 +1,15 @@
 import type { JSX, ReactNode } from "react";
+import type { StyleType } from "../utils/style-type";
 
-// Cross-platform props interface - narrowed to what both platforms support
-// Excludes style to allow platform-specific styling
-export interface PreProps {
+export type PreProps = {
   children?: ReactNode;
-  className?: string;
   id?: string;
-}
+} & StyleType;
 
-export function Pre(props: PreProps): JSX.Element {
-  return <pre {...props} />;
+export function Pre({ className, style, children, id }: PreProps): JSX.Element {
+  return (
+    <pre className={className} style={style} id={id}>
+      {children}
+    </pre>
+  );
 }

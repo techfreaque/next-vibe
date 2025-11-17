@@ -1,5 +1,6 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
+import { useState } from "react";
 import type { JSX } from "react";
 
 import {
@@ -39,6 +40,9 @@ import { Section } from "next-vibe-ui/ui/section";
 import { H2, H3, Small } from "next-vibe-ui/ui/typography";
 
 export function NavigationPreview(): JSX.Element {
+  const [showBookmarks, setShowBookmarks] = useState(false);
+  const [showFullUrls, setShowFullUrls] = useState(true);
+
   return (
     <Div className="space-y-8">
       <Section>
@@ -169,10 +173,16 @@ export function NavigationPreview(): JSX.Element {
               <MenubarMenu>
                 <MenubarTrigger>View</MenubarTrigger>
                 <MenubarContent>
-                  <MenubarCheckboxItem>
+                  <MenubarCheckboxItem
+                    checked={showBookmarks}
+                    onCheckedChange={setShowBookmarks}
+                  >
                     Always Show Bookmarks Bar
                   </MenubarCheckboxItem>
-                  <MenubarCheckboxItem checked>
+                  <MenubarCheckboxItem
+                    checked={showFullUrls}
+                    onCheckedChange={setShowFullUrls}
+                  >
                     Always Show Full URLs
                   </MenubarCheckboxItem>
                   <MenubarSeparator />

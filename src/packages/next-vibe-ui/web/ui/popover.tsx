@@ -3,6 +3,7 @@
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 // Cross-platform types
 export interface PopoverRootProps {
@@ -29,8 +30,7 @@ export interface PopoverPortalProps {
   container?: HTMLElement | null;
 }
 
-export interface PopoverContentProps {
-  className?: string;
+export type PopoverContentProps = {
   children?: React.ReactNode;
   align?: "start" | "center" | "end";
   sideOffset?: number;
@@ -43,13 +43,12 @@ export interface PopoverContentProps {
   onInteractOutside?: (event: Event) => void;
   forceMount?: true;
   id?: string;
-}
+} & StyleType;
 
-export interface PopoverCloseProps {
-  className?: string;
+export type PopoverCloseProps = {
   children?: React.ReactNode;
   asChild?: boolean;
-}
+} & StyleType;
 
 export function Popover({
   children,
@@ -100,21 +99,42 @@ PopoverPortal.displayName = PopoverPrimitive.Portal.displayName;
 
 export function PopoverContent({
   className,
+  style,
   align = "center",
   sideOffset = 4,
-  ...props
+  alignOffset,
+  side,
+  onOpenAutoFocus,
+  onCloseAutoFocus,
+  onEscapeKeyDown,
+  onPointerDownOutside,
+  onInteractOutside,
+  forceMount,
+  id,
+  children,
 }: PopoverContentProps): React.JSX.Element {
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
         align={align}
         sideOffset={sideOffset}
+        alignOffset={alignOffset}
+        side={side}
+        onOpenAutoFocus={onOpenAutoFocus}
+        onCloseAutoFocus={onCloseAutoFocus}
+        onEscapeKeyDown={onEscapeKeyDown}
+        onPointerDownOutside={onPointerDownOutside}
+        onInteractOutside={onInteractOutside}
+        forceMount={forceMount}
+        id={id}
         className={cn(
           "z-[9999] w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           className,
         )}
-        {...props}
-      />
+        style={style}
+      >
+        {children}
+      </PopoverPrimitive.Content>
     </PopoverPrimitive.Portal>
   );
 }
@@ -122,11 +142,16 @@ PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
 export function PopoverClose({
   children,
+  className,
+  style,
   asChild,
-  ...props
 }: PopoverCloseProps): React.JSX.Element {
   return (
-    <PopoverPrimitive.Close asChild={asChild} {...props}>
+    <PopoverPrimitive.Close
+      asChild={asChild}
+      className={className}
+      style={style}
+    >
       {children}
     </PopoverPrimitive.Close>
   );

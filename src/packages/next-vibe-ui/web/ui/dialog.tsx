@@ -4,6 +4,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Cross2Icon } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 
@@ -32,40 +33,34 @@ export interface DialogCloseProps {
   children?: React.ReactNode;
 }
 
-export interface DialogOverlayProps {
-  className?: string;
+export type DialogOverlayProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface DialogContentProps {
-  className?: string;
+export type DialogContentProps = {
   children?: React.ReactNode;
   onOpenAutoFocus?: (event: Event) => void;
   onCloseAutoFocus?: (event: Event) => void;
   onEscapeKeyDown?: (event: Event) => void;
   onPointerDownOutside?: (event: Event) => void;
   onInteractOutside?: (event: Event) => void;
-}
+} & StyleType;
 
-export interface DialogHeaderProps {
-  className?: string;
+export type DialogHeaderProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface DialogFooterProps {
-  className?: string;
+export type DialogFooterProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface DialogTitleProps {
-  className?: string;
+export type DialogTitleProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface DialogDescriptionProps {
-  className?: string;
+export type DialogDescriptionProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
 export function Dialog({
   children,
@@ -116,6 +111,7 @@ DialogClose.displayName = DialogPrimitive.Close.displayName;
 
 export function DialogOverlay({
   className,
+  style,
   ...props
 }: DialogOverlayProps): React.JSX.Element {
   return (
@@ -124,6 +120,7 @@ export function DialogOverlay({
         "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         className,
       )}
+      style={style}
       {...props}
     />
   );
@@ -132,6 +129,7 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 export function DialogContent({
   className,
+  style,
   children,
   ...props
 }: DialogContentProps): React.JSX.Element {
@@ -145,6 +143,7 @@ export function DialogContent({
           "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
           className,
         )}
+        style={style}
         {...props}
       >
         {children}
@@ -162,6 +161,7 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 export function DialogHeader({
   className,
+  style,
   children,
 }: DialogHeaderProps): React.JSX.Element {
   return (
@@ -170,6 +170,7 @@ export function DialogHeader({
         "flex flex-col space-y-1.5 text-center sm:text-left",
         className,
       )}
+      style={style}
     >
       {children}
     </div>
@@ -179,6 +180,7 @@ DialogHeader.displayName = "DialogHeader";
 
 export function DialogFooter({
   className,
+  style,
   children,
 }: DialogFooterProps): React.JSX.Element {
   return (
@@ -187,6 +189,7 @@ export function DialogFooter({
         "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
         className,
       )}
+      style={style}
     >
       {children}
     </div>
@@ -196,6 +199,7 @@ DialogFooter.displayName = "DialogFooter";
 
 export function DialogTitle({
   className,
+  style,
   ...props
 }: DialogTitleProps): React.JSX.Element {
   return (
@@ -204,6 +208,7 @@ export function DialogTitle({
         "text-lg font-semibold leading-none tracking-tight",
         className,
       )}
+      style={style}
       {...props}
     />
   );
@@ -212,11 +217,13 @@ DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
 export function DialogDescription({
   className,
+  style,
   ...props
 }: DialogDescriptionProps): React.JSX.Element {
   return (
     <DialogPrimitive.Description
       className={cn("text-sm text-muted-foreground", className)}
+      style={style}
       {...props}
     />
   );

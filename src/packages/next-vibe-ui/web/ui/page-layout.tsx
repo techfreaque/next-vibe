@@ -1,22 +1,25 @@
-// Web implementation - simple passthrough
 import type { ReactNode } from "react";
+import type { StyleType } from "../utils/style-type";
 
-export interface PageLayoutProps {
+export type PageLayoutProps = {
   children: ReactNode;
-  className?: string;
   scrollable?: boolean;
-}
+} & StyleType;
 
 /**
- * PageLayout - Cross-platform page wrapper
  * Web: Simple div wrapper (no safe area needed)
  * Native: SafeAreaView with optional scrolling
  */
 export function PageLayout({
   children,
   className,
+  style,
 }: PageLayoutProps): React.JSX.Element {
-  return <div className={className}>{children}</div>;
+  return (
+    <div className={className} style={style}>
+      {children}
+    </div>
+  );
 }
 
 PageLayout.displayName = "PageLayout";

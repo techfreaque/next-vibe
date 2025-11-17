@@ -26,6 +26,7 @@ import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { Button } from "@/packages/next-vibe-ui/native/ui/button";
 
 interface HomePageProps {
   params: Promise<{
@@ -60,7 +61,7 @@ export default async function HomePage({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Div className="flex flex-row items-center flex flex-row gap-2">
+            <Div className="flex-row items-center flex gap-2">
               <Span className="text-2xl font-bold text-primary">{locale}</Span>
             </Div>
           </CardContent>
@@ -102,30 +103,30 @@ export default async function HomePage({
           </CardContent>
           <CardFooter>
             <Div>
-              <Link href={`/${locale}/chat`} asChild>
-                {/* <Button className="w-full"> */}
-                <Span>{t("app.native.page.links.chat")}</Span>
-                {/* </Button> */}
+              <Link href={`/${locale}`}>
+                <Button className="w-full">
+                  <Span>{t("app.native.page.links.chat")}</Span>
+                </Button>
               </Link>
-              <Link href={`/${locale}/help`} asChild>
-                {/* <Button className="w-full"> */}
-                <Span>{t("app.native.page.links.help")}</Span>
-                {/* </Button> */}
+              <Link href={`/${locale}/help`}>
+                <Button className="w-full">
+                  <Span>{t("app.native.page.links.help")}</Span>
+                </Button>
               </Link>
-              <Link href={`/${locale}/story/about-us`} asChild>
-                {/* <Button className="w-full"> */}
-                <Span>{t("app.native.page.links.about")}</Span>
-                {/* </Button> */}
+              <Link href={`/${locale}/story/about-us`}>
+                <Button className="w-full">
+                  <Span>{t("app.native.page.links.about")}</Span>
+                </Button>
               </Link>
-              <Link href={`/${locale}/story`} asChild>
-                {/* <Button className="w-full"> */}
-                <Span>{t("app.native.page.links.story")}</Span>
-                {/* </Button> */}
+              <Link href={`/${locale}/story`}>
+                <Button>
+                  <Span>{t("app.native.page.links.story")}</Span>
+                </Button>
               </Link>
-              <Link href={`/${locale}/design-test`} asChild>
-                <Span className="text-primary font-bold">
+              <Link href={`/${locale}/design-test`}>
+                {/* <Button> */}
                   {t("app.native.page.links.designTest")}
-                </Span>
+                {/* </Button> */}
               </Link>
             </Div>
           </CardFooter>

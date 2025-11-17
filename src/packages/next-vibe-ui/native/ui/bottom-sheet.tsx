@@ -7,6 +7,7 @@
 import type { ReactNode } from "react";
 import React from "react";
 import { View } from "react-native";
+import { styled } from "nativewind";
 
 export {
   Sheet as BottomSheet,
@@ -14,6 +15,8 @@ export {
   SheetContent as BottomSheetContent,
   SheetTrigger as BottomSheetOpenTrigger,
 } from "./sheet";
+
+const StyledView = styled(View, { className: "style" });
 
 interface BottomSheetViewProps {
   children: ReactNode;
@@ -24,7 +27,7 @@ export function BottomSheetView({
   children,
   className,
 }: BottomSheetViewProps): React.JSX.Element {
-  return <View className={className}>{children}</View>;
+  return <StyledView className={className}>{children}</StyledView>;
 }
 
 BottomSheetView.displayName = "BottomSheetView";

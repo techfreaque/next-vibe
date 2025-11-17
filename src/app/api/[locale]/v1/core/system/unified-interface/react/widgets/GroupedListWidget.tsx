@@ -42,7 +42,6 @@ export const GroupedListWidget = ({
   metadata: _metadata,
   context: _context,
   className = "",
-  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element => {
   // Initialize hooks before any early returns
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
@@ -58,11 +57,7 @@ export const GroupedListWidget = ({
   }, [typedData]);
 
   if (!isValidData || !typedData) {
-    return (
-      <Div className={className} style={style}>
-        —
-      </Div>
-    );
+    return <Div className={className}>—</Div>;
   }
 
   const toggleGroup = (groupKey: string): void => {
@@ -78,7 +73,7 @@ export const GroupedListWidget = ({
   };
 
   return (
-    <Div className={`flex flex-col gap-4 ${className}`} style={style}>
+    <Div className={`flex flex-col gap-4 ${className}`}>
       {typedData.groups.map((group) => {
         const isExpanded = expandedGroups.has(group.key);
         const itemCount = group.items.length;

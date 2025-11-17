@@ -29,7 +29,7 @@ export interface CommandMetadata {
  */
 export interface HelpServiceOptions {
   category?: string;
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
 }
 
 /**

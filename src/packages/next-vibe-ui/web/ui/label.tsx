@@ -9,12 +9,10 @@ const labelVariants = cva(
   "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 );
 
-// Cross-platform props interface
 export interface LabelRootProps {
-  className?: string;
   children?: React.ReactNode;
   htmlFor?: string;
-  nativeID?: string;
+  className?: string;
 }
 
 export function Label({

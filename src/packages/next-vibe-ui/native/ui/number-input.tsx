@@ -1,16 +1,19 @@
-/**
- * Number Input Component (React Native)
- * A number input with increment/decrement buttons
- */
+import * as React from "react";
+import { View } from "react-native";
+import { styled } from "nativewind";
 
-import { Minus, Plus } from "lucide-react-native";
+import type { NumberInputProps } from "@/packages/next-vibe-ui/web/ui/number-input";
 
+import { cn } from "../lib/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 import { Button } from "./button";
-import { Div } from "./div";
+import { Minus, Plus } from "./icons";
 import { Input } from "./input";
 
-// Import ALL types from web - ZERO definitions here
-import type { NumberInputProps } from "@/packages/next-vibe-ui/web/ui/number-input";
+const StyledView = styled(View, { className: "style" });
+
+export type { NumberInputProps };
 
 export function NumberInput({
   value = 1,
@@ -21,20 +24,25 @@ export function NumberInput({
   step = 1,
   disabled = false,
   className,
+  style,
   name: _name,
 }: NumberInputProps): React.JSX.Element {
+  const currentValue = value ?? min;
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   const handleDecrement = (): void => {
-    const newValue = Math.max(min, (value || min) - step);
+    const newValue = Math.max(min, currentValue - step);
     onChange?.(newValue);
   };
 
   const handleIncrement = (): void => {
-    const newValue = Math.min(max, (value || min) + step);
+    const newValue = Math.min(max, currentValue + step);
     onChange?.(newValue);
   };
 
   const handleInputChange = (text: string): void => {
-    if (text === "") {
+    if (text === "" || text === "-") {
+      // Allow empty or negative sign for better UX
       onChange?.(min);
       return;
     }
@@ -45,19 +53,27 @@ export function NumberInput({
     }
   };
 
+  const isDecrementDisabled = disabled || currentValue <= min;
+  const isIncrementDisabled = disabled || currentValue >= max;
+
   return (
-    <Div className={`flex flex-row items-center gap-3 ${className || ""}`}>
+    <StyledView
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("flex-row items-center gap-3", className),
+      })}
+    >
       <Button
         variant="outline"
         size="sm"
         onClick={handleDecrement}
-        disabled={disabled || (value !== undefined && value <= min)}
+        disabled={isDecrementDisabled}
       >
         <Minus size={16} />
       </Button>
-      <Input
+      <Input<"number">
         keyboardType="numeric"
-        value={String(value)}
+        value={currentValue}
         onChangeText={handleInputChange}
         onBlur={onBlur}
         editable={!disabled}
@@ -67,10 +83,10 @@ export function NumberInput({
         variant="outline"
         size="sm"
         onClick={handleIncrement}
-        disabled={disabled || (value !== undefined && value >= max)}
+        disabled={isIncrementDisabled}
       >
         <Plus size={16} />
       </Button>
-    </Div>
+    </StyledView>
   );
 }

@@ -398,14 +398,15 @@ export class WebAuthHandler extends BaseAuthHandler {
     logger: EndpointLogger,
   ): Promise<string | null> {
     // Import here to avoid circular dependencies
-    const { leadAuthService } = await import(
-      "@/app/api/[locale]/v1/core/leads/auth-service"
+    const { leadAuthRepository } = await import(
+      "@/app/api/[locale]/v1/core/leads/auth/repository"
     );
 
     // If we have an existing leadId from cookie, validate and reuse it
     if (existingLeadId) {
-      const isValid = await leadAuthService.validateLeadId(
+      const isValid = await leadAuthRepository.validateLeadId(
         existingLeadId,
+        locale,
         logger,
       );
       if (isValid) {
@@ -432,10 +433,9 @@ export class WebAuthHandler extends BaseAuthHandler {
       userAgent: undefined,
       referer: undefined,
       ipAddress: undefined,
-      timestamp: new Date().toISOString(),
     };
 
-    const result = await leadAuthService.ensurePublicLeadId(
+    const result = await leadAuthRepository.ensurePublicLeadId(
       undefined, // Don't pass existingLeadId since we already validated it above
       clientInfo,
       locale,

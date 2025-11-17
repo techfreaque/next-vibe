@@ -5,29 +5,25 @@ import type { SlotProps } from "input-otp";
 import { OTPInput, OTPInputContext } from "input-otp";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
-export interface InputOTPProps {
-  className?: string;
+export type InputOTPProps = {
   containerClassName?: string;
   value?: string;
   onChange?: (value: string) => void;
   maxLength?: number;
   children: React.ReactNode;
-}
+} & StyleType;
 
-export interface InputOTPGroupProps {
-  className?: string;
+export type InputOTPGroupProps = {
   children: React.ReactNode;
-}
+} & StyleType;
 
-export interface InputOTPSlotProps {
+export type InputOTPSlotProps = {
   index: number;
-  className?: string;
-}
+} & StyleType;
 
-export interface InputOTPSeparatorProps {
-  className?: string;
-}
+export type InputOTPSeparatorProps = StyleType;
 
 export interface OTPContextValue {
   value: string;
@@ -37,6 +33,7 @@ export interface OTPContextValue {
 
 function InputOTP({
   className,
+  style,
   containerClassName,
   maxLength = 6,
   value,
@@ -53,6 +50,7 @@ function InputOTP({
         containerClassName,
       )}
       className={cn("disabled:cursor-not-allowed", className)}
+      style={style}
     >
       {children}
     </OTPInput>
@@ -62,15 +60,21 @@ InputOTP.displayName = "InputOTP";
 
 function InputOTPGroup({
   className,
+  style,
   children,
 }: InputOTPGroupProps): React.JSX.Element {
-  return <div className={cn("flex items-center", className)}>{children}</div>;
+  return (
+    <div className={cn("flex items-center", className)} style={style}>
+      {children}
+    </div>
+  );
 }
 InputOTPGroup.displayName = "InputOTPGroup";
 
 function InputOTPSlot({
   index,
   className,
+  style,
 }: InputOTPSlotProps): React.JSX.Element | null {
   const inputOTPContext = React.useContext(OTPInputContext);
   const slotProps = inputOTPContext.slots[index];
@@ -86,6 +90,7 @@ function InputOTPSlot({
         isActive ? "z-10 ring-1 ring-ring" : "",
         className,
       )}
+      style={style}
     >
       {char}
       {hasFakeCaret && (
@@ -100,9 +105,10 @@ InputOTPSlot.displayName = "InputOTPSlot";
 
 function InputOTPSeparator({
   className,
+  style,
 }: InputOTPSeparatorProps): React.JSX.Element {
   return (
-    <div role="separator" className={className}>
+    <div role="separator" className={className} style={style}>
       <DashIcon />
     </div>
   );

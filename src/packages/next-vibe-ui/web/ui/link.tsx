@@ -1,33 +1,34 @@
 import NextLink from "next/link";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
-// Cross-platform base props interface
-export interface LinkBaseProps {
-  className?: string;
+export type LinkProps = {
   children?: React.ReactNode;
   href: string;
-}
-
-// Web-specific props interface that extends Next.js Link
-export interface LinkProps
-  extends React.ComponentPropsWithoutRef<typeof NextLink> {
-  asChild?: boolean;
-  className?: string;
-}
+  target?: "_blank" | "_self" | "_parent" | "_top";
+  rel?: string;
+  onClick?: () => void;
+} & StyleType;
 
 /**
  * Link component for web using Next.js Link
  * Supports asChild pattern for composition
  */
-function Link({ className, children, ...props }: LinkProps): React.JSX.Element {
+export function Link({
+  className,
+  style,
+  children,
+  href,
+}: LinkProps): React.JSX.Element {
   return (
     <NextLink
       className={cn(
         "text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         className,
       )}
-      {...props}
+      style={style}
+      href={href}
     >
       {children}
     </NextLink>
@@ -35,5 +36,3 @@ function Link({ className, children, ...props }: LinkProps): React.JSX.Element {
 }
 
 Link.displayName = "Link";
-
-export { Link };

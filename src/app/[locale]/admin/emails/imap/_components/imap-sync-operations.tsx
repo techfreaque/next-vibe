@@ -187,8 +187,8 @@ export function ImapSyncOperations(): JSX.Element {
     syncEndpoint.create.form.setValue("dryRun", false);
     syncEndpoint.create.form.setValue("maxMessages", 1000);
 
-    // Submit the form directly - handleSubmit handles the event internally
-    void syncEndpoint.create.submitForm(undefined);
+    // Submit the form directly
+    void syncEndpoint.create.onSubmit();
   };
 
   const handleStopSync = (): void => {

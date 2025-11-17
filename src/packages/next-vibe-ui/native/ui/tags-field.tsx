@@ -8,10 +8,12 @@ import { Plus, X } from "./icons";
 
 // Import cross-platform types from web (source of truth)
 import type {
-  TagOptionBase,
-  TagsFieldPropsBase,
+  TagOption,
+  TagsFieldProps,
 } from "@/packages/next-vibe-ui/web/ui/tags-field";
 import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 
 import { useTranslation } from "../../../../i18n/core/client";
 import { cn } from "../lib/utils";
@@ -20,39 +22,36 @@ import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
 
-// Native uses base interface directly (without TranslationKey dependency)
-export type TagsFieldProps = TagsFieldPropsBase;
-
 export function TagsField({
   value = [],
   onChange,
   onBlur,
   suggestions = [],
-  placeholder = "Add tags...",
+  placeholder = "packages.nextVibeUi.web.common.addTags",
   maxTags,
   allowCustom = true,
   disabled = false,
   className,
+  style,
   name: _name,
 }: TagsFieldProps): React.JSX.Element {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Filter suggestions based on input and exclude already selected
-  const filteredSuggestions = suggestions.filter(
-    (suggestion: TagOptionBase) => {
-      const matchesInput = suggestion.label
-        .toLowerCase()
-        .includes(inputValue.toLowerCase());
-      const notSelected = !value.includes(suggestion.value);
-      return matchesInput && notSelected;
-    },
-  );
+  const filteredSuggestions = suggestions.filter((suggestion: TagOption) => {
+    const matchesInput = suggestion.label
+      .toLowerCase()
+      .includes(inputValue.toLowerCase());
+    const notSelected = !value.includes(suggestion.value);
+    return matchesInput && notSelected;
+  });
 
   // Group suggestions by category
   const groupedSuggestions = filteredSuggestions.reduce(
-    (groups: Record<string, TagOptionBase[]>, suggestion: TagOptionBase) => {
+    (groups: Record<string, TagOption[]>, suggestion: TagOption) => {
       const category = suggestion.category || "other";
       if (!groups[category]) {
         groups[category] = [];
@@ -60,7 +59,7 @@ export function TagsField({
       groups[category].push(suggestion);
       return groups;
     },
-    {} as Record<string, TagOptionBase[]>,
+    {} as Record<string, TagOption[]>,
   );
 
   const addTag = (tagValue: string): void => {
@@ -116,9 +115,7 @@ export function TagsField({
   };
 
   const getTagLabel = (tagValue: string): string => {
-    const suggestion = suggestions.find(
-      (s: TagOptionBase) => s.value === tagValue,
-    );
+    const suggestion = suggestions.find((s: TagOption) => s.value === tagValue);
     return suggestion ? suggestion.label : tagValue;
   };
 
@@ -129,7 +126,12 @@ export function TagsField({
   };
 
   return (
-    <View className={cn("relative", className)}>
+    <View
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("relative", className),
+      })}
+    >
       <View
         className={cn(
           "min-h-[48px] w-full rounded-md border border-input bg-background px-3 py-2",
@@ -188,8 +190,8 @@ export function TagsField({
                           </UIText>
                         )}
                         <View className="gap-1">
-                          {(categorySuggestions as TagOptionBase[]).map(
-                            (suggestion: TagOptionBase) => (
+                          {(categorySuggestions as TagOption[]).map(
+                            (suggestion: TagOption) => (
                               <Pressable
                                 key={suggestion.value}
                                 onPress={() => addTag(suggestion.value)}
@@ -213,7 +215,7 @@ export function TagsField({
                   {allowCustom &&
                     inputValue.trim() &&
                     !filteredSuggestions.some(
-                      (s: TagOptionBase) => s.value === inputValue.trim(),
+                      (s: TagOption) => s.value === inputValue.trim(),
                     ) && (
                       <View className="p-2 border-t border-border">
                         <Pressable
@@ -248,3 +250,6 @@ export function TagsField({
     </View>
   );
 }
+
+// Re-export all types from web
+export type { TagOption, TagsFieldProps };

@@ -66,8 +66,8 @@ class CreditValidator implements CreditValidatorInterface {
   /**
    * Validate user has enough credits for model
    * Logic:
-   * - If user has active subscription → use user credits (subscription credits)
-   * - If user has no subscription → use lead credits (linked via user_leads table)
+   * - In wallet-based system, each user has ONE wallet
+   * - Get user's balance directly from their wallet
    */
   async validateUserCredits(
     userId: string,
@@ -77,43 +77,10 @@ class CreditValidator implements CreditValidatorInterface {
     try {
       const cost = getModelCost(modelId);
 
-      // Use cluster resolver to find canonical lead for user
-      const { getCanonicalLeadForUser } = await import(
-        "@/app/api/[locale]/v1/core/leads/cluster-resolver"
-      );
-      const canonicalLeadId = await getCanonicalLeadForUser(userId, logger);
-
-      if (!canonicalLeadId) {
-        logger.error("No canonical lead found for user", { userId });
-        return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      const userLead = { leadId: canonicalLeadId };
-
-      // Use repository method to determine credit source and get balance
-      const identifierResult =
-        await creditRepository.getCreditIdentifierBySubscription(
-          userId,
-          userLead.leadId,
-          logger,
-        );
-
-      if (!identifierResult.success) {
-        return fail({
-          message: "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          cause: identifierResult,
-        });
-      }
-
-      const { creditType } = identifierResult.data;
-
-      // Get balance using the repository method
+      // In wallet-based system, we get the user's wallet balance directly
+      // No need for canonical lead resolution - each user has their own wallet
       const balanceResult = await creditRepository.getBalance(
-        { leadId: userLead.leadId, userId },
+        { userId },
         logger,
       );
 
@@ -130,12 +97,10 @@ class CreditValidator implements CreditValidatorInterface {
 
       logger.info("Validated user credits", {
         userId,
-        leadId: userLead.leadId,
         modelId,
         cost,
         balance,
         hasCredits,
-        creditType,
       });
 
       return success({

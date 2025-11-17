@@ -10,6 +10,7 @@ import {
 import { cn } from "next-vibe/shared/utils/utils";
 import type { ReactElement } from "react";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 import {
   Table,
@@ -20,8 +21,7 @@ import {
   TableRow,
 } from "./table";
 
-// Cross-platform base props interface
-export interface DataTableProps<TData, TValue = string> {
+export type DataTableProps<TData, TValue = string> = {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onRowPress?: (row: Row<TData>) => void;
@@ -30,8 +30,7 @@ export interface DataTableProps<TData, TValue = string> {
   ListFooterComponent?: React.ComponentType | ReactElement | null;
   isRefreshing?: boolean;
   onRefresh?: () => void;
-  className?: string;
-}
+} & StyleType;
 
 /**
  * @docs https://tanstack.com/table
@@ -43,6 +42,7 @@ export function DataTable<TData, TValue = string>({
   ListEmptyComponent,
   ListFooterComponent,
   className,
+  style,
 }: DataTableProps<TData, TValue>): ReactElement {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const table = useReactTable({
@@ -60,7 +60,7 @@ export function DataTable<TData, TValue = string>({
   const hasNoData = rows.length === 0;
 
   return (
-    <div className={cn("relative w-full", className)}>
+    <div className={cn("relative w-full", className)} style={style}>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -100,7 +100,7 @@ export function DataTable<TData, TValue = string>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                onPress={
+                onClick={
                   onRowPress
                     ? (): void => {
                         onRowPress(row);

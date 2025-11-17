@@ -1,19 +1,18 @@
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 export interface KbdMouseEvent {
   preventDefault?: () => void;
   stopPropagation?: () => void;
 }
 
-export interface KbdProps {
-  className?: string;
+export type KbdProps = {
   children?: React.ReactNode;
-  style?: React.CSSProperties;
   id?: string;
   "aria-label"?: string;
   onClick?: (event: KbdMouseEvent) => void;
-}
+} & StyleType;
 
 function Kbd({ className, children, ...props }: KbdProps): React.JSX.Element {
   return (

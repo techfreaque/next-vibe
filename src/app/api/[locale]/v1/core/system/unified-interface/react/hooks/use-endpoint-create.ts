@@ -3,7 +3,7 @@
 
 "use client";
 
-import { type FormEvent, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import type { z } from "zod";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
@@ -122,17 +122,15 @@ export function useEndpointCreate<
   if (formResult) {
     const originalSubmitForm = formResult.submitForm;
 
-    const wrappedSubmitForm = (
-      event: FormEvent<HTMLFormElement> | undefined,
-    ): Promise<void> | void => {
-      return originalSubmitForm(event, {
+    const wrappedSubmitForm = (): Promise<void> | void => {
+      return originalSubmitForm({
         urlParamVariables: options.urlPathParams,
       } as never);
     };
 
     return {
       ...formResult,
-      submitForm: wrappedSubmitForm as never,
+      submitForm: wrappedSubmitForm,
     };
   }
 

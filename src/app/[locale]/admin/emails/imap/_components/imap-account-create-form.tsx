@@ -11,7 +11,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { H3 } from "next-vibe-ui/ui/typography";
-import type { FormEvent, JSX } from "react";
+import type { JSX } from "react";
 
 import { useImapAccountCreateEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/create/hooks";
 import { ImapAuthMethod } from "@/app/api/[locale]/v1/core/emails/imap-client/enum";
@@ -39,8 +39,8 @@ export function ImapAccountCreateForm({
   const endpoint = useImapAccountCreateEndpoint(logger);
 
   // Handle form submission
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    await endpoint.create.submitForm(e);
+  const handleSubmit = async (): Promise<void> => {
+    await endpoint.create.onSubmit();
     if (endpoint.create.response?.success) {
       onSuccess();
     }

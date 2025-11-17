@@ -15,12 +15,22 @@ export const translations = {
       expiry: "Expiry",
       freeTier: "Free Tier",
       monthlyReset: "Monthly Reset",
+      freeGrant: "Free Grant",
+      freeReset: "Free Reset",
+      refund: "Refund",
+      transfer: "Transfer",
     },
   },
   expire: {
     task: {
       description: "Expires old subscription credits daily",
       error: "Failed to expire credits",
+    },
+  },
+  cleanup: {
+    task: {
+      description: "Cleans up orphaned lead wallets weekly",
+      error: "Failed to cleanup orphaned wallets",
     },
   },
   errors: {
@@ -39,12 +49,15 @@ export const translations = {
     stripeCustomerFailed: "Failed to create Stripe customer",
     checkoutFailed: "Failed to create checkout session",
     mergeFailed: "Failed to merge lead credits",
+    mergeLeadWalletsFailed: "Failed to merge lead wallets into user account",
+    cleanupOrphanedFailed: "Failed to cleanup orphaned lead wallets",
     monthlyResetFailed: "Failed to reset monthly credits",
     noLeadsToMerge: "No leads provided to merge",
     oldestLeadNotFound: "Could not find oldest lead in cluster",
     transactionFailed: "Failed to create transaction record",
     not_implemented_on_native:
       "{{method}} is not implemented on native platform. Please use the web version for this operation.",
+    expireCreditsFailed: "Failed to expire credits",
   },
   get: {
     title: "Get Credit Balance",

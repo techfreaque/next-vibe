@@ -1,38 +1,17 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import { Moon, Sun } from "next-vibe-ui/ui/icons";
-import { type JSX, useEffect, useState } from "react";
+import { type JSX } from "react";
+import { useThemeToggle } from "next-vibe-ui/ui/theme-provider";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { DropdownMenuItem } from "next-vibe-ui/ui/dropdown-menu";
 
-export function useThemeToggle(): {
-  onToggleTheme: () => void;
-  theme: "light" | "dark";
-  isMounted: boolean;
-} {
-  const { setTheme, resolvedTheme } = useTheme();
-  const theme = resolvedTheme === "dark" ? "dark" : "light";
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  function onToggleTheme(): void {
-    setTheme(theme === "dark" ? "light" : "dark");
-  }
-
-  return {
-    onToggleTheme,
-    theme,
-    isMounted,
-  };
-}
+export { useThemeToggle } from "next-vibe-ui/ui/theme-provider";
 
 export function ThemeToggle({
   locale,

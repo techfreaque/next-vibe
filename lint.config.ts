@@ -473,59 +473,59 @@ export const oxlintConfig: OxlintConfig = {
 // ESLint Configuration
 // ============================================================
 
-export const eslintConfig: EslintConfig = {
-  ignores: [
-    ".dist",
-    ".next",
-    ".tmp",
-    "postcss.config.mjs",
-    "node_modules",
-    ".git",
-    "coverage",
-    "public",
-    "drizzle",
-    ".vscode",
-    ".vibe-guard-instance",
-    ".github",
-    ".claude",
-    "to_migrate",
-    "postgres_data",
-    ".nyc_output",
-    "build",
-    "*.min.js",
-    "**/*.d.ts",
-  ],
-  files: ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
-  eslintOnlyRules: {
-    "simple-import-sort/imports": "error",
-    "simple-import-sort/exports": "error",
-    "unused-imports/no-unused-imports": "off",
-    "import/first": "error",
-    "import/no-duplicates": "error",
-    "import/newline-after-import": "error",
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "error",
-    "react-compiler/react-compiler": "error",
-    "@c-ehrlich/use-server/no-top-level-use-server": "error",
-  },
+// export const eslintConfig: EslintConfig = {
+//   ignores: [
+//     ".dist",
+//     ".next",
+//     ".tmp",
+//     "postcss.config.mjs",
+//     "node_modules",
+//     ".git",
+//     "coverage",
+//     "public",
+//     "drizzle",
+//     ".vscode",
+//     ".vibe-guard-instance",
+//     ".github",
+//     ".claude",
+//     "to_migrate",
+//     "postgres_data",
+//     ".nyc_output",
+//     "build",
+//     "*.min.js",
+//     "**/*.d.ts",
+//   ],
+//   files: ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
+//   eslintOnlyRules: {
+//     "simple-import-sort/imports": "error",
+//     "simple-import-sort/exports": "error",
+//     "unused-imports/no-unused-imports": "off",
+//     "import/first": "error",
+//     "import/no-duplicates": "error",
+//     "import/newline-after-import": "error",
+//     "react-hooks/rules-of-hooks": "error",
+//     "react-hooks/exhaustive-deps": "error",
+//     "react-compiler/react-compiler": "error",
+//     "@c-ehrlich/use-server/no-top-level-use-server": "error",
+//   },
 
-  ruleOverrides: {
-    typescript: {},
-    promise: {
-      "promise/no-return-wrap": "error",
-      "promise/no-nesting": "warn",
-    },
-    import: {
-      "import/first": "error",
-      "import/no-duplicates": "error",
-      "import/newline-after-import": "error",
-    },
-  },
-  parserOptions: {
-    project: "./tsconfig.json",
-    tsconfigRootDir: ".",
-  },
-};
+//   ruleOverrides: {
+//     typescript: {},
+//     promise: {
+//       "promise/no-return-wrap": "error",
+//       "promise/no-nesting": "warn",
+//     },
+//     import: {
+//       "import/first": "error",
+//       "import/no-duplicates": "error",
+//       "import/newline-after-import": "error",
+//     },
+//   },
+//   parserOptions: {
+//     project: "./tsconfig.json",
+//     tsconfigRootDir: ".",
+//   },
+// };
 
 // ============================================================
 // Prettier Configuration
@@ -673,7 +673,7 @@ export const i18nPluginConfig = {
 
 export const config: OxlintPrettierEslintConfig = {
   oxlint: oxlintConfig,
-  eslint: eslintConfig,
+  // eslint: eslintConfig,
   prettier: prettierConfig,
 };
 

@@ -3,43 +3,28 @@
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
-// Cross-platform types
-export interface TabsRootProps {
+// Tabs
+export type TabsProps = {
+  children?: React.ReactNode;
   value?: string;
   onValueChange?: (value: string) => void;
   defaultValue?: string;
   orientation?: "horizontal" | "vertical";
   activationMode?: "automatic" | "manual";
-  className?: string;
-  children?: React.ReactNode;
   dir?: "ltr" | "rtl";
-}
+} & StyleType;
 
-export interface TabsListProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface TabsTriggerProps {
-  value: string;
-  disabled?: boolean;
-  className?: string;
-  children?: React.ReactNode;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
-}
-
-export interface TabsContentProps {
-  value: string;
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export function Tabs({ children, ...props }: TabsRootProps): React.JSX.Element {
+export function Tabs({ children, ...props }: TabsProps): React.JSX.Element {
   return <TabsPrimitive.Root {...props}>{children}</TabsPrimitive.Root>;
 }
 Tabs.displayName = TabsPrimitive.Root.displayName;
+
+// TabsList
+export type TabsListProps = {
+  children?: React.ReactNode;
+} & StyleType;
 
 export function TabsList({
   className,
@@ -60,6 +45,15 @@ export function TabsList({
 }
 TabsList.displayName = TabsPrimitive.List.displayName;
 
+// TabsTrigger
+export type TabsTriggerProps = {
+  children?: React.ReactNode;
+  value: string;
+  disabled?: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+} & StyleType;
+
 export function TabsTrigger({
   className,
   children,
@@ -78,6 +72,12 @@ export function TabsTrigger({
   );
 }
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
+
+// TabsContent
+export type TabsContentProps = {
+  children?: React.ReactNode;
+  value: string;
+} & StyleType;
 
 export function TabsContent({
   className,

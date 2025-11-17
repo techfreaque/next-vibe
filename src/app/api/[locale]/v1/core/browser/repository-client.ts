@@ -23,8 +23,8 @@ interface BrowserRepositoryClient {
    */
   executeTool(
     tool: typeof BrowserToolValue,
+    locale: CountryLanguage,
     args?: string,
-    locale?: CountryLanguage,
   ): Promise<BrowserResponseOutput>;
 
   /**
@@ -56,8 +56,8 @@ class BrowserRepositoryClientImpl implements BrowserRepositoryClient {
    */
   async executeTool(
     tool: typeof BrowserToolValue,
+    locale: CountryLanguage,
     args?: string,
-    locale: CountryLanguage = "en-GLOBAL",
   ): Promise<BrowserResponseOutput> {
     const url = `${this.baseUrl}/${locale}/v1/core/browser`;
 

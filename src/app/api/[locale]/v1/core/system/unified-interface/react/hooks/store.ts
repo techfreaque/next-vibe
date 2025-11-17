@@ -164,6 +164,7 @@ export interface ApiStore {
    */
   updateEndpointData: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
+    logger: EndpointLogger,
     updater: (
       oldData:
         | {
@@ -310,6 +311,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
    */
   updateEndpointData: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
+    logger: EndpointLogger,
     updater: (
       oldData:
         | {
@@ -327,7 +329,12 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     urlPathParams?: TEndpoint["TUrlVariablesOutput"],
   ): void => {
     // Generate the query key using shared utility (same format as useApiQuery)
-    const queryKey = buildQueryKey(endpoint, requestData, urlPathParams);
+    const queryKey = buildQueryKey(
+      endpoint,
+      logger,
+      requestData,
+      urlPathParams,
+    );
 
     // Update React Query cache (single source of truth)
     queryClient.setQueryData(queryKey, (oldData: unknown) => {
@@ -555,6 +562,7 @@ export const apiClient = {
    */
   updateEndpointData: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
+    logger: EndpointLogger,
     updater: (
       oldData:
         | {
@@ -573,6 +581,12 @@ export const apiClient = {
   ): void => {
     useApiStore
       .getState()
-      .updateEndpointData(endpoint, updater, requestData, urlPathParams);
+      .updateEndpointData(
+        endpoint,
+        logger,
+        updater,
+        requestData,
+        urlPathParams,
+      );
   },
 };

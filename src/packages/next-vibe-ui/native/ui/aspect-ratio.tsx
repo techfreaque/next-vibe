@@ -4,16 +4,26 @@ import * as React from "react";
 import type { AspectRatioRootProps } from "@/packages/next-vibe-ui/web/ui/aspect-ratio";
 import { cn } from "next-vibe/shared/utils/utils";
 import { styled } from "nativewind";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledAspectRatioRoot = styled(AspectRatioPrimitive.Root, { className: "style" });
 
 export function AspectRatio({
   className,
+  style,
   ratio,
   children,
 }: AspectRatioRootProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
-    <StyledAspectRatioRoot ratio={ratio ?? 16 / 9} className={cn(className)}>
+    <StyledAspectRatioRoot
+      ratio={ratio ?? 16 / 9}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(className),
+      })}
+    >
       {children}
     </StyledAspectRatioRoot>
   );

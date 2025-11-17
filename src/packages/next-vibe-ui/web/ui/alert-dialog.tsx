@@ -3,6 +3,7 @@
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 import { buttonVariants } from "./button";
 
@@ -25,53 +26,48 @@ export interface AlertDialogPortalProps {
   container?: HTMLElement | null;
 }
 
-export interface AlertDialogOverlayProps {
-  className?: string;
+export type AlertDialogOverlayProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface AlertDialogContentProps {
-  className?: string;
+export type AlertDialogContentProps = {
   children?: React.ReactNode;
   onOpenAutoFocus?: (event: Event) => void;
   onCloseAutoFocus?: (event: Event) => void;
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
-  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
-}
+  onClick?: () => void;
+  stopPropagation?: boolean;
+} & StyleType;
 
-export interface AlertDialogHeaderProps {
-  className?: string;
+export type AlertDialogHeaderProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface AlertDialogFooterProps {
-  className?: string;
+export type AlertDialogFooterProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface AlertDialogTitleProps {
-  className?: string;
+export type AlertDialogTitleProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface AlertDialogDescriptionProps {
-  className?: string;
+export type AlertDialogDescriptionProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface AlertDialogActionProps {
-  className?: string;
+export type AlertDialogActionProps = {
   children?: React.ReactNode;
   asChild?: boolean;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-}
+  onClick?: () => void;
+  stopPropagation?: boolean;
+} & StyleType;
 
-export interface AlertDialogCancelProps {
-  className?: string;
+export type AlertDialogCancelProps = {
   children?: React.ReactNode;
   asChild?: boolean;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-}
+  stopPropagation?: boolean;
+  onClick?: () => void;
+} & StyleType;
 
 export function AlertDialog({
   children,
@@ -111,6 +107,7 @@ AlertDialogPortal.displayName = AlertDialogPrimitive.Portal.displayName;
 
 export function AlertDialogOverlay({
   className,
+  style,
   ...props
 }: AlertDialogOverlayProps): React.JSX.Element {
   return (
@@ -119,6 +116,7 @@ export function AlertDialogOverlay({
         "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         className,
       )}
+      style={style}
       {...props}
     />
   );
@@ -127,6 +125,7 @@ AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName;
 
 export function AlertDialogContent({
   className,
+  style,
   ...props
 }: AlertDialogContentProps): React.JSX.Element {
   return (
@@ -137,6 +136,7 @@ export function AlertDialogContent({
           "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
           className,
         )}
+        style={style}
         {...props}
       />
     </AlertDialogPortal>
@@ -146,6 +146,7 @@ AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
 
 export function AlertDialogHeader({
   className,
+  style,
   children,
 }: AlertDialogHeaderProps): React.JSX.Element {
   return (
@@ -154,6 +155,7 @@ export function AlertDialogHeader({
         "flex flex-col space-y-2 text-center sm:text-left",
         className,
       )}
+      style={style}
     >
       {children}
     </div>
@@ -163,6 +165,7 @@ AlertDialogHeader.displayName = "AlertDialogHeader";
 
 export function AlertDialogFooter({
   className,
+  style,
   children,
 }: AlertDialogFooterProps): React.JSX.Element {
   return (
@@ -171,6 +174,7 @@ export function AlertDialogFooter({
         "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
         className,
       )}
+      style={style}
     >
       {children}
     </div>
@@ -180,11 +184,13 @@ AlertDialogFooter.displayName = "AlertDialogFooter";
 
 export function AlertDialogTitle({
   className,
+  style,
   ...props
 }: AlertDialogTitleProps): React.JSX.Element {
   return (
     <AlertDialogPrimitive.Title
       className={cn("text-lg font-semibold", className)}
+      style={style}
       {...props}
     />
   );
@@ -193,11 +199,13 @@ AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName;
 
 export function AlertDialogDescription({
   className,
+  style,
   ...props
 }: AlertDialogDescriptionProps): React.JSX.Element {
   return (
     <AlertDialogPrimitive.Description
       className={cn("text-sm text-muted-foreground", className)}
+      style={style}
       {...props}
     />
   );
@@ -207,11 +215,13 @@ AlertDialogDescription.displayName =
 
 export function AlertDialogAction({
   className,
+  style,
   ...props
 }: AlertDialogActionProps): React.JSX.Element {
   return (
     <AlertDialogPrimitive.Action
       className={cn(buttonVariants(), className)}
+      style={style}
       {...props}
     />
   );
@@ -220,6 +230,7 @@ AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
 
 export function AlertDialogCancel({
   className,
+  style,
   ...props
 }: AlertDialogCancelProps): React.JSX.Element {
   return (
@@ -229,6 +240,7 @@ export function AlertDialogCancel({
         "mt-2 sm:mt-0",
         className,
       )}
+      style={style}
       {...props}
     />
   );

@@ -10,27 +10,38 @@ import Animated, {
 
 import { cn } from "next-vibe/shared/utils/utils";
 
+// Import ALL types from web version (web is source of truth)
 import type {
   ProgressRootProps,
   ProgressIndicatorProps,
 } from "@/packages/next-vibe-ui/web/ui/progress";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
+
+// Re-export types for consistency
+export type { ProgressRootProps, ProgressIndicatorProps };
 
 const StyledProgressRoot = ProgressPrimitive.Root;
 const StyledProgressIndicator = ProgressPrimitive.Indicator;
 
 function Progress({
   className,
+  style,
   value,
   max,
   getValueLabel,
   children,
 }: ProgressRootProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <StyledProgressRoot
-      className={cn(
-        "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
-        className,
-      )}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
+          className,
+        ),
+      })}
       value={value ?? undefined}
       max={max}
       getValueLabel={getValueLabel}

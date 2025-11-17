@@ -91,11 +91,9 @@ export function WidgetSkeleton({
   return (
     <Div className={cn("flex flex-col gap-2", className)}>
       {Array.from({ length: lines }).map((_, i) => (
-        <Skeleton
-          key={i}
-          className="h-4 w-full"
-          style={{ width: `${100 - i * 10}%` }}
-        />
+        <Div key={i} style={{ width: `${100 - i * 10}%` }}>
+          <Skeleton className="h-4 w-full" />
+        </Div>
       ))}
     </Div>
   );

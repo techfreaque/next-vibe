@@ -161,7 +161,7 @@ export function OverlaysPreview(): JSX.Element {
 
           <Div className="space-y-2">
             <H3>Sheet</H3>
-            <Div className="flex gap-2">
+            <Div className="flex flex-row gap-2">
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="outline">Open Sheet (Right)</Button>

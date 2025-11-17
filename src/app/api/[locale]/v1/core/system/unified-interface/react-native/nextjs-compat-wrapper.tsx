@@ -28,7 +28,7 @@
 
 import { Slot, useLocalSearchParams } from "expo-router";
 import type React from "react";
-import type { JSX } from "react";
+import type { JSX, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { Span } from "next-vibe-ui/ui/span";
@@ -37,32 +37,34 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { envClient } from "@/config/env-client";
 
 /**
- * Base params type for routing
+ * Next.js 15 async component props format
  */
-export type RouteParams = Record<string, string | string[] | number | boolean>;
-
-/**
- * Next.js 15 page component props format
- */
-export interface NextPageProps<TParams extends RouteParams = RouteParams> {
-  params: Promise<TParams>;
+export interface AsyncPageRouterProps {
+  params: Promise<PageRouterParams>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}
+export interface AsyncLayoutRouterProps extends AsyncPageRouterProps {
+  children: React.ReactNode;
 }
 
 /**
- * Next.js 15 layout component props format
+ * Next.js 15 sync component props format
  */
-export interface NextLayoutProps<TParams extends RouteParams = RouteParams> {
-  params: Promise<TParams>;
+export interface SyncPageRouterProps {
+  params: PageRouterParams;
+  searchParams?: Record<string, string | string[] | undefined>;
+}
+export interface SyncLayoutRouterProps extends SyncPageRouterProps {
   children: React.ReactNode;
 }
 
 /**
  * Expo Router params with locale
  */
-export interface ExpoRouterParams extends Record<string, string | string[]> {
+export interface PageRouterParams extends Record<string, string | string[]> {
   locale: CountryLanguage;
 }
 
@@ -70,11 +72,16 @@ export interface ExpoRouterParams extends Record<string, string | string[]> {
  * Type for any Next.js page component (handles various signatures)
  * Using a single flexible signature to avoid intersection type issues
  */
-export type AnyNextPageComponent<
-  _TParams extends RouteParams = ExpoRouterParams,
-> =
-  // eslint-disable-next-line typescript-eslint/no-explicit-any -- Need flexible type to support various Next.js component signatures
-  (props: any) => Promise<JSX.Element> | JSX.Element | never;
+export type AnyNextComponent =
+  | AnyNextSyncPageComponent
+  | AnyNextAsyncPageComponent;
+export type AnyNextSyncPageComponent = (
+  props: SyncLayoutRouterProps,
+) => JSX.Element | never;
+
+export type AnyNextAsyncPageComponent = (
+  props: AsyncLayoutRouterProps,
+) => Promise<JSX.Element>;
 
 /**
  * Creates a wrapper for Next.js page components with lazy loading and error boundaries
@@ -90,11 +97,11 @@ export type AnyNextPageComponent<
  * @param importFn - Function that dynamically imports the page component
  * @returns A synchronous Expo Router compatible component
  */
-export function createPageWrapperWithImport<
-  TParams extends ExpoRouterParams = ExpoRouterParams,
->(importFn: () => Promise<Record<string, unknown>>): () => React.ReactElement {
+export function createPageWrapperWithImport(
+  importFn: () => Promise<Record<string, unknown>>,
+): () => React.ReactElement {
   return function PageWrapper(): React.ReactElement {
-    const params = useLocalSearchParams<TParams>();
+    const params = useLocalSearchParams<PageRouterParams>();
 
     const [content, setContent] = useState<JSX.Element | null>(null);
     const [error, setError] = useState<Error | null>(null);
@@ -110,15 +117,8 @@ export function createPageWrapperWithImport<
         try {
           // Dynamically import the component
           const componentModule = await importFn();
-          const PageComponent =
-            componentModule.default as AnyNextPageComponent<TParams>;
-
-          // Create a proper Promise<TParams> for Next.js 15 async params
-          const paramsPromise: Promise<TParams> = Promise.resolve(params);
-          // Call the async page component with Next.js 15 format params
-          const result = await PageComponent({
-            params: paramsPromise,
-          });
+          const PageComponent = componentModule.default as AnyNextComponent;
+          const result = await renderedComponent(PageComponent, params, null);
 
           if (!cancelled) {
             setContent(result);
@@ -143,6 +143,9 @@ export function createPageWrapperWithImport<
               );
             } else {
               logger.error("Failed to load page", { error: parsedError });
+              if (envClient.NODE_ENV !== "production") {
+                throw err;
+              }
             }
 
             setError(
@@ -219,11 +222,11 @@ export function createPageWrapperWithImport<
  * @param PageComponent - The Next.js page component to wrap
  * @returns A synchronous Expo Router compatible component
  */
-export function createPageWrapper<
-  TParams extends ExpoRouterParams = ExpoRouterParams,
->(PageComponent: AnyNextPageComponent<TParams>): () => React.ReactElement {
+export function createPageWrapper(
+  PageComponent: AnyNextComponent,
+): () => React.ReactElement {
   return function PageWrapper(): React.ReactElement {
-    const params = useLocalSearchParams<TParams>();
+    const params = useLocalSearchParams<PageRouterParams>();
     const [content, setContent] = useState<JSX.Element | null>(null);
     const [error, setError] = useState<Error | null>(null);
     const logger = useMemo(
@@ -240,12 +243,7 @@ export function createPageWrapper<
       queueMicrotask(() => {
         void (async (): Promise<void> => {
           try {
-            // Create a proper Promise<TParams> for Next.js 15 async params
-            const paramsPromise: Promise<TParams> = Promise.resolve(params);
-            // Call the async page component with Next.js 15 format params
-            const result = await PageComponent({
-              params: paramsPromise,
-            });
+            const result = await renderedComponent(PageComponent, params, null);
 
             if (!cancelled) {
               setContent(result);
@@ -334,14 +332,6 @@ export function createPageWrapper<
 }
 
 /**
- * Type for any Next.js layout component (handles various signatures)
- * Using a single flexible signature to avoid intersection type issues
- */
-type AnyNextLayoutComponent<_TParams extends RouteParams = ExpoRouterParams> =
-  // eslint-disable-next-line typescript-eslint/no-explicit-any -- Need flexible type to support various Next.js component signatures
-  (props: any) => Promise<JSX.Element> | JSX.Element;
-
-/**
  * Creates a wrapper for Next.js layout components to work in Expo Router
  *
  * Features:
@@ -358,11 +348,11 @@ type AnyNextLayoutComponent<_TParams extends RouteParams = ExpoRouterParams> =
  * @param LayoutComponent - The Next.js layout component to wrap
  * @returns A synchronous Expo Router compatible component
  */
-export function createLayoutWrapper<
-  TParams extends ExpoRouterParams = ExpoRouterParams,
->(LayoutComponent: AnyNextLayoutComponent<TParams>): () => React.ReactElement {
+export function createLayoutWrapper(
+  LayoutComponent: AnyNextComponent,
+): () => React.ReactElement {
   return function LayoutWrapper(): React.ReactElement {
-    const params = useLocalSearchParams<TParams>();
+    const params = useLocalSearchParams<PageRouterParams>();
     const [content, setContent] = useState<React.ReactElement | null>(null);
     const logger = useMemo(
       () => createEndpointLogger(true, Date.now(), params.locale),
@@ -379,14 +369,11 @@ export function createLayoutWrapper<
       queueMicrotask(() => {
         void (async (): Promise<void> => {
           try {
-            // Create a proper Promise<TParams> for Next.js 15 async params
-            const paramsPromise: Promise<TParams> = Promise.resolve(params);
-            // Call the async layout component with Next.js 15 format params
-            const result = await LayoutComponent({
-              params: paramsPromise,
-              children: slotElement,
-            });
-
+            const result = await renderedComponent(
+              LayoutComponent,
+              params,
+              slotElement,
+            );
             if (!cancelled) {
               setContent(result);
             }
@@ -425,13 +412,11 @@ export function createLayoutWrapper<
  * @param importFn - Function that dynamically imports the layout component
  * @returns A synchronous Expo Router compatible component
  */
-export function createLayoutWrapperWithImport<
-  TParams extends ExpoRouterParams = ExpoRouterParams,
->(
-  importFn: () => Promise<{ default: AnyNextLayoutComponent<TParams> }>,
+export function createLayoutWrapperWithImport(
+  importFn: () => Promise<{ default: AnyNextComponent }>,
 ): () => React.ReactElement {
   return function LayoutWrapper(): React.ReactElement {
-    const params = useLocalSearchParams<TParams>();
+    const params = useLocalSearchParams<PageRouterParams>();
     const [content, setContent] = useState<React.ReactElement | null>(null);
     const logger = useMemo(
       () => createEndpointLogger(true, Date.now(), params.locale),
@@ -448,17 +433,14 @@ export function createLayoutWrapperWithImport<
       queueMicrotask(() => {
         void (async (): Promise<void> => {
           try {
-            // Dynamically import the component
             const layoutModule = await importFn();
             const LayoutComponent = layoutModule.default;
 
-            // Create a proper Promise<TParams> for Next.js 15 async params
-            const paramsPromise: Promise<TParams> = Promise.resolve(params);
-            // Call the async layout component with Next.js 15 format params
-            const result = await LayoutComponent({
-              params: paramsPromise,
-              children: slotElement,
-            });
+            const result = await renderedComponent(
+              LayoutComponent,
+              params,
+              slotElement,
+            );
 
             if (!cancelled) {
               setContent(result);
@@ -466,8 +448,7 @@ export function createLayoutWrapperWithImport<
           } catch (err) {
             if (!cancelled) {
               logger.error("Failed to load layout", { error: parseError(err) });
-              // On error, just render Slot directly
-              setContent(slotElement);
+              throw err;
             }
           }
         })();
@@ -484,133 +465,25 @@ export function createLayoutWrapperWithImport<
   };
 }
 
-/**
- * Advanced wrapper options for custom behavior
- */
-export interface WrapperOptions {
-  /**
-   * Custom loading component (page wrapper only)
-   */
-  loadingComponent?: React.ReactElement;
-  /**
-   * Custom error component renderer (page wrapper only)
-   */
-  errorComponent?: (
-    error: Error,
-    locale: CountryLanguage,
-  ) => React.ReactElement;
-  /**
-   * Additional params to merge with route params
-   */
-  additionalParams?: RouteParams;
+async function renderedComponent(
+  Component: AnyNextComponent,
+  params: PageRouterParams,
+  children: ReactNode | null,
+): Promise<JSX.Element> {
+  if (isAsyncComponent(Component)) {
+    const paramsPromise: Promise<PageRouterParams> = Promise.resolve(params);
+    return await Component({
+      params: paramsPromise,
+      children,
+    });
+  }
+  return <Component params={params}> {children}</Component>;
 }
 
-/**
- * Creates a page wrapper with custom options
- */
-export function createPageWrapperWithOptions<
-  TParams extends ExpoRouterParams = ExpoRouterParams,
->(
-  PageComponent: AnyNextPageComponent<TParams>,
-  options: WrapperOptions = {},
-): () => React.ReactElement {
-  return function PageWrapperWithOptions(): React.ReactElement {
-    const routeParams = useLocalSearchParams<TParams>();
-    const params: TParams = useMemo(
-      () => ({ ...routeParams, ...options.additionalParams }),
-      [routeParams],
-    );
-    const [content, setContent] = useState<JSX.Element | null>(null);
-    const [error, setError] = useState<Error | null>(null);
-    const logger = useMemo(
-      () => createEndpointLogger(true, Date.now(), params.locale),
-      [params.locale],
-    );
-    const { t } = simpleT(params.locale);
-
-    useEffect(() => {
-      let cancelled = false;
-
-      queueMicrotask(() => {
-        void (async (): Promise<void> => {
-          try {
-            // Create a proper Promise<TParams> for Next.js 15 async params
-            const paramsPromise: Promise<TParams> = Promise.resolve(params);
-            const result = await PageComponent({
-              params: paramsPromise,
-            });
-
-            if (!cancelled) {
-              setContent(result);
-            }
-          } catch (err) {
-            if (!cancelled) {
-              logger.error("Failed to load page", { error: parseError(err) });
-              setError(
-                err instanceof Error
-                  ? err
-                  : new Error(
-                      t(
-                        "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
-                      ),
-                    ),
-              );
-            }
-          }
-        })();
-      });
-
-      return (): void => {
-        cancelled = true;
-      };
-    }, [logger, params, t]);
-
-    // Error state with custom component
-    if (error) {
-      if (options.errorComponent) {
-        return options.errorComponent(error, params.locale);
-      }
-
-      return (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            padding: 20,
-          }}
-        >
-          <Span style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-            {t(
-              "app.api.v1.core.system.unifiedInterface.reactNative.errors.failedToLoadPage",
-            )}
-          </Span>
-          <Span style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
-            {error.message}
-          </Span>
-        </View>
-      );
-    }
-
-    // Loading state with custom component
-    if (!content) {
-      if (options.loadingComponent) {
-        return options.loadingComponent;
-      }
-
-      return (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <ActivityIndicator size="large" />
-        </View>
-      );
-    }
-
-    return content;
-  };
+function isAsyncComponent(
+  _PageComponent: AnyNextComponent,
+): PageComponent is AnyNextAsyncPageComponent {
+  return true;
+  // TODO figure out a way to check if component is async
+  // return typeof PageComponent.then === "function";
 }

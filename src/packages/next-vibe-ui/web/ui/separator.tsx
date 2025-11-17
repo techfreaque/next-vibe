@@ -3,20 +3,18 @@
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
-// Cross-platform types for native import
-export interface SeparatorRootProps
-  extends React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root> {
-  className?: string;
+export type SeparatorRootProps = {
   orientation?: "horizontal" | "vertical";
   decorative?: boolean;
-}
+} & StyleType;
 
 export function Separator({
   className,
+  style,
   orientation = "horizontal",
   decorative = true,
-  ...props
 }: SeparatorRootProps): React.JSX.Element {
   return (
     <SeparatorPrimitive.Root
@@ -27,7 +25,7 @@ export function Separator({
         orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
         className,
       )}
-      {...props}
+      style={style}
     />
   );
 }

@@ -1,0 +1,155 @@
+"use client";
+
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import type { JSX } from "react";
+import React, { useCallback, useState } from "react";
+
+import {
+  DEFAULT_FOLDER_CONFIGS,
+  DEFAULT_FOLDER_IDS,
+  isDefaultFolderId,
+} from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { FolderAccessModal } from "../thread-area/folder-access-modal";
+
+interface RootFolderBarProps {
+  activeFolderId: string | null;
+  onSelectFolder: (folderId: string) => void;
+  isAuthenticated: boolean;
+  locale: CountryLanguage;
+}
+
+/**
+ * Get color classes for a folder based on its color
+ */
+/* eslint-disable i18next/no-literal-string */
+function getColorClasses(color: string | null, isActive: boolean): string {
+  if (!color) {
+    return isActive ? "bg-primary text-primary-foreground" : "hover:bg-accent";
+  }
+
+  // Map color names to Tailwind classes (softer colors)
+  const colorMap: Record<string, { active: string; hover: string }> = {
+    sky: {
+      active:
+        "bg-sky-500/15 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20",
+      hover: "hover:bg-sky-500/10 hover:text-sky-600",
+    },
+    teal: {
+      active:
+        "bg-teal-500/15 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20",
+      hover: "hover:bg-teal-500/10 hover:text-teal-600",
+    },
+    amber: {
+      active:
+        "bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20",
+      hover: "hover:bg-amber-500/10 hover:text-amber-600",
+    },
+    purple: {
+      active:
+        "bg-purple-500/15 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20",
+      hover: "hover:bg-purple-500/10 hover:text-purple-600",
+    },
+    zinc: {
+      active:
+        "bg-zinc-500/15 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-500/20",
+      hover: "hover:bg-zinc-500/10 hover:text-zinc-600",
+    },
+  };
+
+  const classes = colorMap[color];
+  if (!classes) {
+    return isActive ? "bg-primary text-primary-foreground" : "hover:bg-accent";
+  }
+
+  return isActive ? classes.active : classes.hover;
+}
+
+/* eslint-enable i18next/no-literal-string */
+
+export function RootFolderBar({
+  activeFolderId,
+  onSelectFolder,
+  isAuthenticated,
+  locale,
+}: RootFolderBarProps): JSX.Element {
+  // Get root folders from DEFAULT_FOLDER_CONFIGS
+  // Show all folders to all users, but disable PRIVATE and SHARED for public users
+  const rootFolders = DEFAULT_FOLDER_CONFIGS;
+
+  // State for modal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+
+  // Check if a folder is accessible to the current user
+  const isFolderAccessible = useCallback(
+    (folderId: string): boolean => {
+      if (isAuthenticated) {
+        return true; // Authenticated users can access all folders
+      }
+      // Public users can only access PUBLIC and INCOGNITO folders
+      return (
+        folderId === DEFAULT_FOLDER_IDS.PUBLIC ||
+        folderId === DEFAULT_FOLDER_IDS.INCOGNITO
+      );
+    },
+    [isAuthenticated],
+  );
+
+  const handleClick = useCallback(
+    (folderId: string): void => {
+      if (folderId && isDefaultFolderId(folderId)) {
+        // Only allow navigation if folder is accessible
+        if (isFolderAccessible(folderId)) {
+          onSelectFolder(folderId);
+        } else {
+          // Show modal explaining the folder and prompting login/signup
+          setSelectedFolderId(folderId);
+          setModalOpen(true);
+        }
+      }
+    },
+    [onSelectFolder, isFolderAccessible],
+  );
+
+  return (
+    <>
+      <Div className="overflow-x-auto">
+        <Div className="flex flex-row items-center gap-1 px-3 py-2 min-w-max">
+          {rootFolders.map((folderConfig) => {
+            const FolderIcon = getIconComponent(folderConfig.icon);
+            const isActive = folderConfig.id === activeFolderId;
+            const folderColor = folderConfig.color;
+            const colorClasses = getColorClasses(folderColor, isActive);
+
+            return (
+              <Button
+                key={folderConfig.id}
+                variant="ghost"
+                size="icon"
+                className={`h-11 w-11 ${colorClasses}`}
+                onClick={() => handleClick(folderConfig.id)}
+                suppressHydrationWarning
+              >
+                <FolderIcon className="h-6 w-6 flex items-center justify-center" />
+              </Button>
+            );
+          })}
+        </Div>
+      </Div>
+
+      {/* Folder Access Modal */}
+      {selectedFolderId && (
+        <FolderAccessModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          folderId={selectedFolderId}
+          locale={locale}
+        />
+      )}
+    </>
+  );
+}

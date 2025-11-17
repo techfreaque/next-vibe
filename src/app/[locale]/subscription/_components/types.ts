@@ -31,10 +31,14 @@ export const getTransactionTypeKey = (
       return "app.subscription.subscription.history.types.usage";
     case CreditTransactionType.EXPIRY:
       return "app.subscription.subscription.history.types.expiry";
-    case CreditTransactionType.FREE_TIER:
-      return "app.subscription.subscription.history.types.free_tier";
-    case CreditTransactionType.MONTHLY_RESET:
-      return "app.subscription.subscription.history.types.monthly_reset";
+    case CreditTransactionType.FREE_GRANT:
+      return "app.subscription.subscription.history.types.free_grant";
+    case CreditTransactionType.FREE_RESET:
+      return "app.subscription.subscription.history.types.free_reset";
+    case CreditTransactionType.REFUND:
+      return "app.subscription.subscription.history.types.refund";
+    case CreditTransactionType.TRANSFER:
+      return "app.subscription.subscription.history.types.transfer";
     default:
       return "app.subscription.subscription.history.types.usage"; // fallback
   }

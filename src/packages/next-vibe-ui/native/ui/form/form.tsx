@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Slot } from "@radix-ui/react-slot";
@@ -11,8 +12,6 @@ import { styled } from "nativewind";
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-const StyledView = styled(View, { className: "style" });
-
 // ============================================================================
 // IMPORT ALL TYPES FROM WEB - DO NOT REDEFINE ANY TYPES
 // ============================================================================
@@ -21,6 +20,7 @@ import type {
   FormProps,
   FormFieldProps,
   FormItemProps,
+  FormLabelProps,
   FormControlProps,
   FormDescriptionProps,
   FormMessageProps,
@@ -31,35 +31,48 @@ import type {
 
 import { Label } from "../label";
 import { P } from "../typography";
+import { convertCSSToViewStyle } from "../../utils/style-converter";
+import { applyStyleType } from "../../../web/utils/style-type";
+
+// ============================================================================
+// STYLED COMPONENTS
+// ============================================================================
+
+const StyledView = styled(View, { className: "style" });
 
 // ============================================================================
 // IMPLEMENTATION - Uses imported types, platform-specific components
 // ============================================================================
 
-/**
- * Form - Native implementation using View instead of form element
- * React Native does not support HTML form elements
- */
 function Form<TRequest extends FieldValues>(
   props: FormProps<TRequest>,
 ): React.JSX.Element {
-  // If form is provided, wrap with FormProvider for react-hook-form integration
   if (props.form) {
     return (
       <FormProvider {...props.form}>
-        <View className={cn(props.className)}>{props.children}</View>
+        <StyledView className={cn(props.className)}>{props.children}</StyledView>
       </FormProvider>
     );
   }
 
-  // Otherwise, render a simple View element
-  return <View className={cn(props.className)}>{props.children}</View>;
+  return (
+    <StyledView className={cn(props.className)}>{props.children}</StyledView>
+  );
 }
 
+/**
+ * FormFieldContext - Identical to web implementation
+ * Stores the current field name for use in child components
+ */
 const FormFieldContext = React.createContext<
   FormFieldContextValue<FieldValues, FieldPath<FieldValues>> | undefined
 >(undefined);
 
+/**
+ * FormField - Identical to web implementation
+ * Wraps react-hook-form Controller with context provider
+ * Function signature identical to web version
+ */
 const FormField = <
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
@@ -73,10 +86,19 @@ const FormField = <
   );
 };
 
+/**
+ * FormItemContext - Identical to web implementation
+ * Stores the unique ID for the form item
+ */
 const FormItemContext = React.createContext<FormItemContextValue | undefined>(
   undefined,
 );
 
+/**
+ * useFormField - Identical to web implementation
+ * Hook for accessing form field state in child components
+ * Return type identical to web version
+ */
 const useFormField = (): UseFormFieldReturn => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
@@ -108,66 +130,69 @@ const useFormField = (): UseFormFieldReturn => {
 
 /**
  * FormItem - Native implementation using View instead of div
- * Uses FormItemProps type from web but renders with native components
+ * Function signature identical to web version
  *
- * Type compatibility: FormItemProps is HTMLAttributes on web, but we need
- * ViewProps on native. We pick only the compatible props (className, children, etc.)
+ * TYPE COMPATIBILITY: FormItemProps is HTMLAttributes<HTMLDivElement> on web.
+ * We accept all props and filter to native-compatible ones internally.
  */
-const FormItem = React.forwardRef<
-  View,
-  Pick<FormItemProps, "className" | "children">
->((props, ref): React.JSX.Element => {
+function FormItem({
+  className,
+  style,
+  ...props
+}: FormItemProps): React.JSX.Element {
   const id = React.useId();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
+  // Filter to only props compatible with View
+  // React Native View doesn't support all HTML attributes
+  const { children } = props;
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <StyledView ref={ref} className={cn("space-y-2", props.className)}>
-        {props.children}
+      <StyledView
+        {...applyStyleType({
+          nativeStyle,
+          className: cn("space-y-2", className),
+        })}
+      >
+        {children}
       </StyledView>
     </FormItemContext.Provider>
   );
-});
+}
 FormItem.displayName = "FormItem";
 
-/**
- * FormLabel - Native implementation using Label component
- * Uses native-compatible props (only className and children)
- * Note: ref and htmlFor are web-specific and not used in native
- */
-const FormLabel = ({
+function FormLabel({
   className,
   children,
-}: {
-  className?: string;
-  children?: React.ReactNode;
-}): React.JSX.Element => {
+  htmlFor: _htmlFor,
+}: FormLabelProps): React.JSX.Element {
   const { error, formItemId } = useFormField();
 
   return (
     <Label
       className={cn(error && "text-red-600 dark:text-red-400", className)}
-      nativeID={formItemId}
+      htmlFor={formItemId}
     >
       {children}
     </Label>
   );
-};
+}
 FormLabel.displayName = "FormLabel";
 
 /**
  * FormControl - Native implementation using Slot
- * Uses FormControlProps type from web
+ * Function signature identical to web version
+ *
+ * ACCESSIBILITY: Passes through aria attributes which will be converted
+ * to React Native accessibility props by the Slot component
  */
-const FormControl = React.forwardRef<
-  React.ElementRef<typeof Slot>,
-  FormControlProps
->(({ ...props }, ref) => {
+function FormControl({ ...props }: FormControlProps): React.JSX.Element {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
   return (
     <Slot
-      ref={ref}
       id={formItemId}
       aria-describedby={
         error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`
@@ -176,44 +201,54 @@ const FormControl = React.forwardRef<
       {...props}
     />
   );
-});
+}
 FormControl.displayName = "FormControl";
 
 /**
  * FormDescription - Native implementation using P (Text) instead of p
- * Uses FormDescriptionProps type from web but renders with native components
+ * Function signature identical to web version
  *
- * Type compatibility: FormDescriptionProps is HTMLAttributes on web, but we need
- * TextProps on native. We pick only the compatible props (className, children, etc.)
+ * TYPE COMPATIBILITY: FormDescriptionProps is HTMLAttributes<HTMLParagraphElement> on web.
+ * We accept all props and filter to native-compatible ones internally.
  */
 function FormDescription({
   className,
+  style: _style,
   ...props
-}: Pick<FormDescriptionProps, "className" | "children">): React.JSX.Element {
+}: FormDescriptionProps): React.JSX.Element {
   const { formDescriptionId } = useFormField();
 
+  // Filter to only props compatible with Text
+  const { children } = props;
+
+  // Note: style prop is not passed due to StyleType discriminated union
   return (
     <P
-      nativeID={formDescriptionId}
+      id={formDescriptionId}
       className={cn("text-[0.8rem] text-muted-foreground", className)}
-      {...props}
-    />
+    >
+      {children}
+    </P>
   );
 }
 FormDescription.displayName = "FormDescription";
 
 /**
  * FormMessage - Native implementation using P (Text) instead of p
- * Uses FormMessageProps type from web but renders with native components
+ * Function signature identical to web version
  *
- * Type compatibility: FormMessageProps is HTMLAttributes on web, but we need
- * TextProps on native. We pick only the compatible props (className, children, etc.)
+ * TRANSLATION: Uses i18next for error message translation
+ * Handles undefined/missing error messages gracefully
+ *
+ * TYPE COMPATIBILITY: FormMessageProps is HTMLAttributes<HTMLParagraphElement> on web.
+ * We accept all props and filter to native-compatible ones internally.
  */
 function FormMessage({
   className,
+  style: _style,
   children,
-  ...props
-}: Pick<FormMessageProps, "className" | "children">): React.JSX.Element | null {
+  ..._props
+}: FormMessageProps): React.JSX.Element | null {
   const { error, formMessageId } = useFormField();
   const { t } = useTranslation();
   const body = error ? String(error.message) : children;
@@ -221,20 +256,25 @@ function FormMessage({
   if (!body || body === "undefined") {
     return null;
   }
+
+  // Note: style prop is not passed due to StyleType discriminated union
   return (
     <P
-      nativeID={formMessageId}
+      id={formMessageId}
       className={cn(
         "text-[0.8rem] font-medium text-red-600 dark:text-red-400",
         className,
       )}
-      {...props}
     >
       {t(body as TranslationKey)}
     </P>
   );
 }
 FormMessage.displayName = "FormMessage";
+
+// ============================================================================
+// EXPORTS - Must match web version exactly
+// ============================================================================
 
 export {
   Form,

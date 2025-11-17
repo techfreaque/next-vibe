@@ -4,6 +4,7 @@ import * as TogglePrimitive from "@radix-ui/react-toggle";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 const toggleVariants = cva(
   "web:group web:inline-flex items-center justify-center rounded-md web:ring-offset-background web:transition-colors web:hover:bg-muted active:bg-muted web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
@@ -46,33 +47,38 @@ const toggleTextVariants = cva("text-sm text-foreground font-medium", {
   },
 });
 
-// Cross-platform types - exported for native
 export type ToggleVariant = VariantProps<typeof toggleVariants>["variant"];
 export type ToggleSize = VariantProps<typeof toggleVariants>["size"];
 
-export interface ToggleRootProps
-  extends React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root>,
-    VariantProps<typeof toggleVariants> {
-  className?: string;
+export type ToggleRootProps = {
   variant?: ToggleVariant;
   size?: ToggleSize;
   children?: React.ReactNode;
   pressed?: boolean;
   onPressedChange?: (pressed: boolean) => void;
   disabled?: boolean;
-}
+} & StyleType;
 
 export function Toggle({
   className,
+  style,
   variant,
   size,
-  ...props
+  children,
+  pressed,
+  onPressedChange,
+  disabled,
 }: ToggleRootProps): React.JSX.Element {
   return (
     <TogglePrimitive.Root
       className={cn(toggleVariants({ variant, size, className }))}
-      {...props}
-    />
+      style={style}
+      pressed={pressed}
+      onPressedChange={onPressedChange}
+      disabled={disabled}
+    >
+      {children}
+    </TogglePrimitive.Root>
   );
 }
 

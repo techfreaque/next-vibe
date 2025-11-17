@@ -44,15 +44,9 @@ const { POST } = createEndpoint({
     { type: WidgetType.CONTAINER },
     { request: "data", response: true },
     {
-      email: requestDataField(
-        { type: WidgetType.TEXT },
-        z.string().email()
-      ),
-      name: requestDataField(
-        { type: WidgetType.TEXT },
-        z.string().min(1)
-      ),
-    }
+      email: requestDataField({ type: WidgetType.TEXT }, z.string().email()),
+      name: requestDataField({ type: WidgetType.TEXT }, z.string().min(1)),
+    },
   ),
 });
 ```
@@ -120,25 +114,39 @@ Define how data should be displayed:
 
 ```typescript
 // Text display
-{ type: WidgetType.TEXT }
+{
+  type: WidgetType.TEXT;
+}
 
 // Clickable link
-{ type: WidgetType.LINK }
+{
+  type: WidgetType.LINK;
+}
 
 // Data table with sorting
-{ type: WidgetType.DATA_TABLE }
+{
+  type: WidgetType.DATA_TABLE;
+}
 
 // Card grid
-{ type: WidgetType.DATA_CARDS }
+{
+  type: WidgetType.DATA_CARDS;
+}
 
 // Search results
-{ type: WidgetType.LINK_LIST }
+{
+  type: WidgetType.LINK_LIST;
+}
 
 // Code with syntax highlighting
-{ type: WidgetType.CODE_OUTPUT }
+{
+  type: WidgetType.CODE_OUTPUT;
+}
 
 // Markdown content
-{ type: WidgetType.MARKDOWN }
+{
+  type: WidgetType.MARKDOWN;
+}
 ```
 
 Results automatically render beautifully in:
@@ -153,11 +161,11 @@ Results automatically render beautifully in:
 Control who can access your endpoints:
 
 ```typescript
-allowedRoles: [UserRole.ADMIN] // Only admins
-allowedRoles: [UserRole.CUSTOMER] // Authenticated users
-allowedRoles: [UserRole.PUBLIC] // Everyone
-allowedRoles: [UserRole.CLI_OFF] // Disable CLI access
-allowedRoles: [UserRole.AI_TOOL_OFF] // Disable AI access
+allowedRoles: [UserRole.ADMIN]; // Only admins
+allowedRoles: [UserRole.CUSTOMER]; // Authenticated users
+allowedRoles: [UserRole.PUBLIC]; // Everyone
+allowedRoles: [UserRole.CLI_OFF]; // Disable CLI access
+allowedRoles: [UserRole.AI_TOOL_OFF]; // Disable AI access
 ```
 
 Permissions enforced automatically everywhere.
@@ -167,10 +175,10 @@ Permissions enforced automatically everywhere.
 Set credit costs for your endpoints:
 
 ```typescript
-credits: 0  // Free
-credits: 1  // Cheap (e.g., web search)
-credits: 5  // Medium (e.g., text-to-speech)
-credits: 10 // Expensive (e.g., GPT-4 message)
+credits: 0; // Free
+credits: 1; // Cheap (e.g., web search)
+credits: 5; // Medium (e.g., text-to-speech)
+credits: 10; // Expensive (e.g., GPT-4 message)
 ```
 
 Credits automatically:
@@ -198,8 +206,8 @@ const result: ResponseOutput = await endpoint.mutate(input);
 All user-facing text uses translation keys:
 
 ```typescript
-title: "app.api.v1.core.user.create.post.title"
-description: "app.api.v1.core.user.create.post.description"
+title: "app.api.v1.core.user.create.post.title";
+description: "app.api.v1.core.user.create.post.description";
 ```
 
 Automatically translated in:
@@ -229,10 +237,7 @@ const { GET } = createEndpoint({
     { type: WidgetType.CONTAINER },
     { request: "urlPathParams", response: true },
     {
-      query: requestUrlParamField(
-        { type: WidgetType.TEXT },
-        z.string().min(1)
-      ),
+      query: requestUrlParamField({ type: WidgetType.TEXT }, z.string().min(1)),
       results: responseArrayField(
         { type: WidgetType.LINK_LIST }, // Renders as clickable links!
         objectField(
@@ -242,10 +247,10 @@ const { GET } = createEndpoint({
             title: responseField({ type: WidgetType.TEXT }, z.string()),
             url: responseField({ type: WidgetType.LINK }, z.string()),
             snippet: responseField({ type: WidgetType.MARKDOWN }, z.string()),
-          }
-        )
-      )
-    }
+          },
+        ),
+      ),
+    },
   ),
 });
 ```

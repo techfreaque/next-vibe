@@ -3,10 +3,9 @@
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
-// Cross-platform types
-export interface SliderRootProps {
-  className?: string;
+export type SliderRootProps = {
   value?: number[];
   defaultValue?: number[];
   onValueChange?: (value: number[]) => void;
@@ -15,23 +14,19 @@ export interface SliderRootProps {
   step?: number;
   disabled?: boolean;
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface SliderTrackProps {
-  className?: string;
+export type SliderTrackProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface SliderRangeProps {
-  className?: string;
-}
+export type SliderRangeProps = StyleType;
 
-export interface SliderThumbProps {
-  className?: string;
-}
+export type SliderThumbProps = StyleType;
 
 export function Slider({
   className,
+  style,
   value,
   defaultValue,
   onValueChange,
@@ -48,6 +43,7 @@ export function Slider({
         "relative flex w-full touch-none select-none items-center",
         className,
       )}
+      style={style}
       value={value}
       defaultValue={defaultValue}
       onValueChange={onValueChange}
@@ -65,6 +61,7 @@ Slider.displayName = SliderPrimitive.Root.displayName;
 
 export function SliderTrack({
   className,
+  style,
   children,
   ...props
 }: SliderTrackProps): React.JSX.Element {
@@ -74,6 +71,7 @@ export function SliderTrack({
         "relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20",
         className,
       )}
+      style={style}
       {...props}
     >
       {children}
@@ -84,11 +82,13 @@ SliderTrack.displayName = SliderPrimitive.Track.displayName;
 
 export function SliderRange({
   className,
+  style,
   ...props
 }: SliderRangeProps): React.JSX.Element {
   return (
     <SliderPrimitive.Range
       className={cn("absolute h-full bg-primary", className)}
+      style={style}
       {...props}
     />
   );
@@ -97,6 +97,7 @@ SliderRange.displayName = SliderPrimitive.Range.displayName;
 
 export function SliderThumb({
   className,
+  style,
   ...props
 }: SliderThumbProps): React.JSX.Element {
   return (
@@ -105,6 +106,7 @@ export function SliderThumb({
         "block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
         className,
       )}
+      style={style}
       {...props}
     />
   );

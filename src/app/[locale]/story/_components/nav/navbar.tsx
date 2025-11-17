@@ -43,7 +43,7 @@ export function Navbar({
   const { t } = simpleT(locale);
 
   return (
-    <header
+    <Div
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
         "bg-white/95 dark:bg-gray-950/95 backdrop-blur-md shadow-sm",
@@ -218,6 +218,6 @@ export function Navbar({
           <MobileMenuClient locale={locale} navigationItems={navigationItems} />
         </Div>
       </Div>
-    </header>
+    </Div>
   );
 }

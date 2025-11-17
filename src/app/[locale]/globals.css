@@ -2,11 +2,6 @@
 
 @plugin 'tailwindcss-animate';
 
-/* @custom-variant dark (&:where(.dark, .dark *));
-@custom-variant light (&:where(:not(.dark), :not(.dark) *)); */
-
-/* @custom-variant light (&:where(html:not(.dark), html:not(.dark) *)); */
-
 @custom-variant dark (&:where(html.dark, html.dark *));
 @custom-variant light (&:where(html:not(.dark), html:not(.dark) *));
 

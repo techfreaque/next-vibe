@@ -14,6 +14,7 @@ import {
   Dimensions,
   RefreshControl,
   ScrollView,
+  Text as RNText,
 } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { styled } from "nativewind";
@@ -28,11 +29,22 @@ import {
   TableRow,
 } from "./table";
 
-// Import ALL types from web - ZERO definitions here
+// Import ALL types from web version (web is source of truth)
 import type { DataTableProps } from "@/packages/next-vibe-ui/web/ui/data-table";
+
+// Re-export types for consistency
+export type { DataTableProps };
 
 // Styled components for NativeWind support
 const StyledAnimatedView = styled(Animated.View, { className: "style" });
+
+// Helper to wrap flexRender output in Text if it's a string or number
+function wrapInTextIfNeeded(content: React.ReactNode): React.ReactNode {
+  if (typeof content === "string" || typeof content === "number") {
+    return <RNText>{content}</RNText>;
+  }
+  return content;
+}
 
 /**
  * @docs https://tanstack.com/table
@@ -83,9 +95,11 @@ export function DataTable<TData, TValue = string>({
                   >
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
+                      : wrapInTextIfNeeded(
+                          flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          ),
                         )}
                   </TableHead>
                 );
@@ -155,7 +169,7 @@ export function DataTable<TData, TValue = string>({
       >
         <Table>
           <TableBody>
-            <TableRow className={rowClassName} onPress={handlePress}>
+            <TableRow className={rowClassName} onClick={handlePress}>
               {row.getVisibleCells().map(
                 (cell): React.ReactElement => (
                   <TableCell
@@ -167,9 +181,11 @@ export function DataTable<TData, TValue = string>({
                       ),
                     }}
                   >
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext(),
+                    {wrapInTextIfNeeded(
+                      flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      ),
                     )}
                   </TableCell>
                 ),

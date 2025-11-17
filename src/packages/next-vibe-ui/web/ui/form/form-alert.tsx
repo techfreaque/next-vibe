@@ -2,6 +2,7 @@ import { AlertCircle, AlertTriangle, CheckCircle, Info } from "lucide-react";
 import type { MessageResponseType } from "next-vibe/shared/types/response.schema";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
+import type { StyleType } from "../../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 
@@ -13,10 +14,9 @@ export interface FormAlertState {
   message: MessageResponseType;
 }
 
-export interface FormAlertProps {
+export type FormAlertProps = {
   alert: FormAlertState | null;
-  className?: string;
-}
+} & StyleType;
 
 /**
  * Central alert component for forms with consistent styling and icons
@@ -29,6 +29,7 @@ export interface FormAlertProps {
 export function FormAlert({
   alert,
   className,
+  style,
 }: FormAlertProps): JSX.Element | null {
   const { t } = useTranslation();
 
@@ -63,6 +64,7 @@ export function FormAlert({
       variant={alert.variant}
       icon={Icon}
       className={cn("my-4", className)}
+      style={style}
     >
       {alert.title && (
         <AlertTitle>

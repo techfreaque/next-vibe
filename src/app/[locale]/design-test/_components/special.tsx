@@ -5,20 +5,6 @@ import type { JSX } from "react";
 import { DataTable } from "next-vibe-ui/ui/data-table";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Image } from "next-vibe-ui/ui/image";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger,
-} from "next-vibe-ui/ui/sidebar";
 import { Div } from "next-vibe-ui/ui/div";
 import { Section } from "next-vibe-ui/ui/section";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
@@ -31,9 +17,21 @@ const sampleData = [
 ];
 
 const columns = [
-  { accessorKey: "name", header: "Name" },
-  { accessorKey: "email", header: "Email" },
-  { accessorKey: "role", header: "Role" },
+  {
+    accessorKey: "name",
+    header: () => <P className="font-medium">Name</P>,
+    cell: ({ getValue }) => <P>{String(getValue())}</P>,
+  },
+  {
+    accessorKey: "email",
+    header: () => <P className="font-medium">Email</P>,
+    cell: ({ getValue }) => <P>{String(getValue())}</P>,
+  },
+  {
+    accessorKey: "role",
+    header: () => <P className="font-medium">Role</P>,
+    cell: ({ getValue }) => <P>{String(getValue())}</P>,
+  },
 ];
 
 const markdownContent = `
@@ -88,50 +86,6 @@ export function SpecialPreview(): JSX.Element {
                   height={300}
                   className="rounded-md"
                 />
-              </CardContent>
-            </Card>
-          </Div>
-
-          <Div className="space-y-2">
-            <H3>Sidebar</H3>
-            <Card>
-              <CardContent className="pt-6">
-                <Div className="h-[400px] flex">
-                  <SidebarProvider>
-                    <Sidebar>
-                      <SidebarHeader>
-                        <P className="font-semibold p-4">App Name</P>
-                      </SidebarHeader>
-                      <SidebarContent>
-                        <SidebarGroup>
-                          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-                          <SidebarGroupContent>
-                            <SidebarMenu>
-                              <SidebarMenuItem>
-                                <SidebarMenuButton>Dashboard</SidebarMenuButton>
-                              </SidebarMenuItem>
-                              <SidebarMenuItem>
-                                <SidebarMenuButton>Settings</SidebarMenuButton>
-                              </SidebarMenuItem>
-                              <SidebarMenuItem>
-                                <SidebarMenuButton>Profile</SidebarMenuButton>
-                              </SidebarMenuItem>
-                            </SidebarMenu>
-                          </SidebarGroupContent>
-                        </SidebarGroup>
-                      </SidebarContent>
-                      <SidebarFooter>
-                        <P className="text-xs p-4 text-muted-foreground">
-                          Footer
-                        </P>
-                      </SidebarFooter>
-                    </Sidebar>
-                    <Div className="flex-1 p-4">
-                      <SidebarTrigger />
-                      <P className="mt-4">Main content area with sidebar</P>
-                    </Div>
-                  </SidebarProvider>
-                </Div>
               </CardContent>
             </Card>
           </Div>

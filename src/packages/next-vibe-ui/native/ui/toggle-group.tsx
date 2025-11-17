@@ -1,9 +1,12 @@
 import * as ToggleGroupPrimitive from "@rn-primitives/toggle-group";
 import type { LucideIcon } from "lucide-react-native";
 import * as React from "react";
+import { View } from "react-native";
+import { styled } from "nativewind";
 
 import { cn } from "../lib/utils";
-import { styled } from "nativewind";
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 import {
   toggleTextVariants,
@@ -16,7 +19,9 @@ import type {
   ToggleGroupRootProps,
 } from "../../web/ui/toggle-group";
 
-const StyledToggleGroupRoot = styled(ToggleGroupPrimitive.Root);
+// The styled() function has type inference issues with this primitive
+const StyledToggleGroupRoot = ToggleGroupPrimitive.Root;
+const StyledView = styled(View, { className: "style" });
 
 const ToggleGroupContext = React.createContext<{
   size?: ToggleSize;
@@ -37,7 +42,9 @@ export function ToggleGroup({
   loop,
   orientation,
   dir,
+  style,
 }: ToggleGroupRootProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   const mergedClassName = cn(
     "flex flex-row items-center justify-center gap-1",
     className,
@@ -68,37 +75,42 @@ export function ToggleGroup({
   return (
     <ToggleGroupContext.Provider value={{ variant, size }}>
       {toggleType === "single" ? (
-        <StyledToggleGroupRoot
-          className={mergedClassName}
-          type="single"
-          value={typeof toggleValue === "string" ? toggleValue : undefined}
-          onValueChange={singleHandler}
-          defaultValue={
-            typeof defaultValue === "string" ? defaultValue : undefined
-          }
-          disabled={disabled}
-          rovingFocus={rovingFocus}
-          loop={loop}
-          orientation={orientation}
-          dir={dir}
-        >
-          {children}
-        </StyledToggleGroupRoot>
+        <StyledView {...applyStyleType({ nativeStyle, className: mergedClassName })}>
+          <StyledToggleGroupRoot
+            {...({
+              type: "single",
+              value: typeof toggleValue === "string" ? toggleValue : undefined,
+              onValueChange: singleHandler,
+              defaultValue:
+                typeof defaultValue === "string" ? defaultValue : undefined,
+              disabled,
+              rovingFocus,
+              loop,
+              orientation,
+              dir,
+            } as React.ComponentProps<typeof StyledToggleGroupRoot>)}
+          >
+            {children}
+          </StyledToggleGroupRoot>
+        </StyledView>
       ) : (
-        <StyledToggleGroupRoot
-          className={mergedClassName}
-          type="multiple"
-          value={Array.isArray(toggleValue) ? toggleValue : []}
-          onValueChange={multipleHandler}
-          defaultValue={Array.isArray(defaultValue) ? defaultValue : []}
-          disabled={disabled}
-          rovingFocus={rovingFocus}
-          loop={loop}
-          orientation={orientation}
-          dir={dir}
-        >
-          {children}
-        </StyledToggleGroupRoot>
+        <StyledView {...applyStyleType({ nativeStyle, className: mergedClassName })}>
+          <StyledToggleGroupRoot
+            {...({
+              type: "multiple",
+              value: (Array.isArray(toggleValue) ? toggleValue : []) as string[],
+              onValueChange: multipleHandler,
+              defaultValue: (Array.isArray(defaultValue) ? defaultValue : []) as string[],
+              disabled,
+              rovingFocus,
+              loop,
+              orientation,
+              dir,
+            } as React.ComponentProps<typeof StyledToggleGroupRoot>)}
+          >
+            {children}
+          </StyledToggleGroupRoot>
+        </StyledView>
       )}
     </ToggleGroupContext.Provider>
   );
@@ -125,10 +137,12 @@ export function ToggleGroupItem({
   size,
   value,
   disabled,
+  style,
   ...props
 }: ToggleGroupItemProps): React.JSX.Element {
   const context = useToggleGroupContext();
   const { value: groupValue } = ToggleGroupPrimitive.useRootContext();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <TextClassContext.Provider
@@ -140,16 +154,19 @@ export function ToggleGroupItem({
       )}
     >
       <ToggleGroupPrimitive.Item
-        className={cn(
-          toggleVariants({
-            variant: context.variant || variant,
-            size: context.size || size,
-          }),
-          disabled && "pointer-events-none opacity-50",
-          ToggleGroupPrimitive.utils.getIsSelected(groupValue, value) &&
-            "bg-accent",
-          className,
-        )}
+        {...applyStyleType({
+          nativeStyle,
+          className: cn(
+            toggleVariants({
+              variant: context.variant || variant,
+              size: context.size || size,
+            }),
+            disabled && "pointer-events-none opacity-50",
+            ToggleGroupPrimitive.utils.getIsSelected(groupValue, value) &&
+              "bg-accent",
+            className,
+          ),
+        })}
         value={value}
         disabled={disabled}
         {...props}

@@ -12,8 +12,7 @@ import {
 import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import type { ChatFolder } from "../../types";
+import type { ChatFolder } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
 
 /**
  * Check if a folder ID is a default/root folder

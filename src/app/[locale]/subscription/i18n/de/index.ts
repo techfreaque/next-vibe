@@ -154,6 +154,10 @@ export const translations: typeof enTranslations = {
         expiry: "Ablauf",
         free_tier: "Kostenlose Stufe",
         monthly_reset: "Monatliche Zurücksetzung",
+        free_grant: "Kostenlose Gewährung",
+        free_reset: "Kostenlose Zurücksetzung",
+        refund: "Rückerstattung",
+        transfer: "Übertragung",
       },
     },
     tabs: {

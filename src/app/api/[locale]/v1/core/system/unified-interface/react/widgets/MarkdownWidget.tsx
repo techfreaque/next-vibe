@@ -36,7 +36,6 @@ export function MarkdownWidget({
   data,
   context,
   className,
-  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
   const { t } = simpleT(context.locale);
 
@@ -44,7 +43,7 @@ export function MarkdownWidget({
     return (
       <Div
         className={cn("text-muted-foreground italic", className)}
-        style={style}
+        
       >
         —
       </Div>
@@ -57,7 +56,7 @@ export function MarkdownWidget({
     return (
       <Div
         className={cn("text-muted-foreground italic", className)}
-        style={style}
+        
       >
         {t(
           "app.api.v1.core.system.unifiedInterface.react.widgets.markdown.noContent",
@@ -76,7 +75,7 @@ export function MarkdownWidget({
         "prose-pre:bg-muted prose-pre:border prose-pre:border-border",
         className,
       )}
-      style={style}
+      
     >
       <Markdown content={content} />
     </Div>

@@ -2,37 +2,31 @@
 
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
-// Cross-platform types
-export interface CollapsibleRootProps {
+export type CollapsibleProps = {
+  children?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   disabled?: boolean;
   defaultOpen?: boolean;
-  children?: React.ReactNode;
-}
-
-export interface CollapsibleTriggerProps {
-  asChild?: boolean;
-  disabled?: boolean;
-  children?: React.ReactNode;
-}
-
-export interface CollapsibleContentProps {
-  forceMount?: true;
-  children?: React.ReactNode;
-  className?: string;
-}
+} & StyleType;
 
 export function Collapsible({
   children,
   ...props
-}: CollapsibleRootProps): React.JSX.Element {
+}: CollapsibleProps): React.JSX.Element {
   return (
     <CollapsiblePrimitive.Root {...props}>{children}</CollapsiblePrimitive.Root>
   );
 }
 Collapsible.displayName = CollapsiblePrimitive.Root.displayName;
+
+export type CollapsibleTriggerProps = {
+  children?: React.ReactNode;
+  asChild?: boolean;
+  disabled?: boolean;
+} & StyleType;
 
 export function CollapsibleTrigger({
   children,
@@ -47,6 +41,11 @@ export function CollapsibleTrigger({
 }
 CollapsibleTrigger.displayName =
   CollapsiblePrimitive.CollapsibleTrigger.displayName;
+
+export type CollapsibleContentProps = {
+  children?: React.ReactNode;
+  forceMount?: true;
+} & StyleType;
 
 export function CollapsibleContent({
   children,

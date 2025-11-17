@@ -44,7 +44,6 @@ export function ContainerWidget({
   data,
   context,
   className,
-  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
   const { t } = simpleT(context.locale);
 
@@ -52,7 +51,7 @@ export function ContainerWidget({
     return (
       <Div
         className={cn("text-muted-foreground italic", className)}
-        style={style}
+        
       >
         —
       </Div>
@@ -63,7 +62,7 @@ export function ContainerWidget({
 
   if (!children || children.length === 0) {
     return (
-      <Card className={className} style={style}>
+      <Card className={className} >
         {(title ?? description) && (
           <CardHeader>
             {title && <CardTitle>{title}</CardTitle>}
@@ -91,7 +90,7 @@ export function ContainerWidget({
   /* eslint-enable i18next/no-literal-string */
 
   return (
-    <Card className={className} style={style}>
+    <Card className={className} >
       {(title ?? description) && (
         <CardHeader>
           {title && <CardTitle>{title}</CardTitle>}

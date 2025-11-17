@@ -28,7 +28,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { leadAuthRepository } from "../../leads/auth/repository";
-import { leads, userLeads } from "../../leads/db";
+import { leads, userLeadLinks } from "../../leads/db";
 import { LeadSource, LeadStatus } from "../../leads/enum";
 import { db } from "../../system/db";
 import { detectPlatformFromRequest } from "../../system/unified-interface/shared/auth/platform-detection";
@@ -195,6 +195,16 @@ export interface AuthRepository {
     callbackUrl: string,
     logger: EndpointLogger,
   ): Promise<CompleteUserType>;
+
+  /**
+   * Authenticate user by email (for CLI authentication)
+   * Returns JWT payload for authenticated user
+   */
+  authenticateUserByEmail(
+    email: string,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<JwtPrivatePayloadType>>;
 }
 
 /**
@@ -258,30 +268,21 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   async getPrimaryLeadId(userId: string): Promise<string | null> {
-    const [primaryUserLead] = await db
+    // With wallet-based system, no isPrimary concept - just get first linked lead
+    const [userLeadLink] = await db
       .select()
-      .from(userLeads)
-      .where(and(eq(userLeads.userId, userId), eq(userLeads.isPrimary, true)))
+      .from(userLeadLinks)
+      .where(eq(userLeadLinks.userId, userId))
       .limit(1);
 
-    if (primaryUserLead) {
-      return primaryUserLead.leadId;
-    }
-
-    const [anyUserLead] = await db
-      .select()
-      .from(userLeads)
-      .where(eq(userLeads.userId, userId))
-      .limit(1);
-
-    return anyUserLead?.leadId || null;
+    return userLeadLink?.leadId || null;
   }
 
   async getAllLeadIds(userId: string): Promise<string[]> {
     const userLeadRecords = await db
-      .select({ leadId: userLeads.leadId })
-      .from(userLeads)
-      .where(eq(userLeads.userId, userId));
+      .select({ leadId: userLeadLinks.leadId })
+      .from(userLeadLinks)
+      .where(eq(userLeadLinks.userId, userId));
     return userLeadRecords.map((record) => record.leadId);
   }
 
@@ -406,25 +407,15 @@ class AuthRepositoryImpl implements AuthRepository {
   ): Promise<string | null> {
     try {
       // Get primary lead for user
-      const [primaryUserLead] = await db
+      // With wallet-based system, no isPrimary - just get any linked lead
+      const [userLeadLink] = await db
         .select()
-        .from(userLeads)
-        .where(and(eq(userLeads.userId, userId), eq(userLeads.isPrimary, true)))
+        .from(userLeadLinks)
+        .where(eq(userLeadLinks.userId, userId))
         .limit(1);
 
-      if (primaryUserLead) {
-        return primaryUserLead.leadId;
-      }
-
-      // Fallback to any lead for user
-      const [anyUserLead] = await db
-        .select()
-        .from(userLeads)
-        .where(eq(userLeads.userId, userId))
-        .limit(1);
-
-      if (anyUserLead) {
-        return anyUserLead.leadId;
+      if (userLeadLink) {
+        return userLeadLink.leadId;
       }
 
       // Create new lead if none exists
@@ -468,10 +459,10 @@ class AuthRepositoryImpl implements AuthRepository {
       })
       .returning();
 
-    await db.insert(userLeads).values({
+    await db.insert(userLeadLinks).values({
       userId,
       leadId: newLead.id,
-      isPrimary: true,
+      linkReason: "user_creation",
     });
 
     logger.debug("Created lead for user", { userId, leadId: newLead.id });
@@ -1313,6 +1304,61 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     return user;
+  }
+
+  /**
+   * Authenticate user by email (for CLI authentication)
+   * Moved from CLI handler to enforce repository-first architecture
+   */
+  async authenticateUserByEmail(
+    email: string,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<JwtPrivatePayloadType>> {
+    try {
+      logger.debug("Authenticating user by email", { email });
+
+      const userResult = await userRepository.getUserByEmail(
+        email,
+        UserDetailLevel.COMPLETE,
+        locale,
+        logger,
+      );
+
+      if (!userResult.success || !userResult.data) {
+        logger.debug("User not found in database", { email });
+        return fail({
+          message: "app.api.v1.core.user.auth.errors.user_not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: { email },
+        });
+      }
+
+      const user = userResult.data;
+      const leadId = await this.getLeadIdFromDb(user.id, locale, logger);
+
+      if (!leadId) {
+        logger.error("Failed to get lead ID for user", { userId: user.id });
+        return fail({
+          message: "app.api.v1.core.user.auth.errors.lead_creation_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+
+      return success({
+        isPublic: false,
+        id: user.id,
+        leadId,
+      });
+    } catch (error) {
+      const parsedError = parseError(error);
+      logger.error("Error authenticating by email", parsedError);
+      return fail({
+        message: "app.api.v1.core.user.auth.errors.authentication_failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
+      });
+    }
   }
 }
 

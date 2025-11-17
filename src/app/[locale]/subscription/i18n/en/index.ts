@@ -151,6 +151,10 @@ export const translations = {
         expiry: "Expiry",
         free_tier: "Free Tier",
         monthly_reset: "Monthly Reset",
+        free_grant: "Free Grant",
+        free_reset: "Free Reset",
+        refund: "Refund",
+        transfer: "Transfer",
       },
     },
     tabs: {

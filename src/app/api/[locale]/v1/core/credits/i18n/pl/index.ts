@@ -15,12 +15,22 @@ export const translations: typeof enTranslations = {
       expiry: "Wygaśnięcie",
       freeTier: "Darmowy",
       monthlyReset: "Miesięczne odnowienie",
+      freeGrant: "Darmowe przyznanie",
+      freeReset: "Darmowe odnowienie",
+      refund: "Zwrot",
+      transfer: "Transfer",
     },
   },
   expire: {
     task: {
       description: "Wygasa stare kredyty subskrypcyjne codziennie",
       error: "Nie udało się wygasić kredytów",
+    },
+  },
+  cleanup: {
+    task: {
+      description: "Czyści osierocone portfele leadów tygodniowo",
+      error: "Nie udało się wyczyścić osieroconych portfeli",
     },
   },
   errors: {
@@ -39,12 +49,17 @@ export const translations: typeof enTranslations = {
     stripeCustomerFailed: "Nie udało się utworzyć klienta Stripe",
     checkoutFailed: "Nie udało się utworzyć sesji płatności",
     mergeFailed: "Nie udało się połączyć kredytów leada",
+    mergeLeadWalletsFailed:
+      "Nie udało się połączyć portfeli leadów z kontem użytkownika",
+    cleanupOrphanedFailed:
+      "Nie udało się wyczyścić osieroconych portfeli leadów",
     monthlyResetFailed: "Nie udało się odnowić miesięcznych kredytów",
     noLeadsToMerge: "Brak leadów do połączenia",
     oldestLeadNotFound: "Nie znaleziono najstarszego leada w klastrze",
     transactionFailed: "Nie udało się utworzyć rekordu transakcji",
     not_implemented_on_native:
       "{{method}} nie jest zaimplementowana na platformie natywnej. Użyj wersji webowej dla tej operacji.",
+    expireCreditsFailed: "Nie udało się wygasić kredytów",
   },
   get: {
     title: "Pobierz saldo kredytów",

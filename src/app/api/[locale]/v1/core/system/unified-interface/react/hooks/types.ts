@@ -7,7 +7,6 @@ import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import type { FormEvent } from "react";
 import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
@@ -297,7 +296,6 @@ export interface ApiFormReturn<
 }
 
 export type SubmitFormFunction<TRequest, TResponse, TUrlVariables> = (
-  event: FormEvent<HTMLFormElement> | undefined,
   options?: SubmitFormFunctionOptions<TRequest, TResponse, TUrlVariables>,
 ) => Promise<void> | void;
 

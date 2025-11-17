@@ -2,146 +2,291 @@ import { ChevronRightIcon, DotsHorizontalIcon } from "next-vibe-ui/ui/icons";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 
-// Cross-platform types
-export interface BreadcrumbProps {
+// Breadcrumb
+export type BreadcrumbProps = {
+  children?: React.ReactNode;
   separator?: React.ReactNode;
-  className?: string;
-  children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface BreadcrumbListProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface BreadcrumbItemProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface BreadcrumbLinkProps {
-  asChild?: boolean;
-  className?: string;
-  children?: React.ReactNode;
-  href?: string;
-  onPress?: () => void; // Native-specific, optional for web
-}
-
-export interface BreadcrumbPageProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export interface BreadcrumbSeparatorProps {
-  children?: React.ReactNode;
-  className?: string;
-}
-
-export interface BreadcrumbEllipsisProps {
-  className?: string;
-}
-
-function Breadcrumb({
-  ...props
-}: React.ComponentPropsWithoutRef<"nav"> & {
-  separator?: React.ReactNode;
-}): React.JSX.Element {
-  return <nav aria-label="breadcrumb" {...props} />;
+export function Breadcrumb({
+  className,
+  style,
+  children,
+}: BreadcrumbProps): React.JSX.Element {
+  return (
+    <nav aria-label="breadcrumb" className={className} style={style}>
+      {children}
+    </nav>
+  );
 }
 Breadcrumb.displayName = "Breadcrumb";
 
-function BreadcrumbList({
+// BreadcrumbList
+export type BreadcrumbListProps = {
+  children?: React.ReactNode;
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+} & StyleType;
+
+export function BreadcrumbList({
   className,
-  ...props
-}: React.ComponentPropsWithoutRef<"ol">): React.JSX.Element {
+  style,
+  children,
+  id,
+  role,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledby,
+}: BreadcrumbListProps): React.JSX.Element {
   return (
     <ol
       className={cn(
-        "flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5",
+        "flex flex-wrap items-center gap-1.5 wrap-break-word text-sm text-muted-foreground sm:gap-2.5",
         className,
       )}
-      {...props}
-    />
+      style={style}
+      id={id}
+      role={role}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledby}
+    >
+      {children}
+    </ol>
   );
 }
 BreadcrumbList.displayName = "BreadcrumbList";
 
-function BreadcrumbItem({
+// BreadcrumbItem
+export type BreadcrumbItemProps = {
+  children?: React.ReactNode;
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-current"?:
+    | "page"
+    | "step"
+    | "location"
+    | "date"
+    | "time"
+    | "true"
+    | "false"
+    | boolean;
+} & StyleType;
+
+export function BreadcrumbItem({
   className,
+  style,
+  children,
   ...props
-}: React.ComponentPropsWithoutRef<"li">): React.JSX.Element {
+}: BreadcrumbItemProps): React.JSX.Element {
   return (
     <li
       className={cn("inline-flex items-center gap-1.5", className)}
+      style={style}
       {...props}
-    />
+    >
+      {children}
+    </li>
   );
 }
 BreadcrumbItem.displayName = "BreadcrumbItem";
 
-function BreadcrumbLink({
+// Cross-platform click event for BreadcrumbLink
+export interface BreadcrumbLinkClickEvent {
+  preventDefault: () => void;
+  stopPropagation: () => void;
+}
+
+// BreadcrumbLink
+export type BreadcrumbLinkProps = {
+  children?: React.ReactNode;
+  asChild?: boolean;
+  href?: string;
+  target?: "_blank" | "_self" | "_parent" | "_top";
+  rel?: string;
+  download?: string | boolean;
+  hrefLang?: string;
+  ping?: string;
+  referrerPolicy?: React.HTMLAttributeReferrerPolicy;
+  type?: string;
+  onClick?: (e: BreadcrumbLinkClickEvent) => void;
+  "aria-label"?: string;
+  "aria-current"?:
+    | "page"
+    | "step"
+    | "location"
+    | "date"
+    | "time"
+    | "true"
+    | "false"
+    | boolean;
+} & StyleType;
+
+export function BreadcrumbLink({
   asChild,
   className,
-  ...props
-}: React.ComponentPropsWithoutRef<"a"> & {
-  asChild?: boolean;
-}): React.JSX.Element {
+  style,
+  children,
+  href,
+  target,
+  rel,
+  download,
+  hrefLang,
+  ping,
+  referrerPolicy,
+  type,
+  onClick,
+  "aria-label": ariaLabel,
+  "aria-current": ariaCurrent,
+}: BreadcrumbLinkProps): React.JSX.Element {
   const Comp = asChild ? Slot : "a";
 
   return (
     <Comp
       className={cn("transition-colors hover:text-foreground", className)}
-      {...props}
-    />
+      style={style}
+      href={href}
+      target={target}
+      rel={rel}
+      download={download}
+      hrefLang={hrefLang}
+      ping={ping}
+      referrerPolicy={referrerPolicy}
+      type={type}
+      onClick={onClick}
+      aria-label={ariaLabel}
+      aria-current={ariaCurrent}
+    >
+      {children}
+    </Comp>
   );
 }
 BreadcrumbLink.displayName = "BreadcrumbLink";
 
-function BreadcrumbPage({
+// BreadcrumbPage
+export type BreadcrumbPageProps = {
+  children?: React.ReactNode;
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-current"?:
+    | "page"
+    | "step"
+    | "location"
+    | "date"
+    | "time"
+    | "true"
+    | "false"
+    | boolean;
+} & StyleType;
+
+export function BreadcrumbPage({
   className,
-  ...props
-}: React.ComponentPropsWithoutRef<"span">): React.JSX.Element {
-  return (
-    <span
-      aria-current="page"
-      className={cn("font-normal text-foreground", className)}
-      {...props}
-    />
-  );
+  style,
+  children,
+  "aria-current": ariaCurrent = "page",
+  id,
+  role,
+  "aria-label": ariaLabel,
+}: BreadcrumbPageProps): React.JSX.Element {
+  const spanProps: {
+    "aria-current"?:
+      | "page"
+      | "step"
+      | "location"
+      | "date"
+      | "time"
+      | "true"
+      | "false"
+      | boolean;
+    className: string;
+    style?: React.CSSProperties;
+    id?: string;
+    role?: string;
+    "aria-label"?: string;
+  } = {
+    "aria-current": ariaCurrent,
+    className: cn("font-normal text-foreground", className),
+    style,
+  };
+
+  if (id) {
+    spanProps.id = id;
+  }
+  if (role) {
+    spanProps.role = role;
+  }
+  if (ariaLabel) {
+    spanProps["aria-label"] = ariaLabel;
+  }
+
+  return <span {...spanProps}>{children}</span>;
 }
 BreadcrumbPage.displayName = "BreadcrumbPage";
 
-const BreadcrumbSeparator = ({
+// BreadcrumbSeparator
+export type BreadcrumbSeparatorProps = {
+  children?: React.ReactNode;
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-hidden"?: boolean | "true" | "false";
+} & StyleType;
+
+export function BreadcrumbSeparator({
   children,
   className,
-  ...props
-}: React.ComponentProps<"li">): React.JSX.Element => (
-  <li
-    role="presentation"
-    aria-hidden="true"
-    className={cn("[&>svg]:size-3.5", className)}
-    {...props}
-  >
-    {children ?? <ChevronRightIcon />}
-  </li>
-);
+  style,
+  id,
+  role = "presentation",
+  "aria-label": ariaLabel,
+  "aria-hidden": ariaHidden = "true",
+}: BreadcrumbSeparatorProps): React.JSX.Element {
+  return (
+    <li
+      role={role}
+      aria-hidden={ariaHidden}
+      className={cn("[&>svg]:size-3.5", className)}
+      style={style}
+      id={id}
+      aria-label={ariaLabel}
+    >
+      {children ?? <ChevronRightIcon />}
+    </li>
+  );
+}
 BreadcrumbSeparator.displayName = "BreadcrumbSeparator";
 
-const BreadcrumbEllipsis = ({
+export type BreadcrumbEllipsisProps = {
+  id?: string;
+  role?: string;
+  "aria-label"?: string;
+  "aria-hidden"?: boolean | "true" | "false";
+} & StyleType;
+
+export function BreadcrumbEllipsis({
   className,
-  ...props
-}: React.ComponentProps<"span">): React.JSX.Element => {
+  style,
+  id,
+  role = "presentation",
+  "aria-label": ariaLabel,
+  "aria-hidden": ariaHidden = "true",
+}: BreadcrumbEllipsisProps): React.JSX.Element {
   const { t } = useTranslation();
 
   return (
     <span
-      role="presentation"
-      aria-hidden="true"
+      role={role}
+      aria-hidden={ariaHidden}
       className={cn("flex h-9 w-9 items-center justify-center", className)}
-      {...props}
+      style={style}
+      id={id}
+      aria-label={ariaLabel}
     >
       <DotsHorizontalIcon className="h-4 w-4" />
       <span className="sr-only">
@@ -149,15 +294,5 @@ const BreadcrumbEllipsis = ({
       </span>
     </span>
   );
-};
+}
 BreadcrumbEllipsis.displayName = "BreadcrumbElipssis";
-
-export {
-  Breadcrumb,
-  BreadcrumbEllipsis,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-};

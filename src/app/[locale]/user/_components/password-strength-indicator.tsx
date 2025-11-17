@@ -86,10 +86,9 @@ export function PasswordStrengthIndicator({
         </Span>
       </Div>
       <Div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-        <Div
-          className={`h-full ${color} transition-all duration-300`}
-          style={{ width: `${widthPercentage}%` }}
-        />
+        <Div style={{ width: `${widthPercentage}%` }}>
+          <Div className={`h-full ${color} transition-all duration-300`} />
+        </Div>
       </Div>
       {strength <= 2 && (
         <P className="text-xs text-red-500 mt-1">

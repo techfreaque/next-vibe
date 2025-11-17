@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils";
 import React from "react";
+import type { StyleType } from "../utils/style-type";
 
 import type { InputGenericTarget } from "./input";
 
@@ -41,8 +42,6 @@ export interface TextareaKeyboardEvent {
   code: string;
   preventDefault: () => void;
   stopPropagation: () => void;
-  // currentTarget: InputGenericTarget<T>;
-  // target: InputGenericTarget<T>;
   shiftKey: boolean;
   ctrlKey: boolean;
   altKey: boolean;
@@ -65,9 +64,7 @@ export interface TextareaRefObject {
   value?: string;
 }
 
-// Cross-platform props interface
-export interface TextareaBaseProps {
-  className?: string;
+export type TextareaProps = {
   value?: string;
   defaultValue?: string;
   placeholder?: string;
@@ -87,7 +84,8 @@ export interface TextareaBaseProps {
   maxRows?: number;
   onKeyDown?: (e: TextareaKeyboardEvent) => void;
   ref?: React.RefObject<TextareaRefObject | null>;
-}
+  variant?: VariantProps<typeof textareaVariants>["variant"];
+} & StyleType;
 
 export const textareaVariants = cva(
   "flex w-full rounded-md text-sm text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 transition-[color,box-shadow] outline-none resize-none overflow-hidden",
@@ -106,12 +104,9 @@ export const textareaVariants = cva(
   },
 );
 
-export interface TextareaProps
-  extends TextareaBaseProps,
-    VariantProps<typeof textareaVariants> {}
-
 function Textarea({
   className,
+  style,
   variant,
   minRows = 2,
   maxRows = 10,
@@ -205,6 +200,7 @@ function Textarea({
   const content = (
     <textarea
       className={cn(textareaVariants({ variant }), className)}
+      style={style}
       ref={internalRef}
       onChange={handleChange}
       onBlur={onBlur}

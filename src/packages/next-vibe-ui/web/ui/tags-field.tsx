@@ -9,6 +9,7 @@ import { Plus, X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useRef, useState } from "react";
+import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -18,34 +19,13 @@ import { Button } from "./button";
 import { Input, type InputKeyboardEvent } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
-// Cross-platform base interface (no TranslationKey dependency)
-export interface TagOptionBase {
-  value: string;
-  label: string;
-  category?: string;
-}
-
 export interface TagOption {
   value: string;
   label: TranslationKey;
   category?: string;
 }
 
-// Cross-platform props interface
-export interface TagsFieldPropsBase {
-  value?: string[];
-  onChange: (value: string[]) => void;
-  onBlur?: () => void;
-  suggestions?: TagOptionBase[];
-  placeholder?: string;
-  maxTags?: number;
-  allowCustom?: boolean;
-  disabled?: boolean;
-  className?: string;
-  name?: string;
-}
-
-export interface TagsFieldProps {
+export type TagsFieldProps = {
   value?: string[];
   onChange: (value: string[]) => void;
   onBlur?: () => void;
@@ -54,9 +34,8 @@ export interface TagsFieldProps {
   maxTags?: number;
   allowCustom?: boolean;
   disabled?: boolean;
-  className?: string;
   name?: string;
-}
+} & StyleType;
 
 export function TagsField({
   value = [],
@@ -68,6 +47,7 @@ export function TagsField({
   allowCustom = true,
   disabled = false,
   className,
+  style,
   name,
 }: TagsFieldProps): JSX.Element {
   const { t } = useTranslation();
@@ -159,7 +139,7 @@ export function TagsField({
   const canAddMore = !maxTags || value.length < maxTags;
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative", className)} style={style}>
       <div
         className={cn(
           "min-h-[40px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm",

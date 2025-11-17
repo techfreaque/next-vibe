@@ -41,7 +41,7 @@ interface CliExecutionOptions {
     namedArgs: Record<string, string | number | boolean>;
   };
   user?: InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>;
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
   dryRun?: boolean;
   interactive?: boolean;
   verbose?: boolean;
@@ -447,7 +447,7 @@ export class CliEntryPoint {
       }
 
       try {
-        const definitionImport = (await import(definitionPath)) as  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: CLI argument parsing requires 'unknown' for flexible input handling
+        const definitionImport = (await import(definitionPath)) as // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: CLI argument parsing requires 'unknown' for flexible input handling
           | Record<string, unknown>
           // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Option extraction requires 'unknown' for dynamic CLI options
           | { default: Record<string, unknown> };

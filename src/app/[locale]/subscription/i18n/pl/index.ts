@@ -155,6 +155,10 @@ export const translations: typeof enTranslations = {
         expiry: "Wygaśnięcie",
         free_tier: "Darmowy poziom",
         monthly_reset: "Miesięczne odnowienie",
+        free_grant: "Darmowe przyznanie",
+        free_reset: "Darmowe odnowienie",
+        refund: "Zwrot",
+        transfer: "Transfer",
       },
     },
     tabs: {

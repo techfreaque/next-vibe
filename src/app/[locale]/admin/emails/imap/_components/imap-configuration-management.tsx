@@ -284,7 +284,7 @@ export function ImapConfigurationManagement({
             </Tabs>
 
             {/* Form Actions */}
-            <Div className="flex justify-end flex flex-row gap-4 pt-6 border-t">
+            <Div className="flex justify-end flex-row gap-4 pt-6 border-t">
               <Button
                 type="button"
                 variant="outline"

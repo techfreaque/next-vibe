@@ -19,12 +19,12 @@ import {
   CarouselPrevious,
 } from "next-vibe-ui/ui/carousel";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "next-vibe-ui/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+// import {
+//   ChartContainer,
+//   Chart,
+//   Bar,
+//   Axis,
+// } from "next-vibe-ui/ui/chart";
 import {
   H1,
   H2,
@@ -51,21 +51,21 @@ import {
 import { Div } from "next-vibe-ui/ui/div";
 import { Section } from "next-vibe-ui/ui/section";
 
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 273 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-];
+// const chartData = [
+//   { month: "January", desktop: 186 },
+//   { month: "February", desktop: 305 },
+//   { month: "March", desktop: 237 },
+//   { month: "April", desktop: 273 },
+//   { month: "May", desktop: 209 },
+//   { month: "June", desktop: 214 },
+// ];
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
-  },
-};
+// const chartConfig = {
+//   desktop: {
+//     label: "Desktop",
+//     color: "hsl(var(--chart-1))",
+//   },
+// };
 
 export function DataDisplayPreview(): JSX.Element {
   return (
@@ -129,7 +129,7 @@ export function DataDisplayPreview(): JSX.Element {
               </TableBody>
             </Table>
           </Div>
-
+          {/* 
           <Div className="space-y-2">
             <H3>Chart</H3>
             <Card>
@@ -138,26 +138,18 @@ export function DataDisplayPreview(): JSX.Element {
                   config={chartConfig}
                   className="min-h-[200px] w-full"
                 >
-                  <BarChart accessibilityLayer data={chartData}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis
-                      dataKey="month"
-                      tickLine={false}
-                      tickMargin={10}
-                      axisLine={false}
-                      tickFormatter={(value) => value.slice(0, 3)}
-                    />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar
-                      dataKey="desktop"
-                      fill="var(--color-desktop)"
-                      radius={4}
-                    />
-                  </BarChart>
+                  <Chart data={chartData} xKey="month" yKeys={["desktop"]}>
+                    {({ points }) => (
+                      <>
+                        <Bar points={points.desktop} chartPressState={[]} />
+                        <Axis />
+                      </>
+                    )}
+                  </Chart>
                 </ChartContainer>
               </CardContent>
             </Card>
-          </Div>
+          </Div> */}
 
           <Div className="space-y-2">
             <H3>Carousel</H3>

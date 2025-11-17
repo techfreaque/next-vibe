@@ -1,116 +1,131 @@
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
-// Cross-platform types for native import
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
+// Common base for all card components
+type CardCommonBaseProps = {
   children?: React.ReactNode;
-  style?: React.CSSProperties;
-}
+  id?: string;
+} & StyleType;
 
-export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-  children?: React.ReactNode;
-  style?: React.CSSProperties;
-}
+export type CardProps = CardCommonBaseProps;
 
-export interface CardTitleProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-  children?: React.ReactNode;
-  style?: React.CSSProperties;
-}
-
-export interface CardDescriptionProps
-  extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-  children?: React.ReactNode;
-  style?: React.CSSProperties;
-}
-
-export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-  children?: React.ReactNode;
-  style?: React.CSSProperties;
-}
-
-export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-  children?: React.ReactNode;
-  style?: React.CSSProperties;
-}
-
-function Card({ className, ...props }: CardProps): React.JSX.Element {
+export function Card({
+  className,
+  style,
+  id,
+  children,
+}: CardProps): React.JSX.Element {
   return (
     <div
+      id={id}
       className={cn(
         "rounded-lg border bg-card text-card-foreground shadow-sm",
         className,
       )}
-      {...props}
-    />
+      style={style}
+    >
+      {children}
+    </div>
   );
 }
 Card.displayName = "Card";
 
-function CardHeader({
+export type CardHeaderProps = CardCommonBaseProps;
+
+export function CardHeader({
   className,
-  ...props
+  style,
+  id,
+  children,
 }: CardHeaderProps): React.JSX.Element {
   return (
-    <div className={cn("flex flex-col gap-1.5 p-6", className)} {...props} />
+    <div
+      id={id}
+      className={cn("flex flex-col gap-1.5 p-6", className)}
+      style={style}
+    >
+      {children}
+    </div>
   );
 }
 CardHeader.displayName = "CardHeader";
 
-function CardTitle({ className, ...props }: CardTitleProps): React.JSX.Element {
+export type CardTitleProps = CardCommonBaseProps;
+
+export function CardTitle({
+  className,
+  style,
+  id,
+  children,
+}: CardTitleProps): React.JSX.Element {
   return (
     <div
+      id={id}
       className={cn(
         "text-2xl font-semibold leading-none tracking-tight",
         className,
       )}
-      {...props}
-    />
+      style={style}
+    >
+      {children}
+    </div>
   );
 }
 CardTitle.displayName = "CardTitle";
 
-function CardDescription({
+export type CardDescriptionProps = CardCommonBaseProps;
+
+export function CardDescription({
   className,
-  ...props
+  style,
+  id,
+  children,
 }: CardDescriptionProps): React.JSX.Element {
   return (
     <div
+      id={id}
       className={cn("text-sm text-muted-foreground", className)}
-      {...props}
-    />
+      style={style}
+    >
+      {children}
+    </div>
   );
 }
 CardDescription.displayName = "CardDescription";
 
-function CardContent({
+export type CardContentProps = CardCommonBaseProps;
+
+export function CardContent({
   className,
-  ...props
+  style,
+  id,
+  children,
 }: CardContentProps): React.JSX.Element {
-  return <div className={cn("p-6 pt-0", className)} {...props} />;
+  return (
+    <div id={id} className={cn("p-6 pt-0", className)} style={style}>
+      {children}
+    </div>
+  );
 }
 CardContent.displayName = "CardContent";
 
-function CardFooter({
+export type CardFooterProps = CardCommonBaseProps;
+
+export function CardFooter({
   className,
-  ...props
+  style,
+  id,
+  children,
 }: CardFooterProps): React.JSX.Element {
   return (
-    <div className={cn("flex items-center p-6 pt-0", className)} {...props} />
+    <div
+      id={id}
+      className={cn("flex items-center p-6 pt-0", className)}
+      style={style}
+    >
+      {children}
+    </div>
   );
 }
 CardFooter.displayName = "CardFooter";
-
-export {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-};

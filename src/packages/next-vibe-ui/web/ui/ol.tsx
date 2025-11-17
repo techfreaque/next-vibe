@@ -1,15 +1,14 @@
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 export interface OlMouseEvent {
   preventDefault?: () => void;
   stopPropagation?: () => void;
 }
 
-export interface OlProps {
-  className?: string;
+export type OlProps = {
   children?: React.ReactNode;
-  style?: React.CSSProperties;
   id?: string;
   role?: string;
   start?: number;
@@ -21,7 +20,7 @@ export interface OlProps {
   onClick?: (event: OlMouseEvent) => void;
   onMouseEnter?: (event: OlMouseEvent) => void;
   onMouseLeave?: (event: OlMouseEvent) => void;
-}
+} & StyleType;
 
 function Ol({ className, children, ...props }: OlProps): React.JSX.Element {
   return (

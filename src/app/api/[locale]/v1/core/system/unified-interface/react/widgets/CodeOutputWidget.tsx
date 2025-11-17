@@ -35,13 +35,12 @@ export function CodeOutputWidget({
   metadata: _metadata,
   context,
   className,
-  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
   if (!isCodeOutputWidgetData(data)) {
     return (
       <Div
         className={cn("italic p-4 text-muted-foreground", className)}
-        style={style}
+        
       >
         —
       </Div>
@@ -60,7 +59,7 @@ export function CodeOutputWidget({
     return (
       <Div
         className={cn("italic p-4 text-muted-foreground", className)}
-        style={style}
+        
       >
         —
       </Div>
@@ -76,7 +75,7 @@ export function CodeOutputWidget({
         theme === "dark" ? "bg-slate-900" : "bg-slate-50",
         className,
       )}
-      style={style}
+      
     >
       <Div className="flex items-center justify-between border-b border-border bg-accent px-4 py-2">
         <Span className="font-mono text-xs uppercase text-muted-foreground">

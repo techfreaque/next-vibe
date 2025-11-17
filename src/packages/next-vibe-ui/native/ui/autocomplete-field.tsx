@@ -8,6 +8,8 @@ import { Check, ChevronDown, Search, X } from "./icons";
 
 import { useTranslation } from "@/i18n/core/client";
 import { cn } from "../lib/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 import { Badge } from "./badge";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
@@ -17,27 +19,31 @@ import { Text as UIText } from "./text";
 import type {
   AutocompleteOptionBase,
   AutocompleteFieldPropsBase,
+  AutocompleteFieldProps,
 } from "@/packages/next-vibe-ui/web/ui/autocomplete-field";
+import { FormFieldCategory } from "@/packages/next-vibe-ui/web/ui/autocomplete-field";
 
-// Native uses the exact same interface as web
-export type AutocompleteFieldProps = AutocompleteFieldPropsBase;
+// Re-export FormFieldCategory
+export { FormFieldCategory };
 
 export function AutocompleteField({
   value = "",
   onChange,
   onBlur,
   options,
-  placeholder = "Select option...",
-  searchPlaceholder = "Search options...",
+  placeholder = "app.common.selectOption",
+  searchPlaceholder = "app.common.searchOptions",
   allowCustom = true,
   disabled = false,
   className,
+  style,
   name: _name,
 }: AutocompleteFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isCustomValue, setIsCustomValue] = useState(false);
   const { t } = useTranslation();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Group options by category
   const groupedOptions = useMemo(() => {
@@ -116,7 +122,12 @@ export function AutocompleteField({
   };
 
   return (
-    <View className={cn("relative", className)}>
+    <View
+      {...applyStyleType({
+        nativeStyle,
+        className: cn("relative", className),
+      })}
+    >
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <Pressable
@@ -256,4 +267,8 @@ export function AutocompleteField({
 }
 
 // Re-export cross-platform types
-export type { AutocompleteOptionBase, AutocompleteFieldPropsBase };
+export type {
+  AutocompleteOptionBase,
+  AutocompleteFieldPropsBase,
+  AutocompleteFieldProps,
+};

@@ -1,9 +1,12 @@
 import * as HoverCardPrimitive from "@rn-primitives/hover-card";
 import * as React from "react";
-import { StyleSheet } from "react-native";
+import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
+import { styled } from "nativewind";
 
 import { cn } from "next-vibe/shared/utils/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 import { TextClassContext } from "./text";
 
 import type {
@@ -13,7 +16,7 @@ import type {
   HoverCardContentProps,
 } from "@/packages/next-vibe-ui/web/ui/hover-card";
 
-const StyledHoverCardContent = HoverCardPrimitive.Content;
+const StyledView = styled(View, { className: "style" });
 
 function HoverCard({
   children,
@@ -49,58 +52,66 @@ function HoverCardContent({
   align = "center",
   sideOffset = 4,
   className,
+  style,
   children,
   disablePositioningStyle,
-  asChild,
   forceMount,
   side,
   alignOffset,
   avoidCollisions,
-  // WEB ONLY props - destructured but not used
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  collisionBoundary,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  collisionPadding,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  arrowPadding,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  sticky,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  hideWhenDetached,
+  collisionBoundary: _collisionBoundary, // Web-only
+  collisionPadding: _collisionPadding, // Web-only
+  arrowPadding: _arrowPadding, // Web-only
+  sticky: _sticky, // Web-only
+  hideWhenDetached: _hideWhenDetached, // Web-only
+  onEscapeKeyDown, // Web-only but accepted by RN primitive
+  onPointerDownOutside, // Web-only but accepted by RN primitive
 }: HoverCardContentProps): React.JSX.Element {
   const { open } = HoverCardPrimitive.useRootContext();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Filter side to only supported values for RN primitives
   const nativeSide = side === "left" || side === "right" ? undefined : side;
 
   return (
     <HoverCardPrimitive.Portal>
-      <HoverCardPrimitive.Overlay style={StyleSheet.absoluteFill}>
-        <Animated.View entering={FadeIn}>
+      <HoverCardPrimitive.Overlay>
+        <Animated.View
+          entering={FadeIn}
+          style={convertCSSToViewStyle({ zIndex: 50 })}
+        >
           <TextClassContext.Provider
             value={
               "text-popover-foreground" // eslint-disable-line i18next/no-literal-string -- CSS class
             }
           >
-            <StyledHoverCardContent
+            <HoverCardPrimitive.Content
+              asChild
               align={align}
               sideOffset={sideOffset}
               disablePositioningStyle={disablePositioningStyle}
-              asChild={asChild}
               forceMount={forceMount}
               side={nativeSide}
               alignOffset={alignOffset}
               avoidCollisions={avoidCollisions}
-              className={cn(
-                "z-50 w-64 rounded-md border border-border bg-popover p-4 shadow-md shadow-foreground/5 outline-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-                open
-                  ? "animate-in fade-in-0 zoom-in-95"
-                  : "animate-out fade-out-0 zoom-out-95",
-                className,
-              )}
+              onEscapeKeyDown={onEscapeKeyDown}
+              onPointerDownOutside={onPointerDownOutside}
             >
-              {children}
-            </StyledHoverCardContent>
+              <StyledView
+                {...applyStyleType({
+                  nativeStyle,
+                  className: cn(
+                    "z-50 w-64 rounded-md border border-border bg-popover p-4 shadow-md shadow-foreground/5 outline-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+                    open
+                      ? "animate-in fade-in-0 zoom-in-95"
+                      : "animate-out fade-out-0 zoom-out-95",
+                    className,
+                  ),
+                })}
+              >
+                {children}
+              </StyledView>
+            </HoverCardPrimitive.Content>
           </TextClassContext.Provider>
         </Animated.View>
       </HoverCardPrimitive.Overlay>

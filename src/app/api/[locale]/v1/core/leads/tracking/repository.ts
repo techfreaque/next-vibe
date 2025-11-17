@@ -1189,24 +1189,16 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
               currentLeadId,
             });
           } else {
-            // For anonymous users, create lead-to-lead link
-            await leadAuthRepository.linkLeads(
+            // For anonymous users, log the lead-to-lead relationship in engagement metadata
+            // (Lead-to-lead linking table removed in wallet-based system)
+            logger.debug("app.api.v1.core.leads.tracking.click.leadRelationship", {
               currentLeadId,
               trackingLeadId,
-              "tracking_click",
-              {
-                campaignId: campaignId || "",
-                url,
-                timestamp: new Date().toISOString(),
-              },
-              locale,
-              logger,
-            );
-            leadsLinked = true;
-            logger.debug("app.api.v1.core.leads.tracking.click.linkedLeads", {
-              currentLeadId,
-              trackingLeadId,
+              campaignId: campaignId || "",
+              url,
+              timestamp: new Date().toISOString(),
             });
+            leadsLinked = false; // No actual linking in wallet-based system
           }
         } catch (error) {
           logger.error(

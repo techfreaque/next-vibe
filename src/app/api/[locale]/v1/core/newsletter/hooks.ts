@@ -139,7 +139,7 @@ interface NewsletterManagerResult {
     type: "error" | "success" | "confirm" | "info";
     message: TranslationKey;
   } | null;
-  handleEmailChange: (e: InputChangeEvent) => void;
+  handleEmailChange: (e: InputChangeEvent<"email">) => void;
   clearMessages: () => void;
 }
 
@@ -184,7 +184,7 @@ export function useNewsletterManager(): NewsletterManagerResult {
 
   // Handle email change - only allow changes when not logged in
   const handleEmailChange = useCallback(
-    (e: InputChangeEvent): void => {
+    (e: InputChangeEvent<"email">): void => {
       if (!isLoggedIn) {
         setManualEmail(e.target.value);
       }

@@ -5,74 +5,44 @@ import { MagnifyingGlassIcon } from "next-vibe-ui/ui/icons";
 import { Command as CommandPrimitive } from "cmdk";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 import { Dialog, DialogContent } from "./dialog";
 
-// Cross-platform type exports - narrowed to work on both platforms
-export interface CommandProps {
+// Command
+export type CommandProps = {
   children?: React.ReactNode;
-  className?: string;
-}
+  id?: string;
+  shouldFilter?: boolean;
+} & StyleType;
 
-export interface CommandInputProps {
-  className?: string;
-  placeholder?: string;
-  value?: string;
-  onValueChange?: (value: string) => void;
-}
-
-export interface CommandListProps {
-  children?: React.ReactNode;
-  className?: string;
-}
-
-export interface CommandEmptyProps {
-  children?: React.ReactNode;
-  className?: string;
-}
-
-export interface CommandGroupProps {
-  children?: React.ReactNode;
-  className?: string;
-  heading?: string;
-}
-
-export interface CommandItemProps {
-  children?: React.ReactNode;
-  className?: string;
-  disabled?: boolean;
-  onPress?: () => void; // Native-specific, optional for web
-  onSelect?: () => void; // Web uses onSelect, native uses onPress
-}
-
-export interface CommandSeparatorProps {
-  className?: string;
-}
-
-export interface CommandShortcutProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export type CommandDialogProps = DialogProps;
-
-function Command({
+export function Command({
   className,
-  ...props
-}: React.ComponentPropsWithoutRef<typeof CommandPrimitive>): React.JSX.Element {
+  style,
+  children,
+  id,
+  shouldFilter,
+}: CommandProps): React.JSX.Element {
   return (
     <CommandPrimitive
       className={cn(
         "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground",
         className,
       )}
-      {...props}
-    />
+      style={style}
+      id={id}
+      shouldFilter={shouldFilter}
+    >
+      {children}
+    </CommandPrimitive>
   );
 }
 Command.displayName = CommandPrimitive.displayName;
 
-const CommandDialog = ({
+// CommandDialog
+export type CommandDialogProps = DialogProps;
+
+export const CommandDialog = ({
   children,
   ...props
 }: CommandDialogProps): React.JSX.Element => {
@@ -87,12 +57,20 @@ const CommandDialog = ({
   );
 };
 
-function CommandInput({
+// CommandInput
+export type CommandInputProps = {
+  placeholder?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
+} & StyleType;
+
+export function CommandInput({
   className,
-  ...props
-}: React.ComponentPropsWithoutRef<
-  typeof CommandPrimitive.Input
->): React.JSX.Element {
+  style,
+  placeholder,
+  value,
+  onValueChange,
+}: CommandInputProps): React.JSX.Element {
   return (
     <div className="flex items-center border-b px-3" data-cmdk-input-wrapper="">
       <MagnifyingGlassIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
@@ -101,7 +79,10 @@ function CommandInput({
           "flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
-        {...props}
+        style={style}
+        placeholder={placeholder}
+        value={value}
+        onValueChange={onValueChange}
       />
     </div>
   );
@@ -109,113 +90,152 @@ function CommandInput({
 
 CommandInput.displayName = CommandPrimitive.Input.displayName;
 
-function CommandList({
+// CommandList
+export type CommandListProps = {
+  children?: React.ReactNode;
+} & StyleType;
+
+export function CommandList({
   className,
-  ...props
-}: React.ComponentPropsWithoutRef<
-  typeof CommandPrimitive.List
->): React.JSX.Element {
+  style,
+  children,
+}: CommandListProps): React.JSX.Element {
   return (
     <CommandPrimitive.List
       className={cn(
         "max-h-[300px] overflow-y-auto overflow-x-hidden",
         className,
       )}
-      {...props}
-    />
+      style={style}
+    >
+      {children}
+    </CommandPrimitive.List>
   );
 }
 
 CommandList.displayName = CommandPrimitive.List.displayName;
 
-function CommandEmpty(
-  props: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>,
-): React.JSX.Element {
+// CommandEmpty
+export type CommandEmptyProps = {
+  children?: React.ReactNode;
+} & StyleType;
+
+export function CommandEmpty({
+  className,
+  style,
+  children,
+}: CommandEmptyProps): React.JSX.Element {
   return (
-    <CommandPrimitive.Empty className="py-6 text-center text-sm" {...props} />
+    <CommandPrimitive.Empty
+      className={cn("py-6 text-center text-sm", className)}
+      style={style}
+    >
+      {children}
+    </CommandPrimitive.Empty>
   );
 }
 
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName;
 
-function CommandGroup({
+// CommandGroup
+export type CommandGroupProps = {
+  children?: React.ReactNode;
+  heading?: string;
+} & StyleType;
+
+export function CommandGroup({
   className,
-  ...props
-}: React.ComponentPropsWithoutRef<
-  typeof CommandPrimitive.Group
->): React.JSX.Element {
+  style,
+  children,
+  heading,
+}: CommandGroupProps): React.JSX.Element {
   return (
     <CommandPrimitive.Group
       className={cn(
         "overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
         className,
       )}
-      {...props}
-    />
+      style={style}
+      heading={heading}
+    >
+      {children}
+    </CommandPrimitive.Group>
   );
 }
 
 CommandGroup.displayName = CommandPrimitive.Group.displayName;
 
-function CommandSeparator({
+export type CommandSeparatorProps = StyleType;
+
+export function CommandSeparator({
   className,
-  ...props
-}: React.ComponentPropsWithoutRef<
-  typeof CommandPrimitive.Separator
->): React.JSX.Element {
+  style,
+}: CommandSeparatorProps): React.JSX.Element {
   return (
     <CommandPrimitive.Separator
       className={cn("-mx-1 h-px bg-border", className)}
-      {...props}
+      style={style}
     />
   );
 }
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
 
-function CommandItem({
+// CommandItem
+export type CommandItemProps = {
+  children?: React.ReactNode;
+  disabled?: boolean;
+  value?: string;
+  onSelect?: (value: string) => void;
+  onPress?: () => void;
+} & StyleType;
+
+export function CommandItem({
   className,
-  ...props
-}: React.ComponentPropsWithoutRef<
-  typeof CommandPrimitive.Item
->): React.JSX.Element {
+  style,
+  children,
+  disabled,
+  value,
+  onSelect,
+}: CommandItemProps): React.JSX.Element {
   return (
     <CommandPrimitive.Item
       className={cn(
         "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent hover:text-accent-foreground",
-        props.disabled && "pointer-events-none opacity-50",
+        disabled && "pointer-events-none opacity-50",
         className,
       )}
-      {...props}
-    />
+      style={style}
+      disabled={disabled}
+      value={value}
+      onSelect={onSelect}
+    >
+      {children}
+    </CommandPrimitive.Item>
   );
 }
 
 CommandItem.displayName = CommandPrimitive.Item.displayName;
 
-const CommandShortcut = ({
+// CommandShortcut
+export type CommandShortcutProps = {
+  children?: React.ReactNode;
+} & StyleType;
+
+export const CommandShortcut = ({
   className,
-  ...props
-}: React.HTMLAttributes<HTMLSpanElement>): React.JSX.Element => {
+  style,
+  children,
+}: CommandShortcutProps): React.JSX.Element => {
   return (
     <span
       className={cn(
         "ml-auto text-xs tracking-widest text-muted-foreground",
         className,
       )}
-      {...props}
-    />
+      style={style}
+    >
+      {children}
+    </span>
   );
 };
 CommandShortcut.displayName = "CommandShortcut";
-
-export {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-};

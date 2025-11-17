@@ -36,7 +36,7 @@ import {
   type Lead,
   leadEngagements,
   leads,
-  userLeads,
+  userLeadLinks,
 } from "./db";
 import type {
   BatchOperationScopeValues,
@@ -1377,35 +1377,30 @@ class LeadsRepositoryImpl implements LeadsRepository {
             // Check if user-lead relationship already exists
             const [existingRelationship] = await tx
               .select()
-              .from(userLeads)
+              .from(userLeadLinks)
               .where(
                 and(
-                  eq(userLeads.userId, options.userId),
-                  eq(userLeads.leadId, existingLead.id),
+                  eq(userLeadLinks.userId, options.userId),
+                  eq(userLeadLinks.leadId, existingLead.id),
                 ),
               )
               .limit(1);
 
             if (!existingRelationship) {
-              // Check if user has any existing leads to determine isPrimary
-              const existingUserLeads = await tx
-                .select()
-                .from(userLeads)
-                .where(eq(userLeads.userId, options.userId));
-
-              const isPrimary = existingUserLeads.length === 0;
-
               // Create user-lead relationship record only if it doesn't exist
-              await tx.insert(userLeads).values({
-                userId: options.userId,
-                leadId: existingLead.id,
-                isPrimary,
-              });
+              // Using onConflictDoNothing for race condition safety
+              await tx
+                .insert(userLeadLinks)
+                .values({
+                  userId: options.userId,
+                  leadId: existingLead.id,
+                  linkReason: "lead_update",
+                })
+                .onConflictDoNothing();
 
               logger.debug("User-lead relationship created (internal)", {
                 userId: options.userId,
                 leadId: existingLead.id,
-                isPrimary,
               });
             } else {
               logger.debug("User-lead relationship already exists (internal)", {

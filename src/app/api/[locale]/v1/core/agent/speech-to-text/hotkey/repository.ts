@@ -21,7 +21,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { FEATURE_COSTS } from "@/app/api/[locale]/v1/core/agent/chat/model-access/costs";
 import { speechToTextRepository } from "@/app/api/[locale]/v1/core/agent/speech-to-text/repository";
-import { deductCredits } from "@/app/api/[locale]/v1/core/agent/shared/credit-deduction";
 
 import { createAdapters } from "./adapters/factory";
 import type {
@@ -31,6 +30,7 @@ import type {
 import { HotkeyAction, RecordingStatus } from "./enum";
 import { type SpeechHotkeySession, createSession } from "./session";
 import { checkPlatformDependencies, platformDetector } from "./utils/platform";
+import { creditRepository } from "../../../credits/repository";
 
 /**
  * Session store (in-memory for now, could be Redis in production)
@@ -276,7 +276,7 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
     });
 
     // Deduct credits AFTER successful completion
-    await deductCredits({
+    await creditRepository.deductCreditsForFeature({
       user,
       cost: FEATURE_COSTS.STT,
       feature: "stt-hotkey",

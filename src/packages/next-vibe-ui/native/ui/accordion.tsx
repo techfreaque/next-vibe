@@ -1,6 +1,7 @@
 import * as AccordionPrimitive from "@rn-primitives/accordion";
 import * as React from "react";
 import { Pressable } from "react-native";
+import { styled } from "nativewind";
 import Animated, {
   Extrapolation,
   FadeIn,
@@ -16,12 +17,17 @@ import Animated, {
 import type {
   AccordionContentProps,
   AccordionItemProps,
-  AccordionRootProps,
+  AccordionProps,
   AccordionTriggerProps,
 } from "@/packages/next-vibe-ui/web/ui/accordion";
 import { cn } from "../lib/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 import { ChevronDown } from "./icons/ChevronDown";
 import { TextClassContext } from "./text";
+
+const StyledAnimatedView = styled(Animated.View, { className: "style" });
+const StyledPressable = styled(Pressable, { className: "style" });
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_TRIGGER = "text-lg font-medium group-hover:underline";
@@ -31,43 +37,61 @@ const TEXT_CLASS_CONTENT = "text-lg";
 export function Accordion({
   children,
   className,
+  style,
   disabled,
   type = "single",
   value,
   onValueChange,
   defaultValue,
   collapsible = false,
-}: AccordionRootProps): React.JSX.Element {
+}: AccordionProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   if (type === "multiple") {
+    const multiValue = Array.isArray(value) ? value : undefined;
+    const multiDefaultValue = Array.isArray(defaultValue)
+      ? defaultValue
+      : undefined;
+    const multiOnValueChange =
+      onValueChange && typeof onValueChange === "function"
+        ? (newValue: string[]): void => {
+            if (Array.isArray(newValue)) {
+              onValueChange(newValue);
+            }
+          }
+        : undefined;
+
     return (
       <LayoutAnimationConfig skipEntering>
         <AccordionPrimitive.Root
           type="multiple"
-          value={value as string[] | undefined}
-          onValueChange={
-            onValueChange as ((value: string[]) => void) | undefined
-          }
-          defaultValue={defaultValue as string[] | undefined}
+          value={multiValue}
+          onValueChange={multiOnValueChange}
+          defaultValue={multiDefaultValue}
           disabled={disabled}
-          className={className}
           asChild
         >
-          <Animated.View layout={LinearTransition.duration(200)}>
+          <StyledAnimatedView
+            {...applyStyleType({ nativeStyle, className })}
+            layout={LinearTransition.duration(200)}
+          >
             {children}
-          </Animated.View>
+          </StyledAnimatedView>
         </AccordionPrimitive.Root>
       </LayoutAnimationConfig>
     );
   }
 
-  const [_value, setValue] = React.useState(
-    (defaultValue as string | undefined) || "",
-  );
+  const singleValue = typeof value === "string" ? value : undefined;
+  const singleDefaultValue =
+    typeof defaultValue === "string" ? defaultValue : undefined;
+
+  const [_value, setValue] = React.useState(singleDefaultValue ?? "");
   const handleValueChange = React.useCallback(
     (newValue: string | undefined) => {
-      setValue(newValue || "");
+      setValue(newValue ?? "");
       if (newValue !== undefined && onValueChange) {
-        (onValueChange as (value: string) => void)(newValue);
+        onValueChange(newValue);
       }
     },
     [onValueChange],
@@ -77,17 +101,19 @@ export function Accordion({
     <LayoutAnimationConfig skipEntering>
       <AccordionPrimitive.Root
         type="single"
-        value={value as string | undefined}
+        value={singleValue}
         onValueChange={handleValueChange}
-        defaultValue={defaultValue as string | undefined}
+        defaultValue={singleDefaultValue}
         collapsible={collapsible}
         disabled={disabled}
-        className={className}
         asChild
       >
-        <Animated.View layout={LinearTransition.duration(200)}>
+        <StyledAnimatedView
+          {...applyStyleType({ nativeStyle, className })}
+          layout={LinearTransition.duration(200)}
+        >
           {children}
-        </Animated.View>
+        </StyledAnimatedView>
       </AccordionPrimitive.Root>
     </LayoutAnimationConfig>
   );
@@ -97,32 +123,40 @@ Accordion.displayName = AccordionPrimitive.Root.displayName;
 
 export function AccordionItem({
   className,
+  style,
   value,
   children,
   disabled,
 }: AccordionItemProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <Animated.View
+    <StyledAnimatedView
       className="overflow-hidden"
       layout={LinearTransition.duration(200)}
     >
-      <AccordionPrimitive.Item
-        className={cn("border-b border-border", className)}
-        value={value}
-        disabled={disabled}
-      >
-        {children}
+      <AccordionPrimitive.Item value={value} disabled={disabled} asChild>
+        <StyledAnimatedView
+          {...applyStyleType({
+            nativeStyle,
+            className: cn("border-b border-border", className),
+          })}
+        >
+          {children}
+        </StyledAnimatedView>
       </AccordionPrimitive.Item>
-    </Animated.View>
+    </StyledAnimatedView>
   );
 }
 AccordionItem.displayName = AccordionPrimitive.Item.displayName;
 
 export function AccordionTrigger({
   className,
+  style,
   children,
 }: AccordionTriggerProps): React.JSX.Element {
   const { isExpanded } = AccordionPrimitive.useItemContext();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   const progress = useDerivedValue(() =>
     isExpanded
@@ -134,22 +168,27 @@ export function AccordionTrigger({
     opacity: interpolate(progress.value, [0, 1], [1, 0.8], Extrapolation.CLAMP),
   }));
 
-  const triggerClassName = cn(
-    "flex flex-row flex-1 items-center justify-between py-4 transition-all group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-muted-foreground",
-    className,
-  );
-
   return (
     <TextClassContext.Provider value={TEXT_CLASS_TRIGGER}>
-      <AccordionPrimitive.Header className="flex">
-        <AccordionPrimitive.Trigger asChild>
-          <Pressable className={triggerClassName}>
-            {children}
-            <Animated.View style={chevronStyle}>
-              <ChevronDown size={18} className="text-foreground shrink-0" />
-            </Animated.View>
-          </Pressable>
-        </AccordionPrimitive.Trigger>
+      <AccordionPrimitive.Header asChild>
+        <StyledAnimatedView className="flex">
+          <AccordionPrimitive.Trigger asChild>
+            <StyledPressable
+              {...applyStyleType({
+                nativeStyle,
+                className: cn(
+                  "flex flex-row flex-1 items-center justify-between py-4 transition-all group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-muted-foreground",
+                  className,
+                ),
+              })}
+            >
+              {children}
+              <StyledAnimatedView style={chevronStyle}>
+                <ChevronDown size={18} className="text-foreground shrink-0" />
+              </StyledAnimatedView>
+            </StyledPressable>
+          </AccordionPrimitive.Trigger>
+        </StyledAnimatedView>
       </AccordionPrimitive.Header>
     </TextClassContext.Provider>
   );
@@ -158,24 +197,29 @@ AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
 export function AccordionContent({
   className,
+  style,
   children,
 }: AccordionContentProps): React.JSX.Element {
   const { isExpanded } = AccordionPrimitive.useItemContext();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <TextClassContext.Provider value={TEXT_CLASS_CONTENT}>
-      <AccordionPrimitive.Content
-        className={cn(
-          "overflow-hidden text-sm transition-all",
-          isExpanded ? "animate-accordion-down" : "animate-accordion-up",
-        )}
-      >
-        <Animated.View
+      <AccordionPrimitive.Content asChild>
+        <StyledAnimatedView
+          {...applyStyleType({
+            nativeStyle,
+            className: cn(
+              "overflow-hidden text-sm transition-all pb-4",
+              isExpanded ? "animate-accordion-down" : "animate-accordion-up",
+              className,
+            ),
+          })}
           entering={FadeIn}
           exiting={FadeOutUp.duration(200)}
-          className={cn("pb-4", className)}
         >
           {children}
-        </Animated.View>
+        </StyledAnimatedView>
       </AccordionPrimitive.Content>
     </TextClassContext.Provider>
   );

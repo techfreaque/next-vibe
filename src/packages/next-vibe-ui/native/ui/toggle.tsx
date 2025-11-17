@@ -5,6 +5,8 @@ import * as React from "react";
 
 import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 import { TextClassContext } from "./text";
 import type {
   ToggleRootProps,
@@ -13,7 +15,7 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/toggle";
 
 const toggleVariants = cva(
-  "group inline-flex items-center justify-center rounded-md ring-offset-background transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+  "group inline-flex flex-row items-center justify-center rounded-md ring-offset-background transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
   {
     variants: {
       variant: {
@@ -62,6 +64,7 @@ const StyledToggleRoot = styled(TogglePrimitive.Root, { className: "style" });
 
 export function Toggle({
   className,
+  style,
   variant,
   size,
   pressed,
@@ -72,6 +75,8 @@ export function Toggle({
   const isPressed = pressed ?? false;
   const handlePressedChange =
     onPressedChange ?? ((_pressed: boolean): void => undefined);
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <TextClassContext.Provider
       value={cn(
@@ -85,12 +90,15 @@ export function Toggle({
         pressed={isPressed}
         onPressedChange={handlePressedChange}
         disabled={disabled ?? false}
-        className={cn(
-          toggleVariants({ variant, size }),
-          disabled && "pointer-events-none opacity-50",
-          isPressed && "bg-accent",
-          className,
-        )}
+        {...applyStyleType({
+          nativeStyle,
+          className: cn(
+            toggleVariants({ variant, size }),
+            disabled && "pointer-events-none opacity-50",
+            isPressed && "bg-accent",
+            className,
+          ),
+        })}
       >
         {children}
       </StyledToggleRoot>

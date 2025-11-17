@@ -3,6 +3,7 @@
 import * as ToggleGroupPrimitive from "@radix-ui/react-toggle-group";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 import { toggleVariants, type ToggleSize, type ToggleVariant } from "./toggle";
 
@@ -14,10 +15,9 @@ const ToggleGroupContext = React.createContext<{
   variant: "default",
 });
 
-export interface ToggleGroupRootProps {
+export type ToggleGroupRootProps = {
   variant?: ToggleVariant;
   size?: ToggleSize;
-  className?: string;
   children?: React.ReactNode;
   type?: "single" | "multiple";
   value?: string | string[];
@@ -28,10 +28,11 @@ export interface ToggleGroupRootProps {
   loop?: boolean;
   orientation?: "horizontal" | "vertical";
   dir?: "ltr" | "rtl";
-}
+} & StyleType;
 
 export function ToggleGroup({
   className,
+  style,
   variant,
   size,
   children,
@@ -57,7 +58,11 @@ export function ToggleGroup({
         loop={loop}
         orientation={orientation}
         dir={dir}
-        className={cn("flex items-center justify-center gap-1", className)}
+        className={cn(
+          "flex flex-row items-center justify-center gap-1",
+          className,
+        )}
+        style={style}
       >
         <ToggleGroupContext.Provider value={{ variant, size }}>
           {children}
@@ -77,7 +82,10 @@ export function ToggleGroup({
       loop={loop}
       orientation={orientation}
       dir={dir}
-      className={cn("flex items-center justify-center gap-1", className)}
+      className={cn(
+        "flex flex-row items-center justify-center gap-1",
+        className,
+      )}
     >
       <ToggleGroupContext.Provider value={{ variant, size }}>
         {children}
@@ -86,21 +94,22 @@ export function ToggleGroup({
   );
 }
 
-export interface ToggleGroupItemProps {
+export type ToggleGroupItemProps = {
   variant?: ToggleVariant;
   size?: ToggleSize;
-  className?: string;
   children?: React.ReactNode;
   value: string;
   disabled?: boolean;
-}
+} & StyleType;
 
 export function ToggleGroupItem({
   className,
+  style,
   children,
   variant,
   size,
-  ...props
+  value,
+  disabled,
 }: ToggleGroupItemProps): React.JSX.Element {
   const context = React.useContext(ToggleGroupContext);
 
@@ -113,7 +122,9 @@ export function ToggleGroupItem({
         }),
         className,
       )}
-      {...props}
+      style={style}
+      value={value}
+      disabled={disabled}
     >
       {children}
     </ToggleGroupPrimitive.Item>

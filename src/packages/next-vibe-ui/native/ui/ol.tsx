@@ -4,6 +4,8 @@ import { View, Pressable, type AccessibilityRole } from "react-native";
 import { styled } from "nativewind";
 
 import type { OlProps, OlMouseEvent } from "@/packages/next-vibe-ui/web/ui/ol";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 
 const StyledPressable = styled(Pressable, { className: "style" });
 const StyledView = styled(View, { className: "style" });
@@ -11,7 +13,7 @@ const StyledView = styled(View, { className: "style" });
 function Ol({
   className,
   children,
-  style: _style,
+  style,
   onClick,
   onMouseEnter,
   onMouseLeave,
@@ -24,6 +26,8 @@ function Ol({
   "aria-labelledby": _ariaLabelledby,
   "aria-describedby": _ariaDescribedby,
 }: OlProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   const handlePress = onClick
     ? (): void => {
         const event: OlMouseEvent = {
@@ -87,7 +91,7 @@ function Ol({
   if (onClick || onMouseEnter || onMouseLeave) {
     return (
       <StyledPressable
-        className={cn(className)}
+        {...applyStyleType({ nativeStyle, className: cn(className) })}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -102,7 +106,7 @@ function Ol({
 
   return (
     <StyledView
-      className={cn(className)}
+      {...applyStyleType({ nativeStyle, className: cn(className) })}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={ariaLabel}
       accessibilityValue={start !== undefined ? { text: String(start) } : undefined}

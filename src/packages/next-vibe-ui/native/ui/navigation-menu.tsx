@@ -1,6 +1,7 @@
 import * as NavigationMenuPrimitive from "@rn-primitives/navigation-menu";
 import * as React from "react";
 import { View } from "react-native";
+import { styled } from "nativewind";
 import Animated, {
   Extrapolation,
   interpolate,
@@ -10,6 +11,8 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { cn } from "next-vibe/shared/utils/utils";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { applyStyleType } from "../../web/utils/style-type";
 import { buttonVariants } from "./button";
 import { ChevronDown } from "./icons/ChevronDown";
 
@@ -24,16 +27,20 @@ import type {
   NavigationMenuIndicatorProps,
 } from "@/packages/next-vibe-ui/web/ui/navigation-menu";
 
+const StyledView = styled(View, { className: "style" });
+const StyledAnimatedView = styled(Animated.View, { className: "style" });
+
 // navigationMenuTriggerStyle helper function (native implementation)
 function navigationMenuTriggerStyle(): string {
   return cn(
     buttonVariants({ variant: "ghost" }),
-    "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50",
+    "group inline-flex flex-row h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50",
   );
 }
 
 function NavigationMenu({
   className,
+  style,
   children,
   value,
   onValueChange,
@@ -45,12 +52,17 @@ function NavigationMenu({
   dir,
   orientation,
 }: NavigationMenuProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <View
-      className={cn(
-        "relative z-10 flex flex-row max-w-max items-center justify-center",
-        className,
-      )}
+    <StyledView
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "relative z-10 flex flex-row max-w-max items-center justify-center",
+          className,
+        ),
+      })}
     >
       <NavigationMenuPrimitive.Root
         value={value}
@@ -62,23 +74,27 @@ function NavigationMenu({
       >
         {children}
       </NavigationMenuPrimitive.Root>
-    </View>
+    </StyledView>
   );
 }
 NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName;
 
 function NavigationMenuList({
   className,
+  style,
   children,
-  ...props
 }: NavigationMenuListProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <NavigationMenuPrimitive.List
-      className={cn(
-        "group flex flex-1 flex-row list-none items-center justify-center gap-1",
-        className,
-      )}
-      {...props}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "group flex flex-1 flex-row list-none items-center justify-center gap-1",
+          className,
+        ),
+      })}
     >
       {children}
     </NavigationMenuPrimitive.List>
@@ -88,10 +104,20 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 
 function NavigationMenuItem({
   value,
+  className,
+  style,
   children,
 }: NavigationMenuItemProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <NavigationMenuPrimitive.Item value={value}>
+    <NavigationMenuPrimitive.Item
+      value={value}
+      {...applyStyleType({
+        nativeStyle,
+        className,
+      })}
+    >
       {children}
     </NavigationMenuPrimitive.Item>
   );
@@ -100,11 +126,12 @@ NavigationMenuItem.displayName = NavigationMenuPrimitive.Item.displayName;
 
 function NavigationMenuTrigger({
   className,
+  style,
   children,
-  ...props
 }: NavigationMenuTriggerProps): React.JSX.Element {
   const { value } = NavigationMenuPrimitive.useRootContext();
   const { value: itemValue } = NavigationMenuPrimitive.useItemContext();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   const progress = useDerivedValue(() =>
     value === itemValue
@@ -118,24 +145,24 @@ function NavigationMenuTrigger({
 
   return (
     <NavigationMenuPrimitive.Trigger
-      className={cn(
-        navigationMenuTriggerStyle(),
-        "group gap-1.5",
-        value === itemValue && "bg-accent",
-        className,
-      )}
-      {...props}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          navigationMenuTriggerStyle(),
+          "group gap-1.5",
+          value === itemValue && "bg-accent",
+          className,
+        ),
+      })}
     >
       {children}
-      <Animated.View style={chevronStyle}>
+      <StyledAnimatedView style={chevronStyle}>
         <ChevronDown
           size={12}
-          className={cn(
-            "relative text-foreground h-3 w-3",
-          )}
+          className={cn("relative text-foreground h-3 w-3")}
           aria-hidden={true}
         />
-      </Animated.View>
+      </StyledAnimatedView>
     </NavigationMenuPrimitive.Trigger>
   );
 }
@@ -143,16 +170,20 @@ NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName;
 
 function NavigationMenuContent({
   className,
+  style,
   children,
-  ...props
 }: NavigationMenuContentProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
     <NavigationMenuPrimitive.Content
-      className={cn(
-        "w-full border border-border rounded-lg shadow-lg bg-popover text-popover-foreground overflow-hidden data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out",
-        className,
-      )}
-      {...props}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "w-full border border-border rounded-lg shadow-lg bg-popover text-popover-foreground overflow-hidden data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out",
+          className,
+        ),
+      })}
     >
       {children}
     </NavigationMenuPrimitive.Content>
@@ -161,11 +192,21 @@ function NavigationMenuContent({
 NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
 
 function NavigationMenuLink({
+  className,
+  style,
   children,
   ...props
 }: NavigationMenuLinkProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <NavigationMenuPrimitive.Link {...props}>
+    <NavigationMenuPrimitive.Link
+      {...applyStyleType({
+        nativeStyle,
+        className,
+      })}
+      {...props}
+    >
       {children}
     </NavigationMenuPrimitive.Link>
   );
@@ -174,20 +215,24 @@ NavigationMenuLink.displayName = NavigationMenuPrimitive.Link.displayName;
 
 function NavigationMenuViewport({
   className,
-  ...props
+  style,
 }: NavigationMenuViewportProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
   return (
-    <View className={cn("absolute left-0 top-full flex justify-center")}>
-      <View
-        className={cn(
-          "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-lg animate-in zoom-in-90",
-          className,
-        )}
-        {...props}
+    <StyledView className={cn("absolute left-0 top-full flex justify-center")}>
+      <StyledView
+        {...applyStyleType({
+          nativeStyle,
+          className: cn(
+            "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-lg animate-in zoom-in-90",
+            className,
+          ),
+        })}
       >
         <NavigationMenuPrimitive.Viewport />
-      </View>
-    </View>
+      </StyledView>
+    </StyledView>
   );
 }
 NavigationMenuViewport.displayName =
@@ -195,21 +240,24 @@ NavigationMenuViewport.displayName =
 
 function NavigationMenuIndicator({
   className,
-  ...props
+  style,
 }: NavigationMenuIndicatorProps): React.JSX.Element {
   const { value } = NavigationMenuPrimitive.useRootContext();
   const { value: itemValue } = NavigationMenuPrimitive.useItemContext();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <NavigationMenuPrimitive.Indicator
-      className={cn(
-        "top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden",
-        value === itemValue ? "animate-in fade-in" : "animate-out fade-out",
-        className,
-      )}
-      {...props}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden",
+          value === itemValue ? "animate-in fade-in" : "animate-out fade-out",
+          className,
+        ),
+      })}
     >
-      <View className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md shadow-foreground/5" />
+      <StyledView className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md shadow-foreground/5" />
     </NavigationMenuPrimitive.Indicator>
   );
 }

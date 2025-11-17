@@ -9,6 +9,8 @@ import type {
   RadioGroupRootProps,
   RadioGroupItemProps,
 } from "@/packages/next-vibe-ui/web/ui/radio-group";
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledRadioGroupItem = RadioGroupPrimitive.Item;
 const StyledRadioGroupIndicator = RadioGroupPrimitive.Indicator;
@@ -19,11 +21,14 @@ function RadioGroup({
   value,
   onValueChange,
   disabled,
+  style,
+
   ...props
 }: RadioGroupRootProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <RadioGroupPrimitive.Root
-      className={cn("grid gap-2", className)}
+      {...applyStyleType({ nativeStyle, className: cn("grid gap-2", className) })}
       value={value ?? ""}
       onValueChange={onValueChange ?? (() => {})} // eslint-disable-line no-empty-function
       disabled={disabled}
@@ -41,15 +46,21 @@ function RadioGroupItem({
   value,
   disabled,
   id,
+  style,
+
   ...props
 }: RadioGroupItemProps): React.JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <StyledRadioGroupItem
-      className={cn(
-        "aspect-square h-5 w-5 rounded-full justify-center items-center border border-primary text-primary shadow ring-offset-background focus:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-        disabled && "opacity-50",
-        className,
-      )}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "aspect-square h-5 w-5 rounded-full justify-center items-center border border-primary text-primary shadow ring-offset-background focus:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+          disabled && "opacity-50",
+          className,
+        ),
+      })}
       value={value}
       disabled={disabled}
       id={id}

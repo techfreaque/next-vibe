@@ -11,9 +11,11 @@ import { CardDescription } from "next-vibe-ui/ui/card";
 import { CardHeader } from "next-vibe-ui/ui/card";
 import { CardTitle } from "next-vibe-ui/ui/card";
 import { Link } from "next-vibe-ui/ui/link";
-import type { JSX, MouseEvent } from "react";
-import { type WidgetComponentProps,
-type RenderableValue } from "../../shared/ui/types";
+import type { JSX } from "react";
+import {
+  type WidgetComponentProps,
+  type RenderableValue,
+} from "../../shared/ui/types";
 
 /**
  * Link Card Data Interface
@@ -53,11 +55,10 @@ export function LinkCardWidget({
   metadata: _metadata,
   context,
   className,
-  style,
 }: WidgetComponentProps<RenderableValue>): JSX.Element {
   if (!isLinkCardData(data)) {
     return (
-      <Card className={cn("overflow-hidden", className)} style={style}>
+      <Card className={cn("overflow-hidden", className)}>
         <CardContent className="p-4">
           <Span className="text-muted-foreground italic">—</Span>
         </CardContent>
@@ -75,13 +76,6 @@ export function LinkCardWidget({
     openInNewTab = true,
   } = data;
 
-  const handleClick = (e: MouseEvent<HTMLAnchorElement>): void => {
-    if (context.onNavigate) {
-      e.preventDefault();
-      context.onNavigate(url);
-    }
-  };
-
   const displayDescription = snippet ?? description;
   const isExternal = url.startsWith("http://") || url.startsWith("https://");
 
@@ -97,7 +91,7 @@ export function LinkCardWidget({
               <Span className="truncate transition-colors group-hover:text-primary">
                 {title}
               </Span>
-              <ExternalLink className="h-4 w-4 flex-shrink-0 opacity-50 transition-opacity group-hover:opacity-100" />
+              <ExternalLink className="h-4 w-4 shrink-0 opacity-50 transition-opacity group-hover:opacity-100" />
             </CardTitle>
             <Div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
               {source && <Span className="font-medium">{source}</Span>}
@@ -111,7 +105,7 @@ export function LinkCardWidget({
               alt={title}
               width={64}
               height={64}
-              className="w-16 h-16 object-cover rounded flex-shrink-0"
+              className="w-16 h-16 object-cover rounded shrink-0"
             />
           )}
         </Div>
@@ -133,7 +127,6 @@ export function LinkCardWidget({
         !context.isInteractive && "opacity-75",
         className,
       )}
-      style={style}
     >
       {shouldUseExternalLink ? (
         // External link or new tab - safe to use <a> tag
@@ -142,7 +135,6 @@ export function LinkCardWidget({
           href={url}
           target={openInNewTab ? "_blank" : undefined}
           rel={openInNewTab ? "noopener noreferrer" : undefined}
-          onClick={handleClick}
           className={cn(
             "block focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg",
             !context.isInteractive && "pointer-events-none",
@@ -153,7 +145,6 @@ export function LinkCardWidget({
       ) : (
         <Link
           href={url}
-          onClick={handleClick}
           className={cn(
             "block focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg",
             !context.isInteractive && "pointer-events-none",

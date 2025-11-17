@@ -180,7 +180,7 @@ export function CsvImportDialog({
                               "app.admin.leads.leads.admin.import.file.dropzone.description",
                             )}
                           </P>
-                          <Input
+                          <Input<"file">
                             type="file"
                             // eslint-disable-next-line i18next/no-literal-string
                             accept=".csv"
@@ -206,11 +206,11 @@ export function CsvImportDialog({
                 )}
 
                 {/* Hidden form fields for validation */}
-                <Input
+                <Input<"hidden">
                   type="hidden"
                   {...endpoint.create.form.register("file", { required: true })}
                 />
-                <Input
+                <Input<"hidden">
                   type="hidden"
                   {...endpoint.create.form.register("fileName", {
                     required: true,
@@ -548,7 +548,7 @@ export function CsvImportDialog({
           </Card>
         </Div>
 
-        <DialogFooter className="flex-shrink-0">
+        <DialogFooter className="shrink-0">
           {/* Form Alert for errors and success - positioned above submit button */}
           <Div className="w-full mb-4">
             <FormAlert alert={endpoint.alert} />
@@ -566,7 +566,7 @@ export function CsvImportDialog({
               // Trigger form validation and submission
               const isValid = await endpoint.create.form.trigger();
               if (isValid) {
-                await endpoint.create.submitForm(undefined);
+                await endpoint.create.onSubmit();
               }
             }}
             disabled={
@@ -575,7 +575,7 @@ export function CsvImportDialog({
               !endpoint.create.form.watch("fileName") ||
               endpoint.create.isSubmitting
             }
-            className="bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+            className="bg-blue-600 bg-linear-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
           >
             {endpoint.create.isSubmitting ? (
               <>

@@ -49,19 +49,16 @@ export function CreateTaskDialog({
   const logger = createEndpointLogger(false, Date.now(), locale);
   const endpoint = useCreateCronTask(logger);
 
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
-    e.preventDefault();
-    if (endpoint.create?.onSubmit) {
-      await endpoint.create.onSubmit(e);
-      if (endpoint.create.response?.success) {
-        onTaskCreated();
-        handleClose();
-      }
+  const handleSubmit = async (): Promise<void> => {
+    await endpoint.create.onSubmit();
+    if (endpoint.create.response?.success) {
+      onTaskCreated();
+      handleClose();
     }
   };
 
   const handleClose = (): void => {
-    endpoint.create?.form.reset();
+    endpoint.create.form.reset();
     onClose();
   };
 

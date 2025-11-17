@@ -65,6 +65,7 @@ import { Div } from "../div";
 // Styled View for proper NativeWind support
 const StyledView = styled(View, { className: "style" });
 import { Span } from "../span";
+import { convertCSSToViewStyle } from "../../utils/style-converter";
 import {
   Tooltip,
   TooltipContent,
@@ -691,9 +692,13 @@ export function EndpointFormField<
   schema,
   theme = DEFAULT_THEME,
   className,
+  style,
   endpointFields,
-}: EndpointFormFieldProps<TFieldValues, TName>): JSX.Element {
+}: EndpointFormFieldProps<TFieldValues, TName> & {
+  style?: React.CSSProperties;
+}): JSX.Element {
   const { t } = useTranslation();
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Auto-infer config from endpoint fields if not provided
   const config =
@@ -727,6 +732,9 @@ export function EndpointFormField<
 
         const styleClassName = getFieldStyleClassName(validationState, theme);
 
+        // Note: style prop is not passed to FormItem due to StyleType discriminated union
+        // FormItem uses className for styling via NativeWind (either style OR className, not both)
+        void nativeStyle; // Acknowledge nativeStyle is intentionally unused for FormItem
         return (
           <FormItem
             className={cn(styleClassName.containerClassName, className)}
@@ -775,8 +783,16 @@ export function EndpointFormFields<TFieldValues extends FieldValues>({
   endpointFields,
   theme = DEFAULT_THEME,
   className,
+  style,
   fieldClassName,
-}: EndpointFormFieldsProps<TFieldValues>): JSX.Element {
+}: EndpointFormFieldsProps<TFieldValues> & {
+  style?: React.CSSProperties;
+}): JSX.Element {
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
+  // Note: style prop is not passed to Div due to StyleType discriminated union
+  // Div uses className for styling via NativeWind (either style OR className, not both)
+  void nativeStyle; // Acknowledge nativeStyle is intentionally unused for Div
   return (
     <Div className={cn("space-y-6", className)}>
       {fields.map((fieldDef) => (

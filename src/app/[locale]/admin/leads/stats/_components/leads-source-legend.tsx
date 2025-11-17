@@ -116,10 +116,9 @@ export function LeadsSourceLegend({
             >
               <Div className="flex items-center gap-3">
                 <Div className="flex items-center gap-2">
-                  <Div
-                    className="w-4 h-4 rounded-full"
-                    style={{ backgroundColor: source.color }}
-                  />
+                  <Div style={{ backgroundColor: source.color }}>
+                    <Div className="w-4 h-4 rounded-full" />
+                  </Div>
                   <Switch
                     checked={source.visible}
                     onCheckedChange={() => onToggleSource(source.source)}

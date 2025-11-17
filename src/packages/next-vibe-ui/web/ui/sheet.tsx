@@ -5,6 +5,7 @@ import { Cross2Icon } from "next-vibe-ui/ui/icons";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 
@@ -33,30 +34,25 @@ export interface SheetPortalProps {
   container?: HTMLElement | null;
 }
 
-export interface SheetOverlayProps {
-  className?: string;
+export type SheetOverlayProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface SheetHeaderProps {
-  className?: string;
+export type SheetHeaderProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface SheetFooterProps {
-  className?: string;
+export type SheetFooterProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface SheetTitleProps {
-  className?: string;
+export type SheetTitleProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
-export interface SheetDescriptionProps {
-  className?: string;
+export type SheetDescriptionProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
 const sheetVariants = cva(
   "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -77,18 +73,17 @@ const sheetVariants = cva(
   },
 );
 
-export interface SheetContentProps extends VariantProps<typeof sheetVariants> {
-  className?: string;
+export type SheetContentProps = {
   children?: React.ReactNode;
   onCloseAutoFocus?: (event: Event) => void;
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
   onPointerDownOutside?: (event: Event) => void;
   onInteractOutside?: (event: Event) => void;
-  style?: React.CSSProperties;
   "data-sidebar"?: string;
   "data-mobile"?: string;
   portalHost?: string;
-}
+} & VariantProps<typeof sheetVariants> &
+  StyleType;
 
 export function Sheet({
   children,

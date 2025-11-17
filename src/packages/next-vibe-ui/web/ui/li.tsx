@@ -1,15 +1,14 @@
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
 
 export interface LiMouseEvent {
   preventDefault?: () => void;
   stopPropagation?: () => void;
 }
 
-export interface LiProps {
-  className?: string;
+export type LiProps = {
   children?: React.ReactNode;
-  style?: React.CSSProperties;
   id?: string;
   role?: string;
   value?: number;
@@ -19,7 +18,7 @@ export interface LiProps {
   onClick?: (event: LiMouseEvent) => void;
   onMouseEnter?: (event: LiMouseEvent) => void;
   onMouseLeave?: (event: LiMouseEvent) => void;
-}
+} & StyleType;
 
 function Li({ className, children, ...props }: LiProps): React.JSX.Element {
   return (

@@ -108,14 +108,14 @@ export function BuyCreditsTab({
         provider: provider,
       });
 
-      void subscriptionCheckoutEndpoint.create.submitForm(undefined);
+      void subscriptionCheckoutEndpoint.create.onSubmit();
     } else {
       if (!creditPurchaseEndpoint.create) {
         return;
       }
 
       creditPurchaseEndpoint.create.form.setValue("provider", provider);
-      void creditPurchaseEndpoint.create.submitForm(undefined);
+      void creditPurchaseEndpoint.create.onSubmit();
     }
   };
 

@@ -4,9 +4,10 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { CheckIcon } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { StyleType } from "../utils/style-type";
+import type { DivMouseEvent } from "./div";
 
-// Cross-platform types
-export interface CheckboxRootProps {
+export type CheckboxRootProps = {
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
@@ -14,19 +15,18 @@ export interface CheckboxRootProps {
   required?: boolean;
   name?: string;
   value?: string;
-  className?: string;
   children?: React.ReactNode;
   id?: string;
-  onClick?: (e: React.MouseEvent) => void;
-}
+  onClick?: (e: DivMouseEvent) => void;
+} & StyleType;
 
-export interface CheckboxIndicatorProps {
-  className?: string;
+export type CheckboxIndicatorProps = {
   children?: React.ReactNode;
-}
+} & StyleType;
 
 export function Checkbox({
   className,
+  style,
   children,
   ...props
 }: CheckboxRootProps): React.JSX.Element {
@@ -36,6 +36,7 @@ export function Checkbox({
         "peer h-5 w-5 shrink-0 rounded-sm border border-primary shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
         className,
       )}
+      style={style}
       {...props}
     >
       {children ?? (
@@ -54,6 +55,7 @@ Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
 export function CheckboxIndicator({
   className,
+  style,
   children,
   ...props
 }: CheckboxIndicatorProps): React.JSX.Element {
@@ -63,6 +65,7 @@ export function CheckboxIndicator({
         "flex flex-row items-center justify-center text-current",
         className,
       )}
+      style={style}
       {...props}
     >
       {children ?? <CheckIcon className="h-3.5 w-3.5" />}

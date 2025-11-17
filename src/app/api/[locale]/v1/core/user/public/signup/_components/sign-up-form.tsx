@@ -53,7 +53,7 @@ export default function SignUpForm({
 }: SignUpFormProps): React.ReactElement {
   const { t } = simpleT(locale);
   const signupResult = useRegister();
-  const { form, submitForm, isSubmitting } = signupResult.create || {};
+  const { form, submitForm, isSubmitting } = signupResult.create
   const { alert } = signupResult;
 
   return (

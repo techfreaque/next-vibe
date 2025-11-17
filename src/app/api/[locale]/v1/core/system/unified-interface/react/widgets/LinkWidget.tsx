@@ -4,7 +4,7 @@ import { ExternalLink } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Span } from "next-vibe-ui/ui/span";
 import { Link } from "next-vibe-ui/ui/link";
-import type { JSX, MouseEvent } from "react";
+import type { JSX } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
@@ -50,13 +50,6 @@ export function LinkWidget({
 
   const { url, title, description, openInNewTab = true, rel } = data;
 
-  const handleClick = (e: MouseEvent<HTMLAnchorElement>): void => {
-    if (context.onNavigate) {
-      e.preventDefault();
-      context.onNavigate(url);
-    }
-  };
-
   const isExternal = url.startsWith("http://") || url.startsWith("https://");
 
   const linkContent = (
@@ -89,9 +82,7 @@ export function LinkWidget({
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={handleClick}
           className={commonClassName}
-          style={style}
           aria-label={title ?? url}
         >
           {linkContent}
@@ -106,9 +97,7 @@ export function LinkWidget({
       <a
         href={url}
         rel={rel}
-        onClick={handleClick}
         className={commonClassName}
-        style={style}
         aria-label={title ?? url}
       >
         {linkContent}
@@ -117,13 +106,7 @@ export function LinkWidget({
   }
 
   return (
-    <Link
-      href={url}
-      onClick={handleClick}
-      className={commonClassName}
-      style={style}
-      aria-label={title ?? url}
-    >
+    <Link href={url} className={commonClassName}>
       {linkContent}
     </Link>
   );

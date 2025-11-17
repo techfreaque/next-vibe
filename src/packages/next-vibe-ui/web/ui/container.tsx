@@ -5,13 +5,13 @@
 
 import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
+import type { StyleType } from "../utils/style-type";
 
 // Cross-platform props interface
-export interface ContainerProps {
+export type ContainerProps = {
   children?: ReactNode;
-  className?: string;
   size?: "sm" | "md" | "lg" | "xl" | "2xl" | "full";
-}
+} & StyleType;
 
 const sizeClasses = {
   sm: "max-w-2xl",
@@ -25,6 +25,7 @@ const sizeClasses = {
 export function Container({
   children,
   className,
+  style,
   size = "lg",
 }: ContainerProps): JSX.Element {
   return (
@@ -34,6 +35,7 @@ export function Container({
         sizeClasses[size],
         className,
       )}
+      style={style}
     >
       {children}
     </div>

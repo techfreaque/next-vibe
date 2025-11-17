@@ -167,6 +167,22 @@ export class SignupRepositoryImpl implements SignupRepository {
         logger,
       );
 
+      // Merge lead wallet into user wallet immediately (not lazy)
+      // This ensures user gets their pre-signup credits right away
+      const mergeResult = await creditRepository.mergePendingLeadWallets(
+        userData.id,
+        [user.leadId],
+        logger,
+      );
+      if (!mergeResult.success) {
+        // Log but don't fail signup if merge fails
+        logger.error("Failed to merge lead wallet during signup", {
+          userId: userData.id,
+          leadId: user.leadId,
+          error: mergeResult.message,
+        });
+      }
+
       // Get primary leadId for user
       const leadIdResult = await leadAuthRepository.getAuthenticatedUserLeadId(
         userData.id,

@@ -6,8 +6,7 @@
 
 "use client";
 
-import { type RefObject,
-useMemo, useRef, useState } from "react";
+import { type RefObject, useCallback, useMemo, useRef, useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -35,6 +34,16 @@ import { useNavigation } from "./use-navigation";
 import { useCredits } from "../../../credits/hooks";
 import { type CreditsGetResponseOutput } from "../../../credits/definition";
 import { type TextareaRefObject } from "@/packages/next-vibe-ui/web/ui/textarea";
+import { useBranchManagement } from "./use-branch-management";
+import { useMessageActions } from "./use-message-actions";
+import { useMessageActions as useMessageEditorActions } from "./use-message-editor-actions";
+import { useThreadNavigation } from "./use-thread-navigation";
+import { useCollapseState } from "./use-collapse-state";
+import type { UseCollapseStateReturn } from "./use-collapse-state";
+import { useInputHandlers } from "./use-input-handlers";
+import type { TextareaKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/textarea";
+import { useUIState } from "./use-ui-state";
+import { useFolderHandlers } from "./use-folder-handlers";
 
 /**
  * Return type for useChat hook
@@ -114,6 +123,17 @@ export interface UseChatReturn {
   updateFolder: (folderId: string, updates: FolderUpdate) => Promise<void>;
   deleteFolder: (folderId: string) => Promise<void>;
 
+  // Folder handlers (UI operations)
+  handleReorderFolder: (folderId: string, direction: "up" | "down") => void;
+  handleMoveFolderToParent: (
+    folderId: string,
+    newParentId: string | null,
+  ) => void;
+  handleCreateThreadInFolder: (folderId: string) => void;
+
+  // Collapse state (UI state for thinking/tool sections)
+  collapseState: UseCollapseStateReturn;
+
   // Navigation operations (use router.push instead of store state)
   navigateToThread: (threadId: string) => void;
   navigateToFolder: (
@@ -130,6 +150,60 @@ export interface UseChatReturn {
 
   // Logger
   logger: EndpointLogger;
+
+  // Branch management
+  branchIndices: Record<string, number>;
+  handleSwitchBranch: (parentMessageId: string, branchIndex: number) => void;
+
+  // Message actions
+  deleteDialogOpen: boolean;
+  messageToDelete: string | null;
+  handleDeleteMessage: (messageId: string) => void;
+  handleConfirmDelete: () => void;
+  handleCancelDelete: () => void;
+  countMessageChildren: (messageId: string) => number;
+
+  // Message editor actions (edit/retry/answer states and handlers)
+  editingMessageId: string | null;
+  retryingMessageId: string | null;
+  answeringMessageId: string | null;
+  answerContent: string;
+  startEdit: (messageId: string) => void;
+  startRetry: (messageId: string) => void;
+  startAnswer: (messageId: string) => void;
+  cancelEditorAction: () => void;
+  setAnswerContent: (content: string) => void;
+  handleBranchEdit: (
+    messageId: string,
+    content: string,
+    onBranch?: (id: string, content: string) => Promise<void>,
+  ) => Promise<void>;
+
+  // Thread navigation
+  handleSelectThread: (threadId: string) => void;
+  handleCreateThread: (folderId?: string | null) => void;
+  handleDeleteThread: (threadId: string) => Promise<void>;
+
+  // Input handlers
+  submitMessage: () => Promise<void>;
+  handleSubmit: () => Promise<void>;
+  handleKeyDown: (e: TextareaKeyboardEvent) => void;
+  handleModelChange: (modelId: ModelId) => void;
+  handleFillInputWithPrompt: (
+    prompt: string,
+    personaId: string,
+    modelId?: ModelId,
+  ) => void;
+  handleScreenshot: () => Promise<void>;
+
+  // UI State
+  isToolsModalOpen: boolean;
+  openToolsModal: () => void;
+  closeToolsModal: () => void;
+  setToolsModalOpen: (open: boolean) => void;
+
+  // Search
+  searchThreads: (query: string) => Array<{ id: string; title: string }>;
 }
 
 /**
@@ -248,33 +322,6 @@ export function useChat(
 
   const navigationOps = useNavigation(locale, logger, threads, folders);
 
-  // Compute personas map
-  const personas = useMemo(() => {
-    const response = personasEndpoint.read?.response as
-      | PersonaListResponseOutput
-      | undefined;
-    const personasList = response?.personas;
-    const personasMap: Record<
-      string,
-      { id: string; name: string; icon: string }
-    > = {};
-
-    if (personasList && Array.isArray(personasList)) {
-      personasList.forEach((p) => {
-        personasMap[p.id] = {
-          id: p.id,
-          name: p.name,
-          icon: p.icon,
-        };
-      });
-    }
-
-    return personasMap;
-  }, [personasEndpoint.read?.response]);
-
-  // Get active thread
-  const activeThread = activeThreadId ? threads[activeThreadId] || null : null;
-
   // Compute active thread messages
   const activeThreadMessages = useMemo(() => {
     if (!activeThreadId || activeThreadId === "new") {
@@ -302,6 +349,114 @@ export function useChat(
       (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
     );
   }, [activeThreadId, messages, logger, currentRootFolderId]);
+
+  // Branch management
+  const branchManagement = useBranchManagement({
+    activeThreadMessages,
+  });
+
+  // Message actions (delete)
+  const messageActions = useMessageActions({
+    messagesRecord: messages,
+    deleteMessage: messageOps.deleteMessage,
+  });
+
+  // Message editor actions (edit/retry/answer)
+  const editorActions = useMessageEditorActions(logger);
+
+  // Collapse state for thinking/tool sections
+  const collapseState = useCollapseState();
+
+  // Thread navigation
+  const threadNavigation = useThreadNavigation({
+    locale,
+    currentRootFolderId,
+    currentSubFolderId,
+    folders,
+    navigateToThread: navigationOps.navigateToThread,
+    navigateToNewThread: navigationOps.navigateToNewThread,
+    deleteThread: (threadId: string) =>
+      threadOps.deleteThread(threadId, activeThreadId),
+    logger,
+  });
+
+  // Input handlers
+  const inputHandlers = useInputHandlers({
+    input,
+    isLoading,
+    enabledToolIds: settingsOps.settings.enabledToolIds,
+    sendMessage: messageOps.sendMessage,
+    setInput,
+    setSelectedModel: settingsOps.setSelectedModel,
+    setEnabledToolIds: settingsOps.setEnabledToolIds,
+    inputRef,
+    locale,
+    logger,
+  });
+
+  // UI State
+  const uiState = useUIState();
+
+  // Folder handlers
+  const folderHandlers = useFolderHandlers(
+    {
+      folders,
+      updateFolder: folderOps.updateFolder,
+      logger,
+    },
+    threadNavigation.handleCreateThread,
+  );
+
+  // Compute personas map
+  const personas = useMemo(() => {
+    const response = personasEndpoint.read?.response as
+      | PersonaListResponseOutput
+      | undefined;
+    const personasList = response?.personas;
+    const personasMap: Record<
+      string,
+      { id: string; name: string; icon: string }
+    > = {};
+
+    if (personasList && Array.isArray(personasList)) {
+      personasList.forEach((p) => {
+        personasMap[p.id] = {
+          id: p.id,
+          name: p.name,
+          icon: p.icon,
+        };
+      });
+    }
+
+    return personasMap;
+  }, [personasEndpoint.read?.response]);
+
+  // Get active thread
+  const activeThread = activeThreadId ? threads[activeThreadId] || null : null;
+
+  // Search threads function
+  const searchThreads = useCallback(
+    (query: string): Array<{ id: string; title: string }> => {
+      if (!query.trim()) {
+        return [];
+      }
+
+      const lowerQuery = query.toLowerCase();
+      const results: Array<{ id: string; title: string }> = [];
+
+      Object.values(threads).forEach((thread) => {
+        if (thread.title?.toLowerCase().includes(lowerQuery)) {
+          results.push({
+            id: thread.id,
+            title: thread.title || "",
+          });
+        }
+      });
+
+      return results;
+    },
+    [threads],
+  );
 
   return {
     // State
@@ -367,6 +522,14 @@ export function useChat(
     updateFolder: folderOps.updateFolder,
     deleteFolder: folderOps.deleteFolder,
 
+    // Folder handlers (UI operations)
+    handleReorderFolder: folderHandlers.handleReorderFolder,
+    handleMoveFolderToParent: folderHandlers.handleMoveFolderToParent,
+    handleCreateThreadInFolder: folderHandlers.handleCreateThreadInFolder,
+
+    // Collapse state
+    collapseState,
+
     // Navigation operations
     navigateToThread: navigationOps.navigateToThread,
     navigateToFolder: navigationOps.navigateToFolder,
@@ -377,5 +540,51 @@ export function useChat(
 
     // Logger
     logger,
+
+    // Branch management
+    branchIndices: branchManagement.branchIndices,
+    handleSwitchBranch: branchManagement.handleSwitchBranch,
+
+    // Message actions
+    deleteDialogOpen: messageActions.deleteDialogOpen,
+    messageToDelete: messageActions.messageToDelete,
+    handleDeleteMessage: messageActions.handleDeleteMessage,
+    handleConfirmDelete: messageActions.handleConfirmDelete,
+    handleCancelDelete: messageActions.handleCancelDelete,
+    countMessageChildren: messageActions.countMessageChildren,
+
+    // Message editor actions
+    editingMessageId: editorActions.editingMessageId,
+    retryingMessageId: editorActions.retryingMessageId,
+    answeringMessageId: editorActions.answeringMessageId,
+    answerContent: editorActions.answerContent,
+    startEdit: editorActions.startEdit,
+    startRetry: editorActions.startRetry,
+    startAnswer: editorActions.startAnswer,
+    cancelEditorAction: editorActions.cancelAction,
+    setAnswerContent: editorActions.setAnswerContent,
+    handleBranchEdit: editorActions.handleBranchEdit,
+
+    // Thread navigation
+    handleSelectThread: threadNavigation.handleSelectThread,
+    handleCreateThread: threadNavigation.handleCreateThread,
+    handleDeleteThread: threadNavigation.handleDeleteThread,
+
+    // Input handlers
+    submitMessage: inputHandlers.submitMessage,
+    handleSubmit: inputHandlers.handleSubmit,
+    handleKeyDown: inputHandlers.handleKeyDown,
+    handleModelChange: inputHandlers.handleModelChange,
+    handleFillInputWithPrompt: inputHandlers.handleFillInputWithPrompt,
+    handleScreenshot: inputHandlers.handleScreenshot,
+
+    // UI State
+    isToolsModalOpen: uiState.isToolsModalOpen,
+    openToolsModal: uiState.openToolsModal,
+    closeToolsModal: uiState.closeToolsModal,
+    setToolsModalOpen: uiState.setToolsModalOpen,
+
+    // Search
+    searchThreads,
   };
 }

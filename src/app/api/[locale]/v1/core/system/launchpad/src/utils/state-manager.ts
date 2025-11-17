@@ -95,7 +95,7 @@ export class StateManager {
   /**
    * Save current state to file
    */
-  saveState(state: ReleaseState, logger?: EndpointLogger): void {
+  saveState(state: ReleaseState, logger: EndpointLogger): void {
     try {
       state.lastUpdated = new Date().toISOString();
       writeFileSync(this.stateFilePath, JSON.stringify(state, null, 2));
