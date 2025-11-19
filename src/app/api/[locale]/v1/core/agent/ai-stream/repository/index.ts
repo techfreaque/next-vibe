@@ -1171,11 +1171,10 @@ class AiStreamRepository implements IAiStreamRepository {
               Map<string, DiscoveredEndpoint>
             > => {
               if (!endpointMap) {
-                const { getToolRegistry } = await import(
+                const { ToolRegistry } = await import(
                   "@/app/api/[locale]/v1/core/system/unified-interface/ai/registry"
                 );
-                const registry = getToolRegistry();
-                const allEndpoints = registry.getEndpoints(user, Platform.AI);
+                const allEndpoints = ToolRegistry.getEndpoints(user, Platform.AI);
                 endpointMap = new Map(
                   allEndpoints.map((endpoint) => [endpoint.toolName, endpoint]),
                 );

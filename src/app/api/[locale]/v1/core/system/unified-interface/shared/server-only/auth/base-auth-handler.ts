@@ -10,25 +10,20 @@ import type {
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../types/logger";
+import type { EndpointLogger } from "../../logger/endpoint";
+import type { Platform } from "../../types/platform";
 
 /**
  * Platform types for authentication
+ * @deprecated Use Platform enum from config instead
  */
-export type AuthPlatform =
-  | "next"
-  | "trpc"
-  | "cli"
-  | "ai"
-  | "mcp"
-  | "web"
-  | "mobile";
+export type AuthPlatform = Platform;
 
 /**
  * Authentication context passed to platform handlers
  */
 export interface AuthContext {
-  platform: AuthPlatform;
+  platform: Platform;
   request?: NextRequest;
   token?: string;
   jwtPayload?: JwtPayloadType;
@@ -72,6 +67,14 @@ export interface SessionData {
  * - Web: Uses Next.js cookies for session storage
  * - CLI/MCP: Uses .vibe.session file for JWT storage
  * - Native: Uses AsyncStorage for session storage
+ *
+ * ARCHITECTURE NOTE:
+ * This class should ONLY contain platform-specific infrastructure methods.
+ * All business logic (user/lead management) has been moved to domain repositories:
+ * - @/app/api/[locale]/v1/core/user/auth/helpers.ts
+ * - @/app/api/[locale]/v1/core/user/auth/lead-manager.ts
+ * - @/app/api/[locale]/v1/core/user/auth/validators.ts
+ * - @/app/api/[locale]/v1/core/leads/auth/helpers.ts
  */
 export abstract class BaseAuthHandler {
   /**
@@ -85,7 +88,7 @@ export abstract class BaseAuthHandler {
 
   /**
    * Verify JWT token
-   * Shared across all platforms
+   * Platform-specific implementation (same JWT library, different storage)
    */
   abstract verifyToken(
     token: string,
@@ -94,7 +97,7 @@ export abstract class BaseAuthHandler {
 
   /**
    * Sign JWT token
-   * Shared across all platforms
+   * Platform-specific implementation (same JWT library, different storage)
    */
   abstract signToken(
     payload: JwtPrivatePayloadType,
@@ -146,97 +149,13 @@ export abstract class BaseAuthHandler {
   ): Promise<string | undefined>;
 
   /**
-   * Get lead ID from database
-   * Shared across all platforms
-   */
-  abstract getLeadIdFromDb(
-    userId: string | undefined,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<string | null>;
-
-  /**
-   * Get primary lead ID for user
-   * Shared across all platforms
-   */
-  abstract getPrimaryLeadId(
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<string | null>;
-
-  /**
-   * Get all lead IDs for user
-   * Shared across all platforms
-   */
-  abstract getAllLeadIds(
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<string[]>;
-
-  /**
    * Helper: Check if user has required roles
+   * Pure utility function for role checking
    */
   protected hasRequiredRoles(
-    userRoles: (typeof UserRoleValue)[],
-    requiredRoles: readonly (typeof UserRoleValue)[],
+    userRoles: UserRoleValue[],
+    requiredRoles: readonly UserRoleValue[],
   ): boolean {
     return requiredRoles.some((role) => userRoles.includes(role));
-  }
-
-  /**
-   * Helper: Create public user payload
-   */
-  protected createPublicUser(leadId: string): JwtPayloadType {
-    if (!leadId) {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
-      throw new Error("leadId from DB required for public user");
-    }
-    return {
-      leadId,
-      isPublic: true,
-    };
-  }
-
-  /**
-   * Helper: Create private user payload
-   */
-  protected createPrivateUser(
-    userId: string,
-    leadId: string,
-  ): JwtPrivatePayloadType {
-    if (!leadId) {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
-      throw new Error("leadId from DB required for private user");
-    }
-    if (!userId) {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
-      throw new Error("userId required for private user");
-    }
-    return {
-      id: userId,
-      leadId,
-      isPublic: false,
-    };
-  }
-
-  /**
-   * Helper: Validate user has lead ID
-   */
-  protected async validateUserLeadId(
-    userId: string,
-    leadId: string | undefined,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<string> {
-    if (leadId) {
-      return leadId;
-    }
-    logger.error("User missing leadId from DB", { userId });
-    const dbLeadId = await this.getLeadIdFromDb(userId, locale, logger);
-    if (!dbLeadId) {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for failed lead ID retrieval
-      throw new Error(`Failed to get or create lead ID for user ${userId}`);
-    }
-    return dbLeadId;
   }
 }

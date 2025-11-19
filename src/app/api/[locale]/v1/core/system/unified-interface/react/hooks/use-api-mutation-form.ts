@@ -18,7 +18,7 @@ import { useForm } from "react-hook-form";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { useApiStore } from "./store";
@@ -50,7 +50,7 @@ export function useApiForm<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
@@ -158,7 +158,7 @@ export function useApiForm<
     const debounceMs = 500; // 500ms debounce
 
     const subscription = formMethods.watch((formValues) => {
-      if (Object.keys(formValues).length > 0) {
+      if (Object.keys(formValues).length) {
         // Clear any existing timer
         if (debounceTimer !== null) {
           window.clearTimeout(debounceTimer);

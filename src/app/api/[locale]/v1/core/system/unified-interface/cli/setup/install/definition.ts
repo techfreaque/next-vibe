@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
   tags: [
     "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.title",
   ],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: ["install", "setup"],
   method: Methods.POST,
   path: ["v1", "core", "system", "setup", "install"],

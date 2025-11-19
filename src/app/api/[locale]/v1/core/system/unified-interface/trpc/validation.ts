@@ -7,6 +7,7 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import { validateData } from "next-vibe/shared/utils/validation";
 import type { z } from "zod";
 
@@ -112,10 +113,7 @@ export function validateTrpcRequestData<
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
-        error:
-          error instanceof Error
-            ? error.message
-            : "app.error.errors.unknown_validation_error",
+        error: parseError(error).message,
       },
     };
   }

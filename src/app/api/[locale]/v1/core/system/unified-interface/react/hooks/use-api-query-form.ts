@@ -19,7 +19,7 @@ import type {
   InferSchemaFromField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type { ApiStore, FormQueryParams } from "./store";
@@ -53,7 +53,7 @@ export function useApiQueryForm<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
@@ -293,7 +293,7 @@ export function useApiQueryForm<
     const persistDebounceMs = 500; // 500ms debounce for persistence
 
     const subscription = formMethods.watch((formValues) => {
-      if (Object.keys(formValues).length > 0) {
+      if (Object.keys(formValues).length) {
         // Clear any existing timer
         if (persistDebounceTimer !== null) {
           window.clearTimeout(persistDebounceTimer);
@@ -399,7 +399,7 @@ export function useApiQueryForm<
       const hasChanged =
         JSON.stringify(prevQueryParamsRef.current) !==
         JSON.stringify(queryParams);
-      if (hasChanged && Object.keys(queryParams).length > 0) {
+      if (hasChanged && Object.keys(queryParams).length) {
         // Only refetch if not already loading to avoid conflicts
         if (!query.isLoading) {
           void query.refetch();

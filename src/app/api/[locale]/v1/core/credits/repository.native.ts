@@ -23,18 +23,16 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { nativeEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react-native/native-endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 
 import { GET as getCreditsEndpoint } from "./definition";
 import type {
   CreditRepositoryInterface,
   CreditTransactionOutput,
-} from "./repository";
-import type {
   CreditBalance,
   CreditIdentifier,
-} from "../system/unified-interface/shared/server-only/credits/handler";
+} from "./repository";
 import type { CreditTypeIdentifierValue } from "./enum";
 import type { CreditPackCheckoutSession } from "../payment/providers/types";
 
@@ -112,7 +110,7 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
   async addCredits(
     identifier: CreditIdentifier,
     amount: number,
-    type: string,
+    type: "subscription" | "permanent" | "bonus",
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     logger.error("addCredits not implemented on native");
@@ -156,12 +154,14 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     type: "subscription" | "permanent" | "free",
     logger: EndpointLogger,
     expiresAt?: Date,
+    sessionId?: string,
   ): Promise<ResponseType<void>> {
     logger.error("addUserCredits not implemented on native");
     void userId;
     void amount;
     void type;
     void expiresAt;
+    void sessionId;
     return await Promise.resolve(
       this.createNotImplementedError<void>("addUserCredits"),
     );
@@ -260,6 +260,34 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     return await Promise.resolve(
       this.createNotImplementedError<number>("cleanupOrphanedLeadWallets"),
     );
+  }
+
+  async hasSufficientCredits(
+    identifier: CreditIdentifier,
+    required: number,
+    logger: EndpointLogger,
+  ): Promise<boolean> {
+    logger.error("hasSufficientCredits not implemented on native");
+    void identifier;
+    void required;
+    return false;
+  }
+
+  async deductCreditsWithValidation(
+    identifier: CreditIdentifier,
+    amount: number,
+    modelId: string,
+    logger: EndpointLogger,
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    logger.error("deductCreditsWithValidation not implemented on native");
+    void identifier;
+    void amount;
+    void modelId;
+    return { success: false, error: "Not implemented on native" };
+  }
+
+  generateMessageId(): string {
+    return `msg_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
   }
 }
 

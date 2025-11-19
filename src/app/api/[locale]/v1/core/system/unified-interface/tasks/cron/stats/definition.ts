@@ -42,7 +42,7 @@ const { GET } = createEndpoint({
   description:
     "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.description",
   category: "app.api.v1.core.system.unifiedInterface.tasks.category",
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN],
   aliases: ["cron:stats", "tasks:cron:stats"],
 
   fields: objectField(

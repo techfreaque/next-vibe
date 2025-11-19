@@ -19,6 +19,7 @@ import {
   type WidgetComponentProps,
   type RenderableValue,
 } from "../../shared/ui/types";
+import { isPlainObject } from "../../shared/utils/type-guards";
 import { WidgetRenderer } from "./WidgetRenderer";
 
 /**
@@ -28,9 +29,7 @@ function isContainerWidgetData(
   data: RenderableValue | ContainerWidgetData,
 ): data is ContainerWidgetData {
   return (
-    typeof data === "object" &&
-    data !== null &&
-    !Array.isArray(data) &&
+    isPlainObject(data) &&
     "children" in data &&
     Array.isArray(data.children)
   );

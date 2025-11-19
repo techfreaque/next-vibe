@@ -71,14 +71,13 @@ export class GracefulShutdownManager {
 
     // Handle uncaught exceptions
     process.on("uncaughtException", (error: Error) => {
-      logger.error("💥 Uncaught exception:", error.message || String(error));
+      logger.error("💥 Uncaught exception:", parseError(error).message);
       void this.initiateShutdown("UNCAUGHT_EXCEPTION");
     });
 
     // Handle unhandled promise rejections
     process.on("unhandledRejection", (reason: Error | string) => {
-      const errorMessage =
-        typeof reason === "string" ? reason : reason.message || String(reason);
+      const errorMessage = parseError(reason).message;
       logger.error("💥 Unhandled promise rejection:", errorMessage);
       void this.initiateShutdown("UNHANDLED_REJECTION");
     });

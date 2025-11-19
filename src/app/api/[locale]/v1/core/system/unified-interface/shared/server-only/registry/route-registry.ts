@@ -5,6 +5,8 @@
 
 import "server-only";
 
+import { parseError } from "next-vibe/shared/utils/parse-error";
+
 import {
   getRouteHandler,
   getAllRoutePaths,
@@ -39,12 +41,12 @@ export interface RouteLoadResult<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     UnifiedField<z.ZodTypeAny>
   > = CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     UnifiedField<z.ZodTypeAny>
   >,
 > {
@@ -66,12 +68,12 @@ export class RouteRegistry {
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
+      readonly UserRoleValue[],
       UnifiedField<z.ZodTypeAny>
     > = CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
+      readonly UserRoleValue[],
       UnifiedField<z.ZodTypeAny>
     >,
   >(
@@ -118,7 +120,7 @@ export class RouteRegistry {
       logger.error(`[Route Registry] Failed to load route module`, {
         originalPath,
         routePath,
-        error: error instanceof Error ? error.message : String(error),
+        error: parseError(error).message,
       });
 
       return {

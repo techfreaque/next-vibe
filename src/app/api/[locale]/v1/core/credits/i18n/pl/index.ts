@@ -60,6 +60,9 @@ export const translations: typeof enTranslations = {
     not_implemented_on_native:
       "{{method}} nie jest zaimplementowana na platformie natywnej. Użyj wersji webowej dla tej operacji.",
     expireCreditsFailed: "Nie udało się wygasić kredytów",
+    invalidAmount: "Kwota kredytu musi być liczbą dodatnią",
+    walletNotFound: "Nie znaleziono portfela",
+    walletCreationFailed: "Nie udało się utworzyć portfela",
   },
   get: {
     title: "Pobierz saldo kredytów",

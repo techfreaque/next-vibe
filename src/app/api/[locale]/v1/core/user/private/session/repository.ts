@@ -18,7 +18,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
-import { createDefaultCliUser } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/auth/cli-user";
+import { createDefaultCliUser } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/auth/cli-user";
 
 import type { NewSession, Session } from "./db";
 import { sessions } from "./db";

@@ -149,7 +149,7 @@ export interface FormExamples<
  */
 export interface CreateFormEndpointConfig<
   TExampleKey extends string,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields extends UnifiedField<z.ZodTypeAny>,
 > {
   // Shared configuration
@@ -273,7 +273,7 @@ export type MethodSpecificEndpoint<
   TFields extends UnifiedField<z.ZodTypeAny>,
   TMethod extends Methods,
   TExampleKey extends string,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > = CreateApiEndpoint<
   TExampleKey,
   TMethod,
@@ -294,7 +294,7 @@ export type MethodSpecificEndpoint<
 export interface CreateFormEndpointReturn<
   TFields extends UnifiedField<z.ZodTypeAny>,
   TExampleKey extends string,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > {
   readonly GET: MethodSpecificEndpoint<
     TFields,
@@ -660,7 +660,7 @@ export function generateRequestUrlSchemaForMethod<F>(
 export function createFormEndpoint<
   const TFields extends UnifiedField<z.ZodTypeAny>,
   TExampleKey extends string,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 >(
   config: CreateFormEndpointConfig<TExampleKey, TUserRoleValue, TFields>,
 ): CreateFormEndpointReturn<TFields, TExampleKey, TUserRoleValue> {

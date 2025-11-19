@@ -8,7 +8,7 @@ import { Div } from "next-vibe-ui/ui/div";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { LeadsStatsClient } from "./stats/_components/leads-stats-client";
+import { LeadsStatsClient } from "@/app/api/[locale]/v1/core/leads/stats/_components/leads-stats-client";
 
 interface AdminLeadsPageProps {
   params: Promise<{

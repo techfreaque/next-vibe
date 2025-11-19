@@ -256,29 +256,27 @@ export const chatFolders = pgTable(
     // rolesView: Who can view/read the folder and its existence
     // Inherits to: subfolders, threads
     // Note: .$type<T[]> without | null, nullability inferred
-    rolesView: jsonb("roles_view").$type<(typeof UserRoleValue)[]>(),
+    rolesView: jsonb("roles_view").$type<UserRoleValue[]>(),
 
     // rolesManage: Who can edit/rename folder AND create subfolders
     // Inherits to: subfolders only (not threads)
-    rolesManage: jsonb("roles_manage").$type<(typeof UserRoleValue)[]>(),
+    rolesManage: jsonb("roles_manage").$type<UserRoleValue[]>(),
 
     // rolesCreateThread: Who can create new threads in this folder
     // Inherits to: subfolders, threads
-    rolesCreateThread: jsonb("roles_create_thread").$type<
-      (typeof UserRoleValue)[]
-    >(),
+    rolesCreateThread: jsonb("roles_create_thread").$type<UserRoleValue[]>(),
 
     // rolesPost: Who can post messages in threads within this folder
     // Inherits to: subfolders, threads
-    rolesPost: jsonb("roles_post").$type<(typeof UserRoleValue)[]>(),
+    rolesPost: jsonb("roles_post").$type<UserRoleValue[]>(),
 
     // rolesModerate: Who can moderate/hide content (messages, threads)
     // Inherits to: subfolders, threads
-    rolesModerate: jsonb("roles_moderate").$type<(typeof UserRoleValue)[]>(),
+    rolesModerate: jsonb("roles_moderate").$type<UserRoleValue[]>(),
 
     // rolesAdmin: Who can delete content and manage permissions
     // Inherits to: subfolders, threads
-    rolesAdmin: jsonb("roles_admin").$type<(typeof UserRoleValue)[]>(),
+    rolesAdmin: jsonb("roles_admin").$type<UserRoleValue[]>(),
 
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -369,19 +367,19 @@ export const chatThreads = pgTable(
 
     // rolesView: Who can view/read the thread and its messages
     // Note: .$type<T[]> without | null, nullability inferred
-    rolesView: jsonb("roles_view").$type<(typeof UserRoleValue)[]>(),
+    rolesView: jsonb("roles_view").$type<UserRoleValue[]>(),
 
     // rolesEdit: Who can edit the thread (title, settings, etc.)
-    rolesEdit: jsonb("roles_edit").$type<(typeof UserRoleValue)[]>(),
+    rolesEdit: jsonb("roles_edit").$type<UserRoleValue[]>(),
 
     // rolesPost: Who can post messages in this thread
-    rolesPost: jsonb("roles_post").$type<(typeof UserRoleValue)[]>(),
+    rolesPost: jsonb("roles_post").$type<UserRoleValue[]>(),
 
     // rolesModerate: Who can moderate/hide messages in this thread
-    rolesModerate: jsonb("roles_moderate").$type<(typeof UserRoleValue)[]>(),
+    rolesModerate: jsonb("roles_moderate").$type<UserRoleValue[]>(),
 
     // rolesAdmin: Who can delete the thread and manage permissions
-    rolesAdmin: jsonb("roles_admin").$type<(typeof UserRoleValue)[]>(),
+    rolesAdmin: jsonb("roles_admin").$type<UserRoleValue[]>(),
 
     // Published status (for SHARED folders - allows public read access via link)
     published: boolean("published").default(false).notNull(),

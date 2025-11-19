@@ -15,7 +15,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { translations } from "@/config/i18n/en";
 
-import { SubscriptionClientContent } from "./_components/subscription-client-content";
+import { SubscriptionClientContent } from "@/app/api/[locale]/v1/core/subscription/_components/subscription-client-content";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
 
 interface SubscriptionPageProps {
@@ -106,6 +106,7 @@ export default async function SubscriptionPage({
         userResponse.data.leadId,
         50, // limit
         0, // offset
+        logger,
       );
       history = historyResponse.success ? historyResponse.data : null;
     }

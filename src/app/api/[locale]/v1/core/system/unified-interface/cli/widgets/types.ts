@@ -1,9 +1,7 @@
 /**
  * Widget Types and Interfaces
- * Core types for the modular CLI widget rendering system
+ * CLI-specific widget rendering types
  */
-
-import type { z } from "zod";
 
 import type {
   FieldDataType,
@@ -11,86 +9,13 @@ import type {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import type {
+  RenderableValue as BaseRenderableValue,
+  ResponseFieldMetadata as BaseResponseFieldMetadata,
+} from "../../shared/ui/types";
 
-/**
- * Valid primitive values that can be rendered
- */
-export type RenderableValue =
-  | string
-  | number
-  | boolean
-  | null
-  | undefined
-  | RenderableValue[]
-  | { [key: string]: RenderableValue };
-
-/**
- * Widget configuration interface
- */
-export interface WidgetConfig {
-  layout?:
-    | {
-        columns: number;
-        spacing: string;
-      }
-    | string
-    | number;
-  groupBy?: string;
-  cardTemplate?: string;
-  showSummary?: boolean;
-  summaryTemplate?: string;
-  itemConfig?: {
-    template: string;
-    size: string;
-    spacing: string;
-  };
-  summaryTitle?: string;
-  summaryStats?: Array<{
-    field: string;
-    value: string;
-    label?: string;
-    icon?: string;
-    color?: string;
-  }>;
-  [key: string]: RenderableValue;
-}
-
-/**
- * Response field metadata extracted from endpoint definitions
- */
-export interface ResponseFieldMetadata {
-  name: string;
-  type: FieldDataType;
-  widgetType: WidgetType;
-  value: RenderableValue;
-  label?: TranslationKey;
-  title?: TranslationKey;
-  description?: TranslationKey;
-  required?: boolean;
-  schema?: z.ZodTypeAny;
-  // Additional metadata for rendering
-  format?: string;
-  unit?: string;
-  precision?: number;
-  choices?: string[];
-  columns?: Array<{
-    key: string;
-    label: TranslationKey;
-    type: FieldDataType;
-    width?: string;
-    sortable?: boolean;
-    filterable?: boolean;
-  }>;
-  // Grouped list specific properties
-  groupBy?: string;
-  sortBy?: string;
-  showGroupSummary?: boolean;
-  maxItemsPerGroup?: number;
-  // Widget-specific configuration
-  config?: WidgetConfig;
-  // Nested structure for container/section widgets
-  children?: Record<string, ResponseFieldMetadata>;
-}
+export type RenderableValue = BaseRenderableValue;
+export type ResponseFieldMetadata = BaseResponseFieldMetadata;
 
 /**
  * Response container metadata

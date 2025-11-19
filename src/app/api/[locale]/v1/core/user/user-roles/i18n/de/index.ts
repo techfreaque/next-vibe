@@ -74,6 +74,7 @@ export const translations: typeof enTranslations = {
       partnerEmployee: "Partner-Mitarbeiter",
       admin: "Administrator",
       cliOff: "CLI Deaktiviert",
+      cliAuthBypass: "CLI Auth Bypass",
       aiToolOff: "KI-Tool Deaktiviert",
       webOff: "Web Deaktiviert",
       productionOff: "Produktion Deaktiviert",

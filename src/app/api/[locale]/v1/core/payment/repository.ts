@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type Stripe from "stripe";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 import { env } from "@/config/env";
@@ -607,9 +607,8 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       }
 
       // Subscription module handles its own business logic
-      const { subscriptionRepository } = await import(
-        "../subscription/repository"
-      );
+      const { subscriptionRepository } =
+        await import("../subscription/repository");
       await subscriptionRepository.handleInvoicePaymentSucceeded(
         data,
         subscriptionId,
@@ -670,9 +669,8 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           logger,
         );
       } else if (type === "subscription") {
-        const { subscriptionRepository } = await import(
-          "../subscription/repository"
-        );
+        const { subscriptionRepository } =
+          await import("../subscription/repository");
         await subscriptionRepository.handleSubscriptionCheckout(data, logger);
       } else {
         logger.debug("Unhandled checkout session type", {
@@ -705,9 +703,8 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         subscriptionId,
       });
 
-      const { subscriptionRepository } = await import(
-        "../subscription/repository"
-      );
+      const { subscriptionRepository } =
+        await import("../subscription/repository");
       await subscriptionRepository.handleSubscriptionCanceled(
         subscriptionId,
         logger,
@@ -735,9 +732,8 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         subscriptionId: data.id,
       });
 
-      const { subscriptionRepository } = await import(
-        "../subscription/repository"
-      );
+      const { subscriptionRepository } =
+        await import("../subscription/repository");
       // The webhook data is actually a Stripe.Subscription object from the event
       await subscriptionRepository.handleSubscriptionUpdated(
         data as Stripe.Subscription,

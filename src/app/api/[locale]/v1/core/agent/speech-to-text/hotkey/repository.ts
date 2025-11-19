@@ -15,7 +15,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -91,7 +91,8 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
           missing: deps.missing.join(", "),
         });
         return fail({
-          message: "app.api.v1.core.agent.speechToText.hotkey.post.errors.dependenciesMissing",
+          message:
+            "app.api.v1.core.agent.speechToText.hotkey.post.errors.dependenciesMissing",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             missing: deps.missing.join(", "),
@@ -126,14 +127,18 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
         default:
           // No action provided - should not happen from CLI daemon mode
           return fail({
-            message: "app.api.v1.core.agent.speechToText.hotkey.post.errors.invalidAction",
+            message:
+              "app.api.v1.core.agent.speechToText.hotkey.post.errors.invalidAction",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { action: "none" },
           });
       }
     } catch (error) {
       // Enhanced error logging to debug the "unknown error" issue
-      const errorDetails: Record<string, string | number | boolean | null | undefined> = {
+      const errorDetails: Record<
+        string,
+        string | number | boolean | null | undefined
+      > = {
         action: data.action || "none",
         errorType: typeof error,
         errorName: error instanceof Error ? error.name : "unknown",
@@ -155,7 +160,8 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
       const errorMessage = parseError(error).message;
 
       return fail({
-        message: "app.api.v1.core.agent.speechToText.hotkey.post.errors.actionFailed",
+        message:
+          "app.api.v1.core.agent.speechToText.hotkey.post.errors.actionFailed",
         errorType: ErrorResponseTypes.UNKNOWN_ERROR,
         messageParams: { error: errorMessage },
       });
@@ -231,7 +237,8 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
     if (session.isRecording) {
       logger.warn("Recording already in progress");
       return fail({
-        message: "app.api.v1.core.agent.speechToText.hotkey.post.errors.alreadyRecording",
+        message:
+          "app.api.v1.core.agent.speechToText.hotkey.post.errors.alreadyRecording",
         errorType: ErrorResponseTypes.CONFLICT,
       });
     }
@@ -261,7 +268,8 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
     if (!session.isRecording) {
       logger.warn("No recording in progress");
       return fail({
-        message: "app.api.v1.core.agent.speechToText.hotkey.post.errors.notRecording",
+        message:
+          "app.api.v1.core.agent.speechToText.hotkey.post.errors.notRecording",
         errorType: ErrorResponseTypes.CONFLICT,
       });
     }

@@ -113,7 +113,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
           icons[key] = val;
         }
       }
-      if (Object.keys(icons).length > 0) {
+      if (Object.keys(icons).length) {
         severityIcons = icons;
       }
     }
@@ -346,8 +346,9 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
 
     let summary = config.summaryTemplate!;
     for (const [key, value] of Object.entries(variables)) {
+      // Use replaceAll for better performance than RegExp in loop
       // eslint-disable-next-line i18next/no-literal-string
-      summary = summary.replace(new RegExp(`\\{${key}\\}`, "g"), String(value));
+      summary = summary.replaceAll(`{${key}}`, String(value));
     }
 
     return summary;

@@ -12,7 +12,7 @@ import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { UserCreateForm } from "./_components/user-create-form";
+import { UserCreateForm } from "@/app/api/[locale]/v1/core/users/create/_components/user-create-form";
 
 interface UserCreatePageProps {
   params: Promise<{

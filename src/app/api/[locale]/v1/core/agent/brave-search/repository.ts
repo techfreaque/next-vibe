@@ -9,7 +9,7 @@ import { tool } from "ai";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 
 import type { BraveSearchGetResponseOutput } from "./definition";
@@ -537,9 +537,8 @@ class BraveSearchRepository implements IBraveSearchRepository {
     },
     logger: EndpointLogger,
   ): Promise<ResponseType<BraveSearchGetResponseOutput>> {
-    const { fail, success, ErrorResponseTypes } = await import(
-      "next-vibe/shared/types/response.schema"
-    );
+    const { fail, success, ErrorResponseTypes } =
+      await import("next-vibe/shared/types/response.schema");
 
     try {
       if (!query || typeof query !== "string" || query.trim() === "") {

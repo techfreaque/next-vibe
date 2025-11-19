@@ -14,7 +14,7 @@ import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { LeadEditForm } from "./_components/lead-edit-form";
+import { LeadEditForm } from "@/app/api/[locale]/v1/core/leads/_components/lead-edit-form";
 
 interface LeadEditPageProps {
   params: Promise<{

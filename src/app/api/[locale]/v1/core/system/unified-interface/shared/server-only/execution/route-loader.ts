@@ -11,10 +11,11 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 import type { CreateApiEndpoint } from "../../endpoint/create";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Methods } from "../../types/enums";
-import type { UnifiedField } from "../../types/endpoint";
+import type { CreateApiEndpointAny, UnifiedField } from "../../types/endpoint";
 import type { RouteModule } from "../../types/handler";
 import { routeRegistry } from "../registry/route-registry";
 import type z from "zod";
+import type { Platform } from "../../types/platform";
 
 /**
  * Route loading options
@@ -25,53 +26,18 @@ export interface RouteLoaderOptions {
   /** HTTP method */
   method: Methods | string;
   /** Route alias (for logging) */
-  alias?: string;
+  alias: string | undefined;
 }
 
 /**
  * Route loading result
  * TEndpoint defaults to any CreateApiEndpoint
  */
-export interface RouteLoaderResult<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
-  > = CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
-  >,
-> {
+export interface RouteLoaderResult<TEndpoint extends CreateApiEndpointAny> {
   /** Loaded route module */
   module: RouteModule<TEndpoint> | null;
   /** Error if loading failed */
   error?: string;
-}
-
-/**
- * Load route module using RouteRegistry
- * @deprecated Use routeRegistry.loadRoute() directly
- */
-export async function loadRouteModule<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
-  > = CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
-  >,
->(
-  options: RouteLoaderOptions,
-  logger: EndpointLogger,
-): Promise<RouteLoaderResult<TEndpoint>> {
-  return routeRegistry.loadRoute<TEndpoint>(options, logger);
 }
 
 /**
@@ -92,17 +58,17 @@ export function extractHandlerFromModule<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     UnifiedField<z.ZodTypeAny>
   > = CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     UnifiedField<z.ZodTypeAny>
   >,
 >(
   module: RouteModule<TEndpoint>,
-  platform: "cli" | "ai" | "mcp",
+  platform: typeof Platform.CLI | typeof Platform.AI | typeof Platform.MCP,
   method: Methods | string,
   logger: EndpointLogger,
 ): THandler | null {
@@ -161,24 +127,24 @@ export async function loadRouteHandler<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     UnifiedField<z.ZodTypeAny>
   > = CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     UnifiedField<z.ZodTypeAny>
   >,
 >(
   options: RouteLoaderOptions,
-  platform: "cli" | "ai" | "mcp",
+  platform: typeof Platform.CLI | typeof Platform.AI | typeof Platform.MCP,
   logger: EndpointLogger,
 ): Promise<{
   handler: THandler | null;
   module: RouteModule<TEndpoint> | null;
   error?: string;
 }> {
-  const loadResult = await loadRouteModule<TEndpoint>(options, logger);
+  const loadResult = await routeRegistry.loadRoute<TEndpoint>(options, logger);
 
   if (!loadResult.module || loadResult.error) {
     return {

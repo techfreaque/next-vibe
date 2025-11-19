@@ -24,7 +24,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -112,8 +112,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
   }
 
   getAuthMinimalUser<
-    TRoles extends
-      readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
   >(
     roles: TRoles,
     context: AuthContext,
@@ -130,8 +129,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
   }
 
   getTypedAuthMinimalUser<
-    TRoles extends
-      readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
   >(
     roles: TRoles,
     context: AuthContext,
@@ -144,10 +142,10 @@ class AuthRepositoryNativeImpl implements AuthRepository {
   }
 
   getUserRoles(
-    requiredRoles: readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+    requiredRoles: readonly UserRoleValue[keyof UserRoleValue][],
     context: AuthContext,
     logger: EndpointLogger,
-  ): Promise<(typeof UserRoleValue)[keyof typeof UserRoleValue][]> {
+  ): Promise<UserRoleValue[keyof UserRoleValue][]> {
     logger.warn(
       "getUserRoles not implemented on native - not used in page.tsx",
     );
@@ -279,6 +277,22 @@ class AuthRepositoryNativeImpl implements AuthRepository {
       logger,
     );
     return Promise.reject(new Error(JSON.stringify(error)));
+  }
+
+  authenticateUserByEmail(
+    email: string,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<JwtPrivatePayloadType>> {
+    logger.error("authenticateUserByEmail not available on native");
+    void email;
+    void locale;
+    return Promise.resolve(
+      createUnsupportedError<JwtPrivatePayloadType>(
+        "authenticateUserByEmail",
+        logger,
+      ),
+    );
   }
 }
 

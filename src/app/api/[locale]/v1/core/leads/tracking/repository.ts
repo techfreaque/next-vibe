@@ -17,7 +17,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 // Removed unused import - using direct database operations instead
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import {
   getCountryFromLocale,
@@ -1191,13 +1191,16 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           } else {
             // For anonymous users, log the lead-to-lead relationship in engagement metadata
             // (Lead-to-lead linking table removed in wallet-based system)
-            logger.debug("app.api.v1.core.leads.tracking.click.leadRelationship", {
-              currentLeadId,
-              trackingLeadId,
-              campaignId: campaignId || "",
-              url,
-              timestamp: new Date().toISOString(),
-            });
+            logger.debug(
+              "app.api.v1.core.leads.tracking.click.leadRelationship",
+              {
+                currentLeadId,
+                trackingLeadId,
+                campaignId: campaignId || "",
+                url,
+                timestamp: new Date().toISOString(),
+              },
+            );
             leadsLinked = false; // No actual linking in wallet-based system
           }
         } catch (error) {

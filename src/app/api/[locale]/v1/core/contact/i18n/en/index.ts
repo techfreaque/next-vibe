@@ -2,7 +2,10 @@
  * Contact API translations (English)
  */
 
+import { translations as componentsTranslations } from "../../_components/i18n/en";
+
 export const translations = {
+  _components: componentsTranslations,
   title: "Contact Form Submission",
   description: "Submit contact form and handle email notifications",
   category: "Core API",

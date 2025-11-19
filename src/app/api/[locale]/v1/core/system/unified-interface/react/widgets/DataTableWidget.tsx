@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
+import { isPlainObject } from "../../shared/utils/type-guards";
 import {
   type DataTableWidgetData,
   type WidgetComponentProps,
@@ -33,9 +34,7 @@ function isDataTableWidgetData(
   data: RenderableValue | DataTableWidgetData,
 ): data is DataTableWidgetData {
   if (
-    typeof data === "object" &&
-    data !== null &&
-    !Array.isArray(data) &&
+    isPlainObject(data) &&
     "rows" in data &&
     Array.isArray(data.rows) &&
     "columns" in data &&

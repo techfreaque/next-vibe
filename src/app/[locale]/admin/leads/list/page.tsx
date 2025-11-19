@@ -10,7 +10,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { LeadsListClient } from "./_components/leads-list-client";
+import { LeadsListClient } from "@/app/api/[locale]/v1/core/leads/list/_components/leads-list-client";
 
 export default async function LeadsListPage({
   params,

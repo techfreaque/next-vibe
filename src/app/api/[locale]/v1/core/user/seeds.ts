@@ -7,8 +7,7 @@ import { and, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-import { getCliUserEmail } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/auth/cli-user";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 import { translations } from "@/config/i18n/en";
@@ -53,13 +52,6 @@ export async function dev(
 ): Promise<void> {
   logger.debug("🌱 Seeding auth data for development environment");
 
-  // Create CLI system user with all roles
-  const cliUser = createUserSeed({
-    email: getCliUserEmail(),
-    privateName: "CLI System",
-    publicName: "System CLI",
-  });
-
   // Create admin user
   const adminUser = createUserSeed({
     email: "admin@example.com",
@@ -93,7 +85,7 @@ export async function dev(
     }),
   ];
 
-  const allUsers = [cliUser, adminUser, demoUser, ...regularUsers];
+  const allUsers = [adminUser, demoUser, ...regularUsers];
 
   // Create users with hashed passwords using the repository
   const createdUsers: StandardUserType[] = [];
@@ -189,7 +181,12 @@ export async function dev(
       const existingUserLeadLinks = await db
         .select()
         .from(userLeadLinks)
-        .where(and(eq(userLeadLinks.userId, user.id), eq(userLeadLinks.leadId, leadId)))
+        .where(
+          and(
+            eq(userLeadLinks.userId, user.id),
+            eq(userLeadLinks.leadId, leadId),
+          ),
+        )
         .limit(1);
 
       if (existingUserLeadLinks.length === 0) {
@@ -220,68 +217,53 @@ export async function dev(
   try {
     // Check if user_roles table exists
     try {
-      // Only proceed if we have valid user IDs
-      if (createdUsers.length > 0 && createdUsers[0]) {
-        // First user is CLI user - assign ALL roles for maximum permissions
-        const cliUserId = createdUsers[0].id;
-        const allRoles = [
+      if (createdUsers[0]) {
+        // First user is admin user - assign admin and CLI_AUTH_BYPASS roles
+        const adminUserId = createdUsers[0].id;
+        const adminRoles = [
           UserRole.ADMIN,
+          UserRole.CLI_AUTH_BYPASS,
           UserRole.CLI_OFF,
           UserRole.AI_TOOL_OFF,
-          UserRole.CUSTOMER,
-          UserRole.PARTNER_ADMIN,
-          UserRole.PARTNER_EMPLOYEE,
         ];
 
-        for (const role of allRoles) {
+        for (const role of adminRoles) {
           try {
             await userRolesRepository.addRole(
               {
-                userId: cliUserId,
+                userId: adminUserId,
                 role,
               },
               logger,
             );
-            logger.debug(`Created ${role} role for CLI user ${cliUserId}`);
+            logger.debug(`Created ${role} role for admin user ${adminUserId}`);
           } catch (roleError) {
             logger.error(
-              `Failed to create ${role} role for CLI user`,
+              `Failed to create ${role} role for admin user`,
               parseError(roleError),
             );
           }
         }
       }
 
-      if (createdUsers.length > 1 && createdUsers[1]) {
-        // Second user is admin user
+      if (createdUsers[1]) {
+        // Second user is demo user
         await userRolesRepository.addRole(
           {
-            userId: createdUsers[1].id, // Admin user
-            role: UserRole.ADMIN,
-          },
-          logger,
-        );
-        logger.debug(`Created admin role for user ${createdUsers[1].id}`);
-      }
-
-      if (createdUsers.length > 2 && createdUsers[2]) {
-        // Third user is demo user
-        await userRolesRepository.addRole(
-          {
-            userId: createdUsers[2].id, // Demo user
+            userId: createdUsers[1].id,
             role: UserRole.CUSTOMER,
           },
           logger,
         );
-        logger.debug(`Created customer role for user ${createdUsers[2].id}`);
+        logger.debug(`Created customer role for user ${createdUsers[1].id}`);
       }
 
-      // Create roles for regular users (starting from index 3)
-      for (let i = 3; i < createdUsers.length; i++) {
+      // Create roles for regular users (starting from index 2)
+      for (let i = 2; i < createdUsers.length; i++) {
         if (createdUsers[i]) {
           await userRolesRepository.addRole(
             {
-              userId: createdUsers[i].id, // Regular users
+              userId: createdUsers[i].id,
               role: UserRole.CUSTOMER,
             },
             logger,
@@ -312,34 +294,34 @@ export async function dev(
     // This allows the seed to complete even if roles can't be created
   }
 
-  // Create CLI token and session for CLI user (first user)
+  // Create CLI token and session for admin user (first user)
   if (createdUsers.length > 0 && createdUsers[0]) {
-    const cliUserId = createdUsers[0].id;
+    const adminUserId = createdUsers[0].id;
     try {
-      logger.debug(`Creating CLI authentication for user ${cliUserId}`);
+      logger.debug(`Creating CLI authentication for user ${adminUserId}`);
 
       // Create CLI token
       const cliTokenResponse = await authRepository.createCliToken(
-        cliUserId,
+        adminUserId,
         "en-GLOBAL",
         logger,
       );
       if (cliTokenResponse.success) {
-        logger.debug(`✅ Created CLI token for user ${cliUserId}`);
+        logger.debug(`✅ Created CLI token for user ${adminUserId}`);
 
         // Create a persistent session for CLI operations
         const sessionExpiresAt = new Date(
           Date.now() + 365 * 24 * 60 * 60 * 1000,
         ); // 1 year
         const sessionResult = await sessionRepository.create({
-          userId: cliUserId,
+          userId: adminUserId,
           token: cliTokenResponse.data,
           expiresAt: sessionExpiresAt,
           createdAt: new Date(),
         });
 
         if (sessionResult.success) {
-          logger.debug(`✅ Created CLI session for user ${cliUserId}`);
+          logger.debug(`✅ Created CLI session for user ${adminUserId}`);
         } else {
           logger.error("Failed to create CLI session");
         }

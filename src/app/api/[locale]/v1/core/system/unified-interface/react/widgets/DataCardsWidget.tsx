@@ -16,6 +16,7 @@ import {
   type WidgetComponentProps,
   type RenderableValue,
 } from "../../shared/ui/types";
+import { isPlainObject } from "../../shared/utils/type-guards";
 /**
  * Data Cards Widget Data
  */
@@ -34,9 +35,7 @@ function isDataCardsWidgetData(
   data: RenderableValue,
 ): data is DataCardsWidgetData {
   return (
-    typeof data === "object" &&
-    data !== null &&
-    !Array.isArray(data) &&
+    isPlainObject(data) &&
     "items" in data &&
     Array.isArray(data.items)
   );

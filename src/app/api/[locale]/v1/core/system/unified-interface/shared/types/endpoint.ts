@@ -58,7 +58,7 @@ export type FieldUIConfig = {
 export type CreateApiEndpointAny = CreateApiEndpoint<
   string,
   Methods,
-  readonly (typeof UserRoleValue)[],
+  readonly UserRoleValue[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic catch-all type
   any
 >;

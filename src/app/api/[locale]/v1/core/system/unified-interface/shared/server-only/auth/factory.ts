@@ -1,36 +1,29 @@
 import "server-only";
 
-import type { AuthPlatform, BaseAuthHandler } from "./base-auth-handler";
-import { cliAuthHandler } from "./cli-handler";
-import { webAuthHandler } from "./web-handler";
+import type { BaseAuthHandler } from "./base-auth-handler";
+import { Platform } from "../../types/platform";
+import { cliAuthHandler } from "../../../cli/auth/cli-handler";
+import { webAuthHandler } from "../../../next-api/auth/handler";
 
 /**
  * Platform Authentication Handler Factory
  * Returns the appropriate auth handler based on platform
  *
  * Platform mapping:
- * - next, trpc, web -> WebAuthHandler (cookies)
- * - cli, ai, mcp -> CliAuthHandler (.vibe.session file)
- * - mobile -> Native handler (AsyncStorage) - to be implemented
+ * - WEB, EMAIL -> WebAuthHandler (cookies)
+ * - CLI, AI, MCP -> CliAuthHandler (.vibe.session file)
  */
-export function getPlatformAuthHandler(
-  platform: AuthPlatform,
-): BaseAuthHandler {
+export function getPlatformAuthHandler(platform: Platform): BaseAuthHandler {
   switch (platform) {
-    case "next":
-    case "trpc":
-    case "web":
+    case Platform.WEB:
+    case Platform.AI:
+    case Platform.MOBILE:
+    case Platform.EMAIL:
       return webAuthHandler;
 
-    case "cli":
-    case "ai":
-    case "mcp":
+    case Platform.CLI:
+    case Platform.MCP:
       return cliAuthHandler;
-
-    case "mobile":
-      // TODO: Implement native auth handler
-      // For now, fall back to web handler
-      return webAuthHandler;
 
     default: {
       const _exhaustiveCheck: never = platform;
@@ -43,20 +36,24 @@ export function getPlatformAuthHandler(
 /**
  * Check if platform uses session file storage
  */
-export function usesSessionFile(platform: AuthPlatform): boolean {
-  return platform === "cli" || platform === "ai" || platform === "mcp";
+export function usesSessionFile(platform: Platform): boolean {
+  return (
+    platform === Platform.CLI ||
+    platform === Platform.AI ||
+    platform === Platform.MCP
+  );
 }
 
 /**
  * Check if platform uses cookie storage
  */
-export function usesCookies(platform: AuthPlatform): boolean {
-  return platform === "next" || platform === "trpc" || platform === "web";
+export function usesCookies(platform: Platform): boolean {
+  return platform === Platform.WEB || platform === Platform.EMAIL;
 }
 
 /**
  * Check if platform uses AsyncStorage
  */
-export function usesAsyncStorage(platform: AuthPlatform): boolean {
-  return platform === "mobile";
+export function usesAsyncStorage(platform: Platform): boolean {
+  return platform === Platform.MOBILE;
 }

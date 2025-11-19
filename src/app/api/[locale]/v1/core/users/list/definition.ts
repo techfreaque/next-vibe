@@ -39,7 +39,7 @@ import {
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "users", "list"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF] as const,
+  allowedRoles: [UserRole.ADMIN] as const,
 
   title: "app.api.v1.core.users.list.title" as const,
   description: "app.api.v1.core.users.list.description" as const,

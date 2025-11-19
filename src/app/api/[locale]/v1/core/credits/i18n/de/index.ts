@@ -60,6 +60,9 @@ export const translations: typeof enTranslations = {
     not_implemented_on_native:
       "{{method}} ist auf der nativen Plattform nicht implementiert. Bitte verwenden Sie die Web-Version für diesen Vorgang.",
     expireCreditsFailed: "Fehler beim Ablaufen von Credits",
+    invalidAmount: "Credit-Betrag muss eine positive Zahl sein",
+    walletNotFound: "Wallet nicht gefunden",
+    walletCreationFailed: "Fehler beim Erstellen des Wallets",
   },
   get: {
     title: "Credit-Guthaben abrufen",

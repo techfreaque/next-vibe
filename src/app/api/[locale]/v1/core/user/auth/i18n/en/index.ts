@@ -4,6 +4,9 @@ export const translations = {
       status_save_failed: "Failed to save authentication status",
       status_remove_failed: "Failed to remove authentication status",
       status_check_failed: "Failed to check authentication status",
+      token_save_failed: "Failed to save authentication token",
+      token_get_failed: "Failed to retrieve authentication token",
+      token_remove_failed: "Failed to remove authentication token",
     },
   },
   debug: {

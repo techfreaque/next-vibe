@@ -52,7 +52,7 @@ export function testEndpoint<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields extends UnifiedField<z.ZodTypeAny>,
 >(
   endpoint: CreateApiEndpoint<

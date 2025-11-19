@@ -314,7 +314,7 @@ const sideTasksGetEndpoint = createEndpoint({
   tags: [
     "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.tags.sidetasks",
   ],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN],
   aliases: ["tasks:side:status"],
 
   fields: objectField(

@@ -40,6 +40,17 @@ export enum Methods {
 }
 
 /**
+ * All HTTP methods as array
+ */
+export const ALL_METHODS = [
+  Methods.GET,
+  Methods.POST,
+  Methods.PUT,
+  Methods.PATCH,
+  Methods.DELETE,
+] as const;
+
+/**
  * Field usage enum for type inference
  */
 export enum FieldUsage {

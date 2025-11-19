@@ -7,13 +7,14 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import { validateData } from "next-vibe/shared/utils/validation";
 import { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { CountryLanguageValues, defaultLocale } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../types/logger";
+import type { EndpointLogger } from "../logger/endpoint";
 
 /**
  * Validate locale using the standard schema
@@ -91,6 +92,15 @@ export function validateUrlParameters<TSchema extends z.ZodTypeAny>(
 }
 
 /**
+ * Check if request schema is an empty object
+ */
+export function isEmptyObjectSchema(schema: z.ZodSchema): boolean {
+  return (
+    schema instanceof z.ZodObject && Object.keys(schema.shape).length === 0
+  );
+}
+
+/**
  * Check if schema expects no input (undefined or never)
  */
 export function isEmptySchema(schema: z.ZodSchema): boolean {
@@ -105,11 +115,16 @@ export function isEmptySchema(schema: z.ZodSchema): boolean {
  * Check if schema expects never type specifically
  */
 export function isNeverSchema(schema: z.ZodSchema): boolean {
-  const testResult = schema.safeParse({});
-  return (
-    !testResult.success &&
-    testResult.error?.issues?.[0]?.code === "invalid_type"
-  );
+  try {
+    const testResult = schema.safeParse({});
+    return (
+      !testResult.success &&
+      testResult.error?.issues?.[0]?.code === "invalid_type" &&
+      testResult.error?.issues?.[0]?.expected === "never"
+    );
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -138,7 +153,7 @@ export function getMissingFields(
     }
   } catch (error) {
     logger.warn("Failed to extract missing fields", {
-      error: error instanceof Error ? error.message : String(error),
+      error: parseError(error).message,
     });
   }
 
@@ -164,7 +179,7 @@ export function mergeWithDefaults<T>(
     }
   } catch (error) {
     logger.warn("Failed to merge with defaults", {
-      error: error instanceof Error ? error.message : String(error),
+      error: parseError(error).message,
     });
   }
 

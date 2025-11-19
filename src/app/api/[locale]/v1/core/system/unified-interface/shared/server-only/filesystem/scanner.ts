@@ -68,14 +68,6 @@ export interface DirectoryScanOptions {
 }
 
 /**
- * Constants for file patterns and extensions
- */
-const GLOB_WILDCARD_PATTERN = /\*/g;
-const GLOB_REGEX_REPLACEMENT = ".*";
-const TYPESCRIPT_EXTENSIONS = [".ts", ".tsx"] as const;
-const TEST_FILE_PATTERNS = [".test.", ".spec."] as const;
-
-/**
  * Result of directory scan with full path
  */
 export interface ScanResultSimple {
@@ -187,7 +179,7 @@ export function scanDirectory(
             } else {
               matches = filePattern.test(entry.name);
             }
-          } else if (extensions.length > 0) {
+          } else if (extensions.length) {
             matches = extensions.some((ext) => entry.name.endsWith(ext));
           } else {
             // No pattern specified, match all files
@@ -235,71 +227,6 @@ export function findFilesByName(
 }
 
 /**
- * Find files by extension
- */
-export function findFilesByExtension(
-  baseDir: string,
-  extensions: string[],
-  options: Omit<DirectoryScanOptions, "extensions"> = {},
-): ScanResultWithSegments[] {
-  return scanDirectory(baseDir, {
-    ...options,
-    extensions,
-  });
-}
-
-/**
- * Find files by regex pattern
- */
-export function findFilesByPattern(
-  baseDir: string,
-  pattern: RegExp,
-  options: Omit<DirectoryScanOptions, "filePattern"> = {},
-): ScanResultWithSegments[] {
-  return scanDirectory(baseDir, {
-    ...options,
-    filePattern: pattern,
-  });
-}
-
-/**
- * Check if a path should be excluded based on patterns
- */
-export function shouldExcludePath(
-  relativePath: string,
-  excludePatterns: string[],
-): boolean {
-  return excludePatterns.some((pattern) => {
-    if (pattern.includes("*")) {
-      // Simple glob pattern support
-      const regexPattern = pattern.replace(
-        GLOB_WILDCARD_PATTERN,
-        GLOB_REGEX_REPLACEMENT,
-      );
-      return new RegExp(regexPattern).test(relativePath);
-    }
-    // Exact match or directory match
-    return relativePath === pattern || relativePath.startsWith(`${pattern}/`);
-  });
-}
-
-/**
- * Get all TypeScript files in a directory
- */
-export function findTypeScriptFiles(
-  directory: string,
-  excludePatterns: string[] = [],
-): string[] {
-  const results = scanDirectory(directory, {
-    extensions: [...TYPESCRIPT_EXTENSIONS],
-    excludePatterns,
-    excludeDirs: [...DEFAULT_EXCLUDE_DIRS],
-  });
-
-  return results.map((r) => r.fullPath);
-}
-
-/**
  * Get all route.ts files in a directory
  */
 export function findRouteFiles(
@@ -311,19 +238,4 @@ export function findRouteFiles(
     excludePatterns,
     excludeDirs: [...DEFAULT_EXCLUDE_DIRS, "trpc", "generated"],
   });
-}
-
-/**
- * Get all seed files in a directory
- */
-export function findSeedFiles(directory: string): string[] {
-  const results = scanDirectory(directory, {
-    filePattern: /^seeds?\.ts$/,
-    customFilter: (fullPath) => {
-      // Exclude test and spec files
-      return TEST_FILE_PATTERNS.every((pattern) => !fullPath.includes(pattern));
-    },
-  });
-
-  return results.map((r) => r.fullPath);
 }

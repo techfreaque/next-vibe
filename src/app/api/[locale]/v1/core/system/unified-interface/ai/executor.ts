@@ -5,11 +5,18 @@
 
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { simpleT } from "@/i18n/core/shared";
+import type { TFunction } from "@/i18n/core/static-types";
 
-import { AI_CONFIG, Platform } from "../shared/server-only/config";
-import { BaseExecutor } from "../shared/server-only/execution/executor";
+import { Platform } from "../shared/types/platform";
+import { AI_CONFIG } from "./config";
+import {
+  BaseExecutor,
+  type BaseExecutionResult,
+  type BaseExecutionContext,
+  type BaseExecutionOptions,
+} from "../shared/server-only/execution/executor";
 import type {
   AIToolExecutionContext,
   AIToolExecutionResult,
@@ -23,6 +30,43 @@ import type {
  * Extends BaseExecutor to eliminate duplication
  */
 export class ToolExecutor extends BaseExecutor implements IToolExecutor {
+  // Import route handler lazily to avoid circular dependencies
+  private routeHandler = require("../cli/route-executor").routeHandler;
+
+  /**
+   * Execute via route delegation - implements abstract method from BaseExecutor
+   */
+  protected async executeViaRoute<TData extends Record<string, ToolParameterValue>>(
+    context: BaseExecutionContext<TData>,
+    options: BaseExecutionOptions,
+    t: TFunction,
+  ): Promise<BaseExecutionResult> {
+    const startTime = Date.now();
+    const endpoint = this.getEndpointByToolName(context.toolName);
+
+    if (!endpoint) {
+      return {
+        success: false,
+        error: "Tool not found",
+        metadata: { executionTime: Date.now() - startTime, endpointPath: "", method: "" },
+      };
+    }
+
+    const route = this.endpointToRoute(endpoint, context.toolName);
+    const result = await this.routeHandler.executeRoute(route, context, context.logger, context.locale, t);
+
+    return {
+      success: result.success,
+      data: result.data,
+      error: result.error,
+      metadata: {
+        executionTime: Date.now() - startTime,
+        endpointPath: endpoint.definition.path.join("/"),
+        method: endpoint.definition.method,
+      },
+    };
+  }
+
   /**
    * Execute a tool using shared base executor logic
    */

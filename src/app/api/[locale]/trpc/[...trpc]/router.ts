@@ -7,7 +7,7 @@
 /* eslint-disable simple-import-sort/imports */
 /* eslint-disable prettier/prettier */
 
-import { router } from "@/app/api/[locale]/v1/core/system/unified-interface/react/trpc-trpc";
+import { router } from "@/app/api/[locale]/v1/core/system/unified-interface/trpc/core";
 import { tools as route0Tools } from "../../v1/core/agent/chat/personas/[id]/route";
 import { tools as route1Tools } from "../../v1/core/agent/chat/personas/route";
 import { tools as route2Tools } from "../../v1/core/agent/chat/threads/route";

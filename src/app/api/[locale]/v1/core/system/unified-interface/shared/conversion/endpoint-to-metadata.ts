@@ -5,8 +5,8 @@
  * Pure logic - no server dependencies
  */
 
-import type { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -18,6 +18,7 @@ import type {
   DiscoveredEndpoint,
   DiscoveredEndpointMetadata,
 } from "../server-only/types/registry";
+import { Platform } from "../types/platform";
 
 /**
  * JSON Schema type from zod-to-json-schema
@@ -47,8 +48,11 @@ export interface JsonSchemaObject {
 /**
  * Convert Zod schema to JSON Schema
  */
-export function zodSchemaToJsonSchema(schema: z.ZodSchema): JsonSchema {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Zod schema type compatibility
+export function zodSchemaToJsonSchema(schema: z.ZodType<any, any, any>): JsonSchema {
   try {
+    // Cast to the type expected by zodToJsonSchema - zod v4 type mismatch
+    // @ts-expect-error - Zod v4 type incompatibility with zod-to-json-schema
     return zodToJsonSchema(schema, {
       target: "jsonSchema7",
       $refStrategy: "none",
@@ -73,7 +77,7 @@ export interface BaseEndpointMetadata {
   endpointPath: string;
   method: string;
   routePath: string;
-  allowedRoles: readonly (typeof UserRoleValue)[];
+  allowedRoles: readonly UserRoleValue[];
   requiresAuth: boolean;
   requestSchema?: z.ZodSchema;
   responseSchema?: z.ZodSchema;
@@ -153,12 +157,21 @@ export function extractEndpointPath(endpoint: DiscoveredEndpoint): string {
 }
 
 /**
+ * Extract tags from endpoint definition with empty array fallback
+ */
+function extractDefinitionTags(
+  endpoint: DiscoveredEndpoint,
+): readonly string[] {
+  return endpoint.definition.tags || [];
+}
+
+/**
  * Convert endpoint to base tool metadata
  */
 export function endpointToBaseMetadata(
   endpoint: DiscoveredEndpoint,
 ): BaseToolMetadata {
-  const tags = endpoint.definition.tags || [];
+  const tags = extractDefinitionTags(endpoint);
   return {
     name: endpoint.toolName,
     description: endpoint.definition.description || endpoint.definition.title,
@@ -228,7 +241,7 @@ export function hasResponseSchema(endpoint: DiscoveredEndpoint): boolean {
  */
 export function extractAllowedRoles(
   endpoint: DiscoveredEndpoint,
-): readonly (typeof UserRoleValue)[] {
+): readonly UserRoleValue[] {
   return endpoint.definition.allowedRoles || [];
 }
 
@@ -253,7 +266,7 @@ export function generateEndpointId(method: string, path: string): string {
 export function parsePathSegments(path: string): string[] {
   return path
     .split("/")
-    .filter((segment) => segment.length > 0)
+    .filter((segment) => segment.length)
     .map((segment) => {
       // Convert [id] to _id_
       if (segment.startsWith("[") && segment.endsWith("]")) {
@@ -296,7 +309,7 @@ export function extractCategoryFromPath(path: string[]): string {
  * Extract tags from endpoint
  */
 export function extractTags(endpoint: DiscoveredEndpoint): readonly string[] {
-  const tags = endpoint.definition.tags || [];
+  const tags = extractDefinitionTags(endpoint);
   const category = endpoint.definition.category;
 
   if (category) {
@@ -316,7 +329,7 @@ export function extractTags(endpoint: DiscoveredEndpoint): readonly string[] {
  */
 export function isEnabledForPlatform(
   endpoint: DiscoveredEndpoint,
-  platform: "CLI" | "AI" | "WEB" | "MCP",
+  platform: Platform,
 ): boolean {
   const roles = extractAllowedRoles(endpoint);
 
@@ -325,18 +338,23 @@ export function isEnabledForPlatform(
     | typeof UserRole.AI_TOOL_OFF
     | typeof UserRole.WEB_OFF;
   switch (platform) {
-    case "CLI":
+    case Platform.CLI:
       optOutRole = UserRole.CLI_OFF;
       break;
-    case "AI":
+    case Platform.AI:
       optOutRole = UserRole.AI_TOOL_OFF;
       break;
-    case "WEB":
+    case Platform.WEB:
+    case Platform.EMAIL:
       optOutRole = UserRole.WEB_OFF;
       break;
-    case "MCP":
+    case Platform.MCP:
       // MCP uses CLI_OFF for now since there's no MCP_OFF role yet
       optOutRole = UserRole.CLI_OFF;
+      break;
+    case Platform.MOBILE:
+      // Mobile uses WEB_OFF for now
+      optOutRole = UserRole.WEB_OFF;
       break;
   }
 

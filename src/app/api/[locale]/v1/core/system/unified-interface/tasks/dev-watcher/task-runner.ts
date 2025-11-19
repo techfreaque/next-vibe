@@ -9,7 +9,7 @@ import type { FSWatcher } from "node:fs";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { createMockUser } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/auth/cli-user";
+import { createMockUser } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/auth/cli-user";
 
 import { generateAllRepository } from "../../../generators/generate-all/repository";
 import { CronTaskPriority, TaskCategory } from "../enum";

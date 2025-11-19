@@ -12,6 +12,7 @@ import {
   type WidgetComponentProps,
   type RenderableValue,
 } from "../../shared/ui/types";
+import { isPlainObject, hasStringProperty } from "../../shared/utils/type-guards";
 
 /**
  * Type guard for MarkdownWidgetData
@@ -19,13 +20,7 @@ import {
 function isMarkdownWidgetData(
   data: RenderableValue,
 ): data is MarkdownWidgetData {
-  return (
-    typeof data === "object" &&
-    data !== null &&
-    !Array.isArray(data) &&
-    "content" in data &&
-    typeof data.content === "string"
-  );
+  return isPlainObject(data) && hasStringProperty(data, "content");
 }
 
 /**

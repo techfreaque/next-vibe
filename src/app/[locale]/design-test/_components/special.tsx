@@ -19,18 +19,18 @@ const sampleData = [
 const columns = [
   {
     accessorKey: "name",
-    header: () => <P className="font-medium">Name</P>,
-    cell: ({ getValue }) => <P>{String(getValue())}</P>,
+    header: (): React.ReactElement => <P className="font-medium">Name</P>,
+    cell: ({ getValue }: { getValue: () => unknown }): React.ReactElement => <P>{String(getValue())}</P>,
   },
   {
     accessorKey: "email",
-    header: () => <P className="font-medium">Email</P>,
-    cell: ({ getValue }) => <P>{String(getValue())}</P>,
+    header: (): React.ReactElement => <P className="font-medium">Email</P>,
+    cell: ({ getValue }: { getValue: () => unknown }): React.ReactElement => <P>{String(getValue())}</P>,
   },
   {
     accessorKey: "role",
-    header: () => <P className="font-medium">Role</P>,
-    cell: ({ getValue }) => <P>{String(getValue())}</P>,
+    header: (): React.ReactElement => <P className="font-medium">Role</P>,
+    cell: ({ getValue }: { getValue: () => unknown }): React.ReactElement => <P>{String(getValue())}</P>,
   },
 ];
 

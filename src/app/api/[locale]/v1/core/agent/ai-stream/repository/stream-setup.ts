@@ -13,7 +13,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { creditValidator } from "@/app/api/[locale]/v1/core/credits/validator";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { getUserPublicName } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";

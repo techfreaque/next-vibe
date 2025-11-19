@@ -14,7 +14,7 @@ import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { ImapMessageDetail } from "../../_components/imap-message-detail";
+import { ImapMessageDetail } from "@/app/api/[locale]/v1/core/emails/imap-client/_components/imap-message-detail";
 
 interface ImapMessageDetailPageProps {
   params: Promise<{

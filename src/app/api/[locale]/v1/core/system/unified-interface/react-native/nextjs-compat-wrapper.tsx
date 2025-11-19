@@ -482,8 +482,9 @@ async function renderedComponent(
 
 function isAsyncComponent(
   _PageComponent: AnyNextComponent,
-): PageComponent is AnyNextAsyncPageComponent {
+): _PageComponent is AnyNextAsyncPageComponent {
   return true;
   // TODO figure out a way to check if component is async
   // return typeof PageComponent.then === "function";
 }
+

@@ -7,7 +7,7 @@ import type { NextRequest } from "next/server";
 import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import { leadId } from "../../types";
 import { leadTrackingRepository } from "../repository";
@@ -70,9 +70,8 @@ export class PixelTrackingRepository {
       setImmediate(async () => {
         try {
           // Import user factory for mock user
-          const { createMockUser } = await import(
-            "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/auth/cli-user"
-          );
+          const { createMockUser } =
+            await import("@/app/api/[locale]/v1/core/system/unified-interface/cli/auth/cli-user");
           const mockUser = createMockUser();
 
           const result = await leadTrackingRepository.handleTrackingPixel(

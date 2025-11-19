@@ -30,7 +30,7 @@ export function useEndpointDelete<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,

@@ -7,7 +7,7 @@ import { existsSync, promises as fs } from "node:fs";
 import { cpus, freemem, totalmem } from "node:os";
 import { dirname, extname, join, relative, resolve } from "node:path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";

@@ -15,13 +15,7 @@ import { simpleT } from "@/i18n/core/shared";
 import { binaryStartTime } from "../../../cli/vibe-runtime";
 import type { RouteExecutionResult } from "../../../cli/route-executor";
 import type { EndpointLogger } from "../../logger/endpoint";
-
-/**
- * No-op logger function for minimal logger contexts
- */
-function noopLoggerFunction(): void {
-  // No-op logger function
-}
+import { createEndpointLogger } from "../../logger/endpoint";
 
 /**
  * Safe handle types that should not be forcefully closed
@@ -381,7 +375,7 @@ export class CliResourceManager {
   /**
    * Initialize CLI resources and monitoring
    */
-  initialize(logger: EndpointLogger): void {
+  initialize(logger: EndpointLogger, locale: CountryLanguage): void {
     this.performanceMonitor.initialize();
 
     // Register performance monitor cleanup
@@ -405,7 +399,7 @@ export class CliResourceManager {
     });
 
     // Register process signal handlers for graceful shutdown
-    this.setupSignalHandlers();
+    this.setupSignalHandlers(locale);
   }
 
   /**
@@ -432,18 +426,9 @@ export class CliResourceManager {
   /**
    * Setup signal handlers for graceful shutdown
    */
-  private setupSignalHandlers(): void {
+  private setupSignalHandlers(locale: CountryLanguage): void {
     const handleShutdown = async (): Promise<void> => {
-      // Create a minimal logger for signal handler context
-      const logger: EndpointLogger = {
-        info: noopLoggerFunction,
-        warn: noopLoggerFunction,
-        error: noopLoggerFunction,
-        debug: noopLoggerFunction,
-        vibe: noopLoggerFunction,
-        isDebugEnabled: false,
-      };
-
+      const logger = createEndpointLogger(false, Date.now(), locale);
       try {
         await this.cleanupRegistry.cleanup(logger);
         process.exit(0);
@@ -504,7 +489,7 @@ export class CliResourceManager {
         const handles = this.resourceMonitor.getActiveHandles();
         const requests = this.resourceMonitor.getActiveRequestsCount();
 
-        if (handles.length > 0 || requests > 0) {
+        if (handles.length || requests > 0) {
           logger.info(
             "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.remainingResources",
           );

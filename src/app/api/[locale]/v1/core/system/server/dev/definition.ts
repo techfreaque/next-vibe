@@ -33,7 +33,12 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.server.dev.post.description",
   category: "app.api.v1.core.system.server.category",
   tags: ["app.api.v1.core.system.server.enum.mode.development"],
-  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.CLI_AUTH_BYPASS,
+    UserRole.PRODUCTION_OFF,
+  ],
 
   fields: objectField(
     {

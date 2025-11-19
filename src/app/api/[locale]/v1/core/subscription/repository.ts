@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type Stripe from "stripe";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -373,9 +373,8 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       // Add subscription credits with expiration date
       const { creditRepository } = await import("../credits/repository");
-      const { productsRepository, ProductIds } = await import(
-        "../products/repository-client"
-      );
+      const { productsRepository, ProductIds } =
+        await import("../products/repository-client");
 
       // Map subscription plan to product ID
       const productId =
@@ -480,9 +479,8 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       ) {
         // This is a renewal - add monthly credits with expiration
         const { creditRepository } = await import("../credits/repository");
-        const { productsRepository, ProductIds } = await import(
-          "../products/repository-client"
-        );
+        const { productsRepository, ProductIds } =
+          await import("../products/repository-client");
 
         const productId =
           subscription.planId === SubscriptionPlan.SUBSCRIPTION

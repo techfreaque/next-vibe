@@ -2,6 +2,14 @@ import { translations as setupTranslations } from "../../setup/i18n/pl";
 
 export const translations = {
   setup: setupTranslations,
+  auth: {
+    errors: {
+      userNotFound:
+        "Użytkownik CLI z adresem e-mail {{email}} nie został znaleziony w bazie danych. Proszę najpierw uruchomić 'vibe seed'.",
+      databaseError:
+        "Błąd bazy danych podczas pobierania użytkownika CLI: {{error}}",
+    },
+  },
   vibe: {
     startingUp: "Uruchamianie Vibe CLI...",
     executeCommand: "Wykonywanie polecenia",

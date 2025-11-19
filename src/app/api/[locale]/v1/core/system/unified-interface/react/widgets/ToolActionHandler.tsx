@@ -7,6 +7,7 @@ import {
   type WidgetActionType,
   type WidgetAction,
 } from "../../shared/ui/types";
+import { ensureError } from "../../shared/utils/error";
 /**
  * Tool Action Handler Props
  */
@@ -59,7 +60,7 @@ export function ToolActionHandler({
       setError(errorMessage);
 
       if (onError) {
-        onError(err instanceof Error ? err : new Error(errorMessage), action);
+        onError(ensureError(err, errorMessage), action);
       }
     } finally {
       setIsProcessing(false);

@@ -10,15 +10,13 @@ import {
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import {
-  convertToTRPCError,
-  handleNextVibeResponse,
-} from "../../unified-interface/react/trpc-trpc";
+import { convertToTRPCError, handleNextVibeResponse } from "./core";
 import { createEndpointLogger } from "../shared/logger/endpoint";
 import {
   authenticateUser,
   executeHandler,
 } from "../shared/server-only/execution/core";
+import { Platform } from "../shared/types/platform";
 import type { Methods } from "../shared/types/enums";
 import type { ApiHandlerOptions } from "../shared/types/handler";
 import type {
@@ -43,7 +41,7 @@ export function createTRPCHandler<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields extends UnifiedField<z.ZodTypeAny>,
 >(
   options: ApiHandlerOptions<
@@ -63,7 +61,7 @@ export function createTRPCHandler<
 
   return async (
     input: TRequestOutput & { urlPathParams?: TUrlVariablesOutput },
-    ctx: TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]>,
+    ctx: TRPCContext<Record<string, string>, readonly UserRoleValue[]>,
   ): Promise<TResponseOutput> => {
     try {
       // tRPC procedure execution - debug info available in endpoint logger
@@ -72,7 +70,7 @@ export function createTRPCHandler<
       const authResult = await authenticateUser(
         endpoint,
         {
-          platform: "trpc",
+          platform: Platform.WEB,
           request: ctx.request,
           locale: ctx.locale,
         },

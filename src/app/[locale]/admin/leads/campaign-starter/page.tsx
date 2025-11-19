@@ -10,7 +10,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { CampaignStarterForm } from "./_components/campaign-starter-form";
+import { CampaignStarterForm } from "@/app/api/[locale]/v1/core/leads/campaigns/campaign-starter/_components/campaign-starter-form";
 
 interface AdminCampaignStarterPageProps {
   params: Promise<{

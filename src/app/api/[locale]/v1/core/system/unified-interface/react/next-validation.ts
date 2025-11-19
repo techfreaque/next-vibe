@@ -18,6 +18,7 @@ import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unifie
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { isEmptyObjectSchema } from "../shared/validation/schema";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../shared/logger/endpoint";
@@ -26,6 +27,7 @@ import {
   validateEndpointRequestData,
   validateEndpointUrlParameters,
   validateLocale,
+  isNeverSchema,
 } from "../shared/validation/schema";
 
 /**
@@ -62,7 +64,7 @@ export async function validateNextRequestData<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields extends UnifiedField<z.ZodTypeAny>,
 >(
   endpoint: CreateApiEndpoint<
@@ -89,7 +91,7 @@ export async function validateNextRequestData<
     // Validate URL parameters using schema
     // Schema takes raw input and produces validated output
     // Skip validation if there are no URL parameters (empty object means no params after removing locale)
-    const hasUrlParams = Object.keys(context.urlParameters || {}).length > 0;
+    const hasUrlParams = Object.keys(context.urlParameters || {}).length;
     const urlValidation = hasUrlParams
       ? validateEndpointUrlParameters(
           context.urlParameters,
@@ -157,10 +159,7 @@ export async function validateNextRequestData<
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
-        error:
-          error instanceof Error
-            ? error.message
-            : "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
+        error: parseError(error).message,
       },
     };
   }
@@ -179,28 +178,13 @@ function validateGetRequestData<TRequestOutput>(
 ): ResponseType<TRequestOutput> {
   // Check if the schema is z.undefined(), z.never(), or empty z.object({}) (no request data expected)
   // This happens when an endpoint has no request fields
-  const isEmptyObject =
-    endpoint.requestSchema instanceof z.ZodObject &&
-    Object.keys(endpoint.requestSchema.shape).length === 0;
-
-  // Check if schema is z.never() by testing if it rejects empty object
-  const isNeverSchema = ((): boolean => {
-    try {
-      const testResult = endpoint.requestSchema.safeParse({});
-      return (
-        !testResult.success &&
-        testResult.error?.issues?.[0]?.code === "invalid_type" &&
-        testResult.error?.issues?.[0]?.expected === "never"
-      );
-    } catch {
-      return false;
-    }
-  })();
+  const isEmptyObject = isEmptyObjectSchema(endpoint.requestSchema);
+  const isNever = isNeverSchema(endpoint.requestSchema);
 
   if (
     endpoint.requestSchema instanceof z.ZodUndefined ||
     endpoint.requestSchema instanceof z.ZodNever ||
-    isNeverSchema ||
+    isNever ||
     isEmptyObject
   ) {
     // Return success with empty object as the data (will be cast to TRequestOutput)
@@ -350,28 +334,13 @@ async function validatePostRequestData<TRequestOutput>(
 ): Promise<ResponseType<TRequestOutput>> {
   // Check if the schema is z.undefined(), z.never(), or empty z.object({}) (no request data expected)
   // This happens when an endpoint has no request fields
-  const isEmptyObject =
-    endpoint.requestSchema instanceof z.ZodObject &&
-    Object.keys(endpoint.requestSchema.shape).length === 0;
-
-  // Check if schema is z.never() by testing if it rejects empty object
-  const isNeverSchema = ((): boolean => {
-    try {
-      const testResult = endpoint.requestSchema.safeParse({});
-      return (
-        !testResult.success &&
-        testResult.error?.issues?.[0]?.code === "invalid_type" &&
-        testResult.error?.issues?.[0]?.expected === "never"
-      );
-    } catch {
-      return false;
-    }
-  })();
+  const isEmptyObject = isEmptyObjectSchema(endpoint.requestSchema);
+  const isNever = isNeverSchema(endpoint.requestSchema);
 
   if (
     endpoint.requestSchema instanceof z.ZodUndefined ||
     endpoint.requestSchema instanceof z.ZodNever ||
-    isNeverSchema ||
+    isNever ||
     isEmptyObject
   ) {
     // Return success with empty object as the data (will be cast to TRequestOutput)

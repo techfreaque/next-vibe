@@ -16,6 +16,7 @@ import {
   type WidgetComponentProps,
   type RenderableValue,
 } from "../../shared/ui/types";
+import { isPlainObject, hasStringProperty } from "../../shared/utils/type-guards";
 
 /**
  * Link Card Data Interface
@@ -36,13 +37,9 @@ export interface LinkCardData extends Record<string, RenderableValue> {
  */
 function isLinkCardData(data: RenderableValue): data is LinkCardData {
   return (
-    typeof data === "object" &&
-    data !== null &&
-    !Array.isArray(data) &&
-    "url" in data &&
-    typeof data.url === "string" &&
-    "title" in data &&
-    typeof data.title === "string"
+    isPlainObject(data) &&
+    hasStringProperty(data, "url") &&
+    hasStringProperty(data, "title")
   );
 }
 

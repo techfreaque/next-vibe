@@ -11,7 +11,7 @@ import {
 import { chatThreads } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { canManageThreadPermissions } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { UserRoleDB } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 

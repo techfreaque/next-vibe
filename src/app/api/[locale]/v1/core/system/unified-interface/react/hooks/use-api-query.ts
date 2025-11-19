@@ -9,7 +9,7 @@ import { useMemo } from "react";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
@@ -38,7 +38,7 @@ export function useApiQuery<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
@@ -109,12 +109,12 @@ export function useApiQuery<
     () =>
       buildQueryKey(
         endpoint,
+        logger,
         requestData,
         urlPathParams,
         customQueryKey,
-        logger,
       ),
-    [endpoint, requestData, urlPathParams, customQueryKey, logger],
+    [endpoint, logger, requestData, urlPathParams, customQueryKey],
   );
 
   // Use React Query's useQuery hook

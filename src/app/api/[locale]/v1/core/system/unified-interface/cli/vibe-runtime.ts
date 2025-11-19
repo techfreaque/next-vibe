@@ -13,13 +13,15 @@ import { config } from "dotenv";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import { createEndpointLogger } from "../shared/logger/endpoint";
-import { createDefaultCliUser } from "../shared/server-only/auth/cli-user";
 import { memoryMonitor } from "../shared/server-only/utils/performance";
+import { createDefaultCliUser } from "./auth/cli-user";
 import { CliEntryPoint } from "./entry-point";
 import { ErrorHandler, setupGlobalErrorHandlers } from "./execution-errors";
+import { enableDebug } from "@/config/debug";
 
 export const binaryStartTime = Date.now();
 
@@ -32,6 +34,7 @@ interface CliOptions {
   locale: CountryLanguage;
   output?: string;
   verbose?: boolean;
+  debug?: boolean;
   interactive?: boolean;
   dryRun?: boolean;
 }
@@ -40,7 +43,6 @@ interface CliOptions {
  * CLI Constants to avoid literal strings
  */
 const CLI_CONSTANTS = {
-  DEFAULT_LOCALE: "en-GLOBAL" as const,
   CLI_NAME: "vibe" as const,
   CLI_VERSION: "2.0.0" as const,
   DOUBLE_HYPHEN: "--" as const,
@@ -91,6 +93,8 @@ function loadEnvironment(): void {
 
 // Load environment first
 loadEnvironment();
+
+import { env } from "@/config/env";
 
 /**
  * Try to parse a string as a number if it looks like one
@@ -173,7 +177,7 @@ function parseCliArgumentsSimple(args: string[]): {
       const [key, ...valueParts] = sliced.split(CLI_CONSTANTS.EQUALS);
       let value: string | number | boolean;
 
-      if (valueParts.length > 0) {
+      if (valueParts.length) {
         // --key=value format
         value = valueParts.join(CLI_CONSTANTS.EQUALS);
       } else if (
@@ -271,7 +275,7 @@ function parseCliArguments(
         const [key, ...valueParts] = sliced.split(equalsSeparator);
         let value: string | number | boolean;
 
-        if (valueParts.length > 0) {
+        if (valueParts.length) {
           // --key=value format
           value = valueParts.join(equalsSeparator);
         } else if (
@@ -324,12 +328,12 @@ function parseCliArguments(
 
 const program = new Command();
 
-const { t } = simpleT(CLI_CONSTANTS.DEFAULT_LOCALE);
+const { t: earlyT } = simpleT(env.VIBE_CLI_LOCALE);
 
 program
   .name(CLI_CONSTANTS.CLI_NAME)
   .description(
-    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.description"),
+    earlyT("app.api.v1.core.system.unifiedInterface.cli.vibe.help.description"),
   )
   .version(CLI_CONSTANTS.CLI_VERSION);
 
@@ -338,50 +342,55 @@ program
 program
   .argument(
     "[command]",
-    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.usage"),
+    earlyT("app.api.v1.core.system.unifiedInterface.cli.vibe.help.usage"),
   )
   .argument(
     "[args...]",
-    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.commands"),
+    earlyT("app.api.v1.core.system.unifiedInterface.cli.vibe.help.commands"),
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-d, --data <json>",
-    t("app.api.v1.core.system.unifiedInterface.cli.vibe.executeCommand"),
+    earlyT("app.api.v1.core.system.unifiedInterface.cli.vibe.executeCommand"),
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-u, --user-type <type>",
-    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.userType"),
+    earlyT("app.api.v1.core.system.unifiedInterface.cli.vibe.help.userType"),
     "ADMIN",
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-l, --locale <locale>",
-    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.locale"),
-    CLI_CONSTANTS.DEFAULT_LOCALE,
+    earlyT("app.api.v1.core.system.unifiedInterface.cli.vibe.help.locale"),
+    env.VIBE_CLI_LOCALE,
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-o, --output <format>",
-    t("app.api.v1.core.system.unifiedInterface.cli.vibe.output"),
+    earlyT("app.api.v1.core.system.unifiedInterface.cli.vibe.output"),
     CLI_CONSTANTS.DEFAULT_OUTPUT,
   )
 
   .option(
     "-v, --verbose", // eslint-disable-line i18next/no-literal-string
-    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.verbose"),
+    earlyT("app.api.v1.core.system.unifiedInterface.cli.vibe.help.verbose"),
+    false,
+  )
+  .option(
+    "-x, --debug", // eslint-disable-line i18next/no-literal-string
+    earlyT("app.api.v1.core.system.unifiedInterface.cli.vibe.help.verbose"),
     false,
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-i, --interactive",
-    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.interactive"),
+    earlyT("app.api.v1.core.system.unifiedInterface.cli.vibe.help.interactive"),
     false,
   )
   .option(
     "--dry-run",
-    t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.dryRun"),
+    earlyT("app.api.v1.core.system.unifiedInterface.cli.vibe.help.dryRun"),
     false,
   )
   .allowUnknownOption() // Allow dynamic CLI arguments
@@ -392,30 +401,31 @@ program
       options: CliOptions,
       cmd: Record<string, string | number | boolean>,
     ) => {
+      const debug = options.debug || options.verbose;
       const logger = createEndpointLogger(
-        options.verbose ?? false,
+        debug ?? false,
         Date.now(),
-        options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
+        options.locale,
       );
-      const { t } = simpleT(options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE);
+      const { t } = simpleT(options.locale);
       // Setup global error handlers
       setupGlobalErrorHandlers(logger);
 
-      if (options.verbose) {
+      if (debug) {
         logger.debug("Command execution details", {
           command,
           args: (args || []).join(" "),
-          verbose: options.verbose ?? false,
+          verbose: debug ?? false,
           interactive: options.interactive ?? false,
           rawDataOption: options.data || "none",
         });
+        enableDebug();
       }
 
       // Initialize CLI resource manager and performance monitoring
-      const { cliResourceManager } = await import(
-        "../shared/server-only/utils/debug"
-      );
-      await cliResourceManager.initialize(logger);
+      const { cliResourceManager } =
+        await import("../shared/server-only/utils/debug");
+      await cliResourceManager.initialize(logger, options.locale);
       const performanceMonitor = cliResourceManager.getPerformanceMonitor();
 
       try {
@@ -423,11 +433,7 @@ program
         performanceMonitor.mark("initStart");
         memoryMonitor.snapshot();
 
-        const cli = new CliEntryPoint(
-          logger,
-          t,
-          options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
-        );
+        const cli = new CliEntryPoint(logger, t, options.locale);
         performanceMonitor.mark("initEnd");
 
         // If no command provided, start interactive mode
@@ -437,12 +443,12 @@ program
           );
           await cli.executeCommand("interactive", {
             user: createDefaultCliUser(),
-            locale: options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
+            locale: options.locale,
             output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
               | "table"
               | "pretty"
               | "json",
-            verbose: options.verbose ?? false,
+            verbose: debug ?? false,
             interactive: options.interactive ?? false,
             dryRun: options.dryRun ?? false,
           });
@@ -467,7 +473,7 @@ program
             // Try to parse JSON directly - let JSON.parse handle validation
             parsedData = JSON.parse(cleanData) as ParsedCliData;
           } catch (error) {
-            if (options.verbose) {
+            if (debug) {
               logger.error("JSON parse error", error as Error, {
                 originalData: options.data,
               });
@@ -486,12 +492,12 @@ program
             namedArgs: parsedArgs.namedArgs,
           },
           user: createDefaultCliUser(),
-          locale: options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
+          locale: options.locale,
           output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
             | "table"
             | "pretty"
             | "json",
-          verbose: options.verbose ?? false,
+          verbose: debug ?? false,
           interactive: options.interactive ?? false,
           dryRun: options.dryRun ?? false,
         });
@@ -504,19 +510,16 @@ program
         // Use the new resource manager for cleanup and exit
         await cliResourceManager.cleanupAndExit(
           logger,
-          options.verbose ?? false,
-          options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
+          debug ?? false,
+          options.locale,
           result,
         );
       } catch (error) {
-        const handled = ErrorHandler.handleError(
-          error instanceof Error ? error : new Error(String(error)),
-          logger,
-        );
+        const handled = ErrorHandler.handleError(parseError(error), logger);
 
         logger.error(handled.message);
 
-        if (options.verbose) {
+        if (debug) {
           logger.error(
             t(
               "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.executionFailed",
@@ -534,8 +537,8 @@ program
         // Cleanup and exit with error code
         await cliResourceManager.cleanupAndExit(
           logger,
-          options.verbose ?? false,
-          options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
+          debug ?? false,
+          options.locale,
           {
             success: false,
             error: handled.message,

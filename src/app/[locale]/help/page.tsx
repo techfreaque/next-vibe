@@ -18,8 +18,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
-import ContactForm from "./_components/contact-form";
-import ContactInfo from "./_components/contact-info";
+import ContactForm from "@/app/api/[locale]/v1/core/contact/_components/contact-form";
+import ContactInfo from "@/app/api/[locale]/v1/core/contact/_components/contact-info";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;

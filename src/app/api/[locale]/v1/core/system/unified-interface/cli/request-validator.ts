@@ -7,7 +7,8 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-import { z } from "zod";
+import { parseError } from "next-vibe/shared/utils/parse-error";
+import type { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -18,6 +19,7 @@ import {
   validateEndpointRequestData,
   validateEndpointUrlParameters,
   validateLocale,
+  isNeverSchema,
 } from "../shared/validation/schema";
 
 /**
@@ -61,14 +63,15 @@ export function validateCliRequestData<
       typeof context.requestData === "object" &&
       context.requestData !== null &&
       Object.keys(context.requestData).length === 0;
-    // Check if schema is z.never() using instanceof
-    const isNeverSchema = endpoint.requestSchema instanceof z.ZodNever;
+    // Check if schema is z.never() using utility
+    const isNever = isNeverSchema(endpoint.requestSchema);
 
-    if (isEmptyObject && isNeverSchema) {
+    if (isEmptyObject && isNever) {
       // This is a GET/HEAD/OPTIONS endpoint that expects no input
       // Check if URL params schema is also z.never()
-      const isUrlParamsNever =
-        endpoint.requestUrlPathParamsSchema instanceof z.ZodNever;
+      const isUrlParamsNever = isNeverSchema(
+        endpoint.requestUrlPathParamsSchema,
+      );
 
       if (isUrlParamsNever) {
         // URL params also expect no input
@@ -157,8 +160,7 @@ export function validateCliRequestData<
 
     // Validate URL parameters if schema exists
     // Check if URL params schema is z.never() - if so, skip validation
-    const isUrlParamsNever =
-      endpoint.requestUrlPathParamsSchema instanceof z.ZodNever;
+    const isUrlParamsNever = isNeverSchema(endpoint.requestUrlPathParamsSchema);
 
     const urlValidation = isUrlParamsNever
       ? { success: true as const, data: undefined as z.output<TUrlSchema> }
@@ -194,10 +196,7 @@ export function validateCliRequestData<
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
-        error:
-          error instanceof Error
-            ? error.message
-            : "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
+        error: parseError(error).message,
       },
     };
   }

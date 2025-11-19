@@ -6,6 +6,7 @@
 import type { z } from "zod";
 
 import type { DiscoveredRoute } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/route-executor";
+import { splitPath } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/utils/path";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -524,7 +525,7 @@ export class HelpHandler {
     output += `${t("app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.usageLabel")}: ${help.usage}\n\n`;
 
     // Commands
-    if (help.commands && help.commands.length > 0) {
+    if (help.commands && help.commands.length) {
       // eslint-disable-next-line i18next/no-literal-string
       output += `${t("app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.availableCommandsLabel")}:\n`;
       for (const command of help.commands) {
@@ -535,7 +536,7 @@ export class HelpHandler {
     }
 
     // Options
-    if (help.options && help.options.length > 0) {
+    if (help.options && help.options.length) {
       // eslint-disable-next-line i18next/no-literal-string
       output += `${t("app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.globalOptionsLabel")}:\n`;
       for (const option of help.options) {
@@ -546,7 +547,7 @@ export class HelpHandler {
     }
 
     // Examples
-    if (help.examples && help.examples.length > 0) {
+    if (help.examples && help.examples.length) {
       // eslint-disable-next-line i18next/no-literal-string
       output += `${t("app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.helpHandler.examplesLabel")}:\n`;
       for (const example of help.examples) {
@@ -608,7 +609,7 @@ export class HelpHandler {
       return "other";
     }
 
-    const parts = path.split("/").filter(Boolean);
+    const parts = splitPath(path);
     if (parts.length >= 3) {
       return parts.slice(1, 3).join(".");
     }

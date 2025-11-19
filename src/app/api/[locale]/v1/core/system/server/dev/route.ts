@@ -14,7 +14,6 @@ export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: async ({ data, user, locale, logger }) => {
-      // Lazy import to avoid creating connections during route discovery
       const { devRepository } = await import("./repository");
       return await devRepository.execute(data, user, locale, logger);
     },

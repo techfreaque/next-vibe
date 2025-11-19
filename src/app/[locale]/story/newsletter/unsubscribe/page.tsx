@@ -4,7 +4,7 @@ import type { JSX } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { UnsubscribePage } from "./_components/unsubscribe-page";
+import { UnsubscribePage } from "@/app/api/[locale]/v1/core/newsletter/unsubscribe/_components/unsubscribe-page";
 
 interface PageProps {
   params: Promise<{

@@ -30,11 +30,11 @@ export interface ChatThread {
   archived: boolean;
   tags: string[];
   preview: string | null;
-  rolesView?: (typeof UserRoleValue)[] | null; // Roles that can view/read this thread
-  rolesEdit?: (typeof UserRoleValue)[] | null; // Roles that can edit thread properties
-  rolesPost?: (typeof UserRoleValue)[] | null; // Roles that can post messages in this thread
-  rolesModerate?: (typeof UserRoleValue)[] | null; // Roles that can moderate/hide messages
-  rolesAdmin?: (typeof UserRoleValue)[] | null; // Roles that can delete this thread
+  rolesView?: UserRoleValue[] | null; // Roles that can view/read this thread
+  rolesEdit?: UserRoleValue[] | null; // Roles that can edit thread properties
+  rolesPost?: UserRoleValue[] | null; // Roles that can post messages in this thread
+  rolesModerate?: UserRoleValue[] | null; // Roles that can moderate/hide messages
+  rolesAdmin?: UserRoleValue[] | null; // Roles that can delete this thread
   // Permission flags - computed server-side based on user's actual permissions
   canEdit?: boolean; // Whether current user can edit thread title/settings
   canPost?: boolean; // Whether current user can post messages
@@ -88,12 +88,12 @@ export interface ChatFolder {
   expanded: boolean;
   sortOrder: number;
   metadata: Record<string, string | number | boolean | null>;
-  rolesView?: (typeof UserRoleValue)[] | null; // Roles that can view/read this folder
-  rolesManage?: (typeof UserRoleValue)[] | null; // Roles that can edit folder and create subfolders
-  rolesCreateThread?: (typeof UserRoleValue)[] | null; // Roles that can create threads in this folder
-  rolesPost?: (typeof UserRoleValue)[] | null; // Roles that can post messages in threads
-  rolesModerate?: (typeof UserRoleValue)[] | null; // Roles that can hide/moderate this folder
-  rolesAdmin?: (typeof UserRoleValue)[] | null; // Roles that can delete this folder
+  rolesView?: UserRoleValue[] | null; // Roles that can view/read this folder
+  rolesManage?: UserRoleValue[] | null; // Roles that can edit folder and create subfolders
+  rolesCreateThread?: UserRoleValue[] | null; // Roles that can create threads in this folder
+  rolesPost?: UserRoleValue[] | null; // Roles that can post messages in threads
+  rolesModerate?: UserRoleValue[] | null; // Roles that can hide/moderate this folder
+  rolesAdmin?: UserRoleValue[] | null; // Roles that can delete this folder
   // Permission flags - computed server-side based on user's actual permissions
   canManage?: boolean; // Whether current user can edit folder/create subfolders
   canCreateThread?: boolean; // Whether current user can create threads

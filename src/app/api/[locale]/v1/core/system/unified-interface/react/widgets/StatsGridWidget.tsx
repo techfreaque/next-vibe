@@ -4,6 +4,7 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
+import { isPlainObject } from "../../shared/utils/type-guards";
 import {
   type StatsGridWidgetData,
   type WidgetComponentProps,
@@ -18,9 +19,7 @@ function isStatsGridWidgetData(
   data: RenderableValue,
 ): data is StatsGridWidgetData {
   return (
-    typeof data === "object" &&
-    data !== null &&
-    !Array.isArray(data) &&
+    isPlainObject(data) &&
     "metrics" in data &&
     Array.isArray(data.metrics)
   );

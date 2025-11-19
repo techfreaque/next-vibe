@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -205,10 +205,14 @@ export async function startHotkeyDaemon(
             await onToggle();
           } catch (error) {
             // Enhanced error logging
-            const errorDetails: Record<string, string | number | boolean | null | undefined> = {
+            const errorDetails: Record<
+              string,
+              string | number | boolean | null | undefined
+            > = {
               errorType: typeof error,
               errorName: error instanceof Error ? error.name : "unknown",
-              errorMessage: error instanceof Error ? error.message : String(error),
+              errorMessage:
+                error instanceof Error ? error.message : String(error),
               errorStack: error instanceof Error ? error.stack : undefined,
             };
 

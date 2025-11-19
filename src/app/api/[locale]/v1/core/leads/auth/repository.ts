@@ -14,7 +14,7 @@ import { success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
@@ -80,11 +80,7 @@ export interface LeadAuthRepository {
     logger: EndpointLogger,
   ): ResponseType<void>;
 
-  getUserLeadIds(
-    userId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<string[]>;
+  getUserLeadIds(userId: string, logger: EndpointLogger): Promise<string[]>;
 }
 
 /**
@@ -279,7 +275,9 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
       .limit(1);
 
     if (existingLead) {
-      logger.debug("Found existing anonymous lead", { leadId: existingLead.id });
+      logger.debug("Found existing anonymous lead", {
+        leadId: existingLead.id,
+      });
       return existingLead.id;
     }
 
@@ -408,7 +406,6 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
    */
   async getUserLeadIds(
     userId: string,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<string[]> {
     try {

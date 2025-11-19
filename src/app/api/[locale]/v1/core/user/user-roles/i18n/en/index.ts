@@ -72,6 +72,7 @@ export const translations = {
       partnerEmployee: "Partner Employee",
       admin: "Admin",
       cliOff: "CLI Disabled",
+      cliAuthBypass: "CLI Auth Bypass",
       aiToolOff: "AI Tool Disabled",
       webOff: "Web Disabled",
       productionOff: "Production Disabled",

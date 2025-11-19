@@ -11,8 +11,8 @@ import {
 } from "@/app/api/[locale]/v1/core/products/repository-client";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { BuyCreditsTab } from "@/app/[locale]/subscription/_components/buy-credits-tab";
-import { OverviewTab } from "@/app/[locale]/subscription/_components/overview-tab";
+import { BuyCreditsTab } from "@/app/api/[locale]/v1/core/subscription/_components/buy-credits-tab";
+import { OverviewTab } from "@/app/api/[locale]/v1/core/subscription/_components/overview-tab";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
 
 interface StoryPricingSectionProps {

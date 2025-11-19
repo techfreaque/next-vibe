@@ -12,7 +12,7 @@ import { z } from "zod";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { Methods as MethodsEnum } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { EndpointErrorTypes } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -56,7 +56,7 @@ export interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
  * - Loading states (handled by React Query)
  */
 export async function executeMutation<
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Infrastructure: Generic endpoint type requires 'any' for TFields parameter to accept all endpoint field configurations
   TEndpoint extends CreateApiEndpoint<string, Methods, TUserRoleValue, any>,
 >({

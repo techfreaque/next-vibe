@@ -278,7 +278,7 @@ export class PerformanceMonitor {
     }
 
     const activeTimers = this.getActiveTimers();
-    if (activeTimers.length > 0) {
+    if (activeTimers.length) {
       report += `Active timers: ${activeTimers.join(", ")}\n`;
     }
 

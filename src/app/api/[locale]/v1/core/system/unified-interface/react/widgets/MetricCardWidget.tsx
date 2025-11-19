@@ -10,6 +10,7 @@ import { CardHeader } from "next-vibe-ui/ui/card";
 import { CardTitle } from "next-vibe-ui/ui/card";
 import type { JSX } from "react";
 
+import { isPlainObject } from "../../shared/utils/type-guards";
 import {
   type MetricCardWidgetData,
   type WidgetComponentProps,
@@ -23,9 +24,7 @@ function isMetricCardWidgetData(
   data: RenderableValue,
 ): data is MetricCardWidgetData {
   return (
-    typeof data === "object" &&
-    data !== null &&
-    !Array.isArray(data) &&
+    isPlainObject(data) &&
     "value" in data &&
     "label" in data
   );

@@ -453,8 +453,9 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
   ): string {
     let summary = template;
     for (const [key, value] of Object.entries(counts)) {
+      // Use replaceAll for better performance than RegExp in loop
       // eslint-disable-next-line i18next/no-literal-string
-      summary = summary.replace(new RegExp(`\\{${key}\\}`, "g"), String(value));
+      summary = summary.replaceAll(`{${key}}`, String(value));
     }
     return summary;
   }

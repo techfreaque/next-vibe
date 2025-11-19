@@ -10,7 +10,7 @@ import type { JSX } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { EmailsListClient } from "./_components/emails-list-client";
+import { EmailsListClient } from "@/app/api/[locale]/v1/core/emails/messages/_components/emails-list-client";
 
 interface EmailsListPageProps {
   params: Promise<{

@@ -33,6 +33,7 @@ import {
   authenticateUser,
   executeHandler,
 } from "../shared/server-only/execution/core";
+import { Platform } from "../shared/types/platform";
 import type { Methods } from "../shared/types/enums";
 import type {
   ApiHandlerOptions,
@@ -75,7 +76,7 @@ export function createNextHandler<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields extends UnifiedField<z.ZodTypeAny>,
 >(
   options: ApiHandlerOptions<
@@ -107,7 +108,7 @@ export function createNextHandler<
       // Authenticate user using unified core with Next.js context
       const authResult = await authenticateUser(
         endpoint,
-        { platform: "next", locale },
+        { platform: Platform.WEB, locale },
         logger,
       );
       if (!authResult.success) {

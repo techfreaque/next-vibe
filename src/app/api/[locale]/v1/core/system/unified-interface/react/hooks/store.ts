@@ -11,7 +11,7 @@ import { create } from "zustand";
 import { generateStorageKey } from "@/app/api/[locale]/v1/core/system/unified-interface/react/storage-storage-client";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -334,6 +334,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       logger,
       requestData,
       urlPathParams,
+      undefined,
     );
 
     // Update React Query cache (single source of truth)
@@ -368,7 +369,7 @@ export const apiClient = {
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
+      readonly UserRoleValue[],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       any
     >,
@@ -439,7 +440,7 @@ export const apiClient = {
    * Mutate data through an API endpoint without using React hooks
    */
   mutate: async <
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
+    TUserRoleValue extends readonly UserRoleValue[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Infrastructure: Generic endpoint type requires 'any' for TFields parameter to accept all endpoint field configurations
     TEndpoint extends CreateApiEndpoint<string, Methods, TUserRoleValue, any>,
   >(
@@ -524,7 +525,7 @@ export const apiClient = {
    * @deprecated Use React Query's useMutation hook instead
    */
   getMutationState: <
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
+    TUserRoleValue extends readonly UserRoleValue[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Infrastructure: Generic endpoint type requires 'any' for TFields parameter to accept all endpoint field configurations
     TEndpoint extends CreateApiEndpoint<string, Methods, TUserRoleValue, any>,
   >(

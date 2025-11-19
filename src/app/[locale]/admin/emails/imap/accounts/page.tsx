@@ -10,7 +10,7 @@ import type { JSX } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { ImapAccountsManagement } from "../_components/imap-accounts-management";
+import { ImapAccountsManagement } from "@/app/api/[locale]/v1/core/emails/imap-client/_components/imap-accounts-management";
 
 interface ImapAccountsPageProps {
   params: Promise<{

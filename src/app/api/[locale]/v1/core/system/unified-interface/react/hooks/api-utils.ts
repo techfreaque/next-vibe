@@ -111,9 +111,14 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         });
       }
 
-      // Note: We don't set Authorization header here because the JWT token
-      // is stored in an httpOnly cookie for security. The cookie will be
-      // sent automatically with credentials: "include"
+      // For React Native and mobile platforms, check for stored token and add Authorization header
+      // This allows React Native apps to authenticate using Bearer tokens stored in AsyncStorage
+      // Web apps will continue to use httpOnly cookies automatically sent with credentials: "include"
+      const storedToken = await authClientRepository.getAuthToken(logger);
+      if (storedToken.success && storedToken.data) {
+        headers.Authorization = `Bearer ${storedToken.data}`;
+        logger.debug("Added Authorization header for React Native authentication");
+      }
     }
 
     // Prepare request options

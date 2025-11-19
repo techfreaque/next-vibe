@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import { getPersonaById } from "@/app/api/[locale]/v1/core/agent/chat/personas/repository";
 import { formattingInstructions } from "./system-prompt";

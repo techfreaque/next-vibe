@@ -7,7 +7,7 @@ import type { z } from "zod";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {
@@ -71,7 +71,7 @@ export function useEndpoint<
     ? E extends CreateApiEndpoint<
         string,
         Methods,
-        readonly (typeof UserRoleValue)[],
+        readonly UserRoleValue[],
         UnifiedField<z.ZodTypeAny>
       >
       ? E
@@ -215,7 +215,7 @@ export function useEndpoint<
         isDirty: createOperation.form.formState.isDirty,
         error:
           createOperation.submitError &&
-          Object.keys(createOperation.submitError).length > 0
+          Object.keys(createOperation.submitError).length
             ? createOperation.submitError
             : null,
       }

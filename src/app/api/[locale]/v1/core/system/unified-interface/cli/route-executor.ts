@@ -7,18 +7,25 @@ import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type z from "zod";
 
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import {
+  type UserRoleValue,
+  type UserPermissionRoleValue,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { userRolesRepository } from "@/app/api/[locale]/v1/core/user/user-roles/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
 import type { CreateApiEndpoint } from "../shared/endpoint/create";
 import type { EndpointLogger } from "../shared/logger/endpoint";
-import { getCliUser } from "../shared/server-only/auth/cli-user";
+import { getCliUser } from "./auth/cli-user";
+import { Platform } from "../shared/types/platform";
+import { platformAccessChecker } from "../shared/server-only/permissions/platform-access";
 import { loadEndpointDefinition } from "../shared/registry/definition-loader";
 import type {
   BaseExecutionContext,
   BaseExecutionResult,
+  DiscoveredRoute as BaseDiscoveredRoute,
 } from "../shared/server-only/execution/executor";
 import { loadRouteHandler } from "../shared/server-only/execution/route-loader";
 import type { UnifiedField } from "../shared/types/endpoint";
@@ -29,10 +36,11 @@ import { responseMetadataExtractor } from "./widgets/response-metadata-extractor
 import { schemaUIHandler } from "./widgets/schema-ui-handler";
 import type { RenderableValue, ResponseFieldMetadata } from "./widgets/types";
 
+// Re-export DiscoveredRoute for CLI consumers
+export type DiscoveredRoute = BaseDiscoveredRoute;
+
 // CLI handler function type - matches createCliHandler signature
-interface CliHandlerFunction<
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
-> {
+interface CliHandlerFunction<TUserRoleValue extends readonly UserRoleValue[]> {
   (
     data: CliRequestData,
     urlPathParams: CliUrlParams,
@@ -123,7 +131,7 @@ export interface RouteExecutionContext
   };
 
   /** More specific user type for CLI */
-  user: InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>;
+  user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> | undefined;
 
   /** CLI-specific options */
   options?: {
@@ -153,17 +161,6 @@ export interface RouteExecutionResult
 
   /** Error cause chain for debugging - reuses ErrorResponseType */
   cause?: ErrorResponseType;
-}
-
-/**
- * Route metadata from discovery
- */
-export interface DiscoveredRoute {
-  alias: string;
-  path: string;
-  method: string;
-  routePath: string;
-  description?: string;
 }
 
 /**
@@ -204,8 +201,47 @@ export class RouteDelegationHandler {
       const inputData = await this.collectInputData(endpoint, context, logger);
 
       // Create CLI user context
-      const cliUser =
-        context.user || (await getCliUser(logger, context.locale));
+      let cliUser = context.user;
+
+      if (!cliUser) {
+        const cliUserResult = await getCliUser(logger, context.locale);
+
+        if (!cliUserResult.success) {
+          // Check if endpoint allows CLI_AUTH_BYPASS before failing
+          const { PlatformMarker } =
+            await import("@/app/api/[locale]/v1/core/user/user-roles/enum");
+          const allowsCliAuthBypass =
+            endpoint?.allowedRoles?.includes(PlatformMarker.CLI_AUTH_BYPASS) ??
+            false;
+
+          if (allowsCliAuthBypass) {
+            logger.warn(
+              "CLI user authentication failed, using public user due to CLI_AUTH_BYPASS",
+              {
+                message: cliUserResult.message,
+                errorType: cliUserResult.errorType,
+              },
+            );
+            // Endpoint allows bypass - use public user
+            const { createPublicCliUser } = await import("./auth/cli-user");
+            cliUser = createPublicCliUser();
+          } else {
+            // No bypass allowed - authentication is required
+            logger.error("Failed to get CLI user for authentication", {
+              message: cliUserResult.message,
+              errorType: cliUserResult.errorType,
+            });
+
+            return {
+              success: false,
+              error: cliUserResult.message,
+              errorParams: cliUserResult.messageParams,
+            };
+          }
+        } else {
+          cliUser = cliUserResult.data;
+        }
+      }
 
       if (!cliUser) {
         logger.error("Failed to get CLI user for authentication");
@@ -218,6 +254,62 @@ export class RouteDelegationHandler {
         };
       }
 
+      // Check platform access BEFORE executing handler
+      if (endpoint?.allowedRoles) {
+        // Fetch user roles from database for authenticated users
+        // User roles from database are ONLY permission roles (never platform markers)
+        let userRoles: (typeof UserPermissionRoleValue)[] = [];
+
+        if (!cliUser.isPublic && cliUser.id) {
+          const userRolesResult = await userRolesRepository.getUserRoles(
+            cliUser.id,
+            logger,
+          );
+
+          if (userRolesResult.success && userRolesResult.data) {
+            // Type flows naturally - no assertion needed
+            userRoles = userRolesResult.data;
+          } else {
+            logger.warn("Failed to fetch user roles, using empty roles", {
+              userId: cliUser.id,
+              error: userRolesResult.success
+                ? undefined
+                : userRolesResult.message,
+            });
+          }
+        }
+
+        // Check platform and role access
+        const accessResult = await platformAccessChecker.checkFullAccess(
+          endpoint.allowedRoles,
+          Platform.CLI,
+          cliUser,
+          userRoles,
+          logger,
+        );
+
+        if (!accessResult.success) {
+          logger.warn("Platform access denied for CLI route", {
+            route: route.path,
+            method: route.method,
+            userId: cliUser.isPublic ? "public" : cliUser.id,
+            message: accessResult.message,
+          });
+
+          return {
+            success: false,
+            error: accessResult.message,
+            errorParams: accessResult.messageParams,
+            metadata: {
+              executionTime: Date.now() - startTime,
+              endpointPath: route.path,
+              route: route.path,
+              method: route.method,
+            },
+          };
+        }
+      }
+
       // Show execution info if verbose
       if (context.options?.verbose) {
         logger.info(`🎯 Executing route: ${route.path}`);
@@ -225,7 +317,7 @@ export class RouteDelegationHandler {
         logger.info(`Data: ${JSON.stringify(inputData.data, null, 2)}`);
         if (
           inputData.urlPathParams &&
-          Object.keys(inputData.urlPathParams).length > 0
+          Object.keys(inputData.urlPathParams).length
         ) {
           logger.info(
             `URL Params: ${JSON.stringify(inputData.urlPathParams, null, 2)}`,
@@ -311,7 +403,7 @@ export class RouteDelegationHandler {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: parseError(error).message,
         metadata: {
           executionTime: Date.now() - startTime,
           endpointPath: route.path,
@@ -328,14 +420,14 @@ export class RouteDelegationHandler {
   private async getCliHandler(
     route: DiscoveredRoute,
     logger: EndpointLogger,
-  ): Promise<CliHandlerFunction<readonly (typeof UserRoleValue)[]> | null> {
+  ): Promise<CliHandlerFunction<readonly UserRoleValue[]> | null> {
     try {
       const result = await loadRouteHandler<
-        CliHandlerFunction<readonly (typeof UserRoleValue)[]>,
+        CliHandlerFunction<readonly UserRoleValue[]>,
         CreateApiEndpoint<
           string,
           Methods,
-          readonly (typeof UserRoleValue)[],
+          readonly UserRoleValue[],
           UnifiedField<z.ZodTypeAny>
         >
       >(
@@ -344,7 +436,7 @@ export class RouteDelegationHandler {
           method: route.method,
           alias: route.alias,
         },
-        "cli",
+        Platform.CLI,
         logger,
       );
 
@@ -383,14 +475,14 @@ export class RouteDelegationHandler {
   ): Promise<CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     UnifiedField<z.ZodTypeAny>
   > | null> {
     const result = await loadEndpointDefinition<
       CreateApiEndpoint<
         string,
         Methods,
-        readonly (typeof UserRoleValue)[],
+        readonly UserRoleValue[],
         UnifiedField<z.ZodTypeAny>
       >
     >(
@@ -418,7 +510,7 @@ export class RouteDelegationHandler {
     endpoint: CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
+      readonly UserRoleValue[],
       UnifiedField<z.ZodTypeAny>
     > | null,
     context: RouteExecutionContext,
@@ -431,7 +523,7 @@ export class RouteDelegationHandler {
 
     // Merge CLI data with provided data (CLI args take precedence)
     const contextData = context.data as InputData | undefined;
-    if (contextData || (cliData && Object.keys(cliData).length > 0)) {
+    if (contextData || (cliData && Object.keys(cliData).length)) {
       inputData.data = {
         ...(contextData || {}),
         ...(cliData || {}),
@@ -446,7 +538,7 @@ export class RouteDelegationHandler {
       );
 
       if (
-        missingRequired.length > 0 &&
+        missingRequired.length &&
         context.options?.interactive &&
         endpoint
       ) {
@@ -516,7 +608,7 @@ export class RouteDelegationHandler {
     endpoint: CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
+      readonly UserRoleValue[],
       UnifiedField<z.ZodTypeAny>
     >,
     formType: "request" | "urlPathParams" = "request",
@@ -575,7 +667,7 @@ export class RouteDelegationHandler {
       let detailedError = errorMessage;
 
       // Always show error details from errorParams, even in non-verbose mode
-      if (result.errorParams && Object.keys(result.errorParams).length > 0) {
+      if (result.errorParams && Object.keys(result.errorParams).length) {
         // eslint-disable-next-line i18next/no-literal-string
         detailedError += "\n\nDetails:";
         for (const [key, value] of Object.entries(result.errorParams)) {
@@ -688,7 +780,7 @@ export class RouteDelegationHandler {
     // Add cause error params - ErrorResponseType uses 'messageParams' field
     if (
       result.cause.messageParams &&
-      Object.keys(result.cause.messageParams).length > 0
+      Object.keys(result.cause.messageParams).length
     ) {
       for (const [key, value] of Object.entries(result.cause.messageParams)) {
         // eslint-disable-next-line i18next/no-literal-string
@@ -832,7 +924,7 @@ export class RouteDelegationHandler {
     endpoint: CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
+      readonly UserRoleValue[],
       UnifiedField<z.ZodTypeAny>
     > | null,
     context: RouteExecutionContext,
@@ -859,7 +951,7 @@ export class RouteDelegationHandler {
     if (
       firstCliArgKey &&
       typeof firstCliArgKey === "string" &&
-      positionalArgs.length > 0
+      positionalArgs.length
     ) {
       // If there's only one positional arg, use it as a string for backward compatibility
       // If there are multiple positional args, use them as an array
@@ -897,7 +989,7 @@ export class RouteDelegationHandler {
 
       data[camelCaseKey] = convertedValue;
     }
-    return Object.keys(data).length > 0 ? data : null;
+    return Object.keys(data).length ? data : null;
   }
 
   /**
@@ -907,7 +999,7 @@ export class RouteDelegationHandler {
     endpoint: CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
+      readonly UserRoleValue[],
       UnifiedField<z.ZodTypeAny>
     > | null,
     providedData: InputData,

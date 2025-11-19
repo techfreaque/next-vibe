@@ -7,11 +7,10 @@ import "server-only";
 
 import type { z } from "zod";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
-import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
+import type { CreateApiEndpointAny } from "../../types/endpoint";
 
 /**
  * Discovered endpoint (minimal format from endpoint-adapter)
@@ -21,12 +20,7 @@ export interface DiscoveredEndpoint {
   toolName: string;
   routePath: string;
   definitionPath: string;
-  definition: CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
-  >;
+  definition: CreateApiEndpointAny;
   enabled: boolean;
   discoveredAt: number;
 }
@@ -55,7 +49,7 @@ export interface DiscoveredEndpointMetadata {
   tags: readonly (TranslationKey | undefined)[]; // Translation keys for tags
 
   // Access Control
-  allowedRoles: readonly (typeof UserRoleValue)[];
+  allowedRoles: readonly UserRoleValue[];
   requiresAuth: boolean;
 
   // Schemas
@@ -125,7 +119,7 @@ export interface IEndpointRegistry {
  */
 export interface EndpointFilterCriteria {
   methods?: Methods[];
-  roles?: (typeof UserRoleValue)[];
+  roles?: UserRoleValue[];
   categories?: string[];
   tags?: string[];
   requiresAuth?: boolean;

@@ -17,7 +17,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
 import { leadAuthRepository } from "@/app/api/[locale]/v1/core/leads/auth/repository";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -174,12 +174,17 @@ export class SignupRepositoryImpl implements SignupRepository {
         [user.leadId],
         logger,
       );
+      let creditMergeFailed = false;
       if (!mergeResult.success) {
-        // Log but don't fail signup if merge fails
-        logger.error("Failed to merge lead wallet during signup", {
+        // CRITICAL: Log as error but track failure so we can inform user
+        // User will still be registered, but may not have their pre-signup credits
+        creditMergeFailed = true;
+        logger.error("CRITICAL: Failed to merge lead wallet during signup", {
           userId: userData.id,
           leadId: user.leadId,
           error: mergeResult.message,
+          action:
+            "User registered but credits may be missing - requires manual intervention",
         });
       }
 
@@ -237,6 +242,18 @@ export class SignupRepositoryImpl implements SignupRepository {
         }
       }
 
+      const nextSteps = [
+        "app.api.v1.core.user.public.signup.success.nextSteps.profile",
+        "app.api.v1.core.user.public.signup.success.nextSteps.explore",
+      ];
+
+      // Add warning if credit merge failed - user should contact support
+      if (creditMergeFailed) {
+        nextSteps.unshift(
+          "app.api.v1.core.user.public.signup.success.nextSteps.creditMergeWarning",
+        );
+      }
+
       return success<SignupPostResponseOutput>({
         response: {
           success: true,
@@ -253,10 +270,7 @@ export class SignupRepositoryImpl implements SignupRepository {
             expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
             checkSpamFolder: false,
           },
-          nextSteps: [
-            "app.api.v1.core.user.public.signup.success.nextSteps.profile",
-            "app.api.v1.core.user.public.signup.success.nextSteps.explore",
-          ],
+          nextSteps,
         },
       });
     } catch (error) {
@@ -338,7 +352,7 @@ export class SignupRepositoryImpl implements SignupRepository {
     leadId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    role: typeof UserRoleValue = UserRole.CUSTOMER,
+    role: UserRoleValue = UserRole.CUSTOMER,
   ): Promise<ResponseType<StandardUserType>> {
     try {
       // Extract data from nested structure

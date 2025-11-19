@@ -13,13 +13,10 @@ import {
   type UserRoleValue,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { userRolesRepository } from "@/app/api/[locale]/v1/core/user/user-roles/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
-import {
-  AI_CONFIG,
-  type AIPlatformSpecific,
-  Platform,
-} from "../shared/server-only/config";
+import { Platform } from "../shared/types/platform";
+import { AI_CONFIG, type AIPlatformSpecific } from "./config";
 import type {
   AIToolExecutionContext,
   DiscoveredEndpoint,
@@ -109,7 +106,7 @@ export class ToolFilter implements IToolFilter {
 
       // Filter out opt-out roles from allowed roles for permission check
       const effectiveAllowedRoles = endpoint.definition.allowedRoles.filter(
-        (role: typeof UserRoleValue) => !this.isOptOutRole(role),
+        (role: UserRoleValue) => !this.isOptOutRole(role),
       );
 
       // Check if endpoint is PUBLIC-only (authenticated users cannot access)
@@ -148,7 +145,7 @@ export class ToolFilter implements IToolFilter {
     let filtered = endpoints;
 
     // Filter by roles
-    if (criteria.roles && criteria.roles.length > 0) {
+    if (criteria.roles && criteria.roles.length) {
       filtered = filtered.filter(
         (e) =>
           e.definition?.allowedRoles &&
@@ -159,14 +156,14 @@ export class ToolFilter implements IToolFilter {
     }
 
     // Filter by categories
-    if (criteria.categories && criteria.categories.length > 0) {
+    if (criteria.categories && criteria.categories.length) {
       filtered = filtered.filter((e) =>
         criteria.categories!.includes(e.definition.category),
       );
     }
 
     // Filter by tags
-    if (criteria.tags && criteria.tags.length > 0) {
+    if (criteria.tags && criteria.tags.length) {
       filtered = filtered.filter((e) =>
         criteria.tags!.some((tag) => e.definition.tags?.includes(tag)),
       );
@@ -226,7 +223,7 @@ export class ToolFilter implements IToolFilter {
 
     // Filter out opt-out roles from allowed roles for permission check
     const effectiveAllowedRoles = endpoint.definition.allowedRoles.filter(
-      (role: typeof UserRoleValue) => !this.isOptOutRole(role),
+      (role: UserRoleValue) => !this.isOptOutRole(role),
     );
 
     // Public user - only public endpoints
@@ -283,7 +280,7 @@ export class ToolFilter implements IToolFilter {
   /**
    * Check if role is an opt-out role
    */
-  private isOptOutRole(role: typeof UserRoleValue): boolean {
+  private isOptOutRole(role: UserRoleValue): boolean {
     return (
       role === UserRole.CLI_OFF ||
       role === UserRole.AI_TOOL_OFF ||
@@ -294,8 +291,8 @@ export class ToolFilter implements IToolFilter {
   /**
    * Get role priority (higher = more privileged)
    */
-  private getRolePriority(role: typeof UserRoleValue): number {
-    const priorities: Record<typeof UserRoleValue, number> = {
+  private getRolePriority(role: UserRoleValue): number {
+    const priorities: Record<UserRoleValue, number> = {
       [UserRole.PUBLIC]: 0,
       [UserRole.CUSTOMER]: 5,
       [UserRole.PARTNER_EMPLOYEE]: 20,
@@ -303,6 +300,7 @@ export class ToolFilter implements IToolFilter {
       [UserRole.ADMIN]: 100,
       // Opt-out roles don't have priority
       [UserRole.CLI_OFF]: -1,
+      [UserRole.CLI_AUTH_BYPASS]: -1,
       [UserRole.AI_TOOL_OFF]: -1,
       [UserRole.WEB_OFF]: -1,
       [UserRole.PRODUCTION_OFF]: -1,
@@ -314,10 +312,7 @@ export class ToolFilter implements IToolFilter {
   /**
    * Check if role A can access role B's resources
    */
-  canAccessRole(
-    userRole: typeof UserRoleValue,
-    requiredRole: typeof UserRoleValue,
-  ): boolean {
+  canAccessRole(userRole: UserRoleValue, requiredRole: UserRoleValue): boolean {
     // Opt-out roles can't be used for access checks
     if (this.isOptOutRole(requiredRole)) {
       return false;
@@ -369,7 +364,7 @@ export class ToolFilter implements IToolFilter {
 
       for (const role of endpoint.definition.allowedRoles) {
         // Only count actual user roles, not opt-out roles
-        const roleValue = role as typeof UserRoleValue;
+        const roleValue = role as UserRoleValue;
         if (!this.isOptOutRole(roleValue)) {
           counts[roleValue] = (counts[roleValue] || 0) + 1;
         }

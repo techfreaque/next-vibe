@@ -15,7 +15,7 @@ import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 import { translations } from "@/config/i18n/en";
 
-import { LoginForm } from "@/app/api/[locale]/v1/core/user/public/login/_components/login-form";
+import { LoginFormNew } from "@/app/api/[locale]/v1/core/user/public/login/_components/login-form-new";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -120,7 +120,7 @@ export default async function LoginPage({
       <Div className="">
         <Div className="order-1 md:order-2 text-center">
           <Div className="mb-8">
-            <H1 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+            <H1 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-r from-cyan-500 to-blue-600">
               {t("app.user.other.login.auth.login.title")}
             </H1>
             <P className="text-gray-600 dark:text-gray-300 text-lg mb-6">
@@ -128,7 +128,10 @@ export default async function LoginPage({
             </P>
           </Div>
         </Div>
-        <LoginForm locale={locale} loginOptions={loginOptionsResponse.data} />
+        <LoginFormNew
+          locale={locale}
+          loginOptions={loginOptionsResponse.data}
+        />
       </Div>
     </>
   );

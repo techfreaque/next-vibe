@@ -1,7 +1,7 @@
-import { translations as componentsTranslations } from "../../_components/i18n/en";
+import { translations as contactTranslations } from "@/app/api/[locale]/v1/core/contact/i18n/en";
 
 export const translations = {
-  components: componentsTranslations,
+  contact: contactTranslations,
   nav: {
     home: "Home",
   },

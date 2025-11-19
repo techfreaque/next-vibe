@@ -12,7 +12,7 @@ import { spawn } from "node:child_process";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { Task } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/types/repository";
 import { unifiedTaskRunnerRepository } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/unified-runner/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -238,7 +238,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
     logger.vibe("🚀 Starting development server");
     logger.vibe(
-      `📍 Port: ${port} | Debug: ${logger.isDebugEnabled ? "ON" : "OFF"} | Tasks: ${data.skipTaskRunner ? "DISABLED" : "ENABLED"}`,
+      `📍 Port: ${port} | Debug: ${logger.isDebugEnabled ? "ON" : "OFF (use --verbose to debug)"} | Tasks: ${data.skipTaskRunner ? "DISABLED" : "ENABLED"}`,
     );
 
     // Database setup
@@ -389,9 +389,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   ): Promise<void> {
     try {
       // Load the task registry
-      const { taskRegistry } = await import(
-        "@/app/api/[locale]/v1/core/system/generated/tasks-index"
-      );
+      const { taskRegistry } =
+        await import("@/app/api/[locale]/v1/core/system/generated/tasks-index");
 
       // Filter tasks for development environment
       const devTasks = this.filterTasksForDevelopment(

@@ -10,7 +10,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
 import { z } from "zod";
 
-import { createTRPCContext } from "@/app/api/[locale]/v1/core/system/unified-interface/react/trpc-trpc-context";
+import { createTRPCContext } from "@/app/api/[locale]/v1/core/system/unified-interface/trpc/context";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 

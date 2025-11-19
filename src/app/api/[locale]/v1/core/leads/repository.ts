@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import { withTransaction } from "@/app/api/[locale]/v1/core/system/db/utils/repository-helpers";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import {
   convertCountryFilter,
   convertLanguageFilter,

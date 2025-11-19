@@ -391,7 +391,7 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer {
       }
 
       const countText =
-        countParts.length > 0 ? countParts.join(", ") : "0 issues";
+        countParts.length ? countParts.join(", ") : "0 issues";
       output += `   ${displayPath} (${countText})\n`;
     }
 

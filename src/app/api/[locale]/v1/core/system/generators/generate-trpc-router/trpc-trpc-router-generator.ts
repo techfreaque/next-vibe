@@ -12,7 +12,7 @@ import { findRouteFiles } from "@/app/api/[locale]/v1/core/system/unified-interf
 import {
   type RouteFileStructure,
   validateRouteFileForTRPC,
-} from "../../unified-interface/react/trpc-trpc-procedure-factory";
+} from "../../unified-interface/trpc/procedure-factory";
 
 /**
  * Router generation configuration
@@ -309,7 +309,7 @@ function generateRouterCode(validRouteFiles: RouteFileInfo[]): string {
 /* eslint-disable simple-import-sort/imports */
 /* eslint-disable prettier/prettier */
 
-import { router } from '@/app/api/[locale]/v1/core/system/unified-interface/react/trpc-trpc';
+import { router } from '@/app/api/[locale]/v1/core/system/unified-interface/trpc/core';
 ${imports.join("\n")}
 
 ${constants.join("\n")}

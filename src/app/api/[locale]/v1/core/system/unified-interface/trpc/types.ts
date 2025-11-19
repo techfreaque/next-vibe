@@ -19,7 +19,7 @@ import type { EndpointLogger } from "../shared/logger/endpoint";
  * Infer JWT payload type from user roles
  */
 export type InferJwtPayloadTypeFromRoles<
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > = TUserRoleValue extends readonly [typeof UserRole.PUBLIC]
   ? { isPublic: true }
   : JwtPayloadType;
@@ -30,7 +30,7 @@ export type InferJwtPayloadTypeFromRoles<
  */
 export interface TRPCContext<
   TUrlParams,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > {
   user: InferJwtPayloadTypeFromRoles<TUserRoleValue> | null;
   locale: CountryLanguage;
@@ -50,9 +50,5 @@ export type TrpcHandlerReturnType<
   TUrlVariablesOutput,
 > = (
   input: TRequestOutput & { urlPathParams?: TUrlVariablesOutput },
-  ctx: TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]>,
+  ctx: TRPCContext<Record<string, string>, readonly UserRoleValue[]>,
 ) => Promise<TResponseOutput>;
-
-const definitions = {};
-
-export default definitions;

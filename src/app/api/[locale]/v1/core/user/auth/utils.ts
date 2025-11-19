@@ -9,6 +9,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/platform";
 
 import { UserDetailLevel } from "../enum";
 import { userRepository } from "../repository";
@@ -30,7 +31,7 @@ export async function requireAdminUser(
     // Check authentication and role
     const minimalUser = await authRepository.getAuthMinimalUser<
       [typeof UserRole.ADMIN]
-    >([UserRole.ADMIN], { platform: "next", locale }, logger);
+    >([UserRole.ADMIN], { platform: Platform.WEB, locale }, logger);
 
     // Check if user is public (not authenticated)
     if (minimalUser.isPublic) {
@@ -76,7 +77,7 @@ export async function requireUser(
     // Check authentication (any authenticated user)
     const minimalUser = await authRepository.getAuthMinimalUser<[]>(
       [],
-      { platform: "next", locale },
+      { platform: Platform.WEB, locale },
       logger,
     );
 

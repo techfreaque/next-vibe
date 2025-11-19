@@ -7,13 +7,14 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import { getCliUser } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/auth/cli-user";
+import { getCliUser } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/auth/cli-user";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ParameterValue } from "../../shared/server-only/execution/executor";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
-import { MCP_CONFIG, Platform } from "../../shared/server-only/config";
+import { Platform } from "../../shared/types/platform";
+import { MCP_CONFIG } from "../config";
 import { getMCPRegistry, toolMetadataToMCPTool } from "../registry";
 import type {
   IMCPProtocolHandler,
@@ -290,19 +291,33 @@ export async function createMCPProtocolHandler(
   locale: CountryLanguage,
 ): Promise<MCPProtocolHandler> {
   // Get CLI user for authentication using consolidated factory
-  const cliUser = await getCliUser(logger, locale);
+  const cliUserResult = await getCliUser(logger, locale);
 
-  if (!cliUser.id) {
+  if (!cliUserResult.success) {
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for invalid CLI user state
+    throw new Error(
+      `CLI user authentication failed: ${cliUserResult.message}`,
+    );
+  }
+
+  const cliUser = cliUserResult.data;
+
+  if (!cliUser.isPublic && !cliUser.id) {
     // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for invalid CLI user state
     throw new Error("CLI user ID is required");
   }
 
   // Convert to JwtPayloadType for MCP
-  const user: JwtPayloadType = {
-    isPublic: false,
-    id: cliUser.id,
-    leadId: cliUser.id, // Use same ID for leadId in CLI context
-  };
+  const user: JwtPayloadType = cliUser.isPublic
+    ? {
+        isPublic: true,
+        leadId: cliUser.leadId,
+      }
+    : {
+        isPublic: false,
+        id: cliUser.id,
+        leadId: cliUser.id, // Use same ID for leadId in CLI context
+      };
 
   return new MCPProtocolHandler(logger, locale, user);
 }

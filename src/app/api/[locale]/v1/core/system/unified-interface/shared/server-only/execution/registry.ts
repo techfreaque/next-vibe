@@ -6,13 +6,15 @@
 
 import "server-only";
 
+import { parseError } from "next-vibe/shared/utils/parse-error";
+
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { Platform } from "../config";
-import { getDiscoveredEndpoints } from "../discovery/adapter";
+import type { Platform } from "../../types/platform";
+import { getDiscoveredEndpoints } from "../registry/endpoint-adapter";
 import { toolFilter } from "../permissions/filter";
 import type { DiscoveredEndpoint } from "../types/registry";
 
@@ -87,7 +89,7 @@ export abstract class BaseRegistry {
       await this.onInitialized();
     } catch (error) {
       this.logger.error(`[${this.config.platformName}] Initialization failed`, {
-        error: error instanceof Error ? error.message : String(error),
+        error: parseError(error).message,
       });
       this.initialized = false;
       this.endpoints = [];
@@ -152,7 +154,7 @@ export abstract class BaseRegistry {
     platform?: Platform,
   ): Promise<DiscoveredEndpoint[]> {
     // Import the lazy loader
-    const { getEndpointsByToolNames } = await import("../discovery/adapter");
+    const { getEndpointsByToolNames } = await import("../registry/endpoint-adapter");
 
     // Load only the requested endpoints
     const endpoints = await getEndpointsByToolNames(toolNames);
@@ -181,7 +183,7 @@ export abstract class BaseRegistry {
     platform?: Platform,
   ): Promise<DiscoveredEndpoint[]> {
     // Import the lazy loader
-    const { getEndpointsByIds } = await import("../discovery/adapter");
+    const { getEndpointsByIds } = await import("../registry/endpoint-adapter");
 
     // Load only the requested endpoints
     const endpoints = await getEndpointsByIds(endpointIds);

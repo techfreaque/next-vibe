@@ -15,7 +15,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -85,9 +85,8 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
         try {
           // Import and start the unified task runner
-          const { unifiedTaskRunnerRepository } = await import(
-            "../../unified-interface/tasks/unified-runner/repository"
-          );
+          const { unifiedTaskRunnerRepository } =
+            await import("../../unified-interface/tasks/unified-runner/repository");
 
           // Set environment to production
           unifiedTaskRunnerRepository.environment = "production";
@@ -192,9 +191,8 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
           try {
             // Import task registry (this will auto-generate if needed)
-            const { taskRegistry } = await import(
-              "../../generated/tasks-index"
-            );
+            const { taskRegistry } =
+              await import("../../generated/tasks-index");
 
             logger.info("Task registry loaded successfully", {
               cronTasks: taskRegistry.cronTasks.length,
@@ -211,9 +209,8 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             );
 
             // Get task runner status
-            const { unifiedTaskRunnerRepository } = await import(
-              "../../unified-interface/tasks/unified-runner/repository"
-            );
+            const { unifiedTaskRunnerRepository } =
+              await import("../../unified-interface/tasks/unified-runner/repository");
             const status = unifiedTaskRunnerRepository.getStatus();
 
             logger.info("Task runner system operational", {

@@ -5,7 +5,7 @@
  */
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import type { NextRequest } from "next/server";
@@ -22,7 +22,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
@@ -31,19 +31,23 @@ import { leadAuthRepository } from "../../leads/auth/repository";
 import { leads, userLeadLinks } from "../../leads/db";
 import { LeadSource, LeadStatus } from "../../leads/enum";
 import { db } from "../../system/db";
-import { detectPlatformFromRequest } from "../../system/unified-interface/shared/auth/platform-detection";
 import {
   type AuthContext,
   type AuthPlatform,
 } from "../../system/unified-interface/shared/server-only/auth/base-auth-handler";
 import { getPlatformAuthHandler } from "../../system/unified-interface/shared/server-only/auth/factory";
+import { Platform } from "../../system/unified-interface/shared/types/platform";
 import { users } from "../db";
 import { UserDetailLevel } from "../enum";
 import { sessionRepository } from "../private/session/repository";
 import { userRepository } from "../repository";
 import type { CompleteUserType } from "../types";
 import type { UserRoleValue } from "../user-roles/enum";
-import { UserRole } from "../user-roles/enum";
+import {
+  UserRole,
+  UserPermissionRole,
+  filterUserPermissionRoles,
+} from "../user-roles/enum";
 import { userRolesRepository } from "../user-roles/repository";
 import type {
   JwtPayloadType,
@@ -54,7 +58,7 @@ import type {
 export type { AuthContext, AuthPlatform };
 
 export type InferUserType<
-  TRoles extends readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+  TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
 > =
   Exclude<TRoles[number], "PUBLIC"> extends never
     ? JWTPublicPayloadType
@@ -66,7 +70,7 @@ export type InferUserType<
  * Helper to create public user payload
  */
 function createPublicUser<
-  TRoles extends readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+  TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
 >(leadId: string): InferUserType<TRoles> {
   return { isPublic: true, leadId } as InferUserType<TRoles>;
 }
@@ -75,7 +79,7 @@ function createPublicUser<
  * Helper to create private user payload
  */
 function createPrivateUser<
-  TRoles extends readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+  TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
 >(userId: string, leadId: string): InferUserType<TRoles> {
   return { isPublic: false, id: userId, leadId } as InferUserType<TRoles>;
 }
@@ -122,8 +126,7 @@ export interface AuthRepository {
    * Get authenticated user with role checking (platform-aware) - returns generic type
    */
   getAuthMinimalUser<
-    TRoles extends
-      readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
   >(
     roles: TRoles,
     context: AuthContext,
@@ -134,10 +137,10 @@ export interface AuthRepository {
    * Get user roles (platform-aware)
    */
   getUserRoles(
-    requiredRoles: readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+    requiredRoles: readonly UserRoleValue[keyof UserRoleValue][],
     context: AuthContext,
     logger: EndpointLogger,
-  ): Promise<(typeof UserRoleValue)[keyof typeof UserRoleValue][]>;
+  ): Promise<UserRoleValue[keyof UserRoleValue][]>;
 
   /**
    * Store authentication token using platform-specific handler
@@ -213,15 +216,9 @@ export interface AuthRepository {
  * Platform-agnostic - delegates to platform handlers for storage
  */
 class AuthRepositoryImpl implements AuthRepository {
-  private readonly secretKey: Uint8Array;
-
-  constructor() {
-    if (!env.JWT_SECRET_KEY) {
-      this.secretKey = new TextEncoder().encode("fallback-dev-key-only");
-    } else {
-      this.secretKey = new TextEncoder().encode(env.JWT_SECRET_KEY);
-    }
-  }
+  private readonly secretKey: Uint8Array = new TextEncoder().encode(
+    env.JWT_SECRET_KEY,
+  );
 
   /**
    * Get leadId from database (platform-agnostic)
@@ -352,9 +349,9 @@ class AuthRepositoryImpl implements AuthRepository {
    */
   private async getUserRolesInternal(
     userId: string,
-    requiredRoles: readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+    requiredRoles: readonly UserRoleValue[keyof UserRoleValue][],
     logger: EndpointLogger,
-  ): Promise<(typeof UserRoleValue)[keyof typeof UserRoleValue][]> {
+  ): Promise<UserRoleValue[keyof UserRoleValue][]> {
     try {
       // Public role is always allowed
       if (requiredRoles.includes(UserRole.PUBLIC)) {
@@ -362,7 +359,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // Customer role is allowed for any authenticated user
-      const roles: (typeof UserRoleValue)[keyof typeof UserRoleValue][] = [];
+      const roles: UserRoleValue[keyof UserRoleValue][] = [];
       if (requiredRoles.includes(UserRole.CUSTOMER)) {
         roles.push(UserRole.CUSTOMER);
       }
@@ -377,7 +374,7 @@ class AuthRepositoryImpl implements AuthRepository {
           .map((r) => r.role)
           .filter((role) =>
             requiredRoles.includes(role),
-          ) as (typeof UserRoleValue)[keyof typeof UserRoleValue][];
+          ) as UserRoleValue[keyof UserRoleValue][];
         for (const role of dbRoles) {
           roles.push(role);
         }
@@ -516,17 +513,33 @@ class AuthRepositoryImpl implements AuthRepository {
    * @returns Authenticated user or public user
    */
   private async getAuthenticatedUserInternal<
-    TRoles extends
-      readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[],
   >(
     userId: string,
     leadId: string,
     requiredRoles: TRoles,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
+    // Filter to get only actual permission roles (not platform markers)
+    const permissionRoles = filterUserPermissionRoles(requiredRoles);
+
+    // If no permission roles after filtering, allow any authenticated user
+    if (permissionRoles.length === 0) {
+      logger.debug(
+        "No permission roles required (only platform markers), allowing authenticated user",
+        {
+          userId,
+          leadId,
+          originalRoles: [...requiredRoles] as string[],
+        },
+      );
+      return createPrivateUser<TRoles>(userId, leadId);
+    }
+
     // Check if endpoint only allows PUBLIC role (no authenticated users allowed)
     const onlyPublicAllowed =
-      requiredRoles.length === 1 && requiredRoles.includes(UserRole.PUBLIC);
+      permissionRoles.length === 1 &&
+      permissionRoles.includes(UserPermissionRole.PUBLIC);
 
     if (onlyPublicAllowed) {
       // Endpoint only allows public users - authenticated users should not access this
@@ -535,14 +548,14 @@ class AuthRepositoryImpl implements AuthRepository {
         {
           userId,
           leadId,
-          requiredRoles: [...requiredRoles] as string[],
+          requiredRoles: [...permissionRoles] as string[],
         },
       );
       return createPublicUser<TRoles>(leadId);
     }
 
     // Customer role is allowed for any authenticated user
-    if (requiredRoles.includes(UserRole.CUSTOMER)) {
+    if (permissionRoles.includes(UserPermissionRole.CUSTOMER)) {
       return createPrivateUser<TRoles>(userId, leadId);
     }
 
@@ -559,30 +572,29 @@ class AuthRepositoryImpl implements AuthRepository {
           userId,
           leadId,
         });
-        // If CUSTOMER role is in required roles, return authenticated user
-        if (requiredRoles.includes(UserRole.CUSTOMER)) {
+        // If CUSTOMER role is in permission roles, return authenticated user
+        if (permissionRoles.includes(UserPermissionRole.CUSTOMER)) {
           return createPrivateUser<TRoles>(userId, leadId);
         }
-        // If PUBLIC role is in required roles (mixed with other roles), return authenticated user
+        // If PUBLIC role is in permission roles (mixed with other roles), return authenticated user
         // (authenticated users can access PUBLIC endpoints when mixed with other roles)
-        if (requiredRoles.includes(UserRole.PUBLIC)) {
+        if (permissionRoles.includes(UserPermissionRole.PUBLIC)) {
           return createPrivateUser<TRoles>(userId, leadId);
         }
         // Otherwise, user doesn't have required roles
-        logger.error(
-          "app.api.v1.core.user.auth.debug.userDoesNotHaveRequiredRoles",
-          {
-            userId,
-            leadId,
-            requiredRoles: [...requiredRoles] as string[],
-          },
-        );
+        logger.warn("User does not have required permission roles", {
+          translationKey:
+            "app.api.v1.core.user.auth.debug.userDoesNotHaveRequiredRoles",
+          userId,
+          leadId,
+          requiredRoles: permissionRoles.join(", "),
+        });
         return createPublicUser<TRoles>(leadId);
       }
 
       // Check for required roles
       const hasRequiredRole = userRolesResponse.data.some((r) =>
-        requiredRoles.some((requiredRole) => r.role === requiredRole),
+        permissionRoles.some((requiredRole) => r.role === requiredRole),
       );
 
       if (hasRequiredRole) {
@@ -590,10 +602,10 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // User doesn't have required roles
-      // If CUSTOMER role is in required roles, we already handled it above
-      // If PUBLIC role is in required roles (mixed with other roles), the user is still authenticated
+      // If CUSTOMER role is in permission roles, we already handled it above
+      // If PUBLIC role is in permission roles (mixed with other roles), the user is still authenticated
       // so we should return the authenticated user, not downgrade to public
-      if (requiredRoles.includes(UserRole.PUBLIC)) {
+      if (permissionRoles.includes(UserPermissionRole.PUBLIC)) {
         // User is authenticated but doesn't have the specific role
         // However, since PUBLIC is allowed (mixed with other roles), we can return the authenticated user
         // as they have at least CUSTOMER role (all authenticated users have CUSTOMER)
@@ -601,23 +613,24 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // User doesn't have required roles and PUBLIC is not allowed
-      logger.error(
-        "app.api.v1.core.user.auth.debug.userDoesNotHaveRequiredRoles",
-        {
-          userId,
-          leadId,
-          requiredRoles: [...requiredRoles] as string[],
-          userRoles: userRolesResponse.data.map((r) => r.role),
-        },
-      );
+      logger.warn("User does not have required permission roles", {
+        translationKey:
+          "app.api.v1.core.user.auth.debug.userDoesNotHaveRequiredRoles",
+        userId,
+        leadId,
+        requiredRoles: permissionRoles.join(", "),
+        userRoles: userRolesResponse.data.map((r) => r.role).join(", "),
+      });
       return createPublicUser<TRoles>(leadId);
     } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.auth.debug.errorCheckingUserAuth",
-        parseError(error),
-      );
+      logger.error("Error checking user authentication", {
+        translationKey: "app.api.v1.core.user.auth.debug.errorCheckingUserAuth",
+        error: parseError(error).message,
+        userId,
+        leadId,
+      });
       // If there's an error but PUBLIC is allowed (mixed with other roles), return authenticated user
-      if (requiredRoles.includes(UserRole.PUBLIC)) {
+      if (permissionRoles.includes(UserPermissionRole.PUBLIC)) {
         return createPrivateUser<TRoles>(userId, leadId);
       }
       // Otherwise, return public user (will be rejected by endpoint handler)
@@ -832,8 +845,8 @@ class AuthRepositoryImpl implements AuthRepository {
         });
       }
 
-      // Default to Next.js platform for backward compatibility
-      const platform = context.platform || "next";
+      // Default to Web platform for backward compatibility
+      const platform = context.platform || Platform.WEB;
 
       // Get platform-specific auth handler
       const authHandler = getPlatformAuthHandler(platform);
@@ -878,8 +891,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Get authenticated user with role checking (platform-aware) - generic return type
    */
   async getAuthMinimalUser<
-    TRoles extends
-      readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
   >(
     roles: TRoles,
     context: AuthContext,
@@ -916,7 +928,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       // If public user, return immediately if PUBLIC role is allowed
       if (jwtPayload.isPublic) {
-        if (roles.includes(UserRole.PUBLIC as TRoles[number])) {
+        if (roles.includes(UserRole.PUBLIC)) {
           return jwtPayload as InferUserType<TRoles>;
         }
         logger.debug("Public user not allowed for this endpoint", {
@@ -940,9 +952,7 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorInUnifiedGetAuthMinimalUser",
         parseError(error),
       );
-      const platform = context.platform || "next";
-      const authHandler = getPlatformAuthHandler(platform);
-      const leadId = await authHandler.getLeadIdFromDb(
+      const leadId = await authRepository.getLeadIdFromDb(
         undefined,
         context.locale,
         logger,
@@ -968,8 +978,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * @returns Authenticated user
    */
   private async authenticateWithPayload<
-    TRoles extends
-      readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
   >(
     jwtPayload: JwtPrivatePayloadType,
     roles: TRoles,
@@ -1048,8 +1057,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Returns the correct user type based on the allowed roles
    */
   async getTypedAuthMinimalUser<
-    TRoles extends
-      readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
   >(
     roles: TRoles,
     context: AuthContext,
@@ -1065,10 +1073,10 @@ class AuthRepositoryImpl implements AuthRepository {
    * Delegates to platform handlers for authentication
    */
   async getUserRoles(
-    requiredRoles: readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+    requiredRoles: readonly UserRoleValue[keyof UserRoleValue][],
     context: AuthContext,
     logger: EndpointLogger,
-  ): Promise<(typeof UserRoleValue)[keyof typeof UserRoleValue][]> {
+  ): Promise<UserRoleValue[keyof UserRoleValue][]> {
     try {
       // Locale is required for lead creation
       if (!context.locale) {
@@ -1100,18 +1108,16 @@ class AuthRepositoryImpl implements AuthRepository {
 
   /**
    * Store authentication token using platform-specific handler
-   * Automatically detects platform from request context
+   * Platform is explicitly passed from the caller context
    */
   async storeAuthTokenForPlatform(
     token: string,
     userId: string,
     leadId: string,
-    request: NextRequest,
+    platform: Platform,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
-      // Determine platform from request
-      const platform = detectPlatformFromRequest(request);
       logger.debug("Storing auth token for platform", { platform, userId });
 
       // Get platform-specific handler
@@ -1131,15 +1137,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
   /**
    * Clear authentication token using platform-specific handler
-   * Automatically detects platform from request context
+   * Platform is explicitly passed from the caller context
    */
   async clearAuthTokenForPlatform(
-    request: NextRequest,
+    platform: Platform,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
-      // Determine platform from request
-      const platform = detectPlatformFromRequest(request);
       logger.debug("Clearing auth token for platform", { platform });
 
       // Get platform-specific handler
@@ -1328,7 +1332,7 @@ class AuthRepositoryImpl implements AuthRepository {
       if (!userResult.success || !userResult.data) {
         logger.debug("User not found in database", { email });
         return fail({
-          message: "app.api.v1.core.user.auth.errors.user_not_found",
+          message: "app.api.v1.core.user.auth.errors.user_not_authenticated",
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { email },
         });
@@ -1340,7 +1344,7 @@ class AuthRepositoryImpl implements AuthRepository {
       if (!leadId) {
         logger.error("Failed to get lead ID for user", { userId: user.id });
         return fail({
-          message: "app.api.v1.core.user.auth.errors.lead_creation_failed",
+          message: "app.api.v1.core.user.auth.errors.session_retrieval_failed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }

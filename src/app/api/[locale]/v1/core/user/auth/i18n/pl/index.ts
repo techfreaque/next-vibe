@@ -6,6 +6,9 @@ export const translations: typeof enTranslations = {
       status_save_failed: "Nie udało się zapisać statusu uwierzytelniania",
       status_remove_failed: "Nie udało się usunąć statusu uwierzytelniania",
       status_check_failed: "Nie udało się sprawdzić statusu uwierzytelniania",
+      token_save_failed: "Nie udało się zapisać tokenu uwierzytelniania",
+      token_get_failed: "Nie udało się pobrać tokenu uwierzytelniania",
+      token_remove_failed: "Nie udało się usunąć tokenu uwierzytelniania",
     },
   },
   errors: {

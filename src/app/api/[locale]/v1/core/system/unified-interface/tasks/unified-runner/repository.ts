@@ -9,6 +9,7 @@
 import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
+import { ensureError } from "../../shared/utils/error";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -16,7 +17,7 @@ import {
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -265,8 +266,7 @@ export class UnifiedTaskRunnerRepositoryImpl
       const errorMsg = parseError(error).message;
       this.markTaskAsFailed(taskName, errorMsg);
       if (task.onError) {
-        const errorInstance =
-          error instanceof Error ? error : new Error(errorMsg);
+        const errorInstance = ensureError(error, errorMsg);
         await task.onError({
           error: errorInstance,
           logger: this.logger,
@@ -418,8 +418,7 @@ export class UnifiedTaskRunnerRepositoryImpl
           this.markTaskAsFailed(task.name, errorMsg);
 
           if (task.onError) {
-            const errorInstance =
-              error instanceof Error ? error : new Error(errorMsg);
+            const errorInstance = ensureError(error, errorMsg);
             await task.onError({
               error: errorInstance,
               logger: this.logger,
@@ -444,7 +443,7 @@ export class UnifiedTaskRunnerRepositoryImpl
       const cronTasks = tasks.filter(
         (task): task is CronTask => task.type === "cron",
       );
-      if (cronTasks.length > 0) {
+      if (cronTasks.length) {
         this.logger.debug("Setting up cron task scheduler", {
           cronTaskCount: cronTasks.length,
           taskNames: cronTasks.map((t) => t.name),

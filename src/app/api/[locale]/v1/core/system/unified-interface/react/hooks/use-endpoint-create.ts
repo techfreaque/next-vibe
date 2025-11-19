@@ -40,7 +40,7 @@ export function useEndpointCreate<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     UnifiedField<z.ZodTypeAny>
   >,
 >(
@@ -107,7 +107,7 @@ export function useEndpointCreate<
     if (
       autoPrefillData &&
       formResult?.form &&
-      Object.keys(autoPrefillData).length > 0
+      Object.keys(autoPrefillData).length
     ) {
       formResult.form.reset(autoPrefillData as never);
     }

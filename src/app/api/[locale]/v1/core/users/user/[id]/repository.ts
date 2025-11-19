@@ -15,7 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -81,9 +81,8 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
       logger.debug("User found successfully", { userId: foundUser.id });
 
       // Fetch user roles from database
-      const { userRolesRepository } = await import(
-        "@/app/api/[locale]/v1/core/user/user-roles/repository"
-      );
+      const { userRolesRepository } =
+        await import("@/app/api/[locale]/v1/core/user/user-roles/repository");
       const userRolesResponse = await userRolesRepository.findByUserId(
         foundUser.id,
         logger,
@@ -205,9 +204,8 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
       logger.debug("User updated successfully", { userId });
 
       // Fetch user roles from database
-      const { userRolesRepository } = await import(
-        "@/app/api/[locale]/v1/core/user/user-roles/repository"
-      );
+      const { userRolesRepository } =
+        await import("@/app/api/[locale]/v1/core/user/user-roles/repository");
       const userRolesResponse = await userRolesRepository.findByUserId(
         updatedUser.id,
         logger,

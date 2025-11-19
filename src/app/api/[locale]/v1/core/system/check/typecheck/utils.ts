@@ -214,9 +214,8 @@ export function generateCacheKey(
     try {
       const tsconfigPath = resolve("tsconfig.json");
       const stat = statSync(tsconfigPath);
-      const mtime = stat.mtime.getTime();
       // eslint-disable-next-line i18next/no-literal-string
-      return `${baseKey}_project_${mtime}`;
+      return `${baseKey}_project`;
     } catch {
       // eslint-disable-next-line i18next/no-literal-string
       return `${baseKey}_project`;
@@ -295,8 +294,11 @@ export function createTypecheckConfig(path?: string): TypecheckConfig {
     pathType,
     targetPath: path,
     cacheKey,
-    // eslint-disable-next-line i18next/no-literal-string
-    buildInfoFile: join(tmpDir, `tsconfig.${cacheKey}.tsbuildinfo`),
+    buildInfoFile: join(
+      pathType === PathType.NO_PATH ? "." : tmpDir,
+      // eslint-disable-next-line i18next/no-literal-string
+      `tsconfig.${cacheKey}.tsbuildinfo`,
+    ),
   };
 
   // Create temporary config file for single files and folders (not for no-path scenario)

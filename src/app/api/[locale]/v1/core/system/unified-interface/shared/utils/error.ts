@@ -22,6 +22,21 @@ export function isError(error: Error | string): error is Error {
 }
 
 /**
+ * Ensure error is an Error object
+ * Converts strings and other types to Error instances
+ */
+export function ensureError(error: unknown, fallbackMessage?: string): Error {
+  if (error instanceof Error) {
+    return error;
+  }
+  const message =
+    typeof error === "string"
+      ? error
+      : fallbackMessage || "Unknown error occurred";
+  return new Error(message);
+}
+
+/**
  * Create a standardized error object
  */
 export function createStandardError(

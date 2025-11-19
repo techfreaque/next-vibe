@@ -28,6 +28,7 @@ import {
 } from "../../unified-interface/react/next-endpoint-response";
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import { createEndpointLogger } from "../shared/logger/endpoint";
+import { Platform } from "../shared/types/platform";
 import {
   authenticateUser,
   executeHandler,
@@ -75,7 +76,7 @@ export function createNextHandler<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields extends UnifiedField<z.ZodTypeAny>,
   TRequestInput = TRequestOutput,
   TResponseInput = TResponseOutput,
@@ -119,7 +120,7 @@ export function createNextHandler<
       // Authenticate user using unified core with Next.js context
       const authResult = await authenticateUser(
         endpoint,
-        { platform: "next", locale },
+        { platform: Platform.WEB, locale },
         logger,
       );
       if (!authResult.success) {

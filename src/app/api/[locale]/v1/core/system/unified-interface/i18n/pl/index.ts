@@ -19,6 +19,12 @@ export const translations: typeof enTranslations = {
         "Użytkownicy publiczni nie mogą uzyskać dostępu do tego uwierzytelnionego punktu końcowego",
       insufficientPermissions:
         "Niewystarczające uprawnienia do dostępu do tego punktu końcowego",
+      errors: {
+        platformAccessDenied:
+          "Odmowa dostępu dla platformy {{platform}}: {{reason}}",
+        insufficientRoles:
+          "Niewystarczające role. Użytkownik ma: {{userRoles}}. Wymagane: {{requiredRoles}}",
+      },
     },
   },
 };

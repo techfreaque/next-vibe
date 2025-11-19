@@ -14,7 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -75,7 +75,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
             validStatuses.push(statusEnum);
           }
         }
-        if (validStatuses.length > 0) {
+        if (validStatuses.length) {
           conditions.push(inArray(cronTaskExecutions.status, validStatuses));
         }
       }
@@ -109,7 +109,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
         })
         .from(cronTaskExecutions)
         .leftJoin(cronTasks, eq(cronTaskExecutions.taskId, cronTasks.id))
-        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .where(conditions.length ? and(...conditions) : undefined)
         .orderBy(desc(cronTaskExecutions.startedAt))
         .limit(limit)
         .offset(offset);
@@ -127,7 +127,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
         // Handle string priority filter
         // Data is already validated through Zod schema, so strings are valid enum values
         const priorityStrings = data.priority.split(",").map((p) => p.trim());
-        if (priorityStrings.length > 0) {
+        if (priorityStrings.length) {
           executions = executions.filter((exec) => {
             if (!exec.priority) {
               return false;
@@ -141,7 +141,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
       const [countResult] = await db
         .select({ count: count() })
         .from(cronTaskExecutions)
-        .where(conditions.length > 0 ? and(...conditions) : undefined);
+        .where(conditions.length ? and(...conditions) : undefined);
 
       const totalCount = countResult?.count ?? 0;
 
@@ -158,7 +158,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
           averageDuration: avg(cronTaskExecutions.durationMs),
         })
         .from(cronTaskExecutions)
-        .where(conditions.length > 0 ? and(...conditions) : undefined);
+        .where(conditions.length ? and(...conditions) : undefined);
 
       const successRate =
         statsResult && statsResult.totalExecutions > 0

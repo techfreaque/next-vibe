@@ -17,8 +17,9 @@ import { hashPassword } from "next-vibe/shared/utils/password";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/platform";
 
 import { leadAuthRepository } from "../leads/auth/repository";
 import { authRepository } from "./auth/repository";
@@ -142,7 +143,7 @@ export interface UserRepository {
     options: {
       limit?: number;
       offset?: number;
-      roles?: (typeof UserRoleValue)[];
+      roles?: UserRoleValue[];
     },
     logger: EndpointLogger,
   ): Promise<
@@ -158,7 +159,7 @@ export interface UserRepository {
       };
       searchInfo: {
         searchTerm: string | undefined;
-        appliedFilters: (typeof UserRoleValue)[];
+        appliedFilters: UserRoleValue[];
         searchTime: string;
         totalResults: number;
       };
@@ -185,9 +186,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   ): Promise<ResponseType<UserType<T>>> {
     try {
       const {
-        roles = [
-          UserRole.CUSTOMER,
-        ] as (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+        roles = [UserRole.CUSTOMER] as UserRoleValue[keyof UserRoleValue][],
         detailLevel = UserDetailLevel.MINIMAL,
       } = options;
 
@@ -199,7 +198,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       // Get the authenticated user
       const verifiedUser = await authRepository.getAuthMinimalUser(
         roles,
-        { platform: "next", locale },
+        { platform: Platform.WEB, locale },
         logger,
       );
 
@@ -504,39 +503,41 @@ export class BaseUserRepositoryImpl implements UserRepository {
           .orderBy(users.privateName, users.publicName);
       }
 
-      // Map to StandardUserType with all required fields
-      const mappedResults: StandardUserType[] = [];
+      // Batch fetch all user roles to avoid N+1 query problem
+      const userIds = searchResults.map((u) => u.id);
+      const rolesMapResponse = await userRolesRepository.findByUserIds(
+        userIds,
+        logger,
+      );
 
-      for (const user of searchResults) {
-        // Get user roles for each user
-        const userRolesResponse = await userRolesRepository.findByUserId(
-          user.id,
-          logger,
-        );
-        if (!userRolesResponse.success) {
-          // Skip users where we can't fetch roles
-          continue;
-        }
-
-        const standardUser: StandardUserType = {
-          id: user.id,
-          leadId: null,
-          isPublic: false,
-          privateName: user.privateName,
-          publicName: user.publicName,
-          email: user.email,
-          locale: user.locale,
-          isActive: user.isActive,
-          emailVerified: user.emailVerified,
-          requireTwoFactor: false,
-          marketingConsent: user.marketingConsent ?? false,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-          userRoles: userRolesResponse.data,
-        };
-
-        mappedResults.push(standardUser);
+      if (!rolesMapResponse.success) {
+        return fail({
+          message: "app.api.v1.core.user.errors.roles_batch_fetch_failed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+          messageParams: { count: userIds.length },
+          cause: rolesMapResponse,
+        });
       }
+
+      const rolesMap = rolesMapResponse.data;
+
+      // Map to StandardUserType with all required fields
+      const mappedResults: StandardUserType[] = searchResults.map((user) => ({
+        id: user.id,
+        leadId: null,
+        isPublic: false,
+        privateName: user.privateName,
+        publicName: user.publicName,
+        email: user.email,
+        locale: user.locale,
+        isActive: user.isActive,
+        emailVerified: user.emailVerified,
+        requireTwoFactor: false,
+        marketingConsent: user.marketingConsent ?? false,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        userRoles: rolesMap.get(user.id) || [],
+      }));
 
       return success(mappedResults);
     } catch (error) {
@@ -568,43 +569,41 @@ export class BaseUserRepositoryImpl implements UserRepository {
         .offset(offset)
         .orderBy(users.privateName, users.publicName);
 
-      // Map to StandardUserType with all required fields
-      const mappedResults: StandardUserType[] = [];
+      // Batch fetch all user roles to avoid N+1 query problem
+      const userIds = allUsers.map((u) => u.id);
+      const rolesMapResponse = await userRolesRepository.findByUserIds(
+        userIds,
+        logger,
+      );
 
-      for (const user of allUsers) {
-        // Get user roles for each user
-        const userRolesResponse = await userRolesRepository.findByUserId(
-          user.id,
-          logger,
-        );
-
-        if (!userRolesResponse.success) {
-          logger.error("Error getting user roles", {
-            message: userRolesResponse.message,
-            errorCode: userRolesResponse.errorType.errorCode,
-          });
-          continue; // Skip this user if we can't get roles
-        }
-
-        const standardUser: StandardUserType = {
-          id: user.id,
-          leadId: null,
-          privateName: user.privateName,
-          publicName: user.publicName,
-          email: user.email,
-          locale: user.locale,
-          isActive: user.isActive,
-          emailVerified: user.emailVerified,
-          isPublic: false,
-          requireTwoFactor: false,
-          marketingConsent: user.marketingConsent ?? false,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-          userRoles: userRolesResponse.data,
-        };
-
-        mappedResults.push(standardUser);
+      if (!rolesMapResponse.success) {
+        return fail({
+          message: "app.api.v1.core.user.errors.roles_batch_fetch_failed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+          messageParams: { count: userIds.length },
+          cause: rolesMapResponse,
+        });
       }
+
+      const rolesMap = rolesMapResponse.data;
+
+      // Map to StandardUserType with all required fields
+      const mappedResults: StandardUserType[] = allUsers.map((user) => ({
+        id: user.id,
+        leadId: null,
+        privateName: user.privateName,
+        publicName: user.publicName,
+        email: user.email,
+        locale: user.locale,
+        isActive: user.isActive,
+        emailVerified: user.emailVerified,
+        isPublic: false,
+        requireTwoFactor: false,
+        marketingConsent: user.marketingConsent ?? false,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        userRoles: rolesMap.get(user.id) || [],
+      }));
 
       return success(mappedResults);
     } catch (error) {
@@ -732,7 +731,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
     options: {
       limit?: number;
       offset?: number;
-      roles?: (typeof UserRoleValue)[];
+      roles?: UserRoleValue[];
     },
     logger: EndpointLogger,
   ): Promise<
@@ -748,7 +747,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       };
       searchInfo: {
         searchTerm: string | undefined;
-        appliedFilters: (typeof UserRoleValue)[];
+        appliedFilters: UserRoleValue[];
         searchTime: string;
         totalResults: number;
       };

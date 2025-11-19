@@ -6,6 +6,7 @@
  */
 
 import type { DiscoveredEndpoint } from "../server-only/types/registry";
+import { splitPath } from "../utils/path";
 /**
  * Singleton instance using shared factory
  */
@@ -297,7 +298,7 @@ export class UnifiedGroupingService {
         continue;
       }
 
-      const pathSegments = key.split("/").filter(Boolean);
+      const pathSegments = splitPath(key);
 
       result.push({
         id: key,

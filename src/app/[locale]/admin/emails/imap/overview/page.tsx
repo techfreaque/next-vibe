@@ -10,7 +10,7 @@ import type { JSX } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { ImapOverviewDashboard } from "../_components/imap-overview-dashboard";
+import { ImapOverviewDashboard } from "@/app/api/[locale]/v1/core/emails/imap-client/_components/imap-overview-dashboard";
 
 interface ImapOverviewPageProps {
   params: Promise<{

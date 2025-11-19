@@ -13,18 +13,13 @@ import {
   type WidgetComponentProps,
   type RenderableValue,
 } from "../../shared/ui/types";
+import { isPlainObject, hasStringProperty } from "../../shared/utils/type-guards";
 
 /**
  * Type guard for LinkWidgetData
  */
 function isLinkWidgetData(data: RenderableValue): data is LinkWidgetData {
-  return (
-    typeof data === "object" &&
-    data !== null &&
-    !Array.isArray(data) &&
-    "url" in data &&
-    typeof data.url === "string"
-  );
+  return isPlainObject(data) && hasStringProperty(data, "url");
 }
 
 /**

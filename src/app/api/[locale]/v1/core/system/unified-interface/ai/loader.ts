@@ -5,7 +5,8 @@
 
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import { parseError } from "next-vibe/shared/utils/parse-error";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -34,12 +35,10 @@ export async function loadTools(params: {
   }
 
   try {
-    const { getToolRegistry } = await import(
-      "@/app/api/[locale]/v1/core/system/unified-interface/ai/registry"
-    );
-    const registry = getToolRegistry();
+    const { ToolRegistry } =
+      await import("@/app/api/[locale]/v1/core/system/unified-interface/ai/registry");
 
-    const enabledEndpoints = await registry.getEndpointsByIdsLazy(
+    const enabledEndpoints = await ToolRegistry.getEndpointsByIdsLazy(
       params.requestedTools,
       params.user,
     );
@@ -51,13 +50,11 @@ export async function loadTools(params: {
       loadedNames: enabledEndpoints.map((endpoint) => endpoint.toolName),
     });
 
-    if (enabledEndpoints.length > 0) {
-      const { getToolExecutor } = await import(
-        "@/app/api/[locale]/v1/core/system/unified-interface/ai/executor"
-      );
-      const { createToolsFromEndpoints } = await import(
-        "@/app/api/[locale]/v1/core/system/unified-interface/ai/factory"
-      );
+    if (enabledEndpoints.length) {
+      const { getToolExecutor } =
+        await import("@/app/api/[locale]/v1/core/system/unified-interface/ai/executor");
+      const { createToolsFromEndpoints } =
+        await import("@/app/api/[locale]/v1/core/system/unified-interface/ai/factory");
       const toolExecutor = getToolExecutor();
       const toolsMap = createToolsFromEndpoints(
         enabledEndpoints,
@@ -78,7 +75,7 @@ export async function loadTools(params: {
     }
   } catch (error) {
     params.logger.error("Failed to load tools from registry", {
-      error: error instanceof Error ? error.message : String(error),
+      error: parseError(error).message,
     });
   }
 

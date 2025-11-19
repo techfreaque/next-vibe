@@ -214,7 +214,7 @@ export interface MCPToolMetadata {
   routePath: string;
   definitionPath: string;
   method: Methods;
-  allowedRoles: readonly (typeof UserRoleValue)[];
+  allowedRoles: readonly UserRoleValue[];
   requiresAuth: boolean;
   requestSchema?: z.ZodTypeAny;
   responseSchema?: z.ZodTypeAny;

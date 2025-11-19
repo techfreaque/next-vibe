@@ -12,7 +12,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types"
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { Platform } from "../shared/server-only/config";
+import type { Platform } from "../shared/types/platform";
 import type {
   BaseExecutionContext,
   BaseExecutionResult,
@@ -132,7 +132,7 @@ export interface AIToolExecutionResult
  */
 export interface ToolFilterCriteria {
   /** User roles to filter by */
-  roles?: readonly (typeof UserRoleValue)[];
+  roles?: readonly UserRoleValue[];
 
   /** Include only specific categories */
   categories?: readonly TranslationKey[];

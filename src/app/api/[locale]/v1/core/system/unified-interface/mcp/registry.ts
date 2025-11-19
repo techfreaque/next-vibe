@@ -5,8 +5,10 @@
 
 import "server-only";
 
+import { parseError } from "next-vibe/shared/utils/parse-error";
+
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -141,9 +143,8 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
 
     // Execute tool using shared base executor
     try {
-      const { RouteDelegationHandler } = await import(
-        "../../unified-interface/cli/route-executor"
-      );
+      const { RouteDelegationHandler } =
+        await import("../../unified-interface/cli/route-executor");
 
       const { t } = simpleT(context.locale);
 
@@ -183,7 +184,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
     } catch (error) {
       this.logger.error("[MCP Registry] Tool execution failed", {
         toolName: context.toolName,
-        error: error instanceof Error ? error.message : String(error),
+        error: parseError(error).message,
       });
 
       return this.fail({

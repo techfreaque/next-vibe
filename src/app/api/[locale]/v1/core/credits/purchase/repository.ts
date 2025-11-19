@@ -11,7 +11,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
@@ -80,9 +80,8 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
       const user = userResult.data;
 
       // Check if user has an active subscription before allowing credit pack purchase
-      const { subscriptionRepository } = await import(
-        "../../subscription/repository"
-      );
+      const { subscriptionRepository } =
+        await import("../../subscription/repository");
       const subscriptionResult = await subscriptionRepository.getSubscription(
         userId,
         logger,
@@ -154,9 +153,8 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
       const country = getCountryFromLocale(locale);
 
       // Get product and calculate totals based on quantity
-      const { productsRepository } = await import(
-        "../../products/repository-client"
-      );
+      const { productsRepository } =
+        await import("../../products/repository-client");
       const product = productsRepository.getProduct(
         ProductIds.CREDIT_PACK,
         locale,

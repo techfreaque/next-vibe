@@ -7,11 +7,11 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { Platform } from "../../shared/server-only/config";
+import { Platform } from "../../shared/types/platform";
 import { getMCPRegistry } from "../registry";
 import type {
   MCPExecuteRequestOutput,

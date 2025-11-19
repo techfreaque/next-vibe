@@ -141,11 +141,11 @@ async function loadThreadsFromServer(
             status: "active" | "archived" | "deleted";
             pinned: boolean;
             preview: string | null;
-            rolesView?: (typeof UserRoleValue)[] | null;
-            rolesEdit?: (typeof UserRoleValue)[] | null;
-            rolesPost?: (typeof UserRoleValue)[] | null;
-            rolesModerate?: (typeof UserRoleValue)[] | null;
-            rolesAdmin?: (typeof UserRoleValue)[] | null;
+            rolesView?: UserRoleValue[] | null;
+            rolesEdit?: UserRoleValue[] | null;
+            rolesPost?: UserRoleValue[] | null;
+            rolesModerate?: UserRoleValue[] | null;
+            rolesAdmin?: UserRoleValue[] | null;
             canEdit?: boolean;
             canPost?: boolean;
             canModerate?: boolean;

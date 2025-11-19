@@ -17,7 +17,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
-import { Platform } from "../../shared/server-only/config";
+import { Platform } from "../../shared/types/platform";
+import { splitPath } from "../../shared/utils/path";
 import { schemaUIHandler } from "./schema-ui-handler";
 
 /**
@@ -207,7 +208,7 @@ export class InteractiveModeHandler {
       return;
     }
 
-    const pathParts = route.path.split("/").filter(Boolean).slice(4); // Remove /api/[locale]/v1 prefix
+    const pathParts = splitPath(route.path).slice(4); // Remove /api/[locale]/v1 prefix
 
     let currentNode = this.routeTree;
 
@@ -345,7 +346,7 @@ export class InteractiveModeHandler {
     }
 
     // Add separator if there are routes/directories
-    if (choices.length > 0) {
+    if (choices.length) {
       // eslint-disable-next-line i18next/no-literal-string
       choices.push({ name: "─────────────────────", value: "separator" });
     }
@@ -641,8 +642,8 @@ export class InteractiveModeHandler {
 
     // Show preview before execution
     if (
-      Object.keys(requestData).length > 0 ||
-      Object.keys(urlPathParams).length > 0
+      Object.keys(requestData).length ||
+      Object.keys(urlPathParams).length
     ) {
       const previewText = tSelected(
         "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.preview",
@@ -658,12 +659,12 @@ export class InteractiveModeHandler {
       );
 
       this.logger.info(previewText);
-      if (Object.keys(requestData).length > 0) {
+      if (Object.keys(requestData).length) {
         this.logger.info(
           `${requestDataText}: ${JSON.stringify(requestData, null, 2)}`,
         );
       }
-      if (Object.keys(urlPathParams).length > 0) {
+      if (Object.keys(urlPathParams).length) {
         this.logger.info(
           `${urlParametersText}: ${JSON.stringify(urlPathParams, null, 2)}`,
         );

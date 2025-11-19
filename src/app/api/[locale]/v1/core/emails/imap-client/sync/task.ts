@@ -15,7 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,

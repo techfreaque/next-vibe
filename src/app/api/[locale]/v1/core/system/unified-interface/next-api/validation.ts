@@ -11,6 +11,7 @@ import {
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
@@ -20,7 +21,7 @@ import type { EndpointLogger } from "../shared/logger/endpoint";
 import {
   validateGetRequestData,
   validatePostRequestData,
-} from "../shared/validation/platform";
+} from "./request-validators";
 import {
   type ValidatedRequestData,
   validateEndpointUrlParameters,
@@ -122,10 +123,7 @@ export async function validateNextRequestData<
         "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
-        error:
-          error instanceof Error
-            ? error.message
-            : "app.api.v1.core.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
+        error: parseError(error).message,
       },
     };
   }

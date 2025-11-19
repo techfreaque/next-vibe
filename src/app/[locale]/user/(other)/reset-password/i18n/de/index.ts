@@ -1,9 +1,9 @@
-import { translations as componentsTranslations } from "../../_components/i18n/de";
+import { translations as requestTranslations } from "@/app/api/[locale]/v1/core/user/public/reset-password/request/i18n/de";
 import { translations as tokenTranslations } from "../../[token]/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  components: componentsTranslations,
+  request: requestTranslations,
   token: tokenTranslations,
   meta: {
     passwordReset: {

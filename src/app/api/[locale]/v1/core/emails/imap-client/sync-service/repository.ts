@@ -20,7 +20,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type { NewEmail } from "@/app/api/[locale]/v1/core/emails/messages/db";
 import { emails } from "@/app/api/[locale]/v1/core/emails/messages/db";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/types";

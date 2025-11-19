@@ -18,7 +18,7 @@ import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { CronTaskEditClient } from "./_components/cron-task-edit-client";
+import { CronTaskEditClient } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/task/_components/cron-task-edit-client";
 
 interface CronTaskEditPageProps {
   params: Promise<{

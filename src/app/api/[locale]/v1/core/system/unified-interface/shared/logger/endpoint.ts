@@ -2,12 +2,61 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
-import type { EndpointLogger, LoggerMetadata } from "../types/logger";
-import { debugApp } from "@/config/debug";
+import { enableDebugLogger } from "@/config/debug";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
-// Re-export types for convenience
-export type { EndpointLogger, LoggerMetadata };
+/**
+ * Logger metadata - structured data for logging
+ */
+export type LoggerMetadata =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Error
+  | Date
+  | { [key: string]: LoggerMetadata }
+  | LoggerMetadata[];
+
+/**
+ * Logger interface for endpoint handlers
+ * Provides structured logging with timing information
+ */
+export interface EndpointLogger {
+  /**
+   * Log an info message - always runs
+   */
+  info(message: string, ...metadata: LoggerMetadata[]): void;
+
+  /**
+   * Log an error message - always runs
+   */
+  error(
+    message: string,
+    error?: LoggerMetadata,
+    ...metadata: LoggerMetadata[]
+  ): void;
+
+  /**
+   * Log a warning message - always runs
+   */
+  warn(message: string, ...metadata: LoggerMetadata[]): void;
+
+  /**
+   * Log a vibe message (special formatted info) - always runs
+   */
+  vibe(message: string, ...metadata: LoggerMetadata[]): void;
+
+  /**
+   * Log a debug message - only runs when debug flag is enabled
+   */
+  debug(message: string, ...metadata: LoggerMetadata[]): void;
+
+  isDebugEnabled: boolean;
+}
 
 /**
  * Creates a logger instance for endpoint handlers
@@ -16,17 +65,16 @@ export type { EndpointLogger, LoggerMetadata };
 export function createEndpointLogger(
   debugEnabled = false,
   startTime: number = Date.now(),
-  _locale: CountryLanguage,
+  locale: CountryLanguage,
 ): EndpointLogger {
   const getElapsedTime = (): string => {
     const elapsed = (Date.now() - startTime) / 1000;
     return `${elapsed.toFixed(3)}s`;
   };
+  const { t } = simpleT(locale);
 
   const formatMessage = (level: string, message: string): string => {
-    // Messages are plain strings, not translation keys
-    // Translation keys should be handled by the caller if needed
-    return `[${getElapsedTime()}] ${message}`;
+    return `[${getElapsedTime()}] ${t(message as TranslationKey)}`;
   };
 
   return {
@@ -49,13 +97,13 @@ export function createEndpointLogger(
     },
 
     debug(message: string, ...metadata: LoggerMetadata[]): void {
-      if (debugApp || debugEnabled) {
+      if (debugEnabled || enableDebugLogger) {
         console.log(formatMessage("DEBUG", message), ...metadata);
       }
     },
     warn(message: string, ...metadata: LoggerMetadata[]): void {
       console.warn(formatMessage("WARN", message), ...metadata);
     },
-    isDebugEnabled: debugEnabled,
+    isDebugEnabled: debugEnabled || enableDebugLogger,
   };
 }

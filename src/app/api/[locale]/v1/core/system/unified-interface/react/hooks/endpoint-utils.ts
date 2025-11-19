@@ -2,7 +2,10 @@ import { Environment } from "next-vibe/shared/utils";
 import { useMemo } from "react";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import {
+  Methods,
+  ALL_METHODS,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { clearFormsAfterSuccessInDev } from "@/config/debug";
 import { envClient } from "@/config/env-client";
@@ -26,7 +29,7 @@ export function useAvailableMethods<
       CreateApiEndpoint<
         string,
         Methods,
-        readonly (typeof UserRoleValue)[],
+        readonly UserRoleValue[],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         any
       >
@@ -35,7 +38,7 @@ export function useAvailableMethods<
 >(endpoints: T): Methods[] {
   return useMemo(() => {
     return Object.keys(endpoints).filter((method) =>
-      ["GET", "POST", "PUT", "PATCH", "DELETE"].includes(method),
+      ALL_METHODS.includes(method as Methods),
     ) as Methods[];
   }, [endpoints]);
 }

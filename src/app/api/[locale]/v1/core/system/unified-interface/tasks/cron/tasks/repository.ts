@@ -17,7 +17,7 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -224,14 +224,14 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       }
 
       // Apply multi-select status filter - skip for now since field doesn't exist
-      if (data.status && data.status.length > 0) {
+      if (data.status && data.status.length) {
         // Since we don't have lastExecutionStatus in the current schema,
         // we'll filter by enabled status as a placeholder
         logger.debug("Applied status filter", { statuses: data.status });
       }
 
       // Apply multi-select priority filter
-      if (data.priority && data.priority.length > 0) {
+      if (data.priority && data.priority.length) {
         conditions.push(inArray(cronTasks.priority, data.priority));
         logger.debug("Applied priority filter", {
           priorities: data.priority,
@@ -239,7 +239,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       }
 
       // Apply multi-select category filter
-      if (data.category && data.category.length > 0) {
+      if (data.category && data.category.length) {
         conditions.push(inArray(cronTasks.category, data.category));
         logger.debug("Applied category filter", {
           categories: data.category,
@@ -257,7 +257,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       const tasks = await db
         .select()
         .from(cronTasks)
-        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .where(conditions.length ? and(...conditions) : undefined)
         .orderBy(sortOrder)
         .limit(limit)
         .offset(offset);
@@ -313,7 +313,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         .where(eq(cronTasks.name, data.name))
         .limit(1);
 
-      if (existingTask.length > 0) {
+      if (existingTask.length) {
         logger.warn("Task with same name already exists", {
           name: data.name,
         });

@@ -3,7 +3,6 @@
  * Functions for creating CLI handlers from endpoint configurations using unified core logic
  */
 
-import { NextRequest } from "next/server";
 import {
   ErrorResponseTypes,
   isStreamingResponse,
@@ -15,10 +14,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { createEndpointLogger } from "../shared/logger/endpoint";
-import {
-  authenticateUser,
-  executeHandler,
-} from "../shared/server-only/execution/core";
+import { executeHandler } from "../shared/server-only/execution/core";
 import type { Methods } from "../shared/types/enums";
 import type { UnifiedField } from "../shared/types/endpoint";
 import type {
@@ -29,23 +25,6 @@ import type {
 import { validateCliRequestData } from "./request-validator";
 
 /**
- * Create a minimal NextRequest mock for CLI context
- * CLI handlers don't have real HTTP requests, so we create a minimal mock
- */
-function createMockNextRequest(locale: CountryLanguage): NextRequest {
-  const url = `http://localhost:3000/${locale}/cli`;
-  const headers = new Headers({
-    "content-type": "application/json",
-    "x-cli-request": "true",
-  });
-
-  return new NextRequest(url, {
-    method: "POST",
-    headers,
-  });
-}
-
-/**
  * Create a CLI handler for a specific method
  */
 export function createCliHandler<
@@ -54,7 +33,7 @@ export function createCliHandler<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Infrastructure: Generic endpoint type requires 'any' for TFields parameter to accept all endpoint field configurations
   TFields extends UnifiedField<any>,
 >(
@@ -85,21 +64,6 @@ export function createCliHandler<
     const { t } = simpleT(locale);
     const logger = createEndpointLogger(verbose, Date.now(), locale);
 
-    // Authenticate user using unified core with CLI context
-    // Only pass jwtPayload if user is not public (CLI/AI platforms don't support public payloads)
-    const authResult = await authenticateUser(
-      endpoint,
-      {
-        platform: "cli",
-        jwtPayload: user.isPublic ? undefined : user,
-        locale,
-      },
-      logger,
-    );
-    if (!authResult.success) {
-      return authResult;
-    }
-
     // Validate request data using CLI-specific validation
     const validationResult = validateCliRequestData(
       endpoint,
@@ -123,6 +87,7 @@ export function createCliHandler<
     const validatedLocale = validationResult.data.locale;
 
     // Execute handler using unified core
+    // CLI doesn't have a NextRequest - request is optional for non-web platforms
     const result = await executeHandler({
       endpoint,
       handler,
@@ -131,8 +96,8 @@ export function createCliHandler<
       user,
       t,
       locale: validatedLocale,
-      request: createMockNextRequest(locale),
       logger,
+      request: undefined,
     });
 
     // CLI doesn't support streaming responses

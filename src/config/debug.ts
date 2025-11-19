@@ -1,16 +1,21 @@
-// this only affects local development
-
-// using constants to avoid eslint warnings  in other places
-const _true = true as boolean;
-const _false = false as boolean;
-
-export const enableDebugLogger = _false;
-export const debugCli = _false;
-export const debugCron = _false;
-export const debugMiddleware = _false;
-export const debugApp = enableDebugLogger;
-export const debugLibrary = _true;
-export const translationsKeyMode = _false;
+export let enableDebugLogger = false;
+export let debugCli = false;
+export let debugCron = false;
+export let debugMiddleware = false;
+export let debugApp = enableDebugLogger;
+export const translationsKeyMode = false as boolean;
 
 // Form clearing behavior in development
-export const clearFormsAfterSuccessInDev = _false;
+export const clearFormsAfterSuccessInDev = false;
+
+/**
+ * Used to enable debug mode at runtime via --verbose flag
+ * Should be called at startup
+ */
+export function enableDebug(): void {
+  enableDebugLogger = true;
+  debugCli = true;
+  debugCron = true;
+  debugMiddleware = true;
+  debugApp = true;
+}

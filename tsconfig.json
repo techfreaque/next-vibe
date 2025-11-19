@@ -64,7 +64,8 @@
     ".tmp",
     ".next",
     "to_migrate/**/*.ts",
-    "to_migrate/**/*.tsx"
+    "to_migrate/**/*.tsx",
+    
   ],
   "extends": "expo/tsconfig.base"
 }

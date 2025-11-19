@@ -11,7 +11,7 @@ import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 import { translations } from "@/config/i18n/en";
 
-import ResetPasswordForm from "./_components/reset-password-form";
+import ResetPasswordForm from "@/app/api/[locale]/v1/core/user/public/reset-password/request/_components/reset-password-form";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;

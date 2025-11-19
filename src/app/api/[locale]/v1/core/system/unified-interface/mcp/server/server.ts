@@ -6,11 +6,13 @@
 
 import "server-only";
 
+import { parseError } from "next-vibe/shared/utils/parse-error";
+
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { env } from "@/config/env";
 
-import { MCP_CONFIG } from "../../shared/server-only/config";
+import { MCP_CONFIG } from "../config";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { createEndpointLogger } from "../../shared/logger/endpoint";
 import { createMCPProtocolHandler } from "./protocol-handler";
@@ -33,8 +35,8 @@ export class MCPServer {
   private transport?: StdioTransport;
   private running = false;
 
-  constructor(options: MCPServerOptions = {}) {
-    this.locale = options.locale || env.VIBE_LOCALE;
+  constructor(options: MCPServerOptions = { locale: env.VIBE_CLI_LOCALE }) {
+    this.locale = options.locale || env.VIBE_CLI_LOCALE;
     const isDebug =
       options.debug ??
       (process.env.DEBUG === "true" || process.env.VIBE_LOG_LEVEL === "debug");
@@ -103,7 +105,7 @@ export class MCPServer {
       await this.keepAlive();
     } catch (error) {
       this.logger.error("[MCP Server] Failed to start", {
-        error: error instanceof Error ? error.message : String(error),
+        error: parseError(error).message,
       });
       // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Re-throw MCP server startup errors for caller to handle
       throw error;

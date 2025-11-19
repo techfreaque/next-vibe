@@ -16,6 +16,7 @@ import {
   type WidgetComponentProps,
   type RenderableValue,
 } from "../../shared/ui/types";
+import { isPlainObject, hasStringProperty } from "../../shared/utils/type-guards";
 
 /**
  * Type guard for GroupedListWidgetData
@@ -24,13 +25,10 @@ function isGroupedListWidgetData(
   data: RenderableValue,
 ): data is GroupedListWidgetData {
   return (
-    typeof data === "object" &&
-    data !== null &&
-    !Array.isArray(data) &&
+    isPlainObject(data) &&
     "groups" in data &&
     Array.isArray(data.groups) &&
-    "groupBy" in data &&
-    typeof data.groupBy === "string"
+    hasStringProperty(data, "groupBy")
   );
 }
 

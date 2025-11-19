@@ -14,7 +14,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/db";
 import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/enum";
 import { env } from "@/config/env";

@@ -6,35 +6,16 @@
 
 import "server-only";
 
-import {
-  type DiscoveredRoute,
-  RouteDelegationHandler,
-  type RouteExecutionContext,
-  type RouteExecutionResult,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/cli/route-executor";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { getDiscoveredEndpoints } from "../discovery/adapter";
+import { getDiscoveredEndpoints } from "../registry/endpoint-adapter";
 import type { DiscoveredEndpoint } from "../types/registry";
-import { type Platform } from "../config";
-
-/**
- * Extract error message from unknown error
- * Inlined to avoid Turbopack bundling issues
- */
-// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Handler execution requires 'unknown' for flexible handler signatures
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  if (typeof error === "string") {
-    return error;
-  }
-  return String(error);
-}
+import { type Platform } from "../../types/platform";
+import { getErrorMessage } from "../../utils/error";
+import { extractEndpointPath } from "../../conversion/endpoint-to-metadata";
 
 /**
  * Recursive parameter value type
@@ -115,77 +96,34 @@ export interface BaseExecutionOptions {
 }
 
 /**
+ * Discovered route type
+ * Represents a discovered API route/endpoint
+ */
+export interface DiscoveredRoute {
+  alias: string;
+  path: string;
+  method: string;
+  routePath: string;
+  description?: string;
+}
+
+/**
  * Base Executor Class
  * Provides common execution logic for all platforms
+ * Subclasses must implement executeViaRoute
  */
 export abstract class BaseExecutor {
-  protected routeHandler: RouteDelegationHandler;
-
-  constructor() {
-    this.routeHandler = new RouteDelegationHandler();
-  }
-
   /**
    * Execute a tool via route delegation
+   * Must be implemented by subclasses
    */
-  protected async executeViaRoute<
+  protected abstract executeViaRoute<
     TData extends { [key: string]: ParameterValue },
   >(
     context: BaseExecutionContext<TData>,
     options: BaseExecutionOptions,
     t: TFunction,
-  ): Promise<BaseExecutionResult> {
-    const startTime = Date.now();
-
-    try {
-      // Get endpoint by tool name
-      const endpoint = this.getEndpointByToolName(context.toolName);
-
-      if (!endpoint) {
-        context.logger.error("[Base Executor] Tool not found", {
-          toolName: context.toolName,
-        });
-        return this.createErrorResult("Tool not found", startTime);
-      }
-
-      // Dry run mode
-      if (options.dryRun) {
-        return this.createDryRunResult(
-          context.toolName,
-          context.data,
-          endpoint,
-          startTime,
-        );
-      }
-
-      // Convert endpoint to route format
-      const route = this.endpointToRoute(endpoint, context.toolName);
-
-      // Prepare execution context for route handler
-      const routeContext = this.createRouteContext(context, options);
-
-      // Execute via route delegation handler
-      const result = await this.routeHandler.executeRoute(
-        route,
-        routeContext,
-        context.logger,
-        context.locale,
-        t,
-      );
-
-      // Convert result to base format
-      return this.convertRouteResult(result, endpoint, startTime);
-    } catch (error) {
-      const errorMessage = getErrorMessage(error);
-      context.logger.error(`[Base Executor] Tool execution failed`, {
-        toolName: context.toolName,
-        error: errorMessage,
-        executionTime: Date.now() - startTime,
-      });
-
-      return this.createErrorResult(errorMessage, startTime);
-    }
-  }
+  ): Promise<BaseExecutionResult>;
 
   /**
    * Validate tool parameters
@@ -212,7 +150,7 @@ export abstract class BaseExecutor {
           return {
             valid: false,
             errors: result.error.issues.map(
-              (issue) => `${issue.path.join(".")}: ${issue.message}`,
+              (issue: { path: Array<string | number>; message: string }) => `${issue.path.join(".")}: ${issue.message}`,
             ),
           };
         }
@@ -222,7 +160,7 @@ export abstract class BaseExecutor {
     } catch (error) {
       return {
         valid: false,
-        errors: [getErrorMessage(error)],
+        errors: [getErrorMessage(error as Error | string)],
       };
     }
   }
@@ -244,54 +182,10 @@ export abstract class BaseExecutor {
   ): DiscoveredRoute {
     return {
       alias: toolName,
-      path: endpoint.definition.path.join("/"),
+      path: extractEndpointPath(endpoint),
       method: endpoint.definition.method,
       routePath: endpoint.routePath,
       description: endpoint.definition.description,
-    };
-  }
-
-  /**
-   * Create route execution context
-   */
-  protected createRouteContext<TData extends { [key: string]: ParameterValue }>(
-    context: BaseExecutionContext<TData>,
-    options: BaseExecutionOptions,
-  ): RouteExecutionContext {
-    return {
-      toolName: context.toolName,
-      data: context.data,
-      user: context.user,
-      locale: context.locale,
-      logger: context.logger,
-      platform: context.platform,
-      options: {
-        verbose: options.verbose || false,
-        dryRun: options.dryRun || false,
-        interactive: options.interactive || false,
-        output: options.output || "json",
-      },
-    };
-  }
-
-  /**
-   * Convert route result to base result
-   */
-  protected convertRouteResult(
-    result: RouteExecutionResult,
-    endpoint: DiscoveredEndpoint,
-    startTime: number,
-  ): BaseExecutionResult {
-    return {
-      success: result.success,
-      data: result.data,
-      error: result.error,
-      metadata: {
-        executionTime: Date.now() - startTime,
-        endpointPath: endpoint.definition.path.join("/"),
-        method: endpoint.definition.method,
-        ...result.metadata,
-      },
     };
   }
 
@@ -328,11 +222,11 @@ export abstract class BaseExecutor {
         dryRun: true,
         toolName,
         parameters,
-        endpoint: endpoint.definition.path.join("/"),
+        endpoint: extractEndpointPath(endpoint),
       }),
       metadata: {
         executionTime: Date.now() - startTime,
-        endpointPath: endpoint.definition.path.join("/"),
+        endpointPath: extractEndpointPath(endpoint),
         method: endpoint.definition.method,
       },
     };

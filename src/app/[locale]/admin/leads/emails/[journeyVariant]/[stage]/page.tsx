@@ -12,7 +12,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
 import type React from "react";
 
-import { EmailPreviewClient } from "@/app/[locale]/admin/leads/emails/_components/email-preview-client";
+import { EmailPreviewClient } from "@/app/api/[locale]/v1/core/leads/campaigns/emails/_components/email-preview-client";
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
 import { emailService } from "@/app/api/[locale]/v1/core/leads/campaigns/emails";
 import type {

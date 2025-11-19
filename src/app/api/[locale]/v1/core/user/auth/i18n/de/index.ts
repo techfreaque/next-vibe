@@ -9,6 +9,12 @@ export const translations: typeof enTranslations = {
         "Authentifizierungsstatus konnte nicht entfernt werden",
       status_check_failed:
         "Authentifizierungsstatus konnte nicht überprüft werden",
+      token_save_failed:
+        "Authentifizierungstoken konnte nicht gespeichert werden",
+      token_get_failed:
+        "Authentifizierungstoken konnte nicht abgerufen werden",
+      token_remove_failed:
+        "Authentifizierungstoken konnte nicht entfernt werden",
     },
   },
   errors: {

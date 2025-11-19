@@ -33,7 +33,7 @@ export function endpointHandler<
     TUrlVariablesOutput,
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
@@ -46,7 +46,7 @@ export function endpointHandler<
     UrlVariablesOutput: infer TUrlVariablesOutput;
   };
   method: infer TMethod extends Methods;
-  allowedRoles: infer TUserRoleValue extends readonly (typeof UserRoleValue)[];
+  allowedRoles: infer TUserRoleValue extends readonly UserRoleValue[];
 }
   ? EndpointHandlerReturn<
       TRequestOutput,
@@ -80,8 +80,7 @@ export function endpointHandler<
       UrlVariablesOutput: infer TUrlVariablesOutput;
     };
     method: infer TMethod extends Methods;
-    allowedRoles: infer TUserRoleValue extends
-      readonly (typeof UserRoleValue)[];
+    allowedRoles: infer TUserRoleValue extends readonly UserRoleValue[];
   }
     ? EndpointHandlerReturn<
         TRequestOutput,

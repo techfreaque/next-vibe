@@ -8,7 +8,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 
 import { imapAccounts, type NewImapAccount } from "./db";

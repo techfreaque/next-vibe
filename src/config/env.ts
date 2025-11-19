@@ -214,7 +214,7 @@ export const envSchema = envClientSchema.extend({
   // Optional: If not provided, CLI/MCP will use public user with leadId
   VIBE_CLI_USER_EMAIL: z.string().email().optional(),
 
-  VIBE_LOCALE: (z.string() as z.Schema<CountryLanguage>)
+  VIBE_CLI_LOCALE: (z.string() as z.Schema<CountryLanguage>)
     .optional()
     .default(defaultLocale),
 });

@@ -20,7 +20,7 @@ import {
   canManageFolderPermissions,
 } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -205,9 +205,8 @@ export class ChatFoldersRepositoryImpl
         canCreateFolder: false,
       };
       if (rootFolderId) {
-        const { rootFolderPermissionsRepository } = await import(
-          "./root-permissions/repository"
-        );
+        const { rootFolderPermissionsRepository } =
+          await import("./root-permissions/repository");
         const permissionsResult =
           await rootFolderPermissionsRepository.getRootFolderPermissions(
             { rootFolderId },

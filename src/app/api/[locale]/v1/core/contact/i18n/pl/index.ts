@@ -1,4 +1,5 @@
 import type { translations as enTranslations } from "../en";
+import { translations as componentsTranslations } from "../../_components/i18n/pl";
 
 /**
 *
@@ -7,6 +8,7 @@ import type { translations as enTranslations } from "../en";
 */
 
 export const translations: typeof enTranslations = {
+  _components: componentsTranslations,
   title: "Przesłanie formularza kontaktowego",
   description: "Prześlij formularz kontaktowy i obsługuj powiadomienia e-mail",
   category: "Podstawowe API",

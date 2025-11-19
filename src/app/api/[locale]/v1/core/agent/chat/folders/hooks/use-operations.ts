@@ -26,12 +26,12 @@ export interface FolderUpdate {
   parentId?: string | null;
   expanded?: boolean;
   sortOrder?: number;
-  rolesView?: (typeof UserRoleValue)[] | null;
-  rolesManage?: (typeof UserRoleValue)[] | null;
-  rolesCreateThread?: (typeof UserRoleValue)[] | null;
-  rolesPost?: (typeof UserRoleValue)[] | null;
-  rolesModerate?: (typeof UserRoleValue)[] | null;
-  rolesAdmin?: (typeof UserRoleValue)[] | null;
+  rolesView?: UserRoleValue[] | null;
+  rolesManage?: UserRoleValue[] | null;
+  rolesCreateThread?: UserRoleValue[] | null;
+  rolesPost?: UserRoleValue[] | null;
+  rolesModerate?: UserRoleValue[] | null;
+  rolesAdmin?: UserRoleValue[] | null;
 }
 
 /**
@@ -91,9 +91,8 @@ export function useFolderOperations(
           { name, rootFolderId, parentId },
         );
 
-        const { generateIncognitoId, saveFolder } = await import(
-          "../../incognito/storage"
-        );
+        const { generateIncognitoId, saveFolder } =
+          await import("../../incognito/storage");
 
         const folder: ChatFolder = {
           id: generateIncognitoId("folder"),
@@ -253,9 +252,8 @@ export function useFolderOperations(
           { folderId },
         );
 
-        const { deleteFolder: deleteIncognitoFolder } = await import(
-          "../../incognito/storage"
-        );
+        const { deleteFolder: deleteIncognitoFolder } =
+          await import("../../incognito/storage");
 
         deleteIncognitoFolder(folderId);
         chatStore.deleteFolder(folderId);

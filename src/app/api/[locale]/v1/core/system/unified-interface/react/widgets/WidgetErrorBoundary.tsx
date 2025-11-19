@@ -1,4 +1,5 @@
 "use client";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { AlertTriangle } from "next-vibe-ui/ui/icons";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
@@ -54,7 +55,7 @@ export class WidgetErrorBoundary extends Component<
 
     // Log error for debugging
     // eslint-disable-next-line i18next/no-literal-string
-    const errorMsg = error instanceof Error ? error.message : String(error);
+    const errorMsg = parseError(error).message;
     // eslint-disable-next-line i18next/no-literal-string
     const errorInfoStr = JSON.stringify(errorInfo);
     // eslint-disable-next-line no-console, i18next/no-literal-string

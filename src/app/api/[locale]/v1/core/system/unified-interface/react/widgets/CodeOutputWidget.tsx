@@ -10,6 +10,7 @@ import {
   type WidgetComponentProps,
   type RenderableValue,
 } from "../../shared/ui/types";
+import { isPlainObject, hasStringProperty } from "../../shared/utils/type-guards";
 
 /**
  * Type guard for CodeOutputWidgetData
@@ -17,13 +18,7 @@ import {
 function isCodeOutputWidgetData(
   data: RenderableValue,
 ): data is CodeOutputWidgetData {
-  return (
-    typeof data === "object" &&
-    data !== null &&
-    !Array.isArray(data) &&
-    "code" in data &&
-    typeof data.code === "string"
-  );
+  return isPlainObject(data) && hasStringProperty(data, "code");
 }
 
 /**

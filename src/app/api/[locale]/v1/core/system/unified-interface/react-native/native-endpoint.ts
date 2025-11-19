@@ -24,7 +24,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { envClient } from "@/config/env-client";
 import { type CreateApiEndpointAny } from "../shared/types/endpoint";
 import { type CountryLanguage } from "@/i18n/core/config";

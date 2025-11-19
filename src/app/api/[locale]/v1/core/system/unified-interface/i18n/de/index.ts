@@ -19,6 +19,12 @@ export const translations: typeof enTranslations = {
         "Öffentliche Benutzer können nicht auf diesen authentifizierten Endpunkt zugreifen",
       insufficientPermissions:
         "Unzureichende Berechtigungen für den Zugriff auf diesen Endpunkt",
+      errors: {
+        platformAccessDenied:
+          "Zugriff verweigert für {{platform}} Plattform: {{reason}}",
+        insufficientRoles:
+          "Unzureichende Rollen. Benutzer hat: {{userRoles}}. Erforderlich: {{requiredRoles}}",
+      },
     },
   },
 };

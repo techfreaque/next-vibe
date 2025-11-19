@@ -15,7 +15,7 @@ import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 import { translations } from "@/config/i18n/en";
 
-import ResetPasswordConfirmForm from "./_components/reset-password-confirm-form";
+import ResetPasswordConfirmForm from "@/app/api/[locale]/v1/core/user/public/reset-password/confirm/_components/reset-password-confirm-form";
 
 /**
  * Generate metadata for the Reset Password Confirm page with translations

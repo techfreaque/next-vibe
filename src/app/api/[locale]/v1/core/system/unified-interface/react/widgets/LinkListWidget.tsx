@@ -13,6 +13,7 @@ import {
   type RenderableValue,
 } from "../../shared/ui/types";
 import type { LinkCardData } from "./LinkCardWidget";
+import { isPlainObject } from "../../shared/utils/type-guards";
 import { LinkCardWidget } from "./LinkCardWidget";
 
 /**
@@ -31,9 +32,7 @@ export interface LinkListData extends Record<string, RenderableValue> {
  */
 function isLinkListData(data: RenderableValue): data is LinkListData {
   return (
-    typeof data === "object" &&
-    data !== null &&
-    !Array.isArray(data) &&
+    isPlainObject(data) &&
     "items" in data &&
     Array.isArray(data.items)
   );

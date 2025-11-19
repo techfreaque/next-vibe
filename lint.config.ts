@@ -12,7 +12,6 @@
  */
 
 import type {
-  EslintConfig,
   OxlintConfig,
   OxlintPrettierEslintConfig,
   PrettierConfig,

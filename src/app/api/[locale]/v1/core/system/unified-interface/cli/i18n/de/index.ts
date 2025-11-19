@@ -3,6 +3,14 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   setup: setupTranslations,
+  auth: {
+    errors: {
+      userNotFound:
+        "CLI-Benutzer mit E-Mail {{email}} wurde nicht in der Datenbank gefunden. Bitte führen Sie zuerst 'vibe seed' aus.",
+      databaseError:
+        "Datenbankfehler beim Abrufen des CLI-Benutzers: {{error}}",
+    },
+  },
   vibe: {
     startingUp: "Vibe CLI wird gestartet...",
     executeCommand: "Befehl wird ausgeführt",

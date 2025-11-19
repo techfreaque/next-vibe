@@ -29,7 +29,7 @@ export async function sendTestRequest<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields extends UnifiedField<z.ZodTypeAny>,
   TRequestInput = Record<string, string | number | boolean | null>,
   TUrlVariablesInput = Record<string, string | number | boolean | null>,

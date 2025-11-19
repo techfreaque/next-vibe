@@ -23,7 +23,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import { nativeEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react-native/native-endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NewUser, User } from "./db";
@@ -232,7 +232,7 @@ class UserRepositoryNativeImpl implements UserRepository {
     options: {
       limit?: number;
       offset?: number;
-      roles?: (typeof UserRoleValue)[];
+      roles?: UserRoleValue[];
     },
     logger: EndpointLogger,
   ): Promise<
@@ -248,7 +248,7 @@ class UserRepositoryNativeImpl implements UserRepository {
       };
       searchInfo: {
         searchTerm: string | undefined;
-        appliedFilters: (typeof UserRoleValue)[];
+        appliedFilters: UserRoleValue[];
         searchTime: string;
         totalResults: number;
       };
@@ -272,7 +272,7 @@ class UserRepositoryNativeImpl implements UserRepository {
         };
         searchInfo: {
           searchTerm: string | undefined;
-          appliedFilters: (typeof UserRoleValue)[];
+          appliedFilters: UserRoleValue[];
           searchTime: string;
           totalResults: number;
         };

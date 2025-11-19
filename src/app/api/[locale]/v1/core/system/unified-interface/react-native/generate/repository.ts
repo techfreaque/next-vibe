@@ -291,7 +291,7 @@ export default createLayoutWrapperWithImport(() => import("${importPath}"));
         result.created.push(relativePath);
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : String(error);
+          parseError(error).message;
         result.errors.push({ file: relativePath, error: errorMessage });
       }
     }
@@ -327,7 +327,7 @@ export default createLayoutWrapperWithImport(() => import("${importPath}"));
         result.created.push(relativePath);
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : String(error);
+          parseError(error).message;
         result.errors.push({ file: relativePath, error: errorMessage });
       }
     }

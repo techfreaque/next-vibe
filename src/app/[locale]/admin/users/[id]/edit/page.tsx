@@ -14,7 +14,7 @@ import { userByIdRepository } from "@/app/api/[locale]/v1/core/users/user/[id]/r
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { UserEditForm } from "./_components/user-edit-form";
+import { UserEditForm } from "@/app/api/[locale]/v1/core/users/user/_components/user-edit-form";
 
 interface UserEditPageProps {
   params: Promise<{

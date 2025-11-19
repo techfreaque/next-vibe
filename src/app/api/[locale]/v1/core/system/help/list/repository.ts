@@ -15,7 +15,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-import { helpService } from "../../unified-interface/shared/server-only/help/service";
+import { endpointListingService } from "../../unified-interface/shared/server-only/endpoint-listing/service";
 import type {
   HelpListRequestOutput,
   HelpListResponseOutput,
@@ -36,37 +36,32 @@ class HelpListRepository {
     logger.info("Discovering available commands");
 
     try {
-      // Use shared help service for command discovery
-      const commands = helpService.discoverCommands(logger, {
-        category: data.category,
+      // Use unified endpoint listing service
+      const endpoints = endpointListingService.discoverEndpoints(logger, {
         locale,
+        category: data.category,
       });
 
-      // Sort commands by category and alias
-      const sortedCommands = commands.toSorted((a, b) => {
+      // Sort endpoints by category and name
+      const sortedEndpoints = endpoints.toSorted((a, b) => {
         const catCompare = a.category.localeCompare(b.category);
         if (catCompare !== 0) {
           return catCompare;
         }
-        return a.alias.localeCompare(b.alias);
+        return a.name.localeCompare(b.name);
       });
 
       // Format commands for API response
-      const formattedCommands = sortedCommands.map((cmd) => ({
-        alias: cmd.alias,
-        message:
-          data.showDescriptions && cmd.description
-            ? cmd.description
-            : cmd.alias,
+      const formattedCommands = sortedEndpoints.map((ep) => ({
+        alias: ep.name,
+        message: data.showDescriptions && ep.description ? ep.description : ep.name,
         description:
-          data.showDescriptions && cmd.description
-            ? cmd.description
-            : undefined,
-        category: cmd.category,
+          data.showDescriptions && ep.description ? ep.description : undefined,
+        category: ep.category,
         aliases:
-          data.showAliases && cmd.aliases ? cmd.aliases.join(", ") : undefined,
+          data.showAliases && ep.aliases ? ep.aliases.join(", ") : undefined,
         // Add display name for GROUPED_LIST
-        rule: cmd.alias,
+        rule: ep.name,
       }));
 
       logger.info("Command discovery completed", {

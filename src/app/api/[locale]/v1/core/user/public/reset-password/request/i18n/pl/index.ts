@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
+import { translations as componentsTranslations } from "../../_components/i18n/pl";
 
 export const translations: typeof enTranslations = {
+  _components: componentsTranslations,
   title: "Żądanie resetowania hasła",
   description: "Żądanie resetowania hasła",
   tag: "Reset hasła",

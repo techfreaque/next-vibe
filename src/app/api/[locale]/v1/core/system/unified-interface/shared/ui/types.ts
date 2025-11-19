@@ -8,14 +8,16 @@
  */
 
 import type React from "react";
+import type { z } from "zod";
 
-import type { ResponseFieldMetadata } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/types";
 import type {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import type { TranslationKey } from "@/i18n/core/static-types";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { Platform } from "../types/platform";
 
 /**
  * Valid primitive values that can be rendered
@@ -28,6 +30,75 @@ export type RenderableValue =
   | undefined
   | RenderableValue[]
   | { [key: string]: RenderableValue };
+
+/**
+ * Widget configuration interface
+ */
+export interface WidgetConfig {
+  layout?:
+    | {
+        columns: number;
+        spacing: string;
+      }
+    | string
+    | number;
+  groupBy?: string;
+  cardTemplate?: string;
+  showSummary?: boolean;
+  summaryTemplate?: string;
+  itemConfig?: {
+    template: string;
+    size: string;
+    spacing: string;
+  };
+  summaryTitle?: string;
+  summaryStats?: Array<{
+    field: string;
+    value: string;
+    label?: string;
+    icon?: string;
+    color?: string;
+  }>;
+  [key: string]: RenderableValue;
+}
+
+/**
+ * Response field metadata extracted from endpoint definitions
+ * Shared across all platforms (CLI, Web, Mobile)
+ */
+export interface ResponseFieldMetadata {
+  name: string;
+  type: FieldDataType;
+  widgetType: WidgetType;
+  value: RenderableValue;
+  label?: TranslationKey;
+  title?: TranslationKey;
+  description?: TranslationKey;
+  required?: boolean;
+  schema?: z.ZodTypeAny;
+  // Additional metadata for rendering
+  format?: string;
+  unit?: string;
+  precision?: number;
+  choices?: string[];
+  columns?: Array<{
+    key: string;
+    label: TranslationKey;
+    type: FieldDataType;
+    width?: string;
+    sortable?: boolean;
+    filterable?: boolean;
+  }>;
+  // Grouped list specific properties
+  groupBy?: string;
+  sortBy?: string;
+  showGroupSummary?: boolean;
+  maxItemsPerGroup?: number;
+  // Widget-specific configuration
+  config?: WidgetConfig;
+  // Nested structure for container/section widgets
+  children?: Record<string, ResponseFieldMetadata>;
+}
 
 /**
  * Widget action types for interactive elements
@@ -69,7 +140,7 @@ export interface WidgetRenderContext {
   isInteractive: boolean;
 
   /** User permissions for conditional rendering */
-  permissions: readonly (typeof UserRoleValue)[];
+  permissions: readonly UserRoleValue[];
 
   /** Navigation callback for links and routing */
   onNavigate?: (url: string) => void;
@@ -78,7 +149,7 @@ export interface WidgetRenderContext {
   onAction?: (action: WidgetAction) => void | Promise<void>;
 
   /** Platform identifier */
-  platform?: "web" | "native" | "cli";
+  platform?: typeof Platform.WEB | typeof Platform.MOBILE | typeof Platform.CLI;
 
   /** Theme preference */
   theme?: "light" | "dark" | "system";
@@ -129,7 +200,9 @@ export interface WidgetRegistryEntry<TData = unknown> {
     | WidgetRenderer<TData>;
 
   /** Supported platforms */
-  platforms?: Array<"web" | "native" | "cli">;
+  platforms?: Array<
+    typeof Platform.WEB | typeof Platform.MOBILE | typeof Platform.CLI
+  >;
 
   /** Whether this widget supports editing */
   supportsEditing?: boolean;

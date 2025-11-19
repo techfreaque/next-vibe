@@ -16,12 +16,12 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint";
-import { getCliUserForCommand } from "../shared/server-only/auth/cli-user";
+// getCliUser is now imported dynamically where needed
 import type { ParameterValue } from "../shared/server-only/execution/executor";
 import { findRouteFiles } from "../shared/server-only/filesystem/scanner";
 import { memoryMonitor } from "../shared/server-only/utils/performance";
 import type { InferJwtPayloadTypeFromRoles } from "../shared/types/handler";
-import { Platform } from "../shared/server-only/config";
+import { Platform } from "../shared/types/platform";
 import { getConfig } from "./config";
 import type {
   CliRequestData,
@@ -40,7 +40,7 @@ interface CliExecutionOptions {
     positionalArgs: string[];
     namedArgs: Record<string, string | number | boolean>;
   };
-  user?: InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>;
+  user?: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
   locale: CountryLanguage;
   dryRun?: boolean;
   interactive?: boolean;
@@ -166,13 +166,18 @@ export class CliEntryPoint {
     };
 
     // Get CLI user for authentication if not provided
-    const cliUser = options.user
-      ? options.user
-      : await getCliUserForCommand(
-          command,
-          this.logger,
-          options.locale || "en-GLOBAL",
-        );
+    let cliUser = options.user;
+
+    if (!cliUser) {
+      const { getCliUser } = await import("./auth/cli-user");
+      const cliUserResult = await getCliUser(this.logger, options.locale);
+
+      if (cliUserResult.success) {
+        cliUser = cliUserResult.data;
+      }
+      // If getCliUser fails, leave cliUser as undefined
+      // route-executor will handle it and check CLI_AUTH_BYPASS
+    }
 
     // Create execution context
     const context: RouteExecutionContext = {
@@ -181,7 +186,7 @@ export class CliEntryPoint {
       urlPathParams: options.urlPathParams,
       cliArgs: options.cliArgs, // Pass CLI arguments
       user: cliUser,
-      locale: options.locale || this.locale,
+      locale: options.locale,
       logger: this.logger,
       platform: Platform.CLI,
       options: {
@@ -210,7 +215,7 @@ export class CliEntryPoint {
         result,
         options.output || "pretty",
         endpointDefinition,
-        options.locale || this.locale,
+        options.locale,
         this.logger.isDebugEnabled || false,
         this.logger,
       );
@@ -224,7 +229,7 @@ export class CliEntryPoint {
         this.t(
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.executionFailed",
           {
-            error: error instanceof Error ? error.message : String(error),
+            error: parseError(error).message,
           },
         ),
       );
@@ -300,7 +305,7 @@ export class CliEntryPoint {
       );
 
       // Extract custom aliases and description if available
-      if (actualMethods.length > 0) {
+      if (actualMethods.length) {
         const firstMethodKey = actualMethods[0];
         if (firstMethodKey) {
           const firstMethod = defaultExport[firstMethodKey];
@@ -323,14 +328,14 @@ export class CliEntryPoint {
       if (this.logger) {
         this.logger.debug?.("Failed to load definition for aliases", {
           definitionPath,
-          error: error instanceof Error ? error.message : String(error),
+          error: parseError(error).message,
         });
       }
     }
 
     // Use actual methods or fallback
     const methodsToRegister =
-      actualMethods.length > 0
+      actualMethods.length
         ? actualMethods
         : ["POST", "GET", "PUT", "PATCH", "DELETE"];
 
@@ -580,13 +585,24 @@ export class CliEntryPoint {
     logger: EndpointLogger,
   ): Promise<RouteExecutionResult> {
     try {
-      const cliUser = await getCliUserForCommand(
-        "interactive",
-        logger,
-        this.locale,
-      );
+      const { getCliUser } = await import("./auth/cli-user");
+      const cliUserResult = await getCliUser(logger, this.locale);
+
+      if (!cliUserResult.success) {
+        logger.error("CLI user authentication failed for interactive mode", {
+          message: cliUserResult.message,
+          errorType: cliUserResult.errorType,
+        });
+
+        return {
+          success: false,
+          error: cliUserResult.message,
+          errorParams: cliUserResult.messageParams,
+        };
+      }
+
       await interactiveModeHandler.startInteractiveMode(
-        cliUser,
+        cliUserResult.data,
         this.locale,
         this.routes,
         logger,

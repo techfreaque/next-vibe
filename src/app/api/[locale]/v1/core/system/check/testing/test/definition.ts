@@ -28,7 +28,13 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.check.testing.test.description",
   category: "app.api.v1.core.system.check.testing.test.category",
   tags: ["app.api.v1.core.system.check.testing.test.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF, UserRole.WEB_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.PRODUCTION_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.CLI_AUTH_BYPASS,
+  ],
   aliases: ["test", "t"],
 
   cli: {

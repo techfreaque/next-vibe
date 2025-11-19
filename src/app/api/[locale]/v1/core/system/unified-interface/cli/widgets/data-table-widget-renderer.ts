@@ -46,7 +46,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
 
     const config = this.getTableConfig(field, context.options.locale);
 
-    if (config.columns && config.columns.length > 0) {
+    if (config.columns && config.columns.length) {
       return this.renderTableWithColumns(data, config, context);
     } else {
       return this.renderTableAutoColumns(data, context);

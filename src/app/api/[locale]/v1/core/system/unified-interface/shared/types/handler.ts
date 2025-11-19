@@ -72,7 +72,7 @@ import type { CreateApiEndpoint } from "../endpoint/create";
 import type { EndpointLogger } from "../logger/endpoint";
 import type { Methods } from "./enums";
 import type { UserRole } from "../../../../user/user-roles/enum";
-import { type UnifiedField } from "./endpoint";
+import { type CreateApiEndpointAny, type UnifiedField } from "./endpoint";
 import type z from "zod";
 
 // Re-export MCP types for convenience
@@ -144,24 +144,12 @@ type ExtractUrlVariablesOutput<TEndpoint> = TEndpoint extends {
  * Helper type to extract allowed roles from endpoint, with fallback
  */
 type ExtractAllowedRoles<TEndpoint> = TEndpoint extends {
-  allowedRoles: infer Roles extends readonly (typeof UserRoleValue)[];
+  allowedRoles: infer Roles extends readonly UserRoleValue[];
 }
   ? Roles
-  : readonly (typeof UserRoleValue)[];
+  : readonly UserRoleValue[];
 
-export interface RouteModule<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
-  > = CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
-  >,
-> {
+export interface RouteModule<TEndpoint extends CreateApiEndpointAny> {
   // HTTP method handlers (GET, POST, PUT, PATCH, DELETE)
   readonly GET?: NextHandlerReturnType<
     ExtractResponseOutput<TEndpoint>,
@@ -218,12 +206,12 @@ export interface DefinitionModule<
   TEndpoint extends CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     UnifiedField<z.ZodTypeAny>
   > = CreateApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly UserRoleValue[],
     UnifiedField<z.ZodTypeAny>
   >,
 > {
@@ -236,7 +224,7 @@ export interface DefinitionModule<
  * - No PUBLIC role in roles → JwtPayloadType
  * - Mixed roles (includes PUBLIC + others) → JwtPayloadType (union)
  */
-export type InferJwtPayloadType<TUserRoleValue extends typeof UserRoleValue> =
+export type InferJwtPayloadType<TUserRoleValue extends UserRoleValue> =
   TUserRoleValue extends typeof UserRole.PUBLIC
     ? JWTPublicPayloadType
     : JwtPayloadType;
@@ -251,7 +239,7 @@ export type InferJwtPayloadType<TUserRoleValue extends typeof UserRoleValue> =
  * - Otherwise → JwtPrivatePayloadType (no PUBLIC, guaranteed authenticated)
  */
 export type InferJwtPayloadTypeFromRoles<
-  TRoles extends readonly (typeof UserRoleValue)[],
+  TRoles extends readonly UserRoleValue[],
 > =
   Exclude<TRoles[number], typeof UserRole.PUBLIC> extends never
     ? JWTPublicPayloadType
@@ -302,7 +290,7 @@ export interface MethodHandlerConfig<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > {
   handler: ApiHandlerFunction<
     TRequestOutput,
@@ -330,7 +318,7 @@ export type EndpointHandlerConfig<T> = {
           ResponseOutput: infer TResOut;
           UrlVariablesOutput: infer TUrlOut;
         };
-        allowedRoles: infer TRoles extends readonly (typeof UserRoleValue)[];
+        allowedRoles: infer TRoles extends readonly UserRoleValue[];
       }
       ? MethodHandlerConfig<TReqOut, TResOut, TUrlOut, TRoles>
       : never
@@ -391,7 +379,7 @@ export type EndpointsHandlerReturn<T> = {
         Record<string, string | number | boolean>,
         Record<string, string | number | boolean>,
         Record<string, string | number | boolean>,
-        readonly (typeof UserRoleValue)[]
+        readonly UserRoleValue[]
       >
     >;
   };
@@ -405,7 +393,7 @@ export type EndpointsHandlerReturn<T> = {
 export interface ApiHandlerProps<
   TRequestOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > {
   /** Request data (validated by Zod schema) */
   data: TRequestOutput;
@@ -422,8 +410,8 @@ export interface ApiHandlerProps<
   /** Locale */
   locale: CountryLanguage;
 
-  /** Original request object */
-  request: NextRequest;
+  /** Original request object (optional - only available in Next.js context) */
+  request?: NextRequest;
 
   /** Logger instance for structured logging */
   logger: EndpointLogger;
@@ -442,7 +430,7 @@ export type ApiHandlerFunction<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > = (
   props: ApiHandlerProps<TRequestOutput, TUrlVariablesOutput, TUserRoleValue>,
 ) =>
@@ -498,7 +486,7 @@ export interface ApiHandlerOptions<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
   TFields extends UnifiedField<z.ZodTypeAny>,
   TRequestInput = TRequestOutput,
   TResponseInput = TResponseOutput,
@@ -554,7 +542,7 @@ export type EndpointHandlerReturn<
   TResponseOutput,
   TUrlVariablesOutput,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly UserRoleValue[],
 > = {
   [K in TMethod]: NextHandlerReturnType<TResponseOutput, TUrlVariablesOutput>;
 } & {

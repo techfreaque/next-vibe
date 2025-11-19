@@ -6,6 +6,7 @@
 
 import type { EndpointLogger } from "../logger/endpoint";
 import type { Methods } from "../types/enums";
+import type { CreateApiEndpointAny } from "../types/endpoint";
 import { endpointRegistry } from "./endpoint-registry";
 
 /**
@@ -35,8 +36,9 @@ export interface DefinitionLoaderResult<TEndpoint = unknown> {
  * Load endpoint definition using EndpointRegistry
  * @deprecated Use endpointRegistry.loadDefinition() directly
  */
-// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Definition type extraction requires 'unknown' for generic module support
-export async function loadEndpointDefinition<TEndpoint = unknown>(
+export async function loadEndpointDefinition<
+  TEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny,
+>(
   options: DefinitionLoaderOptions,
   logger: EndpointLogger,
 ): Promise<DefinitionLoaderResult<TEndpoint>> {

@@ -34,7 +34,7 @@ export function endpointsHandler<const T>(
       CreateApiEndpoint<
         string,
         Methods,
-        readonly (typeof UserRoleValue)[],
+        readonly UserRoleValue[],
         UnifiedField<z.ZodTypeAny>
       >
     >,
@@ -51,7 +51,7 @@ export function endpointsHandler<const T>(
       Record<string, string | number | boolean | null>,
       Record<string, string | number | boolean | null>,
       M,
-      readonly (typeof UserRoleValue)[]
+      readonly UserRoleValue[]
     >;
   }
 
@@ -65,14 +65,14 @@ export function endpointsHandler<const T>(
     ] as T[typeof method] extends CreateApiEndpoint<
       infer TExampleKey extends string,
       infer TMethod extends Methods,
-      infer TUserRoleValue extends readonly (typeof UserRoleValue)[],
+      infer TUserRoleValue extends readonly UserRoleValue[],
       infer TFields extends UnifiedField<z.ZodTypeAny>
     >
       ? CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>
       : CreateApiEndpoint<
           string,
           Methods,
-          readonly (typeof UserRoleValue)[],
+          readonly UserRoleValue[],
           UnifiedField<z.ZodTypeAny>
         >;
     const methodConfig = methodConfigs[method];
@@ -133,7 +133,7 @@ export function endpointsHandler<const T>(
       Record<string, string | number | boolean | null>,
       Record<string, string | number | boolean | null>,
       Record<string, string | number | boolean | null>,
-      readonly (typeof UserRoleValue)[]
+      readonly UserRoleValue[]
     >;
   };
 

@@ -41,7 +41,7 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
   logger: EndpointLogger,
   requestData: TRequestData,
   urlPathParams: TUrlPathParams,
-  customQueryKey: QueryKey,
+  customQueryKey?: QueryKey,
 ): QueryKey {
   // If custom query key is provided, use it
   if (customQueryKey) {
@@ -70,7 +70,7 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
             if (typeof value === "object" && value !== null) {
               // Return a simplified version of objects
               const valueAsObject = value as SerializableObject;
-              if (Object.keys(valueAsObject).length > 0) {
+              if (Object.keys(valueAsObject).length) {
                 // Create a safe representation of the object
                 const safeObject: SerializableObject = {};
                 // Filter and transform entries
@@ -126,7 +126,7 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
             if (typeof value === "object" && value !== null) {
               // Return a simplified version of objects
               const valueAsObject = value as SerializableObject;
-              if (Object.keys(valueAsObject).length > 0) {
+              if (Object.keys(valueAsObject).length) {
                 // Create a safe representation of the object
                 const safeObject: SerializableObject = {};
                 // Filter and transform entries

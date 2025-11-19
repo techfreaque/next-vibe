@@ -48,9 +48,12 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { ThreadPermissionsDialog } from "./thread-permissions-dialog";
-import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTouchDevice } from "@/hooks/use-touch-device";
-import { chatColors, chatTransitions } from "@/app/[locale]/chat/lib/design-tokens";
+import {
+  chatColors,
+  chatTransitions,
+} from "@/app/[locale]/chat/lib/design-tokens";
 import type { ChatThread } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
 
 export interface ThreadItemProps {
@@ -265,9 +268,7 @@ export function ThreadItem({
           }
 
           return (
-            <Div
-              className="flex items-center gap-1"
-            >
+            <Div className="flex items-center gap-1">
               <DropdownMenu
                 open={dropdownOpen}
                 onOpenChange={(open) => {
@@ -452,9 +453,7 @@ export function ThreadItem({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>
-              {t("app.chat.common.cancel")}
-            </AlertDialogCancel>
+            <AlertDialogCancel>{t("app.chat.common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 handleConfirmDelete();

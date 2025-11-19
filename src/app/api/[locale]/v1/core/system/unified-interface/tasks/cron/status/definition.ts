@@ -33,7 +33,7 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
   description:
     "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.description",
   category: "app.api.v1.core.system.unifiedInterface.tasks.taskCategory.system",
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN],
   aliases: ["cron:status", "tasks:cron:status"],
   tags: ["app.api.v1.core.system.unifiedInterface.tasks.type.cron"],
   errorTypes: {

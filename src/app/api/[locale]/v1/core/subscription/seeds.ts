@@ -8,7 +8,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -273,9 +273,8 @@ export async function dev(
             : undefined;
 
           // Get subscription credits from products repository
-          const { productsRepository, ProductIds } = await import(
-            "../products/repository-client"
-          );
+          const { productsRepository, ProductIds } =
+            await import("../products/repository-client");
           const subscription = productsRepository.getProduct(
             ProductIds.SUBSCRIPTION,
             locale,

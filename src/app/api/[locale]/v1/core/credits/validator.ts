@@ -12,7 +12,7 @@ import {
 
 import { getModelCost } from "@/app/api/[locale]/v1/core/agent/chat/model-access/costs";
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { creditRepository } from "./repository";

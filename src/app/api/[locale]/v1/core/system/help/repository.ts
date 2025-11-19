@@ -16,13 +16,28 @@ import { parseError } from "next-vibe/shared/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../system/unified-interface/shared/logger/endpoint";
-import { helpService } from "../../system/unified-interface/shared/server-only/help/service";
+import { endpointListingService } from "../../system/unified-interface/shared/server-only/endpoint-listing/service";
 import type { HelpRequestOutput, HelpResponseOutput } from "./definition";
 
 /**
  * Help Repository
  */
 class HelpRepository {
+  /**
+   * Discover all available commands using unified service
+   */
+  discoverCommands(
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+    category?: string,
+  ): ReturnType<typeof endpointListingService.discoverEndpoints> {
+    // Use unified endpoint listing service
+    return endpointListingService.discoverEndpoints(logger, {
+      locale,
+      category,
+    });
+  }
+
   /**
    * Execute the help command
    */
@@ -36,14 +51,14 @@ class HelpRepository {
     });
 
     try {
-      // Use shared help service for command discovery
-      const commands = helpService.discoverCommands(logger, { locale });
+      // Discover commands
+      const commands = this.discoverCommands(logger, locale);
 
       if (data.command) {
         // Show help for specific command
         const command = commands.find(
           (cmd) =>
-            cmd.alias === data.command ||
+            cmd.name === data.command ||
             cmd.aliases?.includes(data.command || ""),
         );
 
@@ -79,20 +94,20 @@ class HelpRepository {
    * Format help for a specific command
    */
   private formatCommandHelp(command: {
-    alias: string;
+    name: string;
     path: string;
     method: string;
     category: string;
-    description?: string;
+    description: string;
     aliases?: string[];
   }): HelpResponseOutput {
     return {
       header: {
-        title: `${command.alias} - ${command.description || "No description available"}`,
+        title: `${command.name} - ${command.description || "No description available"}`,
         description: command.description,
       },
       usage: {
-        patterns: [`vibe ${command.alias} [options]`],
+        patterns: [`vibe ${command.name} [options]`],
       },
       commonCommands: {
         items: [], // Empty for specific command help
@@ -129,11 +144,11 @@ class HelpRepository {
       examples: {
         items: [
           {
-            command: `vibe ${command.alias}`,
+            command: `vibe ${command.name}`,
             description: "Run command with default options",
           },
           {
-            command: `vibe ${command.alias} --help`,
+            command: `vibe ${command.name} --help`,
             description: "Show command help",
           },
         ],

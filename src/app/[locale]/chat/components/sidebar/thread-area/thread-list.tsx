@@ -7,7 +7,7 @@ import React from "react";
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { ChatThread } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
 import { ThreadItem } from "./thread-item";
 

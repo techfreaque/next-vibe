@@ -56,7 +56,7 @@ import { FolderPermissionsDialog } from "./folder-permissions-dialog";
 import { MoveFolderDialog } from "./move-folder-dialog";
 import { RenameFolderDialog } from "./rename-folder-dialog";
 import { ThreadList } from "./thread-list";
-import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { ChatFolder } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
 import {
   shouldFolderBeExpanded,

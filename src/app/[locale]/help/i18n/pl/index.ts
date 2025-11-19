@@ -1,8 +1,8 @@
-import { translations as componentsTranslations } from "../../_components/i18n/pl";
 import type { translations as enTranslations } from "../en";
+import { translations as contactTranslations } from "@/app/api/[locale]/v1/core/contact/i18n/pl";
 
 export const translations: typeof enTranslations = {
-  components: componentsTranslations,
+  contact: contactTranslations,
   nav: {
     home: "Strona główna",
   },

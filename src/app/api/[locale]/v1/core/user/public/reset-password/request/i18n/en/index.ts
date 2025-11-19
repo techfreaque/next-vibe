@@ -1,4 +1,7 @@
+import { translations as componentsTranslations } from "../../_components/i18n/en";
+
 export const translations = {
+  _components: componentsTranslations,
   title: "Reset Password Request",
   description: "Request password reset",
   tag: "Password Reset",

@@ -1,86 +1,69 @@
 /**
  * AI Tool Registry
- * Central registry for managing and accessing AI tools
  */
 
 import "server-only";
 
-import { defaultLocale } from "@/i18n/core/config";
-
-import { Platform } from "../shared/server-only/config";
-import { BaseRegistry } from "../shared/server-only/execution/registry";
-import type { EndpointLogger } from "../shared/types/logger";
+import { Platform } from "../shared/types/platform";
+import type { EndpointLogger } from "../shared/logger/endpoint";
+import { getDiscoveredEndpoints } from "../shared/server-only/registry/endpoint-adapter";
 import { toolFilter } from "./filter";
-/**
- * Singleton instance
- */
-import { createSingletonGetter } from "../shared/utils/singleton";
 import { toolExecutor } from "./executor";
 import type {
   AIToolExecutionContext,
   AIToolExecutionResult,
   DiscoveredEndpoint,
-  IToolRegistry,
   ToolExecutorOptions,
   ToolFilterCriteria,
   ToolRegistryStats,
 } from "./types";
 
 /**
- * Tool Registry Implementation
- * Extends BaseRegistry to eliminate duplication
+ * Registry state
  */
-export class ToolRegistry extends BaseRegistry implements IToolRegistry {
-  private cacheStats = {
-    hits: 0,
-    misses: 0,
-    lastRefresh: 0,
-  };
+let initialized = false;
+let endpoints: DiscoveredEndpoint[] = [];
+let cacheStats = {
+  hits: 0,
+  misses: 0,
+  lastRefresh: 0,
+};
 
-  constructor() {
-    // eslint-disable-next-line i18next/no-literal-string
-    const platformName = "AI Tool Registry";
-    super({
-      platformName,
-      locale: defaultLocale,
-    });
+/**
+ * AI Tool Registry
+ */
+export class ToolRegistry {
+  /**
+   * Initialize the registry
+   */
+  static async initialize(): Promise<void> {
+    if (initialized) {
+      return;
+    }
+
+    endpoints = getDiscoveredEndpoints();
+    initialized = true;
+    cacheStats.lastRefresh = Date.now();
   }
 
   /**
-   * Initialize the registry using generated endpoints
+   * Get endpoints with filtering
    */
-  async initialize(): Promise<void> {
-    await super.initialize();
-  }
-
-  /**
-   * Post-initialization hook
-   */
-  protected async onInitialized(): Promise<void> {
-    this.cacheStats.lastRefresh = Date.now();
-    await Promise.resolve(); // Satisfy async requirement
-  }
-
-  /**
-   * Get all endpoints with optional filtering by user permissions and platform (synchronous)
-   * For proper role checking, use getEndpointsAsync
-   * @param user - User context for permission filtering (optional)
-   * @param platform - Platform to filter by (optional, defaults to AI)
-   * @param criteria - Additional filter criteria (optional)
-   */
-  getEndpoints(
+  static getEndpoints(
     user?: AIToolExecutionContext["user"],
     platform?: Platform,
     criteria?: ToolFilterCriteria,
   ): DiscoveredEndpoint[] {
-    this.ensureInitialized();
+    ToolRegistry.ensureInitialized();
 
-    // Use base class method for permission filtering
     let filtered = user
-      ? super.getEndpointsByPermissions(user, platform || Platform.AI)
-      : super.getEndpoints();
+      ? toolFilter.filterEndpointsByPermissions(
+          endpoints,
+          user,
+          platform || Platform.AI,
+        )
+      : endpoints;
 
-    // Apply additional criteria if provided
     if (criteria) {
       filtered = toolFilter.filterEndpointsByCriteria(filtered, criteria);
     }
@@ -89,30 +72,23 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
   }
 
   /**
-   * Get all endpoints with optional filtering by user permissions and platform (async - fetches user roles)
-   * This is the preferred method for accurate permission checking
-   * @param user - User context for permission filtering (optional)
-   * @param platform - Platform to filter by (optional, defaults to AI)
-   * @param logger - Logger for debugging
-   * @param criteria - Additional filter criteria (optional)
+   * Get endpoints async with proper role checking
    */
-  async getEndpointsAsync(
+  static async getEndpointsAsync(
     user: AIToolExecutionContext["user"],
     platform: Platform = Platform.AI,
     logger: EndpointLogger,
     criteria?: ToolFilterCriteria,
   ): Promise<DiscoveredEndpoint[]> {
-    this.ensureInitialized();
+    ToolRegistry.ensureInitialized();
 
-    // Use async permission filtering that fetches user roles from database
     let filtered = await toolFilter.filterEndpointsByPermissionsAsync(
-      this.endpoints,
+      endpoints,
       user,
       platform,
       logger,
     );
 
-    // Apply additional criteria if provided
     if (criteria) {
       filtered = toolFilter.filterEndpointsByCriteria(filtered, criteria);
     }
@@ -121,80 +97,57 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
   }
 
   /**
-   * Lazy load specific endpoints by tool names
-   * This method dynamically imports only the requested endpoint definitions
-   * instead of loading all endpoints during initialization
-   *
-   * @param toolNames - Array of tool names to load
-   * @param user - User context for permission filtering (optional)
-   * @param platform - Platform to filter by (optional, defaults to AI)
-   * @param criteria - Additional filter criteria (optional)
-   * @returns Array of DiscoveredEndpoint objects for the requested tools
+   * Get endpoints by tool names
    */
-  async getEndpointsByToolNamesLazy(
+  static async getEndpointsByToolNamesLazy(
     toolNames: string[],
     user?: AIToolExecutionContext["user"],
     platform?: Platform,
-    criteria?: ToolFilterCriteria,
   ): Promise<DiscoveredEndpoint[]> {
-    // Use base class lazy loading method
-    let endpoints = await super.getEndpointsByToolNamesLazy(
-      toolNames,
-      user,
-      platform || Platform.AI,
-    );
+    ToolRegistry.ensureInitialized();
 
-    // Apply additional criteria if provided
-    if (criteria) {
-      endpoints = toolFilter.filterEndpointsByCriteria(endpoints, criteria);
-    }
+    const filtered = endpoints.filter((e) => toolNames.includes(e.toolName));
 
-    return endpoints;
+    return user
+      ? toolFilter.filterEndpointsByPermissions(
+          filtered,
+          user,
+          platform || Platform.AI,
+        )
+      : filtered;
   }
 
   /**
-   * Lazy load specific endpoints by endpoint IDs
-   * This method dynamically imports only the requested endpoint definitions
-   * More precise than getEndpointsByToolNamesLazy as it loads exact endpoints
-   *
-   * @param endpointIds - Array of endpoint IDs to load (e.g., ["get_v1_core_agent_chat_folders"])
-   * @param user - User context for permission filtering (optional)
-   * @param platform - Platform to filter by (optional, defaults to AI)
-   * @param criteria - Additional filter criteria (optional)
-   * @returns Array of DiscoveredEndpoint objects for the requested endpoints
+   * Get endpoints by IDs
    */
-  async getEndpointsByIdsLazy(
+  static async getEndpointsByIdsLazy(
     endpointIds: string[],
     user?: AIToolExecutionContext["user"],
     platform?: Platform,
-    criteria?: ToolFilterCriteria,
   ): Promise<DiscoveredEndpoint[]> {
-    // Use base class lazy loading method
-    let endpoints = await super.getEndpointsByIdsLazy(
-      endpointIds,
-      user,
-      platform || Platform.AI,
-    );
+    ToolRegistry.ensureInitialized();
 
-    // Apply additional criteria if provided
-    if (criteria) {
-      endpoints = toolFilter.filterEndpointsByCriteria(endpoints, criteria);
-    }
+    const filtered = endpoints.filter((e) => endpointIds.includes(e.id));
 
-    return endpoints;
+    return user
+      ? toolFilter.filterEndpointsByPermissions(
+          filtered,
+          user,
+          platform || Platform.AI,
+        )
+      : filtered;
   }
 
   /**
    * Execute a tool
    */
-  async executeTool(
+  static async executeTool(
     context: AIToolExecutionContext,
     options?: ToolExecutorOptions,
   ): Promise<AIToolExecutionResult> {
-    this.ensureInitialized();
+    ToolRegistry.ensureInitialized();
 
-    // Check if user has permission
-    const endpoint = super.getEndpointByToolName(context.toolName);
+    const endpoint = endpoints.find((e) => e.toolName === context.toolName);
     if (!endpoint) {
       return {
         success: false,
@@ -208,7 +161,12 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
       };
     }
 
-    if (!super.hasPermission(endpoint, context.user)) {
+    const hasPermission = toolFilter.hasEndpointPermission(
+      endpoint,
+      context.user,
+      Platform.AI,
+    );
+    if (!hasPermission) {
       return {
         success: false,
         error:
@@ -225,68 +183,64 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
   }
 
   /**
-   * Get registry statistics
+   * Get statistics
    */
-  getStats(): ToolRegistryStats {
-    const allEndpoints = super.getEndpoints();
+  static getStats(): ToolRegistryStats {
+    const toolsByCategory: Record<string, number> = {};
+    const toolsByRole: Record<string, number> = {};
 
-    // Use shared counting utility
-    const toolsByCategory = this.countByKey(
-      allEndpoints,
-      (e) => e.definition.category,
-    );
-    const toolsByRole = this.countByKey(allEndpoints, (e) =>
-      Array.isArray(e.definition?.allowedRoles)
-        ? e.definition.allowedRoles
-        : null,
-    );
+    for (const endpoint of endpoints) {
+      const category = endpoint.definition.category;
+      if (category) {
+        toolsByCategory[category] = (toolsByCategory[category] || 0) + 1;
+      }
 
-    // All endpoints are dynamic (from generated endpoints)
-    const dynamicTools = allEndpoints.length;
-    const manualTools = 0;
+      if (Array.isArray(endpoint.definition?.allowedRoles)) {
+        for (const role of endpoint.definition.allowedRoles) {
+          toolsByRole[role] = (toolsByRole[role] || 0) + 1;
+        }
+      }
+    }
 
     return {
-      totalEndpoints: allEndpoints.length,
-      totalTools: allEndpoints.length,
+      totalEndpoints: endpoints.length,
+      totalTools: endpoints.length,
       toolsByCategory,
       toolsByRole,
-      manualTools,
-      dynamicTools,
+      manualTools: 0,
+      dynamicTools: endpoints.length,
       cacheStats: {
-        size: allEndpoints.length,
-        hits: this.cacheStats.hits,
-        misses: this.cacheStats.misses,
-        lastRefresh: this.cacheStats.lastRefresh,
+        size: endpoints.length,
+        hits: cacheStats.hits,
+        misses: cacheStats.misses,
+        lastRefresh: cacheStats.lastRefresh,
       },
-      lastRefresh: this.cacheStats.lastRefresh,
-      initialized: this.initialized,
+      lastRefresh: cacheStats.lastRefresh,
+      initialized,
     };
   }
 
   /**
    * Clear cache
    */
-  clearCache(): void {
-    this.cacheStats.hits = 0;
-    this.cacheStats.misses = 0;
+  static clearCache(): void {
+    cacheStats.hits = 0;
+    cacheStats.misses = 0;
   }
 
   /**
-   * Ensure registry is initialized
+   * Ensure initialized
    */
-  protected ensureInitialized(): void {
-    if (!this.initialized) {
-      void this.initialize();
+  private static ensureInitialized(): void {
+    if (!initialized) {
+      void ToolRegistry.initialize();
     }
   }
 }
 
-export const getToolRegistry = createSingletonGetter(() => new ToolRegistry());
-export const aiToolRegistry = getToolRegistry();
-
-// Initialize on module load
+// Initialize on load
 try {
-  void aiToolRegistry.initialize();
+  void ToolRegistry.initialize();
 } catch {
   // Will retry on first access
 }

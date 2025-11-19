@@ -110,7 +110,7 @@ export class StdioTransport implements IMCPTransport {
       process.stdout.write(`${json}\n`);
     } catch (error) {
       this.logger.error("[MCP Transport] Failed to send message", {
-        error: error instanceof Error ? error.message : String(error),
+        error: parseError(error).message,
       });
       // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Re-throw transport errors for caller to handle
       throw error;

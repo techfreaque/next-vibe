@@ -9,7 +9,7 @@ import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/conf
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { ThreadList } from "./thread-list";
 import { FolderItem } from "./folder-item";
 import { groupThreadsByTime } from "./folder-list-helpers";

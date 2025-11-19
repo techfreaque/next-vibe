@@ -61,17 +61,17 @@ export interface DefaultFolderConfig {
 
   /** Default permission roles for folders in this root folder */
   /** Roles that can view/read this folder and its contents */
-  rolesView: (typeof UserRoleValue)[];
+  rolesView: UserRoleValue[];
   /** Roles that can edit folder and create subfolders */
-  rolesManage: (typeof UserRoleValue)[];
+  rolesManage: UserRoleValue[];
   /** Roles that can create threads in this folder */
-  rolesCreateThread: (typeof UserRoleValue)[];
+  rolesCreateThread: UserRoleValue[];
   /** Roles that can post messages in threads */
-  rolesPost: (typeof UserRoleValue)[];
+  rolesPost: UserRoleValue[];
   /** Roles that can moderate/hide content in this folder */
-  rolesModerate: (typeof UserRoleValue)[];
+  rolesModerate: UserRoleValue[];
   /** Roles that can delete content and manage permissions */
-  rolesAdmin: (typeof UserRoleValue)[];
+  rolesAdmin: UserRoleValue[];
 }
 
 /**

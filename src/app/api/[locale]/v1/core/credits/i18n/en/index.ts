@@ -58,6 +58,9 @@ export const translations = {
     not_implemented_on_native:
       "{{method}} is not implemented on native platform. Please use the web version for this operation.",
     expireCreditsFailed: "Failed to expire credits",
+    invalidAmount: "Credit amount must be a positive number",
+    walletNotFound: "Wallet not found",
+    walletCreationFailed: "Failed to create wallet",
   },
   get: {
     title: "Get Credit Balance",

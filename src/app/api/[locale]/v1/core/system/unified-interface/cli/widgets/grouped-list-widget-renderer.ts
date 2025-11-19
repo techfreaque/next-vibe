@@ -625,7 +625,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
         continue;
       }
 
-      const parts = categoryPath.split("/").filter((p) => p.length > 0);
+      const parts = categoryPath.split("/").filter((p) => p.length);
       let currentNode = root;
 
       // Build/traverse tree
@@ -670,7 +670,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     );
 
     // Render this node's items first if any
-    if (node.items.length > 0 && depth > 0) {
+    if (node.items.length && depth > 0) {
       // Calculate total count including children
       const totalCount = this.countItemsRecursive(node);
       const itemText = `${totalCount} item${totalCount !== 1 ? "s" : ""}`;
@@ -710,7 +710,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
       const childNode = childEntry[1];
       const childOutput = this.renderTreeNode(
         childNode,
-        depth + (node.items.length > 0 ? 1 : 0),
+        depth + (node.items.length ? 1 : 0),
         config,
         context,
       );

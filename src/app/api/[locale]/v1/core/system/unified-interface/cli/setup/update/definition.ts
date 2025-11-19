@@ -32,7 +32,7 @@ const { POST } = createEndpoint({
   category:
     "app.api.v1.core.system.unifiedInterface.cli.setup.update.post.title",
   tags: ["app.api.v1.core.system.unifiedInterface.cli.setup.update.post.title"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN],
   aliases: ["update", "setup:update"],
   method: Methods.POST,
   path: ["v1", "core", "system", "setup", "update"],

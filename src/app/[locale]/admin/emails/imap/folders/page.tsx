@@ -11,7 +11,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { ImapFoldersManagement } from "../_components/imap-folders-management";
+import { ImapFoldersManagement } from "@/app/api/[locale]/v1/core/emails/imap-client/_components/imap-folders-management";
 
 interface ImapFoldersPageProps {
   params: Promise<{

@@ -11,7 +11,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,

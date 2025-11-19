@@ -8,13 +8,14 @@ import "server-only";
 
 import { tool } from "ai";
 import { z } from "zod";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { generateSchemaForUsage } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import { FieldUsage } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { Platform } from "../shared/server-only/config";
+import { Platform } from "../shared/types/platform";
 import type {
   AIToolExecutionContext,
   CoreTool,
@@ -286,7 +287,7 @@ export class ToolFactory {
       context.logger.error("[Tool Factory] Failed to create tool", {
         toolName: endpoint.toolName,
         endpointId: endpoint.id,
-        error: error instanceof Error ? error.message : String(error),
+        error: parseError(error).message,
       });
       throw error;
     }
@@ -387,7 +388,7 @@ export class ToolFactory {
           "[Tool Factory] Skipping tool with invalid schema",
           {
             toolName: endpoint.toolName,
-            error: error instanceof Error ? error.message : String(error),
+            error: parseError(error).message,
           },
         );
       }

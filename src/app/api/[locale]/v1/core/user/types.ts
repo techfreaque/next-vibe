@@ -83,7 +83,7 @@ export type ExtendedUserDetailLevel =
  */
 export interface UserFetchOptions {
   includeInactive?: boolean;
-  roles?: (typeof UserRoleValue)[keyof typeof UserRoleValue][];
+  roles?: UserRoleValue[keyof UserRoleValue][];
   detailLevel?: UserDetailLevelType;
 }
 
@@ -115,7 +115,7 @@ export type ExtendedUserType<
 export interface UserSearchOptions {
   limit?: number;
   offset?: number;
-  roles?: (typeof UserRoleValue)[keyof typeof UserRoleValue][];
+  roles?: UserRoleValue[keyof UserRoleValue][];
 }
 
 const definitions = {};

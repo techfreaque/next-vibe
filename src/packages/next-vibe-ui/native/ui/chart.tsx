@@ -191,6 +191,7 @@ type VictoryPropsType = Record<
   | string
   | number
   | boolean
+  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Chart library type definition requires generic object type for flexible configuration
   | object
   | React.ReactNode
   | React.ReactElement
@@ -283,10 +284,18 @@ export function Chart({
   }
   const { CartesianChart } = components;
   const chartProps: VictoryPropsType = { children };
-  if (width !== undefined) chartProps.width = width;
-  if (height !== undefined) chartProps.height = height;
-  if (padding !== undefined) chartProps.padding = padding;
-  if (domainPadding !== undefined) chartProps.domainPadding = domainPadding;
+  if (width !== undefined) {
+    chartProps.width = width;
+  }
+  if (height !== undefined) {
+    chartProps.height = height;
+  }
+  if (padding !== undefined) {
+    chartProps.padding = padding;
+  }
+  if (domainPadding !== undefined) {
+    chartProps.domainPadding = domainPadding;
+  }
   return <CartesianChart {...chartProps} />;
 }
 
@@ -310,18 +319,42 @@ export function Line({
   }
   const { Line: VictoryLine } = components;
   const lineProps: VictoryPropsType = {};
-  if (data !== undefined) lineProps.data = data;
-  if (x !== undefined) lineProps.x = x;
-  if (y !== undefined) lineProps.y = y;
-  if (interpolation !== undefined) lineProps.interpolation = interpolation;
-  if (animate !== undefined) lineProps.animate = animate;
-  if (style !== undefined) lineProps.style = style;
-  if (labels !== undefined) lineProps.labels = labels;
-  if (domain !== undefined) lineProps.domain = domain;
-  if (scale !== undefined) lineProps.scale = scale;
-  if (samples !== undefined) lineProps.samples = samples;
-  if (sortKey !== undefined) lineProps.sortKey = sortKey;
-  if (sortOrder !== undefined) lineProps.sortOrder = sortOrder;
+  if (data !== undefined) {
+    lineProps.data = data;
+  }
+  if (x !== undefined) {
+    lineProps.x = x;
+  }
+  if (y !== undefined) {
+    lineProps.y = y;
+  }
+  if (interpolation !== undefined) {
+    lineProps.interpolation = interpolation;
+  }
+  if (animate !== undefined) {
+    lineProps.animate = animate;
+  }
+  if (style !== undefined) {
+    lineProps.style = style;
+  }
+  if (labels !== undefined) {
+    lineProps.labels = labels;
+  }
+  if (domain !== undefined) {
+    lineProps.domain = domain;
+  }
+  if (scale !== undefined) {
+    lineProps.scale = scale;
+  }
+  if (samples !== undefined) {
+    lineProps.samples = samples;
+  }
+  if (sortKey !== undefined) {
+    lineProps.sortKey = sortKey;
+  }
+  if (sortOrder !== undefined) {
+    lineProps.sortOrder = sortOrder;
+  }
   return <VictoryLine {...lineProps} />;
 }
 
@@ -340,13 +373,27 @@ export function Bar({
   }
   const { Bar: VictoryBar } = components;
   const barProps: VictoryPropsType = {};
-  if (data !== undefined) barProps.data = data;
-  if (x !== undefined) barProps.x = x;
-  if (y !== undefined) barProps.y = y;
-  if (animate !== undefined) barProps.animate = animate;
-  if (barWidth !== undefined) barProps.barWidth = barWidth;
-  if (style !== undefined) barProps.style = style;
-  if (labels !== undefined) barProps.labels = labels;
+  if (data !== undefined) {
+    barProps.data = data;
+  }
+  if (x !== undefined) {
+    barProps.x = x;
+  }
+  if (y !== undefined) {
+    barProps.y = y;
+  }
+  if (animate !== undefined) {
+    barProps.animate = animate;
+  }
+  if (barWidth !== undefined) {
+    barProps.barWidth = barWidth;
+  }
+  if (style !== undefined) {
+    barProps.style = style;
+  }
+  if (labels !== undefined) {
+    barProps.labels = labels;
+  }
   return <VictoryBar {...barProps} />;
 }
 
@@ -368,16 +415,36 @@ export function Area({
   }
   const { Area: VictoryArea } = components;
   const areaProps: VictoryPropsType = {};
-  if (data !== undefined) areaProps.data = data;
-  if (x !== undefined) areaProps.x = x;
-  if (y !== undefined) areaProps.y = y;
-  if (y0 !== undefined) areaProps.y0 = y0;
-  if (interpolation !== undefined) areaProps.interpolation = interpolation;
-  if (animate !== undefined) areaProps.animate = animate;
-  if (style !== undefined) areaProps.style = style;
-  if (labels !== undefined) areaProps.labels = labels;
-  if (domain !== undefined) areaProps.domain = domain;
-  if (scale !== undefined) areaProps.scale = scale;
+  if (data !== undefined) {
+    areaProps.data = data;
+  }
+  if (x !== undefined) {
+    areaProps.x = x;
+  }
+  if (y !== undefined) {
+    areaProps.y = y;
+  }
+  if (y0 !== undefined) {
+    areaProps.y0 = y0;
+  }
+  if (interpolation !== undefined) {
+    areaProps.interpolation = interpolation;
+  }
+  if (animate !== undefined) {
+    areaProps.animate = animate;
+  }
+  if (style !== undefined) {
+    areaProps.style = style;
+  }
+  if (labels !== undefined) {
+    areaProps.labels = labels;
+  }
+  if (domain !== undefined) {
+    areaProps.domain = domain;
+  }
+  if (scale !== undefined) {
+    areaProps.scale = scale;
+  }
   return <VictoryArea {...areaProps} />;
 }
 

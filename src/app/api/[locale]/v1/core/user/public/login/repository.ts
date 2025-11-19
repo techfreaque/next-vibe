@@ -20,7 +20,7 @@ import { verifyPassword } from "next-vibe/shared/utils/password";
 import { leadAuthRepository } from "@/app/api/[locale]/v1/core/leads/auth/repository";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
