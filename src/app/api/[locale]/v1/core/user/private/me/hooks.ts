@@ -83,7 +83,6 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
     error,
   } = useApiQuery({
     endpoint: meEndpoints.GET,
-    requestData: undefined, // GET /me has no request data
     logger,
     options: {
       enabled: queryEnabled, // Enable based on auth status

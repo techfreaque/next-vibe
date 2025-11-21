@@ -160,7 +160,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.folders.get.response.folders.folder.userId.content" as const,
               },
-              z.uuid(),
+              z.uuid().nullable(),
             ),
             rootFolderId: responseField(
               {

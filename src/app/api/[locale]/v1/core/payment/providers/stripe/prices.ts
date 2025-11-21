@@ -71,12 +71,15 @@ export class StripePriceManager {
         modelCount: TOTAL_MODEL_COUNT,
       });
 
-      logger.debug("Creating Stripe price", {
+      logger.info("Creating Stripe price with locale-adjusted pricing", {
         productId,
-        country,
+        requestedCountry: country,
+        derivedCountryFromLocale: product.country,
+        locale,
         interval,
         price: product.price,
         currency: product.currency,
+        unitAmountCents: Math.round(product.price * 100),
       });
 
       // Create Stripe Product

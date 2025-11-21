@@ -152,10 +152,12 @@ export class ChatFoldersRepositoryImpl
             canManageFolderPermissions(user, folder, logger, folderMap),
           ]);
 
-          // Skip folders without userId - they shouldn't exist in this context
-          if (!folder.userId) {
-            logger.warn("Folder has null userId, skipping", {
+          // System folders (PUBLIC root categories) can have null userId
+          // Only skip if it's not a PUBLIC folder
+          if (!folder.userId && folder.rootFolderId !== DefaultFolderId.PUBLIC) {
+            logger.warn("Folder has null userId in non-PUBLIC root, skipping", {
               folderId: folder.id,
+              rootFolderId: folder.rootFolderId,
             });
             return null;
           }
