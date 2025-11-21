@@ -70,7 +70,7 @@ export function useApiQuery<
         responseData: TEndpoint["TResponseOutput"];
         requestData: TEndpoint["TRequestOutput"];
         urlPathParams: TEndpoint["TUrlVariablesOutput"];
-      }) => void | ErrorResponseType;
+      }) => void | ErrorResponseType | Promise<void | ErrorResponseType>;
       onError?: ({
         error,
         requestData,
@@ -79,7 +79,7 @@ export function useApiQuery<
         error: ErrorResponseType;
         requestData: TEndpoint["TRequestOutput"];
         urlPathParams: TEndpoint["TUrlVariablesOutput"];
-      }) => void;
+      }) => void | Promise<void>;
       refetchOnWindowFocus?: boolean;
       retry?: number;
       initialData?: TEndpoint["TResponseOutput"];

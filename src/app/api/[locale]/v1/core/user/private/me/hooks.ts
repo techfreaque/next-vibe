@@ -9,7 +9,6 @@ import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { useEffect } from "react";
 
@@ -70,9 +69,6 @@ export interface UseUserReturn {
 }
 
 export function useUser(logger: EndpointLogger): UseUserReturn {
-  const { toast } = useToast();
-  const { t } = useTranslation();
-
   const [queryEnabled, setQueryEnabled] = useCustomState(
     queryEnabledKey,
     false,
@@ -91,31 +87,19 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
     logger,
     options: {
       enabled: queryEnabled, // Enable based on auth status
-      onError: ({ error }: { error: ErrorResponseType }) => {
-        // Only show toast for client errors, not connection errors
-        // as those are already handled by the hooks
-        // Suppress toast for unauthorized errors (403) when JWT token contains non-existent user ID
-        if (error.errorType === ErrorResponseTypes.UNAUTHORIZED) {
-          return;
-        }
-        toast({
-          title: t("app.common.error.title"),
-          description: error.message,
-          variant: "destructive",
-        });
+      onError: async ({ error }) => {
+        logger.error("Failed to fetch user data", error);
+        await authClientRepository.removeAuthStatus(logger);
       },
-      onSuccess: () => {
-        // Set auth status when user data is successfully fetched
-        void (async (): Promise<void> => {
-          const authStatusResult =
-            await authClientRepository.setAuthStatus(logger);
-          if (!authStatusResult.success) {
-            logger.error("user.auth.status.set.failed", {
-              message: authStatusResult.message,
-              errorCode: authStatusResult.errorType.errorCode,
-            });
-          }
-        })();
+      onSuccess: async () => {
+        const authStatusResult =
+          await authClientRepository.setAuthStatus(logger);
+        if (!authStatusResult.success) {
+          logger.error("user.auth.status.set.failed", {
+            message: authStatusResult.message,
+            errorCode: authStatusResult.errorType.errorCode,
+          });
+        }
       },
     },
   });

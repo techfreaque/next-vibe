@@ -6,6 +6,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { enableDebugLogger } from "@/config/debug";
 import type { TranslationKey } from "@/i18n/core/static-types";
+import type { ErrorResponseType } from "../../../../shared/types/response.schema";
 
 /**
  * Logger metadata - structured data for logging
@@ -18,6 +19,7 @@ export type LoggerMetadata =
   | undefined
   | Error
   | Date
+  | ErrorResponseType
   | { [key: string]: LoggerMetadata }
   | LoggerMetadata[];
 

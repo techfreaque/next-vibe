@@ -83,7 +83,6 @@ export class DatabaseMigrationRepositoryImpl
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateResponseType>> {
     const startTime = Date.now();
-    const { t } = simpleT(locale);
 
     try {
       // Generate migrations if requested
@@ -99,9 +98,11 @@ export class DatabaseMigrationRepositoryImpl
         }
 
         if (generateResult.status !== 0) {
-          const errorOutput = generateResult.stderr || generateResult.stdout || "Unknown error";
+          const errorOutput =
+            generateResult.stderr || generateResult.stdout || "Unknown error";
           return fail({
-            message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
+            message:
+              "app.api.v1.core.system.db.migrate.post.errors.network.title",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
               error: `Generation failed with exit code ${generateResult.status}: ${errorOutput}`,
@@ -124,25 +125,24 @@ export class DatabaseMigrationRepositoryImpl
 
       // Use drizzle-kit push for direct schema sync
       logger.info("Running migrations using drizzle-kit push");
-      const pushResult = spawnSync(
-        "bunx",
-        ["drizzle-kit", "push", "--force"],
-        {
-          encoding: "utf8",
-          cwd: process.cwd(),
-        },
-      );
+      const pushResult = spawnSync("bunx", ["drizzle-kit", "push", "--force"], {
+        encoding: "utf8",
+        cwd: process.cwd(),
+      });
 
       if (pushResult.error) {
         throw pushResult.error;
       }
 
-      const output = [pushResult.stdout, pushResult.stderr].filter(Boolean).join("\n");
+      const output = [pushResult.stdout, pushResult.stderr]
+        .filter(Boolean)
+        .join("\n");
 
       if (pushResult.status !== 0) {
         logger.error("Migration failed", { output });
         return fail({
-          message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
+          message:
+            "app.api.v1.core.system.db.migrate.post.errors.network.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: `Migration failed with exit code ${pushResult.status}`,
@@ -177,7 +177,6 @@ export class DatabaseMigrationRepositoryImpl
       });
     }
   }
-
 
   /**
    * Repair migration tracking (merged from migrate-repair.ts)
