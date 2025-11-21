@@ -279,13 +279,30 @@ export class SchemaUIHandler {
           default: field.defaultValue?.toString(),
           validate: field.validation
             ? (inputStr): string | boolean => {
-                const num = parseFloat(inputStr);
-                if (isNaN(num)) {
-                  return String(num);
+                // First check if it's a valid number format
+                const trimmed = inputStr.trim();
+                if (trimmed === "" && !field.required) {
+                  return true; // Allow empty for optional fields
                 }
-                return this.validateField(num, field.validation!);
+                const num = parseFloat(trimmed);
+                if (isNaN(num)) {
+                  return "Please enter a valid number";
+                }
+                // Validate the parsed NUMBER against the schema
+                const validationResult = this.validateField(num, field.validation!);
+                return validationResult;
               }
-            : undefined,
+            : (inputStr): string | boolean => {
+                const trimmed = inputStr.trim();
+                if (trimmed === "" && !field.required) {
+                  return true;
+                }
+                const num = parseFloat(trimmed);
+                if (isNaN(num)) {
+                  return "Please enter a valid number";
+                }
+                return true;
+              },
         });
         const num = parseFloat(inputValue);
         value = isNaN(num) ? undefined : num;

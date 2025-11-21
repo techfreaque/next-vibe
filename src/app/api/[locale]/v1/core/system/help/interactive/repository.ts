@@ -116,27 +116,45 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       this.logger.info("");
 
       // Build route tree for file explorer navigation
-      // Convert endpoints object to array of DiscoveredRoute
+      // Convert nested endpoints object to array of DiscoveredRoute
       const routesArray: DiscoveredRoute[] = [];
-      for (const [key, apiSection] of Object.entries(endpoints)) {
-        // Extract the actual endpoint data from ApiSection
-        const methods = Object.keys(apiSection).filter(k =>
-          ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(k)
-        );
 
-        for (const method of methods) {
-          const endpoint = apiSection[method];
-          if (endpoint) {
-            routesArray.push({
-              alias: key,
-              path: `/api/[locale]/v1/${key}`,
-              method: method,
-              routePath: key,
-              description: typeof endpoint.description === 'string' ? endpoint.description : undefined,
-            });
+      // Helper function to recursively extract routes from nested structure
+      const extractRoutes = (obj: any, pathParts: string[] = []): void => {
+        for (const [key, value] of Object.entries(obj)) {
+          if (!value || typeof value !== 'object') continue;
+
+          // Check if this is an API section (has HTTP methods)
+          const methods = Object.keys(value).filter(k =>
+            ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(k)
+          );
+
+          if (methods.length > 0) {
+            // This is an endpoint - extract route info
+            const fullPath = [...pathParts, key].join('/');
+            for (const method of methods) {
+              const endpoint = value[method];
+              if (endpoint && endpoint.path) {
+                const pathArray = Array.isArray(endpoint.path) ? endpoint.path : [endpoint.path];
+                const routePath = pathArray.join('/');
+
+                routesArray.push({
+                  alias: endpoint.aliases?.[0] || fullPath,
+                  path: `/api/[locale]/${routePath}`,
+                  method: method,
+                  routePath: fullPath,
+                  description: typeof endpoint.description === 'string' ? endpoint.description : undefined,
+                });
+              }
+            }
+          } else {
+            // Continue traversing nested structure
+            extractRoutes(value, [...pathParts, key]);
           }
         }
-      }
+      };
+
+      extractRoutes(endpoints);
 
       this.buildRouteTree(routesArray);
 

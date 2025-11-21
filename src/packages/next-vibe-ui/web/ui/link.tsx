@@ -18,9 +18,18 @@ export function Link({
   className,
   children,
   href,
+  target,
+  rel,
+  onClick,
 }: LinkProps): React.JSX.Element {
   return (
-    <NextLink className={className} href={href}>
+    <NextLink
+      className={className}
+      href={href}
+      target={target}
+      rel={rel}
+      onClick={onClick}
+    >
       {children}
     </NextLink>
   );

@@ -46,19 +46,21 @@ function hasInteractiveChildren(children: ReactNode): boolean {
   return hasInteractive;
 }
 
-export function Link({ className, children, href }: LinkProps): JSX.Element {
-  const textClassName = cn(
-    "text-primary underline-offset-4 active:underline",
-    className,
-  );
-
+export function Link({
+  className,
+  children,
+  href,
+  target,
+  rel,
+  onClick,
+}: LinkProps): JSX.Element {
   // If children contain interactive elements, use View instead of Text
   const useView = hasInteractiveChildren(children);
 
   if (useView) {
     return (
-      <ExpoLink href={href} asChild>
-        <StyledView className={cn(textClassName, "self-start")}>
+      <ExpoLink href={href} asChild target={target} rel={rel} onPress={onClick}>
+        <StyledView className={cn(className, "self-start")}>
           {children}
         </StyledView>
       </ExpoLink>
@@ -66,8 +68,8 @@ export function Link({ className, children, href }: LinkProps): JSX.Element {
   }
 
   return (
-    <ExpoLink href={href}>
-      <StyledText className={textClassName}>{children}</StyledText>
+    <ExpoLink href={href} target={target} rel={rel} onPress={onClick}>
+      <StyledText className={className}>{children}</StyledText>
     </ExpoLink>
   );
 }
